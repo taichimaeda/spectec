@@ -106,8 +106,8 @@ let rec render_def (d : def) =
     begin match deftyp.it with
     | AliasT ty ->
       "type " ^ render_type_name id ^ " = " ^ render_typ ty
-    | NotationT (_op, ty) ->
-      "type " ^ render_type_name id ^ " = " ^ render_typ ty
+    | NotationT (mop, ty) ->
+      "type " ^ render_type_name id ^ " = {- mixop: " ^ Il.Print.string_of_mixop mop ^ " -} " ^ render_typ ty
     | VariantT (ids, cases) ->
       "data " ^ render_type_name id ^ prepend "\n = " "\n | " (
         List.map (render_variant_inj_case id) ids @
