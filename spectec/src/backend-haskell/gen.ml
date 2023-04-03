@@ -1,5 +1,7 @@
 open Il.Ast
 
+let include_input = true
+
 let parens s = "(" ^ s ^ ")"
 let ($$) s1 s2 = parens (s1 ^ " " ^ s2)
 let render_tuple how tys = parens (String.concat ", " (List.map how tys))
@@ -92,9 +94,13 @@ let render_clause (id : id) (clause : clause) = match clause.it with
    id.it ^ " " ^ render_exp lhs ^ " = " ^ render_exp rhs
 
 let rec render_def (d : def) =
-  "{- " (*  ^ Util.Source.string_of_region d.at ^ "\n"*)  ^
-  Il.Print.string_of_def d ^
-  "\n-}\n" ^
+  begin
+    if include_input then
+    "{- " (*  ^ Util.Source.string_of_region d.at ^ "\n"*)  ^
+    Il.Print.string_of_def d ^
+    "\n-}\n"
+    else ""
+  end ^
   match d.it with
   | SynD (id, deftyp, _hints) ->
     begin match deftyp.it with
