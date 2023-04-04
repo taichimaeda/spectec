@@ -4,6 +4,7 @@ let include_input = true
 
 let parens s = "(" ^ s ^ ")"
 let brackets s = "[" ^ s ^ "]"
+let braces s = "{" ^ s ^ "}"
 let ($$) s1 s2 = parens (s1 ^ " " ^ s2)
 let render_tuple how tys = parens (String.concat ", " (List.map how tys))
 let render_list how tys = brackets (String.concat ", " (List.map how tys))
@@ -12,9 +13,15 @@ let render_type_name (id : id) = String.capitalize_ascii id.it
 
 (* let render_rec_con (id : id) = "Mk" ^ render_type_name id *)
 
+let is_reserved = function
+ | "in"
+ | "export"
+ | "import"
+ -> true
+ | _ -> false
+
 let make_id s = match s with
- | "in" -> "in_"
- | "export" -> "export_"
+ | s when is_reserved s -> "«" ^ s ^ "»"
  | s -> String.map (function
     | '.' -> '_'
     | '-' -> '_'
@@ -79,7 +86,7 @@ let render_variant_case id ((a, ty, _hints) : typcase) =
   else render_typ ty ^ " -> " ^ render_type_name id
 
 let rec render_exp (exp : exp) = match exp.it with
-  | VarE v -> v.it
+  | VarE v -> render_id v
   | BoolE true -> "True"
   | BoolE false -> "Frue"
   | NatE n -> string_of_int n
@@ -91,12 +98,21 @@ let rec render_exp (exp : exp) = match exp.it with
   | OptE (Some e) -> "some" $$ render_exp e
   | IterE (e, _) -> render_exp e
   | CaseE (a, e, typ, styps) -> render_case a e typ styps
+  | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
+    render_field_name a ^ " := " ^ render_exp e
+    ) fields))
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
   | DotE (e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
+  | LenE e -> render_exp e ^ ".length"
   | BinE (AddOp, e1, e2) -> "Nat.add" $$ render_exp e1 $$ render_exp e2 ^
                             " /- TODO: Why does + not work -/"
   | CmpE (EqOp, e1, e2) -> (render_exp e1 ^ " = " ^ render_exp e2)
+  | CmpE (NeOp, e1, e2) -> (render_exp e1 ^ " != " ^ render_exp e2)
+  | CmpE (LeOp, e1, e2) -> (render_exp e1 ^ " <= " ^ render_exp e2)
+  | CmpE (LtOp, e1, e2) -> (render_exp e1 ^ " < " ^ render_exp e2)
+  | CmpE (GeOp, e1, e2) -> (render_exp e1 ^ " >= " ^ render_exp e2)
+  | CmpE (GtOp, e1, e2) -> (render_exp e1 ^ " > " ^ render_exp e2)
   (* CompE can compose records piecewise
   | CompE (e1, e2) -> (render_exp e1 ^ " ++ " ^ render_exp e2)
   *)
