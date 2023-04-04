@@ -1,6 +1,6 @@
 open Il.Ast
 
-let include_input = true
+let include_input = false
 
 let parens s = "(" ^ s ^ ")"
 let brackets s = "[" ^ s ^ "]"
@@ -111,9 +111,9 @@ let rec render_exp (exp : exp) = match exp.it with
   | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)
   | BinE (DivOp, e1, e2)   -> parens ("Nat.div" $$ render_exp e1 $$ render_exp e2)
   | BinE (AndOp, e1, e2)   -> parens (render_exp e1 ^ " && "  ^ render_exp e2)
-  | BinE (EquivOp, e1, e2) -> parens (render_exp e1 ^ " <=> " ^ render_exp e2)
+  | BinE (EquivOp, e1, e2) -> parens (render_exp e1 ^ " = "   ^ render_exp e2)
   | BinE (OrOp, e1, e2)    -> parens (render_exp e1 ^ " || "  ^ render_exp e2)
-  | CmpE (EqOp, e1, e2)    -> parens (render_exp e1 ^ " = "   ^ render_exp e2)
+  | CmpE (EqOp, e1, e2)    -> parens (render_exp e1 ^ " == "  ^ render_exp e2)
   | CmpE (NeOp, e1, e2)    -> parens (render_exp e1 ^ " != "  ^ render_exp e2)
   | CmpE (LeOp, e1, e2)    -> parens (render_exp e1 ^ " <= "  ^ render_exp e2)
   | CmpE (LtOp, e1, e2)    -> parens (render_exp e1 ^ " < "   ^ render_exp e2)
@@ -156,7 +156,7 @@ let rec render_def (d : def) =
         List.map (render_variant_inj_case id) ids @
         List.map (render_variant_case id) cases
       ) ^
-      (if ids = [] && cases = [] then "" else "\n  deriving Inhabited")
+      (if ids = [] && cases = [] then "\n  deriving BEq" else "\n  deriving Inhabited, BEq")
     | StructT fields ->
       (*
       "type " ^ render_type_name id ^ " = " ^ render_tuple render_typ (
@@ -167,7 +167,7 @@ let rec render_def (d : def) =
       String.concat "" ( List.map (fun (a, ty, _hints) ->
         "\n  " ^ render_field_name a ^ " : " ^ render_typ ty
       ) fields) ^
-      "\n  deriving Inhabited\n" ^
+      "\n  deriving Inhabited, BEq\n" ^
       "instance : Append " ^ render_type_name id ^ " where\n" ^
       "  append := fun r1 r2 => {\n" ^
       String.concat "" (List.map (fun (a, _ty, _hints) ->
@@ -203,8 +203,14 @@ let rec render_def (d : def) =
           "\n    " ^ (render_type_name id $$ render_exp exp)
     ) rules)
 
+  | RecD [def] ->
+    (* Self-recursion is always fine *)
+    render_def def
+
   | RecD defs ->
-    String.concat "\n" (List.map render_def defs)
+    "mutual\n" ^
+    String.concat "\n" (List.map render_def defs) ^
+    "end\n"
 
 let render_script (el : script) =
   String.concat "\n\n" (List.map render_def el)
