@@ -87,6 +87,8 @@ let rec render_exp (exp : exp) = match exp.it with
   | MixE (_, e) -> render_exp e
   | TupE es -> render_tuple render_exp es
   | ListE es -> render_list render_exp es
+  | OptE None -> "none"
+  | OptE (Some e) -> "some" $$ render_exp e
   | IterE (e, _) -> render_exp e
   | CaseE (a, e, typ, styps) -> render_case a e typ styps
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
@@ -94,6 +96,10 @@ let rec render_exp (exp : exp) = match exp.it with
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
   | BinE (AddOp, e1, e2) -> "Nat.add" $$ render_exp e1 $$ render_exp e2 ^
                             " /- TODO: Why does + not work -/"
+  | CmpE (EqOp, e1, e2) -> (render_exp e1 ^ " = " ^ render_exp e2)
+  (* CompE can compose records piecewise
+  | CompE (e1, e2) -> (render_exp e1 ^ " ++ " ^ render_exp e2)
+  *)
   | _ -> "default /- " ^ Il.Print.string_of_exp exp ^ " -/"
 
 and render_case a e typ = function
