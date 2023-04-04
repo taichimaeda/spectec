@@ -33,6 +33,9 @@ exe-haskell:
 	dune build $(DUNE_OPTS) $(SRCDIR)/exe-haskell/main.exe
 	ln -sf $(OUTDIR)/exe-haskell/main.exe ./$(NAME)-haskell
 
+exe-lean4:
+	dune build $(DUNE_OPTS) $(SRCDIR)/exe-lean4/main.exe
+	ln -sf $(OUTDIR)/exe-lean4/main.exe ./$(NAME)-lean4
 
 # Latex
 
