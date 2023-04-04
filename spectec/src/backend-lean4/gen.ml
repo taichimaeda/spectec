@@ -42,7 +42,7 @@ let render_con_name qual id : atom -> string = function
   | a -> "/- render_con_name: TODO -/ " ^ Il.Print.string_of_atom a
 
 let render_field_name : atom -> string = function
-  | Atom s -> String.uncapitalize_ascii (make_id s)
+  | Atom s -> make_id s
   | a -> "/- render_field_name: TODO -/ " ^ Il.Print.string_of_atom a
 
 let rec render_typ (ty : typ) = match ty.it with
@@ -105,17 +105,22 @@ let rec render_exp (exp : exp) = match exp.it with
   | DotE (e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
   | LenE e -> render_exp e ^ ".length"
-  | BinE (AddOp, e1, e2) -> "Nat.add" $$ render_exp e1 $$ render_exp e2 ^
-                            " /- TODO: Why does + not work -/"
-  | CmpE (EqOp, e1, e2) -> (render_exp e1 ^ " = " ^ render_exp e2)
-  | CmpE (NeOp, e1, e2) -> (render_exp e1 ^ " != " ^ render_exp e2)
-  | CmpE (LeOp, e1, e2) -> (render_exp e1 ^ " <= " ^ render_exp e2)
-  | CmpE (LtOp, e1, e2) -> (render_exp e1 ^ " < " ^ render_exp e2)
-  | CmpE (GeOp, e1, e2) -> (render_exp e1 ^ " >= " ^ render_exp e2)
-  | CmpE (GtOp, e1, e2) -> (render_exp e1 ^ " > " ^ render_exp e2)
-  (* CompE can compose records piecewise
-  | CompE (e1, e2) -> (render_exp e1 ^ " ++ " ^ render_exp e2)
-  *)
+  | CallE (id, e) -> render_id id $$ render_exp e
+  | BinE (AddOp, e1, e2)   -> parens (render_exp e1 ^ " + " ^ render_exp e2)
+  | BinE (SubOp, e1, e2)   -> parens (render_exp e1 ^ " - " ^ render_exp e2)
+  | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)
+  | BinE (DivOp, e1, e2)   -> parens ("Nat.div" $$ render_exp e1 $$ render_exp e2)
+  | BinE (AndOp, e1, e2)   -> parens (render_exp e1 ^ " && "  ^ render_exp e2)
+  | BinE (EquivOp, e1, e2) -> parens (render_exp e1 ^ " <=> " ^ render_exp e2)
+  | BinE (OrOp, e1, e2)    -> parens (render_exp e1 ^ " || "  ^ render_exp e2)
+  | CmpE (EqOp, e1, e2)    -> parens (render_exp e1 ^ " = "   ^ render_exp e2)
+  | CmpE (NeOp, e1, e2)    -> parens (render_exp e1 ^ " != "  ^ render_exp e2)
+  | CmpE (LeOp, e1, e2)    -> parens (render_exp e1 ^ " <= "  ^ render_exp e2)
+  | CmpE (LtOp, e1, e2)    -> parens (render_exp e1 ^ " < "   ^ render_exp e2)
+  | CmpE (GeOp, e1, e2)    -> parens (render_exp e1 ^ " >= "  ^ render_exp e2)
+  | CmpE (GtOp, e1, e2)    -> parens (render_exp e1 ^ " > "   ^ render_exp e2)
+  | CatE (e1, e2)          -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
+  | CompE (e1, e2)         -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
   | _ -> "default /- " ^ Il.Print.string_of_exp exp ^ " -/"
 
 and render_case a e typ = function
@@ -130,26 +135,22 @@ let render_clause (_id : id) (clause : clause) = match clause.it with
    (if premise <> [] then "-- Premises ignored! \n" else "") ^
    "\n  | " ^ render_exp lhs ^ " => " ^ render_exp rhs
 
-let rec render_def (d : def) =
-  begin
+let show_input (d:def) =
     if include_input then
     "/- " (*  ^ Util.Source.string_of_region d.at ^ "\n"*)  ^
     Il.Print.string_of_def d ^
     "\n-/\n"
     else ""
-  end ^
+
+let rec render_def (d : def) =
   match d.it with
   | SynD (id, deftyp, _hints) ->
+    show_input d ^
     begin match deftyp.it with
     | AliasT ty ->
-      "def " ^ render_type_name id ^ " := " ^ render_typ ty ^
-      "\n  deriving Inhabited" ^
-      (if ty.it = NatT
-       then "\n\ninstance : OfNat " ^ render_type_name id ^ " n where ofNat := (OfNat.ofNat n : Nat)"
-       else "")
+      "@[reducible] def " ^ render_type_name id ^ " := " ^ render_typ ty 
     | NotationT (mop, ty) ->
-      "def " ^ render_type_name id ^ " := /- mixop: " ^ Il.Print.string_of_mixop mop ^ " -/ " ^ render_typ ty ^
-      "\n  deriving Inhabited"
+      "@[reducible] def " ^ render_type_name id ^ " := /- mixop: " ^ Il.Print.string_of_mixop mop ^ " -/ " ^ render_typ ty 
     | VariantT (ids, cases) ->
       "inductive " ^ render_type_name id ^ " where" ^ prepend "\n | " "\n | " (
         List.map (render_variant_inj_case id) ids @
@@ -166,15 +167,23 @@ let rec render_def (d : def) =
       String.concat "" ( List.map (fun (a, ty, _hints) ->
         "\n  " ^ render_field_name a ^ " : " ^ render_typ ty
       ) fields) ^
-      "\n  deriving Inhabited"
+      "\n  deriving Inhabited\n" ^
+      "instance : Append " ^ render_type_name id ^ " where\n" ^
+      "  append := fun r1 r2 => {\n" ^
+      String.concat "" (List.map (fun (a, _ty, _hints) ->
+        "    " ^ render_field_name a ^ " := r1." ^ render_field_name a ^ " ++ r2." ^ render_field_name a ^ ",\n"
+      ) fields) ^
+      "  }"
     end
   | DecD (id, typ1, typ2, clauses, hints) ->
+    show_input d ^
     "def " ^ id.it ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
     String.concat "" (List.map (render_clause id) clauses) ^
     (if (List.exists (fun h -> h.hintid.it = "partial") hints)
     then "\n  | _ => default" else "") (* Could use no_error_if_unused% as well *)
 
   | RelD (id, _mixop, typ, rules, _hints) ->
+    show_input d ^
     "inductive " ^ render_type_name id ^ " : " ^ render_typ typ ^ " -> Prop where" ^
     String.concat "" (List.mapi (fun i (rule : rule) -> match rule.it with
       | RuleD (rule_id, binds, _mixop, exp, prems) ->
@@ -188,7 +197,7 @@ let rec render_def (d : def) =
           | RulePr (pid, _mixops, pexp, _iter) ->
             render_type_name pid $$ render_exp pexp
           | IffPr (pexp, _iter) -> render_exp pexp
-          | ElsePr -> "/- Else? -?"
+          | ElsePr -> "True /- Else? -/"
           end ^ " -> "
         ) prems) ^
           "\n    " ^ (render_type_name id $$ render_exp exp)
@@ -201,7 +210,9 @@ let render_script (el : script) =
   String.concat "\n\n" (List.map render_def el)
 
 let gen_string (el : script) =
-  "/- Lean 4 export -/\n" ^
+  "/- Lean 4 export -/\n\n" ^
+  "instance : Append (Option a) where\n" ^
+  "  append := fun o1 o2 => match o1 with | none => o2 | _ => o1\n\n" ^
   render_script el
 
 
