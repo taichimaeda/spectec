@@ -29,11 +29,11 @@ jobs:
         with:
           ghc-version: 9.2
       - name: Setup Lean
-        uses: engineerd/configurator@v0.0.9
-        with:
-          name: lean
-          url: https://github.com/leanprover/lean4-nightly/releases/download/nightly-2023-02-10/lean-4.0.0-nightly-2023-02-10-linux.tar.zst
-          pathInArchive: lean-4.0.0-nightly-2023-02-10-linux/bin/lean
+        run: |
+          cd /tmp
+          curl -O https://github.com/leanprover/lean4-nightly/releases/download/nightly-2023-02-10/lean-4.0.0-nightly-2023-02-10-linux.tar.zst
+          tar xaf lean-4.0.0-nightly-2023-02-10-linux.tar.zst
+          echo "/tmp/lean-4.0.0-nightly-2023-02-10-linux/bin" >> $GITHUB_PATH
       - name: Setup Dune
         run: opam install --yes dune menhir mdx
       - name: Setup Latex
