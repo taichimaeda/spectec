@@ -1000,12 +1000,12 @@ inductive Step : (Config × Config) -> Prop where
   | pure (instr : Instr) (instr' : Instr) (z : State) :
     (Step_pure ((Admininstr.Instr instr), (Admininstr.Instr instr'))) ->
     (Step ((z, (Admininstr.Instr instr)), (z, (Admininstr.Instr instr'))))
-$ lake build |& sed -e 's,/[^ ]*/toolchains,.../toolchains`,g'
+$ lake build |& sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,'
 Building SpecTec
 error: > LEAN_PATH=./build/lib LD_LIBRARY_PATH=.../toolchains`/leanprover--lean4---nightly-2023-02-10/lib:/etc/sane-libs:./build/lib .../toolchains`/leanprover--lean4---nightly-2023-02-10/bin/lean ./././SpecTec.lean -R ././. -o ./build/lib/SpecTec.olean -i ./build/lib/SpecTec.ilean -c ./build/ir/SpecTec.c
 error: stdout:
-./././SpecTec.lean:284:4: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
-./././SpecTec.lean:371:21: error: application type mismatch
+./././SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1013,51 +1013,51 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:422:6: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   none
 has type
   Option ?m.72695 : Type ?u.72694
 but is expected to have type
   N : Type
-./././SpecTec.lean:422:28: error: unknown constant 'Numtype.In'
-./././SpecTec.lean:428:6: error: type mismatch
+./././SpecTec.lean: error: unknown constant 'Numtype.In'
+./././SpecTec.lean: error: type mismatch
   none
 has type
   Option ?m.73266 : Type ?u.73265
 but is expected to have type
   N : Type
-./././SpecTec.lean:428:28: error: unknown constant 'Numtype.In'
-./././SpecTec.lean:499:33: error: unknown constant 'Numtype.Fn'
-./././SpecTec.lean:499:67: error: unknown constant 'Numtype.Fn'
-./././SpecTec.lean:499:96: error: unknown constant 'Valtype.Fn'
-./././SpecTec.lean:499:117: error: unknown constant 'Valtype.Fn'
-./././SpecTec.lean:502:6: error: type mismatch
+./././SpecTec.lean: error: unknown constant 'Numtype.In'
+./././SpecTec.lean: error: unknown constant 'Numtype.Fn'
+./././SpecTec.lean: error: unknown constant 'Numtype.Fn'
+./././SpecTec.lean: error: unknown constant 'Valtype.Fn'
+./././SpecTec.lean: error: unknown constant 'Valtype.Fn'
+./././SpecTec.lean: error: type mismatch
   none
 has type
   Option ?m.75279 : Type ?u.75278
 but is expected to have type
   Sx : Type
-./././SpecTec.lean:502:28: error: unknown constant 'Valtype.In'
-./././SpecTec.lean:502:55: error: unknown constant 'Valtype.In'
-./././SpecTec.lean:503:33: error: unknown constant 'Numtype.In'
-./././SpecTec.lean:503:67: error: unknown constant 'Numtype.In'
-./././SpecTec.lean:503:94: error: unknown constant 'Valtype.In'
-./././SpecTec.lean:503:115: error: unknown constant 'Valtype.In'
-./././SpecTec.lean:523:5: error: type mismatch
+./././SpecTec.lean: error: unknown constant 'Valtype.In'
+./././SpecTec.lean: error: unknown constant 'Valtype.In'
+./././SpecTec.lean: error: unknown constant 'Numtype.In'
+./././SpecTec.lean: error: unknown constant 'Numtype.In'
+./././SpecTec.lean: error: unknown constant 'Valtype.In'
+./././SpecTec.lean: error: unknown constant 'Valtype.In'
+./././SpecTec.lean: error: type mismatch
   (t_1, t_2)
 has type
   Valtype × Valtype : Type
 but is expected to have type
   Functype : Type
-./././SpecTec.lean:524:51: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype (List Valtype) ?m.76541
-./././SpecTec.lean:526:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   (t_1, t_2)
 has type
   Valtype × Valtype : Type
 but is expected to have type
   Functype : Type
-./././SpecTec.lean:527:35: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1065,15 +1065,15 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:529:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   some t
 has type
   Option Valtype : Type
 but is expected to have type
   Option Resulttype : Type
-./././SpecTec.lean:530:34: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.77852
-./././SpecTec.lean:532:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t
 argument
   t
@@ -1081,7 +1081,7 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:533:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t
 argument
   t
@@ -1089,7 +1089,7 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:534:35: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk l
 argument
   l
@@ -1097,25 +1097,25 @@ has type
   Labelidx : Type
 but is expected to have type
   List Labelidx : Type
-./././SpecTec.lean:534:46: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.78399
-./././SpecTec.lean:536:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   t
 has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:537:37: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype (List Valtype) ?m.79015
-./././SpecTec.lean:539:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   t
 has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:540:34: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.79533
-./././SpecTec.lean:542:27: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1123,7 +1123,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:543:146: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr_1
 argument
   instr_1
@@ -1131,7 +1131,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:543:156: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1139,7 +1139,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:543:122: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   List.cons t_2
 argument
   t_2
@@ -1147,7 +1147,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:544:146: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr_2
 argument
   instr_2
@@ -1155,7 +1155,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:544:156: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1163,7 +1163,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:545:33: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr_1
 argument
   instr_1
@@ -1171,7 +1171,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:545:54: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1179,7 +1179,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:544:122: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   List.cons t_2
 argument
   t_2
@@ -1187,7 +1187,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:547:27: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1195,7 +1195,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:548:146: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1203,7 +1203,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:548:154: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1211,7 +1211,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:549:35: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (bt, instr)
 argument
   instr
@@ -1219,7 +1219,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:549:45: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1227,7 +1227,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:548:122: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   List.cons t_1
 argument
   t_1
@@ -1235,7 +1235,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:551:27: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1243,7 +1243,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:552:146: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1251,7 +1251,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:552:154: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1259,7 +1259,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:553:36: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (bt, instr)
 argument
   instr
@@ -1267,7 +1267,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:553:46: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1275,7 +1275,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:552:122: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   List.cons t_2
 argument
   t_2
@@ -1283,7 +1283,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:565:38: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1291,7 +1291,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:568:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1299,7 +1299,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:568:29: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1307,7 +1307,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:569:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1315,11 +1315,11 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:569:30: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.81846
-./././SpecTec.lean:569:42: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.82047
-./././SpecTec.lean:571:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1327,7 +1327,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:571:29: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1335,7 +1335,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:572:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t'_1
 argument
   t'_1
@@ -1343,7 +1343,7 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:573:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_2
 argument
   t_2
@@ -1351,7 +1351,7 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:574:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1359,7 +1359,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:574:37: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   ([t'_1], t'_2)
 argument
   t'_2
@@ -1367,7 +1367,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:576:28: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1375,7 +1375,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:577:33: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_2
 argument
   t_2
@@ -1383,9 +1383,9 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:578:22: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend (List Instr) Instr ?m.83395
-./././SpecTec.lean:578:46: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t_1
 argument
   t_1
@@ -1393,7 +1393,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:585:21: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1401,7 +1401,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:585:33: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   ([], t)
 argument
   t
@@ -1409,7 +1409,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:586:17: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr
 argument
   instr
@@ -1417,7 +1417,7 @@ has type
   Instr : Type
 but is expected to have type
   Expr : Type
-./././SpecTec.lean:602:20: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
   instr
@@ -1425,13 +1425,13 @@ has type
   Instr : Type
 but is expected to have type
   Expr : Type
-./././SpecTec.lean:612:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   (t_1, t_2)
 has type
   Valtype × Valtype : Type
 but is expected to have type
   Functype : Type
-./././SpecTec.lean:614:406: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (expr, t_2)
 argument
   t_2
@@ -1439,7 +1439,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:615:22: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk t
 argument
   t
@@ -1447,9 +1447,9 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-./././SpecTec.lean:614:107: error: failed to synthesize instance
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Valtype Valtype ?m.101807
-./././SpecTec.lean:614:249: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   List.cons t_2
 argument
   t_2
@@ -1457,7 +1457,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:614:392: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   some t_2
 argument
   t_2
@@ -1465,7 +1465,7 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-./././SpecTec.lean:646:22: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk expr
 argument
   expr
@@ -1473,7 +1473,7 @@ has type
   Expr : Type
 but is expected to have type
   List Expr : Type
-./././SpecTec.lean:657:18: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk b
 argument
   b
@@ -1481,45 +1481,45 @@ has type
   Byte : Type
 but is expected to have type
   List (List Byte) : Type
-./././SpecTec.lean:697:19: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   ft
 has type
   Functype : Type
 but is expected to have type
   List Functype : Type
-./././SpecTec.lean:698:5: error: invalid field 'length', the environment does not contain 'Mem.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Mem.length'
   mem
 has type
   Mem
-./././SpecTec.lean:698:5: error: invalid field 'length', the environment does not contain 'Memtype.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Memtype.length'
   mem
 has type
   Memtype
-./././SpecTec.lean:698:5: error: invalid field 'length', the environment does not contain 'Limits.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Limits.length'
   mem
 has type
   Limits
-./././SpecTec.lean:698:5: error: invalid field 'length', the environment does not contain 'Prod.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Prod.length'
   mem
 has type
   U32 × U32
-./././SpecTec.lean:699:5: error: invalid field 'length', the environment does not contain 'Start.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Start.length'
   start
 has type
   Start
-./././SpecTec.lean:699:5: error: invalid field 'length', the environment does not contain 'Funcidx.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Funcidx.length'
   start
 has type
   Funcidx
-./././SpecTec.lean:699:5: error: invalid field 'length', the environment does not contain 'Idx.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
   start
 has type
   Idx
-./././SpecTec.lean:699:5: error: invalid field 'length', the environment does not contain 'Nat.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
   start
 has type
   Nat
-./././SpecTec.lean:700:16: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk import
 argument
   import
@@ -1527,7 +1527,7 @@ has type
   Import : Type
 but is expected to have type
   List Import : Type
-./././SpecTec.lean:700:26: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk func
 argument
   func
@@ -1535,7 +1535,7 @@ has type
   Func : Type
 but is expected to have type
   List Func : Type
-./././SpecTec.lean:700:32: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk global
 argument
   global
@@ -1543,7 +1543,7 @@ has type
   Global : Type
 but is expected to have type
   List Global : Type
-./././SpecTec.lean:700:42: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk table
 argument
   table
@@ -1551,7 +1551,7 @@ has type
   Table : Type
 but is expected to have type
   List Table : Type
-./././SpecTec.lean:700:49: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk mem
 argument
   mem
@@ -1559,7 +1559,7 @@ has type
   Mem : Type
 but is expected to have type
   List Mem : Type
-./././SpecTec.lean:700:54: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk elem
 argument
   elem
@@ -1567,7 +1567,7 @@ has type
   Elem : Type
 but is expected to have type
   List Elem : Type
-./././SpecTec.lean:700:60: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk data
 argument
   data
@@ -1575,7 +1575,7 @@ has type
   Data : Type
 but is expected to have type
   List Data : Type
-./././SpecTec.lean:700:66: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk start
 argument
   start
@@ -1583,33 +1583,33 @@ has type
   Start : Type
 but is expected to have type
   List Start : Type
-./././SpecTec.lean:832:5: warning: unused variable `s` [linter.unusedVariables]
-./././SpecTec.lean:835:8: warning: unused variable `f` [linter.unusedVariables]
-./././SpecTec.lean:840:4: error: expected identifier
-./././SpecTec.lean:840:10: error: expected 'elab', 'elab_rules', 'infix', 'infixl', 'infixr', 'instance', 'macro', 'macro_rules', 'notation', 'postfix', 'prefix', 'syntax' or 'unif_hint'
-./././SpecTec.lean:853:9: warning: unused variable `f` [linter.unusedVariables]
-./././SpecTec.lean:853:13: warning: unused variable `x` [linter.unusedVariables]
-./././SpecTec.lean:853:16: warning: unused variable `v` [linter.unusedVariables]
-./././SpecTec.lean:856:6: warning: unused variable `s` [linter.unusedVariables]
-./././SpecTec.lean:856:13: warning: unused variable `x` [linter.unusedVariables]
-./././SpecTec.lean:856:16: warning: unused variable `v` [linter.unusedVariables]
-./././SpecTec.lean:859:6: warning: unused variable `s` [linter.unusedVariables]
-./././SpecTec.lean:859:13: warning: unused variable `x` [linter.unusedVariables]
-./././SpecTec.lean:859:16: warning: unused variable `i` [linter.unusedVariables]
-./././SpecTec.lean:859:19: warning: unused variable `r` [linter.unusedVariables]
-./././SpecTec.lean:869:10: error: invalid field 'length', the environment does not contain 'Labelidx.length'
+./././SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
+./././SpecTec.lean: error: expected identifier
+./././SpecTec.lean: error: expected 'elab', 'elab_rules', 'infix', 'infixl', 'infixr', 'instance', 'macro', 'macro_rules', 'notation', 'postfix', 'prefix', 'syntax' or 'unif_hint'
+./././SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `v` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `v` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
+./././SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Labelidx.length'
   l
 has type
   Labelidx
-./././SpecTec.lean:869:10: error: invalid field 'length', the environment does not contain 'Idx.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
   l
 has type
   Idx
-./././SpecTec.lean:869:10: error: invalid field 'length', the environment does not contain 'Nat.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
   l
 has type
   Nat
-./././SpecTec.lean:870:103: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk l
 argument
   l
@@ -1617,19 +1617,19 @@ has type
   Labelidx : Type
 but is expected to have type
   List Labelidx : Type
-./././SpecTec.lean:872:9: error: invalid field 'length', the environment does not contain 'Labelidx.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Labelidx.length'
   l
 has type
   Labelidx
-./././SpecTec.lean:872:9: error: invalid field 'length', the environment does not contain 'Idx.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
   l
 has type
   Idx
-./././SpecTec.lean:872:9: error: invalid field 'length', the environment does not contain 'Nat.length'
+./././SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
   l
 has type
   Nat
-./././SpecTec.lean:873:103: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk l
 argument
   l
@@ -1637,19 +1637,19 @@ has type
   Labelidx : Type
 but is expected to have type
   List Labelidx : Type
-./././SpecTec.lean:873:144: error: invalid field 'get!', the environment does not contain 'Labelidx.get!'
+./././SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Labelidx.get!'
   l
 has type
   Labelidx
-./././SpecTec.lean:873:144: error: invalid field 'get!', the environment does not contain 'Idx.get!'
+./././SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Idx.get!'
   l
 has type
   Idx
-./././SpecTec.lean:873:144: error: invalid field 'get!', the environment does not contain 'Nat.get!'
+./././SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Nat.get!'
   l
 has type
   Nat
-./././SpecTec.lean:881:40: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr'
 argument
   instr'
@@ -1657,11 +1657,11 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:881:50: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:881:74: error: failed to synthesize instance
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend (List Admininstr) Admininstr ?m.130319
-./././SpecTec.lean:881:150: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:883:40: error: application type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr'
 argument
   instr'
@@ -1669,12 +1669,12 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:883:50: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:883:76: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:883:100: error: failed to synthesize instance
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend (List Admininstr) Admininstr ?m.130708
-./././SpecTec.lean:883:171: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:886:101: error: application type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr_1
 argument
   instr_1
@@ -1682,7 +1682,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:886:160: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (bt, instr_2)
 argument
   instr_2
@@ -1690,7 +1690,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:889:101: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk instr_1
 argument
   instr_1
@@ -1698,7 +1698,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:889:160: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (bt, instr_1)
 argument
   instr_1
@@ -1706,14 +1706,14 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:891:5: error: type mismatch
+./././SpecTec.lean: error: type mismatch
   (t_1, t_2)
 has type
   Valtype × Valtype : Type
 but is expected to have type
   Blocktype : Type
-./././SpecTec.lean:892:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:892:77: error: application type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: application type mismatch
   (bt, instr)
 argument
   instr
@@ -1721,7 +1721,7 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:892:131: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (bt, instr)
 argument
   instr
@@ -1729,15 +1729,15 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:892:143: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:894:5: error: type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: type mismatch
   (t_1, t_2)
 has type
   Valtype × Valtype : Type
 but is expected to have type
   Blocktype : Type
-./././SpecTec.lean:895:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:895:78: error: application type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: application type mismatch
   (bt, instr)
 argument
   instr
@@ -1745,29 +1745,29 @@ has type
   Instr : Type
 but is expected to have type
   List Instr : Type
-./././SpecTec.lean:895:120: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:897:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:897:82: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:897:104: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:900:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:900:42: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:900:156: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:903:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:903:42: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:903:156: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:905:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:912:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:915:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:919:5: error: type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: type mismatch
   (m, (t_1, t_2), t, instr)
 has type
   Moduleinst × (Valtype × Valtype) × Valtype × Instr : Type
 but is expected to have type
   Funcinst : Type
-./././SpecTec.lean:920:22: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:920:110: error: failed to synthesize instance
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: failed to synthesize instance
   HAppend Val Val ?m.134041
-./././SpecTec.lean:920:174: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   ([], Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1775,20 +1775,20 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:932:281: error: unknown constant 'Admininstr.Ref'
-./././SpecTec.lean:953:73: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:953:247: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:953:366: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:956:73: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:959:73: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:965:116: error: unknown constant 'Admininstr.Ref'
-./././SpecTec.lean:970:66: error: unknown constant 'Admininstr.Globalinst'
-./././SpecTec.lean:972:65: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:979:74: error: unknown constant 'Admininstr.Ref'
-./././SpecTec.lean:982:74: error: unknown constant 'Admininstr.Ref'
-./././SpecTec.lean:984:23: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:986:23: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:990:21: error: application type mismatch
+./././SpecTec.lean: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Globalinst'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1796,7 +1796,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:990:53: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z', Admininstr.Instr instr')
 argument
   Admininstr.Instr instr'
@@ -1804,7 +1804,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:991:15: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1812,7 +1812,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:991:47: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z', Admininstr.Instr instr')
 argument
   Admininstr.Instr instr'
@@ -1820,7 +1820,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:993:20: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1828,7 +1828,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:994:15: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1836,7 +1836,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:994:46: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr')
 argument
   Admininstr.Instr instr'
@@ -1844,7 +1844,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:996:16: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   Prod.mk (Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1852,7 +1852,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:997:15: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr)
 argument
   Admininstr.Instr instr
@@ -1860,7 +1860,7 @@ has type
   Admininstr : Type
 but is expected to have type
   List Admininstr : Type
-./././SpecTec.lean:997:46: error: application type mismatch
+./././SpecTec.lean: error: application type mismatch
   (z, Admininstr.Instr instr')
 argument
   Admininstr.Instr instr'
