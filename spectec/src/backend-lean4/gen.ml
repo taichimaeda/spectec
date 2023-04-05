@@ -80,17 +80,15 @@ let rec prepend first rest = function
   | (x::xs) -> first ^ x ^ prepend rest rest xs
 
 
-let render_variant_inj qual id1 id2 =
-  (if qual then render_type_name id1 ^ "." else "" ) ^
-  render_type_name id2
+let render_variant_inj (id1 : id) (id2 : id) =
+  make_id (id1.it ^ "_" ^ id2.it)
 
 let render_variant_inj' (typ1 : typ) (typ2 : typ) = match typ1.it, typ2.it with
-  | VarT id1, VarT id2 -> render_variant_inj true id1 id2
+  | VarT id1, VarT id2 -> render_variant_inj id1 id2
   | _, _ -> "_ {- render_variant_inj': Typs not ids -}"
 
-let render_variant_inj_case id1 id2 =
-  render_variant_inj false id1 id2 ^ " : " ^
-  render_type_name id2 ^ " -> " ^ render_type_name id1
+let render_variant_inj_case _id1 _id2 =
+  "/- Incomplete Ir.Flat.transform? -/"
 
 let render_variant_case id ((a, ty, _hints) : typcase) =
   render_con_name false id a ^ " : " ^

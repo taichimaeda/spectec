@@ -57,6 +57,19 @@ data Valtype
  | Valtype_EXTERNREF
  | Valtype_BOT
 
+valtype_numtype :: Numtype -> Valtype
+valtype_numtype Numtype_I32 = Valtype_I32
+valtype_numtype Numtype_I64 = Valtype_I64
+valtype_numtype Numtype_F32 = Valtype_F32
+valtype_numtype Numtype_F64 = Valtype_F64
+
+valtype_vectype :: Vectype -> Valtype
+valtype_vectype Vectype_V128 = Valtype_V128
+
+valtype_reftype :: Reftype -> Valtype
+valtype_reftype Reftype_FUNCREF = Valtype_FUNCREF
+valtype_reftype Reftype_EXTERNREF = Valtype_EXTERNREF
+
 data In
  = In_I32
  | In_I64
@@ -391,6 +404,14 @@ data Val
  | Val_REF_FUNC_ADDR Funcaddr
  | Val_REF_HOST_ADDR Hostaddr
 
+val_num :: Num -> Val
+val_num (Num_CONST x) = (Val_CONST x)
+
+val_ref :: Ref -> Val
+val_ref (Ref_REF_NULL x) = (Val_REF_NULL x)
+val_ref (Ref_REF_FUNC_ADDR x) = (Val_REF_FUNC_ADDR x)
+val_ref (Ref_REF_HOST_ADDR x) = (Val_REF_HOST_ADDR x)
+
 data Result
  = Result_VALS [Val]
  | Result_TRAP
@@ -500,6 +521,52 @@ data Admininstr
  | Admininstr_LABEL_ (N, [Instr], [Admininstr])
  | Admininstr_FRAME_ (N, Frame, [Admininstr])
  | Admininstr_TRAP
+
+admininstr_instr :: Instr -> Admininstr
+admininstr_instr Instr_UNREACHABLE = Admininstr_UNREACHABLE
+admininstr_instr Instr_NOP = Admininstr_NOP
+admininstr_instr Instr_DROP = Admininstr_DROP
+admininstr_instr (Instr_SELECT x) = (Admininstr_SELECT x)
+admininstr_instr (Instr_BLOCK x) = (Admininstr_BLOCK x)
+admininstr_instr (Instr_LOOP x) = (Admininstr_LOOP x)
+admininstr_instr (Instr_IF x) = (Admininstr_IF x)
+admininstr_instr (Instr_BR x) = (Admininstr_BR x)
+admininstr_instr (Instr_BR_IF x) = (Admininstr_BR_IF x)
+admininstr_instr (Instr_BR_TABLE x) = (Admininstr_BR_TABLE x)
+admininstr_instr (Instr_CALL x) = (Admininstr_CALL x)
+admininstr_instr (Instr_CALL_INDIRECT x) = (Admininstr_CALL_INDIRECT x)
+admininstr_instr Instr_RETURN = Admininstr_RETURN
+admininstr_instr (Instr_CONST x) = (Admininstr_CONST x)
+admininstr_instr (Instr_UNOP x) = (Admininstr_UNOP x)
+admininstr_instr (Instr_BINOP x) = (Admininstr_BINOP x)
+admininstr_instr (Instr_TESTOP x) = (Admininstr_TESTOP x)
+admininstr_instr (Instr_RELOP x) = (Admininstr_RELOP x)
+admininstr_instr (Instr_EXTEND x) = (Admininstr_EXTEND x)
+admininstr_instr (Instr_CVTOP x) = (Admininstr_CVTOP x)
+admininstr_instr (Instr_REF_NULL x) = (Admininstr_REF_NULL x)
+admininstr_instr (Instr_REF_FUNC x) = (Admininstr_REF_FUNC x)
+admininstr_instr Instr_REF_IS_NULL = Admininstr_REF_IS_NULL
+admininstr_instr (Instr_LOCAL_GET x) = (Admininstr_LOCAL_GET x)
+admininstr_instr (Instr_LOCAL_SET x) = (Admininstr_LOCAL_SET x)
+admininstr_instr (Instr_LOCAL_TEE x) = (Admininstr_LOCAL_TEE x)
+admininstr_instr (Instr_GLOBAL_GET x) = (Admininstr_GLOBAL_GET x)
+admininstr_instr (Instr_GLOBAL_SET x) = (Admininstr_GLOBAL_SET x)
+admininstr_instr (Instr_TABLE_GET x) = (Admininstr_TABLE_GET x)
+admininstr_instr (Instr_TABLE_SET x) = (Admininstr_TABLE_SET x)
+admininstr_instr (Instr_TABLE_SIZE x) = (Admininstr_TABLE_SIZE x)
+admininstr_instr (Instr_TABLE_GROW x) = (Admininstr_TABLE_GROW x)
+admininstr_instr (Instr_TABLE_FILL x) = (Admininstr_TABLE_FILL x)
+admininstr_instr (Instr_TABLE_COPY x) = (Admininstr_TABLE_COPY x)
+admininstr_instr (Instr_TABLE_INIT x) = (Admininstr_TABLE_INIT x)
+admininstr_instr (Instr_ELEM_DROP x) = (Admininstr_ELEM_DROP x)
+admininstr_instr Instr_MEMORY_SIZE = Admininstr_MEMORY_SIZE
+admininstr_instr Instr_MEMORY_GROW = Admininstr_MEMORY_GROW
+admininstr_instr Instr_MEMORY_FILL = Admininstr_MEMORY_FILL
+admininstr_instr Instr_MEMORY_COPY = Admininstr_MEMORY_COPY
+admininstr_instr (Instr_MEMORY_INIT x) = (Admininstr_MEMORY_INIT x)
+admininstr_instr (Instr_DATA_DROP x) = (Admininstr_DATA_DROP x)
+admininstr_instr (Instr_LOAD x) = (Admininstr_LOAD x)
+admininstr_instr (Instr_STORE x) = (Admininstr_STORE x)
 
 type Config = {- mixop: `%;%` -} (State, [Admininstr])
 

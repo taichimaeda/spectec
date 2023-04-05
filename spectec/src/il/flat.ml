@@ -41,33 +41,44 @@ let register_cons (env : env) (id :id) (cases : typcase list) =
   else
     env.variants <- Env.add id.it cases env.variants
 
-let rec transform_def env (def : def) : def = match def.it with
+let rec transform_def_rec env (def : def) : def * (def list) = match def.it with
   | RecD defs ->
-    { def with it = RecD (List.map (transform_def env) defs) }
+    let defs', new_defs = List.split (List.map (transform_def_rec env) defs) in
+    { def with it = RecD defs' },  List.concat new_defs
   | SynD (id, deftyp, hints) ->
     begin match deftyp.it with
     | VariantT (ids, cases) ->
       let cases' = List.concat_map (lookup_cons env) ids @ cases in
       register_cons env id cases';
-      { def with it = SynD (id, { deftyp with it = VariantT ([], cases') }, hints) }
-    | _ -> def
+      { def with it = SynD (id, { deftyp with it = VariantT ([], cases') }, hints) },
+      (* Also generate conversion functions *)
+      List.map (fun sid ->
+        let name = (id.it ^ "_" ^ sid.it) $ no_region in
+        let ty = VarT id $ no_region in
+        let sty = VarT sid $ no_region in
+        let clauses = List.map (fun (a, arg_typ, _hints) ->
+          if arg_typ.it = TupT []
+          then DefD ([],
+                CaseE (a, TupE [] $ no_region, sty) $ no_region,
+                CaseE (a, TupE [] $ no_region, ty) $ no_region, []) $ no_region
+          else
+            let x = "x" $ no_region in
+            DefD ([(x, arg_typ, [])],
+                CaseE (a, VarE x $ no_region, sty) $ no_region,
+                CaseE (a, VarE x $ no_region, ty) $ no_region, []) $ no_region
+        ) (lookup_cons env sid) in
+        DecD (name, VarT sid $ no_region, VarT id $ no_region, clauses, []) $ no_region
+      ) ids
+    | _ -> def, []
     end
-  (* Giving up on this translation
-  | DecD  (id, ty1, ty2, clauses, hints) -> 
-    let clauses' = List.concat_map (fun clause ->
-      match clause.it with
-      | DefD ([(id1, ty1, [])],
-              {it = SubE ({it = VarE id2} as ide, ty2, ty3)} as lhs,
-              rhs, []) when id1.it = id2.it and Eq.eq_typ t1 t2 ->
-        (* This clause has to be duplicated *)
-        (* Lets assume nullary constructors only *)
-        List.map (fun con ->
-          { clause with it = DefD ([], { lhs with it = CaseE (con, 
-   *)
-  | _ ->  
-  def (* TODO: look inside *)
+  | _ ->
+  def, [] (* TODO: look inside *)
+
+and transform_def env (def : def) : def list =
+  let def', new_defs = transform_def_rec env def in
+  def' :: new_defs
 
 let transform (defs : script) =
   let env = new_env () in
-  List.map (transform_def env) defs
+  List.concat_map (transform_def env) defs
 
