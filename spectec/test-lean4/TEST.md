@@ -892,10 +892,10 @@ def funcinst : State -> (List Funcinst)
 def func : (State × Funcidx) -> Funcinst
   | ((s, f), x) => (s.FUNC.get! (f.MODULE.FUNC.get! x))
 
-def local : (State × Localidx) -> Val
+def «local» : (State × Localidx) -> Val
   | ((s, f), x) => (f.LOCAL.get! x)
 
-def global : (State × Globalidx) -> Globalinst
+def «global» : (State × Globalidx) -> Globalinst
   | ((s, f), x) => (s.GLOBAL.get! (f.MODULE.GLOBAL.get! x))
 
 def table : (State × Tableidx) -> Tableinst
@@ -1313,8 +1313,7 @@ but is expected to have type
   List Datatype : Type
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
-SpecTec.lean: error: expected identifier
-SpecTec.lean: error: expected 'elab', 'elab_rules', 'infix', 'infixl', 'infixr', 'instance', 'macro', 'macro_rules', 'notation', 'postfix', 'prefix', 'syntax' or 'unif_hint'
+SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `v` [linter.unusedVariables]
@@ -1361,7 +1360,7 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.172081
+  HAppend (List Val) Val ?m.172363
 SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'

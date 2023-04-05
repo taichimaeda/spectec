@@ -191,7 +191,7 @@ let rec render_def (d : def) =
     end
   | DecD (id, typ1, typ2, clauses, hints) ->
     show_input d ^
-    "def " ^ id.it ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
+    "def " ^ render_id id ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
     String.concat "" (List.map (render_clause id) clauses) ^
     (if (List.exists (fun h -> h.hintid.it = "partial") hints)
     then "\n  | _ => default" else "") (* Could use no_error_if_unused% as well *)
