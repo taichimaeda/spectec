@@ -128,7 +128,7 @@ def $with_table((s; f), x, i, r) = s[.TABLE[f.MODULE.TABLE[x]][i]=r]; f
 
 ;; Administrative Instructions
 
-syntax admininstr hint(show instr) hint(desc "administrative instruction") =
+syntax admininstr hint(show instr) hint(desc "administrative instruction") hint(subtype val) hint(subtype ref) =
   | instr
   | REF.FUNC_ADDR funcaddr         hint(show REF.FUNC %)
   | REF.HOST_ADDR hostaddr         hint(show REF.EXTERN %)

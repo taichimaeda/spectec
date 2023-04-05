@@ -52,6 +52,9 @@ let rec transform_def_rec env (def : def) : def * (def list) = match def.it with
       register_cons env id cases';
       { def with it = SynD (id, { deftyp with it = VariantT ([], cases') }, hints) },
       (* Also generate conversion functions *)
+      let sids = ids @ List.concat_map (fun {hintid; hintexp} ->
+          if hintid.it = "subtype" then List.map (fun s -> s $ no_region) hintexp else []
+      ) hints in
       List.map (fun sid ->
         let name = (id.it ^ "_" ^ sid.it) $ no_region in
         let ty = VarT id $ no_region in
@@ -68,7 +71,7 @@ let rec transform_def_rec env (def : def) : def * (def list) = match def.it with
                 CaseE (a, VarE x $ no_region, ty) $ no_region, []) $ no_region
         ) (lookup_cons env sid) in
         DecD (name, VarT sid $ no_region, VarT id $ no_region, clauses, []) $ no_region
-      ) ids
+      ) sids
     | _ -> def, []
     end
   | _ ->

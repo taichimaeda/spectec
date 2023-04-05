@@ -568,6 +568,12 @@ admininstr_instr (Instr_DATA_DROP x) = (Admininstr_DATA_DROP x)
 admininstr_instr (Instr_LOAD x) = (Admininstr_LOAD x)
 admininstr_instr (Instr_STORE x) = (Admininstr_STORE x)
 
+admininstr_val :: Val -> Admininstr
+admininstr_val (Val_CONST x) = (Admininstr_CONST x)
+admininstr_val (Val_REF_NULL x) = (Admininstr_REF_NULL x)
+admininstr_val (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
+admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
+
 type Config = {- mixop: `%;%` -} (State, [Admininstr])
 
 funcaddr :: State -> [Funcaddr]

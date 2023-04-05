@@ -948,6 +948,12 @@ def admininstr_instr : Instr -> Admininstr
   | (Instr.LOAD x) => (Admininstr.LOAD x)
   | (Instr.STORE x) => (Admininstr.STORE x)
 
+def admininstr_val : Val -> Admininstr
+  | (Val.CONST x) => (Admininstr.CONST x)
+  | (Val.REF_NULL x) => (Admininstr.REF_NULL x)
+  | (Val.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
+  | (Val.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
+
 @[reducible] def Config := /- mixop: `%;%` -/ (State × (List Admininstr))
 
 def funcaddr : State -> (List Funcaddr)
@@ -1401,23 +1407,13 @@ SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
 SpecTec.lean: error: application type mismatch
-  admininstr_instr instr
+  admininstr_val val
 argument
-  instr
+  val
 has type
-  List Instr : Type
+  List Val : Type
 but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.175603
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.175212
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.175212
+  Val : Type
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
@@ -1427,7 +1423,51 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.176064
+  HAppend (List Admininstr) Admininstr ?m.175910
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.176117
+SpecTec.lean: error: application type mismatch
+  admininstr_val val'
+argument
+  val'
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.176643
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr'
 argument
@@ -1436,18 +1476,26 @@ has type
   List Instr : Type
 but is expected to have type
   Instr : Type
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.175729
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.175729
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.175729
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.176938
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.177461
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
@@ -1456,14 +1504,26 @@ has type
   List Instr : Type
 but is expected to have type
   Instr : Type
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.176692
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.176692
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.177772
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.178129
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
@@ -1472,62 +1532,18 @@ has type
   List Instr : Type
 but is expected to have type
   Instr : Type
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177230
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177230
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177726
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177726
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177726
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177846
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177846
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.177846
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178009
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178009
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178009
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178135
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178206
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.178286
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.178434
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.179306
 SpecTec.lean: error: application type mismatch
   default_ t
 argument
@@ -1537,7 +1553,7 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.179079
+  HAppend (List Val) Val ?m.179609
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
@@ -1547,61 +1563,25 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: function expected at
-  admininstr_val
+  admininstr_ref
 term has type
-  ?m.178646
+  ?m.180129
 SpecTec.lean: error: function expected at
   admininstr_ref
 term has type
-  ?m.179615
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180815
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180815
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180815
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181036
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181166
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.181369
+  ?m.181676
 SpecTec.lean: error: function expected at
   admininstr_globalinst
 term has type
-  ?m.181504
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181566
+  ?m.181811
 SpecTec.lean: error: function expected at
   admininstr_ref
 term has type
-  ?m.181820
+  ?m.182082
 SpecTec.lean: error: function expected at
   admininstr_ref
 term has type
-  ?m.181937
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182041
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182116
+  ?m.182199
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
