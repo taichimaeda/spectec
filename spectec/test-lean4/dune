@@ -3,6 +3,9 @@
   (deps
     (file ../src/exe-lean4/main.exe)
     (glob_files ../spec/*.watsup)
+    (file lean-toolchain)
+    (file lake-manifest.json)
+    (file lakefile.lean)
   )
   (files TEST.md)
 )
