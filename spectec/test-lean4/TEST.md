@@ -51,9 +51,13 @@ inductive Reftype where
   deriving Inhabited, BEq
 
 inductive Valtype where
- | Numtype : Numtype -> Valtype
- | Vectype : Vectype -> Valtype
- | Reftype : Reftype -> Valtype
+ | I32 : Valtype
+ | I64 : Valtype
+ | F32 : Valtype
+ | F64 : Valtype
+ | V128 : Valtype
+ | FUNCREF : Valtype
+ | EXTERNREF : Valtype
  | BOT : Valtype
   deriving Inhabited, BEq
 
@@ -278,11 +282,11 @@ inductive Externuse where
 @[reducible] def Module := /- mixop: MODULE -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
 
 def size : Valtype -> Nat
-  | (Valtype.Vectype Vectype.V128) => 128
-  | (Valtype.Numtype Numtype.F64) => 64
-  | (Valtype.Numtype Numtype.F32) => 32
-  | (Valtype.Numtype Numtype.I64) => 64
-  | (Valtype.Numtype Numtype.I32) => 32
+  | Valtype.V128 => 128
+  | Valtype.F64 => 64
+  | Valtype.F32 => 32
+  | Valtype.I64 => 64
+  | Valtype.I32 => 32
   | _ => default
 
 def test_sub_ATOM_22 : N -> Nat
@@ -425,58 +429,58 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((((Nat.pow 2) n_A)) <= (((Nat.div (size t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div (size t)) 8)))) ->
     ((n == none) || (nt == (Numtype.In «in»))) ->
-    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype nt)], [])))
+    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, (Valtype.Numtype nt)], [])))
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div (size t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div (size t)) 8)))) ->
     ((n == none) || (nt == (Numtype.In «in»))) ->
-    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([(Valtype.Numtype Numtype.I32)], [(Valtype.Numtype nt)])))
+    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([Valtype.I32], [(Valtype.Numtype nt)])))
   | data_drop (C : Context) (x : Idx) :
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
   | memory_init (C : Context) (mt : Memtype) (x : Idx) :
     ((C.MEM.get! 0) == mt) ->
     ((C.DATA.get! x) == ()) ->
-    (Instr_ok (C, (Instr.MEMORY_INIT x), ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, (Instr.MEMORY_INIT x), ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
   | memory_copy (C : Context) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_COPY, ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, Instr.MEMORY_COPY, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
   | memory_fill (C : Context) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_FILL, ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, Instr.MEMORY_FILL, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
   | memory_grow (C : Context) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_GROW, ([(Valtype.Numtype Numtype.I32)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, Instr.MEMORY_GROW, ([Valtype.I32], [Valtype.I32])))
   | memory_size (C : Context) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_SIZE, ([], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, Instr.MEMORY_SIZE, ([], [Valtype.I32])))
   | elem_drop (C : Context) (rt : Reftype) (x : Idx) :
     ((C.ELEM.get! x) == rt) ->
     (Instr_ok (C, (Instr.ELEM_DROP x), ([], [])))
   | table_init (C : Context) (lim : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
     ((C.TABLE.get! x_1) == (lim, rt)) ->
     ((C.ELEM.get! x_2) == rt) ->
-    (Instr_ok (C, (Instr.TABLE_INIT (x_1, x_2)), ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32)], [])))
+    (Instr_ok (C, (Instr.TABLE_INIT (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
   | table_copy (C : Context) (lim_1 : Limits) (lim_2 : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
     ((C.TABLE.get! x_1) == (lim_1, rt)) ->
     ((C.TABLE.get! x_2) == (lim_2, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_COPY (x_1, x_2)), ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32), (Valtype.Numtype Numtype.I32)], [])))
+    (Instr_ok (C, (Instr.TABLE_COPY (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
   | table_fill (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_FILL x), ([(Valtype.Numtype Numtype.I32), (Valtype.Reftype rt), (Valtype.Numtype Numtype.I32)], [])))
+    (Instr_ok (C, (Instr.TABLE_FILL x), ([Valtype.I32, (Valtype.Reftype rt), Valtype.I32], [])))
   | table_grow (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GROW x), ([(Valtype.Reftype rt), (Valtype.Numtype Numtype.I32)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, (Instr.TABLE_GROW x), ([(Valtype.Reftype rt), Valtype.I32], [Valtype.I32])))
   | table_size (C : Context) (tt : Tabletype) (x : Idx) :
     ((C.TABLE.get! x) == tt) ->
-    (Instr_ok (C, (Instr.TABLE_SIZE x), ([], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, (Instr.TABLE_SIZE x), ([], [Valtype.I32])))
   | table_set (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_SET x), ([(Valtype.Numtype Numtype.I32), (Valtype.Reftype rt)], [])))
+    (Instr_ok (C, (Instr.TABLE_SET x), ([Valtype.I32, (Valtype.Reftype rt)], [])))
   | table_get (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GET x), ([(Valtype.Numtype Numtype.I32)], [(Valtype.Reftype rt)])))
+    (Instr_ok (C, (Instr.TABLE_GET x), ([Valtype.I32], [(Valtype.Reftype rt)])))
   | global_set (C : Context) (t : Valtype) (x : Idx) :
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
@@ -493,10 +497,10 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.LOCAL.get! x) == t) ->
     (Instr_ok (C, (Instr.LOCAL_GET x), ([], [t])))
   | ref_is_null (C : Context) (rt : Reftype) :
-    (Instr_ok (C, Instr.REF_IS_NULL, ([(Valtype.Reftype rt)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, Instr.REF_IS_NULL, ([(Valtype.Reftype rt)], [Valtype.I32])))
   | ref_func (C : Context) (ft : Functype) (x : Idx) :
     ((C.FUNC.get! x) == ft) ->
-    (Instr_ok (C, (Instr.REF_FUNC x), ([], [(Valtype.Reftype Reftype.FUNCREF)])))
+    (Instr_ok (C, (Instr.REF_FUNC x), ([], [Valtype.FUNCREF])))
   | ref_null (C : Context) (rt : Reftype) :
     (Instr_ok (C, (Instr.REF_NULL rt), ([], [(Valtype.Reftype rt)])))
   | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
@@ -514,9 +518,9 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (n <= (size (Valtype.Numtype nt))) ->
     (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(Valtype.Numtype nt)], [(Valtype.Numtype nt)])))
   | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) :
-    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(Valtype.Numtype nt), (Valtype.Numtype nt)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(Valtype.Numtype nt), (Valtype.Numtype nt)], [Valtype.I32])))
   | testop (C : Context) (nt : Numtype) (testop : Testop_numtype) :
-    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(Valtype.Numtype nt)], [(Valtype.Numtype Numtype.I32)])))
+    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(Valtype.Numtype nt)], [Valtype.I32])))
   | binop (C : Context) (binop : Binop_numtype) (nt : Numtype) :
     (Instr_ok (C, (Instr.BINOP (nt, binop)), ([(Valtype.Numtype nt), (Valtype.Numtype nt)], [(Valtype.Numtype nt)])))
   | unop (C : Context) (nt : Numtype) (unop : Unop_numtype) :
@@ -526,7 +530,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
     ((C.TABLE.get! x) == (lim, Reftype.FUNCREF)) ->
     (ft == (t_1, t_2)) ->
-    (Instr_ok (C, (Instr.CALL_INDIRECT (x, ft)), ((t_1 ++ [(Valtype.Numtype Numtype.I32)]), t_2)))
+    (Instr_ok (C, (Instr.CALL_INDIRECT (x, ft)), ((t_1 ++ [Valtype.I32]), t_2)))
   | call (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
     ((C.FUNC.get! x) == (t_1, t_2)) ->
     (Instr_ok (C, (Instr.CALL x), (t_1, t_2)))
@@ -539,7 +543,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
   | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
-    (Instr_ok (C, (Instr.BR_IF l), ((t ++ [(Valtype.Numtype Numtype.I32)]), t)))
+    (Instr_ok (C, (Instr.BR_IF l), ((t ++ [Valtype.I32]), t)))
   | br (C : Context) (l : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
     (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
@@ -559,9 +563,9 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | select_impl (C : Context) (numtype : Numtype) (t : Valtype) (t' : Valtype) (vectype : Vectype) :
     (Valtype_sub (t, t')) ->
     ((t' == (Valtype.Numtype numtype)) || (t' == (Valtype.Vectype vectype))) ->
-    (Instr_ok (C, (Instr.SELECT none), ([t, t, (Valtype.Numtype Numtype.I32)], [t])))
+    (Instr_ok (C, (Instr.SELECT none), ([t, t, Valtype.I32], [t])))
   | select_expl (C : Context) (t : Valtype) :
-    (Instr_ok (C, (Instr.SELECT (some t)), ([t, t, (Valtype.Numtype Numtype.I32)], [t])))
+    (Instr_ok (C, (Instr.SELECT (some t)), ([t, t, Valtype.I32], [t])))
   | drop (C : Context) (t : Valtype) :
     (Instr_ok (C, Instr.DROP, ([t], [])))
   | nop (C : Context) :
@@ -641,7 +645,7 @@ inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
     (Elemmode_ok (C, Elemmode.DECLARE, rt))
   | active (C : Context) (expr : Expr) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Expr_ok_const (C, expr, (Valtype.Numtype Numtype.I32))) /- * -/ ->
+    (Expr_ok_const (C, expr, Valtype.I32)) /- * -/ ->
     (Elemmode_ok (C, (Elemmode.TABLE (x, expr)), rt))
 
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
@@ -653,7 +657,7 @@ inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
 inductive Datamode_ok : (Context × Datamode) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    (Expr_ok_const (C, expr, (Valtype.Numtype Numtype.I32))) /- * -/ ->
+    (Expr_ok_const (C, expr, Valtype.I32)) /- * -/ ->
     (Datamode_ok (C, (Datamode.MEMORY (0, expr))))
 
 inductive Data_ok : (Context × Data) -> Prop where
@@ -733,8 +737,10 @@ inductive Ref where
   deriving Inhabited, BEq
 
 inductive Val where
- | Num : Num -> Val
- | Ref : Ref -> Val
+ | CONST : (Numtype × C_numtype) -> Val
+ | REF_NULL : Reftype -> Val
+ | REF_FUNC_ADDR : Funcaddr -> Val
+ | REF_HOST_ADDR : Hostaddr -> Val
   deriving Inhabited, BEq
 
 inductive Result where
@@ -750,11 +756,12 @@ inductive Externval where
   deriving Inhabited, BEq
 
 def default_ : Valtype -> Val
-  | (Valtype.Reftype rt) => (Val.Ref (Ref.REF_NULL rt))
-  | (Valtype.Numtype Numtype.F64) => (Val.Num (Num.CONST (Numtype.F64, 0)))
-  | (Valtype.Numtype Numtype.F32) => (Val.Num (Num.CONST (Numtype.F32, 0)))
-  | (Valtype.Numtype Numtype.I64) => (Val.Num (Num.CONST (Numtype.I64, 0)))
-  | (Valtype.Numtype Numtype.I32) => (Val.Num (Num.CONST (Numtype.I32, 0)))
+  | Valtype.EXTERNREF => (Val.REF_NULL Reftype.EXTERNREF)
+  | Valtype.FUNCREF => (Val.REF_NULL Reftype.FUNCREF)
+  | Valtype.F64 => (Val.CONST (Numtype.F64, 0))
+  | Valtype.F32 => (Val.CONST (Numtype.F32, 0))
+  | Valtype.I64 => (Val.CONST (Numtype.I64, 0))
+  | Valtype.I32 => (Val.CONST (Numtype.I32, 0))
   | _ => default
 
 @[reducible] def Exportinst := /- mixop: EXPORT -/ (Name × Externval)
@@ -822,7 +829,50 @@ instance : Append Frame where
 @[reducible] def State := /- mixop: `%;%` -/ (Store × Frame)
 
 inductive Admininstr where
- | Instr : Instr -> Admininstr
+ | UNREACHABLE : Admininstr
+ | NOP : Admininstr
+ | DROP : Admininstr
+ | SELECT : (Option Valtype) -> Admininstr
+ | BLOCK : (Blocktype × (List Instr)) -> Admininstr
+ | LOOP : (Blocktype × (List Instr)) -> Admininstr
+ | IF : (Blocktype × (List Instr) × (List Instr)) -> Admininstr
+ | BR : Labelidx -> Admininstr
+ | BR_IF : Labelidx -> Admininstr
+ | BR_TABLE : ((List Labelidx) × Labelidx) -> Admininstr
+ | CALL : Funcidx -> Admininstr
+ | CALL_INDIRECT : (Tableidx × Functype) -> Admininstr
+ | RETURN : Admininstr
+ | CONST : (Numtype × C_numtype) -> Admininstr
+ | UNOP : (Numtype × Unop_numtype) -> Admininstr
+ | BINOP : (Numtype × Binop_numtype) -> Admininstr
+ | TESTOP : (Numtype × Testop_numtype) -> Admininstr
+ | RELOP : (Numtype × Relop_numtype) -> Admininstr
+ | EXTEND : (Numtype × N) -> Admininstr
+ | CVTOP : (Numtype × Cvtop × Numtype × (Option Sx)) -> Admininstr
+ | REF_NULL : Reftype -> Admininstr
+ | REF_FUNC : Funcidx -> Admininstr
+ | REF_IS_NULL : Admininstr
+ | LOCAL_GET : Localidx -> Admininstr
+ | LOCAL_SET : Localidx -> Admininstr
+ | LOCAL_TEE : Localidx -> Admininstr
+ | GLOBAL_GET : Globalidx -> Admininstr
+ | GLOBAL_SET : Globalidx -> Admininstr
+ | TABLE_GET : Tableidx -> Admininstr
+ | TABLE_SET : Tableidx -> Admininstr
+ | TABLE_SIZE : Tableidx -> Admininstr
+ | TABLE_GROW : Tableidx -> Admininstr
+ | TABLE_FILL : Tableidx -> Admininstr
+ | TABLE_COPY : (Tableidx × Tableidx) -> Admininstr
+ | TABLE_INIT : (Tableidx × Elemidx) -> Admininstr
+ | ELEM_DROP : Elemidx -> Admininstr
+ | MEMORY_SIZE : Admininstr
+ | MEMORY_GROW : Admininstr
+ | MEMORY_FILL : Admininstr
+ | MEMORY_COPY : Admininstr
+ | MEMORY_INIT : Dataidx -> Admininstr
+ | DATA_DROP : Dataidx -> Admininstr
+ | LOAD : (Numtype × (Option (N × Sx)) × Nat × Nat) -> Admininstr
+ | STORE : (Numtype × (Option N) × Nat × Nat) -> Admininstr
  | REF_FUNC_ADDR : Funcaddr -> Admininstr
  | REF_HOST_ADDR : Hostaddr -> Admininstr
  | CALL_ADDR : Funcaddr -> Admininstr
@@ -872,52 +922,52 @@ inductive E where
 inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
   | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i >= l.length) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.BR_TABLE (l, l')))], [(Admininstr.Instr (Instr.BR l'))]))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
   | br_table_lt (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i < l.length) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.BR_TABLE (l, l')))], [(Admininstr.Instr (Instr.BR (l.get! i)))]))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR (l.get! i))]))
   | br_if_false (c : C_numtype) (l : Labelidx) :
     (c == 0) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.BR_IF l))], []))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], []))
   | br_if_true (c : C_numtype) (l : Labelidx) :
     (c != 0) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.BR_IF l))], [(Admininstr.Instr (Instr.BR l))]))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
   | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val) /- * -/ ++ ([(Admininstr.Instr (Instr.BR (l + 1)))] ++ (Admininstr.Instr instr) /- * -/))))], ((Admininstr.Val val) /- * -/ ++ [(Admininstr.Instr (Instr.BR l))])))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val) /- * -/ ++ ([(Admininstr.BR (l + 1))] ++ (Admininstr.Instr instr) /- * -/))))], ((Admininstr.Val val) /- * -/ ++ [(Admininstr.BR l)])))
   | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val') /- * -/ ++ ((Admininstr.Val val) /- ^n -/ ++ ([(Admininstr.Instr (Instr.BR 0))] ++ (Admininstr.Instr instr) /- * -/)))))], ((Admininstr.Val val) /- ^n -/ ++ (Admininstr.Instr instr') /- * -/)))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val') /- * -/ ++ ((Admininstr.Val val) /- ^n -/ ++ ([(Admininstr.BR 0)] ++ (Admininstr.Instr instr) /- * -/)))))], ((Admininstr.Val val) /- ^n -/ ++ (Admininstr.Instr instr') /- * -/)))
   | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c == 0) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.IF (bt, instr_1, instr_2)))], [(Admininstr.Instr (Instr.BLOCK (bt, instr_2)))]))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
   | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c != 0) ->
-    (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.IF (bt, instr_1, instr_2)))], [(Admininstr.Instr (Instr.BLOCK (bt, instr_1)))]))
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
   | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((Admininstr.Val val) /- ^k -/ ++ [(Admininstr.Instr (Instr.LOOP (bt, instr)))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((Admininstr.Val val) /- ^k -/ ++ (Admininstr.Instr instr) /- * -/)))]))
+    (Step_pure (((Admininstr.Val val) /- ^k -/ ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((Admininstr.Val val) /- ^k -/ ++ (Admininstr.Instr instr) /- * -/)))]))
   | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((Admininstr.Val val) /- ^k -/ ++ [(Admininstr.Instr (Instr.BLOCK (bt, instr)))]), [(Admininstr.LABEL_ (n, [], ((Admininstr.Val val) /- ^k -/ ++ (Admininstr.Instr instr) /- * -/)))]))
+    (Step_pure (((Admininstr.Val val) /- ^k -/ ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((Admininstr.Val val) /- ^k -/ ++ (Admininstr.Instr instr) /- * -/)))]))
   | local_tee (val : Val) (x : Idx) :
-    (Step_pure ([(Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_TEE x))], [(Admininstr.Val val), (Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_SET x))]))
+    (Step_pure ([(Admininstr.Val val), (Admininstr.LOCAL_TEE x)], [(Admininstr.Val val), (Admininstr.Val val), (Admininstr.LOCAL_SET x)]))
   | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c == 0) ->
-    (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.SELECT t))], [(Admininstr.Val val_2)]))
+    (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(Admininstr.Val val_2)]))
   | select_true (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c != 0) ->
-    (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.SELECT t))], [(Admininstr.Val val_1)]))
+    (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(Admininstr.Val val_1)]))
   | drop (val : Val) :
-    (Step_pure ([(Admininstr.Val val), (Admininstr.Instr Instr.DROP)], []))
+    (Step_pure ([(Admininstr.Val val), Admininstr.DROP], []))
   | nop  :
-    (Step_pure ([(Admininstr.Instr Instr.NOP)], []))
+    (Step_pure ([Admininstr.NOP], []))
   | unreachable  :
-    (Step_pure ([(Admininstr.Instr Instr.UNREACHABLE)], [Admininstr.TRAP]))
+    (Step_pure ([Admininstr.UNREACHABLE], [Admininstr.TRAP]))
   | ref_is_null_false (val : Val) :
     True /- Else? -/ ->
-    (Step_pure ([(Admininstr.Val val), (Admininstr.Instr Instr.REF_IS_NULL)], [(Admininstr.Instr (Instr.CONST (Numtype.I32, 0)))]))
+    (Step_pure ([(Admininstr.Val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
   | ref_is_null_true (rt : Reftype) (val : Val) :
-    (val == (Val.Ref (Ref.REF_NULL rt))) ->
-    (Step_pure ([(Admininstr.Val val), (Admininstr.Instr Instr.REF_IS_NULL)], [(Admininstr.Instr (Instr.CONST (Numtype.I32, 1)))]))
+    (val == (Val.REF_NULL rt)) ->
+    (Step_pure ([(Admininstr.Val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
 
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | call_addr (a : Addr) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
@@ -925,70 +975,70 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, ((Admininstr.Val val) /- ^k -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, {LOCAL := (val ++ (default_ t) /- * -/), MODULE := m}, [(Admininstr.LABEL_ (n, [], (Admininstr.Instr instr) /- * -/))]))]))
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CALL_INDIRECT (x, ft)))]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
   | call_indirect_call (a : Addr) (ft : Functype) (func : Func) (i : Nat) (m : Moduleinst) (x : Idx) (z : State) :
     (((table (z, x)).get! i) == (Ref.REF_FUNC_ADDR a)) ->
     (((funcinst z).get! a) == (m, func)) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CALL_INDIRECT (x, ft)))]), [(Admininstr.CALL_ADDR a)]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [(Admininstr.CALL_ADDR a)]))
   | call (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.CALL x))]), [(Admininstr.CALL_ADDR ((funcaddr z).get! x))]))
+    (Step_read ((z, [(Admininstr.CALL x)]), [(Admininstr.CALL_ADDR ((funcaddr z).get! x))]))
   | table_init_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (n + 1)))), (Admininstr.Instr (Instr.TABLE_INIT (x, y)))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Ref ((elem (z, y)).get! i)), (Admininstr.Instr (Instr.TABLE_SET x)), (Admininstr.Instr (Instr.CONST (Numtype.I32, (j + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_INIT (x, y)))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.Ref ((elem (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]))
   | table_init_zero (i : Nat) (j : Nat) (x : Idx) (y : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, 0))), (Admininstr.Instr (Instr.TABLE_INIT (x, y)))]), []))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_INIT (x, y))]), []))
   | table_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     (((i + n) > (elem (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_INIT (x, y)))]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [Admininstr.TRAP]))
   | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     (j > i) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (n + 1)))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, (j + n)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + n)))), (Admininstr.Instr (Instr.TABLE_GET y)), (Admininstr.Instr (Instr.TABLE_SET x)), (Admininstr.Instr (Instr.CONST (Numtype.I32, (j + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, (j + n))), (Admininstr.CONST (Numtype.I32, (i + n))), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]))
   | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     (j <= i) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (n + 1)))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.TABLE_GET y)), (Admininstr.Instr (Instr.TABLE_SET x)), (Admininstr.Instr (Instr.CONST (Numtype.I32, (j + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]))
   | table_copy_zero (i : Nat) (j : Nat) (x : Idx) (y : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, 0))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]), []))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_COPY (x, y))]), []))
   | table_copy_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     (((i + n) > (table (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
   | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Val val), (Admininstr.Instr (Instr.CONST (Numtype.I32, (n + 1)))), (Admininstr.Instr (Instr.TABLE_FILL x))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Val val), (Admininstr.Instr (Instr.TABLE_SET x)), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + 1)))), (Admininstr.Val val), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_FILL x))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Val val), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Val val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.Val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]))
   | table_fill_zero (i : Nat) (val : Val) (x : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Val val), (Admininstr.Instr (Instr.CONST (Numtype.I32, 0))), (Admininstr.Instr (Instr.TABLE_FILL x))]), []))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Val val), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_FILL x)]), []))
   | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
     ((i + n) > (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Val val), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_FILL x))]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
   | table_size (n : N) (x : Idx) (z : State) :
     ((table (z, x)).length == n) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.TABLE_SIZE x))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, n)))]))
+    (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
   | table_get_lt (i : Nat) (x : Idx) (z : State) :
     (i < (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.TABLE_GET x))]), [(Admininstr.Ref ((table (z, x)).get! i))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(Admininstr.Ref ((table (z, x)).get! i))]))
   | table_get_ge (i : Nat) (x : Idx) (z : State) :
     (i >= (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.TABLE_GET x))]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
   | global_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.GLOBAL_GET x))]), [(Admininstr.Globalinst («global» (z, x)))]))
+    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(Admininstr.Globalinst («global» (z, x)))]))
   | local_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.LOCAL_GET x))]), [(Admininstr.Val («local» (z, x)))]))
+    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(Admininstr.Val («local» (z, x)))]))
   | ref_func (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.REF_FUNC x))]), [(Admininstr.REF_FUNC_ADDR ((funcaddr z).get! x))]))
+    (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((funcaddr z).get! x))]))
 
 inductive Step_write : (Config × Config) -> Prop where
   | table_set_ge (i : Nat) (ref : Ref) (x : Idx) (z : State) :
     (i >= (table (z, x)).length) ->
-    (Step_write ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Ref ref), (Admininstr.Instr (Instr.TABLE_GET x))]), (z, [Admininstr.TRAP])))
+    (Step_write ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Ref ref), (Admininstr.TABLE_GET x)]), (z, [Admininstr.TRAP])))
   | table_set_lt (i : Nat) (ref : Ref) (x : Idx) (z : State) :
     (i < (table (z, x)).length) ->
-    (Step_write ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Ref ref), (Admininstr.Instr (Instr.TABLE_GET x))]), ((with_table (z, x, i, ref)), [])))
+    (Step_write ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.Ref ref), (Admininstr.TABLE_GET x)]), ((with_table (z, x, i, ref)), [])))
   | global_set (val : Val) (x : Idx) (z : State) :
-    (Step_write ((z, [(Admininstr.Val val), (Admininstr.Instr (Instr.GLOBAL_SET x))]), ((with_global (z, x, val)), [])))
+    (Step_write ((z, [(Admininstr.Val val), (Admininstr.GLOBAL_SET x)]), ((with_global (z, x, val)), [])))
   | local_set (val : Val) (x : Idx) (z : State) :
-    (Step_write ((z, [(Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_SET x))]), ((with_local (z, x, val)), [])))
+    (Step_write ((z, [(Admininstr.Val val), (Admininstr.LOCAL_SET x)]), ((with_local (z, x, val)), [])))
 
 inductive Step : (Config × Config) -> Prop where
   | write (instr : (List Instr)) (instr' : (List Instr)) (z : State) (z' : State) :
@@ -1027,6 +1077,7 @@ has type
 but is expected to have type
   Nat : Type
 SpecTec.lean: error: unknown constant 'Numtype.In'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
 SpecTec.lean: error: application type mismatch
   Nat.div n
 argument
@@ -1052,12 +1103,19 @@ has type
   Option N × Option Sx : Type
 but is expected to have type
   Option (N × Sx) : Type
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
 SpecTec.lean: error: type mismatch
   ((), t)
 has type
   Unit × Valtype : Type
 but is expected to have type
   Globaltype : Type
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
 SpecTec.lean: error: unknown constant 'Numtype.Fn'
 SpecTec.lean: error: unknown constant 'Numtype.Fn'
 SpecTec.lean: error: unknown constant 'Valtype.Fn'
@@ -1068,6 +1126,22 @@ SpecTec.lean: error: unknown constant 'Numtype.In'
 SpecTec.lean: error: unknown constant 'Numtype.In'
 SpecTec.lean: error: unknown constant 'Valtype.In'
 SpecTec.lean: error: unknown constant 'Valtype.In'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
 SpecTec.lean: error: application type mismatch
   List.get! C.LABEL l
 argument
@@ -1124,6 +1198,8 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
+SpecTec.lean: error: unknown constant 'Valtype.Numtype'
+SpecTec.lean: error: unknown constant 'Valtype.Vectype'
 SpecTec.lean: error: application type mismatch
   Prod.mk t'_1
 argument
@@ -1133,7 +1209,7 @@ has type
 but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.77841
+  HAppend (List Instr) Instr ?m.76839
 SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
@@ -1156,6 +1232,7 @@ has type
   List Expr : Type
 but is expected to have type
   Expr : Type
+SpecTec.lean: error: unknown constant 'Valtype.Reftype'
 SpecTec.lean: error: application type mismatch
   Prod.mk elemmode
 argument
@@ -1249,58 +1326,19 @@ SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.124169
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.124562
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
@@ -1323,15 +1361,8 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.126855
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+  HAppend (List Val) Val ?m.172081
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
@@ -1345,100 +1376,16 @@ SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  Admininstr.Instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
+SpecTec.lean: error: unknown constant 'Admininstr.Instr'
 ```

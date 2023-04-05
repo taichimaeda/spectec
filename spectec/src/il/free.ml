@@ -92,8 +92,7 @@ and free_exp exp =
   | StrE expfields -> free_list free_expfield expfields
   | CallE (id, exp1) -> union (free_defid id) (free_exp exp1)
   | IterE (exp1, iter) -> union (free_exp exp1) (free_iter iter)
-  | DotE (typ, exp1, _) -> union (free_exp exp1) (free_typ typ)
-  | CaseE (_, exp1, id2, styps) -> union (free_exp exp1) (free_list free_synid (id2::styps))
+  | DotE (typ, exp1, _) | CaseE (_, exp1, typ) -> union (free_exp exp1) (free_typ typ)
 
 and free_expfield (_, exp) = free_exp exp
 

@@ -52,6 +52,8 @@ let () =
     let il = Frontend.Elab.elab el in
     log "IL Validation...";
     Il.Validation.valid il;
+    log "Variant flattening";
+    let il = Il.Flat.transform il in
     log "Lean4 Generation...";
     if !odst = "" && !dsts = [] then
       print_endline (Backend_lean4.Gen.gen_string il);

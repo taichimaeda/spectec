@@ -984,8 +984,10 @@ syntax externval =
 
 ;; 4-runtime.watsup:44.1-44.44
 def default_ : valtype -> val
-  ;; 4-runtime.watsup:49.1-49.34
-  def {rt : reftype} default_(rt <: valtype) = REF.NULL_val(rt)
+  ;; 4-runtime.watsup:50.1-50.48
+  def default_(EXTERNREF_valtype) = REF.NULL_val(EXTERNREF_reftype)
+  ;; 4-runtime.watsup:49.1-49.44
+  def default_(FUNCREF_valtype) = REF.NULL_val(FUNCREF_reftype)
   ;; 4-runtime.watsup:48.1-48.35
   def default_(F64_valtype) = CONST_val(F64_numtype, 0)
   ;; 4-runtime.watsup:47.1-47.35
@@ -995,43 +997,43 @@ def default_ : valtype -> val
   ;; 4-runtime.watsup:45.1-45.35
   def default_(I32_valtype) = CONST_val(I32_numtype, 0)
 
-;; 4-runtime.watsup:60.1-60.71
+;; 4-runtime.watsup:61.1-61.71
 syntax exportinst = EXPORT(name, externval)
 
-;; 4-runtime.watsup:70.1-77.25
+;; 4-runtime.watsup:71.1-78.25
 syntax moduleinst = {FUNC funcaddr*, GLOBAL globaladdr*, TABLE tableaddr*, MEM memaddr*, ELEM elemaddr*, DATA dataaddr*, EXPORT exportinst*}
 
-;; 4-runtime.watsup:54.1-54.66
+;; 4-runtime.watsup:55.1-55.66
 syntax funcinst = `%;%`(moduleinst, func)
 
-;; 4-runtime.watsup:55.1-55.53
+;; 4-runtime.watsup:56.1-56.53
 syntax globalinst = val
 
-;; 4-runtime.watsup:56.1-56.52
+;; 4-runtime.watsup:57.1-57.52
 syntax tableinst = ref*
 
-;; 4-runtime.watsup:57.1-57.52
+;; 4-runtime.watsup:58.1-58.52
 syntax meminst = byte*
 
-;; 4-runtime.watsup:58.1-58.53
+;; 4-runtime.watsup:59.1-59.53
 syntax eleminst = ref*
 
-;; 4-runtime.watsup:59.1-59.51
+;; 4-runtime.watsup:60.1-60.51
 syntax datainst = byte*
 
-;; 4-runtime.watsup:62.1-68.21
+;; 4-runtime.watsup:63.1-69.21
 syntax store = {FUNC funcinst*, GLOBAL globalinst*, TABLE tableinst*, MEM meminst*, ELEM eleminst*, DATA datainst*}
 
-;; 4-runtime.watsup:79.1-81.24
+;; 4-runtime.watsup:80.1-82.24
 syntax frame = {LOCAL val*, MODULE moduleinst}
 
-;; 4-runtime.watsup:82.1-82.47
+;; 4-runtime.watsup:83.1-83.47
 syntax state = `%;%`(store, frame)
 
-;; 4-runtime.watsup:130.1-137.5
+;; 4-runtime.watsup:131.1-138.5
 rec {
 
-;; 4-runtime.watsup:130.1-137.5
+;; 4-runtime.watsup:131.1-138.5
 syntax admininstr =
   | instr
   | REF.FUNC_ADDR(funcaddr)
@@ -1042,63 +1044,63 @@ syntax admininstr =
   | TRAP
 }
 
-;; 4-runtime.watsup:83.1-83.62
+;; 4-runtime.watsup:84.1-84.62
 syntax config = `%;%`(state, admininstr*)
 
-;; 4-runtime.watsup:98.1-98.59
+;; 4-runtime.watsup:99.1-99.59
 def funcaddr : state -> funcaddr*
-  ;; 4-runtime.watsup:99.1-99.38
+  ;; 4-runtime.watsup:100.1-100.38
   def {f : frame, s : store} funcaddr(`%;%`(s, f)) = f.MODULE_frame.FUNC_moduleinst
 
-;; 4-runtime.watsup:101.1-101.52
+;; 4-runtime.watsup:102.1-102.52
 def funcinst : state -> funcinst*
-  ;; 4-runtime.watsup:102.1-102.31
+  ;; 4-runtime.watsup:103.1-103.31
   def {f : frame, s : store} funcinst(`%;%`(s, f)) = s.FUNC_store
 
-;; 4-runtime.watsup:104.1-104.61
+;; 4-runtime.watsup:105.1-105.61
 def func : (state, funcidx) -> funcinst
-  ;; 4-runtime.watsup:105.1-105.48
+  ;; 4-runtime.watsup:106.1-106.48
   def {f : frame, s : store, x : idx} func(`%;%`(s, f), x) = s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]]
 
-;; 4-runtime.watsup:107.1-107.59
+;; 4-runtime.watsup:108.1-108.59
 def local : (state, localidx) -> val
-  ;; 4-runtime.watsup:108.1-108.35
+  ;; 4-runtime.watsup:109.1-109.35
   def {f : frame, s : store, x : idx} local(`%;%`(s, f), x) = f.LOCAL_frame[x]
 
-;; 4-runtime.watsup:110.1-110.69
+;; 4-runtime.watsup:111.1-111.69
 def global : (state, globalidx) -> globalinst
-  ;; 4-runtime.watsup:111.1-111.54
+  ;; 4-runtime.watsup:112.1-112.54
   def {f : frame, s : store, x : idx} global(`%;%`(s, f), x) = s.GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]]
 
-;; 4-runtime.watsup:113.1-113.65
+;; 4-runtime.watsup:114.1-114.65
 def table : (state, tableidx) -> tableinst
-  ;; 4-runtime.watsup:114.1-114.51
+  ;; 4-runtime.watsup:115.1-115.51
   def {f : frame, s : store, x : idx} table(`%;%`(s, f), x) = s.TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]]
 
-;; 4-runtime.watsup:116.1-116.62
+;; 4-runtime.watsup:117.1-117.62
 def elem : (state, tableidx) -> eleminst
-  ;; 4-runtime.watsup:117.1-117.48
+  ;; 4-runtime.watsup:118.1-118.48
   def {f : frame, s : store, x : idx} elem(`%;%`(s, f), x) = s.ELEM_store[f.MODULE_frame.ELEM_moduleinst[x]]
 
-;; 4-runtime.watsup:119.1-119.76
+;; 4-runtime.watsup:120.1-120.76
 def with_local : (state, localidx, val) -> state
-  ;; 4-runtime.watsup:120.1-120.50
+  ;; 4-runtime.watsup:121.1-121.50
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
 
-;; 4-runtime.watsup:122.1-122.79
+;; 4-runtime.watsup:123.1-123.79
 def with_global : (state, globalidx, val) -> state
-  ;; 4-runtime.watsup:123.1-123.69
+  ;; 4-runtime.watsup:124.1-124.69
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
 
-;; 4-runtime.watsup:125.1-125.84
+;; 4-runtime.watsup:126.1-126.84
 def with_table : (state, tableidx, n, ref) -> state
-  ;; 4-runtime.watsup:126.1-126.72
+  ;; 4-runtime.watsup:127.1-127.72
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
 
-;; 4-runtime.watsup:139.1-142.21
+;; 4-runtime.watsup:140.1-143.21
 rec {
 
-;; 4-runtime.watsup:139.1-142.21
+;; 4-runtime.watsup:140.1-143.21
 syntax E =
   | _HOLE
   | _SEQ(val*, E, instr*)
@@ -2831,7 +2833,8 @@ $$
 {\mathrm{default}}_{\mathsf{i{\scriptstyle64}}} &=& (\mathsf{i{\scriptstyle64}}.\mathsf{const}~0) &  \\
 {\mathrm{default}}_{\mathsf{f{\scriptstyle32}}} &=& (\mathsf{f{\scriptstyle32}}.\mathsf{const}~0) &  \\
 {\mathrm{default}}_{\mathsf{f{\scriptstyle64}}} &=& (\mathsf{f{\scriptstyle64}}.\mathsf{const}~0) &  \\
-{\mathrm{default}}_{\mathit{rt}} &=& (\mathsf{ref.null}~\mathit{rt}) &  \\
+{\mathrm{default}}_{\mathsf{funcref}} &=& (\mathsf{ref.null}~\mathsf{funcref}) &  \\
+{\mathrm{default}}_{\mathsf{externref}} &=& (\mathsf{ref.null}~\mathsf{externref}) &  \\
 \end{array}
 $$
 

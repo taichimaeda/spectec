@@ -43,6 +43,11 @@ let render_con_name qual id : atom -> string = function
     make_id s
   | a -> "/- render_con_name: TODO -/ " ^ Il.Print.string_of_atom a
 
+let render_con_name' qual (typ : typ) a = match typ.it with
+  | VarT id -> render_con_name qual id a
+  | _ -> "_ {- render_con_name': Typ not id -}"
+
+
 let render_field_name : atom -> string = function
   | Atom s -> make_id s
   | a -> "/- render_field_name: TODO -/ " ^ Il.Print.string_of_atom a
@@ -108,7 +113,7 @@ let rec render_exp (exp : exp) = match exp.it with
     | VarE v -> render_id v (* Short-ciruit this common form *)
     | _ -> render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
   end
-  | CaseE (a, e, typ, styps) -> render_case a e typ styps
+  | CaseE (a, e, typ) -> render_case a e typ
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
     render_field_name a ^ " := " ^ render_exp e
     ) fields))
@@ -134,12 +139,10 @@ let rec render_exp (exp : exp) = match exp.it with
   | CompE (e1, e2)         -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
   | _ -> "default /- " ^ Il.Print.string_of_exp exp ^ " -/"
 
-and render_case a e typ = function
-  | [] ->
+and render_case a e typ =
     if e.it = TupE []
-    then render_con_name true typ a
-    else render_con_name true typ a $$ render_exp e
-  | (styp::styps) -> render_variant_inj true typ styp $$ render_case a e styp styps
+    then render_con_name' true typ a
+    else render_con_name' true typ a $$ render_exp e
 
 let render_clause (_id : id) (clause : clause) = match clause.it with
   | DefD (_binds, lhs, rhs, premise) ->

@@ -1,6 +1,6 @@
 open Il.Ast
 
-let include_input = true
+let include_input = false
 
 let parens s = "(" ^ s ^ ")"
 let ($$) s1 s2 = parens (s1 ^ " " ^ s2)
@@ -26,6 +26,10 @@ let render_con_name id : atom -> string = function
     then render_type_name id ^ make_id s
     else render_type_name id ^ "_" ^ make_id s
   | a -> "{- render_con_name: TODO -} " ^ Il.Print.string_of_atom a
+
+let render_con_name' (typ : typ) a = match typ.it with
+  | VarT id -> render_con_name id a
+  | _ -> "_ {- render_con_name': Typ not id -}"
 
 let render_field_name : atom -> string = function
   | Atom s -> String.uncapitalize_ascii (make_id s)
@@ -74,19 +78,17 @@ let rec render_exp (exp : exp) = match exp.it with
   | MixE (_, e) -> render_exp e
   | TupE es -> render_tuple render_exp es
   | IterE (e, _) -> render_exp e
-  | CaseE (a, e, typ, styps) -> render_case a e typ styps
+  | CaseE (a, e, typ) -> render_case a e typ
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
   | DotE (_typ, e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ " !! " ^ ("fromIntegral" $$ render_exp e2))
   | BinE (AddOp, e1, e2) -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | _ -> "undefined {- " ^ Il.Print.string_of_exp exp ^ " -}"
 
-and render_case a e typ = function
-  | [] ->
+and render_case a e typ =
     if e.it = TupE []
-    then render_con_name typ a
-    else render_con_name typ a $$ render_exp e
-  | (styp::styps) -> render_variant_inj typ styp $$ render_case a e styp styps
+    then render_con_name' typ a
+    else render_con_name' typ a $$ render_exp e
 
 let render_clause (id : id) (clause : clause) = match clause.it with
   | DefD (_binds, lhs, rhs, premise) ->
