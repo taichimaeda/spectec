@@ -69,10 +69,10 @@ The language consists of few generic concepts:
 
   rule Step/if-true:
     z; (I32.CONST c) (IF instr_1* ELSE instr_2*) ~> z; (BLOCK instr_1*)
-    -- iff c =/= 0
+    -- if c =/= 0
   rule Step/if-false:
     z; (I32.CONST c) (IF instr_1* ELSE instr_2*) ~> z; (BLOCK instr_2*)
-    -- iff c = 0
+    -- if c = 0
   ```
   Every rule is named, so that it can be referenced.
   Each premise is introduced by a dash and includes the name of the relation it is referencing, easing checking and processing.
@@ -119,7 +119,6 @@ Currently, the implementation consists of merely the frontend, which performs:
 * recursion analysis,
 * type checking for the EL,
 * elaboration from EL into IL,
-* type checking for the EL,
 * splicing expressions and definitions into files.
 
 Lowering from EL into IL infers additional information and makes it explicit in the representation:

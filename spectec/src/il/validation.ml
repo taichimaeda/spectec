@@ -280,9 +280,8 @@ and infer_exp env exp : typ =
   | CompE (exp1, _) ->
     infer_exp env exp1
   | StrE _ -> error exp.at "cannot infer type of record"
-  | DotE (exp1, atom) ->
-    let typ1 = infer_exp env exp1 in
-    let typfields = as_struct_typ "expression" env Infer typ1 exp1.at in
+  | DotE (typ1, exp1, atom) ->
+    let typfields = as_struct_typ "expression" env Check typ1 exp1.at in
     find_field typfields atom exp1.at
   | TupE exps -> TupT (List.map (infer_exp env) exps) $ exp.at
   | CallE (id, _) -> snd (find "function" env.defs id)
@@ -347,10 +346,10 @@ and valid_exp env exp typ =
   | StrE expfields ->
     let typfields = as_struct_typ "record" env Check typ exp.at in
     valid_list valid_expfield env expfields typfields exp.at
-  | DotE (exp1, atom) ->
-    let typ1 = infer_exp env exp1 in
+  | DotE (typ1, exp1, atom) ->
+    valid_typ env typ1;
     valid_exp env exp1 typ1;
-    let typfields = as_struct_typ "expression" env Infer typ1 exp1.at in
+    let typfields = as_struct_typ "expression" env Check typ1 exp1.at in
     let typ' = find_field typfields atom exp1.at in
     equiv_typ env typ' typ exp.at
   | CompE (exp1, exp2) ->
@@ -438,7 +437,7 @@ let valid_prem env prem =
   | RulePr (id, mixop, exp, iter_opt) ->
     valid_expmix env mixop exp (find "relation" env.rels id) exp.at;
     Option.iter (valid_iter env) iter_opt
-  | IffPr (exp, iter_opt) ->
+  | IfPr (exp, iter_opt) ->
     valid_exp env exp (BoolT $ exp.at);
     Option.iter (valid_iter env) iter_opt
   | ElsePr ->

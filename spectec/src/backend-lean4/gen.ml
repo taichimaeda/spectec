@@ -102,7 +102,7 @@ let rec render_exp (exp : exp) = match exp.it with
     render_field_name a ^ " := " ^ render_exp e
     ) fields))
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
-  | DotE (e, a) -> render_exp e ^ "." ^ render_field_name a
+  | DotE (_ty, e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
   | LenE e -> render_exp e ^ ".length"
   | CallE (id, e) -> render_id id $$ render_exp e
@@ -196,7 +196,7 @@ let rec render_def (d : def) =
           begin match prem.it with
           | RulePr (pid, _mixops, pexp, _iter) ->
             render_type_name pid $$ render_exp pexp
-          | IffPr (pexp, _iter) -> render_exp pexp
+          | IfPr (pexp, _iter) -> render_exp pexp
           | ElsePr -> "True /- Else? -/"
           end ^ " -> "
         ) prems) ^

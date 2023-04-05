@@ -145,7 +145,8 @@ and string_of_exp exp =
       "[" ^ string_of_path path ^ " =.. " ^ string_of_exp exp2 ^ "]"
   | StrE expfields ->
     "{" ^ concat ", " (List.map string_of_expfield expfields) ^ "}"
-  | DotE (exp1, atom) -> string_of_exp exp1 ^ "." ^ string_of_atom atom
+  | DotE (typ, exp1, atom) ->
+    string_of_exp exp1 ^ "." ^ string_of_atom atom ^ "_" ^ string_of_typ typ
   | CompE (exp1, exp2) -> string_of_exp exp1 ^ " ++ " ^ string_of_exp exp2
   | LenE exp1 -> "|" ^ string_of_exp exp1 ^ "|"
   | TupE exps -> "(" ^ string_of_exps ", " exps ^ ")"
@@ -196,9 +197,9 @@ let string_of_premise prem =
     id.it ^ ": " ^ string_of_exp (MixE (mixop, exp) $ exp.at)
   | RulePr (id, mixop, exp, Some iter) ->
     "(" ^ id.it ^ ": " ^ string_of_exp (MixE (mixop, exp) $ exp.at) ^ ")" ^ string_of_iter iter
-  | IffPr (exp, None) -> "iff " ^ string_of_exp exp
-  | IffPr (exp, Some iter) ->
-    "(" ^ "iff " ^ string_of_exp exp ^ ")" ^ string_of_iter iter
+  | IfPr (exp, None) -> "if " ^ string_of_exp exp
+  | IfPr (exp, Some iter) ->
+    "(" ^ "if " ^ string_of_exp exp ^ ")" ^ string_of_iter iter
   | ElsePr -> "otherwise"
 
 let string_of_rule rule =

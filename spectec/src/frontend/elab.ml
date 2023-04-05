@@ -606,7 +606,7 @@ and elab_exp env exp typ : Il.exp =
     let exp1' = elab_exp env exp1 typ1 in
     let typfields = as_struct_typ "expression" env Infer typ1 exp1.at in
     let typ' = find_field typfields atom exp1.at in
-    let exp' = Il.DotE (exp1', elab_atom atom) $ exp.at in
+    let exp' = Il.DotE (elab_typ env typ1, exp1', elab_atom atom) $ exp.at in
     cast_exp "field" env exp' typ' typ
   | CommaE (exp1, exp2) ->
     let exp1' = elab_exp env exp1 typ in
@@ -953,10 +953,10 @@ let elab_prem env prem : Il.premise =
     let exps' = elab_exp_notation' env exp nottyp in
     let iter_opt' = Option.map (elab_iter env) iter_opt in
     Il.RulePr (id, mixop', tup_exp' exps' exp.at, iter_opt') $ prem.at
-  | IffPr (exp, iter_opt) ->
+  | IfPr (exp, iter_opt) ->
     let exp' = elab_exp env exp (BoolT $ exp.at) in
     let iter_opt' = Option.map (elab_iter env) iter_opt in
-    Il.IffPr (exp', iter_opt') $ prem.at
+    Il.IfPr (exp', iter_opt') $ prem.at
   | ElsePr ->
     Il.ElsePr $ prem.at
 

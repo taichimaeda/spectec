@@ -78,8 +78,7 @@ and free_exp exp =
   match exp.it with
   | VarE id -> free_varid id
   | BoolE _ | NatE _ | TextE _ -> empty
-  | UnE (_, exp1) | DotE (exp1, _)
-  | LenE exp1 | MixE (_, exp1) | SubE (exp1, _, _) ->
+  | UnE (_, exp1) | LenE exp1 | MixE (_, exp1) | SubE (exp1, _, _) ->
     free_exp exp1
   | BinE (_, exp1, exp2) | CmpE (_, exp1, exp2)
   | IdxE (exp1, exp2) | CompE (exp1, exp2) | CatE (exp1, exp2) ->
@@ -93,6 +92,7 @@ and free_exp exp =
   | StrE expfields -> free_list free_expfield expfields
   | CallE (id, exp1) -> union (free_defid id) (free_exp exp1)
   | IterE (exp1, iter) -> union (free_exp exp1) (free_iter iter)
+  | DotE (typ, exp1, _) -> union (free_exp exp1) (free_typ typ)
   | CaseE (_, exp1, id2, styps) -> union (free_exp exp1) (free_list free_synid (id2::styps))
 
 and free_expfield (_, exp) = free_exp exp
@@ -116,7 +116,7 @@ let free_prem prem =
   match prem.it with
   | RulePr (id, _mixop, exp, itero) ->
     union (free_relid id) (union (free_exp exp) (free_opt free_iter itero))
-  | IffPr (exp, itero) -> union (free_exp exp) (free_opt free_iter itero)
+  | IfPr (exp, itero) -> union (free_exp exp) (free_opt free_iter itero)
   | ElsePr -> empty
 
 let free_rule rule =

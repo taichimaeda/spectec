@@ -76,7 +76,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | IterE (e, _) -> render_exp e
   | CaseE (a, e, typ, styps) -> render_case a e typ styps
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
-  | DotE (e, a) -> render_exp e ^ "." ^ render_field_name a
+  | DotE (_typ, e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ " !! " ^ ("fromIntegral" $$ render_exp e2))
   | BinE (AddOp, e1, e2) -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | _ -> "undefined {- " ^ Il.Print.string_of_exp exp ^ " -}"
