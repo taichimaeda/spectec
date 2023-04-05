@@ -1,5 +1,6 @@
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
+#  inputs.lean.url = "github:leanprover/lean4";
 
   description = "Nix infrastructure for spectec";
   outputs = { self, nixpkgs }:
@@ -10,6 +11,7 @@
       devShells.${system}.default =
         pkgs.mkShell {
           packages = with pkgs; [
+            #lean.packages.${system}.lean-all
             dune_3
             ocamlPackages.ocaml
             ocamlPackages.menhir
