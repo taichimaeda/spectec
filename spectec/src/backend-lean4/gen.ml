@@ -17,6 +17,8 @@ let is_reserved = function
  | "in"
  | "export"
  | "import"
+ | "global"
+ | "local"
  -> true
  | _ -> false
 

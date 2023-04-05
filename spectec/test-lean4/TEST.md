@@ -357,7 +357,7 @@ inductive Externtype_ok : Externtype -> Prop where
   | table (tabletype : Tabletype) :
     (Tabletype_ok tabletype) ->
     (Externtype_ok (Externtype.TABLE tabletype))
-  | global (globaltype : Globaltype) :
+  | «global» (globaltype : Globaltype) :
     (Globaltype_ok globaltype) ->
     (Externtype_ok (Externtype.GLOBAL globaltype))
   | func (functype : Functype) :
@@ -406,7 +406,7 @@ inductive Externtype_sub : (Externtype × Externtype) -> Prop where
   | table (tt_1 : Tabletype) (tt_2 : Tabletype) :
     (Tabletype_sub (tt_1, tt_2)) ->
     (Externtype_sub ((Externtype.TABLE tt_1), (Externtype.TABLE tt_2)))
-  | global (gt_1 : Globaltype) (gt_2 : Globaltype) :
+  | «global» (gt_1 : Globaltype) (gt_2 : Globaltype) :
     (Globaltype_sub (gt_1, gt_2)) ->
     (Externtype_sub ((Externtype.GLOBAL gt_1), (Externtype.GLOBAL gt_2)))
   | func (ft_1 : Functype) (ft_2 : Functype) :
@@ -678,7 +678,7 @@ inductive Externuse_ok : (Context × Externuse × Externtype) -> Prop where
   | table (C : Context) (tt : Tabletype) (x : Idx) :
     ((C.TABLE.get! x) == tt) ->
     (Externuse_ok (C, (Externuse.TABLE x), (Externtype.TABLE tt)))
-  | global (C : Context) (gt : Globaltype) (x : Idx) :
+  | «global» (C : Context) (gt : Globaltype) (x : Idx) :
     ((C.GLOBAL.get! x) == gt) ->
     (Externuse_ok (C, (Externuse.GLOBAL x), (Externtype.GLOBAL gt)))
   | func (C : Context) (ft : Functype) (x : Idx) :
@@ -691,9 +691,9 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
     (Export_ok (C, (name, externuse), xt))
 
 inductive Module_ok : Module -> Prop where
-  | rule_0 (C : Context) (data : Data) (elem : Elem) («export» : Export) (ft : Functype) (func : Func) (global : Global) (gt : Globaltype) («import» : Import) (mem : Mem) (mt : Memtype) (n : N) (rt : Reftype) (start : Start) (table : Table) (tt : Tabletype) :
+  | rule_0 (C : Context) (data : Data) (elem : Elem) («export» : Export) (ft : Functype) (func : Func) («global» : Global) (gt : Globaltype) («import» : Import) (mem : Mem) (mt : Memtype) (n : N) (rt : Reftype) (start : Start) (table : Table) (tt : Tabletype) :
     (Func_ok (C, func, ft)) ->
-    (Global_ok (C, global, gt)) ->
+    (Global_ok (C, «global», gt)) ->
     (Table_ok (C, table, tt)) ->
     (Mem_ok (C, mem, mt)) ->
     (Elem_ok (C, elem, rt)) ->
@@ -702,7 +702,7 @@ inductive Module_ok : Module -> Prop where
     (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := (), LOCAL := [], LABEL := [], RETURN := none}) ->
     (mem.length <= 1) ->
     (start.length <= 1) ->
-    (Module_ok («import», func, global, table, mem, elem, data, start, «export»))
+    (Module_ok («import», func, «global», table, mem, elem, data, start, «export»))
 
 @[reducible] def Addr := Nat
 
@@ -972,9 +972,9 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (i >= (table (z, x)).length) ->
     (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.TABLE_GET x))]), [Admininstr.TRAP]))
   | global_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.GLOBAL_GET x))]), [(Admininstr.Globalinst (global (z, x)))]))
+    (Step_read ((z, [(Admininstr.Instr (Instr.GLOBAL_GET x))]), [(Admininstr.Globalinst («global» (z, x)))]))
   | local_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.Instr (Instr.LOCAL_GET x))]), [(Admininstr.Val (local (z, x)))]))
+    (Step_read ((z, [(Admininstr.Instr (Instr.LOCAL_GET x))]), [(Admininstr.Val («local» (z, x)))]))
   | ref_func (x : Idx) (z : State) :
     (Step_read ((z, [(Admininstr.Instr (Instr.REF_FUNC x))]), [(Admininstr.REF_FUNC_ADDR ((funcaddr z).get! x))]))
 
@@ -1543,7 +1543,7 @@ has type
   Global : Type
 but is expected to have type
   List Global : Type
-./././SpecTec.lean:700:40: error: application type mismatch
+./././SpecTec.lean:700:42: error: application type mismatch
   Prod.mk table
 argument
   table
@@ -1551,7 +1551,7 @@ has type
   Table : Type
 but is expected to have type
   List Table : Type
-./././SpecTec.lean:700:47: error: application type mismatch
+./././SpecTec.lean:700:49: error: application type mismatch
   Prod.mk mem
 argument
   mem
@@ -1559,7 +1559,7 @@ has type
   Mem : Type
 but is expected to have type
   List Mem : Type
-./././SpecTec.lean:700:52: error: application type mismatch
+./././SpecTec.lean:700:54: error: application type mismatch
   Prod.mk elem
 argument
   elem
@@ -1567,7 +1567,7 @@ has type
   Elem : Type
 but is expected to have type
   List Elem : Type
-./././SpecTec.lean:700:58: error: application type mismatch
+./././SpecTec.lean:700:60: error: application type mismatch
   Prod.mk data
 argument
   data
@@ -1575,7 +1575,7 @@ has type
   Data : Type
 but is expected to have type
   List Data : Type
-./././SpecTec.lean:700:64: error: application type mismatch
+./././SpecTec.lean:700:66: error: application type mismatch
   Prod.mk start
 argument
   start
@@ -1758,8 +1758,32 @@ but is expected to have type
 ./././SpecTec.lean:905:18: error: unknown constant 'Admininstr.Val'
 ./././SpecTec.lean:912:18: error: unknown constant 'Admininstr.Val'
 ./././SpecTec.lean:915:18: error: unknown constant 'Admininstr.Val'
-./././SpecTec.lean:972:81: error: expected ')' or term
-./././SpecTec.lean:972:87: error: expected 'elab', 'elab_rules', 'infix', 'infixl', 'infixr', 'instance', 'macro', 'macro_rules', 'notation', 'postfix', 'prefix', 'syntax' or 'unif_hint'
+./././SpecTec.lean:919:5: error: type mismatch
+  (m, (t_1, t_2), t, instr)
+has type
+  Moduleinst × (Valtype × Valtype) × Valtype × Instr : Type
+but is expected to have type
+  Funcinst : Type
+./././SpecTec.lean:920:22: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:920:110: error: failed to synthesize instance
+  HAppend Val Val ?m.134041
+./././SpecTec.lean:920:174: error: application type mismatch
+  ([], Admininstr.Instr instr)
+argument
+  Admininstr.Instr instr
+has type
+  Admininstr : Type
+but is expected to have type
+  List Admininstr : Type
+./././SpecTec.lean:932:281: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean:953:73: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:953:247: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:953:366: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:956:73: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:959:73: error: unknown constant 'Admininstr.Val'
+./././SpecTec.lean:965:116: error: unknown constant 'Admininstr.Ref'
+./././SpecTec.lean:970:66: error: unknown constant 'Admininstr.Globalinst'
+./././SpecTec.lean:972:65: error: unknown constant 'Admininstr.Val'
 ./././SpecTec.lean:979:74: error: unknown constant 'Admininstr.Ref'
 ./././SpecTec.lean:982:74: error: unknown constant 'Admininstr.Ref'
 ./././SpecTec.lean:984:23: error: unknown constant 'Admininstr.Val'
