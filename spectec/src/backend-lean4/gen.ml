@@ -47,6 +47,13 @@ let render_field_name : atom -> string = function
   | Atom s -> make_id s
   | a -> "/- render_field_name: TODO -/ " ^ Il.Print.string_of_atom a
 
+
+let wrap_type_iter (ty : string) : iter -> string = function
+  | Opt -> "Option" $$ ty
+  |  _  -> "List" $$ ty
+
+let wrap_type_iters (ty : string) : iter list -> string = List.fold_left wrap_type_iter ty
+
 let rec render_typ (ty : typ) = match ty.it with
   | VarT id -> render_type_name id
   | BoolT -> "Bool"
@@ -54,8 +61,7 @@ let rec render_typ (ty : typ) = match ty.it with
   | TextT -> "String"
   | TupT [] -> "Unit"
   | TupT tys -> render_tuple_typ tys
-  | IterT (ty, Opt) -> "Option" $$ render_typ ty
-  | IterT (ty, _) -> "List" $$ render_typ ty
+  | IterT (ty, it) -> wrap_type_iter (render_typ ty) it
 
 and render_tuple_typ tys = parens (String.concat " × " (List.map render_typ tys))
 
@@ -190,8 +196,8 @@ let rec render_def (d : def) =
     String.concat "" (List.mapi (fun i (rule : rule) -> match rule.it with
       | RuleD (rule_id, binds, _mixop, exp, prems) ->
         "\n  | " ^ render_rule_name false id rule_id i ^ " " ^
-        String.concat " " (List.map (fun ((bid : id), btyp) ->
-          parens (render_id bid ^ " : " ^ render_typ btyp)
+        String.concat " " (List.map (fun ((bid : id), btyp, iters) ->
+          parens (render_id bid ^ " : " ^ wrap_type_iters (render_typ btyp) iters)
           ) binds) ^ " : " ^
         String.concat "" (List.map (fun (prem : premise) ->
           "\n    " ^

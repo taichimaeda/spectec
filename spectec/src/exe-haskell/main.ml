@@ -48,8 +48,6 @@ let () =
     Arg.parse argspec add_arg usage;
     log "Parsing...";
     let el = List.concat_map Frontend.Parse.parse_file !srcs in
-    log "Multiplicity checking...";
-    Frontend.Multiplicity.check el;
     log "Elaboration...";
     let il = Frontend.Elab.elab el in
     log "IL Validation...";

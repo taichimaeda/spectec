@@ -371,7 +371,7 @@ inductive Valtype_sub : (Valtype × Valtype) -> Prop where
     (Valtype_sub (t, t))
 
 inductive Resulttype_sub : ((List Valtype) × (List Valtype)) -> Prop where
-  | rule_0 (t_1 : Valtype) (t_2 : Valtype) :
+  | rule_0 (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Valtype_sub (t_1, t_2)) ->
     (Resulttype_sub (t_1, t_2))
 
@@ -420,18 +420,18 @@ inductive Blocktype_ok : (Context × Blocktype × Functype) -> Prop where
 
 mutual
 inductive Instr_ok : (Context × Instr × Functype) -> Prop where
-  | store (C : Context) («in» : In) (mt : Memtype) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
+  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div (size t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div (size t)) 8)))) ->
     ((n == none) || (nt == (Numtype.In «in»))) ->
     (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([(Valtype.Numtype Numtype.I32), (Valtype.Numtype nt)], [])))
-  | load (C : Context) («in» : In) (mt : Memtype) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (sx : Sx) (t : Valtype) :
+  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div (size t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div (size t)) 8)))) ->
     ((n == none) || (nt == (Numtype.In «in»))) ->
-    (Instr_ok (C, (Instr.LOAD (nt, (some (n, sx)), n_A, n_O)), ([(Valtype.Numtype Numtype.I32)], [(Valtype.Numtype nt)])))
+    (Instr_ok (C, (Instr.LOAD (nt, (n, sx), n_A, n_O)), ([(Valtype.Numtype Numtype.I32)], [(Valtype.Numtype nt)])))
   | data_drop (C : Context) (x : Idx) :
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
@@ -481,7 +481,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
   | global_get (C : Context) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == ((some ()), t)) ->
+    ((C.GLOBAL.get! x) == ((), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
   | local_tee (C : Context) (t : Valtype) (x : Idx) :
     ((C.LOCAL.get! x) == t) ->
@@ -502,7 +502,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
     (fn_1 != fn_2) ->
     (Instr_ok (C, (Instr.CVTOP ((Numtype.Fn fn_1), Cvtop.CONVERT, (Numtype.Fn fn_2), none)), ([(Valtype.Fn fn_2)], [(Valtype.Fn fn_1)])))
-  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : Sx) :
+  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
     (in_1 != in_2) ->
     ((sx == none) = ((size (Valtype.In in_1)) > (size (Valtype.In in_2)))) ->
     (Instr_ok (C, (Instr.CVTOP ((Numtype.In in_1), Cvtop.CONVERT, (Numtype.In in_2), sx)), ([(Valtype.In in_2)], [(Valtype.In in_1)])))
@@ -523,36 +523,36 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.UNOP (nt, unop)), ([(Valtype.Numtype nt)], [(Valtype.Numtype nt)])))
   | const (C : Context) (c_nt : C_numtype) (nt : Numtype) :
     (Instr_ok (C, (Instr.CONST (nt, c_nt)), ([], [(Valtype.Numtype nt)])))
-  | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : Valtype) (t_2 : Valtype) (x : Idx) :
+  | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
     ((C.TABLE.get! x) == (lim, Reftype.FUNCREF)) ->
     (ft == (t_1, t_2)) ->
     (Instr_ok (C, (Instr.CALL_INDIRECT (x, ft)), ((t_1 ++ [(Valtype.Numtype Numtype.I32)]), t_2)))
-  | call (C : Context) (t_1 : Valtype) (t_2 : Valtype) (x : Idx) :
+  | call (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
     ((C.FUNC.get! x) == (t_1, t_2)) ->
     (Instr_ok (C, (Instr.CALL x), (t_1, t_2)))
-  | return (C : Context) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | return (C : Context) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (C.RETURN == (some t)) ->
     (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
-  | br_table (C : Context) (l : Labelidx) (l' : Labelidx) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Resulttype_sub (t, (C.LABEL.get! l))) ->
     (Resulttype_sub (t, (C.LABEL.get! l'))) ->
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
-  | br_if (C : Context) (l : Labelidx) (t : Valtype) :
+  | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
     (Instr_ok (C, (Instr.BR_IF l), ((t ++ [(Valtype.Numtype Numtype.I32)]), t)))
-  | br (C : Context) (l : Labelidx) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | br (C : Context) (l : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
     (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
-  | if (C : Context) (bt : Blocktype) (instr_1 : Instr) (instr_2 : Instr) (t_1 : Valtype) (t_2 : Valtype) :
+  | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}), instr_1, (t_1, t_2))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}), instr_2, (t_1, t_2))) ->
     (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
-  | loop (C : Context) (bt : Blocktype) (instr : Instr) (t_1 : Valtype) (t_2 : Valtype) :
+  | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_1], RETURN := none}), instr, (t_1, [t_2]))) ->
     (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, t_2)))
-  | block (C : Context) (bt : Blocktype) (instr : Instr) (t_1 : Valtype) (t_2 : Valtype) :
+  | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}), instr, (t_1, t_2))) ->
     (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
@@ -566,18 +566,18 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, Instr.DROP, ([t], [])))
   | nop (C : Context) :
     (Instr_ok (C, Instr.NOP, ([], [])))
-  | unreachable (C : Context) (t_1 : Valtype) (t_2 : Valtype) :
+  | unreachable (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Instr_ok (C, Instr.UNREACHABLE, (t_1, t_2)))
 inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
-  | frame (C : Context) (instr : Instr) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | frame (C : Context) (instr : (List Instr)) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (InstrSeq_ok (C, instr, (t_1, t_2))) ->
     (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))
-  | weak (C : Context) (instr : Instr) (t'_1 : Valtype) (t'_2 : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | weak (C : Context) (instr : (List Instr)) (t'_1 : Valtype) (t'_2 : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (InstrSeq_ok (C, instr, (t_1, t_2))) ->
     (Resulttype_sub (t'_1, t_1)) ->
     (Resulttype_sub (t_2, t'_2)) ->
     (InstrSeq_ok (C, instr, ([t'_1], t'_2)))
-  | seq (C : Context) (instr_1 : Instr) (instr_2 : Instr) (t_1 : Valtype) (t_2 : Valtype) (t_3 : Valtype) :
+  | seq (C : Context) (instr_1 : Instr) (instr_2 : Instr) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (t_3 : (List Valtype)) :
     (Instr_ok (C, instr_1, (t_1, t_2))) ->
     (InstrSeq_ok (C, [instr_2], (t_2, t_3))) ->
     (InstrSeq_ok (C, ([instr_1] ++ instr_2), (t_1, t_3)))
@@ -586,7 +586,7 @@ inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
 
 
 inductive Expr_ok : (Context × Expr × Resulttype) -> Prop where
-  | rule_0 (C : Context) (instr : Instr) (t : Valtype) :
+  | rule_0 (C : Context) (instr : (List Instr)) (t : (List Valtype)) :
     (InstrSeq_ok (C, instr, ([], t))) ->
     (Expr_ok (C, instr, t))
 
@@ -602,7 +602,7 @@ inductive Instr_const : (Context × Instr) -> Prop where
     (Instr_const (C, (Instr.CONST (nt, c))))
 
 inductive Expr_const : (Context × Expr) -> Prop where
-  | rule_0 (C : Context) (instr : Instr) :
+  | rule_0 (C : Context) (instr : (List Instr)) :
     (Instr_const (C, instr)) ->
     (Expr_const (C, instr))
 
@@ -613,7 +613,7 @@ inductive Expr_ok_const : (Context × Expr × Valtype) -> Prop where
     (Expr_ok_const (C, expr, t))
 
 inductive Func_ok : (Context × Func × Functype) -> Prop where
-  | rule_0 (C : Context) (expr : Expr) (ft : Functype) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) :
+  | rule_0 (C : Context) (expr : Expr) (ft : Functype) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (ft == (t_1, t_2)) ->
     (Functype_ok ft) ->
     (Expr_ok ((((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := (t_1 ++ t), LABEL := [], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [], RETURN := (some t_2)}), expr, t_2)) ->
@@ -622,7 +622,7 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) :
     (Globaltype_ok gt) ->
-    (gt == ((some ()), t)) ->
+    (gt == ((), t)) ->
     (Expr_ok_const (C, expr, t)) ->
     (Global_ok (C, (gt, expr), gt))
 
@@ -645,7 +645,7 @@ inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
     (Elemmode_ok (C, (Elemmode.TABLE (x, expr)), rt))
 
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
-  | rule_0 (C : Context) (elemmode : Elemmode) (expr : Expr) (rt : Reftype) :
+  | rule_0 (C : Context) (elemmode : (Option Elemmode)) (expr : (List Expr)) (rt : Reftype) :
     (Expr_ok (C, expr, [(Valtype.Reftype rt)])) ->
     (Elemmode_ok (C, elemmode, rt)) ->
     (Elem_ok (C, (rt, expr, elemmode), rt))
@@ -657,7 +657,7 @@ inductive Datamode_ok : (Context × Datamode) -> Prop where
     (Datamode_ok (C, (Datamode.MEMORY (0, expr))))
 
 inductive Data_ok : (Context × Data) -> Prop where
-  | rule_0 (C : Context) (b : Byte) (datamode : Datamode) :
+  | rule_0 (C : Context) (b : (List (List Byte))) (datamode : (Option Datamode)) :
     (Datamode_ok (C, datamode)) ->
     (Data_ok (C, (b, datamode)))
 
@@ -691,7 +691,7 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
     (Export_ok (C, (name, externuse), xt))
 
 inductive Module_ok : Module -> Prop where
-  | rule_0 (C : Context) (data : Data) (elem : Elem) («export» : Export) (ft : Functype) (func : Func) («global» : Global) (gt : Globaltype) («import» : Import) (mem : Mem) (mt : Memtype) (n : N) (rt : Reftype) (start : Start) (table : Table) (tt : Tabletype) :
+  | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
     (Func_ok (C, func, ft)) ->
     (Global_ok (C, «global», gt)) ->
     (Table_ok (C, table, tt)) ->
@@ -870,10 +870,10 @@ inductive E where
   deriving Inhabited, BEq
 
 inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
-  | br_table_ge (i : Nat) (l : Labelidx) (l' : Labelidx) :
+  | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i >= l.length) ->
     (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.BR_TABLE (l, l')))], [(Admininstr.Instr (Instr.BR l'))]))
-  | br_table_lt (i : Nat) (l : Labelidx) (l' : Labelidx) :
+  | br_table_lt (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i < l.length) ->
     (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.BR_TABLE (l, l')))], [(Admininstr.Instr (Instr.BR (l.get! i)))]))
   | br_if_false (c : C_numtype) (l : Labelidx) :
@@ -882,28 +882,28 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
   | br_if_true (c : C_numtype) (l : Labelidx) :
     (c != 0) ->
     (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.BR_IF l))], [(Admininstr.Instr (Instr.BR l))]))
-  | br_succ (instr : Instr) (instr' : Instr) (l : Labelidx) (n : N) (val : Val) :
+  | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
     (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val) ++ ([(Admininstr.Instr (Instr.BR (l + 1)))] ++ (Admininstr.Instr instr)))))], ((Admininstr.Val val) ++ [(Admininstr.Instr (Instr.BR l))])))
-  | br_zero (instr : Instr) (instr' : Instr) (n : N) (val : Val) (val' : Val) :
+  | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
     (Step_pure ([(Admininstr.LABEL_ (n, instr', ((Admininstr.Val val') ++ ((Admininstr.Val val) ++ ([(Admininstr.Instr (Instr.BR 0))] ++ (Admininstr.Instr instr))))))], ((Admininstr.Val val) ++ (Admininstr.Instr instr'))))
-  | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : Instr) (instr_2 : Instr) :
+  | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c == 0) ->
     (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.IF (bt, instr_1, instr_2)))], [(Admininstr.Instr (Instr.BLOCK (bt, instr_2)))]))
-  | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : Instr) (instr_2 : Instr) :
+  | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c != 0) ->
     (Step_pure ([(Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.IF (bt, instr_1, instr_2)))], [(Admininstr.Instr (Instr.BLOCK (bt, instr_1)))]))
-  | loop (bt : Blocktype) (instr : Instr) (k : Nat) (n : N) (t_1 : Valtype) (t_2 : Valtype) (val : Val) :
+  | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
     (Step_pure (((Admininstr.Val val) ++ [(Admininstr.Instr (Instr.LOOP (bt, instr)))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((Admininstr.Val val) ++ (Admininstr.Instr instr))))]))
-  | block (bt : Blocktype) (instr : Instr) (k : Nat) (n : N) (t_1 : Valtype) (t_2 : Valtype) (val : Val) :
+  | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
     (Step_pure (((Admininstr.Val val) ++ [(Admininstr.Instr (Instr.BLOCK (bt, instr)))]), [(Admininstr.LABEL_ (n, [], ((Admininstr.Val val) ++ (Admininstr.Instr instr))))]))
   | local_tee (val : Val) (x : Idx) :
     (Step_pure ([(Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_TEE x))], [(Admininstr.Val val), (Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_SET x))]))
-  | select_false (c : C_numtype) (t : Valtype) (val_1 : Val) (val_2 : Val) :
+  | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c == 0) ->
     (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.SELECT t))], [(Admininstr.Val val_2)]))
-  | select_true (c : C_numtype) (t : Valtype) (val_1 : Val) (val_2 : Val) :
+  | select_true (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c != 0) ->
     (Step_pure ([(Admininstr.Val val_1), (Admininstr.Val val_2), (Admininstr.Instr (Instr.CONST (Numtype.I32, c))), (Admininstr.Instr (Instr.SELECT t))], [(Admininstr.Val val_1)]))
   | drop (val : Val) :
@@ -920,7 +920,7 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([(Admininstr.Val val), (Admininstr.Instr Instr.REF_IS_NULL)], [(Admininstr.Instr (Instr.CONST (Numtype.I32, 1)))]))
 
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
-  | call_addr (a : Addr) (instr : Instr) (k : Nat) (m : Moduleinst) (n : N) (t : Valtype) (t_1 : Valtype) (t_2 : Valtype) (val : Val) (z : State) :
+  | call_addr (a : Addr) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
     (((funcinst z).get! a) == (m, ((t_1, t_2), t, instr))) ->
     (Step_read ((z, ((Admininstr.Val val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, {LOCAL := (val ++ (default_ t)), MODULE := m}, [(Admininstr.LABEL_ (n, [], (Admininstr.Instr instr)))]))]))
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
@@ -942,7 +942,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (((i + n) > (elem (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
     (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_INIT (x, y)))]), [Admininstr.TRAP]))
   | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (i > i) ->
+    (j > i) ->
     (Step_read ((z, [(Admininstr.Instr (Instr.CONST (Numtype.I32, j))), (Admininstr.Instr (Instr.CONST (Numtype.I32, i))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (n + 1)))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]), [(Admininstr.Instr (Instr.CONST (Numtype.I32, (j + n)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + n)))), (Admininstr.Instr (Instr.TABLE_GET y)), (Admininstr.Instr (Instr.TABLE_SET x)), (Admininstr.Instr (Instr.CONST (Numtype.I32, (j + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, (i + 1)))), (Admininstr.Instr (Instr.CONST (Numtype.I32, n))), (Admininstr.Instr (Instr.TABLE_COPY (x, y)))]))
   | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     (j <= i) ->
@@ -991,13 +991,13 @@ inductive Step_write : (Config × Config) -> Prop where
     (Step_write ((z, [(Admininstr.Val val), (Admininstr.Instr (Instr.LOCAL_SET x))]), ((with_local (z, x, val)), [])))
 
 inductive Step : (Config × Config) -> Prop where
-  | write (instr : Instr) (instr' : Instr) (z : State) (z' : State) :
+  | write (instr : (List Instr)) (instr' : (List Instr)) (z : State) (z' : State) :
     (Step_write ((z, (Admininstr.Instr instr)), (z', (Admininstr.Instr instr')))) ->
     (Step ((z, (Admininstr.Instr instr)), (z', (Admininstr.Instr instr'))))
-  | read (instr : Instr) (instr' : Instr) (z : State) :
+  | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
     (Step_read ((z, (Admininstr.Instr instr)), (Admininstr.Instr instr'))) ->
     (Step ((z, (Admininstr.Instr instr)), (z, (Admininstr.Instr instr'))))
-  | pure (instr : Instr) (instr' : Instr) (z : State) :
+  | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
     (Step_pure ((Admininstr.Instr instr), (Admininstr.Instr instr'))) ->
     (Step ((z, (Admininstr.Instr instr)), (z, (Admininstr.Instr instr'))))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,'
@@ -1007,131 +1007,79 @@ SpecTec.lean: error: application type mismatch
 argument
   t_1
 has type
-  Valtype : Type
-but is expected to have type
   List Valtype : Type
-SpecTec.lean: error: type mismatch
-  none
-has type
-  Option ?m.72695 : Type ?u.72694
 but is expected to have type
-  N : Type
-SpecTec.lean: error: unknown constant 'Numtype.In'
-SpecTec.lean: error: type mismatch
-  none
+  Valtype : Type
+SpecTec.lean: error: application type mismatch
+  Nat.div n
+argument
+  n
 has type
-  Option ?m.73266 : Type ?u.73265
+  Option N : Type
 but is expected to have type
-  N : Type
+  Nat : Type
+SpecTec.lean: error: application type mismatch
+  Nat.div n
+argument
+  n
+has type
+  Option N : Type
+but is expected to have type
+  Nat : Type
 SpecTec.lean: error: unknown constant 'Numtype.In'
+SpecTec.lean: error: application type mismatch
+  Nat.div n
+argument
+  n
+has type
+  Option N : Type
+but is expected to have type
+  Nat : Type
+SpecTec.lean: error: application type mismatch
+  Nat.div n
+argument
+  n
+has type
+  Option N : Type
+but is expected to have type
+  Nat : Type
+SpecTec.lean: error: unknown constant 'Numtype.In'
+SpecTec.lean: error: application type mismatch
+  Prod.mk (n, sx)
+argument
+  (n, sx)
+has type
+  Option N × Option Sx : Type
+but is expected to have type
+  Option (N × Sx) : Type
+SpecTec.lean: error: type mismatch
+  ((), t)
+has type
+  Unit × Valtype : Type
+but is expected to have type
+  Globaltype : Type
 SpecTec.lean: error: unknown constant 'Numtype.Fn'
 SpecTec.lean: error: unknown constant 'Numtype.Fn'
 SpecTec.lean: error: unknown constant 'Valtype.Fn'
 SpecTec.lean: error: unknown constant 'Valtype.Fn'
-SpecTec.lean: error: type mismatch
-  none
-has type
-  Option ?m.75279 : Type ?u.75278
-but is expected to have type
-  Sx : Type
 SpecTec.lean: error: unknown constant 'Valtype.In'
 SpecTec.lean: error: unknown constant 'Valtype.In'
 SpecTec.lean: error: unknown constant 'Numtype.In'
 SpecTec.lean: error: unknown constant 'Numtype.In'
 SpecTec.lean: error: unknown constant 'Valtype.In'
 SpecTec.lean: error: unknown constant 'Valtype.In'
-SpecTec.lean: error: type mismatch
-  (t_1, t_2)
-has type
-  Valtype × Valtype : Type
-but is expected to have type
-  Functype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype (List Valtype) ?m.76541
-SpecTec.lean: error: type mismatch
-  (t_1, t_2)
-has type
-  Valtype × Valtype : Type
-but is expected to have type
-  Functype : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: type mismatch
-  some t
-has type
-  Option Valtype : Type
-but is expected to have type
-  Option Resulttype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.77852
-SpecTec.lean: error: application type mismatch
-  Prod.mk t
-argument
-  t
-has type
-  Valtype : Type
-but is expected to have type
-  List Valtype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t
-argument
-  t
-has type
-  Valtype : Type
-but is expected to have type
-  List Valtype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk l
+  List.get! C.LABEL l
 argument
   l
 has type
-  Labelidx : Type
-but is expected to have type
   List Labelidx : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.78399
-SpecTec.lean: error: type mismatch
-  t
-has type
-  Valtype : Type
 but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype (List Valtype) ?m.79015
-SpecTec.lean: error: type mismatch
-  t
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.79533
+  Nat : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
+  (t_1, t_2)
 argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr_1
-argument
-  instr_1
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
+  t_2
 has type
   Valtype : Type
 but is expected to have type
@@ -1145,33 +1093,9 @@ has type
 but is expected to have type
   Resulttype : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk instr_2
+  (t_1, t_2)
 argument
-  instr_2
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr_1
-argument
-  instr_1
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
+  t_2
 has type
   Valtype : Type
 but is expected to have type
@@ -1185,95 +1109,7 @@ has type
 but is expected to have type
   Resulttype : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  (bt, instr)
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  List.cons t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  (bt, instr)
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  List.cons t_2
+  (t_1, t_2)
 argument
   t_2
 has type
@@ -1281,53 +1117,9 @@ has type
 but is expected to have type
   Resulttype : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
+  (t_1, t_2)
 argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.81846
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.82047
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
+  t_2
 has type
   Valtype : Type
 but is expected to have type
@@ -1340,246 +1132,108 @@ has type
   Valtype : Type
 but is expected to have type
   List Valtype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  List Valtype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  ([t'_1], t'_2)
-argument
-  t'_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.83395
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  ([], t)
-argument
-  t
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  Expr : Type
+  HAppend (List Instr) Instr ?m.77841
 SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
   instr
 has type
+  List Instr : Type
+but is expected to have type
   Instr : Type
-but is expected to have type
-  Expr : Type
 SpecTec.lean: error: type mismatch
-  (t_1, t_2)
+  ((), t)
 has type
-  Valtype × Valtype : Type
+  Unit × Valtype : Type
 but is expected to have type
-  Functype : Type
-SpecTec.lean: error: application type mismatch
-  (expr, t_2)
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t
-argument
-  t
-has type
-  Valtype : Type
-but is expected to have type
-  List Valtype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Valtype Valtype ?m.101807
-SpecTec.lean: error: application type mismatch
-  List.cons t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  some t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
+  Globaltype : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk expr
 argument
   expr
 has type
-  Expr : Type
-but is expected to have type
   List Expr : Type
+but is expected to have type
+  Expr : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk b
+  Prod.mk elemmode
 argument
-  b
+  elemmode
 has type
-  Byte : Type
+  Option Elemmode : Type
 but is expected to have type
-  List (List Byte) : Type
-SpecTec.lean: error: type mismatch
-  ft
-has type
-  Functype : Type
-but is expected to have type
-  List Functype : Type
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Mem.length'
-  mem
-has type
-  Mem
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Memtype.length'
-  mem
-has type
-  Memtype
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Limits.length'
-  mem
-has type
-  Limits
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Prod.length'
-  mem
-has type
-  U32 × U32
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Start.length'
-  start
-has type
-  Start
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Funcidx.length'
-  start
-has type
-  Funcidx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
-  start
-has type
-  Idx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
-  start
-has type
-  Nat
+  Elemmode : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk import
+  (C, datamode)
 argument
-  import
+  datamode
 has type
-  Import : Type
+  Option Datamode : Type
 but is expected to have type
-  List Import : Type
+  Datamode : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk func
 argument
   func
 has type
-  Func : Type
-but is expected to have type
   List Func : Type
+but is expected to have type
+  Func : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk global
 argument
   global
 has type
-  Global : Type
-but is expected to have type
   List Global : Type
+but is expected to have type
+  Global : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk table
 argument
   table
 has type
-  Table : Type
-but is expected to have type
   List Table : Type
+but is expected to have type
+  Table : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk mem
 argument
   mem
 has type
-  Mem : Type
-but is expected to have type
   List Mem : Type
+but is expected to have type
+  Mem : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk elem
 argument
   elem
 has type
-  Elem : Type
-but is expected to have type
   List Elem : Type
+but is expected to have type
+  Elem : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk data
+  (C, data)
 argument
   data
 has type
-  Data : Type
-but is expected to have type
   List Data : Type
+but is expected to have type
+  Data : Type
 SpecTec.lean: error: application type mismatch
-  Prod.mk start
+  (C, start)
 argument
   start
 has type
-  Start : Type
-but is expected to have type
   List Start : Type
+but is expected to have type
+  Start : Type
+SpecTec.lean: error: type mismatch
+  ()
+has type
+  Unit : Type
+but is expected to have type
+  List Datatype : Type
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
 SpecTec.lean: error: expected identifier
@@ -1594,184 +1248,90 @@ SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Labelidx.length'
-  l
-has type
-  Labelidx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
-  l
-has type
-  Idx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
-  l
-has type
-  Nat
-SpecTec.lean: error: application type mismatch
-  Prod.mk l
-argument
-  l
-has type
-  Labelidx : Type
-but is expected to have type
-  List Labelidx : Type
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Labelidx.length'
-  l
-has type
-  Labelidx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Idx.length'
-  l
-has type
-  Idx
-SpecTec.lean: error: invalid field 'length', the environment does not contain 'Nat.length'
-  l
-has type
-  Nat
-SpecTec.lean: error: application type mismatch
-  Prod.mk l
-argument
-  l
-has type
-  Labelidx : Type
-but is expected to have type
-  List Labelidx : Type
-SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Labelidx.get!'
-  l
-has type
-  Labelidx
-SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Idx.get!'
-  l
-has type
-  Idx
-SpecTec.lean: error: invalid field 'get!', the environment does not contain 'Nat.get!'
-  l
-has type
-  Nat
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr'
-argument
-  instr'
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.130319
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: application type mismatch
-  Prod.mk instr'
-argument
-  instr'
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.130708
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr_1
-argument
-  instr_1
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  (bt, instr_2)
-argument
-  instr_2
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk instr_1
-argument
-  instr_1
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  (bt, instr_1)
-argument
-  instr_1
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: type mismatch
-  (t_1, t_2)
-has type
-  Valtype × Valtype : Type
-but is expected to have type
-  Blocktype : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  (bt, instr)
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: application type mismatch
-  (bt, instr)
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: type mismatch
-  (t_1, t_2)
-has type
-  Valtype × Valtype : Type
-but is expected to have type
-  Blocktype : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: application type mismatch
-  (bt, instr)
-argument
-  instr
-has type
-  Instr : Type
-but is expected to have type
-  List Instr : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: type mismatch
-  (m, (t_1, t_2), t, instr)
-has type
-  Moduleinst × (Valtype × Valtype) × Valtype × Instr : Type
-but is expected to have type
-  Funcinst : Type
-SpecTec.lean: error: unknown constant 'Admininstr.Val'
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Val Val ?m.134041
-SpecTec.lean: error: application type mismatch
-  ([], Admininstr.Instr instr)
-argument
   Admininstr.Instr instr
+argument
+  instr
 has type
-  Admininstr : Type
+  List Instr : Type
 but is expected to have type
-  List Admininstr : Type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.124169
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.124562
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: unknown constant 'Admininstr.Val'
+SpecTec.lean: error: application type mismatch
+  default_ t
+argument
+  t
+has type
+  List Valtype : Type
+but is expected to have type
+  Valtype : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Val) Val ?m.126855
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
 SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
@@ -1786,83 +1346,99 @@ SpecTec.lean: error: unknown constant 'Admininstr.Ref'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: unknown constant 'Admininstr.Val'
 SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr)
-argument
   Admininstr.Instr instr
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z', Admininstr.Instr instr')
 argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
   Admininstr.Instr instr'
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr)
 argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
   Admininstr.Instr instr
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z', Admininstr.Instr instr')
 argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
   Admininstr.Instr instr'
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr)
 argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
   Admininstr.Instr instr
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr)
 argument
-  Admininstr.Instr instr
+  instr
 has type
-  Admininstr : Type
+  List Instr : Type
 but is expected to have type
-  List Admininstr : Type
+  Instr : Type
 SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr')
-argument
   Admininstr.Instr instr'
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk (Admininstr.Instr instr)
 argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
   Admininstr.Instr instr
-has type
-  Admininstr : Type
-but is expected to have type
-  List Admininstr : Type
-SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr)
 argument
-  Admininstr.Instr instr
+  instr
 has type
-  Admininstr : Type
+  List Instr : Type
 but is expected to have type
-  List Admininstr : Type
+  Instr : Type
 SpecTec.lean: error: application type mismatch
-  (z, Admininstr.Instr instr')
-argument
   Admininstr.Instr instr'
+argument
+  instr'
 has type
-  Admininstr : Type
+  List Instr : Type
 but is expected to have type
-  List Admininstr : Type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  Admininstr.Instr instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
 ```
