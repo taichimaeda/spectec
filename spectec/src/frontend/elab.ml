@@ -772,8 +772,8 @@ and elab_exp_notation' env exp nottyp : Il.exp list =
     if (iter = Opt) <> (iter1 = Opt) then
       error_nottyp exp.at "iteration expression" nottyp;
     let exps1' = elab_exp_notation' env exp1 nottyp1 in
-    let _iter1' = elab_iter env iter1 in
-    [lift_exp' (tup_exp' exps1' exp1.at) iter $ exp.at]
+    let iter1' = elab_iter env iter1 in
+    [Il.IterE (tup_exp' exps1' exp1.at, iter1') $ exp.at]
   (* Significant parentheses indicate a singleton *)
   | ParenE (exp1, true), IterNT (nottyp1, iter) ->
     let exps' = elab_exp_notation' env exp1 nottyp1 in
@@ -938,10 +938,12 @@ and cast_exp_variant phrase env exp' typ1 typ2 : Il.exp =
 
 (* Definitions *)
 
-let make_binds env free at =
+let make_binds env free dims at : Il.binds =
   List.map (fun id' ->
     let id = id' $ at in
-    (id, elab_typ env (find "variable" env.vars (prefix_id id)))
+    let t = elab_typ env (find "variable" env.vars (prefix_id id)) in
+    let ctx = List.map (elab_iter env) (Multiplicity.Env.find id.it dims) in
+    (id, t, ctx)
   ) (Set.elements free)
 
 
@@ -1022,7 +1024,8 @@ let elab_def env def : Il.def list =
     let exps' = elab_exp_notation' env exp nottyp in
     let prems' = map_nl_list (elab_prem env) prems in
     let free = (Free.free_def def).Free.varid in
-    let binds' = make_binds env free def.at in
+    let dims = Multiplicity.check_def def in
+    let binds' = make_binds env free dims def.at in
     let rule' = Il.RuleD (id2, binds', mixop', tup_exp' exps' exp.at, prems') $ def.at in
     env.rels <- rebind "relation" env.rels id1 (nottyp, rule'::rules');
     []
@@ -1042,14 +1045,14 @@ let elab_def env def : Il.def list =
     let exp1' = elab_exp env exp1 typ1 in
     let exp2' = elab_exp env exp2 typ2 in
     let prems' = map_nl_list (elab_prem env) prems in
-    let free =
-      Free.(Set.elements (Set.diff (free_exp exp2).varid (free_exp exp1).varid))
-    in
-    if free <> [] then
+    let free_rh = Free.(Set.diff (free_exp exp2).varid (free_exp exp1).varid) in
+    if free_rh <> Free.Set.empty then
       error def.at ("definition contains unbound variable(s) `" ^
-        String.concat "`, `" free ^ "`");
-    let free = Free.(Set.union (free_exp exp1).varid (free_exp exp1).varid) in
-    let binds' = make_binds env free def.at in
+        String.concat "`, `" (Free.Set.elements free_rh) ^ "`");
+    let free = Free.(Set.union
+      (free_exp exp1).varid (free_nl_list free_prem prems).varid) in
+    let dims = Multiplicity.check_def def in
+    let binds' = make_binds env free dims def.at in
     let clause' = Il.DefD (binds', exp1', exp2', prems') $ def.at in
     env.defs <- rebind "definition" env.defs id (typ1, typ2, clause'::clauses');
     []

@@ -13,7 +13,7 @@ let error at msg = Source.error at "type" msg
 
 module Env = Map.Make(String)
 
-type var_typ = typ
+type var_typ = typ * iter list
 type syn_typ = deftyp
 type rel_typ = mixop * typ
 type def_typ = typ * typ
@@ -23,6 +23,7 @@ type env =
     mutable typs : syn_typ Env.t;
     mutable rels : rel_typ Env.t;
     mutable defs : def_typ Env.t;
+    ctx : iter list;
   }
 
 let new_env () =
@@ -30,6 +31,7 @@ let new_env () =
     typs = Env.empty;
     rels = Env.empty;
     defs = Env.empty;
+    ctx = [];
   }
 
 let fwd_deftyp id = NotationT ([[]; []], VarT (id $ no_region) $ no_region)
@@ -60,6 +62,14 @@ let find_case cases atom at =
   match List.find_opt (fun (atom', _, _) -> atom' = atom) cases with
   | Some (_, x, _) -> x
   | None -> error at ("unknown case `" ^ string_of_atom atom ^ "`")
+
+
+let rec is_prefix ctx1 ctx2 =
+  match ctx1, ctx2 with
+  | [], _ -> true
+  | _, [] -> false
+  | iter1::ctx1', iter2::ctx2' ->
+    Eq.eq_iter iter1 iter2 && is_prefix ctx1' ctx2'
 
 
 (* Type Accessors *)
@@ -265,7 +275,7 @@ and valid_typcase env (_atom, typ, _hints) = valid_typ env typ
 
 and infer_exp env exp : typ =
   match exp.it with
-  | VarE id -> find "variable" env.vars id
+  | VarE id -> fst (find "variable" env.vars id)
   | BoolE _ -> BoolT $ exp.at
   | NatE _ | LenE _ -> NatT $ exp.at
   | TextE _ -> TextT $ exp.at
@@ -302,7 +312,14 @@ and valid_exp env exp typ =
     (string_of_region exp.at) (string_of_exp exp) (string_of_typ typ);
   *)
   match exp.it with
-  | VarE _ | BoolE _ | NatE _ | TextE _ ->
+  | VarE id ->
+    let typ', dim = find "variable" env.vars id in
+    equiv_typ env typ' typ exp.at;
+    if not (is_prefix dim env.ctx) then
+      error exp.at ("inconsistent use of iterated variable `" ^
+        id.it ^ String.concat "" (List.map string_of_iter dim) ^ "` in " ^
+        "context `_" ^ String.concat "" (List.map string_of_iter env.ctx) ^ "`")
+  | BoolE _ | NatE _ | TextE _ ->
     let typ' = infer_exp env exp in
     equiv_typ env typ' typ exp.at
   | UnE (unop, exp1) ->
@@ -374,7 +391,7 @@ and valid_exp env exp typ =
   | IterE (exp1, iter) ->
     valid_iter env iter;
     let typ1 = as_iter_typ iter "iteration" env Check typ exp.at in
-    valid_exp env exp1 typ1
+    valid_exp {env with ctx = iter::env.ctx} exp1 typ1
   | OptE expo ->
     let typ1 = as_iter_typ Opt "option" env Check typ exp.at in
     Option.iter (fun exp1 -> valid_exp env exp1 typ1) expo
@@ -427,19 +444,23 @@ and valid_path env path typ : typ =
 (* Definitions *)
 
 let valid_binds env binds =
-  List.iter (fun (id, typ) ->
+  List.iter (fun (id, typ, dim) ->
     valid_typ env typ;
-    env.vars <- bind "variable" env.vars id typ
+    env.vars <- bind "variable" env.vars id (typ, dim)
   ) binds
+
+let valid_iter_opt env = function
+  | None -> env
+  | Some iter -> valid_iter env iter; {env with ctx = iter::env.ctx}
 
 let valid_prem env prem =
   match prem.it with
   | RulePr (id, mixop, exp, iter_opt) ->
-    valid_expmix env mixop exp (find "relation" env.rels id) exp.at;
-    Option.iter (valid_iter env) iter_opt
+    let env' = valid_iter_opt env iter_opt in
+    valid_expmix env' mixop exp (find "relation" env.rels id) exp.at
   | IfPr (exp, iter_opt) ->
-    valid_exp env exp (BoolT $ exp.at);
-    Option.iter (valid_iter env) iter_opt
+    let env' = valid_iter_opt env iter_opt in
+    valid_exp env' exp (BoolT $ exp.at)
   | ElsePr ->
     ()
 
@@ -458,7 +479,11 @@ let valid_clause env typ1 typ2 clause =
     valid_exp env exp1 typ1;
     valid_exp env exp2 typ2;
     List.iter (valid_prem env) prems;
-    env.vars <- Env.empty
+    env.vars <- Env.empty;
+    let free_rh = Free.(Set.diff (free_exp exp2).varid (free_exp exp1).varid) in
+    if free_rh <> Free.Set.empty then
+      error clause.at ("definition contains unbound variable(s) `" ^
+        String.concat "`, `" (Free.Set.elements free_rh) ^ "`")
 
 
 let infer_def env def =
