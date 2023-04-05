@@ -1000,7 +1000,7 @@ inductive Step : (Config × Config) -> Prop where
   | pure (instr : Instr) (instr' : Instr) (z : State) :
     (Step_pure ((Admininstr.Instr instr), (Admininstr.Instr instr'))) ->
     (Step ((z, (Admininstr.Instr instr)), (z, (Admininstr.Instr instr'))))
-$ lean SpecTec.lean |& sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,'
+$ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,'
 SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
 SpecTec.lean: error: application type mismatch
   Prod.mk t_1
