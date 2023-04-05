@@ -1000,10 +1000,9 @@ inductive Step : (Config × Config) -> Prop where
   | pure (instr : Instr) (instr' : Instr) (z : State) :
     (Step_pure ((Admininstr.Instr instr), (Admininstr.Instr instr'))) ->
     (Step ((z, (Admininstr.Instr instr)), (z, (Admininstr.Instr instr'))))
-$ lake build |& sed -e 's,`.*/toolchains,`.../toolchains`,g'
-info: cloning https://github.com/leanprover/std4 to ./lake-packages/std
+$ lake build |& sed -e 's,/[^ ]*/toolchains,.../toolchains`,g'
 Building SpecTec
-error: > LEAN_PATH=./build/lib:./lake-packages/std/build/lib LD_LIBRARY_PATH=/home/jojo/.elan/toolchains/leanprover--lean4---nightly-2023-02-10/lib:/etc/sane-libs:./build/lib /home/jojo/.elan/toolchains/leanprover--lean4---nightly-2023-02-10/bin/lean ./././SpecTec.lean -R ././. -o ./build/lib/SpecTec.olean -i ./build/lib/SpecTec.ilean -c ./build/ir/SpecTec.c
+error: > LEAN_PATH=./build/lib LD_LIBRARY_PATH=.../toolchains`/leanprover--lean4---nightly-2023-02-10/lib:/etc/sane-libs:./build/lib .../toolchains`/leanprover--lean4---nightly-2023-02-10/bin/lean ./././SpecTec.lean -R ././. -o ./build/lib/SpecTec.olean -i ./build/lib/SpecTec.ilean -c ./build/ir/SpecTec.c
 error: stdout:
 ./././SpecTec.lean:284:4: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
 ./././SpecTec.lean:371:21: error: application type mismatch
