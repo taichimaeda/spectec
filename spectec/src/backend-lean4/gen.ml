@@ -104,7 +104,10 @@ let rec render_exp (exp : exp) = match exp.it with
   | ListE es -> render_list render_exp es
   | OptE None -> "none"
   | OptE (Some e) -> "some" $$ render_exp e
-  | IterE (e, _) -> render_exp e
+  | IterE (e, iter) -> begin match e.it with
+    | VarE v -> render_id v (* Short-ciruit this common form *)
+    | _ -> render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
+  end
   | CaseE (a, e, typ, styps) -> render_case a e typ styps
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
     render_field_name a ^ " := " ^ render_exp e
@@ -202,8 +205,12 @@ let rec render_def (d : def) =
         String.concat "" (List.map (fun (prem : premise) ->
           "\n    " ^
           begin match prem.it with
-          | RulePr (pid, _mixops, pexp, _iter) ->
-            render_type_name pid $$ render_exp pexp
+          | RulePr (pid, _mixops, pexp, iter) ->
+            (render_type_name pid $$ render_exp pexp) ^
+            begin match iter with
+            | None -> ""
+            | Some iter -> " /- " ^ Il.Print.string_of_iter iter ^ " -/"
+            end
           | IfPr (pexp, _iter) -> render_exp pexp
           | ElsePr -> "True /- Else? -/"
           end ^ " -> "
