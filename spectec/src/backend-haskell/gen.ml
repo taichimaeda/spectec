@@ -10,10 +10,18 @@ let render_type_name (id : id) = String.capitalize_ascii id.it
 
 let render_rec_con (id : id) = "Mk" ^ render_type_name id
 
-let make_id = String.map (function
-  | '.' -> '_'
-  | c -> c
-  )
+let is_reserved = function
+ | "data"
+ -> true
+ | _ -> false
+
+let make_id s = match s with
+ | s when is_reserved s ->  s ^ "_"
+ | s -> String.map (function
+    | '.' -> '_'
+    | '-' -> '_'
+    | c -> c
+    ) s
 
 let render_con_name id : atom -> string = function
   | Atom s ->

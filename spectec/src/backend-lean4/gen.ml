@@ -83,7 +83,7 @@ let rec prepend first rest = function
 
 
 let render_variant_inj (id1 : id) (id2 : id) =
-  make_id (id1.it ^ "_" ^ id2.it)
+  "«$" ^ id1.it ^ "_" ^ id2.it ^ "»"
 
 let render_variant_inj' (typ1 : typ) (typ2 : typ) = match typ1.it, typ2.it with
   | VarT id1, VarT id2 -> render_variant_inj id1 id2

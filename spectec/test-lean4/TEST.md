@@ -79,10 +79,18 @@ inductive In where
  | I64 : In
   deriving Inhabited, BEq
 
+def «$numtype_in» : In -> Numtype
+  | In.I32 => Numtype.I32
+  | In.I64 => Numtype.I64
+
 inductive Fn where
  | F32 : Fn
  | F64 : Fn
   deriving Inhabited, BEq
+
+def «$numtype_fn» : Fn -> Numtype
+  | Fn.F32 => Numtype.F32
+  | Fn.F64 => Numtype.F64
 
 @[reducible] def Resulttype := (List Valtype)
 
@@ -441,14 +449,14 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8)))) ->
-    ((n == none) || (nt == (numtype_in «in»))) ->
-    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, (valtype_numtype nt)], [])))
+    ((n == none) || (nt == («$numtype_in» «in»))) ->
+    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8)))) ->
-    ((n == none) || (nt == (numtype_in «in»))) ->
-    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([Valtype.I32], [(valtype_numtype nt)])))
+    ((n == none) || (nt == («$numtype_in» «in»))) ->
+    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
   | data_drop (C : Context) (x : Idx) :
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
@@ -481,19 +489,19 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.TABLE_COPY (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
   | table_fill (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_FILL x), ([Valtype.I32, (valtype_reftype rt), Valtype.I32], [])))
+    (Instr_ok (C, (Instr.TABLE_FILL x), ([Valtype.I32, («$valtype_reftype» rt), Valtype.I32], [])))
   | table_grow (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GROW x), ([(valtype_reftype rt), Valtype.I32], [Valtype.I32])))
+    (Instr_ok (C, (Instr.TABLE_GROW x), ([(«$valtype_reftype» rt), Valtype.I32], [Valtype.I32])))
   | table_size (C : Context) (tt : Tabletype) (x : Idx) :
     ((C.TABLE.get! x) == tt) ->
     (Instr_ok (C, (Instr.TABLE_SIZE x), ([], [Valtype.I32])))
   | table_set (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_SET x), ([Valtype.I32, (valtype_reftype rt)], [])))
+    (Instr_ok (C, (Instr.TABLE_SET x), ([Valtype.I32, («$valtype_reftype» rt)], [])))
   | table_get (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GET x), ([Valtype.I32], [(valtype_reftype rt)])))
+    (Instr_ok (C, (Instr.TABLE_GET x), ([Valtype.I32], [(«$valtype_reftype» rt)])))
   | global_set (C : Context) (t : Valtype) (x : Idx) :
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
@@ -510,36 +518,36 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.LOCAL.get! x) == t) ->
     (Instr_ok (C, (Instr.LOCAL_GET x), ([], [t])))
   | ref_is_null (C : Context) (rt : Reftype) :
-    (Instr_ok (C, Instr.REF_IS_NULL, ([(valtype_reftype rt)], [Valtype.I32])))
+    (Instr_ok (C, Instr.REF_IS_NULL, ([(«$valtype_reftype» rt)], [Valtype.I32])))
   | ref_func (C : Context) (ft : Functype) (x : Idx) :
     ((C.FUNC.get! x) == ft) ->
     (Instr_ok (C, (Instr.REF_FUNC x), ([], [Valtype.FUNCREF])))
   | ref_null (C : Context) (rt : Reftype) :
-    (Instr_ok (C, (Instr.REF_NULL rt), ([], [(valtype_reftype rt)])))
+    (Instr_ok (C, (Instr.REF_NULL rt), ([], [(«$valtype_reftype» rt)])))
   | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
     (fn_1 != fn_2) ->
-    (Instr_ok (C, (Instr.CVTOP ((numtype_fn fn_1), Cvtop.CONVERT, (numtype_fn fn_2), none)), ([(valtype_fn fn_2)], [(valtype_fn fn_1)])))
+    (Instr_ok (C, (Instr.CVTOP ((«$numtype_fn» fn_1), Cvtop.CONVERT, («$numtype_fn» fn_2), none)), ([(«$valtype_fn» fn_2)], [(«$valtype_fn» fn_1)])))
   | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
     (in_1 != in_2) ->
-    ((sx == none) = ((«$size» (valtype_in in_1)) > («$size» (valtype_in in_2)))) ->
-    (Instr_ok (C, (Instr.CVTOP ((numtype_in in_1), Cvtop.CONVERT, (numtype_in in_2), sx)), ([(valtype_in in_2)], [(valtype_in in_1)])))
+    ((sx == none) = ((«$size» («$valtype_in» in_1)) > («$size» («$valtype_in» in_2)))) ->
+    (Instr_ok (C, (Instr.CVTOP ((«$numtype_in» in_1), Cvtop.CONVERT, («$numtype_in» in_2), sx)), ([(«$valtype_in» in_2)], [(«$valtype_in» in_1)])))
   | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) :
     (nt_1 != nt_2) ->
-    ((«$size» (valtype_numtype nt_1)) == («$size» (valtype_numtype nt_2))) ->
-    (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(valtype_numtype nt_2)], [(valtype_numtype nt_1)])))
+    ((«$size» («$valtype_numtype» nt_1)) == («$size» («$valtype_numtype» nt_2))) ->
+    (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
   | extend (C : Context) (n : N) (nt : Numtype) :
-    (n <= («$size» (valtype_numtype nt))) ->
-    (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(valtype_numtype nt)], [(valtype_numtype nt)])))
+    (n <= («$size» («$valtype_numtype» nt))) ->
+    (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
   | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) :
-    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(valtype_numtype nt), (valtype_numtype nt)], [Valtype.I32])))
+    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [Valtype.I32])))
   | testop (C : Context) (nt : Numtype) (testop : Testop_numtype) :
-    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(valtype_numtype nt)], [Valtype.I32])))
+    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(«$valtype_numtype» nt)], [Valtype.I32])))
   | binop (C : Context) (binop : Binop_numtype) (nt : Numtype) :
-    (Instr_ok (C, (Instr.BINOP (nt, binop)), ([(valtype_numtype nt), (valtype_numtype nt)], [(valtype_numtype nt)])))
+    (Instr_ok (C, (Instr.BINOP (nt, binop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
   | unop (C : Context) (nt : Numtype) (unop : Unop_numtype) :
-    (Instr_ok (C, (Instr.UNOP (nt, unop)), ([(valtype_numtype nt)], [(valtype_numtype nt)])))
+    (Instr_ok (C, (Instr.UNOP (nt, unop)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
   | const (C : Context) (c_nt : C_numtype) (nt : Numtype) :
-    (Instr_ok (C, (Instr.CONST (nt, c_nt)), ([], [(valtype_numtype nt)])))
+    (Instr_ok (C, (Instr.CONST (nt, c_nt)), ([], [(«$valtype_numtype» nt)])))
   | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
     ((C.TABLE.get! x) == (lim, Reftype.FUNCREF)) ->
     (ft == (t_1, t_2)) ->
@@ -551,8 +559,8 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (C.RETURN == (some t)) ->
     (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
   | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Resulttype_sub (t, [(valtype_resulttype (C.LABEL.get! l))])) /- * -/ ->
-    (Resulttype_sub (t, [(valtype_resulttype (C.LABEL.get! l'))])) ->
+    (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l))])) /- * -/ ->
+    (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l'))])) ->
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
   | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
@@ -575,7 +583,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
   | select_impl (C : Context) (numtype : Numtype) (t : Valtype) (t' : Valtype) (vectype : Vectype) :
     (Valtype_sub (t, t')) ->
-    ((t' == (valtype_numtype numtype)) || (t' == (valtype_vectype vectype))) ->
+    ((t' == («$valtype_numtype» numtype)) || (t' == («$valtype_vectype» vectype))) ->
     (Instr_ok (C, (Instr.SELECT none), ([t, t, Valtype.I32], [t])))
   | select_expl (C : Context) (t : Valtype) :
     (Instr_ok (C, (Instr.SELECT (some t)), ([t, t, Valtype.I32], [t])))
@@ -663,7 +671,7 @@ inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
 
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
   | rule_0 (C : Context) (elemmode : (Option Elemmode)) (expr : (List Expr)) (rt : Reftype) :
-    (Expr_ok (C, expr, [(valtype_reftype rt)])) /- * -/ ->
+    (Expr_ok (C, expr, [(«$valtype_reftype» rt)])) /- * -/ ->
     (Elemmode_ok (C, elemmode, rt)) /- ? -/ ->
     (Elem_ok (C, (rt, expr, elemmode), rt))
 
@@ -1023,13 +1031,13 @@ def «$cvtop» : (Numtype × Cvtop × Numtype × (Option Sx) × C_numtype) -> (L
 
 inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
   | local_tee (val : Val) (x : Idx) :
-    (Step_pure ([(admininstr_val val), (Admininstr.LOCAL_TEE x)], [(admininstr_val val), (admininstr_val val), (Admininstr.LOCAL_SET x)]))
+    (Step_pure ([(«$admininstr_val» val), (Admininstr.LOCAL_TEE x)], [(«$admininstr_val» val), («$admininstr_val» val), (Admininstr.LOCAL_SET x)]))
   | ref_is_null_false (val : Val) :
     True /- Else? -/ ->
-    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
+    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
   | ref_is_null_true (rt : Reftype) (val : Val) :
     (val == (Val.REF_NULL rt)) ->
-    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
+    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
   | cvtop_trap (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
     ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == []) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [Admininstr.TRAP]))
@@ -1037,7 +1045,7 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == [c]) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
   | extend (c : C_numtype) (n : N) (nt : Numtype) :
-    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» (valtype_numtype nt)), Sx.S, c))))]))
+    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)), Sx.S, c))))]))
   | relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) :
     (c == («$relop» (relop, nt, c_1, c_2))) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
@@ -1057,11 +1065,11 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     ((«$unop» (unop, nt, c_1)) == [c]) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
   | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((admininstr_val val) /- * -/ ++ ([Admininstr.RETURN] ++ (admininstr_instr instr) /- * -/))))], ((admininstr_val val) /- * -/ ++ [Admininstr.RETURN])))
+    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((«$admininstr_val» val) /- * -/ ++ ([Admininstr.RETURN] ++ («$admininstr_instr» instr) /- * -/))))], ((«$admininstr_val» val) /- * -/ ++ [Admininstr.RETURN])))
   | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, ((admininstr_val val') /- * -/ ++ ((admininstr_val val) /- ^n -/ ++ ([Admininstr.RETURN] ++ (admininstr_instr instr) /- * -/)))))], (admininstr_val val) /- ^n -/))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, ((«$admininstr_val» val') /- * -/ ++ ((«$admininstr_val» val) /- ^n -/ ++ ([Admininstr.RETURN] ++ («$admininstr_instr» instr) /- * -/)))))], («$admininstr_val» val) /- ^n -/))
   | frame_vals (f : Frame) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, (admininstr_val val) /- ^n -/))], (admininstr_val val) /- ^n -/))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, («$admininstr_val» val) /- ^n -/))], («$admininstr_val» val) /- ^n -/))
   | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i >= l.length) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
@@ -1075,11 +1083,11 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (c != 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
   | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((admininstr_val val) /- * -/ ++ ([(Admininstr.BR (l + 1))] ++ (admininstr_instr instr) /- * -/))))], ((admininstr_val val) /- * -/ ++ [(Admininstr.BR l)])))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((«$admininstr_val» val) /- * -/ ++ ([(Admininstr.BR (l + 1))] ++ («$admininstr_instr» instr) /- * -/))))], ((«$admininstr_val» val) /- * -/ ++ [(Admininstr.BR l)])))
   | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((admininstr_val val') /- * -/ ++ ((admininstr_val val) /- ^n -/ ++ ([(Admininstr.BR 0)] ++ (admininstr_instr instr) /- * -/)))))], ((admininstr_val val) /- ^n -/ ++ (admininstr_instr instr') /- * -/)))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((«$admininstr_val» val') /- * -/ ++ ((«$admininstr_val» val) /- ^n -/ ++ ([(Admininstr.BR 0)] ++ («$admininstr_instr» instr) /- * -/)))))], ((«$admininstr_val» val) /- ^n -/ ++ («$admininstr_instr» instr') /- * -/)))
   | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr, (admininstr_val val) /- * -/))], (admininstr_val val) /- * -/))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr, («$admininstr_val» val) /- * -/))], («$admininstr_val» val) /- * -/))
   | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c == 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
@@ -1088,18 +1096,18 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
   | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((admininstr_val val) /- ^k -/ ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((admininstr_val val) /- ^k -/ ++ (admininstr_instr instr) /- * -/)))]))
+    (Step_pure (((«$admininstr_val» val) /- ^k -/ ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((«$admininstr_val» val) /- ^k -/ ++ («$admininstr_instr» instr) /- * -/)))]))
   | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((admininstr_val val) /- ^k -/ ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((admininstr_val val) /- ^k -/ ++ (admininstr_instr instr) /- * -/)))]))
+    (Step_pure (((«$admininstr_val» val) /- ^k -/ ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((«$admininstr_val» val) /- ^k -/ ++ («$admininstr_instr» instr) /- * -/)))]))
   | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c == 0) ->
-    (Step_pure ([(admininstr_val val_1), (admininstr_val val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(admininstr_val val_2)]))
+    (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_2)]))
   | select_true (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c != 0) ->
-    (Step_pure ([(admininstr_val val_1), (admininstr_val val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(admininstr_val val_1)]))
+    (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_1)]))
   | drop (val : Val) :
-    (Step_pure ([(admininstr_val val), Admininstr.DROP], []))
+    (Step_pure ([(«$admininstr_val» val), Admininstr.DROP], []))
   | nop  :
     (Step_pure ([Admininstr.NOP], []))
   | unreachable  :
@@ -1108,7 +1116,7 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | table_init_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (admininstr_ref ((«$elem» (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), («$admininstr_ref» ((«$elem» (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
   | table_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
     True /- Else? -/ ->
     (n == 0) ->
@@ -1132,14 +1140,14 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
   | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
     True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), (admininstr_val val), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_FILL x)]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_FILL x)]))
   | table_fill_zero (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
     True /- Else? -/ ->
     (n == 0) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), []))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), []))
   | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
     ((i + n) > («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
   | table_grow_fail (n : N) (x : Idx) (z : State) :
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, default /- - 1 -/))]))
   | table_size (n : N) (x : Idx) (z : State) :
@@ -1147,23 +1155,23 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
   | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) :
     (i >= («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
   | table_get_val (i : Nat) (x : Idx) (z : State) :
     (i < («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(admininstr_ref ((«$table» (z, x)).get! i))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(«$admininstr_ref» ((«$table» (z, x)).get! i))]))
   | table_get_trap (i : Nat) (x : Idx) (z : State) :
     (i >= («$table» (z, x)).length) ->
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
   | global_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(admininstr_globalinst («$global» (z, x)))]))
+    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(«$admininstr_globalinst» («$global» (z, x)))]))
   | local_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(admininstr_val («$local» (z, x)))]))
+    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(«$admininstr_val» («$local» (z, x)))]))
   | ref_func (x : Idx) (z : State) :
     (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
   | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
     (f == {LOCAL := (val ++ («$default_» t) /- * -/), MODULE := m}) ->
-    (Step_read ((z, ((admininstr_val val) /- ^k -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (admininstr_instr instr) /- * -/))]))]))
+    (Step_read ((z, ((«$admininstr_val» val) /- ^k -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], («$admininstr_instr» instr) /- * -/))]))]))
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
     True /- Else? -/ ->
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
@@ -1178,20 +1186,20 @@ inductive Step : (Config × Config) -> Prop where
   | elem_drop (x : Idx) (z : State) :
     (Step ((z, [(Admininstr.ELEM_DROP x)]), ((«$with_elem» (z, x, [])), [])))
   | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) :
-    (Step ((z, [(admininstr_ref ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, ref)), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
+    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, ref)), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
   | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) :
     (i < («$table» (z, x)).length) ->
-    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
   | global_set (val : Val) (x : Idx) (z : State) :
-    (Step ((z, [(admininstr_val val), (Admininstr.GLOBAL_SET x)]), ((«$with_global» (z, x, val)), [])))
+    (Step ((z, [(«$admininstr_val» val), (Admininstr.GLOBAL_SET x)]), ((«$with_global» (z, x, val)), [])))
   | local_set (val : Val) (x : Idx) (z : State) :
-    (Step ((z, [(admininstr_val val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
+    (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
   | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_read ((z, (admininstr_instr instr) /- * -/), (admininstr_instr instr') /- * -/)) ->
-    (Step ((z, (admininstr_instr instr) /- * -/), (z, (admininstr_instr instr') /- * -/)))
+    (Step_read ((z, («$admininstr_instr» instr) /- * -/), («$admininstr_instr» instr') /- * -/)) ->
+    (Step ((z, («$admininstr_instr» instr) /- * -/), (z, («$admininstr_instr» instr') /- * -/)))
   | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_pure ((admininstr_instr instr) /- * -/, (admininstr_instr instr') /- * -/)) ->
-    (Step ((z, (admininstr_instr instr) /- * -/), (z, (admininstr_instr instr') /- * -/)))
+    (Step_pure ((«$admininstr_instr» instr) /- * -/, («$admininstr_instr» instr') /- * -/)) ->
+    (Step ((z, («$admininstr_instr» instr) /- * -/), (z, («$admininstr_instr» instr') /- * -/)))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,'
 SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
 SpecTec.lean: error: application type mismatch
@@ -1218,14 +1226,6 @@ has type
   Option N : Type
 but is expected to have type
   Nat : Type
-SpecTec.lean: error: function expected at
-  numtype_in
-term has type
-  ?m.72247
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.72553
 SpecTec.lean: error: application type mismatch
   Nat.div n
 argument
@@ -1250,30 +1250,6 @@ has type
   Option N × Option Sx : Type
 but is expected to have type
   Option (N × Sx) : Type
-SpecTec.lean: error: function expected at
-  numtype_in
-term has type
-  ?m.73168
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.73618
-SpecTec.lean: error: function expected at
-  valtype_reftype
-term has type
-  ?m.74881
-SpecTec.lean: error: function expected at
-  valtype_reftype
-term has type
-  ?m.75018
-SpecTec.lean: error: function expected at
-  valtype_reftype
-term has type
-  ?m.75212
-SpecTec.lean: error: function expected at
-  valtype_reftype
-term has type
-  ?m.75351
 SpecTec.lean: error: type mismatch
   ((), t)
 has type
@@ -1281,125 +1257,37 @@ has type
 but is expected to have type
   Globaltype : Type
 SpecTec.lean: error: function expected at
-  valtype_reftype
+  «$valtype_fn»
 term has type
-  ?m.76088
+  ?m.74906
 SpecTec.lean: error: function expected at
-  valtype_reftype
+  «$valtype_fn»
 term has type
-  ?m.76238
+  ?m.74906
 SpecTec.lean: error: function expected at
-  numtype_fn
+  «$valtype_in»
 term has type
-  ?m.76329
+  ?m.75090
 SpecTec.lean: error: function expected at
-  numtype_fn
+  «$valtype_in»
 term has type
-  ?m.76329
+  ?m.75090
 SpecTec.lean: error: function expected at
-  valtype_fn
+  «$valtype_in»
 term has type
-  ?m.76394
+  ?m.75090
 SpecTec.lean: error: function expected at
-  valtype_fn
+  «$valtype_in»
 term has type
-  ?m.76394
+  ?m.75090
 SpecTec.lean: error: function expected at
-  valtype_in
+  «$valtype_resulttype»
 term has type
-  ?m.76610
+  ?m.76089
 SpecTec.lean: error: function expected at
-  valtype_in
+  «$valtype_resulttype»
 term has type
-  ?m.76610
-SpecTec.lean: error: function expected at
-  numtype_in
-term has type
-  ?m.76909
-SpecTec.lean: error: function expected at
-  numtype_in
-term has type
-  ?m.76909
-SpecTec.lean: error: function expected at
-  valtype_in
-term has type
-  ?m.76610
-SpecTec.lean: error: function expected at
-  valtype_in
-term has type
-  ?m.76610
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77363
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77363
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77363
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77363
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77531
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77531
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77531
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77650
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77650
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77746
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77825
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77825
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77825
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77936
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.77936
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.78032
-SpecTec.lean: error: function expected at
-  valtype_resulttype
-term has type
-  ?m.78384
-SpecTec.lean: error: function expected at
-  valtype_resulttype
-term has type
-  ?m.78384
+  ?m.76089
 SpecTec.lean: error: application type mismatch
   (t_1, t_2)
 argument
@@ -1448,14 +1336,6 @@ has type
   Valtype : Type
 but is expected to have type
   Resulttype : Type
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.79302
-SpecTec.lean: error: function expected at
-  valtype_vectype
-term has type
-  ?m.79330
 SpecTec.lean: error: application type mismatch
   Prod.mk t'_1
 argument
@@ -1465,7 +1345,7 @@ has type
 but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.80059
+  HAppend (List Instr) Instr ?m.77676
 SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
@@ -1496,10 +1376,6 @@ has type
   Option Elemmode : Type
 but is expected to have type
   Elemmode : Type
-SpecTec.lean: error: function expected at
-  valtype_reftype
-term has type
-  ?m.99302
 SpecTec.lean: error: application type mismatch
   (C, datamode)
 argument
@@ -1589,198 +1465,232 @@ SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.178431
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.178638
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val'
+argument
+  val'
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.179157
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.180061
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.180268
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val'
+argument
+  val'
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.180794
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.181089
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.181730
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.182041
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.182398
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.182703
 SpecTec.lean: error: function expected at
-  admininstr_val
+  «$admininstr_globalinst»
 term has type
-  ?m.180557
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180557
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180557
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180643
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.180732
-SpecTec.lean: error: function expected at
-  valtype_numtype
-term has type
-  ?m.181062
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181652
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.181694
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181652
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181907
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181907
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.181957
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.181907
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182160
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182160
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182470
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.182561
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182470
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182798
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182798
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.182854
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.182798
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.182854
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183104
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183104
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183382
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183382
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.183487
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183720
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.183720
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.183819
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184044
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184044
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184044
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184206
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184206
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184206
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.184332
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.184640
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.186018
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.186018
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.186018
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.186270
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.186432
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.186720
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.186833
-SpecTec.lean: error: function expected at
-  admininstr_globalinst
-term has type
-  ?m.186968
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.187030
+  ?m.185027
 SpecTec.lean: error: application type mismatch
   «$default_» t
 argument
@@ -1790,15 +1700,25 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.188431
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.187612
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.188071
+  HAppend (List Val) Val ?m.185601
+SpecTec.lean: error: application type mismatch
+  «$admininstr_val» val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.185919
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
 SpecTec.lean: error: application type mismatch
   (x, ref)
 argument
@@ -1807,52 +1727,68 @@ has type
   Ref : Type
 but is expected to have type
   List Ref : Type
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.188974
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.189206
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.189310
-SpecTec.lean: error: function expected at
-  admininstr_val
-term has type
-  ?m.189385
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189471
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189471
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189471
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189471
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189618
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189618
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189618
-SpecTec.lean: error: function expected at
-  admininstr_instr
-term has type
-  ?m.189618
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: application type mismatch
+  «$admininstr_instr» instr'
+argument
+  instr'
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
 ```
