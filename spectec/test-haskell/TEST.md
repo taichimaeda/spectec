@@ -78,6 +78,10 @@ numtype_in :: In -> Numtype
 numtype_in In_I32 = Numtype_I32
 numtype_in In_I64 = Numtype_I64
 
+valtype_in :: In -> Valtype
+valtype_in In_I32 = Valtype_I32
+valtype_in In_I64 = Valtype_I64
+
 data Fn
  = Fn_F32
  | Fn_F64
@@ -85,6 +89,10 @@ data Fn
 numtype_fn :: Fn -> Numtype
 numtype_fn Fn_F32 = Numtype_F32
 numtype_fn Fn_F64 = Numtype_F64
+
+valtype_fn :: Fn -> Valtype
+valtype_fn Fn_F32 = Valtype_F32
+valtype_fn Fn_F64 = Valtype_F64
 
 type Resulttype = [Valtype]
 
@@ -660,9 +668,9 @@ cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 
 $ ghc -c Test.hs
 
-Test.hs:608:6: error: parse error on input ‘::’
+Test.hs:616:6: error: parse error on input ‘::’
     |
-608 | data :: (State, Dataidx) -> Datainst
+616 | data :: (State, Dataidx) -> Datainst
     |      ^^
 [1]
 ```

@@ -83,6 +83,10 @@ def «$numtype_in» : In -> Numtype
   | In.I32 => Numtype.I32
   | In.I64 => Numtype.I64
 
+def «$valtype_in» : In -> Valtype
+  | In.I32 => Valtype.I32
+  | In.I64 => Valtype.I64
+
 inductive Fn where
  | F32 : Fn
  | F64 : Fn
@@ -91,6 +95,10 @@ inductive Fn where
 def «$numtype_fn» : Fn -> Numtype
   | Fn.F32 => Numtype.F32
   | Fn.F64 => Numtype.F64
+
+def «$valtype_fn» : Fn -> Valtype
+  | Fn.F32 => Valtype.F32
+  | Fn.F64 => Valtype.F64
 
 @[reducible] def Resulttype := (List Valtype)
 
@@ -1257,37 +1265,13 @@ has type
 but is expected to have type
   Globaltype : Type
 SpecTec.lean: error: function expected at
-  «$valtype_fn»
+  «$valtype_resulttype»
 term has type
-  ?m.74906
-SpecTec.lean: error: function expected at
-  «$valtype_fn»
-term has type
-  ?m.74906
-SpecTec.lean: error: function expected at
-  «$valtype_in»
-term has type
-  ?m.75090
-SpecTec.lean: error: function expected at
-  «$valtype_in»
-term has type
-  ?m.75090
-SpecTec.lean: error: function expected at
-  «$valtype_in»
-term has type
-  ?m.75090
-SpecTec.lean: error: function expected at
-  «$valtype_in»
-term has type
-  ?m.75090
+  ?m.76086
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
-  ?m.76089
-SpecTec.lean: error: function expected at
-  «$valtype_resulttype»
-term has type
-  ?m.76089
+  ?m.76086
 SpecTec.lean: error: application type mismatch
   (t_1, t_2)
 argument
@@ -1345,7 +1329,7 @@ has type
 but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.77676
+  HAppend (List Instr) Instr ?m.77673
 SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
@@ -1482,7 +1466,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.178431
+  HAppend (List Admininstr) Admininstr ?m.178360
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1492,7 +1476,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.178638
+  HAppend Admininstr (List Admininstr) ?m.178567
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val'
 argument
@@ -1518,7 +1502,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.179157
+  HAppend (List Admininstr) Admininstr ?m.179086
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1560,7 +1544,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.180061
+  HAppend (List Admininstr) Admininstr ?m.179990
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1570,7 +1554,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.180268
+  HAppend Admininstr (List Admininstr) ?m.180197
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val'
 argument
@@ -1596,7 +1580,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.180794
+  HAppend (List Admininstr) Admininstr ?m.180723
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1614,7 +1598,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.181089
+  HAppend Admininstr Admininstr ?m.181018
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1640,7 +1624,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.181730
+  HAppend Admininstr (List Admininstr) ?m.181659
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1658,7 +1642,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.182041
+  HAppend Admininstr Admininstr ?m.181970
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1668,7 +1652,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.182398
+  HAppend Admininstr (List Admininstr) ?m.182327
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1686,11 +1670,11 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.182703
+  HAppend Admininstr Admininstr ?m.182632
 SpecTec.lean: error: function expected at
   «$admininstr_globalinst»
 term has type
-  ?m.185027
+  ?m.184956
 SpecTec.lean: error: application type mismatch
   «$default_» t
 argument
@@ -1700,7 +1684,7 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.185601
+  HAppend (List Val) Val ?m.185530
 SpecTec.lean: error: application type mismatch
   «$admininstr_val» val
 argument
@@ -1710,7 +1694,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.185919
+  HAppend Admininstr (List Admininstr) ?m.185848
 SpecTec.lean: error: application type mismatch
   «$admininstr_instr» instr
 argument
