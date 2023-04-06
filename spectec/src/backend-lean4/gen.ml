@@ -32,6 +32,8 @@ let make_id s = match s with
 
 let render_id (id : id) = make_id id.it
 
+let render_fun_id (id : id) = make_id (id.it ^ "_f") (* Hack to namespace the functions *)
+
 let render_rule_name _qual _ty_id (rule_id : id) (i : int) :  string =
   if rule_id.it = ""
   then "rule_" ^ string_of_int i
@@ -119,7 +121,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | DotE (_ty, e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
   | LenE e -> render_exp e ^ ".length"
-  | CallE (id, e) -> render_id id $$ render_exp e
+  | CallE (id, e) -> render_fun_id id $$ render_exp e
   | BinE (AddOp, e1, e2)   -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | BinE (SubOp, e1, e2)   -> parens (render_exp e1 ^ " - " ^ render_exp e2)
   | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)
@@ -189,10 +191,12 @@ let rec render_def (d : def) =
     end
   | DecD (id, typ1, typ2, clauses, hints) ->
     show_input d ^
-    "def " ^ render_id id ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
+    "def " ^ render_fun_id id ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
+    begin if clauses = [] then " := default" else
     String.concat "" (List.map (render_clause id) clauses) ^
     (if (List.exists (fun h -> h.hintid.it = "partial") hints)
     then "\n  | _ => default" else "") (* Could use no_error_if_unused% as well *)
+    end
 
   | RelD (id, _mixop, typ, rules, _hints) ->
     show_input d ^
