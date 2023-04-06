@@ -243,7 +243,7 @@ data Elemmode
 data Datamode
  = Datamode_MEMORY (Memidx, Expr)
 
-type Func = {- mixop: FUNC -} (Functype, [Valtype], Expr)
+type Func = {- mixop: `FUNC%%*%` -} (Functype, [Valtype], Expr)
 
 type Global = {- mixop: GLOBAL -} (Globaltype, Expr)
 
@@ -251,9 +251,9 @@ type Table = {- mixop: TABLE -} Tabletype
 
 type Mem = {- mixop: MEMORY -} Memtype
 
-type Elem = {- mixop: ELEM -} (Reftype, [Expr], (Maybe Elemmode))
+type Elem = {- mixop: `ELEM%%*%?` -} (Reftype, [Expr], (Maybe Elemmode))
 
-type Data = {- mixop: DATA -} ([[Byte]], (Maybe Datamode))
+type Data = {- mixop: `DATA(*)%*%?` -} ([[Byte]], (Maybe Datamode))
 
 type Start = {- mixop: START -} Funcidx
 
@@ -267,7 +267,7 @@ type Export = {- mixop: EXPORT -} (Name, Externuse)
 
 type Import = {- mixop: IMPORT -} (Name, Name, Externtype)
 
-type Module = {- mixop: MODULE -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], [Start], [Export])
+type Module = {- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], [Start], [Export])
 
 size :: Valtype -> Natural
 size Valtype_V128 = 128
@@ -574,7 +574,12 @@ admininstr_val (Val_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_val (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
-type Config = {- mixop: `%;%` -} (State, [Admininstr])
+admininstr_ref :: Ref -> Admininstr
+admininstr_ref (Ref_REF_NULL x) = (Admininstr_REF_NULL x)
+admininstr_ref (Ref_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
+admininstr_ref (Ref_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
+
+type Config = {- mixop: `%;%*` -} (State, [Admininstr])
 
 funcaddr :: State -> [Funcaddr]
 funcaddr (s, f) = f.mODULE.fUNC
@@ -585,17 +590,23 @@ funcinst (s, f) = s.fUNC
 func :: (State, Funcidx) -> Funcinst
 func ((s, f), x) = (s.fUNC !! (fromIntegral (f.mODULE.fUNC !! (fromIntegral x))))
 
-local :: (State, Localidx) -> Val
-local ((s, f), x) = (f.lOCAL !! (fromIntegral x))
-
 global :: (State, Globalidx) -> Globalinst
 global ((s, f), x) = (s.gLOBAL !! (fromIntegral (f.mODULE.gLOBAL !! (fromIntegral x))))
 
 table :: (State, Tableidx) -> Tableinst
 table ((s, f), x) = (s.tABLE !! (fromIntegral (f.mODULE.tABLE !! (fromIntegral x))))
 
+mem :: (State, Memidx) -> Meminst
+mem ((s, f), x) = (s.mEM !! (fromIntegral (f.mODULE.mEM !! (fromIntegral x))))
+
 elem :: (State, Tableidx) -> Eleminst
 elem ((s, f), x) = (s.eLEM !! (fromIntegral (f.mODULE.eLEM !! (fromIntegral x))))
+
+data :: (State, Dataidx) -> Datainst
+data ((s, f), x) = (s.dATA !! (fromIntegral (f.mODULE.dATA !! (fromIntegral x))))
+
+local :: (State, Localidx) -> Val
+local ((s, f), x) = (f.lOCAL !! (fromIntegral x))
 
 with_local :: (State, Localidx, Val) -> State
 with_local ((s, f), x, v) = (s, undefined {- f[LOCAL[x] = v] -})
@@ -606,11 +617,33 @@ with_global ((s, f), x, v) = (undefined {- s[GLOBAL[f.MODULE_frame.GLOBAL_module
 with_table :: (State, Tableidx, N, Ref) -> State
 with_table ((s, f), x, i, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -}, f)
 
+with_tableext :: (State, Tableidx, [Ref]) -> State
+with_tableext ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*] -}, f)
+
+with_elem :: (State, Elemidx, [Ref]) -> State
+with_elem ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*] -}, f)
+
 data E
  = E_HOLE
  | E_SEQ ([Val], E, [Instr])
  | E_LABEL_ (N, [Instr], E)
 
+unop :: (Unop_numtype, Numtype, C_numtype) -> [C_numtype]
+
+
+binop :: (Binop_numtype, Numtype, C_numtype, C_numtype) -> [C_numtype]
+
+
+testop :: (Testop_numtype, Numtype, C_numtype) -> C_numtype
+
+
+relop :: (Relop_numtype, Numtype, C_numtype, C_numtype) -> C_numtype
+
+
+ext :: (Natural, Natural, Sx, C_numtype) -> C_numtype
+
+
+cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 
 
 
@@ -618,4 +651,10 @@ data E
 
 
 $ ghc -c Test.hs
+
+Test.hs:600:6: error: parse error on input ‘::’
+    |
+600 | data :: (State, Dataidx) -> Datainst
+    |      ^^
+[1]
 ```

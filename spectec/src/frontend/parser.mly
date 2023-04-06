@@ -173,12 +173,12 @@ typ_list :
 
 deftyp : deftyp_ { $1 $ at $sloc }
 deftyp_ :
-  | nottyp { NotationT $1 }
-  | LBRACE fieldtyp_list RBRACE { StructT $2 }
-  | BAR casetyp_list { let x, y, z = $2 in VariantT (NoDots, x, y, z) }
-  | NL_BAR casetyp_list { let x, y, z = $2 in VariantT (NoDots, x, y, z) }
-  | dots BAR casetyp_list { let x, y, z = $3 in VariantT (Dots, x, y, z) }
-  | dots NL_BAR casetyp_list { let x, y, z = $3 in VariantT (Dots, x, Nl::y, z) }
+  | nottyp { $1.it }
+  | LBRACE fieldtyp_list RBRACE { StrT $2 }
+  | BAR casetyp_list { let x, y, z = $2 in CaseT (NoDots, x, y, z) }
+  | NL_BAR casetyp_list { let x, y, z = $2 in CaseT (NoDots, x, y, z) }
+  | dots BAR casetyp_list { let x, y, z = $3 in CaseT (Dots, x, y, z) }
+  | dots NL_BAR casetyp_list { let x, y, z = $3 in CaseT (Dots, x, Nl::y, z) }
 
 dots :
   | DOTDOTDOT {}
@@ -188,25 +188,17 @@ dots :
 
 /*nottyp_prim : nottyp_prim_ { $1 $ at $sloc }*/
 nottyp_prim_ :
-  | typ_prim { TypT $1 }
+  | typ_prim { $1.it }
   | atom { AtomT $1 }
   | TICK LPAR nottyp RPAR { BrackT (Paren, $3) }
   | TICK LBRACK nottyp RBRACK { BrackT (Brack, $3) }
   | TICK LBRACE nottyp RBRACE { BrackT (Brace, $3) }
-  | LPAR nottyp RPAR {
-      match $2.it with
-      | TypT typ -> TypT (ParenT typ $ at $sloc)
-      | _ -> ParenNT $2
-    }
+  | LPAR nottyp RPAR { ParenT $2 }
 
 nottyp_post : nottyp_post_ { $1 $ at $sloc }
 nottyp_post_ :
   | nottyp_prim_ { $1 }
-  | nottyp_post iter {
-      match $1.it with
-      | TypT typ -> TypT (IterT (typ, $2) $ at $sloc)
-      | _ -> IterNT ($1, $2)
-    }
+  | nottyp_post iter { IterT ($1, $2) }
 
 nottyp_seq : nottyp_seq_ { $1 $ at $sloc }
 nottyp_seq_ :
@@ -275,6 +267,9 @@ casetyp_list :
 exp_prim : exp_prim_ { $1 $ at $sloc }
 exp_prim_ :
   | varid { VarE $1 }
+  | BOOL { VarE ("bool" $ at $sloc) }
+  | NAT { VarE ("nat" $ at $sloc) }
+  | TEXT { VarE ("text" $ at $sloc) }
   | BOOLLIT { BoolE $1 }
   | NATLIT { NatE $1 }
   | TEXTLIT { TextE $1 }
@@ -389,7 +384,12 @@ exps1 :
 arith_prim : arith_prim_ { $1 $ at $sloc }
 arith_prim_ :
   | varid { VarE $1 }
+  | BOOL { VarE ("bool" $ at $sloc) }
+  | NAT { VarE ("nat" $ at $sloc) }
+  | TEXT { VarE ("text" $ at $sloc) }
   | NATLIT { NatE $1 }
+  | HOLE { HoleE false }
+  | MULTIHOLE { HoleE true }
   | LPAR arith RPAR { ParenE ($2, false) }
 
 arith_post : arith_post_ { $1 $ at $sloc }
@@ -486,14 +486,21 @@ premise_list :
 
 premise : premise_ { $1 $ at $sloc }
 premise_ :
-  | relid COLON exp { RulePr ($1, $3, None) }
+  | relid COLON exp { RulePr ($1, $3, []) }
   | IF exp
-    { match $2.it with
-      | IterE (exp1, iter) -> IfPr (exp1, Some iter)
-      | _ -> IfPr ($2, None) }
+    { let rec iters e its =
+        match e.it with
+        | IterE (e1, it) -> iters e1 (it::its)
+        | _ -> IfPr (e, its)
+      in iters $2 [] }
   | OTHERWISE { ElsePr }
-  | LPAR relid COLON exp RPAR iter { RulePr ($2, $4, Some $6) }
-  | LPAR IF exp RPAR iter { IfPr ($3, Some $5) }
+  | LPAR relid COLON exp RPAR iter_list { RulePr ($2, $4, $6) }
+  | LPAR IF exp RPAR iter_list { IfPr ($3, $5) }
+
+iter_list :
+  | /* empty */ { [] }
+  | iter iter_list { $1::$2 }
+
 
 hint :
   | HINT LPAR hintid exp RPAR { {hintid = $3 $ at $loc($3); hintexp = $4} }

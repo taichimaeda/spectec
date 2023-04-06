@@ -267,7 +267,7 @@ inductive Datamode where
  | MEMORY : (Memidx × Expr) -> Datamode
   deriving Inhabited, BEq
 
-@[reducible] def Func := /- mixop: FUNC -/ (Functype × (List Valtype) × Expr)
+@[reducible] def Func := /- mixop: `FUNC%%*%` -/ (Functype × (List Valtype) × Expr)
 
 @[reducible] def Global := /- mixop: GLOBAL -/ (Globaltype × Expr)
 
@@ -275,9 +275,9 @@ inductive Datamode where
 
 @[reducible] def Mem := /- mixop: MEMORY -/ Memtype
 
-@[reducible] def Elem := /- mixop: ELEM -/ (Reftype × (List Expr) × (Option Elemmode))
+@[reducible] def Elem := /- mixop: `ELEM%%*%?` -/ (Reftype × (List Expr) × (Option Elemmode))
 
-@[reducible] def Data := /- mixop: DATA -/ ((List (List Byte)) × (Option Datamode))
+@[reducible] def Data := /- mixop: `DATA(*)%*%?` -/ ((List (List Byte)) × (Option Datamode))
 
 @[reducible] def Start := /- mixop: START -/ Funcidx
 
@@ -292,7 +292,7 @@ inductive Externuse where
 
 @[reducible] def Import := /- mixop: IMPORT -/ (Name × Name × Externtype)
 
-@[reducible] def Module := /- mixop: MODULE -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
+@[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
 
 def size : Valtype -> Nat
   | Valtype.V128 => 128
@@ -551,8 +551,8 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (C.RETURN == (some t)) ->
     (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
   | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Resulttype_sub (t, (C.LABEL.get! l))) /- * -/ ->
-    (Resulttype_sub (t, (C.LABEL.get! l'))) ->
+    (Resulttype_sub (t, [(valtype_resulttype (C.LABEL.get! l))])) /- * -/ ->
+    (Resulttype_sub (t, [(valtype_resulttype (C.LABEL.get! l'))])) ->
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
   | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
@@ -709,6 +709,7 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
 
 inductive Module_ok : Module -> Prop where
   | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
+    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n -/, LOCAL := [], LABEL := [], RETURN := none}) ->
     (Func_ok (C, func, ft)) /- * -/ ->
     (Global_ok (C, «global», gt)) /- * -/ ->
     (Table_ok (C, table, tt)) /- * -/ ->
@@ -716,7 +717,6 @@ inductive Module_ok : Module -> Prop where
     (Elem_ok (C, elem, rt)) /- * -/ ->
     (Data_ok (C, data)) /- ^n -/ ->
     (Start_ok (C, start)) /- * -/ ->
-    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n -/, LOCAL := [], LABEL := [], RETURN := none}) ->
     (mem.length <= 1) ->
     (start.length <= 1) ->
     (Module_ok («import», func, «global», table, mem, elem, data, start, «export»))
@@ -954,7 +954,12 @@ def admininstr_val : Val -> Admininstr
   | (Val.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
   | (Val.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
 
-@[reducible] def Config := /- mixop: `%;%` -/ (State × (List Admininstr))
+def admininstr_ref : Ref -> Admininstr
+  | (Ref.REF_NULL x) => (Admininstr.REF_NULL x)
+  | (Ref.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
+  | (Ref.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
+
+@[reducible] def Config := /- mixop: `%;%*` -/ (State × (List Admininstr))
 
 def funcaddr : State -> (List Funcaddr)
   | (s, f) => f.MODULE.FUNC
@@ -965,17 +970,23 @@ def funcinst : State -> (List Funcinst)
 def func : (State × Funcidx) -> Funcinst
   | ((s, f), x) => (s.FUNC.get! (f.MODULE.FUNC.get! x))
 
-def «local» : (State × Localidx) -> Val
-  | ((s, f), x) => (f.LOCAL.get! x)
-
 def «global» : (State × Globalidx) -> Globalinst
   | ((s, f), x) => (s.GLOBAL.get! (f.MODULE.GLOBAL.get! x))
 
 def table : (State × Tableidx) -> Tableinst
   | ((s, f), x) => (s.TABLE.get! (f.MODULE.TABLE.get! x))
 
+def mem : (State × Memidx) -> Meminst
+  | ((s, f), x) => (s.MEM.get! (f.MODULE.MEM.get! x))
+
 def elem : (State × Tableidx) -> Eleminst
   | ((s, f), x) => (s.ELEM.get! (f.MODULE.ELEM.get! x))
+
+def data : (State × Dataidx) -> Datainst
+  | ((s, f), x) => (s.DATA.get! (f.MODULE.DATA.get! x))
+
+def «local» : (State × Localidx) -> Val
+  | ((s, f), x) => (f.LOCAL.get! x)
 
 def with_local : (State × Localidx × Val) -> State
   | ((s, f), x, v) => (s, default /- f[LOCAL[x] = v] -/)
@@ -986,13 +997,71 @@ def with_global : (State × Globalidx × Val) -> State
 def with_table : (State × Tableidx × N × Ref) -> State
   | ((s, f), x, i, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -/, f)
 
+def with_tableext : (State × Tableidx × (List Ref)) -> State
+  | ((s, f), x, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*] -/, f)
+
+def with_elem : (State × Elemidx × (List Ref)) -> State
+  | ((s, f), x, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*] -/, f)
+
 inductive E where
  | _HOLE : E
  | _SEQ : ((List Val) × E × (List Instr)) -> E
  | LABEL_ : (N × (List Instr) × E) -> E
   deriving Inhabited, BEq
 
+def unop : (Unop_numtype × Numtype × C_numtype) -> (List C_numtype)
+
+def binop : (Binop_numtype × Numtype × C_numtype × C_numtype) -> (List C_numtype)
+
+def testop : (Testop_numtype × Numtype × C_numtype) -> C_numtype
+
+def relop : (Relop_numtype × Numtype × C_numtype × C_numtype) -> C_numtype
+
+def ext : (Nat × Nat × Sx × C_numtype) -> C_numtype
+
+def cvtop : (Numtype × Cvtop × Numtype × (Option Sx) × C_numtype) -> (List C_numtype)
+
 inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
+  | local_tee (val : Val) (x : Idx) :
+    (Step_pure ([(admininstr_val val), (Admininstr.LOCAL_TEE x)], [(admininstr_val val), (admininstr_val val), (Admininstr.LOCAL_SET x)]))
+  | ref_is_null_false (val : Val) :
+    True /- Else? -/ ->
+    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
+  | ref_is_null_true (rt : Reftype) (val : Val) :
+    (val == (Val.REF_NULL rt)) ->
+    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
+  | cvtop_trap (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
+    ((cvtop (nt_1, cvtop, nt_2, sx, c_1)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [Admininstr.TRAP]))
+  | cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
+    ((cvtop (nt_1, cvtop, nt_2, sx, c_1)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
+  | extend (c : C_numtype) (n : N) (nt : Numtype) :
+    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, (ext (n, (size (valtype_numtype nt)), Sx.S, c))))]))
+  | relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) :
+    (c == (relop (relop, nt, c_1, c_2))) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
+  | testop (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (testop : Testop_numtype) :
+    (c == (testop (testop, nt, c_1))) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.TESTOP (nt, testop))], [(Admininstr.CONST (Numtype.I32, c))]))
+  | binop_trap (binop : Binop_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
+    ((binop (binop, nt, c_1, c_2)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [Admininstr.TRAP]))
+  | binop_val (binop : Binop_numtype) (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
+    ((binop (binop, nt, c_1, c_2)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [(Admininstr.CONST (nt, c))]))
+  | unop_trap (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
+    ((unop (unop, nt, c_1)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [Admininstr.TRAP]))
+  | unop_val (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
+    ((unop (unop, nt, c_1)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
+  | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((admininstr_val val) /- * -/ ++ ([Admininstr.RETURN] ++ (admininstr_instr instr) /- * -/))))], ((admininstr_val val) /- * -/ ++ [Admininstr.RETURN])))
+  | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
+    (Step_pure ([(Admininstr.FRAME_ (n, f, ((admininstr_val val') /- * -/ ++ ((admininstr_val val) /- ^n -/ ++ ([Admininstr.RETURN] ++ (admininstr_instr instr) /- * -/)))))], (admininstr_val val) /- ^n -/))
+  | frame_vals (f : Frame) (n : N) (val : (List Val)) :
+    (Step_pure ([(Admininstr.FRAME_ (n, f, (admininstr_val val) /- ^n -/))], (admininstr_val val) /- ^n -/))
   | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i >= l.length) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
@@ -1009,6 +1078,8 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([(Admininstr.LABEL_ (n, instr', ((admininstr_val val) /- * -/ ++ ([(Admininstr.BR (l + 1))] ++ (admininstr_instr instr) /- * -/))))], ((admininstr_val val) /- * -/ ++ [(Admininstr.BR l)])))
   | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
     (Step_pure ([(Admininstr.LABEL_ (n, instr', ((admininstr_val val') /- * -/ ++ ((admininstr_val val) /- ^n -/ ++ ([(Admininstr.BR 0)] ++ (admininstr_instr instr) /- * -/)))))], ((admininstr_val val) /- ^n -/ ++ (admininstr_instr instr') /- * -/)))
+  | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (n, instr, (admininstr_val val) /- * -/))], (admininstr_val val) /- * -/))
   | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c == 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
@@ -1021,8 +1092,6 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
   | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
     (Step_pure (((admininstr_val val) /- ^k -/ ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((admininstr_val val) /- ^k -/ ++ (admininstr_instr instr) /- * -/)))]))
-  | local_tee (val : Val) (x : Idx) :
-    (Step_pure ([(admininstr_val val), (Admininstr.LOCAL_TEE x)], [(admininstr_val val), (admininstr_val val), (Admininstr.LOCAL_SET x)]))
   | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c == 0) ->
     (Step_pure ([(admininstr_val val_1), (admininstr_val val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(admininstr_val val_2)]))
@@ -1035,17 +1104,66 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([Admininstr.NOP], []))
   | unreachable  :
     (Step_pure ([Admininstr.UNREACHABLE], [Admininstr.TRAP]))
-  | ref_is_null_false (val : Val) :
-    True /- Else? -/ ->
-    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
-  | ref_is_null_true (rt : Reftype) (val : Val) :
-    (val == (Val.REF_NULL rt)) ->
-    (Step_pure ([(admininstr_val val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
 
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
-  | call_addr (a : Addr) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
+  | table_init_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (admininstr_ref ((elem (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
+  | table_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), []))
+  | table_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    (((i + n) > (elem (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [Admininstr.TRAP]))
+  | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, ((j + n) - 1))), (Admininstr.CONST (Numtype.I32, ((i + n) - 1))), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
+  | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (j <= i) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
+  | table_copy_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), []))
+  | table_copy_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    (((i + n) > (table (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
+  | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), (admininstr_val val), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_FILL x)]))
+  | table_fill_zero (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), []))
+  | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    ((i + n) > (table (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
+  | table_grow_fail (n : N) (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, default /- - 1 -/))]))
+  | table_size (n : N) (x : Idx) (z : State) :
+    ((table (z, x)).length == n) ->
+    (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
+  | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) :
+    (i >= (table (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
+  | table_get_val (i : Nat) (x : Idx) (z : State) :
+    (i < (table (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(admininstr_ref ((table (z, x)).get! i))]))
+  | table_get_trap (i : Nat) (x : Idx) (z : State) :
+    (i >= (table (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
+  | global_get (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(admininstr_globalinst («global» (z, x)))]))
+  | local_get (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(admininstr_val («local» (z, x)))]))
+  | ref_func (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((funcaddr z).get! x))]))
+  | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
     (((funcinst z).get! a) == (m, ((t_1, t_2), t, instr))) ->
-    (Step_read ((z, ((admininstr_val val) /- ^k -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, {LOCAL := (val ++ (default_ t) /- * -/), MODULE := m}, [(Admininstr.LABEL_ (n, [], (admininstr_instr instr) /- * -/))]))]))
+    (f == {LOCAL := (val ++ (default_ t) /- * -/), MODULE := m}) ->
+    (Step_read ((z, ((admininstr_val val) /- ^k -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (admininstr_instr instr) /- * -/))]))]))
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
     True /- Else? -/ ->
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
@@ -1055,68 +1173,19 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [(Admininstr.CALL_ADDR a)]))
   | call (x : Idx) (z : State) :
     (Step_read ((z, [(Admininstr.CALL x)]), [(Admininstr.CALL_ADDR ((funcaddr z).get! x))]))
-  | table_init_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (admininstr_ref ((elem (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]))
-  | table_init_zero (i : Nat) (j : Nat) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_INIT (x, y))]), []))
-  | table_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (((i + n) > (elem (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [Admininstr.TRAP]))
-  | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (j > i) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, (j + n))), (Admininstr.CONST (Numtype.I32, (i + n))), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]))
-  | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (j <= i) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]))
-  | table_copy_zero (i : Nat) (j : Nat) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_COPY (x, y))]), []))
-  | table_copy_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (((i + n) > (table (z, y)).length) || ((j + n) > (table (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
-  | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, (n + 1))), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]))
-  | table_fill_zero (i : Nat) (val : Val) (x : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, 0)), (Admininstr.TABLE_FILL x)]), []))
-  | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
-    ((i + n) > (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_val val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
-  | table_size (n : N) (x : Idx) (z : State) :
-    ((table (z, x)).length == n) ->
-    (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
-  | table_get_lt (i : Nat) (x : Idx) (z : State) :
-    (i < (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(admininstr_ref ((table (z, x)).get! i))]))
-  | table_get_ge (i : Nat) (x : Idx) (z : State) :
-    (i >= (table (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
-  | global_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(admininstr_globalinst («global» (z, x)))]))
-  | local_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(admininstr_val («local» (z, x)))]))
-  | ref_func (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((funcaddr z).get! x))]))
-
-inductive Step_write : (Config × Config) -> Prop where
-  | table_set_ge (i : Nat) (ref : Ref) (x : Idx) (z : State) :
-    (i >= (table (z, x)).length) ->
-    (Step_write ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), (z, [Admininstr.TRAP])))
-  | table_set_lt (i : Nat) (ref : Ref) (x : Idx) (z : State) :
-    (i < (table (z, x)).length) ->
-    (Step_write ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), ((with_table (z, x, i, ref)), [])))
-  | global_set (val : Val) (x : Idx) (z : State) :
-    (Step_write ((z, [(admininstr_val val), (Admininstr.GLOBAL_SET x)]), ((with_global (z, x, val)), [])))
-  | local_set (val : Val) (x : Idx) (z : State) :
-    (Step_write ((z, [(admininstr_val val), (Admininstr.LOCAL_SET x)]), ((with_local (z, x, val)), [])))
 
 inductive Step : (Config × Config) -> Prop where
-  | write (instr : (List Instr)) (instr' : (List Instr)) (z : State) (z' : State) :
-    (Step_write ((z, (admininstr_instr instr) /- * -/), (z', (admininstr_instr instr') /- * -/))) ->
-    (Step ((z, (admininstr_instr instr) /- * -/), (z', (admininstr_instr instr') /- * -/)))
+  | elem_drop (x : Idx) (z : State) :
+    (Step ((z, [(Admininstr.ELEM_DROP x)]), ((with_elem (z, x, [])), [])))
+  | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) :
+    (Step ((z, [(admininstr_ref ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((with_tableext (z, x, ref)), [(Admininstr.CONST (Numtype.I32, (table (z, x)).length))])))
+  | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) :
+    (i < (table (z, x)).length) ->
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (admininstr_ref ref), (Admininstr.TABLE_GET x)]), ((with_table (z, x, i, ref)), [])))
+  | global_set (val : Val) (x : Idx) (z : State) :
+    (Step ((z, [(admininstr_val val), (Admininstr.GLOBAL_SET x)]), ((with_global (z, x, val)), [])))
+  | local_set (val : Val) (x : Idx) (z : State) :
+    (Step ((z, [(admininstr_val val), (Admininstr.LOCAL_SET x)]), ((with_local (z, x, val)), [])))
   | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
     (Step_read ((z, (admininstr_instr instr) /- * -/), (admininstr_instr instr') /- * -/)) ->
     (Step ((z, (admininstr_instr instr) /- * -/), (z, (admininstr_instr instr') /- * -/)))
@@ -1227,14 +1296,14 @@ SpecTec.lean: error: function expected at
   valtype_in
 term has type
   ?m.75476
-SpecTec.lean: error: application type mismatch
-  List.get! C.LABEL l
-argument
-  l
-has type
-  List Labelidx : Type
-but is expected to have type
-  Nat : Type
+SpecTec.lean: error: function expected at
+  valtype_resulttype
+term has type
+  ?m.76805
+SpecTec.lean: error: function expected at
+  valtype_resulttype
+term has type
+  ?m.76805
 SpecTec.lean: error: application type mismatch
   (t_1, t_2)
 argument
@@ -1292,7 +1361,7 @@ has type
 but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.78431
+  HAppend (List Instr) Instr ?m.78392
 SpecTec.lean: error: application type mismatch
   (C, instr)
 argument
@@ -1331,6 +1400,12 @@ has type
   Option Datamode : Type
 but is expected to have type
   Datamode : Type
+SpecTec.lean: error: type mismatch
+  ()
+has type
+  Unit : Type
+but is expected to have type
+  List Datatype : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk func
 argument
@@ -1387,12 +1462,6 @@ has type
   List Start : Type
 but is expected to have type
   Start : Type
-SpecTec.lean: error: type mismatch
-  ()
-has type
-  Unit : Type
-but is expected to have type
-  List Datatype : Type
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
@@ -1406,6 +1475,50 @@ SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
+SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: expected ':=', 'where' or '|'
+SpecTec.lean: error: function expected at
+  cvtop
+term has type
+  Cvtop
+SpecTec.lean: error: function expected at
+  cvtop
+term has type
+  Cvtop
+SpecTec.lean: error: function expected at
+  relop
+term has type
+  Relop_numtype
+SpecTec.lean: error: function expected at
+  testop
+term has type
+  Testop_numtype
+SpecTec.lean: error: function expected at
+  binop
+term has type
+  Binop_numtype
+SpecTec.lean: error: function expected at
+  binop
+term has type
+  Binop_numtype
+SpecTec.lean: error: function expected at
+  unop
+term has type
+  Unop_numtype
+SpecTec.lean: error: function expected at
+  unop
+term has type
+  Unop_numtype
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1423,7 +1536,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.175910
+  HAppend (List Admininstr) Admininstr ?m.178901
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1433,7 +1546,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.176117
+  HAppend Admininstr (List Admininstr) ?m.179108
 SpecTec.lean: error: application type mismatch
   admininstr_val val'
 argument
@@ -1459,7 +1572,85 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.176643
+  HAppend (List Admininstr) Admininstr ?m.179627
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.180531
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.180738
+SpecTec.lean: error: application type mismatch
+  admininstr_val val'
+argument
+  val'
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend (List Admininstr) Admininstr ?m.181264
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1477,17 +1668,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.176938
-SpecTec.lean: error: application type mismatch
-  admininstr_val val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.177461
+  HAppend Admininstr Admininstr ?m.181559
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1497,15 +1678,13 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: application type mismatch
-  admininstr_instr instr
+  admininstr_val val
 argument
-  instr
+  val
 has type
-  List Instr : Type
+  List Val : Type
 but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.177772
+  Val : Type
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1515,7 +1694,7 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.178129
+  HAppend Admininstr (List Admininstr) ?m.182200
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1533,7 +1712,7 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.178434
+  HAppend Admininstr Admininstr ?m.182511
 SpecTec.lean: error: application type mismatch
   admininstr_val val
 argument
@@ -1543,7 +1722,29 @@ has type
 but is expected to have type
   Val : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.179306
+  HAppend Admininstr (List Admininstr) ?m.182868
+SpecTec.lean: error: application type mismatch
+  admininstr_val val
+argument
+  val
+has type
+  List Val : Type
+but is expected to have type
+  Val : Type
+SpecTec.lean: error: application type mismatch
+  admininstr_instr instr
+argument
+  instr
+has type
+  List Instr : Type
+but is expected to have type
+  Instr : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr Admininstr ?m.183173
+SpecTec.lean: error: function expected at
+  admininstr_globalinst
+term has type
+  ?m.185503
 SpecTec.lean: error: application type mismatch
   default_ t
 argument
@@ -1553,35 +1754,17 @@ has type
 but is expected to have type
   Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.179609
+  HAppend (List Val) Val ?m.186077
 SpecTec.lean: error: application type mismatch
-  admininstr_instr instr
+  admininstr_val val
 argument
-  instr
+  val
 has type
-  List Instr : Type
+  List Val : Type
 but is expected to have type
-  Instr : Type
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.180129
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.181676
-SpecTec.lean: error: function expected at
-  admininstr_globalinst
-term has type
-  ?m.181811
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.182082
-SpecTec.lean: error: function expected at
-  admininstr_ref
-term has type
-  ?m.182199
+  Val : Type
+SpecTec.lean: error: failed to synthesize instance
+  HAppend Admininstr (List Admininstr) ?m.186395
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument
@@ -1591,29 +1774,13 @@ has type
 but is expected to have type
   Instr : Type
 SpecTec.lean: error: application type mismatch
-  admininstr_instr instr'
+  (x, ref)
 argument
-  instr'
+  ref
 has type
-  List Instr : Type
+  Ref : Type
 but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  admininstr_instr instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  admininstr_instr instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+  List Ref : Type
 SpecTec.lean: error: application type mismatch
   admininstr_instr instr
 argument

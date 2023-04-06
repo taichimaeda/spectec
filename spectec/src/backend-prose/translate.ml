@@ -64,14 +64,14 @@ let pop left = match left.it with
 
 let calc (prems: premise nl_list) : unit =
   prems |> List.iter (fun p -> match p with
-    | Elem { it = IfPr(e, None); _ } -> printf_step "Let %s." (Print.string_of_exp e)
+    | Elem { it = IfPr(e, []); _ } -> printf_step "Let %s." (Print.string_of_exp e)
     | _ -> ()
   )
 
 let cond (prems: premise nl_list) =
   prems
   |> List.map (fun p -> match p with
-    | Elem {it = IfPr(e, None); _} -> Print.string_of_exp e
+    | Elem {it = IfPr(e, []); _} -> Print.string_of_exp e
     | Elem p -> Print.string_of_premise p
     | Nl -> "Nl"
   )
@@ -202,19 +202,14 @@ let handle_reduction_group red_group =
     | [(_, right, prems)] ->
       calc prems;
       push right;
-    (* two rules -> premises are highly likely conditions *)
-    | [(_, right1, prems1) ; (_, right2, prems2)] ->
-      cond prems1;
-        indent();
-        push right1;
-        check_nothing();
-        unindent();
-      cond prems2;
-        indent();
-        push right2;
-        check_nothing();
-        unindent();
-    | _ -> raise (Failure "TODO")
+    (* two or more rules -> premises are highly likely conditions *)
+    | _ -> red_group |> List.iter (fun (_, right, prems) ->
+        cond prems;
+          indent();
+          push right;
+          check_nothing();
+          unindent();
+      )
   );
 
   check_nothing();

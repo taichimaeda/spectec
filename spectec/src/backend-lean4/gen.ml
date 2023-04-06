@@ -206,11 +206,11 @@ let rec render_def (d : def) =
         String.concat "" (List.map (fun (prem : premise) ->
           "\n    " ^
           begin match prem.it with
-          | RulePr (pid, _mixops, pexp, iter) ->
+          | RulePr (pid, _mixops, pexp, iters) ->
             (render_type_name pid $$ render_exp pexp) ^
-            begin match iter with
-            | None -> ""
-            | Some iter -> " /- " ^ Il.Print.string_of_iter iter ^ " -/"
+            begin match iters with
+            | [] -> ""
+            | _ -> " /- " ^ String.concat "" (List.map Il.Print.string_of_iter iters) ^ " -/"
             end
           | IfPr (pexp, _iter) -> render_exp pexp
           | ElsePr -> "True /- Else? -/"
