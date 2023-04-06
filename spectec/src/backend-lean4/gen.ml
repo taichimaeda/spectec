@@ -32,7 +32,7 @@ let make_id s = match s with
 
 let render_id (id : id) = make_id id.it
 
-let render_fun_id (id : id) = make_id (id.it ^ "_f") (* Hack to namespace the functions *)
+let render_fun_id (id : id) = "«$" ^ id.it ^ "»"
 
 let render_rule_name _qual _ty_id (rule_id : id) (i : int) :  string =
   if rule_id.it = ""
