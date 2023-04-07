@@ -596,8 +596,8 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
   | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- * -/, RETURN := none}), instr_1, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- * -/, RETURN := none}), instr_2, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_1, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_2, (t_1, t_2))) ->
     (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
   | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
@@ -743,7 +743,7 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
 
 inductive Module_ok : Module -> Prop where
   | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
-    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n -/, LOCAL := [], LABEL := [], RETURN := none}) ->
+    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n{} -/, LOCAL := [], LABEL := [], RETURN := none}) ->
     (Forall₂ (λ ft func ↦ (Func_ok (C, func, ft))) ft func) ->
     (Forall₂ (λ «global» gt ↦ (Global_ok (C, «global», gt))) «global» gt) ->
     (Forall₂ (λ table tt ↦ (Table_ok (C, table, tt))) table tt) ->
