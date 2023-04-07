@@ -18,6 +18,12 @@ inductive Forall₂ (R : α → β → Prop) : List α → List β → Prop
   | nil : Forall₂ R [] []
   | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)
 attribute [simp] Forall₂.nil
+def Option.zipWith : (α → β → γ) → Option α → Option β → Option γ
+  | f,  (some x), (some y) => some (f x y)
+  | _, _, _ => none
+def Option.toList : Option α → List α
+  | none => List.nil
+  | some x => [x]
 @[reducible] def N := Nat
 
 @[reducible] def Name := String
@@ -466,15 +472,15 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
-    (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8)))) /- ?{n} -/ ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
-    (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8)))) /- ?{n} -/ ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
-    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
+    (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
   | data_drop (C : Context) (x : Idx) :
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
@@ -524,7 +530,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
   | global_get (C : Context) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == (() /- ? -/, t)) ->
+    ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
   | local_tee (C : Context) (t : Valtype) (x : Idx) :
     ((C.LOCAL.get! x) == t) ->
@@ -665,7 +671,7 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) :
     (Globaltype_ok gt) ->
-    (gt == (() /- ? -/, t)) ->
+    (gt == ((some ()), t)) ->
     (Expr_ok_const (C, expr, t)) ->
     (Global_ok (C, (gt, expr), gt))
 
@@ -690,7 +696,7 @@ inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
   | rule_0 (C : Context) (elemmode : (Option Elemmode)) (expr : (List Expr)) (rt : Reftype) :
     (Forall (λ expr ↦ (Expr_ok (C, expr, [(«$valtype_reftype» rt)]))) expr) ->
-    (Elemmode_ok (C, elemmode, rt)) /- ?{elemmode} -/ ->
+    (Forall (λ elemmode ↦ (Elemmode_ok (C, elemmode, rt))) elemmode.toList) ->
     (Elem_ok (C, (rt, expr, elemmode), rt))
 
 inductive Datamode_ok : (Context × Datamode) -> Prop where
@@ -701,7 +707,7 @@ inductive Datamode_ok : (Context × Datamode) -> Prop where
 
 inductive Data_ok : (Context × Data) -> Prop where
   | rule_0 (C : Context) (b : (List (List Byte))) (datamode : (Option Datamode)) :
-    (Datamode_ok (C, datamode)) /- ?{datamode} -/ ->
+    (Forall (λ datamode ↦ (Datamode_ok (C, datamode))) datamode.toList) ->
     (Data_ok (C, ((List.map (λ b ↦ b) b), datamode)))
 
 inductive Start_ok : (Context × Start) -> Prop where
@@ -1220,52 +1226,6 @@ inductive Step : (Config × Config) -> Prop where
     (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,' | sed -e 's,\?m\.[0-9]\+,?m,g'
 SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
-SpecTec.lean: error: application type mismatch
-  Nat.div n
-argument
-  n
-has type
-  Option N : Type
-but is expected to have type
-  Nat : Type
-SpecTec.lean: error: application type mismatch
-  Nat.div n
-argument
-  n
-has type
-  Option N : Type
-but is expected to have type
-  Nat : Type
-SpecTec.lean: error: application type mismatch
-  Nat.div n
-argument
-  n
-has type
-  Option N : Type
-but is expected to have type
-  Nat : Type
-SpecTec.lean: error: application type mismatch
-  Nat.div n
-argument
-  n
-has type
-  Option N : Type
-but is expected to have type
-  Nat : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk (n, sx)
-argument
-  (n, sx)
-has type
-  Option N × Option Sx : Type
-but is expected to have type
-  Option (N × Sx) : Type
-SpecTec.lean: error: type mismatch
-  ((), t)
-has type
-  Unit × Valtype : Type
-but is expected to have type
-  Globaltype : Type
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
@@ -1332,28 +1292,6 @@ but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
   HAppend (List Instr) Instr ?m
-SpecTec.lean: error: type mismatch
-  ((), t)
-has type
-  Unit × Valtype : Type
-but is expected to have type
-  Globaltype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk elemmode
-argument
-  elemmode
-has type
-  Option Elemmode : Type
-but is expected to have type
-  Elemmode : Type
-SpecTec.lean: error: application type mismatch
-  (C, datamode)
-argument
-  datamode
-has type
-  Option Datamode : Type
-but is expected to have type
-  Datamode : Type
 SpecTec.lean: error: type mismatch
   ()
 has type

@@ -116,6 +116,11 @@ let rec render_exp (exp : exp) = match exp.it with
         "(List.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
       | (List|List1|ListN _), [v1; v2] ->
         "(List.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
+      | Opt, [] -> "some" $$ render_exp e
+      | Opt, [v] ->
+        "(Option.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
+      | Opt, [v1; v2] ->
+        "(Option.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
       | _, _ ->
       render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
   end
@@ -172,6 +177,10 @@ let rec render_prem (prem : premise) =
         "(Forall (λ " ^ render_id v ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v ^ ")"
       | (List|List1|ListN _), [v1; v2] ->
         "(Forall₂ (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
+      | Opt, [v] ->
+        "(Forall (λ " ^ render_id v ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v ^ ".toList)"
+      | Opt, [v1; v2] ->
+        "(Forall₂ (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v1 ^ ".toList " ^ render_id v2 ^ ".toList)"
       | _,_ -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iterexp ^ " -/"
     end
     | ElsePr -> "True /- Else? -/"
@@ -260,6 +269,12 @@ let gen_string (el : script) =
   "  | nil : Forall₂ R [] []\n" ^
   "  | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)\n" ^
   "attribute [simp] Forall₂.nil\n" ^
+  "def Option.zipWith : (α → β → γ) → Option α → Option β → Option γ\n" ^
+  "  | f,  (some x), (some y) => some (f x y)\n" ^
+  "  | _, _, _ => none\n" ^
+  "def Option.toList : Option α → List α\n" ^
+  "  | none => List.nil\n" ^
+  "  | some x => [x]\n" ^
 
   render_script el
 
