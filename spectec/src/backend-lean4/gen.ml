@@ -110,9 +110,11 @@ let rec render_exp (exp : exp) = match exp.it with
   | ListE es -> render_list render_exp es
   | OptE None -> "none"
   | OptE (Some e) -> "some" $$ render_exp e
-  | IterE (e, iterexp) -> begin match e.it with
-    | VarE v -> render_id v (* Short-ciruit this common form *)
-    | _ -> match iterexp with
+  | IterE (e, (iter, vs)) -> begin match e.it with
+    | VarE v when List.length vs = 1 && List.for_all (Il.Eq.eq_id v) vs  -> render_id v (* Short-ciruit this common form *)
+    | _ -> match iter, vs with
+      | (List|List1|ListN _), [] ->
+        "[" ^ render_exp e ^ "]"
       | (List|List1|ListN _), [v] ->
         "(List.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
       | (List|List1|ListN _), [v1; v2] ->
@@ -123,7 +125,7 @@ let rec render_exp (exp : exp) = match exp.it with
       | Opt, [v1; v2] ->
         "(Option.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
       | _, _ ->
-      render_exp e ^ " /- " ^ Il.Print.string_of_iterexp iterexp ^ " -/"
+      render_exp e ^ " /- " ^ Il.Print.string_of_iterexp (iter, vs) ^ " -/"
   end
   | CaseE (a, e, typ) -> render_case a e typ
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->

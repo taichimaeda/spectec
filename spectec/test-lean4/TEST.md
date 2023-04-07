@@ -596,13 +596,13 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
   | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_1, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_2, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_1, (t_1, [t_2]))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_2, (t_1, [t_2]))) ->
     (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
   | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
-    (Blocktype_ok (C, bt, (t_1, t_2))) ->
+    (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none}), instr, (t_1, [t_2]))) ->
-    (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, t_2)))
+    (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, [t_2])))
   | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
     (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr, (t_1, t_2))) ->
@@ -625,13 +625,13 @@ inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
     (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))
   | weak (C : Context) (instr : (List Instr)) (t'_1 : Valtype) (t'_2 : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (InstrSeq_ok (C, instr, (t_1, t_2))) ->
-    (Resulttype_sub (t'_1, t_1)) ->
+    (Resulttype_sub ([t'_1], t_1)) ->
     (Resulttype_sub (t_2, t'_2)) ->
     (InstrSeq_ok (C, instr, ([t'_1], t'_2)))
   | seq (C : Context) (instr_1 : Instr) (instr_2 : Instr) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (t_3 : (List Valtype)) :
     (Instr_ok (C, instr_1, (t_1, t_2))) ->
     (InstrSeq_ok (C, [instr_2], (t_2, t_3))) ->
-    (InstrSeq_ok (C, ([instr_1] ++ instr_2), (t_1, t_3)))
+    (InstrSeq_ok (C, ([instr_1] ++ [instr_2]), (t_1, t_3)))
   | empty (C : Context) :
     (InstrSeq_ok (C, [], ([], [])))end
 
@@ -743,7 +743,7 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
 
 inductive Module_ok : Module -> Prop where
   | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
-    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n{} -/, LOCAL := [], LABEL := [], RETURN := none}) ->
+    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := [()], LOCAL := [], LABEL := [], RETURN := none}) ->
     (Forall₂ (λ ft func ↦ (Func_ok (C, func, ft))) ft func) ->
     (Forall₂ (λ «global» gt ↦ (Global_ok (C, «global», gt))) «global» gt) ->
     (Forall₂ (λ table tt ↦ (Table_ok (C, table, tt))) table tt) ->
@@ -1212,7 +1212,7 @@ inductive Step : (Config × Config) -> Prop where
   | elem_drop (x : Idx) (z : State) :
     (Step ((z, [(Admininstr.ELEM_DROP x)]), ((«$with_elem» (z, x, [])), [])))
   | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) :
-    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, ref)), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
+    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, [ref])), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
   | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) :
     (i < («$table» (z, x)).length) ->
     (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
@@ -1236,70 +1236,6 @@ SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
   ?m
-SpecTec.lean: error: application type mismatch
-  (t_1, t_2)
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  List.cons t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  (t_1, t_2)
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  List.cons t_2
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  (t_1, t_2)
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  (t_1, t_2)
-argument
-  t_2
-has type
-  Valtype : Type
-but is expected to have type
-  Resulttype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk t'_1
-argument
-  t'_1
-has type
-  Valtype : Type
-but is expected to have type
-  List Valtype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m
-SpecTec.lean: error: type mismatch
-  ()
-has type
-  Unit : Type
-but is expected to have type
-  List Datatype : Type
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
@@ -1323,12 +1259,4 @@ SpecTec.lean: error: function expected at
   «$admininstr_globalinst»
 term has type
   ?m
-SpecTec.lean: error: application type mismatch
-  (x, ref)
-argument
-  ref
-has type
-  Ref : Type
-but is expected to have type
-  List Ref : Type
 ```
