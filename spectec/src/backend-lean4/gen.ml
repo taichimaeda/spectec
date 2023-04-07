@@ -111,7 +111,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | OptE (Some e) -> "some" $$ render_exp e
   | IterE (e, iter) -> begin match e.it with
     | VarE v -> render_id v (* Short-ciruit this common form *)
-    | _ -> render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
+    | _ -> render_exp e ^ " /- " ^ Il.Print.string_of_iterexp iter ^ " -/"
   end
   | CaseE (a, e, typ) -> render_case a e typ
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
@@ -155,6 +155,13 @@ let show_input (d:def) =
     Il.Print.string_of_def d ^
     "\n-/\n"
     else ""
+
+let rec render_prem (prem : premise) =
+    match prem.it with
+    | RulePr (pid, _mixops, pexp) -> render_type_name pid $$ render_exp pexp
+    | IfPr (pexp) -> render_exp pexp
+    | IterPr (prem, iter) -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iter ^ " -/"
+    | ElsePr -> "True /- Else? -/"
 
 let rec render_def (d : def) =
   match d.it with
@@ -208,17 +215,7 @@ let rec render_def (d : def) =
           parens (render_id bid ^ " : " ^ wrap_type_iters (render_typ btyp) iters)
           ) binds) ^ " : " ^
         String.concat "" (List.map (fun (prem : premise) ->
-          "\n    " ^
-          begin match prem.it with
-          | RulePr (pid, _mixops, pexp, iters) ->
-            (render_type_name pid $$ render_exp pexp) ^
-            begin match iters with
-            | [] -> ""
-            | _ -> " /- " ^ String.concat "" (List.map Il.Print.string_of_iter iters) ^ " -/"
-            end
-          | IfPr (pexp, _iter) -> render_exp pexp
-          | ElsePr -> "True /- Else? -/"
-          end ^ " -> "
+          "\n    " ^ render_prem prem ^ " -> "
         ) prems) ^
           "\n    " ^ (render_type_name id $$ render_exp exp)
     ) rules)

@@ -634,10 +634,10 @@ with_table :: (State, Tableidx, N, Ref) -> State
 with_table ((s, f), x, i, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -}, f)
 
 with_tableext :: (State, Tableidx, [Ref]) -> State
-with_tableext ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*] -}, f)
+with_tableext ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -}, f)
 
 with_elem :: (State, Elemidx, [Ref]) -> State
-with_elem ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*] -}, f)
+with_elem ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -}, f)
 
 data E
  = E_HOLE

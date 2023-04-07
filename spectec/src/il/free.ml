@@ -90,7 +90,7 @@ and free_exp e =
     union (free_list free_exp [e1; e2]) (free_path p)
   | StrE efs -> free_list free_expfield efs
   | CallE (id, e1) -> union (free_defid id) (free_exp e1)
-  | IterE (e1, iter) -> union (free_exp e1) (free_iter iter)
+  | IterE (e1, iter) -> union (free_exp e1) (free_iterexp iter)
   | DotE (t, e1, _) | CaseE (_, e1, t) -> union (free_exp e1) (free_typ t)
 
 and free_expfield (_, e) = free_exp e
@@ -101,6 +101,9 @@ and free_path p =
   | IdxP (p1, e) -> union (free_path p1) (free_exp e)
   | DotP (p1, _) -> free_path p1
 
+and free_iterexp (iter, ids) =
+    union (free_iter iter) (free_list free_varid ids)
+
 
 (* Definitions *)
 
@@ -110,12 +113,12 @@ let bound_binds binds = free_list bound_bind binds
 let free_bind (_id, t, _dim) = free_typ t
 let free_binds binds = free_list free_bind binds
 
-let free_prem prem =
+let rec free_prem prem =
   match prem.it with
-  | RulePr (id, _mixop, e, iters) ->
-    union (free_relid id) (union (free_exp e) (free_list free_iter iters))
-  | IfPr (e, iters) -> union (free_exp e) (free_list free_iter iters)
+  | RulePr (id, _op, e) -> union (free_relid id) (free_exp e)
+  | IfPr e -> free_exp e
   | ElsePr -> empty
+  | IterPr (prem', iter) -> union (free_prem prem') (free_iterexp iter)
 
 let free_rule rule =
   match rule.it with
