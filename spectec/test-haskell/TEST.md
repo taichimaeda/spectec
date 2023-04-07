@@ -6,7 +6,7 @@ $ cat Test.hs
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 module Test where
-import Prelude (Bool, String, undefined, Maybe, fromIntegral, (+), (!!))
+import Prelude (Bool, String, undefined, error, Maybe, fromIntegral, (+), (!!))
 import Numeric.Natural (Natural)
 type N = Natural
 
@@ -650,63 +650,26 @@ data E
  | E_LABEL_ (N, [Instr], E)
 
 unop :: (Unop_numtype, Numtype, C_numtype) -> [C_numtype]
-
+unop = error "function without clauses"
 
 binop :: (Binop_numtype, Numtype, C_numtype, C_numtype) -> [C_numtype]
-
+binop = error "function without clauses"
 
 testop :: (Testop_numtype, Numtype, C_numtype) -> C_numtype
-
+testop = error "function without clauses"
 
 relop :: (Relop_numtype, Numtype, C_numtype, C_numtype) -> C_numtype
-
+relop = error "function without clauses"
 
 ext :: (Natural, Natural, Sx, C_numtype) -> C_numtype
-
+ext = error "function without clauses"
 
 cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
-
+cvtop = error "function without clauses"
 
 
 
 
 
 $ ghc -c Test.hs
-
-Test.hs:647:1: error:
-    The type signature for ‘unop’ lacks an accompanying binding
-    |
-647 | unop :: (Unop_numtype, Numtype, C_numtype) -> [C_numtype]
-    | ^^^^
-
-Test.hs:650:1: error:
-    The type signature for ‘binop’ lacks an accompanying binding
-    |
-650 | binop :: (Binop_numtype, Numtype, C_numtype, C_numtype) -> [C_numtype]
-    | ^^^^^
-
-Test.hs:653:1: error:
-    The type signature for ‘testop’ lacks an accompanying binding
-    |
-653 | testop :: (Testop_numtype, Numtype, C_numtype) -> C_numtype
-    | ^^^^^^
-
-Test.hs:656:1: error:
-    The type signature for ‘relop’ lacks an accompanying binding
-    |
-656 | relop :: (Relop_numtype, Numtype, C_numtype, C_numtype) -> C_numtype
-    | ^^^^^
-
-Test.hs:659:1: error:
-    The type signature for ‘ext’ lacks an accompanying binding
-    |
-659 | ext :: (Natural, Natural, Sx, C_numtype) -> C_numtype
-    | ^^^
-
-Test.hs:662:1: error:
-    The type signature for ‘cvtop’ lacks an accompanying binding
-    |
-662 | cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
-    | ^^^^^
-[1]
 ```

@@ -135,8 +135,9 @@ let rec render_def (d : def) =
     end
   | DecD (id, typ1, typ2, clauses, _hints) ->
     make_id id.it ^ " :: " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^ "\n" ^
-    String.concat "\n" (List.map (render_clause id) clauses)
-
+    if clauses = []
+    then make_id id.it ^ " = error \"function without clauses\""
+    else String.concat "\n" (List.map (render_clause id) clauses)
   | RecD defs ->
     String.concat "\n" (List.map render_def defs)
   | _ -> ""
@@ -148,7 +149,7 @@ let gen_string (el : script) =
   "{-# LANGUAGE OverloadedRecordDot #-}\n" ^
   "{-# LANGUAGE DuplicateRecordFields #-}\n" ^
   "module Test where\n" ^
-  "import Prelude (Bool, String, undefined, Maybe, fromIntegral, (+), (!!))\n" ^
+  "import Prelude (Bool, String, undefined, error, Maybe, fromIntegral, (+), (!!))\n" ^
   "import Numeric.Natural (Natural)\n" ^
   render_script el
 
