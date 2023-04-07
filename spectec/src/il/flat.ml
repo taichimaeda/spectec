@@ -74,7 +74,23 @@ let rec transform_def_rec env (def : def) : def * (def list) = match def.it with
                 CaseE (a, VarE x $ no_region, ty) $ no_region, []) $ no_region
         ) (lookup_cons env sid) in
         DecD (name, VarT sid $ no_region, VarT id $ no_region, clauses, []) $ no_region
-      ) pairs
+      ) pairs @
+      List.concat_map (fun {hintid; hintexp} ->
+        match hintid.it, hintexp with
+        | "subtype_alias", [s1; s2] ->
+          let id1 = s1 $ no_region in
+          let id2 = s2 $ no_region in
+          let name = (id.it ^ "_" ^ id1.it) $ no_region in
+          let name2 = (id.it ^ "_" ^ id2.it) $ no_region in
+          let x = "x" $ no_region in
+          let clauses = [
+            DefD ([(x, VarT id1 $ no_region, [])],
+                  VarE x $ no_region,
+                  CallE (name2, VarE x $ no_region) $ no_region, []) $ no_region
+          ] in
+          [ DecD (name, VarT id1 $ no_region, VarT id $ no_region, clauses, []) $ no_region ]
+        | _, _ -> []
+      ) hints
     | _ -> def, []
     end
   | _ ->

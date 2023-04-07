@@ -994,6 +994,9 @@ def «$admininstr_ref» : Ref -> Admininstr
   | (Ref.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
   | (Ref.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
 
+def «$admininstr_globalinst» : Globalinst -> Admininstr
+  | x => («$admininstr_val» x)
+
 @[reducible] def Config := /- mixop: `%;%*` -/ (State × (List Admininstr))
 
 def «$funcaddr» : State -> (List Funcaddr)
@@ -1234,10 +1237,6 @@ term has type
   ?m
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
-term has type
-  ?m
-SpecTec.lean: error: function expected at
-  «$admininstr_globalinst»
 term has type
   ?m
 ```

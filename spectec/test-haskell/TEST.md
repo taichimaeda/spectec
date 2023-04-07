@@ -597,6 +597,9 @@ admininstr_ref (Ref_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_ref (Ref_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_ref (Ref_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
+admininstr_globalinst :: Globalinst -> Admininstr
+admininstr_globalinst x = undefined {- $admininstr_val(x) -}
+
 type Config = {- mixop: `%;%*` -} (State, [Admininstr])
 
 funcaddr :: State -> [Funcaddr]
@@ -670,9 +673,9 @@ cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 
 $ ghc -c Test.hs
 
-Test.hs:618:6: error: parse error on input ‘::’
+Test.hs:621:6: error: parse error on input ‘::’
     |
-618 | data :: (State, Dataidx) -> Datainst
+621 | data :: (State, Dataidx) -> Datainst
     |      ^^
 [1]
 ```

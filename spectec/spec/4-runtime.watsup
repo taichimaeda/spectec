@@ -137,7 +137,7 @@ def $with_elem((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] = r*]; f
 
 ;; Administrative Instructions
 
-syntax admininstr hint(show instr) hint(desc "administrative instruction") hint(subtype val) hint(subtype ref) =
+syntax admininstr hint(show instr) hint(desc "administrative instruction") hint(subtype val) hint(subtype ref) hint(subtype_alias globalinst val)=
   | instr
   | REF.FUNC_ADDR funcaddr         hint(show REF.FUNC %)
   | REF.HOST_ADDR hostaddr         hint(show REF.EXTERN %)
