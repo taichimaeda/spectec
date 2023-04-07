@@ -109,9 +109,13 @@ let rec render_exp (exp : exp) = match exp.it with
   | ListE es -> render_list render_exp es
   | OptE None -> "none"
   | OptE (Some e) -> "some" $$ render_exp e
-  | IterE (e, iter) -> begin match e.it with
+  | IterE (e, (iter, vs)) -> begin match e.it with
     | VarE v -> render_id v (* Short-ciruit this common form *)
-    | _ -> render_exp e ^ " /- " ^ Il.Print.string_of_iterexp iter ^ " -/"
+    | _ -> match iter, vs with
+      | (List|List1|ListN _), [v] ->
+        "(List.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
+      | _, _ ->
+      render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
   end
   | CaseE (a, e, typ) -> render_case a e typ
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
