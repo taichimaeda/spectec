@@ -278,6 +278,7 @@ let gen_string (el : script) =
   "def Option.toList : Option α → List α\n" ^
   "  | none => List.nil\n" ^
   "  | some x => [x]\n" ^
+  "set_option linter.unusedVariables false\n" ^
 
   render_script el
 

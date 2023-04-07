@@ -24,6 +24,7 @@ def Option.zipWith : (α → β → γ) → Option α → Option β → Option �
 def Option.toList : Option α → List α
   | none => List.nil
   | some x => [x]
+set_option linter.unusedVariables false
 @[reducible] def N := Nat
 
 @[reducible] def Name := String
@@ -1227,7 +1228,6 @@ inductive Step : (Config × Config) -> Prop where
     (Step_pure ((List.map (λ instr ↦ («$admininstr_instr» instr)) instr), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
     (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,' | sed -e 's,\?m\.[0-9]\+,?m,g'
-SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
@@ -1236,25 +1236,6 @@ SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
   ?m
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `v` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `v` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `i` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
-SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
 SpecTec.lean: error: function expected at
   «$admininstr_globalinst»
 term has type
