@@ -8,6 +8,16 @@ $ cat SpecTec.lean
 instance : Append (Option a) where
   append := fun o1 o2 => match o1 with | none => o2 | _ => o1
 
+
+inductive Forall (R : α → Prop) : List α → Prop
+  | nil : Forall R []
+  | cons {a l₁} : R a → Forall R l₁ → Forall R (a :: l₁)
+attribute [simp] Forall.nil
+variable {r : α → β → Prop} {p : γ → δ → Prop}
+inductive Forall₂ (R : α → β → Prop) : List α → List β → Prop
+  | nil : Forall₂ R [] []
+  | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)
+attribute [simp] Forall₂.nil
 @[reducible] def N := Nat
 
 @[reducible] def Name := String
@@ -405,7 +415,7 @@ inductive Valtype_sub : (Valtype × Valtype) -> Prop where
 
 inductive Resulttype_sub : ((List Valtype) × (List Valtype)) -> Prop where
   | rule_0 (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Valtype_sub (t_1, t_2)) /- *{t_1 t_2} -/ ->
+    (Forall₂ (λ t_1 t_2 ↦ (Valtype_sub (t_1, t_2))) t_1 t_2) ->
     (Resulttype_sub (t_1, t_2))
 
 inductive Limits_sub : (Limits × Limits) -> Prop where
@@ -464,7 +474,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
     (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8)))) /- ?{n} -/ ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
-    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ?{n sx} -/, n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
+    (Instr_ok (C, (Instr.LOAD (nt, (n, sx) /- ? -/, n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
   | data_drop (C : Context) (x : Idx) :
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
@@ -514,7 +524,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
   | global_get (C : Context) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == (() /- ?{} -/, t)) ->
+    ((C.GLOBAL.get! x) == (() /- ? -/, t)) ->
     (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
   | local_tee (C : Context) (t : Valtype) (x : Idx) :
     ((C.LOCAL.get! x) == t) ->
@@ -567,7 +577,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (C.RETURN == (some t)) ->
     (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
   | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l))])) /- *{l} -/ ->
+    (Forall (λ l ↦ (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l))]))) l) ->
     (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l'))])) ->
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
   | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
@@ -578,16 +588,16 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
   | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_1, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{} -/, RETURN := none}), instr_2, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- * -/, RETURN := none}), instr_1, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- * -/, RETURN := none}), instr_2, (t_1, t_2))) ->
     (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
   | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_1] /- *{t_1} -/, RETURN := none}), instr, (t_1, [t_2]))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none}), instr, (t_1, [t_2]))) ->
     (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, t_2)))
   | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (Blocktype_ok (C, bt, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2] /- *{t_2} -/, RETURN := none}), instr, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr, (t_1, t_2))) ->
     (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
   | select_impl (C : Context) (numtype : Numtype) (t : Valtype) (t' : Valtype) (vectype : Vectype) :
     (Valtype_sub (t, t')) ->
@@ -636,7 +646,7 @@ inductive Instr_const : (Context × Instr) -> Prop where
 
 inductive Expr_const : (Context × Expr) -> Prop where
   | rule_0 (C : Context) (instr : (List Instr)) :
-    (Instr_const (C, instr)) /- *{instr} -/ ->
+    (Forall (λ instr ↦ (Instr_const (C, instr))) instr) ->
     (Expr_const (C, instr))
 
 inductive Expr_ok_const : (Context × Expr × Valtype) -> Prop where
@@ -655,7 +665,7 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) :
     (Globaltype_ok gt) ->
-    (gt == (() /- ?{} -/, t)) ->
+    (gt == (() /- ? -/, t)) ->
     (Expr_ok_const (C, expr, t)) ->
     (Global_ok (C, (gt, expr), gt))
 
@@ -679,7 +689,7 @@ inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
 
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
   | rule_0 (C : Context) (elemmode : (Option Elemmode)) (expr : (List Expr)) (rt : Reftype) :
-    (Expr_ok (C, expr, [(«$valtype_reftype» rt)])) /- *{expr} -/ ->
+    (Forall (λ expr ↦ (Expr_ok (C, expr, [(«$valtype_reftype» rt)]))) expr) ->
     (Elemmode_ok (C, elemmode, rt)) /- ?{elemmode} -/ ->
     (Elem_ok (C, (rt, expr, elemmode), rt))
 
@@ -692,7 +702,7 @@ inductive Datamode_ok : (Context × Datamode) -> Prop where
 inductive Data_ok : (Context × Data) -> Prop where
   | rule_0 (C : Context) (b : (List (List Byte))) (datamode : (Option Datamode)) :
     (Datamode_ok (C, datamode)) /- ?{datamode} -/ ->
-    (Data_ok (C, (b /- *{b} -/, datamode)))
+    (Data_ok (C, ((List.map (λ b ↦ b) b), datamode)))
 
 inductive Start_ok : (Context × Start) -> Prop where
   | rule_0 (C : Context) (x : Idx) :
@@ -725,14 +735,14 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
 
 inductive Module_ok : Module -> Prop where
   | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
-    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n{} -/, LOCAL := [], LABEL := [], RETURN := none}) ->
-    (Func_ok (C, func, ft)) /- *{ft func} -/ ->
-    (Global_ok (C, «global», gt)) /- *{global gt} -/ ->
-    (Table_ok (C, table, tt)) /- *{table tt} -/ ->
-    (Mem_ok (C, mem, mt)) /- *{mem mt} -/ ->
-    (Elem_ok (C, elem, rt)) /- *{elem rt} -/ ->
-    (Data_ok (C, data)) /- ^n{data} -/ ->
-    (Start_ok (C, start)) /- *{start} -/ ->
+    (C == {FUNC := ft, GLOBAL := gt, TABLE := tt, MEM := mt, ELEM := rt, DATA := () /- ^n -/, LOCAL := [], LABEL := [], RETURN := none}) ->
+    (Forall₂ (λ ft func ↦ (Func_ok (C, func, ft))) ft func) ->
+    (Forall₂ (λ «global» gt ↦ (Global_ok (C, «global», gt))) «global» gt) ->
+    (Forall₂ (λ table tt ↦ (Table_ok (C, table, tt))) table tt) ->
+    (Forall₂ (λ mem mt ↦ (Mem_ok (C, mem, mt))) mem mt) ->
+    (Forall₂ (λ elem rt ↦ (Elem_ok (C, elem, rt))) elem rt) ->
+    (Forall (λ data ↦ (Data_ok (C, data))) data) ->
+    (Forall (λ start ↦ (Start_ok (C, start))) start) ->
     (mem.length <= 1) ->
     (start.length <= 1) ->
     (Module_ok («import», func, «global», table, mem, elem, data, start, «export»))
@@ -1073,11 +1083,11 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     ((«$unop» (unop, nt, c_1)) == [c]) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
   | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((«$admininstr_val» val) /- *{val} -/ ++ ([Admininstr.RETURN] ++ («$admininstr_instr» instr) /- *{instr} -/))))], ((«$admininstr_val» val) /- *{val} -/ ++ [Admininstr.RETURN])))
+    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [Admininstr.RETURN])))
   | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, ((«$admininstr_val» val') /- *{val'} -/ ++ ((«$admininstr_val» val) /- ^n{val} -/ ++ ([Admininstr.RETURN] ++ («$admininstr_instr» instr) /- *{instr} -/)))))], («$admininstr_val» val) /- ^n{val} -/))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
   | frame_vals (f : Frame) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, («$admininstr_val» val) /- ^n{val} -/))], («$admininstr_val» val) /- ^n{val} -/))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
   | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
     (i >= l.length) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
@@ -1091,11 +1101,11 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (c != 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
   | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((«$admininstr_val» val) /- *{val} -/ ++ ([(Admininstr.BR (l + 1))] ++ («$admininstr_instr» instr) /- *{instr} -/))))], ((«$admininstr_val» val) /- *{val} -/ ++ [(Admininstr.BR l)])))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR (l + 1))] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BR l)])))
   | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((«$admininstr_val» val') /- *{val'} -/ ++ ((«$admininstr_val» val) /- ^n{val} -/ ++ ([(Admininstr.BR 0)] ++ («$admininstr_instr» instr) /- *{instr} -/)))))], ((«$admininstr_val» val) /- ^n{val} -/ ++ («$admininstr_instr» instr') /- *{instr'} -/)))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR 0)] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
   | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr, («$admininstr_val» val) /- *{val} -/))], («$admininstr_val» val) /- *{val} -/))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
   | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c == 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
@@ -1104,10 +1114,10 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
   | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((«$admininstr_val» val) /- ^k{val} -/ ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((«$admininstr_val» val) /- ^k{val} -/ ++ («$admininstr_instr» instr) /- *{instr} -/)))]))
+    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
   | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (bt == (t_1, t_2)) ->
-    (Step_pure (((«$admininstr_val» val) /- ^k{val} -/ ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((«$admininstr_val» val) /- ^k{val} -/ ++ («$admininstr_instr» instr) /- *{instr} -/)))]))
+    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
   | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c == 0) ->
     (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_2)]))
@@ -1178,8 +1188,8 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
   | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
-    (f == {LOCAL := (val ++ («$default_» t) /- *{t} -/), MODULE := m}) ->
-    (Step_read ((z, ((«$admininstr_val» val) /- ^k{val} -/ ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], («$admininstr_instr» instr) /- *{instr} -/))]))]))
+    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t)) t)), MODULE := m}) ->
+    (Step_read ((z, ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))]))]))
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
     True /- Else? -/ ->
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
@@ -1203,21 +1213,13 @@ inductive Step : (Config × Config) -> Prop where
   | local_set (val : Val) (x : Idx) (z : State) :
     (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
   | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_read ((z, («$admininstr_instr» instr) /- *{instr} -/), («$admininstr_instr» instr') /- *{instr'} -/)) ->
-    (Step ((z, («$admininstr_instr» instr) /- *{instr} -/), (z, («$admininstr_instr» instr') /- *{instr'} -/)))
+    (Step_read ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
+    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
   | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_pure ((«$admininstr_instr» instr) /- *{instr} -/, («$admininstr_instr» instr') /- *{instr'} -/)) ->
-    (Step ((z, («$admininstr_instr» instr) /- *{instr} -/), (z, («$admininstr_instr» instr') /- *{instr'} -/)))
+    (Step_pure ((List.map (λ instr ↦ («$admininstr_instr» instr)) instr), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
+    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,' | sed -e 's,\?m\.[0-9]\+,?m,g'
 SpecTec.lean: warning: unused variable `n_3_ATOM_y` [linter.unusedVariables]
-SpecTec.lean: error: application type mismatch
-  Prod.mk t_1
-argument
-  t_1
-has type
-  List Valtype : Type
-but is expected to have type
-  Valtype : Type
 SpecTec.lean: error: application type mismatch
   Nat.div n
 argument
@@ -1267,11 +1269,11 @@ but is expected to have type
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
-  ?m.76086
+  ?m
 SpecTec.lean: error: function expected at
   «$valtype_resulttype»
 term has type
-  ?m.76086
+  ?m
 SpecTec.lean: error: application type mismatch
   (t_1, t_2)
 argument
@@ -1329,29 +1331,13 @@ has type
 but is expected to have type
   List Valtype : Type
 SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Instr) Instr ?m.77673
-SpecTec.lean: error: application type mismatch
-  (C, instr)
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+  HAppend (List Instr) Instr ?m
 SpecTec.lean: error: type mismatch
   ((), t)
 has type
   Unit × Valtype : Type
 but is expected to have type
   Globaltype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk expr
-argument
-  expr
-has type
-  List Expr : Type
-but is expected to have type
-  Expr : Type
 SpecTec.lean: error: application type mismatch
   Prod.mk elemmode
 argument
@@ -1374,62 +1360,6 @@ has type
   Unit : Type
 but is expected to have type
   List Datatype : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk func
-argument
-  func
-has type
-  List Func : Type
-but is expected to have type
-  Func : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk global
-argument
-  global
-has type
-  List Global : Type
-but is expected to have type
-  Global : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk table
-argument
-  table
-has type
-  List Table : Type
-but is expected to have type
-  Table : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk mem
-argument
-  mem
-has type
-  List Mem : Type
-but is expected to have type
-  Mem : Type
-SpecTec.lean: error: application type mismatch
-  Prod.mk elem
-argument
-  elem
-has type
-  List Elem : Type
-but is expected to have type
-  Elem : Type
-SpecTec.lean: error: application type mismatch
-  (C, data)
-argument
-  data
-has type
-  List Data : Type
-but is expected to have type
-  Data : Type
-SpecTec.lean: error: application type mismatch
-  (C, start)
-argument
-  start
-has type
-  List Start : Type
-but is expected to have type
-  Start : Type
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `f` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
@@ -1449,260 +1379,10 @@ SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `s` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `x` [linter.unusedVariables]
 SpecTec.lean: warning: unused variable `r` [linter.unusedVariables]
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.178360
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.178567
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val'
-argument
-  val'
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.179086
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.179990
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.180197
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val'
-argument
-  val'
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Admininstr) Admininstr ?m.180723
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.181018
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.181659
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.181970
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.182327
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr Admininstr ?m.182632
 SpecTec.lean: error: function expected at
   «$admininstr_globalinst»
 term has type
-  ?m.184956
-SpecTec.lean: error: application type mismatch
-  «$default_» t
-argument
-  t
-has type
-  List Valtype : Type
-but is expected to have type
-  Valtype : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend (List Val) Val ?m.185530
-SpecTec.lean: error: application type mismatch
-  «$admininstr_val» val
-argument
-  val
-has type
-  List Val : Type
-but is expected to have type
-  Val : Type
-SpecTec.lean: error: failed to synthesize instance
-  HAppend Admininstr (List Admininstr) ?m.185848
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
+  ?m
 SpecTec.lean: error: application type mismatch
   (x, ref)
 argument
@@ -1711,68 +1391,4 @@ has type
   Ref : Type
 but is expected to have type
   List Ref : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr
-argument
-  instr
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
-SpecTec.lean: error: application type mismatch
-  «$admininstr_instr» instr'
-argument
-  instr'
-has type
-  List Instr : Type
-but is expected to have type
-  Instr : Type
 ```

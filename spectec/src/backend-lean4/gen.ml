@@ -114,6 +114,8 @@ let rec render_exp (exp : exp) = match exp.it with
     | _ -> match iter, vs with
       | (List|List1|ListN _), [v] ->
         "(List.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
+      | (List|List1|ListN _), [v1; v2] ->
+        "(List.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
       | _, _ ->
       render_exp e ^ " /- " ^ Il.Print.string_of_iter iter ^ " -/"
   end
@@ -164,7 +166,14 @@ let rec render_prem (prem : premise) =
     match prem.it with
     | RulePr (pid, _mixops, pexp) -> render_type_name pid $$ render_exp pexp
     | IfPr (pexp) -> render_exp pexp
-    | IterPr (prem, iter) -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iter ^ " -/"
+    | IterPr (prem, iterexp) ->
+    begin match iterexp with
+      | (List|List1|ListN _), [v] ->
+        "(Forall (λ " ^ render_id v ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v ^ ")"
+      | (List|List1|ListN _), [v1; v2] ->
+        "(Forall₂ (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
+      | _,_ -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iterexp ^ " -/"
+    end
     | ElsePr -> "True /- Else? -/"
 
 let rec render_def (d : def) =
@@ -240,6 +249,18 @@ let gen_string (el : script) =
   "/- Lean 4 export -/\n\n" ^
   "instance : Append (Option a) where\n" ^
   "  append := fun o1 o2 => match o1 with | none => o2 | _ => o1\n\n" ^
+  "\n" ^
+  (* Really not in the default distribution? *)
+  "inductive Forall (R : α → Prop) : List α → Prop\n" ^
+  "  | nil : Forall R []\n" ^
+  "  | cons {a l₁} : R a → Forall R l₁ → Forall R (a :: l₁)\n" ^
+  "attribute [simp] Forall.nil\n" ^
+  "variable {r : α → β → Prop} {p : γ → δ → Prop}\n" ^
+  "inductive Forall₂ (R : α → β → Prop) : List α → List β → Prop\n" ^
+  "  | nil : Forall₂ R [] []\n" ^
+  "  | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)\n" ^
+  "attribute [simp] Forall₂.nil\n" ^
+
   render_script el
 
 
