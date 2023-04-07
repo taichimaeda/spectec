@@ -586,8 +586,8 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (C.RETURN == (some t)) ->
     (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
   | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Forall (λ l ↦ (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l))]))) l) ->
-    (Resulttype_sub (t, [(«$valtype_resulttype» (C.LABEL.get! l'))])) ->
+    (Forall (λ l ↦ (Resulttype_sub (t, (C.LABEL.get! l)))) l) ->
+    (Resulttype_sub (t, (C.LABEL.get! l'))) ->
     (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
   | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
     ((C.LABEL.get! l) == t) ->
@@ -1231,12 +1231,4 @@ inductive Step : (Config × Config) -> Prop where
     (Step_pure ((List.map (λ instr ↦ («$admininstr_instr» instr)) instr), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
     (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,' | sed -e 's,\?m\.[0-9]\+,?m,g'
-SpecTec.lean: error: function expected at
-  «$valtype_resulttype»
-term has type
-  ?m
-SpecTec.lean: error: function expected at
-  «$valtype_resulttype»
-term has type
-  ?m
 ```
