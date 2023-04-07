@@ -98,7 +98,9 @@ type Resulttype = [Valtype]
 
 type Limits = {- mixop: `[%..%]` -} (U32, U32)
 
-type Globaltype = {- mixop: `MUT%?%` -} ((Maybe ()), Valtype)
+type Mutflag = {- mixop: MUT -} ()
+
+type Globaltype = {- mixop: `%?%` -} ((Maybe Mutflag), Valtype)
 
 type Functype = {- mixop: `%->%` -} (Resulttype, Resulttype)
 
@@ -668,9 +670,9 @@ cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 
 $ ghc -c Test.hs
 
-Test.hs:616:6: error: parse error on input ‘::’
+Test.hs:618:6: error: parse error on input ‘::’
     |
-616 | data :: (State, Dataidx) -> Datainst
+618 | data :: (State, Dataidx) -> Datainst
     |      ^^
 [1]
 ```

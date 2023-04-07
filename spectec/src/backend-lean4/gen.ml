@@ -19,6 +19,7 @@ let is_reserved = function
  | "import"
  | "global"
  | "local"
+ | "mut"
  -> true
  | _ -> false
 

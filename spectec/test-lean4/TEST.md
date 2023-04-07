@@ -120,7 +120,9 @@ def «$valtype_fn» : Fn -> Valtype
 
 @[reducible] def Limits := /- mixop: `[%..%]` -/ (U32 × U32)
 
-@[reducible] def Globaltype := /- mixop: `MUT%?%` -/ ((Option Unit) × Valtype)
+@[reducible] def Mutflag := /- mixop: MUT -/ Unit
+
+@[reducible] def Globaltype := /- mixop: `%?%` -/ ((Option Mutflag) × Valtype)
 
 @[reducible] def Functype := /- mixop: `%->%` -/ (Resulttype × Resulttype)
 
@@ -529,8 +531,8 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | global_set (C : Context) (t : Valtype) (x : Idx) :
     ((C.GLOBAL.get! x) == ((some ()), t)) ->
     (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
-  | global_get (C : Context) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == ((some ()), t)) ->
+  | global_get (C : Context) («mut» : (Option Mutflag)) (t : Valtype) (x : Idx) :
+    ((C.GLOBAL.get! x) == («mut», t)) ->
     (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
   | local_tee (C : Context) (t : Valtype) (x : Idx) :
     ((C.LOCAL.get! x) == t) ->
