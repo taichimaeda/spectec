@@ -623,8 +623,8 @@ mem ((s, f), x) = (s.mEM !! (fromIntegral (f.mODULE.mEM !! (fromIntegral x))))
 elem :: (State, Tableidx) -> Eleminst
 elem ((s, f), x) = (s.eLEM !! (fromIntegral (f.mODULE.eLEM !! (fromIntegral x))))
 
-data :: (State, Dataidx) -> Datainst
-data ((s, f), x) = (s.dATA !! (fromIntegral (f.mODULE.dATA !! (fromIntegral x))))
+data_ :: (State, Dataidx) -> Datainst
+data_ ((s, f), x) = (s.dATA !! (fromIntegral (f.mODULE.dATA !! (fromIntegral x))))
 
 local :: (State, Localidx) -> Val
 local ((s, f), x) = (f.lOCAL !! (fromIntegral x))
@@ -673,9 +673,40 @@ cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 
 $ ghc -c Test.hs
 
-Test.hs:621:6: error: parse error on input ‘::’
+Test.hs:647:1: error:
+    The type signature for ‘unop’ lacks an accompanying binding
     |
-621 | data :: (State, Dataidx) -> Datainst
-    |      ^^
+647 | unop :: (Unop_numtype, Numtype, C_numtype) -> [C_numtype]
+    | ^^^^
+
+Test.hs:650:1: error:
+    The type signature for ‘binop’ lacks an accompanying binding
+    |
+650 | binop :: (Binop_numtype, Numtype, C_numtype, C_numtype) -> [C_numtype]
+    | ^^^^^
+
+Test.hs:653:1: error:
+    The type signature for ‘testop’ lacks an accompanying binding
+    |
+653 | testop :: (Testop_numtype, Numtype, C_numtype) -> C_numtype
+    | ^^^^^^
+
+Test.hs:656:1: error:
+    The type signature for ‘relop’ lacks an accompanying binding
+    |
+656 | relop :: (Relop_numtype, Numtype, C_numtype, C_numtype) -> C_numtype
+    | ^^^^^
+
+Test.hs:659:1: error:
+    The type signature for ‘ext’ lacks an accompanying binding
+    |
+659 | ext :: (Natural, Natural, Sx, C_numtype) -> C_numtype
+    | ^^^
+
+Test.hs:662:1: error:
+    The type signature for ‘cvtop’ lacks an accompanying binding
+    |
+662 | cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
+    | ^^^^^
 [1]
 ```

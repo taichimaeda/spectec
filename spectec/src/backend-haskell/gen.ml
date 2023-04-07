@@ -101,7 +101,7 @@ and render_case a e typ =
 let render_clause (id : id) (clause : clause) = match clause.it with
   | DefD (_binds, lhs, rhs, premise) ->
    (if premise <> [] then "-- Premises ignored! \n" else "") ^
-   id.it ^ " " ^ render_exp lhs ^ " = " ^ render_exp rhs
+   make_id id.it ^ " " ^ render_exp lhs ^ " = " ^ render_exp rhs
 
 let rec render_def (d : def) =
   begin
@@ -134,7 +134,7 @@ let rec render_def (d : def) =
       ) ^ "\n }"
     end
   | DecD (id, typ1, typ2, clauses, _hints) ->
-    id.it ^ " :: " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^ "\n" ^
+    make_id id.it ^ " :: " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^ "\n" ^
     String.concat "\n" (List.map (render_clause id) clauses)
 
   | RecD defs ->
