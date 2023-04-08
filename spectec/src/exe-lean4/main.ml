@@ -58,6 +58,9 @@ let () =
     log "Function totalization";
     let il = Middlend.Totalize.transform il in
     Il.Validation.valid il;
+    log "Side condition inference";
+    let il = Middlend.Sideconditions.transform il in
+    Il.Validation.valid il;
     log "Lean4 Generation...";
     if !odst = "" && !dsts = [] then
       print_endline (Backend_lean4.Gen.gen_string il);
