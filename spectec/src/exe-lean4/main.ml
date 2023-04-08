@@ -53,10 +53,10 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
     log "Variant flattening";
-    let il = Il.Flat.transform il in
+    let il = Middlend.Flat.transform il in
     Il.Validation.valid il;
     log "Function totalization";
-    let il = Il.Totalize.transform il in
+    let il = Middlend.Totalize.transform il in
     Il.Validation.valid il;
     log "Lean4 Generation...";
     if !odst = "" && !dsts = [] then

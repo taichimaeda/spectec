@@ -12,13 +12,11 @@ The declarations are changed:
 
 All calls to such functions are wrapped in option projection `THE e`.
 
-(Until the AST has that we’ll use `CallE (THE, e)`.)
-
 *)
 
 open Util
 open Source
-open Ast
+open Il.Ast
 
 (* Errors *)
 
@@ -77,7 +75,7 @@ and t_exp' env at = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | CaseE (a, e, t) -> CaseE (a, t_exp env e, t)
   | SubE (e, t1, t2) -> SubE (e, t1, t2)
-  | e -> error at ("t_exp: unsupported: " ^ Print.string_of_exp (e $ no_region))
+  | e -> error at ("t_exp: unsupported: " ^ Il.Print.string_of_exp (e $ no_region))
 
 and t_iter env = function
   | ListN e -> ListN (t_exp env e)
