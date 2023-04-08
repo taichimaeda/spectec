@@ -330,11 +330,11 @@ inductive Externuse where
 @[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
 
 def «$size» : Valtype -> Nat
-  | Valtype.V128 => 128
-  | Valtype.F64 => 64
-  | Valtype.F32 => 32
-  | Valtype.I64 => 64
   | Valtype.I32 => 32
+  | Valtype.I64 => 64
+  | Valtype.F32 => 32
+  | Valtype.F64 => 64
+  | Valtype.V128 => 128
   | _ => default
 
 def «$test_sub_ATOM_22» : N -> Nat
@@ -403,24 +403,24 @@ inductive Memtype_ok : Memtype -> Prop where
     (Memtype_ok lim)
 
 inductive Externtype_ok : Externtype -> Prop where
-  | mem (memtype : Memtype) :
-    (Memtype_ok memtype) ->
-    (Externtype_ok (Externtype.MEMORY memtype))
-  | table (tabletype : Tabletype) :
-    (Tabletype_ok tabletype) ->
-    (Externtype_ok (Externtype.TABLE tabletype))
-  | «global» (globaltype : Globaltype) :
-    (Globaltype_ok globaltype) ->
-    (Externtype_ok (Externtype.GLOBAL globaltype))
   | func (functype : Functype) :
     (Functype_ok functype) ->
     (Externtype_ok (Externtype.FUNC functype))
+  | «global» (globaltype : Globaltype) :
+    (Globaltype_ok globaltype) ->
+    (Externtype_ok (Externtype.GLOBAL globaltype))
+  | table (tabletype : Tabletype) :
+    (Tabletype_ok tabletype) ->
+    (Externtype_ok (Externtype.TABLE tabletype))
+  | mem (memtype : Memtype) :
+    (Memtype_ok memtype) ->
+    (Externtype_ok (Externtype.MEMORY memtype))
 
 inductive Valtype_sub : (Valtype × Valtype) -> Prop where
-  | bot (t : Valtype) :
-    (Valtype_sub (Valtype.BOT, t))
   | refl (t : Valtype) :
     (Valtype_sub (t, t))
+  | bot (t : Valtype) :
+    (Valtype_sub (Valtype.BOT, t))
 
 inductive Resulttype_sub : ((List Valtype) × (List Valtype)) -> Prop where
   | rule_0 (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
@@ -452,18 +452,18 @@ inductive Memtype_sub : (Memtype × Memtype) -> Prop where
     (Memtype_sub (lim_1, lim_2))
 
 inductive Externtype_sub : (Externtype × Externtype) -> Prop where
-  | mem (mt_1 : Memtype) (mt_2 : Memtype) :
-    (Memtype_sub (mt_1, mt_2)) ->
-    (Externtype_sub ((Externtype.MEMORY mt_1), (Externtype.MEMORY mt_2)))
-  | table (tt_1 : Tabletype) (tt_2 : Tabletype) :
-    (Tabletype_sub (tt_1, tt_2)) ->
-    (Externtype_sub ((Externtype.TABLE tt_1), (Externtype.TABLE tt_2)))
-  | «global» (gt_1 : Globaltype) (gt_2 : Globaltype) :
-    (Globaltype_sub (gt_1, gt_2)) ->
-    (Externtype_sub ((Externtype.GLOBAL gt_1), (Externtype.GLOBAL gt_2)))
   | func (ft_1 : Functype) (ft_2 : Functype) :
     (Functype_sub (ft_1, ft_2)) ->
     (Externtype_sub ((Externtype.FUNC ft_1), (Externtype.FUNC ft_2)))
+  | «global» (gt_1 : Globaltype) (gt_2 : Globaltype) :
+    (Globaltype_sub (gt_1, gt_2)) ->
+    (Externtype_sub ((Externtype.GLOBAL gt_1), (Externtype.GLOBAL gt_2)))
+  | table (tt_1 : Tabletype) (tt_2 : Tabletype) :
+    (Tabletype_sub (tt_1, tt_2)) ->
+    (Externtype_sub ((Externtype.TABLE tt_1), (Externtype.TABLE tt_2)))
+  | mem (mt_1 : Memtype) (mt_2 : Memtype) :
+    (Memtype_sub (mt_1, mt_2)) ->
+    (Externtype_sub ((Externtype.MEMORY mt_1), (Externtype.MEMORY mt_2)))
 
 inductive Blocktype_ok : (Context × Blocktype × Functype) -> Prop where
   | rule_0 (C : Context) (ft : Functype) :
@@ -472,169 +472,169 @@ inductive Blocktype_ok : (Context × Blocktype × Functype) -> Prop where
 
 mutual
 inductive Instr_ok : (Context × Instr × Functype) -> Prop where
-  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
+  | unreachable (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    (Instr_ok (C, Instr.UNREACHABLE, (t_1, t_2)))
+  | nop (C : Context) :
+    (Instr_ok (C, Instr.NOP, ([], [])))
+  | drop (C : Context) (t : Valtype) :
+    (Instr_ok (C, Instr.DROP, ([t], [])))
+  | select_expl (C : Context) (t : Valtype) :
+    (Instr_ok (C, (Instr.SELECT (some t)), ([t, t, Valtype.I32], [t])))
+  | select_impl (C : Context) (numtype : Numtype) (t : Valtype) (t' : Valtype) (vectype : Vectype) :
+    (Valtype_sub (t, t')) ->
+    ((t' == («$valtype_numtype» numtype)) || (t' == («$valtype_vectype» vectype))) ->
+    (Instr_ok (C, (Instr.SELECT none), ([t, t, Valtype.I32], [t])))
+  | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    (Blocktype_ok (C, bt, (t_1, t_2))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr, (t_1, t_2))) ->
+    (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
+  | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
+    (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none}), instr, (t_1, [t_2]))) ->
+    (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, [t_2])))
+  | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
+    (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_1, (t_1, [t_2]))) ->
+    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_2, (t_1, [t_2]))) ->
+    (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
+  | br (C : Context) (l : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    ((C.LABEL.get! l) == t) ->
+    (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
+  | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
+    ((C.LABEL.get! l) == t) ->
+    (Instr_ok (C, (Instr.BR_IF l), ((t ++ [Valtype.I32]), t)))
+  | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    (Forall (λ l ↦ (Resulttype_sub (t, (C.LABEL.get! l)))) l) ->
+    (Resulttype_sub (t, (C.LABEL.get! l'))) ->
+    (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
+  | return (C : Context) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    (C.RETURN == (some t)) ->
+    (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
+  | call (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
+    ((C.FUNC.get! x) == (t_1, t_2)) ->
+    (Instr_ok (C, (Instr.CALL x), (t_1, t_2)))
+  | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
+    ((C.TABLE.get! x) == (lim, Reftype.FUNCREF)) ->
+    (ft == (t_1, t_2)) ->
+    (Instr_ok (C, (Instr.CALL_INDIRECT (x, ft)), ((t_1 ++ [Valtype.I32]), t_2)))
+  | const (C : Context) (c_nt : C_numtype) (nt : Numtype) :
+    (Instr_ok (C, (Instr.CONST (nt, c_nt)), ([], [(«$valtype_numtype» nt)])))
+  | unop (C : Context) (nt : Numtype) (unop : Unop_numtype) :
+    (Instr_ok (C, (Instr.UNOP (nt, unop)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
+  | binop (C : Context) (binop : Binop_numtype) (nt : Numtype) :
+    (Instr_ok (C, (Instr.BINOP (nt, binop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
+  | testop (C : Context) (nt : Numtype) (testop : Testop_numtype) :
+    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(«$valtype_numtype» nt)], [Valtype.I32])))
+  | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) :
+    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [Valtype.I32])))
+  | extend (C : Context) (n : N) (nt : Numtype) :
+    (n <= («$size» («$valtype_numtype» nt))) ->
+    (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
+  | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) :
+    (nt_1 != nt_2) ->
+    ((«$size» («$valtype_numtype» nt_1)) == («$size» («$valtype_numtype» nt_2))) ->
+    (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
+  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
+    (in_1 != in_2) ->
+    ((sx == none) = ((«$size» («$valtype_in» in_1)) > («$size» («$valtype_in» in_2)))) ->
+    (Instr_ok (C, (Instr.CVTOP ((«$numtype_in» in_1), Cvtop.CONVERT, («$numtype_in» in_2), sx)), ([(«$valtype_in» in_2)], [(«$valtype_in» in_1)])))
+  | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
+    (fn_1 != fn_2) ->
+    (Instr_ok (C, (Instr.CVTOP ((«$numtype_fn» fn_1), Cvtop.CONVERT, («$numtype_fn» fn_2), none)), ([(«$valtype_fn» fn_2)], [(«$valtype_fn» fn_1)])))
+  | ref_null (C : Context) (rt : Reftype) :
+    (Instr_ok (C, (Instr.REF_NULL rt), ([], [(«$valtype_reftype» rt)])))
+  | ref_func (C : Context) (ft : Functype) (x : Idx) :
+    ((C.FUNC.get! x) == ft) ->
+    (Instr_ok (C, (Instr.REF_FUNC x), ([], [Valtype.FUNCREF])))
+  | ref_is_null (C : Context) (rt : Reftype) :
+    (Instr_ok (C, Instr.REF_IS_NULL, ([(«$valtype_reftype» rt)], [Valtype.I32])))
+  | local_get (C : Context) (t : Valtype) (x : Idx) :
+    ((C.LOCAL.get! x) == t) ->
+    (Instr_ok (C, (Instr.LOCAL_GET x), ([], [t])))
+  | local_set (C : Context) (t : Valtype) (x : Idx) :
+    ((C.LOCAL.get! x) == t) ->
+    (Instr_ok (C, (Instr.LOCAL_SET x), ([t], [])))
+  | local_tee (C : Context) (t : Valtype) (x : Idx) :
+    ((C.LOCAL.get! x) == t) ->
+    (Instr_ok (C, (Instr.LOCAL_TEE x), ([t], [t])))
+  | global_get (C : Context) («mut» : (Option Mutflag)) (t : Valtype) (x : Idx) :
+    ((C.GLOBAL.get! x) == («mut», t)) ->
+    (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
+  | global_set (C : Context) (t : Valtype) (x : Idx) :
+    ((C.GLOBAL.get! x) == ((some ()), t)) ->
+    (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
+  | table_get (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
+    ((C.TABLE.get! x) == (lim, rt)) ->
+    (Instr_ok (C, (Instr.TABLE_GET x), ([Valtype.I32], [(«$valtype_reftype» rt)])))
+  | table_set (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
+    ((C.TABLE.get! x) == (lim, rt)) ->
+    (Instr_ok (C, (Instr.TABLE_SET x), ([Valtype.I32, («$valtype_reftype» rt)], [])))
+  | table_size (C : Context) (tt : Tabletype) (x : Idx) :
+    ((C.TABLE.get! x) == tt) ->
+    (Instr_ok (C, (Instr.TABLE_SIZE x), ([], [Valtype.I32])))
+  | table_grow (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
+    ((C.TABLE.get! x) == (lim, rt)) ->
+    (Instr_ok (C, (Instr.TABLE_GROW x), ([(«$valtype_reftype» rt), Valtype.I32], [Valtype.I32])))
+  | table_fill (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
+    ((C.TABLE.get! x) == (lim, rt)) ->
+    (Instr_ok (C, (Instr.TABLE_FILL x), ([Valtype.I32, («$valtype_reftype» rt), Valtype.I32], [])))
+  | table_copy (C : Context) (lim_1 : Limits) (lim_2 : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
+    ((C.TABLE.get! x_1) == (lim_1, rt)) ->
+    ((C.TABLE.get! x_2) == (lim_2, rt)) ->
+    (Instr_ok (C, (Instr.TABLE_COPY (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
+  | table_init (C : Context) (lim : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
+    ((C.TABLE.get! x_1) == (lim, rt)) ->
+    ((C.ELEM.get! x_2) == rt) ->
+    (Instr_ok (C, (Instr.TABLE_INIT (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
+  | elem_drop (C : Context) (rt : Reftype) (x : Idx) :
+    ((C.ELEM.get! x) == rt) ->
+    (Instr_ok (C, (Instr.ELEM_DROP x), ([], [])))
+  | memory_size (C : Context) (mt : Memtype) :
     ((C.MEM.get! 0) == mt) ->
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
-    ((n == none) || (nt == («$numtype_in» «in»))) ->
-    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
+    (Instr_ok (C, Instr.MEMORY_SIZE, ([], [Valtype.I32])))
+  | memory_grow (C : Context) (mt : Memtype) :
+    ((C.MEM.get! 0) == mt) ->
+    (Instr_ok (C, Instr.MEMORY_GROW, ([Valtype.I32], [Valtype.I32])))
+  | memory_fill (C : Context) (mt : Memtype) :
+    ((C.MEM.get! 0) == mt) ->
+    (Instr_ok (C, Instr.MEMORY_FILL, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
+  | memory_copy (C : Context) (mt : Memtype) :
+    ((C.MEM.get! 0) == mt) ->
+    (Instr_ok (C, Instr.MEMORY_COPY, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
+  | memory_init (C : Context) (mt : Memtype) (x : Idx) :
+    ((C.MEM.get! 0) == mt) ->
+    ((C.DATA.get! x) == ()) ->
+    (Instr_ok (C, (Instr.MEMORY_INIT x), ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
+  | data_drop (C : Context) (x : Idx) :
+    ((C.DATA.get! x) == ()) ->
+    (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
     (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
-  | data_drop (C : Context) (x : Idx) :
-    ((C.DATA.get! x) == ()) ->
-    (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
-  | memory_init (C : Context) (mt : Memtype) (x : Idx) :
+  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
-    ((C.DATA.get! x) == ()) ->
-    (Instr_ok (C, (Instr.MEMORY_INIT x), ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
-  | memory_copy (C : Context) (mt : Memtype) :
-    ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_COPY, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
-  | memory_fill (C : Context) (mt : Memtype) :
-    ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_FILL, ([Valtype.I32, Valtype.I32, Valtype.I32], [Valtype.I32])))
-  | memory_grow (C : Context) (mt : Memtype) :
-    ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_GROW, ([Valtype.I32], [Valtype.I32])))
-  | memory_size (C : Context) (mt : Memtype) :
-    ((C.MEM.get! 0) == mt) ->
-    (Instr_ok (C, Instr.MEMORY_SIZE, ([], [Valtype.I32])))
-  | elem_drop (C : Context) (rt : Reftype) (x : Idx) :
-    ((C.ELEM.get! x) == rt) ->
-    (Instr_ok (C, (Instr.ELEM_DROP x), ([], [])))
-  | table_init (C : Context) (lim : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
-    ((C.TABLE.get! x_1) == (lim, rt)) ->
-    ((C.ELEM.get! x_2) == rt) ->
-    (Instr_ok (C, (Instr.TABLE_INIT (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
-  | table_copy (C : Context) (lim_1 : Limits) (lim_2 : Limits) (rt : Reftype) (x_1 : Idx) (x_2 : Idx) :
-    ((C.TABLE.get! x_1) == (lim_1, rt)) ->
-    ((C.TABLE.get! x_2) == (lim_2, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_COPY (x_1, x_2)), ([Valtype.I32, Valtype.I32, Valtype.I32], [])))
-  | table_fill (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
-    ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_FILL x), ([Valtype.I32, («$valtype_reftype» rt), Valtype.I32], [])))
-  | table_grow (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
-    ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GROW x), ([(«$valtype_reftype» rt), Valtype.I32], [Valtype.I32])))
-  | table_size (C : Context) (tt : Tabletype) (x : Idx) :
-    ((C.TABLE.get! x) == tt) ->
-    (Instr_ok (C, (Instr.TABLE_SIZE x), ([], [Valtype.I32])))
-  | table_set (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
-    ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_SET x), ([Valtype.I32, («$valtype_reftype» rt)], [])))
-  | table_get (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) :
-    ((C.TABLE.get! x) == (lim, rt)) ->
-    (Instr_ok (C, (Instr.TABLE_GET x), ([Valtype.I32], [(«$valtype_reftype» rt)])))
-  | global_set (C : Context) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == ((some ()), t)) ->
-    (Instr_ok (C, (Instr.GLOBAL_SET x), ([t], [])))
-  | global_get (C : Context) («mut» : (Option Mutflag)) (t : Valtype) (x : Idx) :
-    ((C.GLOBAL.get! x) == («mut», t)) ->
-    (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
-  | local_tee (C : Context) (t : Valtype) (x : Idx) :
-    ((C.LOCAL.get! x) == t) ->
-    (Instr_ok (C, (Instr.LOCAL_TEE x), ([t], [t])))
-  | local_set (C : Context) (t : Valtype) (x : Idx) :
-    ((C.LOCAL.get! x) == t) ->
-    (Instr_ok (C, (Instr.LOCAL_SET x), ([t], [])))
-  | local_get (C : Context) (t : Valtype) (x : Idx) :
-    ((C.LOCAL.get! x) == t) ->
-    (Instr_ok (C, (Instr.LOCAL_GET x), ([], [t])))
-  | ref_is_null (C : Context) (rt : Reftype) :
-    (Instr_ok (C, Instr.REF_IS_NULL, ([(«$valtype_reftype» rt)], [Valtype.I32])))
-  | ref_func (C : Context) (ft : Functype) (x : Idx) :
-    ((C.FUNC.get! x) == ft) ->
-    (Instr_ok (C, (Instr.REF_FUNC x), ([], [Valtype.FUNCREF])))
-  | ref_null (C : Context) (rt : Reftype) :
-    (Instr_ok (C, (Instr.REF_NULL rt), ([], [(«$valtype_reftype» rt)])))
-  | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
-    (fn_1 != fn_2) ->
-    (Instr_ok (C, (Instr.CVTOP ((«$numtype_fn» fn_1), Cvtop.CONVERT, («$numtype_fn» fn_2), none)), ([(«$valtype_fn» fn_2)], [(«$valtype_fn» fn_1)])))
-  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
-    (in_1 != in_2) ->
-    ((sx == none) = ((«$size» («$valtype_in» in_1)) > («$size» («$valtype_in» in_2)))) ->
-    (Instr_ok (C, (Instr.CVTOP ((«$numtype_in» in_1), Cvtop.CONVERT, («$numtype_in» in_2), sx)), ([(«$valtype_in» in_2)], [(«$valtype_in» in_1)])))
-  | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) :
-    (nt_1 != nt_2) ->
-    ((«$size» («$valtype_numtype» nt_1)) == («$size» («$valtype_numtype» nt_2))) ->
-    (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
-  | extend (C : Context) (n : N) (nt : Numtype) :
-    (n <= («$size» («$valtype_numtype» nt))) ->
-    (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
-  | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) :
-    (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [Valtype.I32])))
-  | testop (C : Context) (nt : Numtype) (testop : Testop_numtype) :
-    (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(«$valtype_numtype» nt)], [Valtype.I32])))
-  | binop (C : Context) (binop : Binop_numtype) (nt : Numtype) :
-    (Instr_ok (C, (Instr.BINOP (nt, binop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
-  | unop (C : Context) (nt : Numtype) (unop : Unop_numtype) :
-    (Instr_ok (C, (Instr.UNOP (nt, unop)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
-  | const (C : Context) (c_nt : C_numtype) (nt : Numtype) :
-    (Instr_ok (C, (Instr.CONST (nt, c_nt)), ([], [(«$valtype_numtype» nt)])))
-  | call_indirect (C : Context) (ft : Functype) (lim : Limits) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
-    ((C.TABLE.get! x) == (lim, Reftype.FUNCREF)) ->
-    (ft == (t_1, t_2)) ->
-    (Instr_ok (C, (Instr.CALL_INDIRECT (x, ft)), ((t_1 ++ [Valtype.I32]), t_2)))
-  | call (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (x : Idx) :
-    ((C.FUNC.get! x) == (t_1, t_2)) ->
-    (Instr_ok (C, (Instr.CALL x), (t_1, t_2)))
-  | return (C : Context) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (C.RETURN == (some t)) ->
-    (Instr_ok (C, Instr.RETURN, ((t_1 ++ t), t_2)))
-  | br_table (C : Context) (l : (List Labelidx)) (l' : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Forall (λ l ↦ (Resulttype_sub (t, (C.LABEL.get! l)))) l) ->
-    (Resulttype_sub (t, (C.LABEL.get! l'))) ->
-    (Instr_ok (C, (Instr.BR_TABLE (l, l')), ((t_1 ++ t), t_2)))
-  | br_if (C : Context) (l : Labelidx) (t : (List Valtype)) :
-    ((C.LABEL.get! l) == t) ->
-    (Instr_ok (C, (Instr.BR_IF l), ((t ++ [Valtype.I32]), t)))
-  | br (C : Context) (l : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    ((C.LABEL.get! l) == t) ->
-    (Instr_ok (C, (Instr.BR l), ((t_1 ++ t), t_2)))
-  | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
-    (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_1, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [[t_2]], RETURN := none}), instr_2, (t_1, [t_2]))) ->
-    (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, [t_2])))
-  | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : Valtype) :
-    (Blocktype_ok (C, bt, (t_1, [t_2]))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none}), instr, (t_1, [t_2]))) ->
-    (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, [t_2])))
-  | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Blocktype_ok (C, bt, (t_1, t_2))) ->
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr, (t_1, t_2))) ->
-    (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
-  | select_impl (C : Context) (numtype : Numtype) (t : Valtype) (t' : Valtype) (vectype : Vectype) :
-    (Valtype_sub (t, t')) ->
-    ((t' == («$valtype_numtype» numtype)) || (t' == («$valtype_vectype» vectype))) ->
-    (Instr_ok (C, (Instr.SELECT none), ([t, t, Valtype.I32], [t])))
-  | select_expl (C : Context) (t : Valtype) :
-    (Instr_ok (C, (Instr.SELECT (some t)), ([t, t, Valtype.I32], [t])))
-  | drop (C : Context) (t : Valtype) :
-    (Instr_ok (C, Instr.DROP, ([t], [])))
-  | nop (C : Context) :
-    (Instr_ok (C, Instr.NOP, ([], [])))
-  | unreachable (C : Context) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (Instr_ok (C, Instr.UNREACHABLE, (t_1, t_2)))
+    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
+    ((n == none) || (nt == («$numtype_in» «in»))) ->
+    (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
 inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
-  | frame (C : Context) (instr : (List Instr)) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
-    (InstrSeq_ok (C, instr, (t_1, t_2))) ->
-    (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))
+  | empty (C : Context) :
+    (InstrSeq_ok (C, [], ([], [])))
+  | seq (C : Context) (instr_1 : Instr) (instr_2 : Instr) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (t_3 : (List Valtype)) :
+    (Instr_ok (C, instr_1, (t_1, t_2))) ->
+    (InstrSeq_ok (C, [instr_2], (t_2, t_3))) ->
+    (InstrSeq_ok (C, ([instr_1] ++ [instr_2]), (t_1, t_3)))
   | weak (C : Context) (instr : (List Instr)) (t'_1 : Valtype) (t'_2 : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
     (InstrSeq_ok (C, instr, (t_1, t_2))) ->
     (Resulttype_sub ([t'_1], t_1)) ->
     (Resulttype_sub (t_2, t'_2)) ->
     (InstrSeq_ok (C, instr, ([t'_1], t'_2)))
-  | seq (C : Context) (instr_1 : Instr) (instr_2 : Instr) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (t_3 : (List Valtype)) :
-    (Instr_ok (C, instr_1, (t_1, t_2))) ->
-    (InstrSeq_ok (C, [instr_2], (t_2, t_3))) ->
-    (InstrSeq_ok (C, ([instr_1] ++ [instr_2]), (t_1, t_3)))
-  | empty (C : Context) :
-    (InstrSeq_ok (C, [], ([], [])))end
+  | frame (C : Context) (instr : (List Instr)) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) :
+    (InstrSeq_ok (C, instr, (t_1, t_2))) ->
+    (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))end
 
 
 inductive Expr_ok : (Context × Expr × Resulttype) -> Prop where
@@ -643,15 +643,15 @@ inductive Expr_ok : (Context × Expr × Resulttype) -> Prop where
     (Expr_ok (C, instr, t))
 
 inductive Instr_const : (Context × Instr) -> Prop where
+  | const (C : Context) (c : C_numtype) (nt : Numtype) :
+    (Instr_const (C, (Instr.CONST (nt, c))))
+  | ref_null (C : Context) (rt : Reftype) :
+    (Instr_const (C, (Instr.REF_NULL rt)))
+  | ref_func (C : Context) (x : Idx) :
+    (Instr_const (C, (Instr.REF_FUNC x)))
   | global_get (C : Context) (t : Valtype) (x : Idx) :
     ((C.GLOBAL.get! x) == (none, t)) ->
     (Instr_const (C, (Instr.GLOBAL_GET x)))
-  | ref_func (C : Context) (x : Idx) :
-    (Instr_const (C, (Instr.REF_FUNC x)))
-  | ref_null (C : Context) (rt : Reftype) :
-    (Instr_const (C, (Instr.REF_NULL rt)))
-  | const (C : Context) (c : C_numtype) (nt : Numtype) :
-    (Instr_const (C, (Instr.CONST (nt, c))))
 
 inductive Expr_const : (Context × Expr) -> Prop where
   | rule_0 (C : Context) (instr : (List Instr)) :
@@ -689,12 +689,12 @@ inductive Mem_ok : (Context × Mem × Memtype) -> Prop where
     (Mem_ok (C, mt, mt))
 
 inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
-  | declare (C : Context) (rt : Reftype) :
-    (Elemmode_ok (C, Elemmode.DECLARE, rt))
   | active (C : Context) (expr : Expr) (lim : Limits) (rt : Reftype) (x : Idx) :
     ((C.TABLE.get! x) == (lim, rt)) ->
     (Expr_ok_const (C, expr, Valtype.I32)) /- *{} -/ ->
     (Elemmode_ok (C, (Elemmode.TABLE (x, expr)), rt))
+  | declare (C : Context) (rt : Reftype) :
+    (Elemmode_ok (C, Elemmode.DECLARE, rt))
 
 inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
   | rule_0 (C : Context) (elemmode : (Option Elemmode)) (expr : (List Expr)) (rt : Reftype) :
@@ -724,18 +724,18 @@ inductive Import_ok : (Context × Import × Externtype) -> Prop where
     (Import_ok (C, (name_1, name_2, xt), xt))
 
 inductive Externuse_ok : (Context × Externuse × Externtype) -> Prop where
-  | mem (C : Context) (mt : Memtype) (x : Idx) :
-    ((C.MEM.get! x) == mt) ->
-    (Externuse_ok (C, (Externuse.MEMORY x), (Externtype.MEMORY mt)))
-  | table (C : Context) (tt : Tabletype) (x : Idx) :
-    ((C.TABLE.get! x) == tt) ->
-    (Externuse_ok (C, (Externuse.TABLE x), (Externtype.TABLE tt)))
-  | «global» (C : Context) (gt : Globaltype) (x : Idx) :
-    ((C.GLOBAL.get! x) == gt) ->
-    (Externuse_ok (C, (Externuse.GLOBAL x), (Externtype.GLOBAL gt)))
   | func (C : Context) (ft : Functype) (x : Idx) :
     ((C.FUNC.get! x) == ft) ->
     (Externuse_ok (C, (Externuse.FUNC x), (Externtype.FUNC ft)))
+  | «global» (C : Context) (gt : Globaltype) (x : Idx) :
+    ((C.GLOBAL.get! x) == gt) ->
+    (Externuse_ok (C, (Externuse.GLOBAL x), (Externtype.GLOBAL gt)))
+  | table (C : Context) (tt : Tabletype) (x : Idx) :
+    ((C.TABLE.get! x) == tt) ->
+    (Externuse_ok (C, (Externuse.TABLE x), (Externtype.TABLE tt)))
+  | mem (C : Context) (mt : Memtype) (x : Idx) :
+    ((C.MEM.get! x) == mt) ->
+    (Externuse_ok (C, (Externuse.MEMORY x), (Externtype.MEMORY mt)))
 
 inductive Export_ok : (Context × Export × Externtype) -> Prop where
   | rule_0 (C : Context) (externuse : Externuse) (name : Name) (xt : Externtype) :
@@ -812,12 +812,12 @@ inductive Externval where
   deriving Inhabited, BEq
 
 def «$default_» : Valtype -> Val
-  | Valtype.EXTERNREF => (Val.REF_NULL Reftype.EXTERNREF)
-  | Valtype.FUNCREF => (Val.REF_NULL Reftype.FUNCREF)
-  | Valtype.F64 => (Val.CONST (Numtype.F64, 0))
-  | Valtype.F32 => (Val.CONST (Numtype.F32, 0))
-  | Valtype.I64 => (Val.CONST (Numtype.I64, 0))
   | Valtype.I32 => (Val.CONST (Numtype.I32, 0))
+  | Valtype.I64 => (Val.CONST (Numtype.I64, 0))
+  | Valtype.F32 => (Val.CONST (Numtype.F32, 0))
+  | Valtype.F64 => (Val.CONST (Numtype.F64, 0))
+  | Valtype.FUNCREF => (Val.REF_NULL Reftype.FUNCREF)
+  | Valtype.EXTERNREF => (Val.REF_NULL Reftype.EXTERNREF)
   | _ => default
 
 @[reducible] def Exportinst := /- mixop: EXPORT -/ (Name × Externval)
@@ -1060,175 +1060,175 @@ def «$ext» : (Nat × Nat × Sx × C_numtype) -> C_numtype := default
 def «$cvtop» : (Numtype × Cvtop × Numtype × (Option Sx) × C_numtype) -> (List C_numtype) := default
 
 inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
-  | local_tee (val : Val) (x : Idx) :
-    (Step_pure ([(«$admininstr_val» val), (Admininstr.LOCAL_TEE x)], [(«$admininstr_val» val), («$admininstr_val» val), (Admininstr.LOCAL_SET x)]))
-  | ref_is_null_false (val : Val) :
-    True /- Else? -/ ->
-    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
-  | ref_is_null_true (rt : Reftype) (val : Val) :
-    (val == (Val.REF_NULL rt)) ->
-    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
-  | cvtop_trap (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
-    ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == []) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [Admininstr.TRAP]))
-  | cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
-    ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == [c]) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
-  | extend (c : C_numtype) (n : N) (nt : Numtype) :
-    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)), Sx.S, c))))]))
-  | relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) :
-    (c == («$relop» (relop, nt, c_1, c_2))) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
-  | testop (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (testop : Testop_numtype) :
-    (c == («$testop» (testop, nt, c_1))) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.TESTOP (nt, testop))], [(Admininstr.CONST (Numtype.I32, c))]))
-  | binop_trap (binop : Binop_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
-    ((«$binop» (binop, nt, c_1, c_2)) == []) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [Admininstr.TRAP]))
-  | binop_val (binop : Binop_numtype) (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
-    ((«$binop» (binop, nt, c_1, c_2)) == [c]) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [(Admininstr.CONST (nt, c))]))
-  | unop_trap (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
-    ((«$unop» (unop, nt, c_1)) == []) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [Admininstr.TRAP]))
-  | unop_val (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
-    ((«$unop» (unop, nt, c_1)) == [c]) ->
-    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
-  | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [Admininstr.RETURN])))
-  | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
-  | frame_vals (f : Frame) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.FRAME_ (n, f, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
-  | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
-    (i >= l.length) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
-  | br_table_lt (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
-    (i < l.length) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR (l.get! i))]))
-  | br_if_false (c : C_numtype) (l : Labelidx) :
-    (c == 0) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], []))
-  | br_if_true (c : C_numtype) (l : Labelidx) :
-    (c != 0) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
-  | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR (l + 1))] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BR l)])))
-  | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR 0)] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
-  | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
-  | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
-    (c == 0) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
-  | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
-    (c != 0) ->
-    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
-  | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
-    (bt == (t_1, t_2)) ->
-    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
-  | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
-    (bt == (t_1, t_2)) ->
-    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
-  | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
-    (c == 0) ->
-    (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_2)]))
+  | unreachable  :
+    (Step_pure ([Admininstr.UNREACHABLE], [Admininstr.TRAP]))
+  | nop  :
+    (Step_pure ([Admininstr.NOP], []))
+  | drop (val : Val) :
+    (Step_pure ([(«$admininstr_val» val), Admininstr.DROP], []))
   | select_true (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
     (c != 0) ->
     (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_1)]))
-  | drop (val : Val) :
-    (Step_pure ([(«$admininstr_val» val), Admininstr.DROP], []))
-  | nop  :
-    (Step_pure ([Admininstr.NOP], []))
-  | unreachable  :
-    (Step_pure ([Admininstr.UNREACHABLE], [Admininstr.TRAP]))
+  | select_false (c : C_numtype) (t : (Option Valtype)) (val_1 : Val) (val_2 : Val) :
+    (c == 0) ->
+    (Step_pure ([(«$admininstr_val» val_1), («$admininstr_val» val_2), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.SELECT t)], [(«$admininstr_val» val_2)]))
+  | block (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
+    (bt == (t_1, t_2)) ->
+    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
+  | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
+    (bt == (t_1, t_2)) ->
+    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
+  | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
+    (c != 0) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
+  | if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
+    (c == 0) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
+  | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (n, instr, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+  | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR 0)] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+  | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR (l + 1))] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BR l)])))
+  | br_if_true (c : C_numtype) (l : Labelidx) :
+    (c != 0) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
+  | br_if_false (c : C_numtype) (l : Labelidx) :
+    (c == 0) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], []))
+  | br_table_lt (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
+    (i < l.length) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR (l.get! i))]))
+  | br_table_ge (i : Nat) (l : (List Labelidx)) (l' : Labelidx) :
+    (i >= l.length) ->
+    (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
+  | frame_vals (f : Frame) (n : N) (val : (List Val)) :
+    (Step_pure ([(Admininstr.FRAME_ (n, f, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+  | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
+    (Step_pure ([(Admininstr.FRAME_ (n, f, ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+  | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
+    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [Admininstr.RETURN])))
+  | unop_val (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
+    ((«$unop» (unop, nt, c_1)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
+  | unop_trap (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
+    ((«$unop» (unop, nt, c_1)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [Admininstr.TRAP]))
+  | binop_val (binop : Binop_numtype) (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
+    ((«$binop» (binop, nt, c_1, c_2)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [(Admininstr.CONST (nt, c))]))
+  | binop_trap (binop : Binop_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) :
+    ((«$binop» (binop, nt, c_1, c_2)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.BINOP (nt, binop))], [Admininstr.TRAP]))
+  | testop (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (testop : Testop_numtype) :
+    (c == («$testop» (testop, nt, c_1))) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.TESTOP (nt, testop))], [(Admininstr.CONST (Numtype.I32, c))]))
+  | relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) :
+    (c == («$relop» (relop, nt, c_1, c_2))) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
+  | extend (c : C_numtype) (n : N) (nt : Numtype) :
+    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)), Sx.S, c))))]))
+  | cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
+    ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == [c]) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
+  | cvtop_trap (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
+    ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == []) ->
+    (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [Admininstr.TRAP]))
+  | ref_is_null_true (rt : Reftype) (val : Val) :
+    (val == (Val.REF_NULL rt)) ->
+    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 1))]))
+  | ref_is_null_false (val : Val) :
+    True /- Else? -/ ->
+    (Step_pure ([(«$admininstr_val» val), Admininstr.REF_IS_NULL], [(Admininstr.CONST (Numtype.I32, 0))]))
+  | local_tee (val : Val) (x : Idx) :
+    (Step_pure ([(«$admininstr_val» val), (Admininstr.LOCAL_TEE x)], [(«$admininstr_val» val), («$admininstr_val» val), (Admininstr.LOCAL_SET x)]))
 
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
-  | table_init_succ (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), («$admininstr_ref» ((«$elem» (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
-  | table_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (n == 0) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), []))
-  | table_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (((i + n) > («$elem» (z, y)).length) || ((j + n) > («$table» (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [Admininstr.TRAP]))
-  | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, ((j + n) - 1))), (Admininstr.CONST (Numtype.I32, ((i + n) - 1))), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
-  | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (j <= i) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
-  | table_copy_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    True /- Else? -/ ->
-    (n == 0) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), []))
-  | table_copy_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
-    (((i + n) > («$table» (z, y)).length) || ((j + n) > («$table» (z, x)).length)) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
-  | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_FILL x)]))
-  | table_fill_zero (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
-    True /- Else? -/ ->
-    (n == 0) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), []))
-  | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
-    ((i + n) > («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
-  | table_grow_fail (n : N) (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, default /- - 1 -/))]))
-  | table_size (n : N) (x : Idx) (z : State) :
-    ((«$table» (z, x)).length == n) ->
-    (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
-  | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) :
-    (i >= («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
-  | table_get_val (i : Nat) (x : Idx) (z : State) :
-    (i < («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(«$admininstr_ref» ((«$table» (z, x)).get! i))]))
-  | table_get_trap (i : Nat) (x : Idx) (z : State) :
-    (i >= («$table» (z, x)).length) ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
-  | global_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(«$admininstr_globalinst» («$global» (z, x)))]))
-  | local_get (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(«$admininstr_val» («$local» (z, x)))]))
-  | ref_func (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
-  | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
-    (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
-    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t)) t)), MODULE := m}) ->
-    (Step_read ((z, ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))]))]))
-  | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
-    True /- Else? -/ ->
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
+  | call (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.CALL x)]), [(Admininstr.CALL_ADDR ((«$funcaddr» z).get! x))]))
   | call_indirect_call (a : Addr) (ft : Functype) (func : Func) (i : Nat) (m : Moduleinst) (x : Idx) (z : State) :
     (((«$table» (z, x)).get! i) == (Ref.REF_FUNC_ADDR a)) ->
     (((«$funcinst» z).get! a) == (m, func)) ->
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [(Admininstr.CALL_ADDR a)]))
-  | call (x : Idx) (z : State) :
-    (Step_read ((z, [(Admininstr.CALL x)]), [(Admininstr.CALL_ADDR ((«$funcaddr» z).get! x))]))
+  | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
+  | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
+    (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
+    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t)) t)), MODULE := m}) ->
+    (Step_read ((z, ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))]))]))
+  | ref_func (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
+  | local_get (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.LOCAL_GET x)]), [(«$admininstr_val» («$local» (z, x)))]))
+  | global_get (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.GLOBAL_GET x)]), [(«$admininstr_globalinst» («$global» (z, x)))]))
+  | table_get_trap (i : Nat) (x : Idx) (z : State) :
+    (i >= («$table» (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
+  | table_get_val (i : Nat) (x : Idx) (z : State) :
+    (i < («$table» (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(«$admininstr_ref» ((«$table» (z, x)).get! i))]))
+  | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) :
+    (i >= («$table» (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
+  | table_size (n : N) (x : Idx) (z : State) :
+    ((«$table» (z, x)).length == n) ->
+    (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
+  | table_grow_fail (n : N) (x : Idx) (z : State) :
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, default /- - 1 -/))]))
+  | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    ((i + n) > («$table» (z, x)).length) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
+  | table_fill_zero (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), []))
+  | table_fill_succ (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (i + 1))), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_FILL x)]))
+  | table_copy_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    (((i + n) > («$table» (z, y)).length) || ((j + n) > («$table» (z, x)).length)) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [Admininstr.TRAP]))
+  | table_copy_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), []))
+  | table_copy_le (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (j <= i) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
+  | table_copy_gt (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_COPY (x, y))]), [(Admininstr.CONST (Numtype.I32, ((j + n) - 1))), (Admininstr.CONST (Numtype.I32, ((i + n) - 1))), (Admininstr.TABLE_GET y), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_COPY (x, y))]))
+  | table_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    (((i + n) > («$elem» (z, y)).length) || ((j + n) > («$table» (z, x)).length)) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [Admininstr.TRAP]))
+  | table_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (n == 0) ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), []))
+  | table_init_succ (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) :
+    True /- Else? -/ ->
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), («$admininstr_ref» ((«$elem» (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
 
 inductive Step : (Config × Config) -> Prop where
-  | elem_drop (x : Idx) (z : State) :
-    (Step ((z, [(Admininstr.ELEM_DROP x)]), ((«$with_elem» (z, x, [])), [])))
-  | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) :
-    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, [ref])), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
-  | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) :
-    (i < («$table» (z, x)).length) ->
-    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
-  | global_set (val : Val) (x : Idx) (z : State) :
-    (Step ((z, [(«$admininstr_val» val), (Admininstr.GLOBAL_SET x)]), ((«$with_global» (z, x, val)), [])))
-  | local_set (val : Val) (x : Idx) (z : State) :
-    (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
-  | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_read ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
-    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
   | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
     (Step_pure ((List.map (λ instr ↦ («$admininstr_instr» instr)) instr), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
     (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+  | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
+    (Step_read ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
+    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+  | local_set (val : Val) (x : Idx) (z : State) :
+    (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
+  | global_set (val : Val) (x : Idx) (z : State) :
+    (Step ((z, [(«$admininstr_val» val), (Admininstr.GLOBAL_SET x)]), ((«$with_global» (z, x, val)), [])))
+  | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) :
+    (i < («$table» (z, x)).length) ->
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
+  | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) :
+    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, [ref])), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
+  | elem_drop (x : Idx) (z : State) :
+    (Step ((z, [(Admininstr.ELEM_DROP x)]), ((«$with_elem» (z, x, [])), [])))
 $ lean SpecTec.lean 2>&1 | sed -e 's,/[^ ]*/toolchains,.../toolchains`,g' | sed -e 's,SpecTec.lean:[0-9]\+:[0-9]\+,SpecTec.lean,' | sed -e 's,\?m\.[0-9]\+,?m,g'
 ```

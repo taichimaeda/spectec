@@ -288,11 +288,11 @@ type Import = {- mixop: IMPORT -} (Name, Name, Externtype)
 type Module = {- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], [Start], [Export])
 
 size :: Valtype -> Natural
-size Valtype_V128 = 128
-size Valtype_F64 = 64
-size Valtype_F32 = 32
-size Valtype_I64 = 64
 size Valtype_I32 = 32
+size Valtype_I64 = 64
+size Valtype_F32 = 32
+size Valtype_F64 = 64
+size Valtype_V128 = 128
 
 test_sub_ATOM_22 :: N -> Natural
 test_sub_ATOM_22 n_3_ATOM_y = 0
@@ -441,12 +441,12 @@ data Externval
  | Externval_MEM Memaddr
 
 default_ :: Valtype -> Val
-default_ Valtype_EXTERNREF = (Val_REF_NULL Reftype_EXTERNREF)
-default_ Valtype_FUNCREF = (Val_REF_NULL Reftype_FUNCREF)
-default_ Valtype_F64 = (Val_CONST (Numtype_F64, 0))
-default_ Valtype_F32 = (Val_CONST (Numtype_F32, 0))
-default_ Valtype_I64 = (Val_CONST (Numtype_I64, 0))
 default_ Valtype_I32 = (Val_CONST (Numtype_I32, 0))
+default_ Valtype_I64 = (Val_CONST (Numtype_I64, 0))
+default_ Valtype_F32 = (Val_CONST (Numtype_F32, 0))
+default_ Valtype_F64 = (Val_CONST (Numtype_F64, 0))
+default_ Valtype_FUNCREF = (Val_REF_NULL Reftype_FUNCREF)
+default_ Valtype_EXTERNREF = (Val_REF_NULL Reftype_EXTERNREF)
 
 type Exportinst = {- mixop: EXPORT -} (Name, Externval)
 
