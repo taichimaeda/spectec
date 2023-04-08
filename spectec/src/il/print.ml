@@ -154,6 +154,7 @@ and string_of_exp e =
     string_of_atom atom ^ "_" ^ string_of_typ t ^ string_of_exp_args e1
   | SubE (e1, _t1, t2) ->
     "(" ^ string_of_exp e1 ^ " <: " ^ string_of_typ t2 ^ ")"
+  | TheE e -> "THE(" ^ string_of_exp e ^ ")"
 
 and string_of_exp_args e =
   match e.it with

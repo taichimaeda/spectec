@@ -321,6 +321,7 @@ and infer_exp env e : typ =
   | CatE _ -> error e.at "cannot infer type of concatenation"
   | CaseE _ -> error e.at "cannot infer type of case constructor"
   | SubE (_, _, t) -> t
+  | TheE e -> as_iter_typ Opt "option" env Check (infer_exp env e) e.at
 
 
 and valid_exp env e t =
@@ -431,6 +432,8 @@ and valid_exp env e t =
     valid_exp env e1 t1;
     equiv_typ env t2 t e.at;
     sub_typ env t1 t2 e.at
+  | TheE e ->
+    valid_exp env e (IterT (t, Opt) $ e.at)
 
 and valid_expmix env mixop e (mixop', t) at =
   if mixop <> mixop' then

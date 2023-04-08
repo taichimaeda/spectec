@@ -241,6 +241,9 @@ and annot_exp env e : Il.Ast.exp * occur =
   | SubE (e1, t1, t2) ->
     let e1', occur1 = annot_exp env e1 in
     SubE (e1', t1, t2) $ e.at, occur1
+  | TheE e1 ->
+    let e1', occur1 = annot_exp env e1 in
+    TheE e1' $ e.at, occur1
 
 and annot_expfield env (atom, e) : Il.Ast.expfield * occur =
   let e', occur = annot_exp env e in

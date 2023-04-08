@@ -107,6 +107,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | ListE es -> render_list render_exp es
   | OptE None -> "none"
   | OptE (Some e) -> "some" $$ render_exp e
+  | TheE e  -> render_exp e ^ ".get!"
   | IterE (e, (iter, vs)) -> begin match e.it with
     | VarE v when List.length vs = 1 && List.for_all (Il.Eq.eq_id v) vs  -> render_id v (* Short-ciruit this common form *)
     | _ -> match iter, vs with

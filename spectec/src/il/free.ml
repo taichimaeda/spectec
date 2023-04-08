@@ -91,6 +91,7 @@ and free_exp e =
   | CallE (id, e1) -> union (free_defid id) (free_exp e1)
   | IterE (e1, iter) -> union (free_exp e1) (free_iterexp iter)
   | DotE (t, e1, _) | CaseE (_, e1, t) -> union (free_exp e1) (free_typ t)
+  | TheE e -> free_exp e
 
 and free_expfield (_, e) = free_exp e
 

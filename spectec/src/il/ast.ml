@@ -115,6 +115,7 @@ and exp' =
   | CatE of exp * exp            (* exp :: exp *)
   | CaseE of atom * exp * typ    (* atom exp : typ *)
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
+  | TheE of exp                  (* THE exp *)
 
 and expfield = atom * exp        (* atom exp *)
 

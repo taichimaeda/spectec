@@ -329,13 +329,13 @@ inductive Externuse where
 
 @[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
 
-def «$size» : Valtype -> Nat
-  | Valtype.I32 => 32
-  | Valtype.I64 => 64
-  | Valtype.F32 => 32
-  | Valtype.F64 => 64
-  | Valtype.V128 => 128
-  | _ => default
+def «$size» : Valtype -> (Option Nat)
+  | Valtype.I32 => (some 32)
+  | Valtype.I64 => (some 64)
+  | Valtype.F32 => (some 32)
+  | Valtype.F64 => (some 64)
+  | Valtype.V128 => (some 128)
+  | x => none
 
 def «$test_sub_ATOM_22» : N -> Nat
   | n_3_ATOM_y => 0
@@ -528,15 +528,15 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) :
     (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [Valtype.I32])))
   | extend (C : Context) (n : N) (nt : Numtype) :
-    (n <= («$size» («$valtype_numtype» nt))) ->
+    (n <= («$size» («$valtype_numtype» nt)).get!) ->
     (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
   | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) :
     (nt_1 != nt_2) ->
-    ((«$size» («$valtype_numtype» nt_1)) == («$size» («$valtype_numtype» nt_2))) ->
+    ((«$size» («$valtype_numtype» nt_1)).get! == («$size» («$valtype_numtype» nt_2)).get!) ->
     (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
   | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
     (in_1 != in_2) ->
-    ((sx == none) = ((«$size» («$valtype_in» in_1)) > («$size» («$valtype_in» in_2)))) ->
+    ((sx == none) = ((«$size» («$valtype_in» in_1)).get! > («$size» («$valtype_in» in_2)).get!)) ->
     (Instr_ok (C, (Instr.CVTOP ((«$numtype_in» in_1), Cvtop.CONVERT, («$numtype_in» in_2), sx)), ([(«$valtype_in» in_2)], [(«$valtype_in» in_1)])))
   | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) :
     (fn_1 != fn_2) ->
@@ -610,14 +610,14 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
+    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t).get!) 8))) ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t).get!) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
   | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
     ((C.MEM.get! 0) == mt) ->
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t)) 8))) ->
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t)) 8))))) n.toList) ->
+    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t).get!) 8))) ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t).get!) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
 inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
@@ -811,14 +811,14 @@ inductive Externval where
  | MEM : Memaddr -> Externval
   deriving Inhabited, BEq
 
-def «$default_» : Valtype -> Val
-  | Valtype.I32 => (Val.CONST (Numtype.I32, 0))
-  | Valtype.I64 => (Val.CONST (Numtype.I64, 0))
-  | Valtype.F32 => (Val.CONST (Numtype.F32, 0))
-  | Valtype.F64 => (Val.CONST (Numtype.F64, 0))
-  | Valtype.FUNCREF => (Val.REF_NULL Reftype.FUNCREF)
-  | Valtype.EXTERNREF => (Val.REF_NULL Reftype.EXTERNREF)
-  | _ => default
+def «$default_» : Valtype -> (Option Val)
+  | Valtype.I32 => (some (Val.CONST (Numtype.I32, 0)))
+  | Valtype.I64 => (some (Val.CONST (Numtype.I64, 0)))
+  | Valtype.F32 => (some (Val.CONST (Numtype.F32, 0)))
+  | Valtype.F64 => (some (Val.CONST (Numtype.F64, 0)))
+  | Valtype.FUNCREF => (some (Val.REF_NULL Reftype.FUNCREF))
+  | Valtype.EXTERNREF => (some (Val.REF_NULL Reftype.EXTERNREF))
+  | x => none
 
 @[reducible] def Exportinst := /- mixop: EXPORT -/ (Name × Externval)
 
@@ -1127,7 +1127,7 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (c == («$relop» (relop, nt, c_1, c_2))) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
   | extend (c : C_numtype) (n : N) (nt : Numtype) :
-    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)), Sx.S, c))))]))
+    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)).get!, Sx.S, c))))]))
   | cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) :
     ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == [c]) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
@@ -1155,7 +1155,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
   | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) :
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
-    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t)) t)), MODULE := m}) ->
+    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t).get!) t)), MODULE := m}) ->
     (Step_read ((z, ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))]))]))
   | ref_func (x : Idx) (z : State) :
     (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
