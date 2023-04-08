@@ -51,7 +51,7 @@ and eq_typ t1 t2 =
 and eq_exp e1 e2 =
   e1.it = e2.it ||
   match e1.it, e2.it with
-  | VarE id1, VarE id2 -> id1.it = id2.it
+  | VarE id1, VarE id2 -> eq_id id1 id2
   | UnE (op1, e11), UnE (op2, e21) -> op1 = op2 && eq_exp e11 e21
   | BinE (op1, e11, e12), BinE (op2, e21, e22) ->
     op1 = op2 && eq_exp e11 e21 && eq_exp e12 e22
