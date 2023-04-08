@@ -64,10 +64,14 @@ syntax reftype =
 
 ;; 1-syntax.watsup:45.1-46.34
 syntax valtype =
-  | numtype
-  | vectype
-  | reftype
   | BOT
+  | I32
+  | I64
+  | F32
+  | F64
+  | V128
+  | FUNCREF
+  | EXTERNREF
 
 ;; 1-syntax.watsup:48.1-48.71
 syntax in =
@@ -970,8 +974,10 @@ syntax ref =
 
 ;; 4-runtime.watsup:28.1-29.10
 syntax val =
-  | num
-  | ref
+  | CONST(numtype, c_numtype)
+  | REF.NULL(reftype)
+  | REF.FUNC_ADDR(funcaddr)
+  | REF.HOST_ADDR(hostaddr)
 
 ;; 4-runtime.watsup:31.1-32.18
 syntax result =
@@ -1038,13 +1044,56 @@ rec {
 
 ;; 4-runtime.watsup:140.1-147.5
 syntax admininstr =
-  | instr
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
   | CALL_ADDR(funcaddr)
   | LABEL_(n, instr*, admininstr*)
   | FRAME_(n, frame, admininstr*)
   | TRAP
+  | UNREACHABLE
+  | NOP
+  | DROP
+  | SELECT(valtype?)
+  | BLOCK(blocktype, instr*)
+  | LOOP(blocktype, instr*)
+  | IF(blocktype, instr*, instr*)
+  | BR(labelidx)
+  | BR_IF(labelidx)
+  | BR_TABLE(labelidx*, labelidx)
+  | CALL(funcidx)
+  | CALL_INDIRECT(tableidx, functype)
+  | RETURN
+  | CONST(numtype, c_numtype)
+  | UNOP(numtype, unop_numtype)
+  | BINOP(numtype, binop_numtype)
+  | TESTOP(numtype, testop_numtype)
+  | RELOP(numtype, relop_numtype)
+  | EXTEND(numtype, n)
+  | CVTOP(numtype, cvtop, numtype, sx?)
+  | REF.NULL(reftype)
+  | REF.FUNC(funcidx)
+  | REF.IS_NULL
+  | LOCAL.GET(localidx)
+  | LOCAL.SET(localidx)
+  | LOCAL.TEE(localidx)
+  | GLOBAL.GET(globalidx)
+  | GLOBAL.SET(globalidx)
+  | TABLE.GET(tableidx)
+  | TABLE.SET(tableidx)
+  | TABLE.SIZE(tableidx)
+  | TABLE.GROW(tableidx)
+  | TABLE.FILL(tableidx)
+  | TABLE.COPY(tableidx, tableidx)
+  | TABLE.INIT(tableidx, elemidx)
+  | ELEM.DROP(elemidx)
+  | MEMORY.SIZE
+  | MEMORY.GROW
+  | MEMORY.FILL
+  | MEMORY.COPY
+  | MEMORY.INIT(dataidx)
+  | DATA.DROP(dataidx)
+  | LOAD(numtype, (n, sx)?, nat, nat)
+  | STORE(numtype, n?, nat, nat)
 }
 
 ;; 4-runtime.watsup:84.1-84.62
