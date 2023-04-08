@@ -48,14 +48,14 @@ data Reftype
  | Reftype_EXTERNREF
 
 data Valtype
- = Valtype_BOT
- | Valtype_I32
+ = Valtype_I32
  | Valtype_I64
  | Valtype_F32
  | Valtype_F64
  | Valtype_V128
  | Valtype_FUNCREF
  | Valtype_EXTERNREF
+ | Valtype_BOT
 
 valtype_numtype :: Numtype -> Valtype
 valtype_numtype Numtype_I32 = Valtype_I32
@@ -489,13 +489,7 @@ data Frame = MkFrame
 type State = {- mixop: `%;%` -} (Store, Frame)
 
 data Admininstr
- = Admininstr_REF_FUNC_ADDR Funcaddr
- | Admininstr_REF_HOST_ADDR Hostaddr
- | Admininstr_CALL_ADDR Funcaddr
- | Admininstr_LABEL_ (N, [Instr], [Admininstr])
- | Admininstr_FRAME_ (N, Frame, [Admininstr])
- | Admininstr_TRAP
- | Admininstr_UNREACHABLE
+ = Admininstr_UNREACHABLE
  | Admininstr_NOP
  | Admininstr_DROP
  | Admininstr_SELECT (Maybe Valtype)
@@ -539,6 +533,12 @@ data Admininstr
  | Admininstr_DATA_DROP Dataidx
  | Admininstr_LOAD (Numtype, (Maybe (N, Sx)), Natural, Natural)
  | Admininstr_STORE (Numtype, (Maybe N), Natural, Natural)
+ | Admininstr_REF_FUNC_ADDR Funcaddr
+ | Admininstr_REF_HOST_ADDR Hostaddr
+ | Admininstr_CALL_ADDR Funcaddr
+ | Admininstr_LABEL_ (N, [Instr], [Admininstr])
+ | Admininstr_FRAME_ (N, Frame, [Admininstr])
+ | Admininstr_TRAP
 
 admininstr_instr :: Instr -> Admininstr
 admininstr_instr Instr_UNREACHABLE = Admininstr_UNREACHABLE

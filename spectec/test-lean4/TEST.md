@@ -68,7 +68,6 @@ inductive Reftype where
   deriving Inhabited, BEq
 
 inductive Valtype where
- | BOT : Valtype
  | I32 : Valtype
  | I64 : Valtype
  | F32 : Valtype
@@ -76,6 +75,7 @@ inductive Valtype where
  | V128 : Valtype
  | FUNCREF : Valtype
  | EXTERNREF : Valtype
+ | BOT : Valtype
   deriving Inhabited, BEq
 
 def «$valtype_numtype» : Numtype -> Valtype
@@ -885,12 +885,6 @@ instance : Append Frame where
 @[reducible] def State := /- mixop: `%;%` -/ (Store × Frame)
 
 inductive Admininstr where
- | REF_FUNC_ADDR : Funcaddr -> Admininstr
- | REF_HOST_ADDR : Hostaddr -> Admininstr
- | CALL_ADDR : Funcaddr -> Admininstr
- | LABEL_ : (N × (List Instr) × (List Admininstr)) -> Admininstr
- | FRAME_ : (N × Frame × (List Admininstr)) -> Admininstr
- | TRAP : Admininstr
  | UNREACHABLE : Admininstr
  | NOP : Admininstr
  | DROP : Admininstr
@@ -935,6 +929,12 @@ inductive Admininstr where
  | DATA_DROP : Dataidx -> Admininstr
  | LOAD : (Numtype × (Option (N × Sx)) × Nat × Nat) -> Admininstr
  | STORE : (Numtype × (Option N) × Nat × Nat) -> Admininstr
+ | REF_FUNC_ADDR : Funcaddr -> Admininstr
+ | REF_HOST_ADDR : Hostaddr -> Admininstr
+ | CALL_ADDR : Funcaddr -> Admininstr
+ | LABEL_ : (N × (List Instr) × (List Admininstr)) -> Admininstr
+ | FRAME_ : (N × Frame × (List Admininstr)) -> Admininstr
+ | TRAP : Admininstr
   deriving Inhabited, BEq
 
 def «$admininstr_instr» : Instr -> Admininstr
