@@ -148,13 +148,13 @@ and string_of_exp e =
   | CallE (id, e) -> "$" ^ id.it ^ string_of_exp_args e
   | IterE (e1, iter) -> string_of_exp e1 ^ string_of_iterexp iter
   | OptE eo -> "?(" ^ string_of_exps "" (Option.to_list eo) ^ ")"
+  | TheE e -> "THE(" ^ string_of_exp e ^ ")"
   | ListE es -> "[" ^ string_of_exps " " es ^ "]"
   | CatE (e1, e2) -> string_of_exp e1 ^ " :: " ^ string_of_exp e2
   | CaseE (atom, e1, t) ->
     string_of_atom atom ^ "_" ^ string_of_typ t ^ string_of_exp_args e1
   | SubE (e1, _t1, t2) ->
     "(" ^ string_of_exp e1 ^ " <: " ^ string_of_typ t2 ^ ")"
-  | TheE e -> "THE(" ^ string_of_exp e ^ ")"
 
 and string_of_exp_args e =
   match e.it with

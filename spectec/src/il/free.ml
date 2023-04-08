@@ -84,6 +84,7 @@ and free_exp e =
     free_list free_exp [e1; e2]
   | SliceE (e1, e2, e3) -> free_list free_exp [e1; e2; e3]
   | OptE eo -> free_opt free_exp eo
+  | TheE e -> free_exp e
   | TupE es | ListE es -> free_list free_exp es
   | UpdE (e1, p, e2) | ExtE (e1, p, e2) ->
     union (free_list free_exp [e1; e2]) (free_path p)
@@ -91,7 +92,6 @@ and free_exp e =
   | CallE (id, e1) -> union (free_defid id) (free_exp e1)
   | IterE (e1, iter) -> union (free_exp e1) (free_iterexp iter)
   | DotE (t, e1, _) | CaseE (_, e1, t) -> union (free_exp e1) (free_typ t)
-  | TheE e -> free_exp e
 
 and free_expfield (_, e) = free_exp e
 

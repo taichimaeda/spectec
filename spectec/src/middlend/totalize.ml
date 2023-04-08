@@ -20,7 +20,7 @@ open Il.Ast
 
 (* Errors *)
 
-let error at msg = Source.error at "totalize" msg
+let _error at msg = Source.error at "totalize" msg
 
 (* Environment *)
 
@@ -49,10 +49,10 @@ let rec t_exp env exp =
     TheE exp' $ no_region
   | _ -> exp'
 
-and t_exp2 env x = { x with it = t_exp' env x.at x.it }
+and t_exp2 env x = { x with it = t_exp' env x.it }
 
 (* Expr traversal *)
-and t_exp' env at = function
+and t_exp' env = function
   | (VarE _ | BoolE _ | NatE _ | TextE _) as e -> e
   | UnE (unop, exp) -> UnE (unop, t_exp env exp)
   | BinE (binop, exp1, exp2) -> BinE (binop, t_exp env exp1, t_exp env exp2)
@@ -71,11 +71,11 @@ and t_exp' env at = function
   | IterE (e, iterexp) -> IterE (t_exp env e, t_iterexp env iterexp)
   | OptE None -> OptE None
   | OptE (Some exp) -> OptE (Some exp)
+  | TheE exp -> TheE exp
   | ListE es -> ListE (List.map (t_exp env) es)
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | CaseE (a, e, t) -> CaseE (a, t_exp env e, t)
   | SubE (e, t1, t2) -> SubE (e, t1, t2)
-  | e -> error at ("t_exp: unsupported: " ^ Il.Print.string_of_exp (e $ no_region))
 
 and t_iter env = function
   | ListN e -> ListN (t_exp env e)
