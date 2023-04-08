@@ -25,7 +25,7 @@ syntax num hint(desc "number") =
   | CONST numtype c_numtype
 syntax ref hint(desc "reference") =
   | REF.NULL reftype | REF.FUNC_ADDR funcaddr | REF.HOST_ADDR hostaddr
-syntax val hint(desc "value") =
+syntax val hint(desc "value") hint(subtype num ref) =
   | num | ref
 
 syntax result hint(desc "result") =
@@ -137,7 +137,7 @@ def $with_elem((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] = r*]; f
 
 ;; Administrative Instructions
 
-syntax admininstr hint(show instr) hint(desc "administrative instruction") hint(subtype val) hint(subtype ref) hint(subtype_alias globalinst val)=
+syntax admininstr hint(show instr) hint(desc "administrative instruction") hint(subtype instr val ref) hint(subtype_alias globalinst val)=
   | instr
   | REF.FUNC_ADDR funcaddr         hint(show REF.FUNC %)
   | REF.HOST_ADDR hostaddr         hint(show REF.EXTERN %)

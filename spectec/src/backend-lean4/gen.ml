@@ -90,9 +90,6 @@ let render_variant_inj' (typ1 : typ) (typ2 : typ) = match typ1.it, typ2.it with
   | VarT id1, VarT id2 -> render_variant_inj id1 id2
   | _, _ -> "_ {- render_variant_inj': Typs not ids -}"
 
-let render_variant_inj_case _id1 _id2 =
-  "/- Incomplete Ir.Flat.transform? -/"
-
 let render_variant_case id ((a, ty, _hints) : typcase) =
   render_con_name false id a ^ " : " ^
   if ty.it = TupT []
@@ -196,13 +193,12 @@ let rec render_def (d : def) =
     | AliasT ty ->
       "@[reducible] def " ^ render_type_name id ^ " := " ^ render_typ ty 
     | NotationT (mop, ty) ->
-      "@[reducible] def " ^ render_type_name id ^ " := /- mixop: " ^ Il.Print.string_of_mixop mop ^ " -/ " ^ render_typ ty 
-    | VariantT (ids, cases) ->
+      "@[reducible] def " ^ render_type_name id ^ " := /- mixop: " ^ Il.Print.string_of_mixop mop ^ " -/ " ^ render_typ ty
+    | VariantT cases ->
       "inductive " ^ render_type_name id ^ " where" ^ prepend "\n | " "\n | " (
-        List.map (render_variant_inj_case id) ids @
         List.map (render_variant_case id) cases
       ) ^
-      (if ids = [] && cases = [] then "\n  deriving BEq" else "\n  deriving Inhabited, BEq")
+      (if cases = [] then "\n  deriving BEq" else "\n  deriving Inhabited, BEq")
     | StructT fields ->
       (*
       "type " ^ render_type_name id ^ " = " ^ render_tuple render_typ (

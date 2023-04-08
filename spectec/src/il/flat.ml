@@ -1,9 +1,11 @@
 (*
 This transformation
- * replaces variant extension with copies of the constructors
  * generates functions for all occurring subtype coercions
+   (not yet: relies on hints so far)
  * uses these functions
+   (not yet: done in the backend so far)
  * duplicates cases in functions as needed
+   (not yet: $default_ rewritten in spec)
 *)
 
 open Util
@@ -47,13 +49,11 @@ let rec transform_def_rec env (def : def) : def * (def list) = match def.it with
     { def with it = RecD defs' },  List.concat new_defs
   | SynD (id, deftyp, hints) ->
     begin match deftyp.it with
-    | VariantT (ids, cases) ->
-      let cases' = List.concat_map (lookup_cons env) ids @ cases in
-      register_cons env id cases';
-      { def with it = SynD (id, { deftyp with it = VariantT ([], cases') }, hints) },
+    | VariantT cases ->
+      register_cons env id cases;
+      def,
       (* Also generate conversion functions *)
       let pairs =
-        List.map (fun sid -> (id, sid)) ids @
         List.concat_map (fun {hintid; hintexp} ->
           (if hintid.it = "subtype" then List.map (fun s -> (id, s $ no_region)) hintexp else []) @
           (if hintid.it = "supertype" then List.map (fun s -> (s $ no_region, id)) hintexp else [])
