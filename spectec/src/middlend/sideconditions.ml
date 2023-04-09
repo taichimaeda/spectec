@@ -18,6 +18,19 @@ open Il.Ast
 
 let _error at msg = Source.error at "sideconditions" msg
 
+let is_null e = CmpE (EqOp, e, OptE None $ no_region) $ no_region
+let iffE e1 e2 = IfPr (BinE (EquivOp, e1, e2) $ no_region) $ no_region
+let same_len e1 e2 = IfPr (CmpE (EqOp, LenE e1 $ no_region, LenE e2 $ no_region) $ no_region) $ no_region
+let has_len ne e = IfPr (CmpE (EqOp, LenE e $ no_region, ne) $ no_region) $ no_region
+
+let iter_side_conditions ((iter, vs) : iterexp) : premise list =
+  let ves = List.map (fun v -> IterE (VarE v $ no_region, (iter, [v])) $ no_region) vs in
+ match iter, ves with
+  | _, [] -> []
+  | Opt, (e::es) -> List.map (fun e' -> iffE (is_null e) (is_null e')) es
+  | (List|List1), (e::es) -> List.map (same_len e) es
+  | ListN ne, es -> List.map (has_len ne) es
+
 (* Expr traversal *)
 let rec t_exp e : premise list =
   (* First the conditions to be generated here *)
@@ -26,9 +39,10 @@ let rec t_exp e : premise list =
     [IfPr (CmpE (LtOp, exp2, LenE exp1 $ no_region) $ no_region) $ no_region]
   | TheE exp ->
     [IfPr (CmpE (NeOp, exp, OptE None $ no_region) $ no_region) $ no_region]
+  | IterE (_exp, iterexp) -> iter_side_conditions iterexp
   | _ -> []
   end @
-  (* And now decend *)
+  (* And now descend *)
   match e.it with
   | VarE _ | BoolE _ | NatE _ | TextE _ | OptE None
   -> []
@@ -77,7 +91,8 @@ let rec t_prem prem = match prem.it with
   | IfPr e -> t_exp e
   | ElsePr -> []
   | IterPr (prem, iterexp)
-  -> List.map (fun pr -> IterPr (pr, iterexp) $ no_region) (t_prem prem) @ t_iterexp iterexp
+  -> iter_side_conditions iterexp @
+     List.map (fun pr -> IterPr (pr, iterexp) $ no_region) (t_prem prem) @ t_iterexp iterexp
 
 let t_prems = List.concat_map t_prem
 
