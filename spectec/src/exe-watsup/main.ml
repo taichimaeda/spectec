@@ -26,6 +26,10 @@ let srcs = ref []    (* src file arguments *)
 let dsts = ref []    (* destination file arguments *)
 let odst = ref ""    (* generation file argument *)
 
+let print_elab_il = ref false
+let print_final_il = ref false
+let print_all_il = ref false
+
 let pass_flat = ref false
 let pass_totalize = ref false
 let pass_sideconditions = ref false
@@ -48,6 +52,10 @@ let argspec = Arg.align
   "-d", Arg.Set dry, " Dry run (when -p) ";
   "-l", Arg.Set log, " Log execution steps";
   "-w", Arg.Set warn, " Warn about unsed or multiply used splices";
+
+  "--print-il", Arg.Set print_elab_il, "Print il (after elaboration)";
+  "--print-final-il", Arg.Set print_final_il, "Print final il";
+  "--print-all-il", Arg.Set print_all_il, "Print il after each step";
 
   "--flat", Arg.Set pass_flat, "Run variant flattening";
   "--totalize", Arg.Set pass_totalize, "Run function totalization";
@@ -76,17 +84,14 @@ let () =
     let el = List.concat_map Frontend.Parse.parse_file !srcs in
     log "Elaboration...";
     let il = Frontend.Elab.elab el in
-    if !odst = "" && !dsts = [] then (
-      log "Printing...";
-      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-    );
+    if !print_elab_il || !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
     log "IL Validation...";
     Il.Validation.valid il;
 
     let il = if !pass_flat || !target = Haskell || !target = Lean4 then begin
       log "Variant flattening...";
       let il = Middlend.Flat.transform il in
-      if !pass_flat then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
@@ -95,7 +100,7 @@ let () =
     let il = if !pass_totalize || !target = Lean4 then begin
       log "Function totalization...";
       let il = Middlend.Totalize.transform il in
-      if !pass_totalize then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
@@ -104,11 +109,13 @@ let () =
     let il = if !pass_sideconditions || !target = Haskell || !target = Lean4 then begin
       log "Side condition inference";
       let il = Middlend.Sideconditions.transform il in
-      if !pass_sideconditions then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
     end else il in
+
+    if !print_final_il && not !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
 
     begin match !target with
     | None -> ()

@@ -1,11 +1,10 @@
 # Preview
 
 ```sh
-$ (cd ../spec && dune exec ../src/exe-watsup/main.exe -- *.watsup -v -l)
+$ (cd ../spec && dune exec ../src/exe-watsup/main.exe -- *.watsup -v -l --print-il)
 watsup 0.3 generator
 == Parsing...
 == Elaboration...
-== Printing...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat

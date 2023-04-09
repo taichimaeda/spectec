@@ -1,10 +1,9 @@
 # Preview
 
 ```sh
-$ (cd ../spec && ../src/exe-watsup/main.exe *.watsup -l --flat --totalize --sideconditions)
+$ (cd ../spec && ../src/exe-watsup/main.exe *.watsup -l --print-all-il --flat --totalize --sideconditions)
 == Parsing...
 == Elaboration...
-== Printing...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
