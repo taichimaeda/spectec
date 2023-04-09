@@ -642,22 +642,22 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (x < C.DATA.length) ->
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
-  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (t : Valtype) :
+  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) :
     (0 < C.MEM.length) ->
-    ((«$size» t) != none) ->
-    (Forall (λ n ↦ ((«$size» t) != none)) n.toList) ->
+    ((«$size» («$valtype_numtype» nt)) != none) ->
+    (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) ->
     ((C.MEM.get! 0) == mt) ->
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t).get!) 8))) ->
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t).get!) 8))))) n.toList) ->
+    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
-  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (t : Valtype) :
+  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) :
     (0 < C.MEM.length) ->
-    ((«$size» t) != none) ->
-    (Forall (λ n ↦ ((«$size» t) != none)) n.toList) ->
+    ((«$size» («$valtype_numtype» nt)) != none) ->
+    (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) ->
     ((C.MEM.get! 0) == mt) ->
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» t).get!) 8))) ->
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» t).get!) 8))))) n.toList) ->
+    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) ->
+    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
 inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
