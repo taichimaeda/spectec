@@ -105,4 +105,5 @@ let rec eq_prem prem1 prem2 =
   | ElsePr, ElsePr -> true
   | IterPr (prem1, iterexp1), IterPr (prem2, iterexp2) ->
   eq_prem prem1 prem2 && eq_iterexp iterexp1 iterexp2
+  | NegPr prem1, NegPr prem2 -> eq_prem prem1 prem2
   | _, _ -> false
