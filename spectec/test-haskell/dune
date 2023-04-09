@@ -1,7 +1,7 @@
 (mdx
   (libraries spectec)
   (deps
-    (file ../src/exe-haskell/main.exe)
+    (file ../src/exe-watsup/main.exe)
     (glob_files ../spec/*.watsup)
   )
   (files TEST.md)

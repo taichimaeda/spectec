@@ -9,7 +9,13 @@ let version = "0.3"
 
 (* Flags and parameters *)
 
-let config = ref Backend_latex.Config.latex
+type target =
+ | None
+ | Latex of Backend_latex.Config.config
+ | Haskell
+ | Lean4
+
+ let target = ref (Latex Backend_latex.Config.latex)
 
 let log = ref false  (* log execution steps *)
 let dst = ref false  (* patch files *)
@@ -39,16 +45,20 @@ let argspec = Arg.align
   "-v", Arg.Unit banner, " Show version";
   "-o", Arg.String (fun s -> odst := s), " Generate file";
   "-p", Arg.Set dst, " Patch files";
-  "-d", Arg.Set dry, " Dry run";
+  "-d", Arg.Set dry, " Dry run (when -p) ";
   "-l", Arg.Set log, " Log execution steps";
   "-w", Arg.Set warn, " Warn about unsed or multiply used splices";
+
   "--flat", Arg.Set pass_flat, "Run variant flattening";
   "--totalize", Arg.Set pass_totalize, "Run function totalization";
   "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
-  "--latex", Arg.Unit (fun () -> config := Backend_latex.Config.latex),
-    " Use Latex settings (default)";
-  "--sphinx", Arg.Unit (fun () -> config := Backend_latex.Config.sphinx),
-    " Use Sphinx settings";
+
+  "--check-only", Arg.Unit (fun () -> target := None), " No output (just checking)";
+  "--latex", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex), " Use Latex settings (default)";
+  "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex), " Use Sphinx settings";
+  "--haskell", Arg.Unit (fun () -> target := Haskell), " Produce Haskell code";
+  "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
+
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
 ]
@@ -73,46 +83,57 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
 
-    let _il = if !pass_flat then begin
+    let il = if !pass_flat || !target = Haskell || !target = Lean4 then begin
       log "Variant flattening...";
-      let il = Middlend.Sideconditions.transform il in
-      log "Printing...";
-      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      let il = Middlend.Flat.transform il in
+      if !pass_flat then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
     end else il in
 
-    let il = if !pass_totalize then begin
+    let il = if !pass_totalize || !target = Lean4 then begin
       log "Function totalization...";
       let il = Middlend.Totalize.transform il in
-      log "Printing...";
-      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      if !pass_totalize then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
     end else il in
 
-    let _il = if !pass_sideconditions then begin
+    let il = if !pass_sideconditions || !target = Haskell || !target = Lean4 then begin
       log "Side condition inference";
       let il = Middlend.Sideconditions.transform il in
-      log "Printing...";
-      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      if !pass_sideconditions then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;
       il
     end else il in
 
-    log "Latex Generation...";
-    if !odst = "" && !dsts = [] then
-      print_endline (Backend_latex.Gen.gen_string el);
-    if !odst <> "" then
-      Backend_latex.Gen.gen_file !odst el;
-    if !dsts <> [] then (
-      let env = Backend_latex.Splice.(env !config el) in
-      List.iter (Backend_latex.Splice.splice_file ~dry:!dry env) !dsts;
-      if !warn then Backend_latex.Splice.warn env;
-    );
+    begin match !target with
+    | None -> ()
+    | Latex config ->
+      log "Latex Generation...";
+      if !odst = "" && !dsts = [] then
+        print_endline (Backend_latex.Gen.gen_string el);
+      if !odst <> "" then
+        Backend_latex.Gen.gen_file !odst el;
+      if !dsts <> [] then (
+        let env = Backend_latex.Splice.(env config el) in
+        List.iter (Backend_latex.Splice.splice_file ~dry:!dry env) !dsts;
+        if !warn then Backend_latex.Splice.warn env;
+      );
+    | Haskell ->
+      if !odst = "" && !dsts = [] then
+        print_endline (Backend_haskell.Gen.gen_string il);
+      if !odst <> "" then
+        Backend_haskell.Gen.gen_file !odst il;
+    | Lean4 ->
+      if !odst = "" && !dsts = [] then
+        print_endline (Backend_haskell.Gen.gen_string il);
+      if !odst <> "" then
+        Backend_lean4.Gen.gen_file !odst il;
+    end;
 (*
     if !odst = "" && !dsts = [] then (
       log "Prose Generation...";

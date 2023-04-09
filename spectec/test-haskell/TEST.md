@@ -1,7 +1,7 @@
 # Preview
 
 ```sh
-$ dune exec ../src/exe-haskell/main.exe -- ../spec/*.watsup -o Test.hs
+$ dune exec ../src/exe-watsup/main.exe -- --haskell ../spec/*.watsup -o Test.hs
 $ cat Test.hs
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE DuplicateRecordFields #-}

@@ -1,7 +1,7 @@
 # Preview
 
 ```sh
-$ dune exec ../src/exe-lean4/main.exe -- ../spec/*.watsup -o SpecTec.lean
+$ dune exec ../src/exe-watsup/main.exe -- --lean4 ../spec/*.watsup -o SpecTec.lean
 $ cat SpecTec.lean
 /- Lean 4 export -/
 

@@ -1490,7 +1490,6 @@ relation Step: `%~>%`(config, config)
 
 == IL Validation...
 == Variant flattening...
-== Printing...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
@@ -1558,15 +1557,66 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
+;;
+def valtype_numtype : numtype -> valtype
+  ;;
+  def valtype_numtype(I32_numtype) = I32_valtype
+  ;;
+  def valtype_numtype(I64_numtype) = I64_valtype
+  ;;
+  def valtype_numtype(F32_numtype) = F32_valtype
+  ;;
+  def valtype_numtype(F64_numtype) = F64_valtype
+
+;;
+def valtype_vectype : vectype -> valtype
+  ;;
+  def valtype_vectype(V128_vectype) = V128_valtype
+
+;;
+def valtype_reftype : reftype -> valtype
+  ;;
+  def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
+  ;;
+  def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
+
 ;; 1-syntax.watsup:48.1-48.71
 syntax in =
   | I32
   | I64
 
+;;
+def numtype_in : in -> numtype
+  ;;
+  def numtype_in(I32_in) = I32_numtype
+  ;;
+  def numtype_in(I64_in) = I64_numtype
+
+;;
+def valtype_in : in -> valtype
+  ;;
+  def valtype_in(I32_in) = I32_valtype
+  ;;
+  def valtype_in(I64_in) = I64_valtype
+
 ;; 1-syntax.watsup:49.1-49.71
 syntax fn =
   | F32
   | F64
+
+;;
+def numtype_fn : fn -> numtype
+  ;;
+  def numtype_fn(F32_fn) = F32_numtype
+  ;;
+  def numtype_fn(F64_fn) = F64_numtype
+
+;;
+def valtype_fn : fn -> valtype
+  ;;
+  def valtype_fn(F32_fn) = F32_valtype
+  ;;
+  def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
 syntax resulttype = valtype*
@@ -1916,7 +1966,6 @@ relation Resulttype_sub: `|-%*<:%*`(valtype*, valtype*)
   ;; 3-typing.watsup:70.1-72.35
   rule _ {t_1* : valtype*, t_2* : valtype*}:
     `|-%*<:%*`(t_1*{t_1}, t_2*{t_2})
-    -- if (|t_1*{t_1}| = |t_2*{t_2}|)
     -- (Valtype_sub: `|-%<:%`(t_1, t_2))*{t_1 t_2}
 
 ;; 3-typing.watsup:75.1-75.75
@@ -2031,20 +2080,16 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:195.1-197.24
   rule br {C : context, l : labelidx, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, BR_instr(l), `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
-    -- if (l < |C.LABEL_context|)
     -- if (C.LABEL_context[l] = t*{t})
 
   ;; 3-typing.watsup:199.1-201.24
   rule br_if {C : context, l : labelidx, t* : valtype*}:
     `%|-%:%`(C, BR_IF_instr(l), `%->%`(t*{t} :: [I32_valtype], t*{t}))
-    -- if (l < |C.LABEL_context|)
     -- if (C.LABEL_context[l] = t*{t})
 
   ;; 3-typing.watsup:203.1-206.42
   rule br_table {C : context, l* : labelidx*, l' : labelidx, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, BR_TABLE_instr(l*{l}, l'), `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
-    -- (if (l < |C.LABEL_context|))*{l}
-    -- if (l' < |C.LABEL_context|)
     -- (Resulttype_sub: `|-%*<:%*`(t*{t}, C.LABEL_context[l]))*{l}
     -- Resulttype_sub: `|-%*<:%*`(t*{t}, C.LABEL_context[l'])
 
@@ -2056,13 +2101,11 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:212.1-214.33
   rule call {C : context, t_1* : valtype*, t_2* : valtype*, x : idx}:
     `%|-%:%`(C, CALL_instr(x), `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- if (x < |C.FUNC_context|)
     -- if (C.FUNC_context[x] = `%->%`(t_1*{t_1}, t_2*{t_2}))
 
   ;; 3-typing.watsup:216.1-219.26
   rule call_indirect {C : context, ft : functype, lim : limits, t_1* : valtype*, t_2* : valtype*, x : idx}:
     `%|-%:%`(C, CALL_INDIRECT_instr(x, ft), `%->%`(t_1*{t_1} :: [I32_valtype], t_2*{t_2}))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, FUNCREF_reftype))
     -- if (ft = `%->%`(t_1*{t_1}, t_2*{t_2}))
 
@@ -2115,7 +2158,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:260.1-262.23
   rule ref.func {C : context, ft : functype, x : idx}:
     `%|-%:%`(C, REF.FUNC_instr(x), `%->%`([], [FUNCREF_valtype]))
-    -- if (x < |C.FUNC_context|)
     -- if (C.FUNC_context[x] = ft)
 
   ;; 3-typing.watsup:264.1-265.31
@@ -2125,128 +2167,104 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:268.1-270.23
   rule local.get {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.GET_instr(x), `%->%`([], [t]))
-    -- if (x < |C.LOCAL_context|)
     -- if (C.LOCAL_context[x] = t)
 
   ;; 3-typing.watsup:272.1-274.23
   rule local.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.SET_instr(x), `%->%`([t], []))
-    -- if (x < |C.LOCAL_context|)
     -- if (C.LOCAL_context[x] = t)
 
   ;; 3-typing.watsup:276.1-278.23
   rule local.tee {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
-    -- if (x < |C.LOCAL_context|)
     -- if (C.LOCAL_context[x] = t)
 
   ;; 3-typing.watsup:281.1-283.29
   rule global.get {C : context, mut? : mutflag?, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (x < |C.GLOBAL_context|)
     -- if (C.GLOBAL_context[x] = `%?%`(mut?{mut}, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (x < |C.GLOBAL_context|)
     -- if (C.GLOBAL_context[x] = `%?%`(?(MUT), t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.GET_instr(x), `%->%`([I32_valtype], [(rt <: valtype)]))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
   ;; 3-typing.watsup:294.1-296.28
   rule table.set {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.SET_instr(x), `%->%`([I32_valtype (rt <: valtype)], []))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
   ;; 3-typing.watsup:298.1-300.24
   rule table.size {C : context, tt : tabletype, x : idx}:
     `%|-%:%`(C, TABLE.SIZE_instr(x), `%->%`([], [I32_valtype]))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = tt)
 
   ;; 3-typing.watsup:302.1-304.28
   rule table.grow {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.GROW_instr(x), `%->%`([(rt <: valtype) I32_valtype], [I32_valtype]))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
   ;; 3-typing.watsup:306.1-308.28
   rule table.fill {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.FILL_instr(x), `%->%`([I32_valtype (rt <: valtype) I32_valtype], []))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
   ;; 3-typing.watsup:310.1-313.32
   rule table.copy {C : context, lim_1 : limits, lim_2 : limits, rt : reftype, x_1 : idx, x_2 : idx}:
     `%|-%:%`(C, TABLE.COPY_instr(x_1, x_2), `%->%`([I32_valtype I32_valtype I32_valtype], []))
-    -- if (x_1 < |C.TABLE_context|)
-    -- if (x_2 < |C.TABLE_context|)
     -- if (C.TABLE_context[x_1] = `%%`(lim_1, rt))
     -- if (C.TABLE_context[x_2] = `%%`(lim_2, rt))
 
   ;; 3-typing.watsup:315.1-318.25
   rule table.init {C : context, lim : limits, rt : reftype, x_1 : idx, x_2 : idx}:
     `%|-%:%`(C, TABLE.INIT_instr(x_1, x_2), `%->%`([I32_valtype I32_valtype I32_valtype], []))
-    -- if (x_1 < |C.TABLE_context|)
-    -- if (x_2 < |C.ELEM_context|)
     -- if (C.TABLE_context[x_1] = `%%`(lim, rt))
     -- if (C.ELEM_context[x_2] = rt)
 
   ;; 3-typing.watsup:320.1-322.23
   rule elem.drop {C : context, rt : reftype, x : idx}:
     `%|-%:%`(C, ELEM.DROP_instr(x), `%->%`([], []))
-    -- if (x < |C.ELEM_context|)
     -- if (C.ELEM_context[x] = rt)
 
   ;; 3-typing.watsup:325.1-327.22
   rule memory.size {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.SIZE_instr, `%->%`([], [I32_valtype]))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
 
   ;; 3-typing.watsup:329.1-331.22
   rule memory.grow {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.GROW_instr, `%->%`([I32_valtype], [I32_valtype]))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
 
   ;; 3-typing.watsup:333.1-335.22
   rule memory.fill {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.FILL_instr, `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
 
   ;; 3-typing.watsup:337.1-339.22
   rule memory.copy {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.COPY_instr, `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
 
   ;; 3-typing.watsup:341.1-344.23
   rule memory.init {C : context, mt : memtype, x : idx}:
     `%|-%:%`(C, MEMORY.INIT_instr(x), `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
-    -- if (0 < |C.MEM_context|)
-    -- if (x < |C.DATA_context|)
     -- if (C.MEM_context[0] = mt)
     -- if (C.DATA_context[x] = OK)
 
   ;; 3-typing.watsup:346.1-348.23
   rule data.drop {C : context, x : idx}:
     `%|-%:%`(C, DATA.DROP_instr(x), `%->%`([], []))
-    -- if (x < |C.DATA_context|)
     -- if (C.DATA_context[x] = OK)
 
   ;; 3-typing.watsup:350.1-355.32
   rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [(nt <: valtype)]))
-    -- if (0 < |C.MEM_context|)
-    -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= ($size(nt <: valtype) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < ($size(nt <: valtype) / 8))))?{n}
@@ -2255,7 +2273,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:357.1-362.32
   rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype}:
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype (nt <: valtype)], []))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= ($size(nt <: valtype) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < ($size(nt <: valtype) / 8))))?{n}
@@ -2310,7 +2327,6 @@ relation Instr_const: `%|-%CONST`(context, instr)
   ;; 3-typing.watsup:380.1-382.32
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (x < |C.GLOBAL_context|)
     -- if (C.GLOBAL_context[x] = `%?%`(?(), t))
 
 ;; 3-typing.watsup:368.1-368.77
@@ -2365,7 +2381,6 @@ relation Elemmode_ok: `%|-%:%`(context, elemmode, reftype)
   ;; 3-typing.watsup:437.1-440.45
   rule active {C : context, expr : expr, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE_elemmode(x, expr), rt)
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
     -- (Expr_ok_const: `%|-%:%CONST`(C, expr, I32_valtype))*{}
 
@@ -2386,7 +2401,6 @@ relation Datamode_ok: `%|-%:OK`(context, datamode)
   ;; 3-typing.watsup:445.1-448.45
   rule _ {C : context, expr : expr, mt : memtype}:
     `%|-%:OK`(C, MEMORY_datamode(0, expr))
-    -- if (0 < |C.MEM_context|)
     -- if (C.MEM_context[0] = mt)
     -- (Expr_ok_const: `%|-%:%CONST`(C, expr, I32_valtype))*{}
 
@@ -2402,7 +2416,6 @@ relation Start_ok: `%|-%:OK`(context, start)
   ;; 3-typing.watsup:450.1-452.39
   rule _ {C : context, x : idx}:
     `%|-%:OK`(C, START(x))
-    -- if (x < |C.FUNC_context|)
     -- if (C.FUNC_context[x] = `%->%`([], []))
 
 ;; 3-typing.watsup:455.1-455.80
@@ -2417,25 +2430,21 @@ relation Externuse_ok: `%|-%:%`(context, externuse, externtype)
   ;; 3-typing.watsup:467.1-469.23
   rule func {C : context, ft : functype, x : idx}:
     `%|-%:%`(C, FUNC_externuse(x), FUNC_externtype(ft))
-    -- if (x < |C.FUNC_context|)
     -- if (C.FUNC_context[x] = ft)
 
   ;; 3-typing.watsup:471.1-473.25
   rule global {C : context, gt : globaltype, x : idx}:
     `%|-%:%`(C, GLOBAL_externuse(x), GLOBAL_externtype(gt))
-    -- if (x < |C.GLOBAL_context|)
     -- if (C.GLOBAL_context[x] = gt)
 
   ;; 3-typing.watsup:475.1-477.24
   rule table {C : context, tt : tabletype, x : idx}:
     `%|-%:%`(C, TABLE_externuse(x), TABLE_externtype(tt))
-    -- if (x < |C.TABLE_context|)
     -- if (C.TABLE_context[x] = tt)
 
   ;; 3-typing.watsup:479.1-481.22
   rule mem {C : context, mt : memtype, x : idx}:
     `%|-%:%`(C, MEMORY_externuse(x), MEMORY_externtype(mt))
-    -- if (x < |C.MEM_context|)
     -- if (C.MEM_context[x] = mt)
 
 ;; 3-typing.watsup:456.1-456.80
@@ -2450,12 +2459,6 @@ relation Module_ok: `|-%:OK`(module)
   ;; 3-typing.watsup:486.1-501.22
   rule _ {C : context, data^n : data^n, elem* : elem*, export* : export*, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, import* : import*, mem* : mem*, mt* : memtype*, n : n, rt* : reftype*, start* : start*, table* : table*, tt* : tabletype*}:
     `|-%:OK`(`MODULE%*%*%*%*%*%*%*%*%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data^n{data}, start*{start}, export*{export}))
-    -- if (|ft*{ft}| = |func*{func}|)
-    -- if (|global*{global}| = |gt*{gt}|)
-    -- if (|table*{table}| = |tt*{tt}|)
-    -- if (|mem*{mem}| = |mt*{mt}|)
-    -- if (|elem*{elem}| = |rt*{rt}|)
-    -- if (|data^n{data}| = n)
     -- if (C = {FUNC ft*{ft}, GLOBAL gt*{gt}, TABLE tt*{tt}, MEM mt*{mt}, ELEM rt*{rt}, DATA OK^n{}, LOCAL [], LABEL [], RETURN ?()})
     -- (Func_ok: `%|-%:%`(C, func, ft))*{ft func}
     -- (Global_ok: `%|-%:%`(C, global, gt))*{global gt}
@@ -2510,6 +2513,20 @@ syntax val =
   | REF.NULL(reftype)
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
+
+;;
+def val_num : num -> val
+  ;;
+  def {x : (numtype, c_numtype)} val_num(CONST_num(x)) = CONST_val(x)
+
+;;
+def val_ref : ref -> val
+  ;;
+  def {x : reftype} val_ref(REF.NULL_ref(x)) = REF.NULL_val(x)
+  ;;
+  def {x : funcaddr} val_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_val(x)
+  ;;
+  def {x : hostaddr} val_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_val(x)
 
 ;; 4-runtime.watsup:31.1-32.18
 syntax result =
@@ -2627,6 +2644,122 @@ syntax admininstr =
   | FRAME_(n, frame, admininstr*)
   | TRAP
 }
+
+;;
+def admininstr_instr : instr -> admininstr
+  ;;
+  def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
+  ;;
+  def admininstr_instr(NOP_instr) = NOP_admininstr
+  ;;
+  def admininstr_instr(DROP_instr) = DROP_admininstr
+  ;;
+  def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
+  ;;
+  def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
+  ;;
+  def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
+  ;;
+  def admininstr_instr(RETURN_instr) = RETURN_admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
+  ;;
+  def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
+  ;;
+  def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
+  ;;
+  def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
+  ;;
+  def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
+  ;;
+  def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
+  ;;
+  def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
+  ;;
+  def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
+  ;;
+  def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
+  ;;
+  def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
+  ;;
+  def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
+  ;;
+  def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
+  ;;
+  def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
+  ;;
+  def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
+  ;;
+  def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
+  ;;
+  def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
+  ;;
+  def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
+  ;;
+  def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
+  ;;
+  def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
+
+;;
+def admininstr_val : val -> admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_ref : ref -> admininstr
+  ;;
+  def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_globalinst : globalinst -> admininstr
+  ;;
+  def {x : globalinst} admininstr_globalinst(x) = $admininstr_val(x)
 
 ;; 4-runtime.watsup:84.1-84.62
 syntax config = `%;%*`(state, admininstr*)
@@ -2756,17 +2889,11 @@ relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
   ;; 6-reduction.watsup:35.1-37.28
   rule block {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
     `%*~>%*`((val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
-    -- if (|t_1^k{t_1}| = k)
-    -- if (|t_2^n{t_2}| = n)
-    -- if (|val^k{val}| = k)
     -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
 
   ;; 6-reduction.watsup:39.1-41.28
   rule loop {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
     `%*~>%*`((val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [LOOP_instr(bt, instr*{instr})], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
-    -- if (|t_1^k{t_1}| = k)
-    -- if (|t_2^n{t_2}| = n)
-    -- if (|val^k{val}| = k)
     -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
 
   ;; 6-reduction.watsup:43.1-45.16
@@ -2786,7 +2913,6 @@ relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
   ;; 6-reduction.watsup:57.1-58.69
   rule br-zero {instr* : instr*, instr'* : instr*, n : n, val^n : val^n, val'* : val*}:
     `%*~>%*`([LABEL__admininstr(n, instr'*{instr'}, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'})
-    -- if (|val^n{val}| = n)
 
   ;; 6-reduction.watsup:60.1-61.65
   rule br-succ {instr* : instr*, instr'* : instr*, l : labelidx, n : n, val* : val*}:
@@ -2815,12 +2941,10 @@ relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
   ;; 6-reduction.watsup:100.1-101.35
   rule frame-vals {f : frame, n : n, val^n : val^n}:
     `%*~>%*`([FRAME__admininstr(n, f, (val <: admininstr)^n{val})], (val <: admininstr)^n{val})
-    -- if (|val^n{val}| = n)
 
   ;; 6-reduction.watsup:103.1-104.55
   rule return-frame {f : frame, instr* : instr*, n : n, val^n : val^n, val'* : val*}:
     `%*~>%*`([FRAME__admininstr(n, f, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val})
-    -- if (|val^n{val}| = n)
 
   ;; 6-reduction.watsup:106.1-107.60
   rule return-label {instr* : instr*, instr'* : instr*, k : nat, val* : val*}:
@@ -2889,13 +3013,10 @@ relation Step_read: `%~>%*`(config, admininstr*)
   ;; 6-reduction.watsup:82.1-83.47
   rule call {x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CALL_admininstr(x)]), [CALL_ADDR_admininstr($funcaddr(z)[x])])
-    -- if (x < |$funcaddr(z)|)
 
   ;; 6-reduction.watsup:85.1-88.34
   rule call_indirect-call {a : addr, ft : functype, func : func, i : nat, m : moduleinst, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CALL_INDIRECT_admininstr(x, ft)]), [CALL_ADDR_admininstr(a)])
-    -- if (i < |$table(z, x)|)
-    -- if (a < |$funcinst(z)|)
     -- if ($table(z, x)[i] = REF.FUNC_ADDR_ref(a))
     -- if ($funcinst(z)[a] = `%;%`(m, func))
 
@@ -2907,17 +3028,12 @@ relation Step_read: `%~>%*`(config, admininstr*)
   ;; 6-reduction.watsup:94.1-97.52
   rule call_addr {a : addr, f : frame, instr* : instr*, k : nat, m : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state}:
     `%~>%*`(`%;%*`(z, (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], (instr <: admininstr)*{instr})])])
-    -- if (a < |$funcinst(z)|)
-    -- if (|t_1^k{t_1}| = k)
-    -- if (|t_2^n{t_2}| = n)
-    -- if (|val^k{val}| = k)
     -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
     -- if (f = {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m})
 
   ;; 6-reduction.watsup:150.1-151.53
   rule ref.func {x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [REF.FUNC_admininstr(x)]), [REF.FUNC_ADDR_admininstr($funcaddr(z)[x])])
-    -- if (x < |$funcaddr(z)|)
 
   ;; 6-reduction.watsup:163.1-164.37
   rule local.get {x : idx, z : state}:
@@ -3003,7 +3119,6 @@ relation Step_read: `%~>%*`(config, admininstr*)
   ;; 6-reduction.watsup:257.1-261.15
   rule table.init-succ {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.INIT_admininstr(x, y)]), [CONST_admininstr(I32_numtype, j) ($elem(z, y)[i] <: admininstr) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) TABLE.INIT_admininstr(x, y)])
-    -- if (i < |$elem(z, y)|)
     -- otherwise
 
 ;; 6-reduction.watsup:3.1-3.63
@@ -3041,7 +3156,6 @@ relation Step: `%~>%`(config, config)
 
 == IL Validation...
 == Function totalization...
-== Printing...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
@@ -3109,15 +3223,66 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
+;;
+def valtype_numtype : numtype -> valtype
+  ;;
+  def valtype_numtype(I32_numtype) = I32_valtype
+  ;;
+  def valtype_numtype(I64_numtype) = I64_valtype
+  ;;
+  def valtype_numtype(F32_numtype) = F32_valtype
+  ;;
+  def valtype_numtype(F64_numtype) = F64_valtype
+
+;;
+def valtype_vectype : vectype -> valtype
+  ;;
+  def valtype_vectype(V128_vectype) = V128_valtype
+
+;;
+def valtype_reftype : reftype -> valtype
+  ;;
+  def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
+  ;;
+  def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
+
 ;; 1-syntax.watsup:48.1-48.71
 syntax in =
   | I32
   | I64
 
+;;
+def numtype_in : in -> numtype
+  ;;
+  def numtype_in(I32_in) = I32_numtype
+  ;;
+  def numtype_in(I64_in) = I64_numtype
+
+;;
+def valtype_in : in -> valtype
+  ;;
+  def valtype_in(I32_in) = I32_valtype
+  ;;
+  def valtype_in(I64_in) = I64_valtype
+
 ;; 1-syntax.watsup:49.1-49.71
 syntax fn =
   | F32
   | F64
+
+;;
+def numtype_fn : fn -> numtype
+  ;;
+  def numtype_fn(F32_fn) = F32_numtype
+  ;;
+  def numtype_fn(F64_fn) = F64_numtype
+
+;;
+def valtype_fn : fn -> valtype
+  ;;
+  def valtype_fn(F32_fn) = F32_valtype
+  ;;
+  def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
 syntax resulttype = valtype*
@@ -4017,6 +4182,20 @@ syntax val =
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
 
+;;
+def val_num : num -> val
+  ;;
+  def {x : (numtype, c_numtype)} val_num(CONST_num(x)) = CONST_val(x)
+
+;;
+def val_ref : ref -> val
+  ;;
+  def {x : reftype} val_ref(REF.NULL_ref(x)) = REF.NULL_val(x)
+  ;;
+  def {x : funcaddr} val_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_val(x)
+  ;;
+  def {x : hostaddr} val_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_val(x)
+
 ;; 4-runtime.watsup:31.1-32.18
 syntax result =
   | _VALS(val*)
@@ -4135,6 +4314,122 @@ syntax admininstr =
   | FRAME_(n, frame, admininstr*)
   | TRAP
 }
+
+;;
+def admininstr_instr : instr -> admininstr
+  ;;
+  def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
+  ;;
+  def admininstr_instr(NOP_instr) = NOP_admininstr
+  ;;
+  def admininstr_instr(DROP_instr) = DROP_admininstr
+  ;;
+  def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
+  ;;
+  def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
+  ;;
+  def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
+  ;;
+  def admininstr_instr(RETURN_instr) = RETURN_admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
+  ;;
+  def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
+  ;;
+  def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
+  ;;
+  def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
+  ;;
+  def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
+  ;;
+  def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
+  ;;
+  def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
+  ;;
+  def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
+  ;;
+  def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
+  ;;
+  def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
+  ;;
+  def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
+  ;;
+  def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
+  ;;
+  def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
+  ;;
+  def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
+  ;;
+  def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
+  ;;
+  def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
+  ;;
+  def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
+  ;;
+  def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
+  ;;
+  def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
+
+;;
+def admininstr_val : val -> admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_ref : ref -> admininstr
+  ;;
+  def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_globalinst : globalinst -> admininstr
+  ;;
+  def {x : globalinst} admininstr_globalinst(x) = $admininstr_val(x)
 
 ;; 4-runtime.watsup:84.1-84.62
 syntax config = `%;%*`(state, admininstr*)
@@ -4531,7 +4826,6 @@ relation Step: `%~>%`(config, config)
 
 == IL Validation...
 == Side condition inference
-== Printing...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
@@ -4599,15 +4893,66 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
+;;
+def valtype_numtype : numtype -> valtype
+  ;;
+  def valtype_numtype(I32_numtype) = I32_valtype
+  ;;
+  def valtype_numtype(I64_numtype) = I64_valtype
+  ;;
+  def valtype_numtype(F32_numtype) = F32_valtype
+  ;;
+  def valtype_numtype(F64_numtype) = F64_valtype
+
+;;
+def valtype_vectype : vectype -> valtype
+  ;;
+  def valtype_vectype(V128_vectype) = V128_valtype
+
+;;
+def valtype_reftype : reftype -> valtype
+  ;;
+  def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
+  ;;
+  def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
+
 ;; 1-syntax.watsup:48.1-48.71
 syntax in =
   | I32
   | I64
 
+;;
+def numtype_in : in -> numtype
+  ;;
+  def numtype_in(I32_in) = I32_numtype
+  ;;
+  def numtype_in(I64_in) = I64_numtype
+
+;;
+def valtype_in : in -> valtype
+  ;;
+  def valtype_in(I32_in) = I32_valtype
+  ;;
+  def valtype_in(I64_in) = I64_valtype
+
 ;; 1-syntax.watsup:49.1-49.71
 syntax fn =
   | F32
   | F64
+
+;;
+def numtype_fn : fn -> numtype
+  ;;
+  def numtype_fn(F32_fn) = F32_numtype
+  ;;
+  def numtype_fn(F64_fn) = F64_numtype
+
+;;
+def valtype_fn : fn -> valtype
+  ;;
+  def valtype_fn(F32_fn) = F32_valtype
+  ;;
+  def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
 syntax resulttype = valtype*
@@ -5563,6 +5908,20 @@ syntax val =
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
 
+;;
+def val_num : num -> val
+  ;;
+  def {x : (numtype, c_numtype)} val_num(CONST_num(x)) = CONST_val(x)
+
+;;
+def val_ref : ref -> val
+  ;;
+  def {x : reftype} val_ref(REF.NULL_ref(x)) = REF.NULL_val(x)
+  ;;
+  def {x : funcaddr} val_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_val(x)
+  ;;
+  def {x : hostaddr} val_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_val(x)
+
 ;; 4-runtime.watsup:31.1-32.18
 syntax result =
   | _VALS(val*)
@@ -5681,6 +6040,122 @@ syntax admininstr =
   | FRAME_(n, frame, admininstr*)
   | TRAP
 }
+
+;;
+def admininstr_instr : instr -> admininstr
+  ;;
+  def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
+  ;;
+  def admininstr_instr(NOP_instr) = NOP_admininstr
+  ;;
+  def admininstr_instr(DROP_instr) = DROP_admininstr
+  ;;
+  def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
+  ;;
+  def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
+  ;;
+  def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
+  ;;
+  def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
+  ;;
+  def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
+  ;;
+  def admininstr_instr(RETURN_instr) = RETURN_admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
+  ;;
+  def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
+  ;;
+  def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
+  ;;
+  def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
+  ;;
+  def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
+  ;;
+  def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
+  ;;
+  def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
+  ;;
+  def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
+  ;;
+  def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
+  ;;
+  def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
+  ;;
+  def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
+  ;;
+  def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
+  ;;
+  def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
+  ;;
+  def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
+  ;;
+  def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
+  ;;
+  def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
+  ;;
+  def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
+  ;;
+  def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
+  ;;
+  def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
+  ;;
+  def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
+  ;;
+  def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
+  ;;
+  def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
+
+;;
+def admininstr_val : val -> admininstr
+  ;;
+  def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
+  ;;
+  def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_ref : ref -> admininstr
+  ;;
+  def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
+  ;;
+  def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
+  ;;
+  def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
+
+;;
+def admininstr_globalinst : globalinst -> admininstr
+  ;;
+  def {x : globalinst} admininstr_globalinst(x) = $admininstr_val(x)
 
 ;; 4-runtime.watsup:84.1-84.62
 syntax config = `%;%*`(state, admininstr*)
