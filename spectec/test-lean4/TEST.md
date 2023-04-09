@@ -91,18 +91,18 @@ def «$valtype_reftype» : Reftype -> Valtype
   | Reftype.FUNCREF => Valtype.FUNCREF
   | Reftype.EXTERNREF => Valtype.EXTERNREF
 
-inductive «in» where
- | I32 : «in»
- | I64 : «in»
+inductive In where
+ | I32 : In
+ | I64 : In
   deriving Inhabited, BEq
 
-def «$numtype_in» : «in» -> Numtype
-  | «in».I32 => Numtype.I32
-  | «in».I64 => Numtype.I64
+def «$numtype_in» : In -> Numtype
+  | In.I32 => Numtype.I32
+  | In.I64 => Numtype.I64
 
-def «$valtype_in» : «in» -> Valtype
-  | «in».I32 => Valtype.I32
-  | «in».I64 => Valtype.I64
+def «$valtype_in» : In -> Valtype
+  | In.I32 => Valtype.I32
+  | In.I64 => Valtype.I64
 
 inductive Fn where
  | F32 : Fn
@@ -304,7 +304,7 @@ inductive Datamode where
 
 @[reducible] def Func := /- mixop: `FUNC%%*%` -/ (Functype × (List Valtype) × Expr)
 
-@[reducible] def «global» := /- mixop: GLOBAL -/ (Globaltype × Expr)
+@[reducible] def Global := /- mixop: GLOBAL -/ (Globaltype × Expr)
 
 @[reducible] def Table := /- mixop: TABLE -/ Tabletype
 
@@ -323,11 +323,11 @@ inductive Externuse where
  | MEMORY : Memidx -> Externuse
   deriving Inhabited, BEq
 
-@[reducible] def «export» := /- mixop: EXPORT -/ (Name × Externuse)
+@[reducible] def Export := /- mixop: EXPORT -/ (Name × Externuse)
 
-@[reducible] def «import» := /- mixop: IMPORT -/ (Name × Name × Externtype)
+@[reducible] def Import := /- mixop: IMPORT -/ (Name × Name × Externtype)
 
-@[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List «import») × (List Func) × (List «global») × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List «export»))
+@[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
 
 def «$size» : Valtype -> (Option Nat)
   | Valtype.I32 => (some 32)
@@ -544,7 +544,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (nt_1 != nt_2) ->
     ((«$size» («$valtype_numtype» nt_1)).get! == («$size» («$valtype_numtype» nt_2)).get!) ->
     (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
-  | convert_i (C : Context) (in_1 : «in») (in_2 : «in») (sx : (Option Sx)) :
+  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) :
     ((«$size» («$valtype_in» in_1)) != none) ->
     ((«$size» («$valtype_in» in_2)) != none) ->
     (in_1 != in_2) ->
@@ -643,7 +643,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (x < C.DATA.length) ->
     ((C.DATA.get! x) == ()) ->
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
-  | load (C : Context) («in» : «in») (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) :
+  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) :
     (0 < C.MEM.length) ->
     ((«$size» («$valtype_numtype» nt)) != none) ->
     (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) ->
@@ -653,7 +653,7 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) ->
     ((n == none) || (nt == («$numtype_in» «in»))) ->
     (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
-  | store (C : Context) («in» : «in») (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) :
+  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) :
     (0 < C.MEM.length) ->
     ((«$size» («$valtype_numtype» nt)) != none) ->
     (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) ->
@@ -714,7 +714,7 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
     (Expr_ok ((((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := (t_1 ++ t), LABEL := [], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [], RETURN := (some t_2)}), expr, t_2)) ->
     (Func_ok (C, (ft, t, expr), ft))
 
-inductive Global_ok : (Context × «global» × Globaltype) -> Prop where
+inductive Global_ok : (Context × Global × Globaltype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) :
     (Globaltype_ok gt) ->
     (gt == ((some ()), t)) ->
@@ -764,7 +764,7 @@ inductive Start_ok : (Context × Start) -> Prop where
     ((C.FUNC.get! x) == ([], [])) ->
     (Start_ok (C, x))
 
-inductive Import_ok : (Context × «import» × Externtype) -> Prop where
+inductive Import_ok : (Context × Import × Externtype) -> Prop where
   | rule_0 (C : Context) (name_1 : Name) (name_2 : Name) (xt : Externtype) :
     (Externtype_ok xt) ->
     (Import_ok (C, (name_1, name_2, xt), xt))
@@ -787,13 +787,13 @@ inductive Externuse_ok : (Context × Externuse × Externtype) -> Prop where
     ((C.MEM.get! x) == mt) ->
     (Externuse_ok (C, (Externuse.MEMORY x), (Externtype.MEMORY mt)))
 
-inductive Export_ok : (Context × «export» × Externtype) -> Prop where
+inductive Export_ok : (Context × Export × Externtype) -> Prop where
   | rule_0 (C : Context) (externuse : Externuse) (name : Name) (xt : Externtype) :
     (Externuse_ok (C, externuse, xt)) ->
     (Export_ok (C, (name, externuse), xt))
 
 inductive Module_ok : Module -> Prop where
-  | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List «export»)) (ft : (List Functype)) (func : (List Func)) («global» : (List «global»)) (gt : (List Globaltype)) («import» : (List «import»)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
+  | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) :
     (ft.length == func.length) ->
     («global».length == gt.length) ->
     (table.length == tt.length) ->
