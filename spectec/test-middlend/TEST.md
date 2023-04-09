@@ -5639,7 +5639,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [(nt <: valtype)]))
     -- if (0 < |C.MEM_context|)
     -- if ($size(nt <: valtype) =/= ?())
-    -- (if ($size(nt <: valtype) =/= ?()))?{n}
     -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (!($size(nt <: valtype)) / 8))
@@ -5651,7 +5650,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype (nt <: valtype)], []))
     -- if (0 < |C.MEM_context|)
     -- if ($size(nt <: valtype) =/= ?())
-    -- (if ($size(nt <: valtype) =/= ?()))?{n}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (!($size(nt <: valtype)) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (!($size(nt <: valtype)) / 8))))?{n}
@@ -7385,7 +7383,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [(nt <: valtype)]))
     -- if (0 < |C.MEM_context|)
     -- if ($size(nt <: valtype) =/= ?())
-    -- (if ($size(nt <: valtype) =/= ?()))?{n}
     -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (!($size(nt <: valtype)) / 8))
@@ -7397,7 +7394,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype (nt <: valtype)], []))
     -- if (0 < |C.MEM_context|)
     -- if ($size(nt <: valtype) =/= ?())
-    -- (if ($size(nt <: valtype) =/= ?()))?{n}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (!($size(nt <: valtype)) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (!($size(nt <: valtype)) / 8))))?{n}

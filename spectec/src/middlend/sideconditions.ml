@@ -101,10 +101,17 @@ let rec t_prem prem = match prem.it with
 
 let t_prems = List.concat_map t_prem
 
+(* Does prem1 obviously imply prem2? *)
+let rec implies prem1 prem2 = Il.Eq.eq_prem prem1 prem2 ||
+  match prem2.it with
+  | IterPr (prem2', _) -> implies prem1 prem2'
+  | _ -> false
+
+
 let t_rule' = function
   | RuleD (id, binds, mixop, exp, prems) ->
     let extra_prems = t_prems prems @ t_exp exp in
-    let prems' = Util.Lib.List.nub Il.Eq.eq_prem (extra_prems @ prems) in
+    let prems' = Util.Lib.List.nub implies (extra_prems @ prems) in
     RuleD (id, binds, mixop, exp, prems')
 
 let t_rule x = { x with it = t_rule' x.it }

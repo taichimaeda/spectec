@@ -641,7 +641,6 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) : 
     (0 < C.MEM.length) -> 
     ((«$size» («$valtype_numtype» nt)) != none) -> 
-    (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) -> 
     ((n == none) = (sx == none)) -> 
     ((C.MEM.get! 0) == mt) -> 
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) -> 
@@ -651,7 +650,6 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
   | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) : 
     (0 < C.MEM.length) -> 
     ((«$size» («$valtype_numtype» nt)) != none) -> 
-    (Forall (λ n ↦ ((«$size» («$valtype_numtype» nt)) != none)) n.toList) -> 
     ((C.MEM.get! 0) == mt) -> 
     ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) -> 
     (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) -> 
