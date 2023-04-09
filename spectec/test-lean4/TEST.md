@@ -1138,13 +1138,13 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (t_2.length == n) ->
     (val.length == k) ->
     (bt == (t_1, t_2)) ->
-    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
+    (Step_pure (((List.map «$admininstr_val» val) ++ [(Admininstr.BLOCK (bt, instr))]), [(Admininstr.LABEL_ (n, [], ((List.map «$admininstr_val» val) ++ (List.map «$admininstr_instr» instr))))]))
   | loop (bt : Blocktype) (instr : (List Instr)) (k : Nat) (n : N) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) :
     (t_1.length == k) ->
     (t_2.length == n) ->
     (val.length == k) ->
     (bt == (t_1, t_2)) ->
-    (Step_pure (((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))]))
+    (Step_pure (((List.map «$admininstr_val» val) ++ [(Admininstr.LOOP (bt, instr))]), [(Admininstr.LABEL_ (n, [(Instr.LOOP (bt, instr))], ((List.map «$admininstr_val» val) ++ (List.map «$admininstr_instr» instr))))]))
   | if_true (bt : Blocktype) (c : C_numtype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) :
     (c != 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_1))]))
@@ -1152,12 +1152,12 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (c == 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.IF (bt, instr_1, instr_2))], [(Admininstr.BLOCK (bt, instr_2))]))
   | label_vals (instr : (List Instr)) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr, (List.map «$admininstr_val» val)))], (List.map «$admininstr_val» val)))
   | br_zero (instr : (List Instr)) (instr' : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
     (val.length == n) ->
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR 0)] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map «$admininstr_val» val') ++ ((List.map «$admininstr_val» val) ++ ([(Admininstr.BR 0)] ++ (List.map «$admininstr_instr» instr))))))], ((List.map «$admininstr_val» val) ++ (List.map «$admininstr_instr» instr'))))
   | br_succ (instr : (List Instr)) (instr' : (List Instr)) (l : Labelidx) (n : N) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([(Admininstr.BR (l + 1))] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.BR l)])))
+    (Step_pure ([(Admininstr.LABEL_ (n, instr', ((List.map «$admininstr_val» val) ++ ([(Admininstr.BR (l + 1))] ++ (List.map «$admininstr_instr» instr)))))], ((List.map «$admininstr_val» val) ++ [(Admininstr.BR l)])))
   | br_if_true (c : C_numtype) (l : Labelidx) :
     (c != 0) ->
     (Step_pure ([(Admininstr.CONST (Numtype.I32, c)), (Admininstr.BR_IF l)], [(Admininstr.BR l)]))
@@ -1172,12 +1172,12 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
     (Step_pure ([(Admininstr.CONST (Numtype.I32, i)), (Admininstr.BR_TABLE (l, l'))], [(Admininstr.BR l')]))
   | frame_vals (f : Frame) (n : N) (val : (List Val)) :
     (val.length == n) ->
-    (Step_pure ([(Admininstr.FRAME_ (n, f, (List.map (λ val ↦ («$admininstr_val» val)) val)))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, (List.map «$admininstr_val» val)))], (List.map «$admininstr_val» val)))
   | return_frame (f : Frame) (instr : (List Instr)) (n : N) (val : (List Val)) (val' : (List Val)) :
     (val.length == n) ->
-    (Step_pure ([(Admininstr.FRAME_ (n, f, ((List.map (λ val' ↦ («$admininstr_val» val')) val') ++ ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr))))))], (List.map (λ val ↦ («$admininstr_val» val)) val)))
+    (Step_pure ([(Admininstr.FRAME_ (n, f, ((List.map «$admininstr_val» val') ++ ((List.map «$admininstr_val» val) ++ ([Admininstr.RETURN] ++ (List.map «$admininstr_instr» instr))))))], (List.map «$admininstr_val» val)))
   | return_label (instr : (List Instr)) (instr' : (List Instr)) (k : Nat) (val : (List Val)) :
-    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ ([Admininstr.RETURN] ++ (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))))], ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [Admininstr.RETURN])))
+    (Step_pure ([(Admininstr.LABEL_ (k, instr', ((List.map «$admininstr_val» val) ++ ([Admininstr.RETURN] ++ (List.map «$admininstr_instr» instr)))))], ((List.map «$admininstr_val» val) ++ [Admininstr.RETURN])))
   | unop_val (c : C_numtype) (c_1 : C_numtype) (nt : Numtype) (unop : Unop_numtype) :
     ((«$unop» (unop, nt, c_1)) == [c]) ->
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.UNOP (nt, unop))], [(Admininstr.CONST (nt, c))]))
@@ -1298,7 +1298,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (Forall (λ t ↦ ((«$default_» t) != none)) t) ->
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) ->
     (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t).get!) t)), MODULE := m}) ->
-    (Step_read ((z, ((List.map (λ val ↦ («$admininstr_val» val)) val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)))]))]))
+    (Step_read ((z, ((List.map «$admininstr_val» val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map «$admininstr_instr» instr)))]))]))
   | ref_func (x : Idx) (z : State) :
     (x < («$funcaddr» z).length) ->
     (Step_read ((z, [(Admininstr.REF_FUNC x)]), [(Admininstr.REF_FUNC_ADDR ((«$funcaddr» z).get! x))]))
@@ -1358,11 +1358,11 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
 
 inductive Step : (Config × Config) -> Prop where
   | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_pure ((List.map (λ instr ↦ («$admininstr_instr» instr)) instr), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
-    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+    (Step_pure ((List.map «$admininstr_instr» instr), (List.map «$admininstr_instr» instr'))) ->
+    (Step ((z, (List.map «$admininstr_instr» instr)), (z, (List.map «$admininstr_instr» instr'))))
   | read (instr : (List Instr)) (instr' : (List Instr)) (z : State) :
-    (Step_read ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))) ->
-    (Step ((z, (List.map (λ instr ↦ («$admininstr_instr» instr)) instr)), (z, (List.map (λ instr' ↦ («$admininstr_instr» instr')) instr'))))
+    (Step_read ((z, (List.map «$admininstr_instr» instr)), (List.map «$admininstr_instr» instr'))) ->
+    (Step ((z, (List.map «$admininstr_instr» instr)), (z, (List.map «$admininstr_instr» instr'))))
   | local_set (val : Val) (x : Idx) (z : State) :
     (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
   | global_set (val : Val) (x : Idx) (z : State) :

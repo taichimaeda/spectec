@@ -5,10 +5,10 @@ let include_input = false
 let parens s = "(" ^ s ^ ")"
 let brackets s = "[" ^ s ^ "]"
 let braces s = "{" ^ s ^ "}"
-let ($$) s1 s2 = parens (s1 ^ " " ^ s2)
+let ($$$) s1 ss = parens (String.concat " " (s1 :: ss))
+let ($$) s1 s2 = s1 $$$ [s2]
 let render_tuple how tys = parens (String.concat ", " (List.map how tys))
 let render_list how tys = brackets (String.concat ", " (List.map how tys))
-
 
 (* let render_rec_con (id : id) = "Mk" ^ render_type_name id *)
 
@@ -116,14 +116,14 @@ let rec render_exp (exp : exp) = match exp.it with
       | (List|List1|ListN _), [] ->
         "[" ^ render_exp e ^ "]"
       | (List|List1|ListN _), [v] ->
-        "(List.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
+        "List.map" $$$ [render_lam v e; render_id v]
       | (List|List1|ListN _), [v1; v2] ->
-        "(List.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
+        "List.zipWith" $$$ [ "(λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ")"; render_id v1; render_id v2 ]
       | Opt, [] -> "some" $$ render_exp e
       | Opt, [v] ->
-        "(Option.map (λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v ^ ")"
+        "Option.map" $$$ [render_lam v e; render_id v]
       | Opt, [v1; v2] ->
-        "(Option.zipWith (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
+        "Option.zipWith" $$$ [ "(λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_exp e ^ ")"; render_id v1; render_id v2 ]
       | _, _ ->
       render_exp e ^ " /- " ^ Il.Print.string_of_iterexp (iter, vs) ^ " -/"
   end
@@ -157,6 +157,11 @@ and render_case a e typ =
     if e.it = TupE []
     then render_con_name' true typ a
     else render_con_name' true typ a $$ render_exp e
+
+and render_lam v e = match e.it with
+  | CallE (f, {it = VarE v2;_}) when v.it = v2.it -> render_fun_id f
+  | SubE ({it = VarE v2;_}, typ1, typ2) when v.it = v2.it -> render_variant_inj' typ2 typ1
+  | _ -> "(λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ")"
 
 let render_clause (_id : id) (clause : clause) = match clause.it with
   | DefD (_binds, lhs, rhs, premise) ->
