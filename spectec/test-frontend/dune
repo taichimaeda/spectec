@@ -4,5 +4,5 @@
     (file ../src/exe-watsup/main.exe)
     (glob_files ../spec/*.watsup)
   )
-  (files TEST.md)
+  (files TEST.md PASSES.md)
 )

@@ -20,6 +20,9 @@ let srcs = ref []    (* src file arguments *)
 let dsts = ref []    (* destination file arguments *)
 let odst = ref ""    (* generation file argument *)
 
+let pass_flat = ref false
+let pass_totalize = ref false
+let pass_sideconditions = ref false
 
 (* Argument parsing *)
 
@@ -39,6 +42,9 @@ let argspec = Arg.align
   "-d", Arg.Set dry, " Dry run";
   "-l", Arg.Set log, " Log execution steps";
   "-w", Arg.Set warn, " Warn about unsed or multiply used splices";
+  "--flat", Arg.Set pass_flat, "Run variant flattening";
+  "--totalize", Arg.Set pass_totalize, "Run function totalization";
+  "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
   "--latex", Arg.Unit (fun () -> config := Backend_latex.Config.latex),
     " Use Latex settings (default)";
   "--sphinx", Arg.Unit (fun () -> config := Backend_latex.Config.sphinx),
@@ -66,6 +72,37 @@ let () =
     );
     log "IL Validation...";
     Il.Validation.valid il;
+
+    let _il = if !pass_flat then begin
+      log "Variant flattening...";
+      let il = Middlend.Sideconditions.transform il in
+      log "Printing...";
+      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      log "IL Validation...";
+      Il.Validation.valid il;
+      il
+    end else il in
+
+    let il = if !pass_totalize then begin
+      log "Function totalization...";
+      let il = Middlend.Totalize.transform il in
+      log "Printing...";
+      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      log "IL Validation...";
+      Il.Validation.valid il;
+      il
+    end else il in
+
+    let _il = if !pass_sideconditions then begin
+      log "Side condition inference";
+      let il = Middlend.Sideconditions.transform il in
+      log "Printing...";
+      Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      log "IL Validation...";
+      Il.Validation.valid il;
+      il
+    end else il in
+
     log "Latex Generation...";
     if !odst = "" && !dsts = [] then
       print_endline (Backend_latex.Gen.gen_string el);
