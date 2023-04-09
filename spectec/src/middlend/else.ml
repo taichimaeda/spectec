@@ -39,7 +39,9 @@ let unarize rule = match rule.it with
         | _ -> error exp.at "expected manifest pair"
       in
       { rule with it = RuleD (rid, binds, unary_mixfix, lhs, prems) }
-  
+
+let not_apart lhs rule = match rule.it with
+    | RuleD (_, _, _, lhs2, _) -> not (Il.Apart.apart lhs lhs2)
 
 let rec go at id mixop typ typ1 hints prev_rules : rule list -> def list = function
   | [] -> [ RelD (id, mixop, typ, List.rev prev_rules, hints) $ at ]
@@ -52,7 +54,7 @@ let rec go at id mixop typ typ1 hints prev_rules : rule list -> def list = funct
           | _ -> error exp.at "expected manifest pair"
         in
         let aux_name = id.it ^ "_before_" ^ rid.it $ rid.at in
-        let applicable_prev_rules = List.map unarize prev_rules in
+        let applicable_prev_rules = List.map unarize (List.filter (not_apart lhs) prev_rules) in
         [ RelD (aux_name, unary_mixfix, typ1, List.rev applicable_prev_rules, hints) $ r.at ] @
         let prems' = List.map (replace_else aux_name lhs) prems in
         let rule' = { r with it = RuleD (rid, binds, rmixop, exp, prems') } in

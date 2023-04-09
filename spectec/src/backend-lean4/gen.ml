@@ -35,7 +35,7 @@ let render_id (id : id) = make_id id.it
 
 let render_fun_id (id : id) = "«$" ^ id.it ^ "»"
 
-let render_type_name (id : id) = String.capitalize_ascii (make_id id.it)
+let render_type_name (id : id) = make_id (String.capitalize_ascii id.it)
 
 let render_rule_name _qual _ty_id (rule_id : id) (i : int) :  string =
   if rule_id.it = ""
