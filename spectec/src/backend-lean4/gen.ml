@@ -9,7 +9,6 @@ let ($$) s1 s2 = parens (s1 ^ " " ^ s2)
 let render_tuple how tys = parens (String.concat ", " (List.map how tys))
 let render_list how tys = brackets (String.concat ", " (List.map how tys))
 
-let render_type_name (id : id) = String.capitalize_ascii id.it
 
 (* let render_rec_con (id : id) = "Mk" ^ render_type_name id *)
 
@@ -31,9 +30,12 @@ let make_id s = match s with
     | c -> c
     ) s
 
+
 let render_id (id : id) = make_id id.it
 
 let render_fun_id (id : id) = "«$" ^ id.it ^ "»"
+
+let render_type_name (id : id) = String.capitalize_ascii (make_id id.it)
 
 let render_rule_name _qual _ty_id (rule_id : id) (i : int) :  string =
   if rule_id.it = ""
@@ -184,7 +186,8 @@ let rec render_prem (prem : premise) =
         "(Forall₂ (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v1 ^ ".toList " ^ render_id v2 ^ ".toList)"
       | _,_ -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iterexp ^ " -/"
     end
-    | ElsePr -> "True /- Else? -/"
+    | ElsePr -> "False /- Else? -/"
+    | NegPr prem -> "Not" $$ render_prem prem
 
 let rec render_def (d : def) =
   match d.it with

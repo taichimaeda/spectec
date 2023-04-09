@@ -33,6 +33,7 @@ let print_all_il = ref false
 let pass_flat = ref false
 let pass_totalize = ref false
 let pass_sideconditions = ref false
+let pass_else_elim = ref false
 
 (* Argument parsing *)
 
@@ -60,6 +61,7 @@ let argspec = Arg.align
   "--flat", Arg.Set pass_flat, "Run variant flattening";
   "--totalize", Arg.Set pass_totalize, "Run function totalization";
   "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
+  "--else-elimination", Arg.Set pass_else_elim, "Eliminate otherwise/else";
 
   "--check-only", Arg.Unit (fun () -> target := None), " No output (just checking)";
   "--latex", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex), " Use Latex settings (default)";
@@ -106,9 +108,18 @@ let () =
       il
     end else il in
 
-    let il = if !pass_sideconditions || !target = Haskell || !target = Lean4 then begin
+    let il = if !pass_sideconditions || !target = Lean4 then begin
       log "Side condition inference";
       let il = Middlend.Sideconditions.transform il in
+      if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+      log "IL Validation...";
+      Il.Validation.valid il;
+      il
+    end else il in
+
+    let il = if !pass_else_elim || !target = Lean4 then begin
+      log "Else elimination";
+      let il = Middlend.Else.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;

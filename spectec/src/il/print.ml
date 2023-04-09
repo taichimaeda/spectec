@@ -199,6 +199,7 @@ let rec string_of_prem prem =
     string_of_prem prem' ^ string_of_iterexp iter
   | IterPr (prem', iter) ->
     "(" ^ string_of_prem prem' ^ ")" ^ string_of_iterexp iter
+  | NegPr prem' -> "unless " ^ string_of_prem prem'
 
 
 let string_of_rule rule =
@@ -241,4 +242,4 @@ let rec string_of_def d =
 (* Scripts *)
 
 let string_of_script ds =
-  concat "" (List.map (suffix string_of_def "\n") ds)
+  (concat "" (List.map (suffix string_of_def "\n") ds))
