@@ -3,7 +3,7 @@
 NAME = watsup
 EXT = $(NAME)
 
-TESTDIRS = test-frontend test-latex
+TESTDIRS = test-frontend test-middlend test-latex
 
 
 DUNE_OPTS ?=
@@ -14,7 +14,7 @@ DUNE_OPTS ?=
 
 default: exe exe-haskell
 all: exe latex test
-ci: all test-frontend test-latex
+ci: all test-frontend test-middlend test-latex
 
 
 # Executable
