@@ -20,6 +20,12 @@ def Option.toList : Option α → List α
   | none => List.nil
   | some x => [x]
 set_option linter.unusedVariables false
+def List.upd : List α → Nat → α → List α
+| [], _, _ => []
+| x::xs, 0, y => y :: xs
+| x::xs, n+1, y => x :: xs.upd n y
+
+
 @[reducible] def N := Nat
 
 @[reducible] def Name := String
@@ -1076,19 +1082,19 @@ def «$local» : (State × Localidx) -> Val
   | ((s, f), x) => (f.LOCAL.get! x)
 
 def «$with_local» : (State × Localidx × Val) -> State
-  | ((s, f), x, v) => (s, default /- f[LOCAL[x] = v] -/)
+  | ((s, f), x, v) => (s, {f with LOCAL := (f.LOCAL.upd x v) })
 
 def «$with_global» : (State × Globalidx × Val) -> State
-  | ((s, f), x, v) => (default /- s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -/, f)
+  | ((s, f), x, v) => ({s with GLOBAL := (s.GLOBAL.upd (f.MODULE.GLOBAL.get! x) v) }, f)
 
 def «$with_table» : (State × Tableidx × N × Ref) -> State
-  | ((s, f), x, i, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -/, f)
+  | ((s, f), x, i, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) ((s.TABLE.get! (f.MODULE.TABLE.get! x)).upd i r)) }, f)
 
 def «$with_tableext» : (State × Tableidx × (List Ref)) -> State
   | ((s, f), x, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -/, f)
 
 def «$with_elem» : (State × Elemidx × (List Ref)) -> State
-  | ((s, f), x, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -/, f)
+  | ((s, f), x, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) r) }, f)
 
 inductive E where
  | _HOLE : E
@@ -1312,7 +1318,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     ((«$table» (z, x)).length == n) -> 
     (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
   | table_grow_fail (n : N) (x : Idx) (z : State) : 
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, (- 1)))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, (0 - 1)))]))
   | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > («$table» (z, x)).length) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))

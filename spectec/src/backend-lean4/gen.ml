@@ -132,11 +132,13 @@ let rec render_exp (exp : exp) = match exp.it with
     render_field_name a ^ " := " ^ render_exp e
     ) fields))
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
-  | DotE (_ty, e, a) -> render_exp e ^ "." ^ render_field_name a
-  | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
+  | DotE (_ty, e, a) -> render_dot (render_exp e) a
+  | UpdE (exp1, path, exp2) ->
+    render_path path (render_exp exp1) (fun _ -> render_exp exp2)
+  | IdxE (e1, e2) -> render_idx (render_exp e1) e2
   | LenE e -> render_exp e ^ ".length"
   | CallE (id, e) -> render_fun_id id $$ render_exp e
-  | UnE (MinusOp, e1)      -> parens ("- " ^ render_exp e1)
+  | UnE (MinusOp, e1)      -> parens ("0 - " ^ render_exp e1)
   | BinE (AddOp, e1, e2)   -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | BinE (SubOp, e1, e2)   -> parens (render_exp e1 ^ " - " ^ render_exp e2)
   | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)
@@ -153,6 +155,23 @@ let rec render_exp (exp : exp) = match exp.it with
   | CatE (e1, e2)          -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
   | CompE (e1, e2)         -> parens (render_exp e2 ^ " ++ "  ^ render_exp e1) (* NB! flip order *)
   | _ -> "default /- " ^ Il.Print.string_of_exp exp ^ " -/"
+
+and render_dot e_string a = e_string ^ "." ^ render_field_name a
+
+and render_idx e_string exp = parens (e_string ^ ".get! " ^ render_exp exp)
+
+(* The path is inside out, in a way, hence the continuation passing style here *)
+and render_path (path : path) old_val (k : string -> string) : string = match path.it with
+  | RootP -> k old_val
+  | DotP (path', a) ->
+    render_path path' old_val (fun old_val ->
+     "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
+    )
+  | IdxP (path', idx_exp) ->
+    render_path path' old_val (fun old_val ->
+      "(" ^ old_val ^ ".upd " ^ render_exp idx_exp ^ " " ^ k (render_idx old_val idx_exp) ^ ")"
+    )
+
 
 and render_case a e typ =
     if e.it = TupE []
@@ -285,7 +304,11 @@ let gen_string (el : script) =
   "  | none => List.nil\n" ^
   "  | some x => [x]\n" ^
   "set_option linter.unusedVariables false\n" ^
-
+  "def List.upd : List α → Nat → α → List α\n" ^
+  "| [], _, _ => []\n" ^
+  "| x::xs, 0, y => y :: xs\n" ^
+  "| x::xs, n+1, y => x :: xs.upd n y\n" ^
+  "\n\n" ^
   render_script el
 
 
