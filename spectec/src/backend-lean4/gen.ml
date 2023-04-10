@@ -135,6 +135,8 @@ let rec render_exp (exp : exp) = match exp.it with
   | DotE (_ty, e, a) -> render_dot (render_exp e) a
   | UpdE (exp1, path, exp2) ->
     render_path path (render_exp exp1) (fun _ -> render_exp exp2)
+  | ExtE (exp1, path, exp2) ->
+    render_path path (render_exp exp1) (fun old_val -> "List.append" $$$ [old_val;  render_exp exp2])
   | IdxE (e1, e2) -> render_idx (render_exp e1) e2
   | LenE e -> render_exp e ^ ".length"
   | CallE (id, e) -> render_fun_id id $$ render_exp e

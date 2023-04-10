@@ -1091,7 +1091,7 @@ def «$with_table» : (State × Tableidx × N × Ref) -> State
   | ((s, f), x, i, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) ((s.TABLE.get! (f.MODULE.TABLE.get! x)).upd i r)) }, f)
 
 def «$with_tableext» : (State × Tableidx × (List Ref)) -> State
-  | ((s, f), x, r) => (default /- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -/, f)
+  | ((s, f), x, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) (List.append (s.TABLE.get! (f.MODULE.TABLE.get! x)) r)) }, f)
 
 def «$with_elem» : (State × Elemidx × (List Ref)) -> State
   | ((s, f), x, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) r) }, f)
