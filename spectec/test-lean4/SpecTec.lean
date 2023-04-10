@@ -482,16 +482,16 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.SELECT none), ([t, t, Valtype.I32], [t])))
   | block (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
     (Blocktype_ok (C, bt, (t_1, t_2))) -> 
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr, (t_1, t_2))) -> 
+    (InstrSeq_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none} ++ C), instr, (t_1, t_2))) -> 
     (Instr_ok (C, (Instr.BLOCK (bt, instr)), (t_1, t_2)))
   | loop (C : Context) (bt : Blocktype) (instr : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
     (Blocktype_ok (C, bt, (t_1, t_2))) -> 
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none}), instr, (t_1, t_2))) -> 
+    (InstrSeq_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_1 ↦ [t_1]) t_1), RETURN := none} ++ C), instr, (t_1, t_2))) -> 
     (Instr_ok (C, (Instr.LOOP (bt, instr)), (t_1, t_2)))
   | if (C : Context) (bt : Blocktype) (instr_1 : (List Instr)) (instr_2 : (List Instr)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
     (Blocktype_ok (C, bt, (t_1, t_2))) -> 
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr_1, (t_1, t_2))) -> 
-    (InstrSeq_ok ((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none}), instr_2, (t_1, t_2))) -> 
+    (InstrSeq_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none} ++ C), instr_1, (t_1, t_2))) -> 
+    (InstrSeq_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := (List.map (λ t_2 ↦ [t_2]) t_2), RETURN := none} ++ C), instr_2, (t_1, t_2))) -> 
     (Instr_ok (C, (Instr.IF (bt, instr_1, instr_2)), (t_1, t_2)))
   | br (C : Context) (l : Labelidx) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
     (l < C.LABEL.length) -> 
@@ -704,7 +704,7 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (ft : Functype) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
     (ft == (t_1, t_2)) -> 
     (Functype_ok ft) -> 
-    (Expr_ok ((((C ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := (t_1 ++ t), LABEL := [], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none}) ++ {FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [], RETURN := (some t_2)}), expr, t_2)) -> 
+    (Expr_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [], RETURN := (some t_2)} ++ ({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none} ++ ({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := (t_1 ++ t), LABEL := [], RETURN := none} ++ C))), expr, t_2)) -> 
     (Func_ok (C, (ft, t, expr), ft))
 
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where

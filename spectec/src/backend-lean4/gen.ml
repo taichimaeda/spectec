@@ -150,7 +150,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | CmpE (GeOp, e1, e2)    -> parens (render_exp e1 ^ " >= "  ^ render_exp e2)
   | CmpE (GtOp, e1, e2)    -> parens (render_exp e1 ^ " > "   ^ render_exp e2)
   | CatE (e1, e2)          -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
-  | CompE (e1, e2)         -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
+  | CompE (e1, e2)         -> parens (render_exp e2 ^ " ++ "  ^ render_exp e1) (* NB! flip order *)
   | _ -> "default /- " ^ Il.Print.string_of_exp exp ^ " -/"
 
 and render_case a e typ =
