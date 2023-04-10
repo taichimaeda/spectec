@@ -136,6 +136,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | IdxE (e1, e2) -> parens (render_exp e1 ^ ".get! " ^ render_exp e2)
   | LenE e -> render_exp e ^ ".length"
   | CallE (id, e) -> render_fun_id id $$ render_exp e
+  | UnE (MinusOp, e1)      -> parens ("- " ^ render_exp e1)
   | BinE (AddOp, e1, e2)   -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | BinE (SubOp, e1, e2)   -> parens (render_exp e1 ^ " - " ^ render_exp e2)
   | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)

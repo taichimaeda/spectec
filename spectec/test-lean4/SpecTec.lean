@@ -1312,7 +1312,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     ((«$table» (z, x)).length == n) -> 
     (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
   | table_grow_fail (n : N) (x : Idx) (z : State) : 
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, default /- - 1 -/))]))
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, (- 1)))]))
   | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > («$table» (z, x)).length) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
