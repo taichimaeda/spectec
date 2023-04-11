@@ -72,12 +72,12 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64

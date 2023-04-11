@@ -71,12 +71,12 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64
@@ -1579,7 +1579,7 @@ def valtype_vectype : vectype -> valtype
   ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
@@ -1598,7 +1598,7 @@ def valtype_in : in -> valtype
   ;;
   def valtype_in(I64_in) = I64_valtype
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64
@@ -3237,7 +3237,7 @@ def valtype_vectype : vectype -> valtype
   ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
@@ -3256,7 +3256,7 @@ def valtype_in : in -> valtype
   ;;
   def valtype_in(I64_in) = I64_valtype
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64
@@ -4899,7 +4899,7 @@ def valtype_vectype : vectype -> valtype
   ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
@@ -4918,7 +4918,7 @@ def valtype_in : in -> valtype
   ;;
   def valtype_in(I64_in) = I64_valtype
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64
@@ -6635,7 +6635,7 @@ def valtype_vectype : vectype -> valtype
   ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
-;; 1-syntax.watsup:48.1-48.71
+;; 1-syntax.watsup:48.1-48.39
 syntax in =
   | I32
   | I64
@@ -6654,7 +6654,7 @@ def valtype_in : in -> valtype
   ;;
   def valtype_in(I64_in) = I64_valtype
 
-;; 1-syntax.watsup:49.1-49.71
+;; 1-syntax.watsup:49.1-49.39
 syntax fn =
   | F32
   | F64
