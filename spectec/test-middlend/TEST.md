@@ -1556,27 +1556,17 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;;
 def valtype_numtype : numtype -> valtype
-  ;;
   def valtype_numtype(I32_numtype) = I32_valtype
-  ;;
   def valtype_numtype(I64_numtype) = I64_valtype
-  ;;
   def valtype_numtype(F32_numtype) = F32_valtype
-  ;;
   def valtype_numtype(F64_numtype) = F64_valtype
 
-;;
 def valtype_reftype : reftype -> valtype
-  ;;
   def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
-  ;;
   def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
 
-;;
 def valtype_vectype : vectype -> valtype
-  ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
 ;; 1-syntax.watsup:48.1-48.39
@@ -1584,18 +1574,12 @@ syntax in =
   | I32
   | I64
 
-;;
 def numtype_in : in -> numtype
-  ;;
   def numtype_in(I32_in) = I32_numtype
-  ;;
   def numtype_in(I64_in) = I64_numtype
 
-;;
 def valtype_in : in -> valtype
-  ;;
   def valtype_in(I32_in) = I32_valtype
-  ;;
   def valtype_in(I64_in) = I64_valtype
 
 ;; 1-syntax.watsup:49.1-49.39
@@ -1603,18 +1587,12 @@ syntax fn =
   | F32
   | F64
 
-;;
 def numtype_fn : fn -> numtype
-  ;;
   def numtype_fn(F32_fn) = F32_numtype
-  ;;
   def numtype_fn(F64_fn) = F64_numtype
 
-;;
 def valtype_fn : fn -> valtype
-  ;;
   def valtype_fn(F32_fn) = F32_valtype
-  ;;
   def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
@@ -2630,126 +2608,67 @@ syntax admininstr =
   | TRAP
 }
 
-;;
 def admininstr_globalinst : globalinst -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_globalinst(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_globalinst(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_instr : instr -> admininstr
-  ;;
   def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
-  ;;
   def admininstr_instr(NOP_instr) = NOP_admininstr
-  ;;
   def admininstr_instr(DROP_instr) = DROP_admininstr
-  ;;
   def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
-  ;;
   def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
-  ;;
   def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
-  ;;
   def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
-  ;;
   def admininstr_instr(RETURN_instr) = RETURN_admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
-  ;;
   def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
-  ;;
   def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
-  ;;
   def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
-  ;;
   def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
-  ;;
   def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
-  ;;
   def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
-  ;;
   def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
-  ;;
   def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
-  ;;
   def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
-  ;;
   def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
-  ;;
   def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
-  ;;
   def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
-  ;;
   def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
-  ;;
   def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
-  ;;
   def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
-  ;;
   def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
-  ;;
   def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
-  ;;
   def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
-  ;;
   def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
 
-;;
 def admininstr_ref : ref -> admininstr
-  ;;
   def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_val : val -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
 ;; 4-runtime.watsup:84.1-84.62
@@ -3214,27 +3133,17 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;;
 def valtype_numtype : numtype -> valtype
-  ;;
   def valtype_numtype(I32_numtype) = I32_valtype
-  ;;
   def valtype_numtype(I64_numtype) = I64_valtype
-  ;;
   def valtype_numtype(F32_numtype) = F32_valtype
-  ;;
   def valtype_numtype(F64_numtype) = F64_valtype
 
-;;
 def valtype_reftype : reftype -> valtype
-  ;;
   def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
-  ;;
   def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
 
-;;
 def valtype_vectype : vectype -> valtype
-  ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
 ;; 1-syntax.watsup:48.1-48.39
@@ -3242,18 +3151,12 @@ syntax in =
   | I32
   | I64
 
-;;
 def numtype_in : in -> numtype
-  ;;
   def numtype_in(I32_in) = I32_numtype
-  ;;
   def numtype_in(I64_in) = I64_numtype
 
-;;
 def valtype_in : in -> valtype
-  ;;
   def valtype_in(I32_in) = I32_valtype
-  ;;
   def valtype_in(I64_in) = I64_valtype
 
 ;; 1-syntax.watsup:49.1-49.39
@@ -3261,18 +3164,12 @@ syntax fn =
   | F32
   | F64
 
-;;
 def numtype_fn : fn -> numtype
-  ;;
   def numtype_fn(F32_fn) = F32_numtype
-  ;;
   def numtype_fn(F64_fn) = F64_numtype
 
-;;
 def valtype_fn : fn -> valtype
-  ;;
   def valtype_fn(F32_fn) = F32_valtype
-  ;;
   def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
@@ -3527,7 +3424,6 @@ def size : valtype -> nat?
   def size(F64_valtype) = ?(64)
   ;; 2-aux.watsup:10.1-10.22
   def size(V128_valtype) = ?(128)
-  ;;
   def {x : valtype} size(x) = ?()
 
 ;; 2-aux.watsup:15.1-15.40
@@ -4199,7 +4095,6 @@ def default_ : valtype -> val?
   def default_(FUNCREF_valtype) = ?(REF.NULL_val(FUNCREF_reftype))
   ;; 4-runtime.watsup:50.1-50.48
   def default_(EXTERNREF_valtype) = ?(REF.NULL_val(EXTERNREF_reftype))
-  ;;
   def {x : valtype} default_(x) = ?()
 
 ;; 4-runtime.watsup:61.1-61.71
@@ -4292,126 +4187,67 @@ syntax admininstr =
   | TRAP
 }
 
-;;
 def admininstr_globalinst : globalinst -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_globalinst(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_globalinst(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_instr : instr -> admininstr
-  ;;
   def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
-  ;;
   def admininstr_instr(NOP_instr) = NOP_admininstr
-  ;;
   def admininstr_instr(DROP_instr) = DROP_admininstr
-  ;;
   def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
-  ;;
   def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
-  ;;
   def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
-  ;;
   def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
-  ;;
   def admininstr_instr(RETURN_instr) = RETURN_admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
-  ;;
   def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
-  ;;
   def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
-  ;;
   def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
-  ;;
   def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
-  ;;
   def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
-  ;;
   def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
-  ;;
   def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
-  ;;
   def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
-  ;;
   def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
-  ;;
   def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
-  ;;
   def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
-  ;;
   def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
-  ;;
   def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
-  ;;
   def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
-  ;;
   def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
-  ;;
   def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
-  ;;
   def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
-  ;;
   def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
-  ;;
   def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
 
-;;
 def admininstr_ref : ref -> admininstr
-  ;;
   def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_val : val -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
 ;; 4-runtime.watsup:84.1-84.62
@@ -4876,27 +4712,17 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;;
 def valtype_numtype : numtype -> valtype
-  ;;
   def valtype_numtype(I32_numtype) = I32_valtype
-  ;;
   def valtype_numtype(I64_numtype) = I64_valtype
-  ;;
   def valtype_numtype(F32_numtype) = F32_valtype
-  ;;
   def valtype_numtype(F64_numtype) = F64_valtype
 
-;;
 def valtype_reftype : reftype -> valtype
-  ;;
   def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
-  ;;
   def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
 
-;;
 def valtype_vectype : vectype -> valtype
-  ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
 ;; 1-syntax.watsup:48.1-48.39
@@ -4904,18 +4730,12 @@ syntax in =
   | I32
   | I64
 
-;;
 def numtype_in : in -> numtype
-  ;;
   def numtype_in(I32_in) = I32_numtype
-  ;;
   def numtype_in(I64_in) = I64_numtype
 
-;;
 def valtype_in : in -> valtype
-  ;;
   def valtype_in(I32_in) = I32_valtype
-  ;;
   def valtype_in(I64_in) = I64_valtype
 
 ;; 1-syntax.watsup:49.1-49.39
@@ -4923,18 +4743,12 @@ syntax fn =
   | F32
   | F64
 
-;;
 def numtype_fn : fn -> numtype
-  ;;
   def numtype_fn(F32_fn) = F32_numtype
-  ;;
   def numtype_fn(F64_fn) = F64_numtype
 
-;;
 def valtype_fn : fn -> valtype
-  ;;
   def valtype_fn(F32_fn) = F32_valtype
-  ;;
   def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
@@ -5189,7 +5003,6 @@ def size : valtype -> nat?
   def size(F64_valtype) = ?(64)
   ;; 2-aux.watsup:10.1-10.22
   def size(V128_valtype) = ?(128)
-  ;;
   def {x : valtype} size(x) = ?()
 
 ;; 2-aux.watsup:15.1-15.40
@@ -5915,7 +5728,6 @@ def default_ : valtype -> val?
   def default_(FUNCREF_valtype) = ?(REF.NULL_val(FUNCREF_reftype))
   ;; 4-runtime.watsup:50.1-50.48
   def default_(EXTERNREF_valtype) = ?(REF.NULL_val(EXTERNREF_reftype))
-  ;;
   def {x : valtype} default_(x) = ?()
 
 ;; 4-runtime.watsup:61.1-61.71
@@ -6008,126 +5820,67 @@ syntax admininstr =
   | TRAP
 }
 
-;;
 def admininstr_globalinst : globalinst -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_globalinst(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_globalinst(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_instr : instr -> admininstr
-  ;;
   def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
-  ;;
   def admininstr_instr(NOP_instr) = NOP_admininstr
-  ;;
   def admininstr_instr(DROP_instr) = DROP_admininstr
-  ;;
   def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
-  ;;
   def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
-  ;;
   def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
-  ;;
   def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
-  ;;
   def admininstr_instr(RETURN_instr) = RETURN_admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
-  ;;
   def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
-  ;;
   def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
-  ;;
   def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
-  ;;
   def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
-  ;;
   def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
-  ;;
   def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
-  ;;
   def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
-  ;;
   def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
-  ;;
   def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
-  ;;
   def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
-  ;;
   def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
-  ;;
   def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
-  ;;
   def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
-  ;;
   def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
-  ;;
   def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
-  ;;
   def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
-  ;;
   def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
-  ;;
   def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
-  ;;
   def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
 
-;;
 def admininstr_ref : ref -> admininstr
-  ;;
   def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_val : val -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
 ;; 4-runtime.watsup:84.1-84.62
@@ -6612,27 +6365,17 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;;
 def valtype_numtype : numtype -> valtype
-  ;;
   def valtype_numtype(I32_numtype) = I32_valtype
-  ;;
   def valtype_numtype(I64_numtype) = I64_valtype
-  ;;
   def valtype_numtype(F32_numtype) = F32_valtype
-  ;;
   def valtype_numtype(F64_numtype) = F64_valtype
 
-;;
 def valtype_reftype : reftype -> valtype
-  ;;
   def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
-  ;;
   def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
 
-;;
 def valtype_vectype : vectype -> valtype
-  ;;
   def valtype_vectype(V128_vectype) = V128_valtype
 
 ;; 1-syntax.watsup:48.1-48.39
@@ -6640,18 +6383,12 @@ syntax in =
   | I32
   | I64
 
-;;
 def numtype_in : in -> numtype
-  ;;
   def numtype_in(I32_in) = I32_numtype
-  ;;
   def numtype_in(I64_in) = I64_numtype
 
-;;
 def valtype_in : in -> valtype
-  ;;
   def valtype_in(I32_in) = I32_valtype
-  ;;
   def valtype_in(I64_in) = I64_valtype
 
 ;; 1-syntax.watsup:49.1-49.39
@@ -6659,18 +6396,12 @@ syntax fn =
   | F32
   | F64
 
-;;
 def numtype_fn : fn -> numtype
-  ;;
   def numtype_fn(F32_fn) = F32_numtype
-  ;;
   def numtype_fn(F64_fn) = F64_numtype
 
-;;
 def valtype_fn : fn -> valtype
-  ;;
   def valtype_fn(F32_fn) = F32_valtype
-  ;;
   def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
@@ -6925,7 +6656,6 @@ def size : valtype -> nat?
   def size(F64_valtype) = ?(64)
   ;; 2-aux.watsup:10.1-10.22
   def size(V128_valtype) = ?(128)
-  ;;
   def {x : valtype} size(x) = ?()
 
 ;; 2-aux.watsup:15.1-15.40
@@ -7651,7 +7381,6 @@ def default_ : valtype -> val?
   def default_(FUNCREF_valtype) = ?(REF.NULL_val(FUNCREF_reftype))
   ;; 4-runtime.watsup:50.1-50.48
   def default_(EXTERNREF_valtype) = ?(REF.NULL_val(EXTERNREF_reftype))
-  ;;
   def {x : valtype} default_(x) = ?()
 
 ;; 4-runtime.watsup:61.1-61.71
@@ -7744,126 +7473,67 @@ syntax admininstr =
   | TRAP
 }
 
-;;
 def admininstr_globalinst : globalinst -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_globalinst(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_globalinst(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_instr : instr -> admininstr
-  ;;
   def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
-  ;;
   def admininstr_instr(NOP_instr) = NOP_admininstr
-  ;;
   def admininstr_instr(DROP_instr) = DROP_admininstr
-  ;;
   def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
-  ;;
   def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
-  ;;
   def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
-  ;;
   def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
-  ;;
   def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
-  ;;
   def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
-  ;;
   def admininstr_instr(RETURN_instr) = RETURN_admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
-  ;;
   def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
-  ;;
   def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
-  ;;
   def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
-  ;;
   def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
-  ;;
   def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
-  ;;
   def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
-  ;;
   def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
-  ;;
   def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
-  ;;
   def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
-  ;;
   def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
-  ;;
   def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
-  ;;
   def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
-  ;;
   def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
-  ;;
   def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
-  ;;
   def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
-  ;;
   def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
-  ;;
   def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
-  ;;
   def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
-  ;;
   def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
-  ;;
   def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
-  ;;
   def {x : (numtype, (n, sx)?, nat, nat)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
-  ;;
   def {x : (numtype, n?, nat, nat)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
 
-;;
 def admininstr_ref : ref -> admininstr
-  ;;
   def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
 
-;;
 def admininstr_val : val -> admininstr
-  ;;
   def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
-  ;;
   def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
   def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
   def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
 ;; 4-runtime.watsup:84.1-84.62
