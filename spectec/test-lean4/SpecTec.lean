@@ -85,12 +85,12 @@ def «$valtype_numtype» : Numtype -> Valtype
   | Numtype.F32 => Valtype.F32
   | Numtype.F64 => Valtype.F64
 
-def «$valtype_vectype» : Vectype -> Valtype
-  | Vectype.V128 => Valtype.V128
-
 def «$valtype_reftype» : Reftype -> Valtype
   | Reftype.FUNCREF => Valtype.FUNCREF
   | Reftype.EXTERNREF => Valtype.EXTERNREF
+
+def «$valtype_vectype» : Vectype -> Valtype
+  | Vectype.V128 => Valtype.V128
 
 inductive In where
  | I32 : In
@@ -846,14 +846,6 @@ inductive Val where
  | REF_HOST_ADDR : Hostaddr -> Val
   deriving Inhabited, BEq
 
-def «$val_num» : Num -> Val
-  | (Num.CONST x) => (Val.CONST x)
-
-def «$val_ref» : Ref -> Val
-  | (Ref.REF_NULL x) => (Val.REF_NULL x)
-  | (Ref.REF_FUNC_ADDR x) => (Val.REF_FUNC_ADDR x)
-  | (Ref.REF_HOST_ADDR x) => (Val.REF_HOST_ADDR x)
-
 inductive Result where
  | _VALS : (List Val) -> Result
  | TRAP : Result
@@ -992,6 +984,12 @@ inductive Admininstr where
  | TRAP : Admininstr
   deriving Inhabited, BEq
 
+def «$admininstr_globalinst» : Globalinst -> Admininstr
+  | (Val.CONST x) => (Admininstr.CONST x)
+  | (Val.REF_NULL x) => (Admininstr.REF_NULL x)
+  | (Val.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
+  | (Val.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
+
 def «$admininstr_instr» : Instr -> Admininstr
   | Instr.UNREACHABLE => Admininstr.UNREACHABLE
   | Instr.NOP => Admininstr.NOP
@@ -1038,19 +1036,16 @@ def «$admininstr_instr» : Instr -> Admininstr
   | (Instr.LOAD x) => (Admininstr.LOAD x)
   | (Instr.STORE x) => (Admininstr.STORE x)
 
-def «$admininstr_val» : Val -> Admininstr
-  | (Val.CONST x) => (Admininstr.CONST x)
-  | (Val.REF_NULL x) => (Admininstr.REF_NULL x)
-  | (Val.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
-  | (Val.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
-
 def «$admininstr_ref» : Ref -> Admininstr
   | (Ref.REF_NULL x) => (Admininstr.REF_NULL x)
   | (Ref.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
   | (Ref.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
 
-def «$admininstr_globalinst» : Globalinst -> Admininstr
-  | x => («$admininstr_val» x)
+def «$admininstr_val» : Val -> Admininstr
+  | (Val.CONST x) => (Admininstr.CONST x)
+  | (Val.REF_NULL x) => (Admininstr.REF_NULL x)
+  | (Val.REF_FUNC_ADDR x) => (Admininstr.REF_FUNC_ADDR x)
+  | (Val.REF_HOST_ADDR x) => (Admininstr.REF_HOST_ADDR x)
 
 @[reducible] def Config := /- mixop: `%;%*` -/ (State × (List Admininstr))
 

@@ -58,12 +58,12 @@ valtype_numtype Numtype_I64 = Valtype_I64
 valtype_numtype Numtype_F32 = Valtype_F32
 valtype_numtype Numtype_F64 = Valtype_F64
 
-valtype_vectype :: Vectype -> Valtype
-valtype_vectype Vectype_V128 = Valtype_V128
-
 valtype_reftype :: Reftype -> Valtype
 valtype_reftype Reftype_FUNCREF = Valtype_FUNCREF
 valtype_reftype Reftype_EXTERNREF = Valtype_EXTERNREF
+
+valtype_vectype :: Vectype -> Valtype
+valtype_vectype Vectype_V128 = Valtype_V128
 
 data In
  = In_I32
@@ -417,14 +417,6 @@ data Val
  | Val_REF_FUNC_ADDR Funcaddr
  | Val_REF_HOST_ADDR Hostaddr
 
-val_num :: Num -> Val
-val_num (Num_CONST x) = (Val_CONST x)
-
-val_ref :: Ref -> Val
-val_ref (Ref_REF_NULL x) = (Val_REF_NULL x)
-val_ref (Ref_REF_FUNC_ADDR x) = (Val_REF_FUNC_ADDR x)
-val_ref (Ref_REF_HOST_ADDR x) = (Val_REF_HOST_ADDR x)
-
 data Result
  = Result_VALS [Val]
  | Result_TRAP
@@ -535,6 +527,12 @@ data Admininstr
  | Admininstr_FRAME_ (N, Frame, [Admininstr])
  | Admininstr_TRAP
 
+admininstr_globalinst :: Globalinst -> Admininstr
+admininstr_globalinst (Val_CONST x) = (Admininstr_CONST x)
+admininstr_globalinst (Val_REF_NULL x) = (Admininstr_REF_NULL x)
+admininstr_globalinst (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
+admininstr_globalinst (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
+
 admininstr_instr :: Instr -> Admininstr
 admininstr_instr Instr_UNREACHABLE = Admininstr_UNREACHABLE
 admininstr_instr Instr_NOP = Admininstr_NOP
@@ -581,19 +579,16 @@ admininstr_instr (Instr_DATA_DROP x) = (Admininstr_DATA_DROP x)
 admininstr_instr (Instr_LOAD x) = (Admininstr_LOAD x)
 admininstr_instr (Instr_STORE x) = (Admininstr_STORE x)
 
-admininstr_val :: Val -> Admininstr
-admininstr_val (Val_CONST x) = (Admininstr_CONST x)
-admininstr_val (Val_REF_NULL x) = (Admininstr_REF_NULL x)
-admininstr_val (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
-admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
-
 admininstr_ref :: Ref -> Admininstr
 admininstr_ref (Ref_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_ref (Ref_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_ref (Ref_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
-admininstr_globalinst :: Globalinst -> Admininstr
-admininstr_globalinst x = undefined {- $admininstr_val(x) -}
+admininstr_val :: Val -> Admininstr
+admininstr_val (Val_CONST x) = (Admininstr_CONST x)
+admininstr_val (Val_REF_NULL x) = (Admininstr_REF_NULL x)
+admininstr_val (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
+admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
 type Config = {- mixop: `%;%*` -} (State, [Admininstr])
 
