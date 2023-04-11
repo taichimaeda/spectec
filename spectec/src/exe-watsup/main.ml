@@ -12,6 +12,7 @@ let version = "0.3"
 type target =
  | None
  | Latex of Backend_latex.Config.config
+ | Prose
  | Haskell
  | Lean4
 
@@ -66,6 +67,7 @@ let argspec = Arg.align
   "--check-only", Arg.Unit (fun () -> target := None), " No output (just checking)";
   "--latex", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex), " Use Latex settings (default)";
   "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex), " Use Sphinx settings";
+  "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
   "--haskell", Arg.Unit (fun () -> target := Haskell), " Produce Haskell code";
   "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
 
@@ -141,6 +143,17 @@ let () =
         List.iter (Backend_latex.Splice.splice_file ~dry:!dry env) !dsts;
         if !warn then Backend_latex.Splice.warn env;
       );
+    | Prose ->
+      log "Prose Generation...";
+      let ir = true in
+      if ir then
+        let program = Backend_prose.Il2ir.translate il in
+        List.map Backend_prose.Print.string_of_program program
+        |> List.iter print_endline
+      else (
+        let prose = Backend_prose.Translate.translate el in
+        print_endline prose
+      )
     | Haskell ->
       if !odst = "" && !dsts = [] then
         print_endline (Backend_haskell.Gen.gen_string il);
@@ -152,13 +165,6 @@ let () =
       if !odst <> "" then
         Backend_lean4.Gen.gen_file !odst il;
     end;
-(*
-    if !odst = "" && !dsts = [] then (
-      log "Prose Generation...";
-      let prose = Backend_prose.Translate.translate el in
-      print_endline prose
-    );
-*)
     log "Complete."
   with
   | Source.Error (at, msg) ->
