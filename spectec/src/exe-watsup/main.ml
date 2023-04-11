@@ -30,7 +30,7 @@ let print_elab_il = ref false
 let print_final_il = ref false
 let print_all_il = ref false
 
-let pass_flat = ref false
+let pass_sub = ref false
 let pass_totalize = ref false
 let pass_sideconditions = ref false
 let pass_else_elim = ref false
@@ -58,7 +58,7 @@ let argspec = Arg.align
   "--print-final-il", Arg.Set print_final_il, "Print final il";
   "--print-all-il", Arg.Set print_all_il, "Print il after each step";
 
-  "--flat", Arg.Set pass_flat, "Run variant flattening";
+  "--sub", Arg.Set pass_sub, "Synthesize explicit subtype coercions";
   "--totalize", Arg.Set pass_totalize, "Run function totalization";
   "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
   "--else-elimination", Arg.Set pass_else_elim, "Eliminate otherwise/else";
@@ -90,9 +90,9 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
 
-    let il = if !pass_flat || !target = Haskell || !target = Lean4 then begin
-      log "Variant flattening...";
-      let il = Middlend.Flat.transform il in
+    let il = if !pass_sub || !target = Haskell || !target = Lean4 then begin
+      log "Subtype injection...";
+      let il = Middlend.Sub.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
       log "IL Validation...";
       Il.Validation.valid il;

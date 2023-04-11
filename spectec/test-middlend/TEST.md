@@ -1,7 +1,7 @@
 # Preview
 
 ```sh
-$ (cd ../spec && ../src/exe-watsup/main.exe *.watsup -l --print-all-il --flat --totalize --sideconditions --else-elimination --check-only)
+$ (cd ../spec && ../src/exe-watsup/main.exe *.watsup -l --print-all-il --sub --totalize --sideconditions --else-elimination --check-only)
 == Parsing...
 == Elaboration...
 
@@ -1488,7 +1488,7 @@ relation Step: `%~>%`(config, config)
     `%~>%`(`%;%*`(z, [ELEM.DROP_admininstr(x)]), `%;%*`($with_elem(z, x, []), []))
 
 == IL Validation...
-== Variant flattening...
+== Subtype injection...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
