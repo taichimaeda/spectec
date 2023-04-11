@@ -1,5 +1,7 @@
 open Il.Ast
 
+let error at msg = Util.Source.error at "Lean4 generation" msg
+
 let include_input = false
 
 let parens s = "(" ^ s ^ ")"
@@ -20,7 +22,8 @@ let is_reserved = function
  | "local"
  | "mut"
  -> true
- | _ -> false
+ | _
+ -> false
 
 let make_id s = match s with
  | s when is_reserved s -> "«" ^ s ^ "»"
@@ -75,23 +78,6 @@ let rec render_typ (ty : typ) = match ty.it with
 
 and render_tuple_typ tys = parens (String.concat " × " (List.map render_typ tys))
 
-let _unsupported_def d =
-  "/- " ^
-  Il.Print.string_of_def d ^
-  "\n-/"
-
-let rec prepend first rest = function
-  | [] -> ""
-  | (x::xs) -> first ^ x ^ prepend rest rest xs
-
-
-let render_variant_inj (id1 : id) (id2 : id) =
-  "«$" ^ id1.it ^ "_" ^ id2.it ^ "»"
-
-let render_variant_inj' (typ1 : typ) (typ2 : typ) = match typ1.it, typ2.it with
-  | VarT id1, VarT id2 -> render_variant_inj id1 id2
-  | _, _ -> "_ {- render_variant_inj': Typs not ids -}"
-
 let render_variant_case id ((a, ty, _hints) : typcase) =
   render_con_name false id a ^ " : " ^
   if ty.it = TupT []
@@ -111,7 +97,8 @@ let rec render_exp (exp : exp) = match exp.it with
   | OptE (Some e) -> "some" $$ render_exp e
   | TheE e  -> render_exp e ^ ".get!"
   | IterE (e, (iter, vs)) -> begin match e.it with
-    | VarE v when List.length vs = 1 && List.for_all (Il.Eq.eq_id v) vs  -> render_id v (* Short-ciruit this common form *)
+    (* Short-ciruit v*; use variable directly instead of calling map *)
+    | VarE v when [v.it] = List.map (fun (v : id) -> v.it) vs -> render_id v
     | _ -> match iter, vs with
       | (List|List1|ListN _), [] ->
         "[" ^ render_exp e ^ "]"
@@ -131,7 +118,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
     render_field_name a ^ " := " ^ render_exp e
     ) fields))
-  | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
+  | SubE _ -> error exp.at "SubE encountered. Did the SubE elimination pass run?"
   | DotE (_ty, e, a) -> render_dot (render_exp e) a
   | UpdE (exp1, path, exp2) ->
     render_path path (render_exp exp1) (fun _ -> render_exp exp2)
@@ -182,7 +169,6 @@ and render_case a e typ =
 
 and render_lam v e = match e.it with
   | CallE (f, {it = VarE v2;_}) when v.it = v2.it -> render_fun_id f
-  | SubE ({it = VarE v2;_}, typ1, typ2) when v.it = v2.it -> render_variant_inj' typ2 typ1
   | _ -> "(λ " ^ render_id v ^ " ↦ " ^ render_exp e ^ ")"
 
 let render_clause (_id : id) (clause : clause) = match clause.it with
@@ -213,7 +199,7 @@ let rec render_prem (prem : premise) =
         "(Forall₂ (λ " ^ render_id v1 ^ " " ^ render_id v2 ^ " ↦ " ^ render_prem prem ^ ") " ^ render_id v1 ^ ".toList " ^ render_id v2 ^ ".toList)"
       | _,_ -> render_prem prem ^ " /- " ^ Il.Print.string_of_iterexp iterexp ^ " -/"
     end
-    | ElsePr -> "False /- Else? -/"
+    | ElsePr -> error prem.at "ElsePr encountered. Did the SubE elimination pass run?"
     | NegPr prem -> "Not" $$ render_prem prem
 
 let rec render_def (d : def) =
@@ -226,21 +212,17 @@ let rec render_def (d : def) =
     | NotationT (mop, ty) ->
       "@[reducible] def " ^ render_type_name id ^ " := /- mixop: " ^ Il.Print.string_of_mixop mop ^ " -/ " ^ render_typ ty
     | VariantT cases ->
-      "inductive " ^ render_type_name id ^ " where" ^ prepend "\n | " "\n | " (
-        List.map (render_variant_case id) cases
+      "inductive " ^ render_type_name id ^ " where" ^ String.concat "" (
+        List.map (fun case -> "\n | " ^ render_variant_case id case) cases
       ) ^
       (if cases = [] then "\n  deriving BEq" else "\n  deriving Inhabited, BEq")
     | StructT fields ->
-      (*
-      "type " ^ render_type_name id ^ " = " ^ render_tuple render_typ (
-        List.map (fun (_a, ty, _hints) -> ty) fields
-      )
-      *)
       "structure " ^ render_type_name id ^ " where " ^
       String.concat "" ( List.map (fun (a, ty, _hints) ->
         "\n  " ^ render_field_name a ^ " : " ^ render_typ ty
       ) fields) ^
       "\n  deriving Inhabited, BEq\n" ^
+      (* Generate an instance so that ++ works, for CompE *)
       "instance : Append " ^ render_type_name id ^ " where\n" ^
       "  append := fun r1 r2 => {\n" ^
       String.concat "" (List.map (fun (a, _ty, _hints) ->
@@ -279,7 +261,7 @@ let rec render_def (d : def) =
   | RecD defs ->
     "mutual\n" ^
     String.concat "\n" (List.map render_def defs) ^
-    "end\n"
+    "end"
 
 let render_script (el : script) =
   String.concat "\n\n" (List.map render_def el)
@@ -289,7 +271,6 @@ let gen_string (el : script) =
   "instance : Append (Option a) where\n" ^
   "  append := fun o1 o2 => match o1 with | none => o2 | _ => o1\n\n" ^
   "\n" ^
-  (* Really not in the default distribution? *)
   "inductive Forall (R : α → Prop) : List α → Prop\n" ^
   "  | nil : Forall R []\n" ^
   "  | cons {a l₁} : R a → Forall R l₁ → Forall R (a :: l₁)\n" ^

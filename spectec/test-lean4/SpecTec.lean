@@ -677,7 +677,6 @@ inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
     (InstrSeq_ok (C, instr, (t_1, t_2))) -> 
     (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))end
 
-
 inductive Expr_ok : (Context × Expr × Resulttype) -> Prop where
   | rule_0 (C : Context) (instr : (List Instr)) (t : (List Valtype)) : 
     (InstrSeq_ok (C, instr, ([], t))) -> 
