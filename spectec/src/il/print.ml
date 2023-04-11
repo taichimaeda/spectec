@@ -200,12 +200,16 @@ let rec string_of_prem prem =
   | IterPr (prem', iter) ->
     "(" ^ string_of_prem prem' ^ ")" ^ string_of_iterexp iter
 
+let region_comment indent at =
+  if at = no_region
+  then ""
+  else indent ^ ";; " ^ string_of_region at ^ "\n"
 
 let string_of_rule rule =
   match rule.it with
   | RuleD (id, binds, mixop, e, prems) ->
     let id' = if id.it = "" then "_" else id.it in
-    "\n  ;; " ^ string_of_region rule.at ^ "\n" ^
+    "\n" ^ region_comment "  " rule.at ^
     "  rule " ^ id' ^ string_of_binds binds ^ ":\n    " ^
       string_of_exp (MixE (mixop, e) $ e.at) ^
       concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
@@ -213,13 +217,13 @@ let string_of_rule rule =
 let string_of_clause id clause =
   match clause.it with
   | DefD (binds, e1, e2, prems) ->
-    "\n  ;; " ^ string_of_region clause.at ^ "\n" ^
+    "\n" ^ region_comment "  " clause.at ^
     "  def" ^ string_of_binds binds ^ " " ^ id.it ^ string_of_exp_args e1 ^ " = " ^
       string_of_exp e2 ^
       concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
 let rec string_of_def d =
-  "\n;; " ^ string_of_region d.at ^ "\n" ^
+  "\n" ^ region_comment "" d.at ^
   match d.it with
   | SynD (id, dt, _hints) ->
     "syntax " ^ id.it ^ " = " ^ string_of_deftyp dt
