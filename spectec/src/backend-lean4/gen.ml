@@ -267,7 +267,12 @@ let render_script (el : script) =
   String.concat "\n\n" (List.map render_def el)
 
 let gen_string (el : script) =
-  "/- Lean 4 export -/\n\n" ^
+  "/- Lean 4 export -/\n" ^
+  "\n" ^
+  "/- A little prelude -/\n" ^
+  "\n" ^
+  "set_option linter.unusedVariables false\n" ^
+  "\n" ^
   "instance : Append (Option a) where\n" ^
   "  append := fun o1 o2 => match o1 with | none => o2 | _ => o1\n\n" ^
   "\n" ^
@@ -275,7 +280,6 @@ let gen_string (el : script) =
   "  | nil : Forall R []\n" ^
   "  | cons {a l₁} : R a → Forall R l₁ → Forall R (a :: l₁)\n" ^
   "attribute [simp] Forall.nil\n" ^
-  "variable {r : α → β → Prop} {p : γ → δ → Prop}\n" ^
   "inductive Forall₂ (R : α → β → Prop) : List α → List β → Prop\n" ^
   "  | nil : Forall₂ R [] []\n" ^
   "  | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)\n" ^
@@ -286,12 +290,13 @@ let gen_string (el : script) =
   "def Option.toList : Option α → List α\n" ^
   "  | none => List.nil\n" ^
   "  | some x => [x]\n" ^
-  "set_option linter.unusedVariables false\n" ^
   "def List.upd : List α → Nat → α → List α\n" ^
   "| [], _, _ => []\n" ^
   "| x::xs, 0, y => y :: xs\n" ^
   "| x::xs, n+1, y => x :: xs.upd n y\n" ^
   "\n\n" ^
+  "/- Now, the generated code -/\n" ^
+  "\n" ^
   render_script el
 
 
