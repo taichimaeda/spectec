@@ -1,5 +1,9 @@
 /- Lean 4 export -/
 
+/- A little prelude -/
+
+set_option linter.unusedVariables false
+
 instance : Append (Option a) where
   append := fun o1 o2 => match o1 with | none => o2 | _ => o1
 
@@ -8,7 +12,6 @@ inductive Forall (R : α → Prop) : List α → Prop
   | nil : Forall R []
   | cons {a l₁} : R a → Forall R l₁ → Forall R (a :: l₁)
 attribute [simp] Forall.nil
-variable {r : α → β → Prop} {p : γ → δ → Prop}
 inductive Forall₂ (R : α → β → Prop) : List α → List β → Prop
   | nil : Forall₂ R [] []
   | cons {a b l₁ l₂} : R a b → Forall₂ R l₁ l₂ → Forall₂ R (a :: l₁) (b :: l₂)
@@ -19,12 +22,13 @@ def Option.zipWith : (α → β → γ) → Option α → Option β → Option �
 def Option.toList : Option α → List α
   | none => List.nil
   | some x => [x]
-set_option linter.unusedVariables false
 def List.upd : List α → Nat → α → List α
 | [], _, _ => []
 | x::xs, 0, y => y :: xs
 | x::xs, n+1, y => x :: xs.upd n y
 
+
+/- Now, the generated code -/
 
 @[reducible] def N := Nat
 
