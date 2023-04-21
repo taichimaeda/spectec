@@ -539,21 +539,21 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (Instr_ok (C, (Instr.TESTOP (nt, testop)), ([(«$valtype_numtype» nt)], [Valtype.I32])))
   | relop (C : Context) (nt : Numtype) (relop : Relop_numtype) : 
     (Instr_ok (C, (Instr.RELOP (nt, relop)), ([(«$valtype_numtype» nt), («$valtype_numtype» nt)], [Valtype.I32])))
-  | extend (C : Context) (n : N) (nt : Numtype) : 
-    ((«$size» («$valtype_numtype» nt)) != none) -> 
-    (n <= («$size» («$valtype_numtype» nt)).get!) -> 
+  | extend (C : Context) (n : N) (nt : Numtype) (o0 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (n <= o0) -> 
     (Instr_ok (C, (Instr.EXTEND (nt, n)), ([(«$valtype_numtype» nt)], [(«$valtype_numtype» nt)])))
-  | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) : 
-    ((«$size» («$valtype_numtype» nt_1)) != none) -> 
-    ((«$size» («$valtype_numtype» nt_2)) != none) -> 
+  | reinterpret (C : Context) (nt_1 : Numtype) (nt_2 : Numtype) (o0 : Nat) (o1 : Nat) : 
+    ((«$size» («$valtype_numtype» nt_1)) == (some o0)) -> 
+    ((«$size» («$valtype_numtype» nt_2)) == (some o1)) -> 
     (nt_1 != nt_2) -> 
-    ((«$size» («$valtype_numtype» nt_1)).get! == («$size» («$valtype_numtype» nt_2)).get!) -> 
+    (o0 == o1) -> 
     (Instr_ok (C, (Instr.CVTOP (nt_1, Cvtop.REINTERPRET, nt_2, none)), ([(«$valtype_numtype» nt_2)], [(«$valtype_numtype» nt_1)])))
-  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) : 
-    ((«$size» («$valtype_in» in_1)) != none) -> 
-    ((«$size» («$valtype_in» in_2)) != none) -> 
+  | convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (Option Sx)) (o0 : Nat) (o1 : Nat) : 
+    ((«$size» («$valtype_in» in_1)) == (some o0)) -> 
+    ((«$size» («$valtype_in» in_2)) == (some o1)) -> 
     (in_1 != in_2) -> 
-    ((sx == none) = ((«$size» («$valtype_in» in_1)).get! > («$size» («$valtype_in» in_2)).get!)) -> 
+    ((sx == none) = (o0 > o1)) -> 
     (Instr_ok (C, (Instr.CVTOP ((«$numtype_in» in_1), Cvtop.CONVERT, («$numtype_in» in_2), sx)), ([(«$valtype_in» in_2)], [(«$valtype_in» in_1)])))
   | convert_f (C : Context) (fn_1 : Fn) (fn_2 : Fn) : 
     (fn_1 != fn_2) -> 
@@ -648,21 +648,25 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (x < C.DATA.length) -> 
     ((C.DATA.get! x) == ()) -> 
     (Instr_ok (C, (Instr.DATA_DROP x), ([], [])))
-  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) : 
+  | load (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (Option Sx)) (o0 : Nat) (o1 : (Option Nat)) : 
+    ((n == none) = (o1 == none)) -> 
     (0 < C.MEM.length) -> 
-    ((«$size» («$valtype_numtype» nt)) != none) -> 
     ((n == none) = (sx == none)) -> 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (Forall₂ (λ n o1 ↦ ((«$size» («$valtype_numtype» nt)) == (some o1))) n.toList o1.toList) -> 
     ((C.MEM.get! 0) == mt) -> 
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) -> 
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) -> 
+    ((((Nat.pow 2) n_A)) <= (((Nat.div o0) 8))) -> 
+    (Forall₂ (λ n o1 ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div o1) 8))))) n.toList o1.toList) -> 
     ((n == none) || (nt == («$numtype_in» «in»))) -> 
     (Instr_ok (C, (Instr.LOAD (nt, (Option.zipWith (λ n sx ↦ (n, sx)) n sx), n_A, n_O)), ([Valtype.I32], [(«$valtype_numtype» nt)])))
-  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) : 
+  | store (C : Context) («in» : In) (mt : Memtype) (n : (Option N)) (n_A : N) (n_O : N) (nt : Numtype) (o0 : Nat) (o1 : (Option Nat)) : 
+    ((n == none) = (o1 == none)) -> 
     (0 < C.MEM.length) -> 
-    ((«$size» («$valtype_numtype» nt)) != none) -> 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (Forall₂ (λ n o1 ↦ ((«$size» («$valtype_numtype» nt)) == (some o1))) n.toList o1.toList) -> 
     ((C.MEM.get! 0) == mt) -> 
-    ((((Nat.pow 2) n_A)) <= (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))) -> 
-    (Forall (λ n ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div («$size» («$valtype_numtype» nt)).get!) 8))))) n.toList) -> 
+    ((((Nat.pow 2) n_A)) <= (((Nat.div o0) 8))) -> 
+    (Forall₂ (λ n o1 ↦ (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) && ((((Nat.div n) 8)) < (((Nat.div o1) 8))))) n.toList o1.toList) -> 
     ((n == none) || (nt == («$numtype_in» «in»))) -> 
     (Instr_ok (C, (Instr.STORE (nt, n, n_A, n_O)), ([Valtype.I32, («$valtype_numtype» nt)], [])))
 inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
@@ -1193,9 +1197,9 @@ inductive Step_pure : ((List Admininstr) × (List Admininstr)) -> Prop where
   | relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) : 
     (c == («$relop» (relop, nt, c_1, c_2))) -> 
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CONST (nt, c_2)), (Admininstr.RELOP (nt, relop))], [(Admininstr.CONST (Numtype.I32, c))]))
-  | extend (c : C_numtype) (n : N) (nt : Numtype) : 
-    ((«$size» («$valtype_numtype» nt)) != none) -> 
-    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, («$size» («$valtype_numtype» nt)).get!, Sx.S, c))))]))
+  | extend (c : C_numtype) (n : N) (nt : Numtype) (o0 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (Step_pure ([(Admininstr.CONST (nt, c)), (Admininstr.EXTEND (nt, n))], [(Admininstr.CONST (nt, («$ext» (n, o0, Sx.S, c))))]))
   | cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (Option Sx)) : 
     ((«$cvtop» (nt_1, cvtop, nt_2, sx, c_1)) == [c]) -> 
     (Step_pure ([(Admininstr.CONST (nt, c_1)), (Admininstr.CVTOP (nt_1, cvtop, nt_2, sx))], [(Admininstr.CONST (nt, c))]))
@@ -1287,14 +1291,15 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | call_indirect_trap (ft : Functype) (i : Nat) (x : Idx) (z : State) : 
     (Not (Step_read_before_call_indirect_trap (z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]))) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CALL_INDIRECT (x, ft))]), [Admininstr.TRAP]))
-  | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) : 
+  | call_addr (a : Addr) (f : Frame) (instr : (List Instr)) (k : Nat) (m : Moduleinst) (n : N) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) (val : (List Val)) (z : State) (o0 : (List Val)) : 
+    (t.length == o0.length) -> 
     (a < («$funcinst» z).length) -> 
     (t_1.length == k) -> 
     (t_2.length == n) -> 
     (val.length == k) -> 
-    (Forall (λ t ↦ ((«$default_» t) != none)) t) -> 
+    (Forall₂ (λ t o0 ↦ ((«$default_» t) == (some o0))) t o0) -> 
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) -> 
-    (f == {LOCAL := (val ++ (List.map (λ t ↦ («$default_» t).get!) t)), MODULE := m}) -> 
+    (f == {LOCAL := (val ++ (List.zipWith (λ t o0 ↦ o0) t o0)), MODULE := m}) -> 
     (Step_read ((z, ((List.map «$admininstr_val» val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map «$admininstr_instr» instr)))]))]))
   | ref_func (x : Idx) (z : State) : 
     (x < («$funcaddr» z).length) -> 
