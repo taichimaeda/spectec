@@ -1301,7 +1301,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (val.length == k) -> 
     (Forall₂ (λ t o0 ↦ ((«$default_» t) == (some o0))) t o0) -> 
     (((«$funcinst» z).get! a) == (m, ((t_1, t_2), t, instr))) -> 
-    (f == {LOCAL := (val ++ (List.zipWith (λ t o0 ↦ o0) t o0)), MODULE := m}) -> 
+    (f == {LOCAL := (val ++ o0), MODULE := m}) -> 
     (Step_read ((z, ((List.map «$admininstr_val» val) ++ [(Admininstr.CALL_ADDR a)])), [(Admininstr.FRAME_ (n, f, [(Admininstr.LABEL_ (n, [], (List.map «$admininstr_instr» instr)))]))]))
   | ref_func (x : Idx) (z : State) : 
     (x < («$funcaddr» z).length) -> 

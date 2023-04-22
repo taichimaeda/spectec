@@ -6120,7 +6120,7 @@ relation Step_read: `%~>%*`(config, admininstr*)
     `%~>%*`(`%;%*`(z, $admininstr_val(val)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], $admininstr_instr(instr)*{instr})])])
     -- (if ($default_(t) = ?(o0)))*{t o0}
     -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
-    -- if (f = {LOCAL val^k{val} :: o0*{t o0}, MODULE m})
+    -- if (f = {LOCAL val^k{val} :: o0*{o0}, MODULE m})
 
   ;; 6-reduction.watsup:150.1-151.53
   rule ref.func {x : idx, z : state}:
@@ -7779,7 +7779,7 @@ relation Step_read: `%~>%*`(config, admininstr*)
     -- if (|val^k{val}| = k)
     -- (if ($default_(t) = ?(o0)))*{t o0}
     -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
-    -- if (f = {LOCAL val^k{val} :: o0*{t o0}, MODULE m})
+    -- if (f = {LOCAL val^k{val} :: o0*{o0}, MODULE m})
 
   ;; 6-reduction.watsup:150.1-151.53
   rule ref.func {x : idx, z : state}:
@@ -9536,7 +9536,7 @@ relation Step_read: `%~>%*`(config, admininstr*)
     -- if (|val^k{val}| = k)
     -- (if ($default_(t) = ?(o0)))*{t o0}
     -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
-    -- if (f = {LOCAL val^k{val} :: o0*{t o0}, MODULE m})
+    -- if (f = {LOCAL val^k{val} :: o0*{o0}, MODULE m})
 
   ;; 6-reduction.watsup:150.1-151.53
   rule ref.func {x : idx, z : state}:
