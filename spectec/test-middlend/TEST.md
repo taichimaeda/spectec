@@ -5417,7 +5417,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [$valtype_numtype(nt)]))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
@@ -5427,7 +5427,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype $valtype_numtype(nt)], []))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
@@ -7039,11 +7039,11 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:350.1-355.32
   rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [$valtype_numtype(nt)]))
-    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if (0 < |C.MEM_context|)
+    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
@@ -7052,10 +7052,10 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:357.1-362.32
   rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype $valtype_numtype(nt)], []))
-    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if (0 < |C.MEM_context|)
+    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
@@ -8700,11 +8700,11 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:350.1-355.32
   rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [$valtype_numtype(nt)]))
-    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if (0 < |C.MEM_context|)
+    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
@@ -8713,10 +8713,10 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
   ;; 3-typing.watsup:357.1-362.32
   rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype $valtype_numtype(nt)], []))
-    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if (0 < |C.MEM_context|)
+    -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{n o1}
+    -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
