@@ -263,6 +263,8 @@ let rec render_def (d : def) =
     String.concat "\n" (List.map render_def defs) ^
     "end"
 
+  | HintD _ -> ""
+
 let render_script (el : script) =
   String.concat "\n\n" (List.map render_def el)
 

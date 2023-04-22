@@ -138,6 +138,7 @@ and def' =
   | RelD of id * mixop * typ * rule list * hint list  (* relation *)
   | DecD of id * typ * typ * clause list * hint list  (* definition *)
   | RecD of def list                                  (* recursive *)
+  | HintD of hintdef
 
 and rule = rule' phrase
 and rule' =
@@ -154,6 +155,12 @@ and premise' =
   | ElsePr                                            (* otherwise *)
   | IterPr of premise * iterexp                       (* iteration *)
   | NegPr of premise                                  (* negation of a premise *)
+
+and hintdef = hintdef' phrase
+and hintdef' =
+  | SynH of id * hint list
+  | RelH of id * hint list
+  | DecH of id * hint list
 
 and hint = {hintid : id; hintexp : string list}       (* hint *)
 
