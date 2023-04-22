@@ -11,5 +11,6 @@
     (re_export backend_prose)
     (re_export backend_haskell)
     (re_export backend_lean4)
+    (re_export backend_coq)
   )
 )

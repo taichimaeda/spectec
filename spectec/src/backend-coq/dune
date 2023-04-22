@@ -1,0 +1,5 @@
+(library
+  (name backend_coq)
+  (libraries util el frontend str)
+  (modules gen)
+)

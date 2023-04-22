@@ -15,6 +15,7 @@ type target =
  | Prose
  | Haskell
  | Lean4
+ | Coq
 
  let target = ref (Latex Backend_latex.Config.latex)
 
@@ -73,6 +74,7 @@ let argspec = Arg.align
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
   "--haskell", Arg.Unit (fun () -> target := Haskell), " Produce Haskell code";
   "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
+  "--coq", Arg.Unit (fun () -> target := Coq), " Produce Coq code";
 
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
@@ -95,7 +97,8 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
 
-    let il = if !pass_sub || !target = Haskell || !target = Lean4 then begin
+(* Need a new pattern when the number of backends expands *)
+    let il = if !pass_sub || !target = Haskell || !target = Lean4 || !target = Coq then begin
       log "Subtype injection...";
       let il = Middlend.Sub.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
@@ -104,7 +107,7 @@ let () =
       il
     end else il in
 
-    let il = if !pass_totalize || !target = Lean4 then begin
+    let il = if !pass_totalize || !target = Lean4 || !target = Coq then begin
       log "Function totalization...";
       let il = Middlend.Totalize.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
@@ -113,7 +116,7 @@ let () =
       il
     end else il in
 
-    let il = if !pass_unthe || !target = Lean4 then begin
+    let il = if !pass_unthe || !target = Lean4 || !target = Coq then begin
       log "Option projection eliminiation";
       let il = Middlend.Unthe.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
@@ -122,7 +125,7 @@ let () =
       il
     end else il in
 
-    let il = if !pass_sideconditions || !target = Lean4 then begin
+    let il = if !pass_sideconditions || !target = Lean4 || !target = Coq then begin
       log "Side condition inference";
       let il = Middlend.Sideconditions.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
@@ -131,7 +134,7 @@ let () =
       il
     end else il in
 
-    let il = if !pass_else_elim || !target = Lean4 then begin
+    let il = if !pass_else_elim || !target = Lean4 || !target = Coq then begin
       log "Else elimination";
       let il = Middlend.Else.transform il in
       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
@@ -176,6 +179,12 @@ let () =
         print_endline (Backend_haskell.Gen.gen_string il);
       if !odst <> "" then
         Backend_lean4.Gen.gen_file !odst il;
+    | Coq ->
+      log "Coq Generation...";
+      if !odst = "" && !dsts = [] then
+        print_endline (Backend_coq.Gen.gen_string il);
+      if !odst <> "" then
+        Backend_coq.Gen.gen_file !odst il;
     end;
     log "Complete."
   with

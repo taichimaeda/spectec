@@ -6,4 +6,7 @@ watsup-lean4
 build
 lake-packages
 
+#coq stuff
+*.aux
+
 .direnv
