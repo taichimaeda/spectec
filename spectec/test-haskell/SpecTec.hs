@@ -7,27 +7,51 @@ type N = Natural
 
 type Name = String
 
+
+
 type Byte = Natural
+
+
 
 type U32 = Natural
 
+
+
 type Idx = Natural
+
+
 
 type Funcidx = Idx
 
+
+
 type Globalidx = Idx
+
+
 
 type Tableidx = Idx
 
+
+
 type Memidx = Idx
+
+
 
 type Elemidx = Idx
 
+
+
 type Dataidx = Idx
+
+
 
 type Labelidx = Idx
 
+
+
 type Localidx = Idx
+
+
 
 data Numtype
  = Numtype_I32
@@ -35,12 +59,18 @@ data Numtype
  | Numtype_F32
  | Numtype_F64
 
+
+
 data Vectype
  = Vectype_V128
+
+
 
 data Reftype
  = Reftype_FUNCREF
  | Reftype_EXTERNREF
+
+
 
 data Valtype
  = Valtype_I32
@@ -65,6 +95,8 @@ valtype_reftype Reftype_EXTERNREF = Valtype_EXTERNREF
 valtype_vectype :: Vectype -> Valtype
 valtype_vectype Vectype_V128 = Valtype_V128
 
+
+
 data In
  = In_I32
  | In_I64
@@ -76,6 +108,8 @@ numtype_in In_I64 = Numtype_I64
 valtype_in :: In -> Valtype
 valtype_in In_I32 = Valtype_I32
 valtype_in In_I64 = Valtype_I64
+
+
 
 data Fn
  = Fn_F32
@@ -89,23 +123,43 @@ valtype_fn :: Fn -> Valtype
 valtype_fn Fn_F32 = Valtype_F32
 valtype_fn Fn_F64 = Valtype_F64
 
+
+
 type Resulttype = [Valtype]
+
+
 
 type Limits = {- mixop: `[%..%]` -} (U32, U32)
 
+
+
 type Mutflag = {- mixop: MUT -} ()
+
+
 
 type Globaltype = {- mixop: `%?%` -} ((Maybe Mutflag), Valtype)
 
+
+
 type Functype = {- mixop: `%->%` -} (Resulttype, Resulttype)
+
+
 
 type Tabletype = {- mixop: `%%` -} (Limits, Reftype)
 
+
+
 type Memtype = {- mixop: `%I8` -} Limits
+
+
 
 type Elemtype = Reftype
 
+
+
 type Datatype = {- mixop: OK -} ()
+
+
 
 data Externtype
  = Externtype_GLOBAL Globaltype
@@ -113,9 +167,13 @@ data Externtype
  | Externtype_TABLE Tabletype
  | Externtype_MEMORY Memtype
 
+
+
 data Sx
  = Sx_U
  | Sx_S
+
+
 
 data Unop_IXX
  = Unop_IXX_CLZ
@@ -201,6 +259,8 @@ type C_vectype = Natural
 
 type Blocktype = Functype
 
+
+
 data Instr
  = Instr_UNREACHABLE
  | Instr_NOP
@@ -244,10 +304,20 @@ data Instr
  | Instr_MEMORY_COPY
  | Instr_MEMORY_INIT Dataidx
  | Instr_DATA_DROP Dataidx
- | Instr_LOAD (Numtype, (Maybe (N, Sx)), Natural, Natural)
- | Instr_STORE (Numtype, (Maybe N), Natural, Natural)
+ | Instr_LOAD (Numtype, (Maybe (N, Sx)), U32, U32)
+ | Instr_STORE (Numtype, (Maybe N), U32, U32)
+
+
+
+
+
+
+
+
 
 type Expr = [Instr]
+
+
 
 
 
@@ -260,17 +330,31 @@ data Datamode
 
 type Func = {- mixop: `FUNC%%*%` -} (Functype, [Valtype], Expr)
 
+
+
 type Global = {- mixop: GLOBAL -} (Globaltype, Expr)
+
+
 
 type Table = {- mixop: TABLE -} Tabletype
 
+
+
 type Mem = {- mixop: MEMORY -} Memtype
+
+
 
 type Elem = {- mixop: `ELEM%%*%?` -} (Reftype, [Expr], (Maybe Elemmode))
 
+
+
 type Data = {- mixop: `DATA(*)%*%?` -} ([[Byte]], (Maybe Datamode))
 
+
+
 type Start = {- mixop: START -} Funcidx
+
+
 
 data Externuse
  = Externuse_FUNC Funcidx
@@ -278,11 +362,27 @@ data Externuse
  | Externuse_TABLE Tableidx
  | Externuse_MEMORY Memidx
 
+
+
 type Export = {- mixop: EXPORT -} (Name, Externuse)
+
+
 
 type Import = {- mixop: IMPORT -} (Name, Name, Externtype)
 
+
+
 type Module = {- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], [Start], [Export])
+
+
+
+Ki :: () -> Natural
+Ki () = 1024
+
+min :: (Natural, Natural) -> Natural
+min (0, j) = 0
+min (i, 0) = 0
+min ((i + 1), (j + 1)) = undefined {- $min(i, j) -}
 
 size :: Valtype -> Natural
 size Valtype_I32 = 32
@@ -290,6 +390,8 @@ size Valtype_I64 = 64
 size Valtype_F32 = 32
 size Valtype_F64 = 64
 size Valtype_V128 = 128
+
+
 
 test_sub_ATOM_22 :: N -> Natural
 test_sub_ATOM_22 n_3_ATOM_y = 0
@@ -387,31 +489,123 @@ data Context = MkContext
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 type Addr = Natural
+
+
 
 type Funcaddr = Addr
 
+
+
 type Globaladdr = Addr
+
+
 
 type Tableaddr = Addr
 
+
+
 type Memaddr = Addr
+
+
 
 type Elemaddr = Addr
 
+
+
 type Dataaddr = Addr
+
+
 
 type Labeladdr = Addr
 
+
+
 type Hostaddr = Addr
+
+
 
 data Num
  = Num_CONST (Numtype, C_numtype)
+
+
 
 data Ref
  = Ref_REF_NULL Reftype
  | Ref_REF_FUNC_ADDR Funcaddr
  | Ref_REF_HOST_ADDR Hostaddr
+
+
 
 data Val
  = Val_CONST (Numtype, C_numtype)
@@ -419,15 +613,21 @@ data Val
  | Val_REF_FUNC_ADDR Funcaddr
  | Val_REF_HOST_ADDR Hostaddr
 
+
+
 data Result
  = Result_VALS [Val]
  | Result_TRAP
+
+
 
 data Externval
  = Externval_FUNC Funcaddr
  | Externval_GLOBAL Globaladdr
  | Externval_TABLE Tableaddr
  | Externval_MEM Memaddr
+
+
 
 default_ :: Valtype -> Val
 default_ Valtype_I32 = (Val_CONST (Numtype_I32, 0))
@@ -436,6 +636,8 @@ default_ Valtype_F32 = (Val_CONST (Numtype_F32, 0))
 default_ Valtype_F64 = (Val_CONST (Numtype_F64, 0))
 default_ Valtype_FUNCREF = (Val_REF_NULL Reftype_FUNCREF)
 default_ Valtype_EXTERNREF = (Val_REF_NULL Reftype_EXTERNREF)
+
+
 
 type Exportinst = {- mixop: EXPORT -} (Name, Externval)
 
@@ -451,15 +653,29 @@ data Moduleinst = MkModuleinst
 
 type Funcinst = {- mixop: `%;%` -} (Moduleinst, Func)
 
+
+
 type Globalinst = Val
+
+
 
 type Tableinst = [Ref]
 
+
+
 type Meminst = [Byte]
+
+
 
 type Eleminst = [Ref]
 
+
+
 type Datainst = [Byte]
+
+
+
+
 
 data Store = MkStore
  { fUNC :: [Funcinst]
@@ -470,12 +686,20 @@ data Store = MkStore
  , dATA :: [Datainst]
  }
 
+
+
+
+
 data Frame = MkFrame
  { lOCAL :: [Val]
  , mODULE :: Moduleinst
  }
 
+
+
 type State = {- mixop: `%;%` -} (Store, Frame)
+
+
 
 data Admininstr
  = Admininstr_UNREACHABLE
@@ -520,8 +744,8 @@ data Admininstr
  | Admininstr_MEMORY_COPY
  | Admininstr_MEMORY_INIT Dataidx
  | Admininstr_DATA_DROP Dataidx
- | Admininstr_LOAD (Numtype, (Maybe (N, Sx)), Natural, Natural)
- | Admininstr_STORE (Numtype, (Maybe N), Natural, Natural)
+ | Admininstr_LOAD (Numtype, (Maybe (N, Sx)), U32, U32)
+ | Admininstr_STORE (Numtype, (Maybe N), U32, U32)
  | Admininstr_REF_FUNC_ADDR Funcaddr
  | Admininstr_REF_HOST_ADDR Hostaddr
  | Admininstr_CALL_ADDR Funcaddr
@@ -594,70 +818,143 @@ admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
 type Config = {- mixop: `%;%*` -} (State, [Admininstr])
 
+
+
 funcaddr :: State -> [Funcaddr]
 funcaddr (s, f) = f.mODULE.fUNC
+
+
 
 funcinst :: State -> [Funcinst]
 funcinst (s, f) = s.fUNC
 
+
+
 func :: (State, Funcidx) -> Funcinst
 func ((s, f), x) = (s.fUNC !! (fromIntegral (f.mODULE.fUNC !! (fromIntegral x))))
+
+
 
 global :: (State, Globalidx) -> Globalinst
 global ((s, f), x) = (s.gLOBAL !! (fromIntegral (f.mODULE.gLOBAL !! (fromIntegral x))))
 
+
+
 table :: (State, Tableidx) -> Tableinst
 table ((s, f), x) = (s.tABLE !! (fromIntegral (f.mODULE.tABLE !! (fromIntegral x))))
+
+
 
 mem :: (State, Memidx) -> Meminst
 mem ((s, f), x) = (s.mEM !! (fromIntegral (f.mODULE.mEM !! (fromIntegral x))))
 
+
+
 elem :: (State, Tableidx) -> Eleminst
 elem ((s, f), x) = (s.eLEM !! (fromIntegral (f.mODULE.eLEM !! (fromIntegral x))))
+
+
 
 data_ :: (State, Dataidx) -> Datainst
 data_ ((s, f), x) = (s.dATA !! (fromIntegral (f.mODULE.dATA !! (fromIntegral x))))
 
+
+
 local :: (State, Localidx) -> Val
 local ((s, f), x) = (f.lOCAL !! (fromIntegral x))
+
+
 
 with_local :: (State, Localidx, Val) -> State
 with_local ((s, f), x, v) = (s, undefined {- f[LOCAL[x] = v] -})
 
+
+
 with_global :: (State, Globalidx, Val) -> State
 with_global ((s, f), x, v) = (undefined {- s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -}, f)
 
-with_table :: (State, Tableidx, N, Ref) -> State
+
+
+with_table :: (State, Tableidx, Natural, Ref) -> State
 with_table ((s, f), x, i, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -}, f)
+
+
 
 with_tableext :: (State, Tableidx, [Ref]) -> State
 with_tableext ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -}, f)
 
+
+
+with_mem :: (State, Tableidx, Natural, Natural, [Byte]) -> State
+with_mem ((s, f), x, i, j, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}] -}, f)
+
+
+
+with_memext :: (State, Tableidx, [Byte]) -> State
+with_memext ((s, f), x, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}] -}, f)
+
+
+
 with_elem :: (State, Elemidx, [Ref]) -> State
 with_elem ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -}, f)
+
+
+
+with_data :: (State, Dataidx, [Byte]) -> State
+with_data ((s, f), x, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}] -}, f)
+
+
+
+
 
 data E
  = E_HOLE
  | E_SEQ ([Val], E, [Instr])
  | E_LABEL_ (N, [Instr], E)
 
+
+
 unop :: (Unop_numtype, Numtype, C_numtype) -> [C_numtype]
 unop = error "function without clauses"
+
+
 
 binop :: (Binop_numtype, Numtype, C_numtype, C_numtype) -> [C_numtype]
 binop = error "function without clauses"
 
+
+
 testop :: (Testop_numtype, Numtype, C_numtype) -> C_numtype
 testop = error "function without clauses"
+
+
 
 relop :: (Relop_numtype, Numtype, C_numtype, C_numtype) -> C_numtype
 relop = error "function without clauses"
 
+
+
 ext :: (Natural, Natural, Sx, C_numtype) -> C_numtype
 ext = error "function without clauses"
 
+
+
 cvtop :: (Numtype, Cvtop, Numtype, (Maybe Sx), C_numtype) -> [C_numtype]
 cvtop = error "function without clauses"
+
+
+
+wrap_ :: ((Natural, Natural), C_numtype) -> Natural
+wrap_ = error "function without clauses"
+
+bytes_ :: (Natural, C_numtype) -> [Byte]
+bytes_ = error "function without clauses"
+
+
+
+
+
+
 
 
 

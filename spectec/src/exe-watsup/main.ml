@@ -63,6 +63,9 @@ let argspec = Arg.align
   "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
     " Generate Latex for Sphinx";
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
+  "--haskell", Arg.Unit (fun () -> target := Haskell), " Produce Haskell code";
+  "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
+
 
   "--print-il", Arg.Set print_elab_il, "Print il (after elaboration)";
   "--print-final-il", Arg.Set print_final_il, "Print final il";
