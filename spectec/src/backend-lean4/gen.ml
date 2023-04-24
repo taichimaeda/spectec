@@ -236,12 +236,7 @@ let rec render_def (d : def) =
     show_input d ^
     "def " ^ render_fun_id id ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
     begin if clauses = [] then " := default" else
-    String.concat "" (List.map (render_clause id) clauses) ^
-    ""
-    (* TODO
-    (if (List.exists (fun h -> h.hintid.it = "partial") hints)
-    then "\n  | _ => default" else "") (* Could use no_error_if_unused% as well *)
-    *)
+    String.concat "" (List.map (render_clause id) clauses)
     end
 
   | RelD (id, _mixop, typ, rules) ->
