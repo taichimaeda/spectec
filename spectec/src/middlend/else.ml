@@ -43,8 +43,8 @@ let unarize rule = match rule.it with
 let not_apart lhs rule = match rule.it with
     | RuleD (_, _, _, lhs2, _) -> not (Il.Apart.apart lhs lhs2)
 
-let rec go at id mixop typ typ1 hints prev_rules : rule list -> def list = function
-  | [] -> [ RelD (id, mixop, typ, List.rev prev_rules, hints) $ at ]
+let rec go at id mixop typ typ1 prev_rules : rule list -> def list = function
+  | [] -> [ RelD (id, mixop, typ, List.rev prev_rules) $ at ]
   | r :: rules -> match r.it with
     | RuleD (rid, binds, rmixop, exp, prems) ->
       if List.exists is_else prems
@@ -58,18 +58,18 @@ let rec go at id mixop typ typ1 hints prev_rules : rule list -> def list = funct
               |> List.map unarize
               |> List.filter (not_apart lhs)
               |> List.rev in
-        [ RelD (aux_name, unary_mixfix, typ1, List.rev applicable_prev_rules, hints) $ r.at ] @
+        [ RelD (aux_name, unary_mixfix, typ1, List.rev applicable_prev_rules) $ r.at ] @
         let prems' = List.map (replace_else aux_name lhs) prems in
         let rule' = { r with it = RuleD (rid, binds, rmixop, exp, prems') } in
-        go at id mixop typ typ1 hints (rule' :: prev_rules) rules
+        go at id mixop typ typ1 (rule' :: prev_rules) rules
       else
-        go at id mixop typ typ1 hints (r :: prev_rules) rules
+        go at id mixop typ typ1 (r :: prev_rules) rules
 
 let rec t_def (def : def) : def list = match def.it with
   | RecD defs -> [ { def with it = RecD (List.concat_map t_def defs) } ]
-  | RelD (id, mixop, typ, rules, hints) -> begin match typ.it with
+  | RelD (id, mixop, typ, rules) -> begin match typ.it with
     | TupT [typ1; _typ2] ->
-      go def.at id mixop typ typ1 hints [] rules
+      go def.at id mixop typ typ1 [] rules
     | _ -> [def]
     end
   | _ -> [ def ]

@@ -109,7 +109,7 @@ let rec render_def (d : def) =
     else ""
   end ^
   match d.it with
-  | SynD (id, deftyp, _hints) ->
+  | SynD (id, deftyp) ->
     begin match deftyp.it with
     | AliasT ty ->
       "type " ^ render_type_name id ^ " = " ^ render_typ ty
@@ -129,7 +129,7 @@ let rec render_def (d : def) =
         List.map (fun (a, ty, _hints) -> render_field_name a ^ " :: " ^ render_typ ty) fields
       ) ^ "\n }"
     end
-  | DecD (id, typ1, typ2, clauses, _hints) ->
+  | DecD (id, typ1, typ2, clauses) ->
     make_id id.it ^ " :: " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^ "\n" ^
     if clauses = []
     then make_id id.it ^ " = error \"function without clauses\""
