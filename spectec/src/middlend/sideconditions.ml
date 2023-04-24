@@ -16,7 +16,7 @@ open Il.Ast
 
 (* Errors *)
 
-let _error at msg = Source.error at "sideconditions" msg
+let error at msg = Source.error at "sideconditions" msg
 
 let is_null e = CmpE (EqOp, e, OptE None $ no_region) $ no_region
 let iffE e1 e2 = IfPr (BinE (EquivOp, e1, e2) $ no_region) $ no_region
@@ -94,6 +94,11 @@ let rec t_prem prem = match prem.it with
   | IterPr (prem, iterexp)
   -> iter_side_conditions iterexp @
      List.map (fun pr -> IterPr (pr, iterexp) $ no_region) (t_prem prem) @ t_iterexp iterexp
+  | NegPr prem'
+  -> match t_prem prem' with
+    | [] -> []
+    | _ -> error prem.at "side condition in negated premise"
+
 
 let t_prems = List.concat_map t_prem
 
