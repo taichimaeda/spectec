@@ -102,7 +102,8 @@ let () =
     let il = if not (!pass_sub || !target = Haskell || !target = Lean4) then il else
      ( log "Subtype injection...";
        let il = Middlend.Sub.transform il in
-       if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+       if !print_all_il then
+         Printf.printf "%s\n%!" (Il.Print.string_of_script il);
        log "IL Validation...";
        Il.Validation.valid il;
        il
@@ -111,7 +112,8 @@ let () =
     let il = if not (!pass_totalize || !target = Lean4) then il else
       ( log "Function totalization...";
         let il = Middlend.Totalize.transform il in
-        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
         il
@@ -121,7 +123,8 @@ let () =
     let il = if not (!pass_unthe || !target = Lean4) then il else
       ( log "Option projection eliminiation";
         let il = Middlend.Unthe.transform il in
-        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
         il
@@ -130,7 +133,8 @@ let () =
     let il = if not (!pass_sideconditions || !target = Lean4) then il else
       ( log "Side condition inference";
         let il = Middlend.Sideconditions.transform il in
-        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
         il
@@ -140,7 +144,8 @@ let () =
     let il = if not (!pass_else_elim || !target = Lean4) then il else
       ( log "Else elimination";
         let il = Middlend.Else.transform il in
-        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
         il
