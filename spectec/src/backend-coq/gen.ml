@@ -2,13 +2,18 @@ open Il.Ast
 
 let error at msg = Util.Source.error at "Coq generation" msg
 
+(* an ugly solution given the constraints *)
+let record_helper = Hashtbl.create 16
+
 let include_input = false
 
 let parens s = "(" ^ s ^ ")"
 let brackets s = "[" ^ s ^ "]"
 let ($$$) s1 ss = parens (String.concat " " (s1 :: ss))
 let ($$) s1 s2 = s1 $$$ [s2]
-let render_tuple how tys = parens (String.concat ", " (List.map how tys))
+let render_tuple how tys = 
+  if tys = [] then "tt"
+  else parens (String.concat ", " (List.map how tys))
 let render_list how tys = 
   if tys = [] then "nil"
   else brackets (String.concat "; " (List.map how tys))
@@ -18,6 +23,11 @@ let render_list how tys =
 let is_reserved = function
  | "in"
  | "()"
+ | "tt"
+ | "Import"
+ | "Export"
+ | "List"
+ | "String"
  -> true
  | _
  -> false
@@ -38,13 +48,13 @@ let render_fun_id (id : id) = "fun_" ^ id.it
 let render_type_name (id : id) = make_id (String.capitalize_ascii id.it)
 
 let render_rule_name ty_id (rule_id : id) (i : int) :  string =
-  render_type_name ty_id ^ "_" ^
+  render_type_name ty_id ^ "__" ^
   if rule_id.it = ""
   then "rule_" ^ string_of_int i
   else make_id rule_id.it
 
 let render_con_name id : atom -> string = function
-  | Atom s -> render_type_name id ^ "_" ^ make_id s
+  | Atom s -> render_type_name id ^ "__" ^ make_id s
   | a -> "(* render_con_name: TODO *) " ^ Il.Print.string_of_atom a
 
 let render_con_name' (typ : typ) a = match typ.it with
@@ -52,7 +62,12 @@ let render_con_name' (typ : typ) a = match typ.it with
   | _ -> "_ (* render_con_name': Typ not id *)"
 
 
-let render_field_name : atom -> string = function
+let render_field_name oty_id (at: atom) : string = 
+  begin match oty_id with
+  | Some ty_id -> render_type_name ty_id ^ "__"
+  | None -> ""
+  end ^
+  match at with
   | Atom s -> make_id s
   | a -> "(* render_field_name: TODO *) " ^ Il.Print.string_of_atom a
 
@@ -72,20 +87,18 @@ let rec render_typ (ty : typ) = match ty.it with
   | TupT tys -> render_tuple_typ tys
   | IterT (ty, it) -> wrap_type_iter (render_typ ty) it
 
-and render_tuple_typ tys = parens (String.concat " * " (List.map render_typ tys))
+and render_tuple_typ tys = parens (String.concat " * " (List.map render_typ tys)) ^ "%type"
 
 let render_variant_case id ((a, ty, _hints) : typcase) =
   render_con_name id a ^ " : " ^
   if ty.it = TupT []
   then render_type_name id
   else render_typ ty ^ " -> " ^ render_type_name id
-
-(* We need a lift if the LHS is a list lookup, since total lookups are scuffed in Coq *)
-let lookup_option_lift (e1: exp) : string = 
-  match e1.it with
-  | IdxE _ -> "Some "
-  | _ -> ""
   
+let infer_record_name ats = 
+  let fields_name = String.concat "" (List.map (fun a -> render_field_name None a) ats) in
+  Hashtbl.find_opt record_helper fields_name
+
 let rec render_exp (exp : exp) = match exp.it with
   | VarE v -> render_id v
   | BoolE true -> "True"
@@ -97,8 +110,8 @@ let rec render_exp (exp : exp) = match exp.it with
   | ListE es -> render_list render_exp es
   | OptE None -> "None"
   | OptE (Some e) -> "Some" $$ render_exp e
-  (* Seems to be looking up from a list*)
-  | TheE e  -> "(* TODO: what is TheE? *) List.nth_error " ^ render_exp e
+  (* Seems to be looking up from a list *)
+  | TheE e  -> "(* TODO: what is TheE? *) " ^ render_exp e
   | IterE (e, (iter, vs)) -> begin match e.it with
     (* Short-ciruit v*; use variable directly instead of calling map *)
     | VarE v when [v.it] = List.map (fun (v : id) -> v.it) vs -> render_id v
@@ -118,15 +131,18 @@ let rec render_exp (exp : exp) = match exp.it with
       render_exp e ^ " (* " ^ Il.Print.string_of_iterexp (iter, vs) ^ " *)"
   end
   | CaseE (a, e, typ) -> render_case a e typ
-  | StrE fields -> "{|" ^ ( String.concat "; " (List.map (fun (a, e) ->
-    render_field_name a ^ " := " ^ render_exp e
-    ) fields)) ^ "|}"
+  | StrE fields -> 
+    let o_record_name = infer_record_name (List.map fst fields) in
+    (if o_record_name = None then "(* FIXME: cannot infer the type of record *) " else "") ^
+    "{| " ^ ( String.concat "; " (List.map (fun (a, e) ->
+    render_field_name o_record_name a ^ " := " ^ render_exp e
+    ) fields)) ^ " |}"
   | SubE _ -> error exp.at "SubE encountered. Did the SubE elimination pass run?"
-  | DotE (_ty, e, a) -> render_dot (render_exp e) a
+  | DotE (ty, e, a) -> render_get_field (render_exp e) (render_typ ty) a
   | UpdE (exp1, path, exp2) ->
     render_path path (render_exp exp1) (fun _ -> render_exp exp2)
   | ExtE (exp1, path, exp2) ->
-    render_path path (render_exp exp1) (fun old_val -> "List.append" $$$ [old_val;  render_exp exp2])
+    render_path path (render_exp exp1) (fun old_val -> "List.app" $$$ [old_val;  render_exp exp2])
   | IdxE (e1, e2) -> render_idx (render_exp e1) e2
   | LenE e -> "List.length (" ^ render_exp e ^ ")"
   | CallE (id, e) -> render_fun_id id $$ render_exp e
@@ -138,7 +154,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | BinE (AndOp, e1, e2)   -> parens (render_exp e1 ^ " /\\ "  ^ render_exp e2)
   | BinE (EquivOp, e1, e2) -> parens (render_exp e1 ^ " = "   ^ render_exp e2)
   | BinE (OrOp, e1, e2)    -> parens (render_exp e1 ^ " \\/ "  ^ render_exp e2)
-  | CmpE (EqOp, e1, e2)    -> parens (render_exp e1 ^ " = "  ^ lookup_option_lift e1 ^ render_exp e2)
+  | CmpE (EqOp, e1, e2)    -> parens (render_exp e1 ^ " = "  ^ render_exp e2)
   | CmpE (NeOp, e1, e2)    -> parens (render_exp e1 ^ " <> "  ^ render_exp e2)
   | CmpE (LeOp, e1, e2)    -> parens (render_exp e1 ^ " <= "  ^ render_exp e2)
   | CmpE (LtOp, e1, e2)    -> parens (render_exp e1 ^ " < "   ^ render_exp e2)
@@ -148,16 +164,19 @@ let rec render_exp (exp : exp) = match exp.it with
   | CompE (e1, e2)         -> parens (render_exp e2 ^ " ++ "  ^ render_exp e1) (* NB! flip order *)
   | _ -> "unit (* " ^ Il.Print.string_of_exp exp ^ " *)"
 
-and render_dot e_string a = e_string ^ "." ^ parens (render_field_name a)
+and render_dot e_string a = e_string ^ "." ^ parens (render_field_name None a)
 
-and render_idx e_string exp = parens ("List.nth_error " ^ e_string ^ " " ^ render_exp exp)
+and render_get_field e_string record_string a = e_string ^ "." ^ parens (record_string ^ "__" ^ render_field_name None a)
+
+and render_idx e_string exp = parens ("lookup_total " ^ e_string ^ " " ^ render_exp exp)
 
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
   | DotP (path', a) ->
     render_path path' old_val (fun old_val ->
-     "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
+      old_val ^ "\n  (* TODO: Coq need a bit more help for dealing with records \n" ^
+     "  {" ^ old_val ^ " with " ^  render_field_name None a ^ " := " ^ k (render_dot old_val a) ^ " }" ^ "*)"
     )
   | IdxP (path', idx_exp) ->
     render_path path' old_val (fun old_val ->
@@ -197,13 +216,26 @@ let rec render_prem (prem : premise) =
       | (List|List1|ListN _), [v1; v2] ->
         "(List.Forall2 (fun " ^ render_id v1 ^ " " ^ render_id v2 ^ " => " ^ render_prem prem ^ ") " ^ render_id v1 ^ " " ^ render_id v2 ^ ")"
       | Opt, [v] ->
-        "(List.Forall (fun " ^ render_id v ^ " => " ^ render_prem prem ^ ") " ^ render_id v ^ ".toList)"
+        "(List.Forall (fun " ^ render_id v ^ " => " ^ render_prem prem ^ ") (option_to_list " ^ render_id v ^ "))"
       | Opt, [v1; v2] ->
-        "(List.Forall2 (fun " ^ render_id v1 ^ " " ^ render_id v2 ^ " => " ^ render_prem prem ^ ") " ^ render_id v1 ^ ".toList " ^ render_id v2 ^ ".toList)"
+        "(List.Forall2 (fun " ^ render_id v1 ^ " " ^ render_id v2 ^ " => " ^ render_prem prem ^ ") (option_to_list " ^ render_id v1 ^ ") (option_to_list " ^ render_id v2 ^ "))"
       | _,_ -> render_prem prem ^ "(* " ^ Il.Print.string_of_iterexp iterexp ^ " *)"
     end
     | ElsePr -> error prem.at "ElsePr encountered. Did the SubE elimination pass run?"
-    | NegPr prem -> "Not" $$ render_prem prem
+    | NegPr prem -> "~ " $$ render_prem prem
+
+let is_simple_constructor ((_, ty, _): typcase) : bool = (ty.it = TupT [])
+
+let get_inhabitance_proof id cases : string =
+  "Global Instance Inhabited_" ^ render_type_name id ^ " : Inhabited " ^ render_type_name id ^ 
+  let simple_constructors = List.filter is_simple_constructor cases in
+  match simple_constructors with
+  | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
+          "  Admitted"
+  | (con, _, _) :: _ -> " := { default_val := " ^ render_con_name id con ^ " }"
+
+let render_record_inhabitance_proof type_string _fields : string =
+  "Global Instance Inhabited_" ^ type_string ^ " : Inhabited " ^ type_string ^ ".\n(* TODO: add automatic record inhabitance proof *)\nAdmitted."
 
 let rec render_def (mutrec_qual: bool) (d : def) =
   match d.it with
@@ -220,14 +252,23 @@ let rec render_def (mutrec_qual: bool) (d : def) =
       "(** Inductive definition : " ^ render_type_name id ^ " **)\n" ^
       "Inductive " ^ render_type_name id ^ " : Type :=" ^ String.concat "" (
         List.map (fun case -> "\n | " ^ render_variant_case id case) cases
-      ) ^ "\n"
+      ) ^ "\n.\n" ^ get_inhabitance_proof id cases
     | StructT fields ->
-      "(** Record definition : " ^ render_type_name id ^ " **)\n" ^
-      "Record " ^ render_type_name id ^ " : Type := {" ^
+      let type_string = render_type_name id in
+      "(** Record definition : " ^ type_string ^ " **)\n" ^
+      "Record " ^ type_string ^ " : Type := {" ^
       String.concat "" ( List.map (fun (a, ty, _hints) ->
-        "\n  " ^ render_field_name a ^ " : " ^ render_typ ty ^ ";"
+        "\n  " ^ render_field_name (Some id) a ^ " : " ^ render_typ ty ^ ";"
       ) fields) ^
-      "\n } \n"
+      "\n }. \n\n" ^
+      render_record_inhabitance_proof type_string fields ^
+      "\n\n" ^
+      "Definition _append_" ^ type_string ^ " (r1 r2: " ^ type_string ^ ") : " ^ type_string ^ " :=\n" ^
+      "{|\n" ^
+      String.concat "" (List.map (fun (a, _ty, _hints) -> 
+        "  " ^ render_field_name (Some id) a ^ " := r1.(" ^ render_field_name (Some id) a ^ ") ++ r2.(" ^ render_field_name (Some id) a ^ ");\n"
+        ) fields) ^ "|}. \n\n" ^
+      "Global Instance Append_" ^ type_string ^ " : Append " ^ type_string ^ " := { _append arg1 arg2 := _append_" ^ type_string ^ " arg1 arg2 }" 
       (* TODO: this needs either an overloaded notation or a separate implementation. Is such thing actually used anywhere in the spec though? *)
      (* (* Generate an instance so that ++ works, for CompE *)
       "instance : Append " ^ render_type_name id ^ " where\n" ^
@@ -242,10 +283,10 @@ let rec render_def (mutrec_qual: bool) (d : def) =
     "(** Function definition : " ^ render_fun_id id ^ " **)\n" ^
     "Definition " ^ render_fun_id id ^ " (arg: " ^ render_typ typ1 ^ ") : " ^ render_typ typ2 ^ " :=\n" ^
     "  match arg with" ^
-    begin if clauses = [] then " := default" else
+    begin if clauses = [] then "\n  | _ => default_val \nend" else
     String.concat "" (List.map (render_clause id) clauses) ^
     (if (List.exists (fun h -> h.hintid.it = "partial") hints)
-    then "\n  | _ => default" else "") ^ "\nend"(* Could use no_error_if_unused% as well *)
+    then "\n  | _ => default_val" else "") ^ "\nend"(* Could use no_error_if_unused% as well *)
     end
 
   | RelD (id, _mixop, typ, rules, _hints) ->
@@ -283,25 +324,42 @@ let is_non_hint (e: def) =
   | HintD _ -> false
   | _ -> true
 
+let parse_record_fields (d: def) =
+  match d.it with
+  | SynD (id, deftyp, _hints) ->
+    begin match deftyp.it with
+    | StructT fields ->
+      let type_id = id in
+      let fields_name = String.concat "" (List.map (fun (a, _ty, _hints) -> render_field_name None a) fields) in
+      (fields_name, Some type_id)
+    | _ -> ("", None)
+    end
+  | _ -> ("", None)
+
+let build_record_helper (el: script) =
+  let _ = List.fold_left 
+          (fun _ (record_fields_name, otype_id) -> 
+            match otype_id with 
+            | Some type_id -> (Hashtbl.add record_helper record_fields_name type_id)
+            | None -> ()) 
+          () (List.map parse_record_fields el) in 
+          ()
+
 let render_script (el : script) =
+  let _ = build_record_helper el in 
   String.concat ".\n\n" (List.map (render_def false) (List.filter is_non_hint el)) ^ "."
 
 let gen_string (el : script) =
-  "(** Coq export **)\n\n" ^
+  "(* Coq export *)\n\n" ^
   "From Coq Require Import String List Unicode.Utf8.\n" ^
-  "\n" ^
-  "Open Scope type_scope.\n" ^
-  "Import ListNotations.\n" ^
   "\n" ^
   "Set Implicit Arguments.\n" ^
   "Unset Strict Implicit.\n" ^
   "Unset Printing Implicit Defensive.\n" ^
   "\n\n" ^
-  "(** Auxiliary definitions **)\n" ^
+  "(** * Auxiliary definitions **)\n" ^
   "\n" ^
-  "Class Append (T: Type) : Type :=\n" ^
-  "  append : T -> T -> T." ^
-  "\n\n" ^
+  "Declare Scope wasm_scope.\n\n" ^
   "Definition option_zip {α β γ: Type} (f: α → β → γ) (x: option α) (y: option β): option γ := \n" ^
   " match x, y with\n" ^
   "  | Some x, Some y => Some (f x y)\n" ^
@@ -312,14 +370,33 @@ let gen_string (el : script) =
   "  | None => nil\n" ^
   "  | Some x => (cons x nil)\n" ^
   " end.\n\n" ^
+  "Class Append (α: Type) := _append : α -> α -> α.\n\n" ^
+  "Infix \"++\" := _append (right associativity, at level 60) : wasm_scope.\n\n" ^
+  "Global Instance Append_List_ {α: Type}: Append (list α) := { _append l1 l2 := List.app l1 l2 }.\n\n" ^
+  "Definition option_append {α: Type} (x y: option α) : option α :=\n" ^
+  " match x with\n" ^
+  "  | Some _ => x\n" ^
+  "  | None => y\n" ^
+  "end.\n\n" ^
+  "Global Instance Append_Option {α: Type}: Append (option α) := { _append o1 o2 := option_append o1 o2 }.\n\n" ^
   "Fixpoint list_update {α: Type} (l: list α) (n: nat) (y: α): list α :=\n" ^
   "match l, n with\n" ^
   "  | nil, _=> nil\n" ^
   "  | x :: l', 0 => y :: l'\n" ^
   "  | x :: l', S n => x :: list_update l' n y\n" ^
-  "end.\n" ^
-  "\n\n" ^
-  "(** Generated code **)\n" ^
+  "end.\n\n" ^
+  "Class Inhabited (T: Type) := { default_val : T }.\n\n" ^
+  "Definition lookup_total {T: Type} {_: Inhabited T} (l: list T) (n: nat) : T :=\n" ^
+  "  List.nth n l default_val.\n\n" ^
+  "Global Instance Inh_unit : Inhabited unit := { default_val := tt }.\n\n" ^
+  "Global Instance Inh_nat : Inhabited nat := { default_val := O }.\n\n" ^
+  "Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }.\n\n" ^
+  "Global Instance Inh_option {T: Type} : Inhabited (option T) := { default_val := None }.\n\n" ^
+  "Global Instance Inh_prod {T1 T2: Type} {_: Inhabited T1} {_: Inhabited T2} : Inhabited (prod T1 T2) := { default_val := (default_val, default_val) }.\n\n" ^
+  "Open Scope wasm_scope.\n" ^
+  "Import ListNotations.\n" ^
+  "\n" ^
+  "(** * Generated code **)\n" ^
   "\n" ^
   render_script el
 

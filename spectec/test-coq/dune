@@ -1,13 +1,14 @@
 (rule
-  (targets coq_output.v)
+  (targets coq_output_current.v)
   (deps
     (file ../watsup)
     (glob_files ../spec/*.watsup)
   )
   (action
     (progn
-      (with-stdout-to coq_output.v (run %{deps} --coq))
-      (run coqdoc coq_output.v)
+      (with-stdout-to coq_output_current.v (run %{deps} --coq))
+      (run coqc coq_output_current.v)
+      (run coqdoc --utf8 --title coq_output coq_output_current.v)
     )
   )
 )
