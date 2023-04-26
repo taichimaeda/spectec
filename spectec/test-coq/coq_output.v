@@ -563,9 +563,20 @@ Record Context : Type := {
   Context__RETURN : (option Resulttype);
  }. 
 
-Global Instance Inhabited_Context : Inhabited Context.
-(* TODO: add automatic record inhabitance proof *)
-Admitted.
+Global Instance Inhabited_Context : Inhabited Context := 
+{default_val := {|
+  Context__FUNC := default_val ;
+  Context__GLOBAL := default_val ;
+  Context__TABLE := default_val ;
+  Context__MEM := default_val ;
+  Context__ELEM := default_val ;
+  Context__DATA := default_val ;
+  Context__LOCAL := default_val ;
+  Context__LABEL := default_val ;
+  Context__RETURN := default_val ;
+|} }. 
+
+
 
 Definition _append_Context (r1 r2: Context) : Context :=
 {|
@@ -1180,9 +1191,18 @@ Record Moduleinst : Type := {
   Moduleinst__EXPORT : (list Exportinst);
  }. 
 
-Global Instance Inhabited_Moduleinst : Inhabited Moduleinst.
-(* TODO: add automatic record inhabitance proof *)
-Admitted.
+Global Instance Inhabited_Moduleinst : Inhabited Moduleinst := 
+{default_val := {|
+  Moduleinst__FUNC := default_val ;
+  Moduleinst__GLOBAL := default_val ;
+  Moduleinst__TABLE := default_val ;
+  Moduleinst__MEM := default_val ;
+  Moduleinst__ELEM := default_val ;
+  Moduleinst__DATA := default_val ;
+  Moduleinst__EXPORT := default_val ;
+|} }. 
+
+
 
 Definition _append_Moduleinst (r1 r2: Moduleinst) : Moduleinst :=
 {|
@@ -1225,9 +1245,17 @@ Record Store : Type := {
   Store__DATA : (list Datainst);
  }. 
 
-Global Instance Inhabited_Store : Inhabited Store.
-(* TODO: add automatic record inhabitance proof *)
-Admitted.
+Global Instance Inhabited_Store : Inhabited Store := 
+{default_val := {|
+  Store__FUNC := default_val ;
+  Store__GLOBAL := default_val ;
+  Store__TABLE := default_val ;
+  Store__MEM := default_val ;
+  Store__ELEM := default_val ;
+  Store__DATA := default_val ;
+|} }. 
+
+
 
 Definition _append_Store (r1 r2: Store) : Store :=
 {|
@@ -1247,9 +1275,13 @@ Record Frame : Type := {
   Frame__MODULE : Moduleinst;
  }. 
 
-Global Instance Inhabited_Frame : Inhabited Frame.
-(* TODO: add automatic record inhabitance proof *)
-Admitted.
+Global Instance Inhabited_Frame : Inhabited Frame := 
+{default_val := {|
+  Frame__LOCAL := default_val ;
+  Frame__MODULE := default_val ;
+|} }. 
+
+
 
 Definition _append_Frame (r1 r2: Frame) : Frame :=
 {|

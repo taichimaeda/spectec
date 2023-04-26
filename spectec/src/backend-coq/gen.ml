@@ -268,8 +268,12 @@ let get_inhabitance_proof id cases : string =
           "  Admitted"
   | (con, _, _) :: _ -> " := { default_val := " ^ render_con_name id con ^ " }"
 
-let render_record_inhabitance_proof type_string _fields : string =
-  "Global Instance Inhabited_" ^ type_string ^ " : Inhabited " ^ type_string ^ ".\n(* TODO: add automatic record inhabitance proof *)\nAdmitted."
+let render_record_inhabitance_proof type_string fields : string =
+  "Global Instance Inhabited_" ^ type_string ^ " : Inhabited " ^ type_string ^ " := \n" ^
+  "{default_val := {|\n" ^
+      String.concat "" (List.map (fun (a, _ty, _hints) -> 
+        "  " ^ type_string ^ "__" ^ render_field_name None a ^ " := default_val ;\n"
+        ) fields) ^ "|} }. \n\n"
 
 let rec get_id_used (rhs: exp) : id list = match rhs.it with
   | VarE _v -> []
