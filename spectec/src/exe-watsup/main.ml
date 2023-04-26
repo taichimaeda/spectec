@@ -197,7 +197,6 @@ let () =
         print_endline (Backend_coq.Gen.gen_string il);
       if !odst <> "" then
         Backend_coq.Gen.gen_file !odst il;
-    end;
     );
     log "Complete."
   with

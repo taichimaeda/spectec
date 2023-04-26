@@ -174,7 +174,7 @@ and render_idx e_string exp = parens ("lookup_total " ^ e_string ^ " " ^ render_
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
-  | DotP (path', a) ->
+  | DotP (path', _ty, a) ->
     render_path path' old_val (fun old_val ->
       old_val ^ "\n  (* TODO: Coq need a bit more help for dealing with records \n" ^
      "  {" ^ old_val ^ " with " ^  render_field_name None a ^ " := " ^ k (render_dot old_val a) ^ " }" ^ "*)"
@@ -183,6 +183,8 @@ and render_path (path : path) old_val (k : string -> string) : string = match pa
     render_path path' old_val (fun old_val ->
       "(list_update " ^ old_val ^ " " ^ render_exp idx_exp ^ " " ^ k (render_idx old_val idx_exp) ^ ")"
     )
+  | SliceP (_path', _e1, _e2) ->
+      "default_val (* TODO *)"
 
 
 and render_case a e typ =
@@ -240,7 +242,7 @@ let render_record_inhabitance_proof type_string _fields : string =
 
 let rec render_def (mutrec_qual: bool) (d : def) =
   match d.it with
-  | SynD (id, deftyp, _hints) ->
+  | SynD (id, deftyp) ->
     show_input d ^
     begin match deftyp.it with
     | AliasT ty ->
@@ -279,18 +281,17 @@ let rec render_def (mutrec_qual: bool) (d : def) =
       ) fields) ^
       "  }"*)
     end
-  | DecD (id, typ1, typ2, clauses, hints) ->
+  | DecD (id, typ1, typ2, clauses) ->
     show_input d ^
     "(** Function definition : " ^ render_fun_id id ^ " **)\n" ^
     "Definition " ^ render_fun_id id ^ " (arg: " ^ render_typ typ1 ^ ") : " ^ render_typ typ2 ^ " :=\n" ^
     "  match arg with" ^
-    begin if clauses = [] then "\n  | _ => default_val \nend" else
-    String.concat "" (List.map (render_clause id) clauses) ^
-    (if (List.exists (fun h -> h.hintid.it = "partial") hints)
-    then "\n  | _ => default_val" else "") ^ "\nend"(* Could use no_error_if_unused% as well *)
+    begin (if clauses = [] then "\n  | _ => default_val" else
+    String.concat "" (List.map (render_clause id) clauses)) ^
+    "\nend"(* Could use no_error_if_unused% as well *)
     end
 
-  | RelD (id, _mixop, typ, rules, _hints) ->
+  | RelD (id, _mixop, typ, rules) ->
     show_input d ^
     "(** Relation definition : " ^ render_type_name id ^ " **)\n" ^
     (if mutrec_qual then
@@ -327,7 +328,7 @@ let is_non_hint (e: def) =
 
 let parse_record_fields (d: def) =
   match d.it with
-  | SynD (id, deftyp, _hints) ->
+  | SynD (id, deftyp) ->
     begin match deftyp.it with
     | StructT fields ->
       let type_id = id in
