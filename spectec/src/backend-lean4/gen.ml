@@ -152,7 +152,7 @@ and render_idx e_string exp = parens (e_string ^ ".get! " ^ render_exp exp)
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
-  | DotP (path', a) ->
+  | DotP (path', _, a) ->
     render_path path' old_val (fun old_val ->
      "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
     )

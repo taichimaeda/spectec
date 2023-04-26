@@ -1162,83 +1162,43 @@ def local : (state, localidx) -> val
 
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
-=======
-  ;; 4-runtime.watsup:133.1-133.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
-=======
-  ;; 4-runtime.watsup:134.1-134.71
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
-=======
-  ;; 4-runtime.watsup:135.1-135.74
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
-=======
-  ;; 4-runtime.watsup:136.1-136.75
   def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:137.1-137.77
   def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
-=======
-  ;; 4-runtime.watsup:138.1-138.69
   def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
-=======
-  ;; 4-runtime.watsup:139.1-139.69
   def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:140.1-140.65
   def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -2924,83 +2884,43 @@ def local : (state, localidx) -> val
 
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
-=======
-  ;; 4-runtime.watsup:133.1-133.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
-=======
-  ;; 4-runtime.watsup:134.1-134.71
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
-=======
-  ;; 4-runtime.watsup:135.1-135.74
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
-=======
-  ;; 4-runtime.watsup:136.1-136.75
   def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:137.1-137.77
   def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
-=======
-  ;; 4-runtime.watsup:138.1-138.69
   def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
-=======
-  ;; 4-runtime.watsup:139.1-139.69
   def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:140.1-140.65
   def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
->>>>>>> sub-elim
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -4688,83 +4608,43 @@ def local : (state, localidx) -> val
 
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
-=======
-  ;; 4-runtime.watsup:133.1-133.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
-=======
-  ;; 4-runtime.watsup:134.1-134.71
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
-=======
-  ;; 4-runtime.watsup:135.1-135.74
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
-=======
-  ;; 4-runtime.watsup:136.1-136.75
   def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:137.1-137.77
   def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
-=======
-  ;; 4-runtime.watsup:138.1-138.69
   def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
-=======
-  ;; 4-runtime.watsup:139.1-139.69
   def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:140.1-140.65
   def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -6461,83 +6341,43 @@ def local : (state, localidx) -> val
 
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
-=======
-  ;; 4-runtime.watsup:133.1-133.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
-=======
-  ;; 4-runtime.watsup:134.1-134.71
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
-=======
-  ;; 4-runtime.watsup:135.1-135.74
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
-=======
-  ;; 4-runtime.watsup:136.1-136.75
   def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:137.1-137.77
   def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
-=======
-  ;; 4-runtime.watsup:138.1-138.69
   def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
-=======
-  ;; 4-runtime.watsup:139.1-139.69
   def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:140.1-140.65
   def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
->>>>>>> the-elimination
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -7049,7 +6889,6 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-<<<<<<< HEAD
 def valtype_numtype : numtype -> valtype
   def valtype_numtype(I32_numtype) = I32_valtype
   def valtype_numtype(I64_numtype) = I64_valtype
@@ -7061,29 +6900,6 @@ def valtype_reftype : reftype -> valtype
   def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
 
 def valtype_vectype : vectype -> valtype
-=======
-;;
-def valtype_numtype : numtype -> valtype
-  ;;
-  def valtype_numtype(I32_numtype) = I32_valtype
-  ;;
-  def valtype_numtype(I64_numtype) = I64_valtype
-  ;;
-  def valtype_numtype(F32_numtype) = F32_valtype
-  ;;
-  def valtype_numtype(F64_numtype) = F64_valtype
-
-;;
-def valtype_reftype : reftype -> valtype
-  ;;
-  def valtype_reftype(FUNCREF_reftype) = FUNCREF_valtype
-  ;;
-  def valtype_reftype(EXTERNREF_reftype) = EXTERNREF_valtype
-
-;;
-def valtype_vectype : vectype -> valtype
-  ;;
->>>>>>> sub-elim
   def valtype_vectype(V128_vectype) = V128_valtype
 
 ;; 1-syntax.watsup:48.1-48.39
@@ -7091,27 +6907,12 @@ syntax in =
   | I32
   | I64
 
-<<<<<<< HEAD
 def numtype_in : in -> numtype
   def numtype_in(I32_in) = I32_numtype
   def numtype_in(I64_in) = I64_numtype
 
 def valtype_in : in -> valtype
   def valtype_in(I32_in) = I32_valtype
-=======
-;;
-def numtype_in : in -> numtype
-  ;;
-  def numtype_in(I32_in) = I32_numtype
-  ;;
-  def numtype_in(I64_in) = I64_numtype
-
-;;
-def valtype_in : in -> valtype
-  ;;
-  def valtype_in(I32_in) = I32_valtype
-  ;;
->>>>>>> sub-elim
   def valtype_in(I64_in) = I64_valtype
 
 ;; 1-syntax.watsup:49.1-49.39
@@ -7119,27 +6920,12 @@ syntax fn =
   | F32
   | F64
 
-<<<<<<< HEAD
 def numtype_fn : fn -> numtype
   def numtype_fn(F32_fn) = F32_numtype
   def numtype_fn(F64_fn) = F64_numtype
 
 def valtype_fn : fn -> valtype
   def valtype_fn(F32_fn) = F32_valtype
-=======
-;;
-def numtype_fn : fn -> numtype
-  ;;
-  def numtype_fn(F32_fn) = F32_numtype
-  ;;
-  def numtype_fn(F64_fn) = F64_numtype
-
-;;
-def valtype_fn : fn -> valtype
-  ;;
-  def valtype_fn(F32_fn) = F32_valtype
-  ;;
->>>>>>> sub-elim
   def valtype_fn(F64_fn) = F64_valtype
 
 ;; 1-syntax.watsup:56.1-57.11
@@ -7680,7 +7466,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, RELOP_instr(nt, relop), `%->%`([$valtype_numtype(nt) $valtype_numtype(nt)], [I32_valtype]))
 
   ;; 3-typing.watsup:238.1-240.23
-<<<<<<< HEAD
   rule extend {C : context, n : n, nt : numtype, o0 : nat}:
     `%|-%:%`(C, EXTEND_instr(nt, n), `%->%`([$valtype_numtype(nt)], [$valtype_numtype(nt)]))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
@@ -7701,28 +7486,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ($size($valtype_in(in_2)) = ?(o1))
     -- if (in_1 =/= in_2)
     -- if ((sx?{sx} = ?()) <=> (o0 > o1))
-=======
-  rule extend {C : context, n : n, nt : numtype}:
-    `%|-%:%`(C, EXTEND_instr(nt, n), `%->%`([$valtype_numtype(nt)], [$valtype_numtype(nt)]))
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (n <= !($size($valtype_numtype(nt))))
-
-  ;; 3-typing.watsup:242.1-245.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
-    `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
-    -- if ($size($valtype_numtype(nt_1)) =/= ?())
-    -- if ($size($valtype_numtype(nt_2)) =/= ?())
-    -- if (nt_1 =/= nt_2)
-    -- if (!($size($valtype_numtype(nt_1))) = !($size($valtype_numtype(nt_2))))
-
-  ;; 3-typing.watsup:247.1-250.52
-  rule convert-i {C : context, in_1 : in, in_2 : in, sx? : sx?}:
-    `%|-%:%`(C, CVTOP_instr($numtype_in(in_1), CONVERT_cvtop, $numtype_in(in_2), sx?{sx}), `%->%`([$valtype_in(in_2)], [$valtype_in(in_1)]))
-    -- if ($size($valtype_in(in_1)) =/= ?())
-    -- if ($size($valtype_in(in_2)) =/= ?())
-    -- if (in_1 =/= in_2)
-    -- if ((sx?{sx} = ?()) <=> (!($size($valtype_in(in_1))) > !($size($valtype_in(in_2)))))
->>>>>>> sub-elim
 
   ;; 3-typing.watsup:252.1-254.22
   rule convert-f {C : context, fn_1 : fn, fn_2 : fn}:
@@ -7864,22 +7627,14 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (C.DATA_context[x] = OK)
 
   ;; 3-typing.watsup:350.1-355.32
-<<<<<<< HEAD
   rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?, o0 : nat, o1? : nat?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [$valtype_numtype(nt)]))
     -- if (0 < |C.MEM_context|)
     -- if ((n?{n} = ?()) <=> (o1?{o1} = ?()))
-=======
-  rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?}:
-    `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [$valtype_numtype(nt)]))
-    -- if (0 < |C.MEM_context|)
-    -- if ($size($valtype_numtype(nt)) =/= ?())
->>>>>>> sub-elim
     -- if ((n?{n} = ?()) <=> (sx?{sx} = ?()))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- (if ($size($valtype_numtype(nt)) = ?(o1)))?{o1}
     -- if (C.MEM_context[0] = mt)
-<<<<<<< HEAD
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
     -- if ((n?{n} = ?()) \/ (nt = $numtype_in(in)))
@@ -7894,20 +7649,6 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= (o0 / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (o1 / 8))))?{n o1}
-=======
-    -- if ((2 ^ n_A) <= (!($size($valtype_numtype(nt))) / 8))
-    -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (!($size($valtype_numtype(nt))) / 8))))?{n}
-    -- if ((n?{n} = ?()) \/ (nt = $numtype_in(in)))
-
-  ;; 3-typing.watsup:357.1-362.32
-  rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype}:
-    `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype $valtype_numtype(nt)], []))
-    -- if (0 < |C.MEM_context|)
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (C.MEM_context[0] = mt)
-    -- if ((2 ^ n_A) <= (!($size($valtype_numtype(nt))) / 8))
-    -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < (!($size($valtype_numtype(nt))) / 8))))?{n}
->>>>>>> sub-elim
     -- if ((n?{n} = ?()) \/ (nt = $numtype_in(in)))
 
 ;; 3-typing.watsup:124.1-124.67
@@ -8182,16 +7923,10 @@ def default_ : valtype -> val?
   def default_(F32_valtype) = ?(CONST_val(F32_numtype, 0))
   ;; 4-runtime.watsup:48.1-48.35
   def default_(F64_valtype) = ?(CONST_val(F64_numtype, 0))
-<<<<<<< HEAD
   ;; 4-runtime.watsup:49.1-49.44
   def default_(FUNCREF_valtype) = ?(REF.NULL_val(FUNCREF_reftype))
   ;; 4-runtime.watsup:50.1-50.48
   def default_(EXTERNREF_valtype) = ?(REF.NULL_val(EXTERNREF_reftype))
-=======
-  ;; 4-runtime.watsup:49.1-49.34
-  def {rt : reftype} default_($valtype_reftype(rt)) = ?(REF.NULL_val(rt))
-  ;;
->>>>>>> sub-elim
   def {x : valtype} default_(x) = ?()
 
 ;; 4-runtime.watsup:61.1-61.71
@@ -8284,7 +8019,6 @@ syntax admininstr =
   | TRAP
 }
 
-<<<<<<< HEAD
 def admininstr_globalinst : globalinst -> admininstr
   def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
   def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
@@ -8349,131 +8083,6 @@ def admininstr_val : val -> admininstr
   def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
 
 ;; 4-runtime.watsup:84.1-84.62
-=======
-;;
-def admininstr_globalinst : globalinst -> admininstr
-  ;;
-  def {x : (numtype, c_numtype)} admininstr_globalinst(CONST_val(x)) = CONST_admininstr(x)
-  ;;
-  def {x : reftype} admininstr_globalinst(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
-  def {x : funcaddr} admininstr_globalinst(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
-  def {x : hostaddr} admininstr_globalinst(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
-
-;;
-def admininstr_instr : instr -> admininstr
-  ;;
-  def admininstr_instr(UNREACHABLE_instr) = UNREACHABLE_admininstr
-  ;;
-  def admininstr_instr(NOP_instr) = NOP_admininstr
-  ;;
-  def admininstr_instr(DROP_instr) = DROP_admininstr
-  ;;
-  def {x : valtype?} admininstr_instr(SELECT_instr(x)) = SELECT_admininstr(x)
-  ;;
-  def {x : (blocktype, instr*)} admininstr_instr(BLOCK_instr(x)) = BLOCK_admininstr(x)
-  ;;
-  def {x : (blocktype, instr*)} admininstr_instr(LOOP_instr(x)) = LOOP_admininstr(x)
-  ;;
-  def {x : (blocktype, instr*, instr*)} admininstr_instr(IF_instr(x)) = IF_admininstr(x)
-  ;;
-  def {x : labelidx} admininstr_instr(BR_instr(x)) = BR_admininstr(x)
-  ;;
-  def {x : labelidx} admininstr_instr(BR_IF_instr(x)) = BR_IF_admininstr(x)
-  ;;
-  def {x : (labelidx*, labelidx)} admininstr_instr(BR_TABLE_instr(x)) = BR_TABLE_admininstr(x)
-  ;;
-  def {x : funcidx} admininstr_instr(CALL_instr(x)) = CALL_admininstr(x)
-  ;;
-  def {x : (tableidx, functype)} admininstr_instr(CALL_INDIRECT_instr(x)) = CALL_INDIRECT_admininstr(x)
-  ;;
-  def admininstr_instr(RETURN_instr) = RETURN_admininstr
-  ;;
-  def {x : (numtype, c_numtype)} admininstr_instr(CONST_instr(x)) = CONST_admininstr(x)
-  ;;
-  def {x : (numtype, unop_numtype)} admininstr_instr(UNOP_instr(x)) = UNOP_admininstr(x)
-  ;;
-  def {x : (numtype, binop_numtype)} admininstr_instr(BINOP_instr(x)) = BINOP_admininstr(x)
-  ;;
-  def {x : (numtype, testop_numtype)} admininstr_instr(TESTOP_instr(x)) = TESTOP_admininstr(x)
-  ;;
-  def {x : (numtype, relop_numtype)} admininstr_instr(RELOP_instr(x)) = RELOP_admininstr(x)
-  ;;
-  def {x : (numtype, n)} admininstr_instr(EXTEND_instr(x)) = EXTEND_admininstr(x)
-  ;;
-  def {x : (numtype, cvtop, numtype, sx?)} admininstr_instr(CVTOP_instr(x)) = CVTOP_admininstr(x)
-  ;;
-  def {x : reftype} admininstr_instr(REF.NULL_instr(x)) = REF.NULL_admininstr(x)
-  ;;
-  def {x : funcidx} admininstr_instr(REF.FUNC_instr(x)) = REF.FUNC_admininstr(x)
-  ;;
-  def admininstr_instr(REF.IS_NULL_instr) = REF.IS_NULL_admininstr
-  ;;
-  def {x : localidx} admininstr_instr(LOCAL.GET_instr(x)) = LOCAL.GET_admininstr(x)
-  ;;
-  def {x : localidx} admininstr_instr(LOCAL.SET_instr(x)) = LOCAL.SET_admininstr(x)
-  ;;
-  def {x : localidx} admininstr_instr(LOCAL.TEE_instr(x)) = LOCAL.TEE_admininstr(x)
-  ;;
-  def {x : globalidx} admininstr_instr(GLOBAL.GET_instr(x)) = GLOBAL.GET_admininstr(x)
-  ;;
-  def {x : globalidx} admininstr_instr(GLOBAL.SET_instr(x)) = GLOBAL.SET_admininstr(x)
-  ;;
-  def {x : tableidx} admininstr_instr(TABLE.GET_instr(x)) = TABLE.GET_admininstr(x)
-  ;;
-  def {x : tableidx} admininstr_instr(TABLE.SET_instr(x)) = TABLE.SET_admininstr(x)
-  ;;
-  def {x : tableidx} admininstr_instr(TABLE.SIZE_instr(x)) = TABLE.SIZE_admininstr(x)
-  ;;
-  def {x : tableidx} admininstr_instr(TABLE.GROW_instr(x)) = TABLE.GROW_admininstr(x)
-  ;;
-  def {x : tableidx} admininstr_instr(TABLE.FILL_instr(x)) = TABLE.FILL_admininstr(x)
-  ;;
-  def {x : (tableidx, tableidx)} admininstr_instr(TABLE.COPY_instr(x)) = TABLE.COPY_admininstr(x)
-  ;;
-  def {x : (tableidx, elemidx)} admininstr_instr(TABLE.INIT_instr(x)) = TABLE.INIT_admininstr(x)
-  ;;
-  def {x : elemidx} admininstr_instr(ELEM.DROP_instr(x)) = ELEM.DROP_admininstr(x)
-  ;;
-  def admininstr_instr(MEMORY.SIZE_instr) = MEMORY.SIZE_admininstr
-  ;;
-  def admininstr_instr(MEMORY.GROW_instr) = MEMORY.GROW_admininstr
-  ;;
-  def admininstr_instr(MEMORY.FILL_instr) = MEMORY.FILL_admininstr
-  ;;
-  def admininstr_instr(MEMORY.COPY_instr) = MEMORY.COPY_admininstr
-  ;;
-  def {x : dataidx} admininstr_instr(MEMORY.INIT_instr(x)) = MEMORY.INIT_admininstr(x)
-  ;;
-  def {x : dataidx} admininstr_instr(DATA.DROP_instr(x)) = DATA.DROP_admininstr(x)
-  ;;
-  def {x : (numtype, (n, sx)?, u32, u32)} admininstr_instr(LOAD_instr(x)) = LOAD_admininstr(x)
-  ;;
-  def {x : (numtype, n?, u32, u32)} admininstr_instr(STORE_instr(x)) = STORE_admininstr(x)
-
-;;
-def admininstr_ref : ref -> admininstr
-  ;;
-  def {x : reftype} admininstr_ref(REF.NULL_ref(x)) = REF.NULL_admininstr(x)
-  ;;
-  def {x : funcaddr} admininstr_ref(REF.FUNC_ADDR_ref(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
-  def {x : hostaddr} admininstr_ref(REF.HOST_ADDR_ref(x)) = REF.HOST_ADDR_admininstr(x)
-
-;;
-def admininstr_val : val -> admininstr
-  ;;
-  def {x : (numtype, c_numtype)} admininstr_val(CONST_val(x)) = CONST_admininstr(x)
-  ;;
-  def {x : reftype} admininstr_val(REF.NULL_val(x)) = REF.NULL_admininstr(x)
-  ;;
-  def {x : funcaddr} admininstr_val(REF.FUNC_ADDR_val(x)) = REF.FUNC_ADDR_admininstr(x)
-  ;;
-  def {x : hostaddr} admininstr_val(REF.HOST_ADDR_val(x)) = REF.HOST_ADDR_admininstr(x)
-
-;; 4-runtime.watsup:83.1-83.62
->>>>>>> sub-elim
 syntax config = `%;%*`(state, admininstr*)
 
 ;; 4-runtime.watsup:102.1-102.59
@@ -8523,83 +8132,43 @@ def local : (state, localidx) -> val
 
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
-=======
-  ;; 4-runtime.watsup:133.1-133.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
-=======
-  ;; 4-runtime.watsup:134.1-134.71
   def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
-=======
-  ;; 4-runtime.watsup:135.1-135.74
   def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
-=======
-  ;; 4-runtime.watsup:136.1-136.75
   def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:137.1-137.77
   def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
-=======
-  ;; 4-runtime.watsup:138.1-138.69
   def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
-=======
-  ;; 4-runtime.watsup:139.1-139.69
   def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
-<<<<<<< HEAD
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
-=======
-  ;; 4-runtime.watsup:140.1-140.65
   def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
->>>>>>> NegPr
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -8763,15 +8332,9 @@ relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
     -- if (c = $relop(relop, nt, c_1, c_2))
 
   ;; 6-reduction.watsup:137.1-138.70
-<<<<<<< HEAD
   rule extend {c : c_numtype, n : n, nt : numtype, o0 : nat}:
     `%*~>%*`([CONST_admininstr(nt, c) EXTEND_admininstr(nt, n)], [CONST_admininstr(nt, $ext(n, o0, S_sx, c))])
     -- if ($size($valtype_numtype(nt)) = ?(o0))
-=======
-  rule extend {c : c_numtype, n : n, nt : numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c) EXTEND_admininstr(nt, n)], [CONST_admininstr(nt, $ext(n, !($size($valtype_numtype(nt))), S_sx, c))])
-    -- if ($size($valtype_numtype(nt)) =/= ?())
->>>>>>> sub-elim
 
   ;; 6-reduction.watsup:141.1-143.48
   rule cvtop-val {c : c_numtype, c_1 : c_numtype, cvtop : cvtop, nt : numtype, nt_1 : numtype, nt_2 : numtype, sx? : sx?}:
@@ -8818,14 +8381,9 @@ relation Step_read: `%~>%*`(config, admininstr*)
     -- otherwise
 
   ;; 6-reduction.watsup:94.1-97.52
-<<<<<<< HEAD
   rule call_addr {a : addr, f : frame, instr* : instr*, k : nat, m : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state, o0* : val*}:
     `%~>%*`(`%;%*`(z, $admininstr_val(val)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], $admininstr_instr(instr)*{instr})])])
     -- if (|t*{t}| = |o0*{o0}|)
-=======
-  rule call_addr {a : addr, f : frame, instr* : instr*, k : nat, m : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state}:
-    `%~>%*`(`%;%*`(z, $admininstr_val(val)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], $admininstr_instr(instr)*{instr})])])
->>>>>>> sub-elim
     -- if (a < |$funcinst(z)|)
     -- if (|t_1^k{t_1}| = k)
     -- if (|t_2^n{t_2}| = n)
@@ -8920,25 +8478,15 @@ relation Step_read: `%~>%*`(config, admininstr*)
   ;; 6-reduction.watsup:268.1-270.49
   rule load-num-trap {i : nat, n_A : n, n_O : n, nt : numtype, z : state, o0 : nat}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?(), n_A, n_O)]), [TRAP_admininstr])
-<<<<<<< HEAD
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if (((i + n_O) + (o0 / 8)) >= |$mem(z, 0)|)
-=======
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (((i + n_O) + (!($size($valtype_numtype(nt))) / 8)) >= |$mem(z, 0)|)
->>>>>>> sub-elim
 
   ;; 6-reduction.watsup:272.1-274.66
   rule load-num-val {c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state, o0 : nat, o1 : nat}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?(), n_A, n_O)]), [CONST_admininstr(nt, c)])
-<<<<<<< HEAD
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if ($size($valtype_numtype(nt)) = ?(o1))
     -- if ($bytes_(o0, c) = $mem(z, 0)[(i + n_O) : (o1 / 8)])
-=======
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if ($bytes_(!($size($valtype_numtype(nt))), c) = $mem(z, 0)[(i + n_O) : (!($size($valtype_numtype(nt))) / 8)])
->>>>>>> sub-elim
 
   ;; 6-reduction.watsup:276.1-278.41
   rule load-pack-trap {i : nat, n : n, n_A : n, n_O : n, nt : numtype, sx : sx, z : state}:
@@ -9050,7 +8598,6 @@ relation Step: `%~>%`(config, config)
   ;; 6-reduction.watsup:285.1-287.49
   rule store-num-trap {c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state, o0 : nat}:
     `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`(z, [TRAP_admininstr]))
-<<<<<<< HEAD
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if (((i + n_O) + (o0 / 8)) >= |$mem(z, 0)|)
 
@@ -9060,16 +8607,6 @@ relation Step: `%~>%`(config, config)
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if ($size($valtype_numtype(nt)) = ?(o1))
     -- if (b*{b} = $bytes_(o1, c))
-=======
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (((i + n_O) + (!($size($valtype_numtype(nt))) / 8)) >= |$mem(z, 0)|)
-
-  ;; 6-reduction.watsup:289.1-291.35
-  rule store-num-val {b* : byte*, c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), (!($size($valtype_numtype(nt))) / 8), b*{b}), []))
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (b*{b} = $bytes_(!($size($valtype_numtype(nt))), c))
->>>>>>> sub-elim
 
   ;; 6-reduction.watsup:293.1-295.41
   rule store-pack-trap {c : c_numtype, i : nat, n : n, n_A : n, n_O : n, nt : numtype, z : state}:
@@ -9079,7 +8616,6 @@ relation Step: `%~>%`(config, config)
   ;; 6-reduction.watsup:297.1-299.50
   rule store-pack-val {b* : byte*, c : c_numtype, i : nat, n : n, n_A : n, n_O : n, nt : numtype, z : state, o0 : nat}:
     `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), (n / 8), b*{b}), []))
-<<<<<<< HEAD
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if (b*{b} = $bytes_(n, $wrap_((o0, n), c)))
 
@@ -10408,42 +9944,42 @@ def local : (state, localidx) -> val
 ;; 4-runtime.watsup:125.1-125.78
 def with_local : (state, localidx, val) -> state
   ;; 4-runtime.watsup:134.1-134.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL[x] = v])
+  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
 
 ;; 4-runtime.watsup:126.1-126.79
 def with_global : (state, globalidx, val) -> state
   ;; 4-runtime.watsup:135.1-135.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
+  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
 
 ;; 4-runtime.watsup:127.1-127.83
 def with_table : (state, tableidx, nat, ref) -> state
   ;; 4-runtime.watsup:136.1-136.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
+  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
 
 ;; 4-runtime.watsup:128.1-128.80
 def with_tableext : (state, tableidx, ref*) -> state
   ;; 4-runtime.watsup:137.1-137.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
+  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
 
 ;; 4-runtime.watsup:129.1-129.90
 def with_mem : (state, tableidx, nat, nat, byte*) -> state
   ;; 4-runtime.watsup:138.1-138.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
+  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
 
 ;; 4-runtime.watsup:130.1-130.78
 def with_memext : (state, tableidx, byte*) -> state
   ;; 4-runtime.watsup:139.1-139.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
+  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
 
 ;; 4-runtime.watsup:131.1-131.77
 def with_elem : (state, elemidx, ref*) -> state
   ;; 4-runtime.watsup:140.1-140.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
+  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
 
 ;; 4-runtime.watsup:132.1-132.77
 def with_data : (state, dataidx, byte*) -> state
   ;; 4-runtime.watsup:141.1-141.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
+  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
 
 ;; 4-runtime.watsup:155.1-158.21
 rec {
@@ -11068,10 +10604,6 @@ relation Step: `%~>%`(config, config)
     `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), (n / 8), b*{b}), []))
     -- if ($size($valtype_numtype(nt)) = ?(o0))
     -- if (b*{b} = $bytes_(n, $wrap_((o0, n), c)))
-=======
-    -- if ($size($valtype_numtype(nt)) =/= ?())
-    -- if (b*{b} = $bytes_(n, $wrap_((!($size($valtype_numtype(nt))), n), c)))
->>>>>>> sub-elim
 
   ;; 6-reduction.watsup:302.1-303.104
   rule memory.grow-succeed {n : n, z : state}:

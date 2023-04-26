@@ -866,42 +866,42 @@ local ((s, f), x) = (f.lOCAL !! (fromIntegral x))
 
 
 with_local :: (State, Localidx, Val) -> State
-with_local ((s, f), x, v) = (s, undefined {- f[LOCAL[x] = v] -})
+with_local ((s, f), x, v) = (s, undefined {- f[LOCAL_frame[x] = v] -})
 
 
 
 with_global :: (State, Globalidx, Val) -> State
-with_global ((s, f), x, v) = (undefined {- s[GLOBAL[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -}, f)
+with_global ((s, f), x, v) = (undefined {- s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -}, f)
 
 
 
 with_table :: (State, Tableidx, Natural, Ref) -> State
-with_table ((s, f), x, i, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -}, f)
+with_table ((s, f), x, i, r) = (undefined {- s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r] -}, f)
 
 
 
 with_tableext :: (State, Tableidx, [Ref]) -> State
-with_tableext ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -}, f)
+with_tableext ((s, f), x, r) = (undefined {- s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}] -}, f)
 
 
 
 with_mem :: (State, Tableidx, Natural, Natural, [Byte]) -> State
-with_mem ((s, f), x, i, j, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}] -}, f)
+with_mem ((s, f), x, i, j, b) = (undefined {- s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}] -}, f)
 
 
 
 with_memext :: (State, Tableidx, [Byte]) -> State
-with_memext ((s, f), x, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}] -}, f)
+with_memext ((s, f), x, b) = (undefined {- s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}] -}, f)
 
 
 
 with_elem :: (State, Elemidx, [Ref]) -> State
-with_elem ((s, f), x, r) = (undefined {- s[TABLE[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -}, f)
+with_elem ((s, f), x, r) = (undefined {- s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -}, f)
 
 
 
 with_data :: (State, Dataidx, [Byte]) -> State
-with_data ((s, f), x, b) = (undefined {- s[MEM[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}] -}, f)
+with_data ((s, f), x, b) = (undefined {- s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}] -}, f)
 
 
 
