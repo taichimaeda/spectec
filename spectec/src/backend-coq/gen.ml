@@ -21,6 +21,7 @@ let render_list how tys =
 (* let render_rec_con (id : id) = "Mk" ^ render_type_name id *)
 
 let is_reserved = function
+ | "N"
  | "in"
  | "In"
  | "()"
@@ -163,7 +164,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | CmpE (GtOp, e1, e2)    -> parens (render_exp e1 ^ " > "   ^ render_exp e2)
   | CatE (e1, e2)          -> parens (render_exp e1 ^ " ++ "  ^ render_exp e2)
   | CompE (e1, e2)         -> parens (render_exp e2 ^ " ++ "  ^ render_exp e1) (* NB! flip order *)
-  | _ -> "unit (* " ^ Il.Print.string_of_exp exp ^ " *)"
+  | _ -> "default_val (* FIXME: " ^ Il.Print.string_of_exp exp ^ " *)"
 
 and render_dot e_string a = e_string ^ "." ^ parens (render_field_name None a)
 
@@ -176,8 +177,9 @@ and render_path (path : path) old_val (k : string -> string) : string = match pa
   | RootP -> k old_val
   | DotP (path', _ty, a) ->
     render_path path' old_val (fun old_val ->
-      old_val ^ "\n  (* TODO: Coq need a bit more help for dealing with records \n" ^
-     "  {" ^ old_val ^ " with " ^  render_field_name None a ^ " := " ^ k (render_dot old_val a) ^ " }" ^ "*)"
+      "(* TODO: Coq need a bit more help for dealing with records \n" ^
+     "  {" ^ old_val ^ " with " ^  render_field_name None a ^ " := " ^ k (render_dot old_val a) ^ " }" ^ " *)" ^
+     old_val
     )
   | IdxP (path', idx_exp) ->
     render_path path' old_val (fun old_val ->
@@ -196,10 +198,39 @@ and render_lam v e = match e.it with
   | CallE (f, {it = VarE v2;_}) when v.it = v2.it -> render_fun_id f
   | _ -> "(fun " ^ render_id v ^ " => " ^ render_exp e ^ ")"
 
+let render_succ_pattern e_string (n: int) = 
+  (String.concat "" (List.init n (fun _ -> "(S "))) ^ "(" ^ e_string ^ ")" ^ (String.concat "" (List.init n (fun _ -> ")")))
+
+let rec render_pattern (pat : exp) = match pat.it with
+  | VarE v -> render_id v
+  | BoolE true -> "True"
+  | BoolE false -> "Frue"
+  | NatE n -> string_of_int n
+  | TextE t -> "\"" ^ String.escaped t ^ "\""
+  | MixE (_, e) -> render_pattern e
+  | TupE es -> render_tuple render_pattern es
+  | ListE es -> render_list render_pattern es
+  | OptE None -> "None"
+  | OptE (Some e) -> "Some" $$ render_pattern e
+  | TheE e  -> "(* TODO: what is TheE? *) " ^ render_pattern e
+  | IterE (e, (_iter, vs)) -> begin match e.it with
+    (* Short-ciruit v*; use variable directly instead of calling map *)
+    | VarE v when [v.it] = List.map (fun (v : id) -> v.it) vs -> render_id v
+    | _ -> "default_val (* FIXME: Unsupported match pattern " ^ Il.Print.string_of_exp pat ^ " *)"
+  end
+  | CaseE (a, e, typ) -> render_case a e typ
+  | SubE _ -> error pat.at "SubE encountered. Did the SubE elimination pass run?"
+  | IdxE (e1, e2) -> render_idx (render_pattern e1) e2
+  | BinE (AddOp, e1, e2) -> begin match e2.it with 
+                            | NatE n -> render_succ_pattern (render_pattern e1) n
+                            | _ -> render_pattern e1 ^ "(* FIXME: Unsupported match pattern " ^ Il.Print.string_of_exp pat ^ " *)"
+                            end
+  | _ -> "default_val (* FIXME: Unsupported match pattern " ^ Il.Print.string_of_exp pat ^ " *)"
+
 let render_clause (_id : id) (clause : clause) = match clause.it with
   | DefD (_binds, lhs, rhs, premise) ->
-   (if premise <> [] then "-- Premises ignored! \n" else "") ^
-   "\n  | " ^ render_exp lhs ^ " => " ^ render_exp rhs
+   (if premise <> [] then "(* Premises ignored! *) \n" else "") ^
+   "\n  | " ^ render_pattern lhs ^ " => " ^ render_exp rhs
 
 let show_input (d:def) =
     if include_input then
@@ -240,6 +271,57 @@ let get_inhabitance_proof id cases : string =
 let render_record_inhabitance_proof type_string _fields : string =
   "Global Instance Inhabited_" ^ type_string ^ " : Inhabited " ^ type_string ^ ".\n(* TODO: add automatic record inhabitance proof *)\nAdmitted."
 
+let rec get_id_used (rhs: exp) : id list = match rhs.it with
+  | VarE _v -> []
+  | BoolE true -> []
+  | BoolE false -> []
+  | NatE _n -> []
+  | TextE _t -> []
+  | MixE (_, e) -> get_id_used e
+  | TupE es -> List.concat (List.map get_id_used es)
+  | ListE es -> List.concat (List.map get_id_used es)
+  | OptE None -> []
+  | OptE (Some e) -> get_id_used e
+  | TheE e  -> get_id_used e
+  | IterE (e, (_iter, vs)) -> begin match e.it with
+    (* Short-ciruit v*; use variable directly instead of calling map *)
+    | VarE v when [v.it] = List.map (fun (v : id) -> v.it) vs -> []
+    | _ -> get_id_used e
+  end
+  | CaseE (_a, e, _typ) -> get_id_used e
+  | StrE fields -> List.concat (List.map (fun (_a, e) -> get_id_used e) fields)
+  | SubE _ -> error rhs.at "SubE encountered. Did the SubE elimination pass run?"
+  | DotE (_ty, e, _a) -> get_id_used e
+  | UpdE (exp1, _path, exp2) -> get_id_used exp1 @ get_id_used exp2
+  | ExtE (exp1, _path, exp2) -> get_id_used exp1 @ get_id_used exp2
+  | IdxE (e1, e2) -> get_id_used e1 @ get_id_used e2
+  | LenE e -> get_id_used e
+  | CallE (id, e) -> [id] @ get_id_used e
+  | UnE (MinusOp, e1)      -> get_id_used e1
+  | BinE (AddOp, e1, e2)   -> get_id_used e1 @ get_id_used e2
+  | BinE (SubOp, e1, e2)   -> get_id_used e1 @ get_id_used e2
+  | BinE (ExpOp, e1, e2)   -> get_id_used e1 @ get_id_used e2
+  | BinE (DivOp, e1, e2)   -> get_id_used e1 @ get_id_used e2
+  | BinE (AndOp, e1, e2)   -> get_id_used e1 @ get_id_used e2
+  | BinE (EquivOp, e1, e2) -> get_id_used e1 @ get_id_used e2
+  | BinE (OrOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (EqOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (NeOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (LeOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (LtOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (GeOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CmpE (GtOp, e1, e2)    -> get_id_used e1 @ get_id_used e2
+  | CatE (e1, e2)          -> get_id_used e1 @ get_id_used e2
+  | CompE (e1, e2)         -> get_id_used e1 @ get_id_used e2
+  | _ -> []
+
+let get_id_used_list (clauses: clause list) : id list =
+  List.concat (List.map (fun (cl: clause) -> match cl.it with | DefD (_binds, _lhs, rhs, _premise) -> get_id_used rhs) clauses)
+
+let is_recursive (i: id) (clauses: clause list) : bool =
+  let ids = get_id_used_list clauses in
+  List.exists (fun (id': id) -> i.it = id'.it) ids
+
 let rec render_def (mutrec_qual: bool) (d : def) =
   match d.it with
   | SynD (id, deftyp) ->
@@ -252,7 +334,7 @@ let rec render_def (mutrec_qual: bool) (d : def) =
       "(** Notation definition : " ^ render_type_name id ^ " **)\n" ^
       "Definition " ^ render_type_name id ^ " := (* mixop: " (* TODO: add it back after escaping round brackets ^ Il.Print.string_of_mixop mop *) ^ " *) " ^ render_typ ty
     | VariantT cases ->
-      "(** Inductive definition : " ^ render_type_name id ^ " **)\n" ^
+      "(** Variant definition : " ^ render_type_name id ^ " **)\n" ^
       "Inductive " ^ render_type_name id ^ " : Type :=" ^ String.concat "" (
         List.map (fun case -> "\n | " ^ render_variant_case id case) cases
       ) ^ "\n.\n" ^ get_inhabitance_proof id cases
@@ -272,24 +354,23 @@ let rec render_def (mutrec_qual: bool) (d : def) =
         "  " ^ render_field_name (Some id) a ^ " := r1.(" ^ render_field_name (Some id) a ^ ") ++ r2.(" ^ render_field_name (Some id) a ^ ");\n"
         ) fields) ^ "|}. \n\n" ^
       "Global Instance Append_" ^ type_string ^ " : Append " ^ type_string ^ " := { _append arg1 arg2 := _append_" ^ type_string ^ " arg1 arg2 }" 
-      (* TODO: this needs either an overloaded notation or a separate implementation. Is such thing actually used anywhere in the spec though? *)
-     (* (* Generate an instance so that ++ works, for CompE *)
-      "instance : Append " ^ render_type_name id ^ " where\n" ^
-      "  append := fun r1 r2 => {\n" ^
-      String.concat "" (List.map (fun (a, _ty, _hints) ->
-        "    " ^ render_field_name a ^ " := r1." ^ render_field_name a ^ " ++ r2." ^ render_field_name a ^ ",\n"
-      ) fields) ^
-      "  }"*)
     end
   | DecD (id, typ1, typ2, clauses) ->
     show_input d ^
     "(** Function definition : " ^ render_fun_id id ^ " **)\n" ^
-    "Definition " ^ render_fun_id id ^ " (arg: " ^ render_typ typ1 ^ ") : " ^ render_typ typ2 ^ " :=\n" ^
-    "  match arg with" ^
-    begin (if clauses = [] then "\n  | _ => default_val" else
+    "(* Dependencies: " ^ String.concat ", " (List.map render_id (get_id_used_list clauses)) ^ " *)\n" ^
+    if is_recursive id clauses then "Fixpoint " ^ render_fun_id id ^ " (arg: " ^ render_typ typ1 ^ ") : " ^ render_typ typ2 ^ ".\n" ^
+    "(* FIXME: Generated fixpoint definitions are fragile and may not directly pass the termination check. The following code is an attempt at rendering:\n" ^
+    "  := match arg with" ^
+     (if clauses = [] then "\n  | _ => default_val" else
     String.concat "" (List.map (render_clause id) clauses)) ^
-    "\nend"(* Could use no_error_if_unused% as well *)
-    end
+    "\nend *)\nAdmitted"(* Could use no_error_if_unused% as well *)
+    else "Definition " ^ render_fun_id id ^ " (arg: " ^ render_typ typ1 ^ ") : " ^ render_typ typ2 ^ " :=\n" ^
+    "  match arg with" ^
+     (if clauses = [] then "\n  | _ => default_val" else
+    String.concat "" (List.map (render_clause id) clauses)) ^
+    "\nend"
+    
 
   | RelD (id, _mixop, typ, rules) ->
     show_input d ^
@@ -354,6 +435,7 @@ let render_script (el : script) =
 let gen_string (el : script) =
   "(* Coq export *)\n\n" ^
   "From Coq Require Import String List Unicode.Utf8.\n" ^
+  "Require Import NArith.\n" ^
   "\n" ^
   "Set Implicit Arguments.\n" ^
   "Unset Strict Implicit.\n" ^

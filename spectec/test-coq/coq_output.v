@@ -1,6 +1,7 @@
 (* Coq export *)
 
 From Coq Require Import String List Unicode.Utf8.
+Require Import NArith.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -64,8 +65,8 @@ Import ListNotations.
 
 (** * Generated code **)
 
-(** Alias definition : N **)
-Definition N := nat.
+(** Alias definition : reserved__N **)
+Definition reserved__N := nat.
 
 (** Alias definition : Name **)
 Definition Name := string.
@@ -103,7 +104,7 @@ Definition Labelidx := Idx.
 (** Alias definition : Localidx **)
 Definition Localidx := Idx.
 
-(** Inductive definition : Numtype **)
+(** Variant definition : Numtype **)
 Inductive Numtype : Type :=
  | Numtype__I32 : Numtype
  | Numtype__I64 : Numtype
@@ -112,20 +113,20 @@ Inductive Numtype : Type :=
 .
 Global Instance Inhabited_Numtype : Inhabited Numtype := { default_val := Numtype__I32 }.
 
-(** Inductive definition : Vectype **)
+(** Variant definition : Vectype **)
 Inductive Vectype : Type :=
  | Vectype__V128 : Vectype
 .
 Global Instance Inhabited_Vectype : Inhabited Vectype := { default_val := Vectype__V128 }.
 
-(** Inductive definition : Reftype **)
+(** Variant definition : Reftype **)
 Inductive Reftype : Type :=
  | Reftype__FUNCREF : Reftype
  | Reftype__EXTERNREF : Reftype
 .
 Global Instance Inhabited_Reftype : Inhabited Reftype := { default_val := Reftype__FUNCREF }.
 
-(** Inductive definition : Valtype **)
+(** Variant definition : Valtype **)
 Inductive Valtype : Type :=
  | Valtype__I32 : Valtype
  | Valtype__I64 : Valtype
@@ -139,6 +140,7 @@ Inductive Valtype : Type :=
 Global Instance Inhabited_Valtype : Inhabited Valtype := { default_val := Valtype__I32 }.
 
 (** Function definition : fun_valtype_numtype **)
+(* Dependencies:  *)
 Definition fun_valtype_numtype (arg: Numtype) : Valtype :=
   match arg with
   | Numtype__I32 => Valtype__I32
@@ -148,6 +150,7 @@ Definition fun_valtype_numtype (arg: Numtype) : Valtype :=
 end.
 
 (** Function definition : fun_valtype_reftype **)
+(* Dependencies:  *)
 Definition fun_valtype_reftype (arg: Reftype) : Valtype :=
   match arg with
   | Reftype__FUNCREF => Valtype__FUNCREF
@@ -155,33 +158,36 @@ Definition fun_valtype_reftype (arg: Reftype) : Valtype :=
 end.
 
 (** Function definition : fun_valtype_vectype **)
+(* Dependencies:  *)
 Definition fun_valtype_vectype (arg: Vectype) : Valtype :=
   match arg with
   | Vectype__V128 => Valtype__V128
 end.
 
-(** Inductive definition : In **)
-Inductive In : Type :=
- | In__I32 : In
- | In__I64 : In
+(** Variant definition : reserved__In **)
+Inductive reserved__In : Type :=
+ | reserved__In__I32 : reserved__In
+ | reserved__In__I64 : reserved__In
 .
-Global Instance Inhabited_In : Inhabited In := { default_val := In__I32 }.
+Global Instance Inhabited_reserved__In : Inhabited reserved__In := { default_val := reserved__In__I32 }.
 
 (** Function definition : fun_numtype_in **)
-Definition fun_numtype_in (arg: In) : Numtype :=
+(* Dependencies:  *)
+Definition fun_numtype_in (arg: reserved__In) : Numtype :=
   match arg with
-  | In__I32 => Numtype__I32
-  | In__I64 => Numtype__I64
+  | reserved__In__I32 => Numtype__I32
+  | reserved__In__I64 => Numtype__I64
 end.
 
 (** Function definition : fun_valtype_in **)
-Definition fun_valtype_in (arg: In) : Valtype :=
+(* Dependencies:  *)
+Definition fun_valtype_in (arg: reserved__In) : Valtype :=
   match arg with
-  | In__I32 => Valtype__I32
-  | In__I64 => Valtype__I64
+  | reserved__In__I32 => Valtype__I32
+  | reserved__In__I64 => Valtype__I64
 end.
 
-(** Inductive definition : Fn **)
+(** Variant definition : Fn **)
 Inductive Fn : Type :=
  | Fn__F32 : Fn
  | Fn__F64 : Fn
@@ -189,6 +195,7 @@ Inductive Fn : Type :=
 Global Instance Inhabited_Fn : Inhabited Fn := { default_val := Fn__F32 }.
 
 (** Function definition : fun_numtype_fn **)
+(* Dependencies:  *)
 Definition fun_numtype_fn (arg: Fn) : Numtype :=
   match arg with
   | Fn__F32 => Numtype__F32
@@ -196,6 +203,7 @@ Definition fun_numtype_fn (arg: Fn) : Numtype :=
 end.
 
 (** Function definition : fun_valtype_fn **)
+(* Dependencies:  *)
 Definition fun_valtype_fn (arg: Fn) : Valtype :=
   match arg with
   | Fn__F32 => Valtype__F32
@@ -229,7 +237,7 @@ Definition Elemtype := Reftype.
 (** Notation definition : Datatype **)
 Definition Datatype := (* mixop:  *) unit.
 
-(** Inductive definition : Externtype **)
+(** Variant definition : Externtype **)
 Inductive Externtype : Type :=
  | Externtype__GLOBAL : Globaltype -> Externtype
  | Externtype__FUNC : Functype -> Externtype
@@ -239,14 +247,14 @@ Inductive Externtype : Type :=
 Global Instance Inhabited_Externtype : Inhabited Externtype(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Sx **)
+(** Variant definition : Sx **)
 Inductive Sx : Type :=
  | Sx__U : Sx
  | Sx__S : Sx
 .
 Global Instance Inhabited_Sx : Inhabited Sx := { default_val := Sx__U }.
 
-(** Inductive definition : Unop_IXX **)
+(** Variant definition : Unop_IXX **)
 Inductive Unop_IXX : Type :=
  | Unop_IXX__CLZ : Unop_IXX
  | Unop_IXX__CTZ : Unop_IXX
@@ -254,7 +262,7 @@ Inductive Unop_IXX : Type :=
 .
 Global Instance Inhabited_Unop_IXX : Inhabited Unop_IXX := { default_val := Unop_IXX__CLZ }.
 
-(** Inductive definition : Unop_FXX **)
+(** Variant definition : Unop_FXX **)
 Inductive Unop_FXX : Type :=
  | Unop_FXX__ABS : Unop_FXX
  | Unop_FXX__NEG : Unop_FXX
@@ -266,7 +274,7 @@ Inductive Unop_FXX : Type :=
 .
 Global Instance Inhabited_Unop_FXX : Inhabited Unop_FXX := { default_val := Unop_FXX__ABS }.
 
-(** Inductive definition : Binop_IXX **)
+(** Variant definition : Binop_IXX **)
 Inductive Binop_IXX : Type :=
  | Binop_IXX__ADD : Binop_IXX
  | Binop_IXX__SUB : Binop_IXX
@@ -283,7 +291,7 @@ Inductive Binop_IXX : Type :=
 .
 Global Instance Inhabited_Binop_IXX : Inhabited Binop_IXX := { default_val := Binop_IXX__ADD }.
 
-(** Inductive definition : Binop_FXX **)
+(** Variant definition : Binop_FXX **)
 Inductive Binop_FXX : Type :=
  | Binop_FXX__ADD : Binop_FXX
  | Binop_FXX__SUB : Binop_FXX
@@ -295,19 +303,19 @@ Inductive Binop_FXX : Type :=
 .
 Global Instance Inhabited_Binop_FXX : Inhabited Binop_FXX := { default_val := Binop_FXX__ADD }.
 
-(** Inductive definition : Testop_IXX **)
+(** Variant definition : Testop_IXX **)
 Inductive Testop_IXX : Type :=
  | Testop_IXX__EQZ : Testop_IXX
 .
 Global Instance Inhabited_Testop_IXX : Inhabited Testop_IXX := { default_val := Testop_IXX__EQZ }.
 
-(** Inductive definition : Testop_FXX **)
+(** Variant definition : Testop_FXX **)
 Inductive Testop_FXX : Type :=
 .
 Global Instance Inhabited_Testop_FXX : Inhabited Testop_FXX(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Relop_IXX **)
+(** Variant definition : Relop_IXX **)
 Inductive Relop_IXX : Type :=
  | Relop_IXX__EQ : Relop_IXX
  | Relop_IXX__NE : Relop_IXX
@@ -318,7 +326,7 @@ Inductive Relop_IXX : Type :=
 .
 Global Instance Inhabited_Relop_IXX : Inhabited Relop_IXX := { default_val := Relop_IXX__EQ }.
 
-(** Inductive definition : Relop_FXX **)
+(** Variant definition : Relop_FXX **)
 Inductive Relop_FXX : Type :=
  | Relop_FXX__EQ : Relop_FXX
  | Relop_FXX__NE : Relop_FXX
@@ -329,7 +337,7 @@ Inductive Relop_FXX : Type :=
 .
 Global Instance Inhabited_Relop_FXX : Inhabited Relop_FXX := { default_val := Relop_FXX__EQ }.
 
-(** Inductive definition : Unop_numtype **)
+(** Variant definition : Unop_numtype **)
 Inductive Unop_numtype : Type :=
  | Unop_numtype___I : Unop_IXX -> Unop_numtype
  | Unop_numtype___F : Unop_FXX -> Unop_numtype
@@ -337,7 +345,7 @@ Inductive Unop_numtype : Type :=
 Global Instance Inhabited_Unop_numtype : Inhabited Unop_numtype(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Binop_numtype **)
+(** Variant definition : Binop_numtype **)
 Inductive Binop_numtype : Type :=
  | Binop_numtype___I : Binop_IXX -> Binop_numtype
  | Binop_numtype___F : Binop_FXX -> Binop_numtype
@@ -345,7 +353,7 @@ Inductive Binop_numtype : Type :=
 Global Instance Inhabited_Binop_numtype : Inhabited Binop_numtype(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Testop_numtype **)
+(** Variant definition : Testop_numtype **)
 Inductive Testop_numtype : Type :=
  | Testop_numtype___I : Testop_IXX -> Testop_numtype
  | Testop_numtype___F : Testop_FXX -> Testop_numtype
@@ -353,7 +361,7 @@ Inductive Testop_numtype : Type :=
 Global Instance Inhabited_Testop_numtype : Inhabited Testop_numtype(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Relop_numtype **)
+(** Variant definition : Relop_numtype **)
 Inductive Relop_numtype : Type :=
  | Relop_numtype___I : Relop_IXX -> Relop_numtype
  | Relop_numtype___F : Relop_FXX -> Relop_numtype
@@ -361,7 +369,7 @@ Inductive Relop_numtype : Type :=
 Global Instance Inhabited_Relop_numtype : Inhabited Relop_numtype(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Cvtop **)
+(** Variant definition : Cvtop **)
 Inductive Cvtop : Type :=
  | Cvtop__CONVERT : Cvtop
  | Cvtop__REINTERPRET : Cvtop
@@ -377,7 +385,7 @@ Definition C_vectype := nat.
 (** Alias definition : Blocktype **)
 Definition Blocktype := Functype.
 
-(** Inductive definition : Instr **)
+(** Variant definition : Instr **)
 Inductive Instr : Type :=
  | Instr__UNREACHABLE : Instr
  | Instr__NOP : Instr
@@ -397,7 +405,7 @@ Inductive Instr : Type :=
  | Instr__BINOP : (Numtype * Binop_numtype)%type -> Instr
  | Instr__TESTOP : (Numtype * Testop_numtype)%type -> Instr
  | Instr__RELOP : (Numtype * Relop_numtype)%type -> Instr
- | Instr__EXTEND : (Numtype * N)%type -> Instr
+ | Instr__EXTEND : (Numtype * reserved__N)%type -> Instr
  | Instr__CVTOP : (Numtype * Cvtop * Numtype * (option Sx))%type -> Instr
  | Instr__REF_NULL : Reftype -> Instr
  | Instr__REF_FUNC : Funcidx -> Instr
@@ -421,22 +429,22 @@ Inductive Instr : Type :=
  | Instr__MEMORY_COPY : Instr
  | Instr__MEMORY_INIT : Dataidx -> Instr
  | Instr__DATA_DROP : Dataidx -> Instr
- | Instr__LOAD : (Numtype * (option (N * Sx)%type) * nat * nat)%type -> Instr
- | Instr__STORE : (Numtype * (option N) * nat * nat)%type -> Instr
+ | Instr__LOAD : (Numtype * (option (reserved__N * Sx)%type) * U32 * U32)%type -> Instr
+ | Instr__STORE : (Numtype * (option reserved__N) * U32 * U32)%type -> Instr
 .
 Global Instance Inhabited_Instr : Inhabited Instr := { default_val := Instr__UNREACHABLE }.
 
 (** Alias definition : Expr **)
 Definition Expr := (list Instr).
 
-(** Inductive definition : Elemmode **)
+(** Variant definition : Elemmode **)
 Inductive Elemmode : Type :=
  | Elemmode__TABLE : (Tableidx * Expr)%type -> Elemmode
  | Elemmode__DECLARE : Elemmode
 .
 Global Instance Inhabited_Elemmode : Inhabited Elemmode := { default_val := Elemmode__DECLARE }.
 
-(** Inductive definition : Datamode **)
+(** Variant definition : Datamode **)
 Inductive Datamode : Type :=
  | Datamode__MEMORY : (Memidx * Expr)%type -> Datamode
 .
@@ -464,7 +472,7 @@ Definition Data := (* mixop:  *) ((list (list Byte)) * (option Datamode))%type.
 (** Notation definition : Start **)
 Definition Start := (* mixop:  *) Funcidx.
 
-(** Inductive definition : Externuse **)
+(** Variant definition : Externuse **)
 Inductive Externuse : Type :=
  | Externuse__FUNC : Funcidx -> Externuse
  | Externuse__GLOBAL : Globalidx -> Externuse
@@ -474,16 +482,35 @@ Inductive Externuse : Type :=
 Global Instance Inhabited_Externuse : Inhabited Externuse(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Notation definition : reserved_Export **)
-Definition reserved_Export := (* mixop:  *) (Name * Externuse)%type.
+(** Notation definition : reserved__Export **)
+Definition reserved__Export := (* mixop:  *) (Name * Externuse)%type.
 
-(** Notation definition : reserved_Import **)
-Definition reserved_Import := (* mixop:  *) (Name * Name * Externtype)%type.
+(** Notation definition : reserved__Import **)
+Definition reserved__Import := (* mixop:  *) (Name * Name * Externtype)%type.
 
 (** Notation definition : Module **)
-Definition Module := (* mixop:  *) ((list reserved_Import) * (list Func) * (list Global) * (list Table) * (list Mem) * (list Elem) * (list Data) * (list Start) * (list reserved_Export))%type.
+Definition Module := (* mixop:  *) ((list reserved__Import) * (list Func) * (list Global) * (list Table) * (list Mem) * (list Elem) * (list Data) * (list Start) * (list reserved__Export))%type.
+
+(** Function definition : fun_Ki **)
+(* Dependencies:  *)
+Definition fun_Ki (arg: unit) : nat :=
+  match arg with
+  | tt => 1024
+end.
+
+(** Function definition : fun_min **)
+(* Dependencies: min *)
+Fixpoint fun_min (arg: (nat * nat)%type) : nat.
+(* FIXME: Generated fixpoint definitions are fragile and may not directly pass the termination check. The following code is an attempt at rendering:
+  := match arg with
+  | (0, j) => 0
+  | (i, 0) => 0
+  | ((S (i)), (S (j))) => (fun_min (i, j))
+end *)
+Admitted.
 
 (** Function definition : fun_size **)
+(* Dependencies:  *)
 Definition fun_size (arg: Valtype) : (option nat) :=
   match arg with
   | Valtype__I32 => (Some 32)
@@ -495,18 +522,20 @@ Definition fun_size (arg: Valtype) : (option nat) :=
 end.
 
 (** Function definition : fun_test_sub_ATOM_22 **)
-Definition fun_test_sub_ATOM_22 (arg: N) : nat :=
+(* Dependencies:  *)
+Definition fun_test_sub_ATOM_22 (arg: reserved__N) : nat :=
   match arg with
   | n_3_ATOM_y => 0
 end.
 
 (** Function definition : fun_curried_ **)
-Definition fun_curried_ (arg: (N * N)%type) : nat :=
+(* Dependencies:  *)
+Definition fun_curried_ (arg: (reserved__N * reserved__N)%type) : nat :=
   match arg with
   | (n_1, n_2) => (n_1 + n_2)
 end.
 
-(** Inductive definition : Testfuse **)
+(** Variant definition : Testfuse **)
 Inductive Testfuse : Type :=
  | Testfuse__AB_ : (nat * nat * nat)%type -> Testfuse
  | Testfuse__CD : (nat * nat * nat)%type -> Testfuse
@@ -555,7 +584,7 @@ Global Instance Append_Context : Append Context := { _append arg1 arg2 := _appen
 
 (** Relation definition : Limits_ok **)
 Inductive Limits_ok : (Limits * nat)%type -> Prop := 
-  | Limits_ok__rule_0 (k : nat) (n_1 : N) (n_2 : N) : 
+  | Limits_ok__rule_0 (k : nat) (n_1 : reserved__N) (n_2 : reserved__N) : 
     ((n_1 <= n_2) /\ (n_2 <= k)) -> 
     (Limits_ok ((n_1, n_2), k))
 .
@@ -620,7 +649,7 @@ Inductive Resulttype_sub : ((list Valtype) * (list Valtype))%type -> Prop :=
 
 (** Relation definition : Limits_sub **)
 Inductive Limits_sub : (Limits * Limits)%type -> Prop := 
-  | Limits_sub__rule_0 (n_11 : N) (n_12 : N) (n_21 : N) (n_22 : N) : 
+  | Limits_sub__rule_0 (n_11 : reserved__N) (n_12 : reserved__N) (n_21 : reserved__N) (n_22 : reserved__N) : 
     (n_11 >= n_21) -> 
     (n_12 <= n_22) -> 
     (Limits_sub ((n_11, n_12), (n_21, n_22)))
@@ -738,7 +767,7 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     (Instr_ok (C, (Instr__TESTOP (nt, testop)), ([(fun_valtype_numtype nt)], [Valtype__I32])))
   | Instr_ok__relop (C : Context) (nt : Numtype) (relop : Relop_numtype) : 
     (Instr_ok (C, (Instr__RELOP (nt, relop)), ([(fun_valtype_numtype nt); (fun_valtype_numtype nt)], [Valtype__I32])))
-  | Instr_ok__extend (C : Context) (n : N) (nt : Numtype) (o0 : nat) : 
+  | Instr_ok__extend (C : Context) (n : reserved__N) (nt : Numtype) (o0 : nat) : 
     ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
     (n <= o0) -> 
     (Instr_ok (C, (Instr__EXTEND (nt, n)), ([(fun_valtype_numtype nt)], [(fun_valtype_numtype nt)])))
@@ -748,7 +777,7 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     (nt_1 <> nt_2) -> 
     (o0 = o1) -> 
     (Instr_ok (C, (Instr__CVTOP (nt_1, Cvtop__REINTERPRET, nt_2, None)), ([(fun_valtype_numtype nt_2)], [(fun_valtype_numtype nt_1)])))
-  | Instr_ok__convert_i (C : Context) (in_1 : In) (in_2 : In) (sx : (option Sx)) (o0 : nat) (o1 : nat) : 
+  | Instr_ok__convert_i (C : Context) (in_1 : reserved__In) (in_2 : reserved__In) (sx : (option Sx)) (o0 : nat) (o1 : nat) : 
     ((fun_size (fun_valtype_in in_1)) = (Some o0)) -> 
     ((fun_size (fun_valtype_in in_2)) = (Some o1)) -> 
     (in_1 <> in_2) -> 
@@ -793,9 +822,9 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     (x < List.length (C.(Context__TABLE))) -> 
     ((lookup_total C.(Context__TABLE) x) = (lim, rt)) -> 
     (Instr_ok (C, (Instr__TABLE_SET x), ([Valtype__I32; (fun_valtype_reftype rt)], nil)))
-  | Instr_ok__table_size (C : Context) (reserved_tt : Tabletype) (x : Idx) : 
+  | Instr_ok__table_size (C : Context) (reserved__tt : Tabletype) (x : Idx) : 
     (x < List.length (C.(Context__TABLE))) -> 
-    ((lookup_total C.(Context__TABLE) x) = reserved_tt) -> 
+    ((lookup_total C.(Context__TABLE) x) = reserved__tt) -> 
     (Instr_ok (C, (Instr__TABLE_SIZE x), (nil, [Valtype__I32])))
   | Instr_ok__table_grow (C : Context) (lim : Limits) (rt : Reftype) (x : Idx) : 
     (x < List.length (C.(Context__TABLE))) -> 
@@ -847,7 +876,7 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     (x < List.length (C.(Context__DATA))) -> 
     ((lookup_total C.(Context__DATA) x) = tt) -> 
     (Instr_ok (C, (Instr__DATA_DROP x), (nil, nil)))
-  | Instr_ok__load (C : Context) (reserved_in : In) (mt : Memtype) (n : (option N)) (n_A : N) (n_O : N) (nt : Numtype) (sx : (option Sx)) (o0 : nat) (o1 : (option nat)) : 
+  | Instr_ok__load (C : Context) (reserved__in : reserved__In) (mt : Memtype) (n : (option reserved__N)) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (sx : (option Sx)) (o0 : nat) (o1 : (option nat)) : 
     (0 < List.length (C.(Context__MEM))) -> 
     ((n = None) = (o1 = None)) -> 
     ((n = None) = (sx = None)) -> 
@@ -856,9 +885,9 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     ((lookup_total C.(Context__MEM) 0) = mt) -> 
     ((((Nat.pow 2) n_A)) <= (((Nat.div o0) 8))) -> 
     (List.Forall2 (fun n o1 => (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) /\ ((((Nat.div n) 8)) < (((Nat.div o1) 8))))) (option_to_list n) (option_to_list o1)) -> 
-    ((n = None) \/ (nt = (fun_numtype_in reserved_in))) -> 
+    ((n = None) \/ (nt = (fun_numtype_in reserved__in))) -> 
     (Instr_ok (C, (Instr__LOAD (nt, (option_zip (fun n sx => (n, sx)) n sx), n_A, n_O)), ([Valtype__I32], [(fun_valtype_numtype nt)])))
-  | Instr_ok__store (C : Context) (reserved_in : In) (mt : Memtype) (n : (option N)) (n_A : N) (n_O : N) (nt : Numtype) (o0 : nat) (o1 : (option nat)) : 
+  | Instr_ok__store (C : Context) (reserved__in : reserved__In) (mt : Memtype) (n : (option reserved__N)) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (o0 : nat) (o1 : (option nat)) : 
     (0 < List.length (C.(Context__MEM))) -> 
     ((n = None) = (o1 = None)) -> 
     ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
@@ -866,7 +895,7 @@ Inductive Instr_ok : (Context * Instr * Functype)%type -> Prop :=
     ((lookup_total C.(Context__MEM) 0) = mt) -> 
     ((((Nat.pow 2) n_A)) <= (((Nat.div o0) 8))) -> 
     (List.Forall2 (fun n o1 => (((((Nat.pow 2) n_A)) <= (((Nat.div n) 8))) /\ ((((Nat.div n) 8)) < (((Nat.div o1) 8))))) (option_to_list n) (option_to_list o1)) -> 
-    ((n = None) \/ (nt = (fun_numtype_in reserved_in))) -> 
+    ((n = None) \/ (nt = (fun_numtype_in reserved__in))) -> 
     (Instr_ok (C, (Instr__STORE (nt, n, n_A, n_O)), ([Valtype__I32; (fun_valtype_numtype nt)], nil)))
 
 with (** Relation definition : InstrSeq_ok **)
@@ -943,9 +972,9 @@ Inductive Global_ok : (Context * Global * Globaltype)%type -> Prop :=
 
 (** Relation definition : Table_ok **)
 Inductive Table_ok : (Context * Table * Tabletype)%type -> Prop := 
-  | Table_ok__rule_0 (C : Context) (reserved_tt : Tabletype) : 
-    (Tabletype_ok reserved_tt) -> 
-    (Table_ok (C, reserved_tt, reserved_tt))
+  | Table_ok__rule_0 (C : Context) (reserved__tt : Tabletype) : 
+    (Tabletype_ok reserved__tt) -> 
+    (Table_ok (C, reserved__tt, reserved__tt))
 .
 
 (** Relation definition : Mem_ok **)
@@ -999,7 +1028,7 @@ Inductive Start_ok : (Context * Start)%type -> Prop :=
 .
 
 (** Relation definition : Import_ok **)
-Inductive Import_ok : (Context * reserved_Import * Externtype)%type -> Prop := 
+Inductive Import_ok : (Context * reserved__Import * Externtype)%type -> Prop := 
   | Import_ok__rule_0 (C : Context) (name_1 : Name) (name_2 : Name) (xt : Externtype) : 
     (Externtype_ok xt) -> 
     (Import_ok (C, (name_1, name_2, xt), xt))
@@ -1015,10 +1044,10 @@ Inductive Externuse_ok : (Context * Externuse * Externtype)%type -> Prop :=
     (x < List.length (C.(Context__GLOBAL))) -> 
     ((lookup_total C.(Context__GLOBAL) x) = gt) -> 
     (Externuse_ok (C, (Externuse__GLOBAL x), (Externtype__GLOBAL gt)))
-  | Externuse_ok__table (C : Context) (reserved_tt : Tabletype) (x : Idx) : 
+  | Externuse_ok__table (C : Context) (reserved__tt : Tabletype) (x : Idx) : 
     (x < List.length (C.(Context__TABLE))) -> 
-    ((lookup_total C.(Context__TABLE) x) = reserved_tt) -> 
-    (Externuse_ok (C, (Externuse__TABLE x), (Externtype__TABLE reserved_tt)))
+    ((lookup_total C.(Context__TABLE) x) = reserved__tt) -> 
+    (Externuse_ok (C, (Externuse__TABLE x), (Externtype__TABLE reserved__tt)))
   | Externuse_ok__mem (C : Context) (mt : Memtype) (x : Idx) : 
     (x < List.length (C.(Context__MEM))) -> 
     ((lookup_total C.(Context__MEM) x) = mt) -> 
@@ -1026,7 +1055,7 @@ Inductive Externuse_ok : (Context * Externuse * Externtype)%type -> Prop :=
 .
 
 (** Relation definition : Export_ok **)
-Inductive Export_ok : (Context * reserved_Export * Externtype)%type -> Prop := 
+Inductive Export_ok : (Context * reserved__Export * Externtype)%type -> Prop := 
   | Export_ok__rule_0 (C : Context) (externuse : Externuse) (name : Name) (xt : Externtype) : 
     (Externuse_ok (C, externuse, xt)) -> 
     (Export_ok (C, (name, externuse), xt))
@@ -1034,17 +1063,17 @@ Inductive Export_ok : (Context * reserved_Export * Externtype)%type -> Prop :=
 
 (** Relation definition : Module_ok **)
 Inductive Module_ok : Module -> Prop := 
-  | Module_ok__rule_0 (C : Context) (data : (list Data)) (elem : (list Elem)) (export : (list reserved_Export)) (ft : (list Functype)) (func : (list Func)) (global : (list Global)) (gt : (list Globaltype)) (import : (list reserved_Import)) (mem : (list Mem)) (mt : (list Memtype)) (n : N) (rt : (list Reftype)) (start : (list Start)) (table : (list Table)) (reserved_tt : (list Tabletype)) : 
+  | Module_ok__rule_0 (C : Context) (data : (list Data)) (elem : (list Elem)) (export : (list reserved__Export)) (ft : (list Functype)) (func : (list Func)) (global : (list Global)) (gt : (list Globaltype)) (import : (list reserved__Import)) (mem : (list Mem)) (mt : (list Memtype)) (n : reserved__N) (rt : (list Reftype)) (start : (list Start)) (table : (list Table)) (reserved__tt : (list Tabletype)) : 
     (List.length (ft) = List.length (func)) -> 
     (List.length (global) = List.length (gt)) -> 
-    (List.length (table) = List.length (reserved_tt)) -> 
+    (List.length (table) = List.length (reserved__tt)) -> 
     (List.length (mem) = List.length (mt)) -> 
     (List.length (elem) = List.length (rt)) -> 
     (List.length (data) = n) -> 
-    (C = {| Context__FUNC := ft; Context__GLOBAL := gt; Context__TABLE := reserved_tt; Context__MEM := mt; Context__ELEM := rt; Context__DATA := [tt]; Context__LOCAL := nil; Context__LABEL := nil; Context__RETURN := None |}) -> 
+    (C = {| Context__FUNC := ft; Context__GLOBAL := gt; Context__TABLE := reserved__tt; Context__MEM := mt; Context__ELEM := rt; Context__DATA := [tt]; Context__LOCAL := nil; Context__LABEL := nil; Context__RETURN := None |}) -> 
     (List.Forall2 (fun ft func => (Func_ok (C, func, ft))) ft func) -> 
     (List.Forall2 (fun global gt => (Global_ok (C, global, gt))) global gt) -> 
-    (List.Forall2 (fun table reserved_tt => (Table_ok (C, table, reserved_tt))) table reserved_tt) -> 
+    (List.Forall2 (fun table reserved__tt => (Table_ok (C, table, reserved__tt))) table reserved__tt) -> 
     (List.Forall2 (fun mem mt => (Mem_ok (C, mem, mt))) mem mt) -> 
     (List.Forall2 (fun elem rt => (Elem_ok (C, elem, rt))) elem rt) -> 
     (List.Forall (fun data => (Data_ok (C, data))) data) -> 
@@ -1081,14 +1110,14 @@ Definition Labeladdr := Addr.
 (** Alias definition : Hostaddr **)
 Definition Hostaddr := Addr.
 
-(** Inductive definition : Num **)
+(** Variant definition : Num **)
 Inductive Num : Type :=
  | Num__CONST : (Numtype * C_numtype)%type -> Num
 .
 Global Instance Inhabited_Num : Inhabited Num(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Ref **)
+(** Variant definition : Ref **)
 Inductive Ref : Type :=
  | Ref__REF_NULL : Reftype -> Ref
  | Ref__REF_FUNC_ADDR : Funcaddr -> Ref
@@ -1097,7 +1126,7 @@ Inductive Ref : Type :=
 Global Instance Inhabited_Ref : Inhabited Ref(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Val **)
+(** Variant definition : Val **)
 Inductive Val : Type :=
  | Val__CONST : (Numtype * C_numtype)%type -> Val
  | Val__REF_NULL : Reftype -> Val
@@ -1107,14 +1136,14 @@ Inductive Val : Type :=
 Global Instance Inhabited_Val : Inhabited Val(* FIXME: no inhabitant found! *) .
   Admitted.
 
-(** Inductive definition : Result **)
+(** Variant definition : Result **)
 Inductive Result : Type :=
  | Result___VALS : (list Val) -> Result
  | Result__TRAP : Result
 .
 Global Instance Inhabited_Result : Inhabited Result := { default_val := Result__TRAP }.
 
-(** Inductive definition : Externval **)
+(** Variant definition : Externval **)
 Inductive Externval : Type :=
  | Externval__FUNC : Funcaddr -> Externval
  | Externval__GLOBAL : Globaladdr -> Externval
@@ -1125,6 +1154,7 @@ Global Instance Inhabited_Externval : Inhabited Externval(* FIXME: no inhabitant
   Admitted.
 
 (** Function definition : fun_default_ **)
+(* Dependencies:  *)
 Definition fun_default_ (arg: Valtype) : (option Val) :=
   match arg with
   | Valtype__I32 => (Some (Val__CONST (Numtype__I32, 0)))
@@ -1232,7 +1262,7 @@ Global Instance Append_Frame : Append Frame := { _append arg1 arg2 := _append_Fr
 (** Notation definition : State **)
 Definition State := (* mixop:  *) (Store * Frame)%type.
 
-(** Inductive definition : Admininstr **)
+(** Variant definition : Admininstr **)
 Inductive Admininstr : Type :=
  | Admininstr__UNREACHABLE : Admininstr
  | Admininstr__NOP : Admininstr
@@ -1252,7 +1282,7 @@ Inductive Admininstr : Type :=
  | Admininstr__BINOP : (Numtype * Binop_numtype)%type -> Admininstr
  | Admininstr__TESTOP : (Numtype * Testop_numtype)%type -> Admininstr
  | Admininstr__RELOP : (Numtype * Relop_numtype)%type -> Admininstr
- | Admininstr__EXTEND : (Numtype * N)%type -> Admininstr
+ | Admininstr__EXTEND : (Numtype * reserved__N)%type -> Admininstr
  | Admininstr__CVTOP : (Numtype * Cvtop * Numtype * (option Sx))%type -> Admininstr
  | Admininstr__REF_NULL : Reftype -> Admininstr
  | Admininstr__REF_FUNC : Funcidx -> Admininstr
@@ -1276,18 +1306,19 @@ Inductive Admininstr : Type :=
  | Admininstr__MEMORY_COPY : Admininstr
  | Admininstr__MEMORY_INIT : Dataidx -> Admininstr
  | Admininstr__DATA_DROP : Dataidx -> Admininstr
- | Admininstr__LOAD : (Numtype * (option (N * Sx)%type) * nat * nat)%type -> Admininstr
- | Admininstr__STORE : (Numtype * (option N) * nat * nat)%type -> Admininstr
+ | Admininstr__LOAD : (Numtype * (option (reserved__N * Sx)%type) * U32 * U32)%type -> Admininstr
+ | Admininstr__STORE : (Numtype * (option reserved__N) * U32 * U32)%type -> Admininstr
  | Admininstr__REF_FUNC_ADDR : Funcaddr -> Admininstr
  | Admininstr__REF_HOST_ADDR : Hostaddr -> Admininstr
  | Admininstr__CALL_ADDR : Funcaddr -> Admininstr
- | Admininstr__LABEL_ : (N * (list Instr) * (list Admininstr))%type -> Admininstr
- | Admininstr__FRAME_ : (N * Frame * (list Admininstr))%type -> Admininstr
+ | Admininstr__LABEL_ : (reserved__N * (list Instr) * (list Admininstr))%type -> Admininstr
+ | Admininstr__FRAME_ : (reserved__N * Frame * (list Admininstr))%type -> Admininstr
  | Admininstr__TRAP : Admininstr
 .
 Global Instance Inhabited_Admininstr : Inhabited Admininstr := { default_val := Admininstr__UNREACHABLE }.
 
 (** Function definition : fun_admininstr_globalinst **)
+(* Dependencies:  *)
 Definition fun_admininstr_globalinst (arg: Globalinst) : Admininstr :=
   match arg with
   | (Val__CONST x) => (Admininstr__CONST x)
@@ -1297,6 +1328,7 @@ Definition fun_admininstr_globalinst (arg: Globalinst) : Admininstr :=
 end.
 
 (** Function definition : fun_admininstr_instr **)
+(* Dependencies:  *)
 Definition fun_admininstr_instr (arg: Instr) : Admininstr :=
   match arg with
   | Instr__UNREACHABLE => Admininstr__UNREACHABLE
@@ -1346,6 +1378,7 @@ Definition fun_admininstr_instr (arg: Instr) : Admininstr :=
 end.
 
 (** Function definition : fun_admininstr_ref **)
+(* Dependencies:  *)
 Definition fun_admininstr_ref (arg: Ref) : Admininstr :=
   match arg with
   | (Ref__REF_NULL x) => (Admininstr__REF_NULL x)
@@ -1354,6 +1387,7 @@ Definition fun_admininstr_ref (arg: Ref) : Admininstr :=
 end.
 
 (** Function definition : fun_admininstr_val **)
+(* Dependencies:  *)
 Definition fun_admininstr_val (arg: Val) : Admininstr :=
   match arg with
   | (Val__CONST x) => (Admininstr__CONST x)
@@ -1366,141 +1400,193 @@ end.
 Definition Config := (* mixop:  *) (State * (list Admininstr))%type.
 
 (** Function definition : fun_funcaddr **)
+(* Dependencies:  *)
 Definition fun_funcaddr (arg: State) : (list Funcaddr) :=
   match arg with
   | (s, f) => f.(Frame__MODULE).(Moduleinst__FUNC)
 end.
 
 (** Function definition : fun_funcinst **)
+(* Dependencies:  *)
 Definition fun_funcinst (arg: State) : (list Funcinst) :=
   match arg with
   | (s, f) => s.(Store__FUNC)
 end.
 
 (** Function definition : fun_func **)
+(* Dependencies:  *)
 Definition fun_func (arg: (State * Funcidx)%type) : Funcinst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__FUNC) (lookup_total f.(Frame__MODULE).(Moduleinst__FUNC) x))
 end.
 
 (** Function definition : fun_global **)
+(* Dependencies:  *)
 Definition fun_global (arg: (State * Globalidx)%type) : Globalinst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__GLOBAL) (lookup_total f.(Frame__MODULE).(Moduleinst__GLOBAL) x))
 end.
 
 (** Function definition : fun_table **)
+(* Dependencies:  *)
 Definition fun_table (arg: (State * Tableidx)%type) : Tableinst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x))
 end.
 
 (** Function definition : fun_mem **)
+(* Dependencies:  *)
 Definition fun_mem (arg: (State * Memidx)%type) : Meminst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__MEM) (lookup_total f.(Frame__MODULE).(Moduleinst__MEM) x))
 end.
 
 (** Function definition : fun_elem **)
+(* Dependencies:  *)
 Definition fun_elem (arg: (State * Tableidx)%type) : Eleminst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__ELEM) (lookup_total f.(Frame__MODULE).(Moduleinst__ELEM) x))
 end.
 
 (** Function definition : fun_data **)
+(* Dependencies:  *)
 Definition fun_data (arg: (State * Dataidx)%type) : Datainst :=
   match arg with
   | ((s, f), x) => (lookup_total s.(Store__DATA) (lookup_total f.(Frame__MODULE).(Moduleinst__DATA) x))
 end.
 
 (** Function definition : fun_local **)
+(* Dependencies:  *)
 Definition fun_local (arg: (State * Localidx)%type) : Val :=
   match arg with
   | ((s, f), x) => (lookup_total f.(Frame__LOCAL) x)
 end.
 
 (** Function definition : fun_with_local **)
+(* Dependencies:  *)
 Definition fun_with_local (arg: (State * Localidx * Val)%type) : State :=
   match arg with
-  | ((s, f), x, v) => (s, f
-  (* TODO: Coq need a bit more help for dealing with records 
-  {f with LOCAL := (list_update f.(LOCAL) x v) }*))
+  | ((s, f), x, v) => (s, (* TODO: Coq need a bit more help for dealing with records 
+  {f with LOCAL := (list_update f.(LOCAL) x v) } *)f)
 end.
 
 (** Function definition : fun_with_global **)
+(* Dependencies:  *)
 Definition fun_with_global (arg: (State * Globalidx * Val)%type) : State :=
   match arg with
-  | ((s, f), x, v) => (s
-  (* TODO: Coq need a bit more help for dealing with records 
-  {s with GLOBAL := (list_update s.(GLOBAL) (lookup_total f.(Frame__MODULE).(Moduleinst__GLOBAL) x) v) }*), f)
+  | ((s, f), x, v) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with GLOBAL := (list_update s.(GLOBAL) (lookup_total f.(Frame__MODULE).(Moduleinst__GLOBAL) x) v) } *)s, f)
 end.
 
 (** Function definition : fun_with_table **)
-Definition fun_with_table (arg: (State * Tableidx * N * Ref)%type) : State :=
+(* Dependencies:  *)
+Definition fun_with_table (arg: (State * Tableidx * nat * Ref)%type) : State :=
   match arg with
-  | ((s, f), x, i, r) => (s
-  (* TODO: Coq need a bit more help for dealing with records 
-  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) (list_update (lookup_total s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x)) i r)) }*), f)
+  | ((s, f), x, i, r) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) (list_update (lookup_total s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x)) i r)) } *)s, f)
 end.
 
 (** Function definition : fun_with_tableext **)
+(* Dependencies:  *)
 Definition fun_with_tableext (arg: (State * Tableidx * (list Ref))%type) : State :=
   match arg with
-  | ((s, f), x, r) => (s
-  (* TODO: Coq need a bit more help for dealing with records 
-  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) (List.app (lookup_total s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x)) r)) }*), f)
+  | ((s, f), x, r) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) (List.app (lookup_total s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x)) r)) } *)s, f)
+end.
+
+(** Function definition : fun_with_mem **)
+(* Dependencies:  *)
+Definition fun_with_mem (arg: (State * Tableidx * nat * nat * (list Byte))%type) : State :=
+  match arg with
+  | ((s, f), x, i, j, b) => (default_val (* TODO *), f)
+end.
+
+(** Function definition : fun_with_memext **)
+(* Dependencies:  *)
+Definition fun_with_memext (arg: (State * Tableidx * (list Byte))%type) : State :=
+  match arg with
+  | ((s, f), x, b) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with MEM := (list_update s.(MEM) (lookup_total f.(Frame__MODULE).(Moduleinst__MEM) x) (List.app (lookup_total s.(MEM) (lookup_total f.(Frame__MODULE).(Moduleinst__MEM) x)) b)) } *)s, f)
 end.
 
 (** Function definition : fun_with_elem **)
+(* Dependencies:  *)
 Definition fun_with_elem (arg: (State * Elemidx * (list Ref))%type) : State :=
   match arg with
-  | ((s, f), x, r) => (s
-  (* TODO: Coq need a bit more help for dealing with records 
-  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) r) }*), f)
+  | ((s, f), x, r) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with TABLE := (list_update s.(TABLE) (lookup_total f.(Frame__MODULE).(Moduleinst__TABLE) x) r) } *)s, f)
 end.
 
-(** Inductive definition : E **)
+(** Function definition : fun_with_data **)
+(* Dependencies:  *)
+Definition fun_with_data (arg: (State * Dataidx * (list Byte))%type) : State :=
+  match arg with
+  | ((s, f), x, b) => ((* TODO: Coq need a bit more help for dealing with records 
+  {s with MEM := (list_update s.(MEM) (lookup_total f.(Frame__MODULE).(Moduleinst__MEM) x) b) } *)s, f)
+end.
+
+(** Variant definition : E **)
 Inductive E : Type :=
  | E___HOLE : E
  | E___SEQ : ((list Val) * E * (list Instr))%type -> E
- | E__LABEL_ : (N * (list Instr) * E)%type -> E
+ | E__LABEL_ : (reserved__N * (list Instr) * E)%type -> E
 .
 Global Instance Inhabited_E : Inhabited E := { default_val := E___HOLE }.
 
 (** Function definition : fun_unop **)
+(* Dependencies:  *)
 Definition fun_unop (arg: (Unop_numtype * Numtype * C_numtype)%type) : (list C_numtype) :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
 end.
 
 (** Function definition : fun_binop **)
+(* Dependencies:  *)
 Definition fun_binop (arg: (Binop_numtype * Numtype * C_numtype * C_numtype)%type) : (list C_numtype) :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
 end.
 
 (** Function definition : fun_testop **)
+(* Dependencies:  *)
 Definition fun_testop (arg: (Testop_numtype * Numtype * C_numtype)%type) : C_numtype :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
 end.
 
 (** Function definition : fun_relop **)
+(* Dependencies:  *)
 Definition fun_relop (arg: (Relop_numtype * Numtype * C_numtype * C_numtype)%type) : C_numtype :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
 end.
 
 (** Function definition : fun_ext **)
+(* Dependencies:  *)
 Definition fun_ext (arg: (nat * nat * Sx * C_numtype)%type) : C_numtype :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
 end.
 
 (** Function definition : fun_cvtop **)
+(* Dependencies:  *)
 Definition fun_cvtop (arg: (Numtype * Cvtop * Numtype * (option Sx) * C_numtype)%type) : (list C_numtype) :=
   match arg with
-  | _ => default_val 
+  | _ => default_val
+end.
+
+(** Function definition : fun_wrap_ **)
+(* Dependencies:  *)
+Definition fun_wrap_ (arg: ((nat * nat)%type * C_numtype)%type) : nat :=
+  match arg with
+  | _ => default_val
+end.
+
+(** Function definition : fun_bytes_ **)
+(* Dependencies:  *)
+Definition fun_bytes_ (arg: (nat * C_numtype)%type) : (list Byte) :=
+  match arg with
+  | _ => default_val
 end.
 
 (** Relation definition : Step_pure_before_ref_is_null_false **)
@@ -1524,13 +1610,13 @@ Inductive Step_pure : ((list Admininstr) * (list Admininstr))%type -> Prop :=
   | Step_pure__select_false (c : C_numtype) (t : (option Valtype)) (val_1 : Val) (val_2 : Val) : 
     (c = 0) -> 
     (Step_pure ([(fun_admininstr_val val_1); (fun_admininstr_val val_2); (Admininstr__CONST (Numtype__I32, c)); (Admininstr__SELECT t)], [(fun_admininstr_val val_2)]))
-  | Step_pure__block (bt : Blocktype) (instr : (list Instr)) (k : nat) (n : N) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) : 
+  | Step_pure__block (bt : Blocktype) (instr : (list Instr)) (k : nat) (n : reserved__N) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) : 
     (List.length (t_1) = k) -> 
     (List.length (t_2) = n) -> 
     (List.length (val) = k) -> 
     (bt = (t_1, t_2)) -> 
     (Step_pure (((List.map fun_admininstr_val val) ++ [(Admininstr__BLOCK (bt, instr))]), [(Admininstr__LABEL_ (n, nil, ((List.map fun_admininstr_val val) ++ (List.map fun_admininstr_instr instr))))]))
-  | Step_pure__loop (bt : Blocktype) (instr : (list Instr)) (k : nat) (n : N) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) : 
+  | Step_pure__loop (bt : Blocktype) (instr : (list Instr)) (k : nat) (n : reserved__N) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) : 
     (List.length (t_1) = k) -> 
     (List.length (t_2) = n) -> 
     (List.length (val) = k) -> 
@@ -1542,12 +1628,12 @@ Inductive Step_pure : ((list Admininstr) * (list Admininstr))%type -> Prop :=
   | Step_pure__if_false (bt : Blocktype) (c : C_numtype) (instr_1 : (list Instr)) (instr_2 : (list Instr)) : 
     (c = 0) -> 
     (Step_pure ([(Admininstr__CONST (Numtype__I32, c)); (Admininstr__IF (bt, instr_1, instr_2))], [(Admininstr__BLOCK (bt, instr_2))]))
-  | Step_pure__label_vals (instr : (list Instr)) (n : N) (val : (list Val)) : 
+  | Step_pure__label_vals (instr : (list Instr)) (n : reserved__N) (val : (list Val)) : 
     (Step_pure ([(Admininstr__LABEL_ (n, instr, (List.map fun_admininstr_val val)))], (List.map fun_admininstr_val val)))
-  | Step_pure__br_zero (instr : (list Instr)) (instr' : (list Instr)) (n : N) (val : (list Val)) (val' : (list Val)) : 
+  | Step_pure__br_zero (instr : (list Instr)) (instr' : (list Instr)) (n : reserved__N) (val : (list Val)) (val' : (list Val)) : 
     (List.length (val) = n) -> 
     (Step_pure ([(Admininstr__LABEL_ (n, instr', ((List.map fun_admininstr_val val') ++ ((List.map fun_admininstr_val val) ++ ([(Admininstr__BR 0)] ++ (List.map fun_admininstr_instr instr))))))], ((List.map fun_admininstr_val val) ++ (List.map fun_admininstr_instr instr'))))
-  | Step_pure__br_succ (instr : (list Instr)) (instr' : (list Instr)) (l : Labelidx) (n : N) (val : (list Val)) : 
+  | Step_pure__br_succ (instr : (list Instr)) (instr' : (list Instr)) (l : Labelidx) (n : reserved__N) (val : (list Val)) : 
     (Step_pure ([(Admininstr__LABEL_ (n, instr', ((List.map fun_admininstr_val val) ++ ([(Admininstr__BR (l + 1))] ++ (List.map fun_admininstr_instr instr)))))], ((List.map fun_admininstr_val val) ++ [(Admininstr__BR l)])))
   | Step_pure__br_if_true (c : C_numtype) (l : Labelidx) : 
     (c <> 0) -> 
@@ -1561,10 +1647,10 @@ Inductive Step_pure : ((list Admininstr) * (list Admininstr))%type -> Prop :=
   | Step_pure__br_table_ge (i : nat) (l : (list Labelidx)) (l' : Labelidx) : 
     (i >= List.length (l)) -> 
     (Step_pure ([(Admininstr__CONST (Numtype__I32, i)); (Admininstr__BR_TABLE (l, l'))], [(Admininstr__BR l')]))
-  | Step_pure__frame_vals (f : Frame) (n : N) (val : (list Val)) : 
+  | Step_pure__frame_vals (f : Frame) (n : reserved__N) (val : (list Val)) : 
     (List.length (val) = n) -> 
     (Step_pure ([(Admininstr__FRAME_ (n, f, (List.map fun_admininstr_val val)))], (List.map fun_admininstr_val val)))
-  | Step_pure__return_frame (f : Frame) (instr : (list Instr)) (n : N) (val : (list Val)) (val' : (list Val)) : 
+  | Step_pure__return_frame (f : Frame) (instr : (list Instr)) (n : reserved__N) (val : (list Val)) (val' : (list Val)) : 
     (List.length (val) = n) -> 
     (Step_pure ([(Admininstr__FRAME_ (n, f, ((List.map fun_admininstr_val val') ++ ((List.map fun_admininstr_val val) ++ ([Admininstr__RETURN] ++ (List.map fun_admininstr_instr instr))))))], (List.map fun_admininstr_val val)))
   | Step_pure__return_label (instr : (list Instr)) (instr' : (list Instr)) (k : nat) (val : (list Val)) : 
@@ -1587,7 +1673,7 @@ Inductive Step_pure : ((list Admininstr) * (list Admininstr))%type -> Prop :=
   | Step_pure__relop (c : C_numtype) (c_1 : C_numtype) (c_2 : C_numtype) (nt : Numtype) (relop : Relop_numtype) : 
     (c = (fun_relop (relop, nt, c_1, c_2))) -> 
     (Step_pure ([(Admininstr__CONST (nt, c_1)); (Admininstr__CONST (nt, c_2)); (Admininstr__RELOP (nt, relop))], [(Admininstr__CONST (Numtype__I32, c))]))
-  | Step_pure__extend (c : C_numtype) (n : N) (nt : Numtype) (o0 : nat) : 
+  | Step_pure__extend (c : C_numtype) (n : reserved__N) (nt : Numtype) (o0 : nat) : 
     ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
     (Step_pure ([(Admininstr__CONST (nt, c)); (Admininstr__EXTEND (nt, n))], [(Admininstr__CONST (nt, (fun_ext (n, o0, Sx__S, c))))]))
   | Step_pure__cvtop_val (c : C_numtype) (c_1 : C_numtype) (cvtop : Cvtop) (nt : Numtype) (nt_1 : Numtype) (nt_2 : Numtype) (sx : (option Sx)) : 
@@ -1618,71 +1704,140 @@ Inductive Step_read_before_call_indirect_trap : Config -> Prop :=
 
 (** Relation definition : Step_read_before_table_fill_zero **)
 Inductive Step_read_before_table_fill_zero : Config -> Prop := 
-  | Step_read_before_table_fill_zero__table_fill_trap (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read_before_table_fill_zero__table_fill_trap (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > List.length ((fun_table (z, x)))) -> 
     (Step_read_before_table_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))
 .
 
 (** Relation definition : Step_read_before_table_fill_succ **)
 Inductive Step_read_before_table_fill_succ : Config -> Prop := 
-  | Step_read_before_table_fill_succ__table_fill_zero (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read_before_table_fill_succ__table_fill_zero (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     (~  (Step_read_before_table_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))) -> 
     (n = 0) -> 
     (Step_read_before_table_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))
-  | Step_read_before_table_fill_succ__table_fill_trap (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read_before_table_fill_succ__table_fill_trap (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > List.length ((fun_table (z, x)))) -> 
     (Step_read_before_table_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))
 .
 
 (** Relation definition : Step_read_before_table_copy_zero **)
 Inductive Step_read_before_table_copy_zero : Config -> Prop := 
-  | Step_read_before_table_copy_zero__table_copy_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_zero__table_copy_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_table (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read_before_table_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
 .
 
 (** Relation definition : Step_read_before_table_copy_le **)
 Inductive Step_read_before_table_copy_le : Config -> Prop := 
-  | Step_read_before_table_copy_le__table_copy_zero (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_le__table_copy_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (n = 0) -> 
     (Step_read_before_table_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
-  | Step_read_before_table_copy_le__table_copy_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_le__table_copy_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_table (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read_before_table_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
 .
 
 (** Relation definition : Step_read_before_table_copy_gt **)
 Inductive Step_read_before_table_copy_gt : Config -> Prop := 
-  | Step_read_before_table_copy_gt__table_copy_le (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_gt__table_copy_le (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (j <= i) -> 
     (Step_read_before_table_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
-  | Step_read_before_table_copy_gt__table_copy_zero (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_gt__table_copy_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (n = 0) -> 
     (Step_read_before_table_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
-  | Step_read_before_table_copy_gt__table_copy_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_copy_gt__table_copy_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_table (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read_before_table_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))
 .
 
 (** Relation definition : Step_read_before_table_init_zero **)
 Inductive Step_read_before_table_init_zero : Config -> Prop := 
-  | Step_read_before_table_init_zero__table_init_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_init_zero__table_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_elem (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read_before_table_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))
 .
 
 (** Relation definition : Step_read_before_table_init_succ **)
 Inductive Step_read_before_table_init_succ : Config -> Prop := 
-  | Step_read_before_table_init_succ__table_init_zero (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_init_succ__table_init_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))) -> 
     (n = 0) -> 
     (Step_read_before_table_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))
-  | Step_read_before_table_init_succ__table_init_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read_before_table_init_succ__table_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_elem (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read_before_table_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))
+.
+
+(** Relation definition : Step_read_before_memory_fill_zero **)
+Inductive Step_read_before_memory_fill_zero : Config -> Prop := 
+  | Step_read_before_memory_fill_zero__memory_fill_trap (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    ((i + n) > List.length ((fun_mem (z, 0)))) -> 
+    (Step_read_before_memory_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))
+.
+
+(** Relation definition : Step_read_before_memory_fill_succ **)
+Inductive Step_read_before_memory_fill_succ : Config -> Prop := 
+  | Step_read_before_memory_fill_succ__memory_fill_zero (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    (~  (Step_read_before_memory_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))) -> 
+    (n = 0) -> 
+    (Step_read_before_memory_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))
+  | Step_read_before_memory_fill_succ__memory_fill_trap (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    ((i + n) > List.length ((fun_mem (z, 0)))) -> 
+    (Step_read_before_memory_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))
+.
+
+(** Relation definition : Step_read_before_memory_copy_zero **)
+Inductive Step_read_before_memory_copy_zero : Config -> Prop := 
+  | Step_read_before_memory_copy_zero__memory_copy_trap (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (((i + n) > List.length ((fun_table (z, 0)))) \/ ((j + n) > List.length ((fun_table (z, 0))))) -> 
+    (Step_read_before_memory_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+.
+
+(** Relation definition : Step_read_before_memory_copy_le **)
+Inductive Step_read_before_memory_copy_le : Config -> Prop := 
+  | Step_read_before_memory_copy_le__memory_copy_zero (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (n = 0) -> 
+    (Step_read_before_memory_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+  | Step_read_before_memory_copy_le__memory_copy_trap (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (((i + n) > List.length ((fun_table (z, 0)))) \/ ((j + n) > List.length ((fun_table (z, 0))))) -> 
+    (Step_read_before_memory_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+.
+
+(** Relation definition : Step_read_before_memory_copy_gt **)
+Inductive Step_read_before_memory_copy_gt : Config -> Prop := 
+  | Step_read_before_memory_copy_gt__memory_copy_le (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (j <= i) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+  | Step_read_before_memory_copy_gt__memory_copy_zero (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (n = 0) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+  | Step_read_before_memory_copy_gt__memory_copy_trap (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (((i + n) > List.length ((fun_table (z, 0)))) \/ ((j + n) > List.length ((fun_table (z, 0))))) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))
+.
+
+(** Relation definition : Step_read_before_memory_init_zero **)
+Inductive Step_read_before_memory_init_zero : Config -> Prop := 
+  | Step_read_before_memory_init_zero__memory_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > List.length ((fun_data (z, y)))) \/ ((j + n) > List.length ((fun_mem (z, 0))))) -> 
+    (Step_read_before_memory_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))
+.
+
+(** Relation definition : Step_read_before_memory_init_succ **)
+Inductive Step_read_before_memory_init_succ : Config -> Prop := 
+  | Step_read_before_memory_init_succ__memory_init_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (z : State) : 
+    (~  (Step_read_before_memory_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))) -> 
+    (n = 0) -> 
+    (Step_read_before_memory_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))
+  | Step_read_before_memory_init_succ__memory_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > List.length ((fun_data (z, y)))) \/ ((j + n) > List.length ((fun_mem (z, 0))))) -> 
+    (Step_read_before_memory_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))
 .
 
 (** Relation definition : Step_read **)
@@ -1699,7 +1854,7 @@ Inductive Step_read : (Config * (list Admininstr))%type -> Prop :=
   | Step_read__call_indirect_trap (ft : Functype) (i : nat) (x : Idx) (z : State) : 
     (~  (Step_read_before_call_indirect_trap (z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CALL_INDIRECT (x, ft))]))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CALL_INDIRECT (x, ft))]), [Admininstr__TRAP]))
-  | Step_read__call_addr (a : Addr) (f : Frame) (instr : (list Instr)) (k : nat) (m : Moduleinst) (n : N) (t : (list Valtype)) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) (z : State) (o0 : (list Val)) : 
+  | Step_read__call_addr (a : Addr) (f : Frame) (instr : (list Instr)) (k : nat) (m : Moduleinst) (n : reserved__N) (t : (list Valtype)) (t_1 : (list Valtype)) (t_2 : (list Valtype)) (val : (list Val)) (z : State) (o0 : (list Val)) : 
     (List.length (t) = List.length (o0)) -> 
     (a < List.length ((fun_funcinst z))) -> 
     (List.length (t_1) = k) -> 
@@ -1722,49 +1877,94 @@ Inductive Step_read : (Config * (list Admininstr))%type -> Prop :=
   | Step_read__table_get_val (i : nat) (x : Idx) (z : State) : 
     (i < List.length ((fun_table (z, x)))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__TABLE_GET x)]), [(fun_admininstr_ref (lookup_total (fun_table (z, x)) i))]))
-  | Step_read__table_set_trap (i : nat) (ref : Ref) (x : Idx) (z : State) : 
-    (i >= List.length ((fun_table (z, x)))) -> 
-    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_ref ref); (Admininstr__TABLE_GET x)]), [Admininstr__TRAP]))
-  | Step_read__table_size (n : N) (x : Idx) (z : State) : 
+  | Step_read__table_size (n : reserved__N) (x : Idx) (z : State) : 
     (List.length ((fun_table (z, x))) = n) -> 
     (Step_read ((z, [(Admininstr__TABLE_SIZE x)]), [(Admininstr__CONST (Numtype__I32, n))]))
-  | Step_read__table_grow_fail (n : N) (x : Idx) (z : State) : 
-    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_GROW x)]), [(Admininstr__CONST (Numtype__I32, (0 - 1)))]))
-  | Step_read__table_fill_trap (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read__table_fill_trap (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > List.length ((fun_table (z, x)))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]), [Admininstr__TRAP]))
-  | Step_read__table_fill_zero (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read__table_fill_zero (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     (~  (Step_read_before_table_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))) -> 
     (n = 0) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]), nil))
-  | Step_read__table_fill_succ (i : nat) (n : N) (val : Val) (x : Idx) (z : State) : 
+  | Step_read__table_fill_succ (i : nat) (n : reserved__N) (val : Val) (x : Idx) (z : State) : 
     (~  (Step_read_before_table_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_FILL x)]), [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__TABLE_SET x); (Admininstr__CONST (Numtype__I32, (i + 1))); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, (n - 1))); (Admininstr__TABLE_FILL x)]))
-  | Step_read__table_copy_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_copy_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_table (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]), [Admininstr__TRAP]))
-  | Step_read__table_copy_zero (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_copy_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (n = 0) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]), nil))
-  | Step_read__table_copy_le (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_copy_le (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (j <= i) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]), [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__TABLE_GET y); (Admininstr__TABLE_SET x); (Admininstr__CONST (Numtype__I32, (j + 1))); (Admininstr__CONST (Numtype__I32, (i + 1))); (Admininstr__CONST (Numtype__I32, (n - 1))); (Admininstr__TABLE_COPY (x, y))]))
-  | Step_read__table_copy_gt (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_copy_gt (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_COPY (x, y))]), [(Admininstr__CONST (Numtype__I32, ((j + n) - 1))); (Admininstr__CONST (Numtype__I32, ((i + n) - 1))); (Admininstr__TABLE_GET y); (Admininstr__TABLE_SET x); (Admininstr__CONST (Numtype__I32, (j + 1))); (Admininstr__CONST (Numtype__I32, (i + 1))); (Admininstr__CONST (Numtype__I32, (n - 1))); (Admininstr__TABLE_COPY (x, y))]))
-  | Step_read__table_init_trap (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (((i + n) > List.length ((fun_elem (z, y)))) \/ ((j + n) > List.length ((fun_table (z, x))))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]), [Admininstr__TRAP]))
-  | Step_read__table_init_zero (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_init_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (~  (Step_read_before_table_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))) -> 
     (n = 0) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]), nil))
-  | Step_read__table_init_succ (i : nat) (j : nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+  | Step_read__table_init_succ (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
     (i < List.length ((fun_elem (z, y)))) -> 
     (~  (Step_read_before_table_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]))) -> 
     (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_INIT (x, y))]), [(Admininstr__CONST (Numtype__I32, j)); (fun_admininstr_ref (lookup_total (fun_elem (z, y)) i)); (Admininstr__TABLE_SET x); (Admininstr__CONST (Numtype__I32, (j + 1))); (Admininstr__CONST (Numtype__I32, (i + 1))); (Admininstr__CONST (Numtype__I32, (n - 1))); (Admininstr__TABLE_INIT (x, y))]))
+  | Step_read__load_num_trap (i : nat) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) (o0 : nat) : 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
+    (((i + n_O) + (((Nat.div o0) 8))) >= List.length ((fun_mem (z, 0)))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__LOAD (nt, None, n_A, n_O))]), [Admininstr__TRAP]))
+  | Step_read__load_num_val (c : C_numtype) (i : nat) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) (o0 : nat) (o1 : nat) : 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o1)) -> 
+    ((fun_bytes_ (o0, c)) = default_val (* FIXME: $mem(z, 0)[(i + n_O) : (o1 / 8)] *)) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__LOAD (nt, None, n_A, n_O))]), [(Admininstr__CONST (nt, c))]))
+  | Step_read__load_pack_trap (i : nat) (n : reserved__N) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (sx : Sx) (z : State) : 
+    (((i + n_O) + (((Nat.div n) 8))) >= List.length ((fun_mem (z, 0)))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__LOAD (nt, (Some (n, sx)), n_A, n_O))]), [Admininstr__TRAP]))
+  | Step_read__load_pack_val (c : C_numtype) (i : nat) (n : reserved__N) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (sx : Sx) (z : State) : 
+    ((fun_bytes_ (n, c)) = default_val (* FIXME: $mem(z, 0)[(i + n_O) : (n / 8)] *)) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__LOAD (nt, (Some (n, sx)), n_A, n_O))]), [(Admininstr__CONST (nt, c))]))
+  | Step_read__memory_fill_trap (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    ((i + n) > List.length ((fun_mem (z, 0)))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]), [Admininstr__TRAP]))
+  | Step_read__memory_fill_zero (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    (~  (Step_read_before_memory_fill_zero (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))) -> 
+    (n = 0) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]), nil))
+  | Step_read__memory_fill_succ (i : nat) (n : reserved__N) (val : Val) (z : State) : 
+    (~  (Step_read_before_memory_fill_succ (z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_FILL]), [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_val val); (Admininstr__STORE (Numtype__I32, (Some 8), 0, 0)); (Admininstr__CONST (Numtype__I32, (i + 1))); (fun_admininstr_val val); (Admininstr__CONST (Numtype__I32, (n - 1))); Admininstr__MEMORY_FILL]))
+  | Step_read__memory_copy_trap (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (((i + n) > List.length ((fun_table (z, 0)))) \/ ((j + n) > List.length ((fun_table (z, 0))))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]), [Admininstr__TRAP]))
+  | Step_read__memory_copy_zero (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (n = 0) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]), nil))
+  | Step_read__memory_copy_le (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_le (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (j <= i) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]), [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__LOAD (Numtype__I32, (Some (8, Sx__U)), 0, 0)); (Admininstr__STORE (Numtype__I32, (Some 8), 0, 0)); (Admininstr__CONST (Numtype__I32, (j + 1))); (Admininstr__CONST (Numtype__I32, (i + 1))); (Admininstr__CONST (Numtype__I32, (n - 1))); Admininstr__MEMORY_COPY]))
+  | Step_read__memory_copy_gt (i : nat) (j : nat) (n : reserved__N) (z : State) : 
+    (~  (Step_read_before_memory_copy_gt (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_COPY]), [(Admininstr__CONST (Numtype__I32, ((j + n) - 1))); (Admininstr__CONST (Numtype__I32, ((i + n) - 1))); (Admininstr__LOAD (Numtype__I32, (Some (8, Sx__U)), 0, 0)); (Admininstr__STORE (Numtype__I32, (Some 8), 0, 0)); (Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, (n - 1))); Admininstr__MEMORY_COPY]))
+  | Step_read__memory_init_trap (i : nat) (j : nat) (n : reserved__N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > List.length ((fun_data (z, y)))) \/ ((j + n) > List.length ((fun_mem (z, 0))))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]), [Admininstr__TRAP]))
+  | Step_read__memory_init_zero (i : nat) (j : nat) (n : reserved__N) (x : Idx) (z : State) : 
+    (~  (Step_read_before_memory_init_zero (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))) -> 
+    (n = 0) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]), nil))
+  | Step_read__memory_init_succ (i : nat) (j : nat) (n : reserved__N) (x : Idx) (z : State) : 
+    (i < List.length ((fun_data (z, x)))) -> 
+    (~  (Step_read_before_memory_init_succ (z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]))) -> 
+    (Step_read ((z, [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__MEMORY_INIT x)]), [(Admininstr__CONST (Numtype__I32, j)); (Admininstr__CONST (Numtype__I32, (lookup_total (fun_data (z, x)) i))); (Admininstr__STORE (Numtype__I32, (Some 8), 0, 0)); (Admininstr__CONST (Numtype__I32, (j + 1))); (Admininstr__CONST (Numtype__I32, (i + 1))); (Admininstr__CONST (Numtype__I32, (n - 1))); (Admininstr__MEMORY_INIT x)]))
 .
 
 (** Relation definition : Step **)
@@ -1779,11 +1979,38 @@ Inductive Step : (Config * Config)%type -> Prop :=
     (Step ((z, [(fun_admininstr_val val); (Admininstr__LOCAL_SET x)]), ((fun_with_local (z, x, val)), nil)))
   | Step__global_set (val : Val) (x : Idx) (z : State) : 
     (Step ((z, [(fun_admininstr_val val); (Admininstr__GLOBAL_SET x)]), ((fun_with_global (z, x, val)), nil)))
+  | Step__table_set_trap (i : nat) (ref : Ref) (x : Idx) (z : State) : 
+    (i >= List.length ((fun_table (z, x)))) -> 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_ref ref); (Admininstr__TABLE_GET x)]), (z, [Admininstr__TRAP])))
   | Step__table_set_val (i : nat) (ref : Ref) (x : Idx) (z : State) : 
     (i < List.length ((fun_table (z, x)))) -> 
     (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (fun_admininstr_ref ref); (Admininstr__TABLE_GET x)]), ((fun_with_table (z, x, i, ref)), nil)))
-  | Step__table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) : 
+  | Step__table_grow_succeed (n : reserved__N) (ref : Ref) (x : Idx) (z : State) : 
     (Step ((z, [(fun_admininstr_ref ref); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_GROW x)]), ((fun_with_tableext (z, x, [ref])), [(Admininstr__CONST (Numtype__I32, List.length ((fun_table (z, x)))))])))
+  | Step__table_grow_fail (n : reserved__N) (ref : Ref) (x : Idx) (z : State) : 
+    (Step ((z, [(fun_admininstr_ref ref); (Admininstr__CONST (Numtype__I32, n)); (Admininstr__TABLE_GROW x)]), (z, [(Admininstr__CONST (Numtype__I32, (0 - 1)))])))
   | Step__elem_drop (x : Idx) (z : State) : 
     (Step ((z, [(Admininstr__ELEM_DROP x)]), ((fun_with_elem (z, x, nil)), nil)))
+  | Step__store_num_trap (c : C_numtype) (i : nat) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) (o0 : nat) : 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
+    (((i + n_O) + (((Nat.div o0) 8))) >= List.length ((fun_mem (z, 0)))) -> 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, c)); (Admininstr__STORE (nt, None, n_A, n_O))]), (z, [Admininstr__TRAP])))
+  | Step__store_num_val (b : (list Byte)) (c : C_numtype) (i : nat) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) (o0 : nat) (o1 : nat) : 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o1)) -> 
+    (b = (fun_bytes_ (o1, c))) -> 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, c)); (Admininstr__STORE (nt, None, n_A, n_O))]), ((fun_with_mem (z, 0, (i + n_O), (((Nat.div o0) 8)), b)), nil)))
+  | Step__store_pack_trap (c : C_numtype) (i : nat) (n : reserved__N) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) : 
+    (((i + n_O) + (((Nat.div n) 8))) >= List.length ((fun_mem (z, 0)))) -> 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, c)); (Admininstr__STORE (nt, (Some n), n_A, n_O))]), (z, [Admininstr__TRAP])))
+  | Step__store_pack_val (b : (list Byte)) (c : C_numtype) (i : nat) (n : reserved__N) (n_A : reserved__N) (n_O : reserved__N) (nt : Numtype) (z : State) (o0 : nat) : 
+    ((fun_size (fun_valtype_numtype nt)) = (Some o0)) -> 
+    (b = (fun_bytes_ (n, (fun_wrap_ ((o0, n), c))))) -> 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, i)); (Admininstr__CONST (Numtype__I32, c)); (Admininstr__STORE (nt, (Some n), n_A, n_O))]), ((fun_with_mem (z, 0, (i + n_O), (((Nat.div n) 8)), b)), nil)))
+  | Step__memory_grow_succeed (n : reserved__N) (z : State) : 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_GROW]), ((fun_with_memext (z, 0, [0])), [(Admininstr__CONST (Numtype__I32, List.length ((fun_mem (z, 0)))))])))
+  | Step__memory_grow_fail (n : reserved__N) (z : State) : 
+    (Step ((z, [(Admininstr__CONST (Numtype__I32, n)); Admininstr__MEMORY_GROW]), (z, [(Admininstr__CONST (Numtype__I32, (0 - 1)))])))
+  | Step__data_drop (x : Idx) (z : State) : 
+    (Step ((z, [(Admininstr__DATA_DROP x)]), ((fun_with_data (z, x, nil)), nil)))
 .

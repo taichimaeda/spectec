@@ -6,9 +6,9 @@
   )
   (action
     (progn
-      (with-stdout-to coq_output_current.v (run %{deps} --coq))
-      (run coqc coq_output_current.v)
-      (run coqdoc --utf8 --title coq_output coq_output_current.v)
+      (with-stdout-to %{targets} (run %{deps} --coq))
+      (run coqc %{targets})
+      (run coqdoc --utf8 --title coq_output %{targets})
     )
   )
 )
