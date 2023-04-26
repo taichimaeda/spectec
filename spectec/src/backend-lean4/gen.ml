@@ -152,10 +152,12 @@ and render_idx e_string exp = parens (e_string ^ ".get! " ^ render_exp exp)
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
-  | DotP (path', a) ->
+  | DotP (path', _, a) ->
     render_path path' old_val (fun old_val ->
      "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
     )
+  | SliceP (_path', _e1, _e2) ->
+    "default /- TODO -/"
   | IdxP (path', idx_exp) ->
     render_path path' old_val (fun old_val ->
       "(" ^ old_val ^ ".upd " ^ render_exp idx_exp ^ " " ^ k (render_idx old_val idx_exp) ^ ")"
@@ -204,7 +206,7 @@ let rec render_prem (prem : premise) =
 
 let rec render_def (d : def) =
   match d.it with
-  | SynD (id, deftyp, _hints) ->
+  | SynD (id, deftyp) ->
     show_input d ^
     begin match deftyp.it with
     | AliasT ty ->
@@ -230,16 +232,14 @@ let rec render_def (d : def) =
       ) fields) ^
       "  }"
     end
-  | DecD (id, typ1, typ2, clauses, hints) ->
+  | DecD (id, typ1, typ2, clauses) ->
     show_input d ^
     "def " ^ render_fun_id id ^ " : " ^ render_typ typ1 ^ " -> " ^ render_typ typ2 ^
     begin if clauses = [] then " := default" else
-    String.concat "" (List.map (render_clause id) clauses) ^
-    (if (List.exists (fun h -> h.hintid.it = "partial") hints)
-    then "\n  | _ => default" else "") (* Could use no_error_if_unused% as well *)
+    String.concat "" (List.map (render_clause id) clauses)
     end
 
-  | RelD (id, _mixop, typ, rules, _hints) ->
+  | RelD (id, _mixop, typ, rules) ->
     show_input d ^
     "inductive " ^ render_type_name id ^ " : " ^ render_typ typ ^ " -> Prop where" ^
     String.concat "" (List.mapi (fun i (rule : rule) -> match rule.it with

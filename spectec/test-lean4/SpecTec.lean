@@ -34,27 +34,51 @@ def List.upd : List α → Nat → α → List α
 
 @[reducible] def Name := String
 
+
+
 @[reducible] def Byte := Nat
+
+
 
 @[reducible] def U32 := Nat
 
+
+
 @[reducible] def Idx := Nat
+
+
 
 @[reducible] def Funcidx := Idx
 
+
+
 @[reducible] def Globalidx := Idx
+
+
 
 @[reducible] def Tableidx := Idx
 
+
+
 @[reducible] def Memidx := Idx
+
+
 
 @[reducible] def Elemidx := Idx
 
+
+
 @[reducible] def Dataidx := Idx
+
+
 
 @[reducible] def Labelidx := Idx
 
+
+
 @[reducible] def Localidx := Idx
+
+
 
 inductive Numtype where
  | I32 : Numtype
@@ -63,14 +87,20 @@ inductive Numtype where
  | F64 : Numtype
   deriving Inhabited, BEq
 
+
+
 inductive Vectype where
  | V128 : Vectype
   deriving Inhabited, BEq
+
+
 
 inductive Reftype where
  | FUNCREF : Reftype
  | EXTERNREF : Reftype
   deriving Inhabited, BEq
+
+
 
 inductive Valtype where
  | I32 : Valtype
@@ -96,6 +126,8 @@ def «$valtype_reftype» : Reftype -> Valtype
 def «$valtype_vectype» : Vectype -> Valtype
   | Vectype.V128 => Valtype.V128
 
+
+
 inductive In where
  | I32 : In
  | I64 : In
@@ -108,6 +140,8 @@ def «$numtype_in» : In -> Numtype
 def «$valtype_in» : In -> Valtype
   | In.I32 => Valtype.I32
   | In.I64 => Valtype.I64
+
+
 
 inductive Fn where
  | F32 : Fn
@@ -122,23 +156,43 @@ def «$valtype_fn» : Fn -> Valtype
   | Fn.F32 => Valtype.F32
   | Fn.F64 => Valtype.F64
 
+
+
 @[reducible] def Resulttype := (List Valtype)
+
+
 
 @[reducible] def Limits := /- mixop: `[%..%]` -/ (U32 × U32)
 
+
+
 @[reducible] def Mutflag := /- mixop: MUT -/ Unit
+
+
 
 @[reducible] def Globaltype := /- mixop: `%?%` -/ ((Option Mutflag) × Valtype)
 
+
+
 @[reducible] def Functype := /- mixop: `%->%` -/ (Resulttype × Resulttype)
+
+
 
 @[reducible] def Tabletype := /- mixop: `%%` -/ (Limits × Reftype)
 
+
+
 @[reducible] def Memtype := /- mixop: `%I8` -/ Limits
+
+
 
 @[reducible] def Elemtype := Reftype
 
+
+
 @[reducible] def Datatype := /- mixop: OK -/ Unit
+
+
 
 inductive Externtype where
  | GLOBAL : Globaltype -> Externtype
@@ -147,10 +201,14 @@ inductive Externtype where
  | MEMORY : Memtype -> Externtype
   deriving Inhabited, BEq
 
+
+
 inductive Sx where
  | U : Sx
  | S : Sx
   deriving Inhabited, BEq
+
+
 
 inductive Unop_IXX where
  | CLZ : Unop_IXX
@@ -249,6 +307,8 @@ inductive Cvtop where
 
 @[reducible] def Blocktype := Functype
 
+
+
 inductive Instr where
  | UNREACHABLE : Instr
  | NOP : Instr
@@ -292,11 +352,21 @@ inductive Instr where
  | MEMORY_COPY : Instr
  | MEMORY_INIT : Dataidx -> Instr
  | DATA_DROP : Dataidx -> Instr
- | LOAD : (Numtype × (Option (N × Sx)) × Nat × Nat) -> Instr
- | STORE : (Numtype × (Option N) × Nat × Nat) -> Instr
+ | LOAD : (Numtype × (Option (N × Sx)) × U32 × U32) -> Instr
+ | STORE : (Numtype × (Option N) × U32 × U32) -> Instr
   deriving Inhabited, BEq
 
+
+
+
+
+
+
+
+
 @[reducible] def Expr := (List Instr)
+
+
 
 
 
@@ -311,17 +381,31 @@ inductive Datamode where
 
 @[reducible] def Func := /- mixop: `FUNC%%*%` -/ (Functype × (List Valtype) × Expr)
 
+
+
 @[reducible] def Global := /- mixop: GLOBAL -/ (Globaltype × Expr)
+
+
 
 @[reducible] def Table := /- mixop: TABLE -/ Tabletype
 
+
+
 @[reducible] def Mem := /- mixop: MEMORY -/ Memtype
+
+
 
 @[reducible] def Elem := /- mixop: `ELEM%%*%?` -/ (Reftype × (List Expr) × (Option Elemmode))
 
+
+
 @[reducible] def Data := /- mixop: `DATA(*)%*%?` -/ ((List (List Byte)) × (Option Datamode))
 
+
+
 @[reducible] def Start := /- mixop: START -/ Funcidx
+
+
 
 inductive Externuse where
  | FUNC : Funcidx -> Externuse
@@ -330,11 +414,27 @@ inductive Externuse where
  | MEMORY : Memidx -> Externuse
   deriving Inhabited, BEq
 
+
+
 @[reducible] def Export := /- mixop: EXPORT -/ (Name × Externuse)
+
+
 
 @[reducible] def Import := /- mixop: IMPORT -/ (Name × Name × Externtype)
 
+
+
 @[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
+
+
+
+def «$Ki» : Unit -> Nat
+  | () => 1024
+
+def «$min» : (Nat × Nat) -> Nat
+  | (0, j) => 0
+  | (i, 0) => 0
+  | ((i + 1), (j + 1)) => («$min» (i, j))
 
 def «$size» : Valtype -> (Option Nat)
   | Valtype.I32 => (some 32)
@@ -343,6 +443,8 @@ def «$size» : Valtype -> (Option Nat)
   | Valtype.F64 => (some 64)
   | Valtype.V128 => (some 128)
   | x => none
+
+
 
 def «$test_sub_ATOM_22» : N -> Nat
   | n_3_ATOM_y => 0
@@ -386,28 +488,40 @@ instance : Append Context where
     RETURN := r1.RETURN ++ r2.RETURN,
   }
 
+
+
 inductive Limits_ok : (Limits × Nat) -> Prop where
   | rule_0 (k : Nat) (n_1 : N) (n_2 : N) : 
     ((n_1 <= n_2) && (n_2 <= k)) -> 
     (Limits_ok ((n_1, n_2), k))
 
+
+
 inductive Functype_ok : Functype -> Prop where
   | rule_0 (ft : Functype) : 
     (Functype_ok ft)
 
+
+
 inductive Globaltype_ok : Globaltype -> Prop where
   | rule_0 (gt : Globaltype) : 
     (Globaltype_ok gt)
+
+
 
 inductive Tabletype_ok : Tabletype -> Prop where
   | rule_0 (lim : Limits) (rt : Reftype) : 
     (Limits_ok (lim, ((((Nat.pow 2) 32)) - 1))) -> 
     (Tabletype_ok (lim, rt))
 
+
+
 inductive Memtype_ok : Memtype -> Prop where
   | rule_0 (lim : Limits) : 
     (Limits_ok (lim, (((Nat.pow 2) 16)))) -> 
     (Memtype_ok lim)
+
+
 
 inductive Externtype_ok : Externtype -> Prop where
   | func (functype : Functype) : 
@@ -423,11 +537,15 @@ inductive Externtype_ok : Externtype -> Prop where
     (Memtype_ok memtype) -> 
     (Externtype_ok (Externtype.MEMORY memtype))
 
+
+
 inductive Valtype_sub : (Valtype × Valtype) -> Prop where
   | refl (t : Valtype) : 
     (Valtype_sub (t, t))
   | bot (t : Valtype) : 
     (Valtype_sub (Valtype.BOT, t))
+
+
 
 inductive Resulttype_sub : ((List Valtype) × (List Valtype)) -> Prop where
   | rule_0 (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
@@ -435,29 +553,41 @@ inductive Resulttype_sub : ((List Valtype) × (List Valtype)) -> Prop where
     (Forall₂ (λ t_1 t_2 ↦ (Valtype_sub (t_1, t_2))) t_1 t_2) -> 
     (Resulttype_sub (t_1, t_2))
 
+
+
 inductive Limits_sub : (Limits × Limits) -> Prop where
   | rule_0 (n_11 : N) (n_12 : N) (n_21 : N) (n_22 : N) : 
     (n_11 >= n_21) -> 
     (n_12 <= n_22) -> 
     (Limits_sub ((n_11, n_12), (n_21, n_22)))
 
+
+
 inductive Functype_sub : (Functype × Functype) -> Prop where
   | rule_0 (ft : Functype) : 
     (Functype_sub (ft, ft))
 
+
+
 inductive Globaltype_sub : (Globaltype × Globaltype) -> Prop where
   | rule_0 (gt : Globaltype) : 
     (Globaltype_sub (gt, gt))
+
+
 
 inductive Tabletype_sub : (Tabletype × Tabletype) -> Prop where
   | rule_0 (lim_1 : Limits) (lim_2 : Limits) (rt : Reftype) : 
     (Limits_sub (lim_1, lim_2)) -> 
     (Tabletype_sub ((lim_1, rt), (lim_2, rt)))
 
+
+
 inductive Memtype_sub : (Memtype × Memtype) -> Prop where
   | rule_0 (lim_1 : Limits) (lim_2 : Limits) : 
     (Limits_sub (lim_1, lim_2)) -> 
     (Memtype_sub (lim_1, lim_2))
+
+
 
 inductive Externtype_sub : (Externtype × Externtype) -> Prop where
   | func (ft_1 : Functype) (ft_2 : Functype) : 
@@ -472,6 +602,8 @@ inductive Externtype_sub : (Externtype × Externtype) -> Prop where
   | mem (mt_1 : Memtype) (mt_2 : Memtype) : 
     (Memtype_sub (mt_1, mt_2)) -> 
     (Externtype_sub ((Externtype.MEMORY mt_1), (Externtype.MEMORY mt_2)))
+
+
 
 inductive Blocktype_ok : (Context × Blocktype × Functype) -> Prop where
   | rule_0 (C : Context) (ft : Functype) : 
@@ -687,10 +819,18 @@ inductive InstrSeq_ok : (Context × (List Instr) × Functype) -> Prop where
     (InstrSeq_ok (C, instr, (t_1, t_2))) -> 
     (InstrSeq_ok (C, instr, ((t ++ t_1), (t ++ t_2))))end
 
+
+
+
+
 inductive Expr_ok : (Context × Expr × Resulttype) -> Prop where
   | rule_0 (C : Context) (instr : (List Instr)) (t : (List Valtype)) : 
     (InstrSeq_ok (C, instr, ([], t))) -> 
     (Expr_ok (C, instr, t))
+
+
+
+
 
 inductive Instr_const : (Context × Instr) -> Prop where
   | const (C : Context) (c : C_numtype) (nt : Numtype) : 
@@ -704,16 +844,22 @@ inductive Instr_const : (Context × Instr) -> Prop where
     ((C.GLOBAL.get! x) == (none, t)) -> 
     (Instr_const (C, (Instr.GLOBAL_GET x)))
 
+
+
 inductive Expr_const : (Context × Expr) -> Prop where
   | rule_0 (C : Context) (instr : (List Instr)) : 
     (Forall (λ instr ↦ (Instr_const (C, instr))) instr) -> 
     (Expr_const (C, instr))
+
+
 
 inductive Expr_ok_const : (Context × Expr × Valtype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (t : Valtype) : 
     (Expr_ok (C, expr, [t])) -> 
     (Expr_const (C, expr)) -> 
     (Expr_ok_const (C, expr, t))
+
+
 
 inductive Func_ok : (Context × Func × Functype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (ft : Functype) (t : (List Valtype)) (t_1 : (List Valtype)) (t_2 : (List Valtype)) : 
@@ -722,6 +868,8 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
     (Expr_ok (({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [], RETURN := (some t_2)} ++ ({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := [], LABEL := [t_2], RETURN := none} ++ ({FUNC := [], GLOBAL := [], TABLE := [], MEM := [], ELEM := [], DATA := [], LOCAL := (t_1 ++ t), LABEL := [], RETURN := none} ++ C))), expr, t_2)) -> 
     (Func_ok (C, (ft, t, expr), ft))
 
+
+
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) : 
     (Globaltype_ok gt) -> 
@@ -729,15 +877,21 @@ inductive Global_ok : (Context × Global × Globaltype) -> Prop where
     (Expr_ok_const (C, expr, t)) -> 
     (Global_ok (C, (gt, expr), gt))
 
+
+
 inductive Table_ok : (Context × Table × Tabletype) -> Prop where
   | rule_0 (C : Context) (tt : Tabletype) : 
     (Tabletype_ok tt) -> 
     (Table_ok (C, tt, tt))
 
+
+
 inductive Mem_ok : (Context × Mem × Memtype) -> Prop where
   | rule_0 (C : Context) (mt : Memtype) : 
     (Memtype_ok mt) -> 
     (Mem_ok (C, mt, mt))
+
+
 
 inductive Elemmode_ok : (Context × Elemmode × Reftype) -> Prop where
   | active (C : Context) (expr : Expr) (lim : Limits) (rt : Reftype) (x : Idx) : 
@@ -754,6 +908,8 @@ inductive Elem_ok : (Context × Elem × Reftype) -> Prop where
     (Forall (λ elemmode ↦ (Elemmode_ok (C, elemmode, rt))) elemmode.toList) -> 
     (Elem_ok (C, (rt, expr, elemmode), rt))
 
+
+
 inductive Datamode_ok : (Context × Datamode) -> Prop where
   | rule_0 (C : Context) (expr : Expr) (mt : Memtype) : 
     (0 < C.MEM.length) -> 
@@ -766,16 +922,26 @@ inductive Data_ok : (Context × Data) -> Prop where
     (Forall (λ datamode ↦ (Datamode_ok (C, datamode))) datamode.toList) -> 
     (Data_ok (C, ((List.map (λ b ↦ b) b), datamode)))
 
+
+
+
+
+
+
 inductive Start_ok : (Context × Start) -> Prop where
   | rule_0 (C : Context) (x : Idx) : 
     (x < C.FUNC.length) -> 
     ((C.FUNC.get! x) == ([], [])) -> 
     (Start_ok (C, x))
 
+
+
 inductive Import_ok : (Context × Import × Externtype) -> Prop where
   | rule_0 (C : Context) (name_1 : Name) (name_2 : Name) (xt : Externtype) : 
     (Externtype_ok xt) -> 
     (Import_ok (C, (name_1, name_2, xt), xt))
+
+
 
 inductive Externuse_ok : (Context × Externuse × Externtype) -> Prop where
   | func (C : Context) (ft : Functype) (x : Idx) : 
@@ -800,6 +966,10 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
     (Externuse_ok (C, externuse, xt)) -> 
     (Export_ok (C, (name, externuse), xt))
 
+
+
+
+
 inductive Module_ok : Module -> Prop where
   | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) : 
     (ft.length == func.length) -> 
@@ -820,33 +990,57 @@ inductive Module_ok : Module -> Prop where
     (start.length <= 1) -> 
     (Module_ok («import», func, «global», table, mem, elem, data, start, «export»))
 
+
+
 @[reducible] def Addr := Nat
+
+
 
 @[reducible] def Funcaddr := Addr
 
+
+
 @[reducible] def Globaladdr := Addr
+
+
 
 @[reducible] def Tableaddr := Addr
 
+
+
 @[reducible] def Memaddr := Addr
+
+
 
 @[reducible] def Elemaddr := Addr
 
+
+
 @[reducible] def Dataaddr := Addr
+
+
 
 @[reducible] def Labeladdr := Addr
 
+
+
 @[reducible] def Hostaddr := Addr
+
+
 
 inductive Num where
  | CONST : (Numtype × C_numtype) -> Num
   deriving Inhabited, BEq
+
+
 
 inductive Ref where
  | REF_NULL : Reftype -> Ref
  | REF_FUNC_ADDR : Funcaddr -> Ref
  | REF_HOST_ADDR : Hostaddr -> Ref
   deriving Inhabited, BEq
+
+
 
 inductive Val where
  | CONST : (Numtype × C_numtype) -> Val
@@ -855,10 +1049,14 @@ inductive Val where
  | REF_HOST_ADDR : Hostaddr -> Val
   deriving Inhabited, BEq
 
+
+
 inductive Result where
  | _VALS : (List Val) -> Result
  | TRAP : Result
   deriving Inhabited, BEq
+
+
 
 inductive Externval where
  | FUNC : Funcaddr -> Externval
@@ -866,6 +1064,8 @@ inductive Externval where
  | TABLE : Tableaddr -> Externval
  | MEM : Memaddr -> Externval
   deriving Inhabited, BEq
+
+
 
 def «$default_» : Valtype -> (Option Val)
   | Valtype.I32 => (some (Val.CONST (Numtype.I32, 0)))
@@ -875,6 +1075,8 @@ def «$default_» : Valtype -> (Option Val)
   | Valtype.FUNCREF => (some (Val.REF_NULL Reftype.FUNCREF))
   | Valtype.EXTERNREF => (some (Val.REF_NULL Reftype.EXTERNREF))
   | x => none
+
+
 
 @[reducible] def Exportinst := /- mixop: EXPORT -/ (Name × Externval)
 
@@ -900,15 +1102,29 @@ instance : Append Moduleinst where
 
 @[reducible] def Funcinst := /- mixop: `%;%` -/ (Moduleinst × Func)
 
+
+
 @[reducible] def Globalinst := Val
+
+
 
 @[reducible] def Tableinst := (List Ref)
 
+
+
 @[reducible] def Meminst := (List Byte)
+
+
 
 @[reducible] def Eleminst := (List Ref)
 
+
+
 @[reducible] def Datainst := (List Byte)
+
+
+
+
 
 structure Store where 
   FUNC : (List Funcinst)
@@ -928,6 +1144,10 @@ instance : Append Store where
     DATA := r1.DATA ++ r2.DATA,
   }
 
+
+
+
+
 structure Frame where 
   LOCAL : (List Val)
   MODULE : Moduleinst
@@ -938,7 +1158,11 @@ instance : Append Frame where
     MODULE := r1.MODULE ++ r2.MODULE,
   }
 
+
+
 @[reducible] def State := /- mixop: `%;%` -/ (Store × Frame)
+
+
 
 inductive Admininstr where
  | UNREACHABLE : Admininstr
@@ -983,8 +1207,8 @@ inductive Admininstr where
  | MEMORY_COPY : Admininstr
  | MEMORY_INIT : Dataidx -> Admininstr
  | DATA_DROP : Dataidx -> Admininstr
- | LOAD : (Numtype × (Option (N × Sx)) × Nat × Nat) -> Admininstr
- | STORE : (Numtype × (Option N) × Nat × Nat) -> Admininstr
+ | LOAD : (Numtype × (Option (N × Sx)) × U32 × U32) -> Admininstr
+ | STORE : (Numtype × (Option N) × U32 × U32) -> Admininstr
  | REF_FUNC_ADDR : Funcaddr -> Admininstr
  | REF_HOST_ADDR : Hostaddr -> Admininstr
  | CALL_ADDR : Funcaddr -> Admininstr
@@ -1058,47 +1282,94 @@ def «$admininstr_val» : Val -> Admininstr
 
 @[reducible] def Config := /- mixop: `%;%*` -/ (State × (List Admininstr))
 
+
+
 def «$funcaddr» : State -> (List Funcaddr)
   | (s, f) => f.MODULE.FUNC
+
+
 
 def «$funcinst» : State -> (List Funcinst)
   | (s, f) => s.FUNC
 
+
+
 def «$func» : (State × Funcidx) -> Funcinst
   | ((s, f), x) => (s.FUNC.get! (f.MODULE.FUNC.get! x))
+
+
 
 def «$global» : (State × Globalidx) -> Globalinst
   | ((s, f), x) => (s.GLOBAL.get! (f.MODULE.GLOBAL.get! x))
 
+
+
 def «$table» : (State × Tableidx) -> Tableinst
   | ((s, f), x) => (s.TABLE.get! (f.MODULE.TABLE.get! x))
+
+
 
 def «$mem» : (State × Memidx) -> Meminst
   | ((s, f), x) => (s.MEM.get! (f.MODULE.MEM.get! x))
 
+
+
 def «$elem» : (State × Tableidx) -> Eleminst
   | ((s, f), x) => (s.ELEM.get! (f.MODULE.ELEM.get! x))
+
+
 
 def «$data» : (State × Dataidx) -> Datainst
   | ((s, f), x) => (s.DATA.get! (f.MODULE.DATA.get! x))
 
+
+
 def «$local» : (State × Localidx) -> Val
   | ((s, f), x) => (f.LOCAL.get! x)
+
+
 
 def «$with_local» : (State × Localidx × Val) -> State
   | ((s, f), x, v) => (s, {f with LOCAL := (f.LOCAL.upd x v) })
 
+
+
 def «$with_global» : (State × Globalidx × Val) -> State
   | ((s, f), x, v) => ({s with GLOBAL := (s.GLOBAL.upd (f.MODULE.GLOBAL.get! x) v) }, f)
 
-def «$with_table» : (State × Tableidx × N × Ref) -> State
+
+
+def «$with_table» : (State × Tableidx × Nat × Ref) -> State
   | ((s, f), x, i, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) ((s.TABLE.get! (f.MODULE.TABLE.get! x)).upd i r)) }, f)
+
+
 
 def «$with_tableext» : (State × Tableidx × (List Ref)) -> State
   | ((s, f), x, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) (List.append (s.TABLE.get! (f.MODULE.TABLE.get! x)) r)) }, f)
 
+
+
+def «$with_mem» : (State × Tableidx × Nat × Nat × (List Byte)) -> State
+  | ((s, f), x, i, j, b) => (default /- TODO -/, f)
+
+
+
+def «$with_memext» : (State × Tableidx × (List Byte)) -> State
+  | ((s, f), x, b) => ({s with MEM := (s.MEM.upd (f.MODULE.MEM.get! x) (List.append (s.MEM.get! (f.MODULE.MEM.get! x)) b)) }, f)
+
+
+
 def «$with_elem» : (State × Elemidx × (List Ref)) -> State
   | ((s, f), x, r) => ({s with TABLE := (s.TABLE.upd (f.MODULE.TABLE.get! x) r) }, f)
+
+
+
+def «$with_data» : (State × Dataidx × (List Byte)) -> State
+  | ((s, f), x, b) => ({s with MEM := (s.MEM.upd (f.MODULE.MEM.get! x) b) }, f)
+
+
+
+
 
 inductive E where
  | _HOLE : E
@@ -1106,17 +1377,35 @@ inductive E where
  | LABEL_ : (N × (List Instr) × E) -> E
   deriving Inhabited, BEq
 
+
+
 def «$unop» : (Unop_numtype × Numtype × C_numtype) -> (List C_numtype) := default
+
+
 
 def «$binop» : (Binop_numtype × Numtype × C_numtype × C_numtype) -> (List C_numtype) := default
 
+
+
 def «$testop» : (Testop_numtype × Numtype × C_numtype) -> C_numtype := default
+
+
 
 def «$relop» : (Relop_numtype × Numtype × C_numtype × C_numtype) -> C_numtype := default
 
+
+
 def «$ext» : (Nat × Nat × Sx × C_numtype) -> C_numtype := default
 
+
+
 def «$cvtop» : (Numtype × Cvtop × Numtype × (Option Sx) × C_numtype) -> (List C_numtype) := default
+
+
+
+def «$wrap_» : ((Nat × Nat) × C_numtype) -> Nat := default
+
+def «$bytes_» : (Nat × C_numtype) -> (List Byte) := default
 
 inductive Step_pure_before_ref_is_null_false : (List Admininstr) -> Prop where
   | ref_is_null_true (rt : Reftype) (val : Val) : 
@@ -1280,6 +1569,61 @@ inductive Step_read_before_table_init_succ : Config -> Prop where
     (((i + n) > («$elem» (z, y)).length) || ((j + n) > («$table» (z, x)).length)) -> 
     (Step_read_before_table_init_succ (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]))
 
+inductive Step_read_before_memory_fill_zero : Config -> Prop where
+  | memory_fill_trap (i : Nat) (n : N) (val : Val) (z : State) : 
+    ((i + n) > («$mem» (z, 0)).length) -> 
+    (Step_read_before_memory_fill_zero (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))
+
+inductive Step_read_before_memory_fill_succ : Config -> Prop where
+  | memory_fill_zero (i : Nat) (n : N) (val : Val) (z : State) : 
+    (Not (Step_read_before_memory_fill_zero (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))) -> 
+    (n == 0) -> 
+    (Step_read_before_memory_fill_succ (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))
+  | memory_fill_trap (i : Nat) (n : N) (val : Val) (z : State) : 
+    ((i + n) > («$mem» (z, 0)).length) -> 
+    (Step_read_before_memory_fill_succ (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))
+
+inductive Step_read_before_memory_copy_zero : Config -> Prop where
+  | memory_copy_trap (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (((i + n) > («$table» (z, 0)).length) || ((j + n) > («$table» (z, 0)).length)) -> 
+    (Step_read_before_memory_copy_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+
+inductive Step_read_before_memory_copy_le : Config -> Prop where
+  | memory_copy_zero (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (n == 0) -> 
+    (Step_read_before_memory_copy_le (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+  | memory_copy_trap (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (((i + n) > («$table» (z, 0)).length) || ((j + n) > («$table» (z, 0)).length)) -> 
+    (Step_read_before_memory_copy_le (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+
+inductive Step_read_before_memory_copy_gt : Config -> Prop where
+  | memory_copy_le (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_le (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (j <= i) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+  | memory_copy_zero (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (n == 0) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+  | memory_copy_trap (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (((i + n) > («$table» (z, 0)).length) || ((j + n) > («$table» (z, 0)).length)) -> 
+    (Step_read_before_memory_copy_gt (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))
+
+inductive Step_read_before_memory_init_zero : Config -> Prop where
+  | memory_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > («$data» (z, y)).length) || ((j + n) > («$mem» (z, 0)).length)) -> 
+    (Step_read_before_memory_init_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))
+
+inductive Step_read_before_memory_init_succ : Config -> Prop where
+  | memory_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (z : State) : 
+    (Not (Step_read_before_memory_init_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))) -> 
+    (n == 0) -> 
+    (Step_read_before_memory_init_succ (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))
+  | memory_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > («$data» (z, y)).length) || ((j + n) > («$mem» (z, 0)).length)) -> 
+    (Step_read_before_memory_init_succ (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))
+
 inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | call (x : Idx) (z : State) : 
     (x < («$funcaddr» z).length) -> 
@@ -1316,14 +1660,9 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | table_get_val (i : Nat) (x : Idx) (z : State) : 
     (i < («$table» (z, x)).length) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.TABLE_GET x)]), [(«$admininstr_ref» ((«$table» (z, x)).get! i))]))
-  | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) : 
-    (i >= («$table» (z, x)).length) -> 
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), [Admininstr.TRAP]))
   | table_size (n : N) (x : Idx) (z : State) : 
     ((«$table» (z, x)).length == n) -> 
     (Step_read ((z, [(Admininstr.TABLE_SIZE x)]), [(Admininstr.CONST (Numtype.I32, n))]))
-  | table_grow_fail (n : N) (x : Idx) (z : State) : 
-    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), [(Admininstr.CONST (Numtype.I32, (0 - 1)))]))
   | table_fill_trap (i : Nat) (n : N) (val : Val) (x : Idx) (z : State) : 
     ((i + n) > («$table» (z, x)).length) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_FILL x)]), [Admininstr.TRAP]))
@@ -1359,6 +1698,56 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     (i < («$elem» (z, y)).length) -> 
     (Not (Step_read_before_table_init_succ (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]))) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_INIT (x, y))]), [(Admininstr.CONST (Numtype.I32, j)), («$admininstr_ref» ((«$elem» (z, y)).get! i)), (Admininstr.TABLE_SET x), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.TABLE_INIT (x, y))]))
+  | load_num_trap (i : Nat) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (((i + n_O) + (((Nat.div o0) 8))) >= («$mem» (z, 0)).length) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, none, n_A, n_O))]), [Admininstr.TRAP]))
+  | load_num_val (c : C_numtype) (i : Nat) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) (o1 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    ((«$size» («$valtype_numtype» nt)) == (some o1)) -> 
+    ((«$bytes_» (o0, c)) == default /- $mem(z, 0)[(i + n_O) : (o1 / 8)] -/) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, none, n_A, n_O))]), [(Admininstr.CONST (nt, c))]))
+  | load_pack_trap (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (sx : Sx) (z : State) : 
+    (((i + n_O) + (((Nat.div n) 8))) >= («$mem» (z, 0)).length) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, (some (n, sx)), n_A, n_O))]), [Admininstr.TRAP]))
+  | load_pack_val (c : C_numtype) (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (sx : Sx) (z : State) : 
+    ((«$bytes_» (n, c)) == default /- $mem(z, 0)[(i + n_O) : (n / 8)] -/) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, (some (n, sx)), n_A, n_O))]), [(Admininstr.CONST (nt, c))]))
+  | memory_fill_trap (i : Nat) (n : N) (val : Val) (z : State) : 
+    ((i + n) > («$mem» (z, 0)).length) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]), [Admininstr.TRAP]))
+  | memory_fill_zero (i : Nat) (n : N) (val : Val) (z : State) : 
+    (Not (Step_read_before_memory_fill_zero (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))) -> 
+    (n == 0) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]), []))
+  | memory_fill_succ (i : Nat) (n : N) (val : Val) (z : State) : 
+    (Not (Step_read_before_memory_fill_succ (z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]))) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_FILL]), [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_val» val), (Admininstr.STORE (Numtype.I32, (some 8), 0, 0)), (Admininstr.CONST (Numtype.I32, (i + 1))), («$admininstr_val» val), (Admininstr.CONST (Numtype.I32, (n - 1))), Admininstr.MEMORY_FILL]))
+  | memory_copy_trap (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (((i + n) > («$table» (z, 0)).length) || ((j + n) > («$table» (z, 0)).length)) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]), [Admininstr.TRAP]))
+  | memory_copy_zero (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (n == 0) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]), []))
+  | memory_copy_le (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_le (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (j <= i) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (Numtype.I32, (some (8, Sx.U)), 0, 0)), (Admininstr.STORE (Numtype.I32, (some 8), 0, 0)), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), Admininstr.MEMORY_COPY]))
+  | memory_copy_gt (i : Nat) (j : Nat) (n : N) (z : State) : 
+    (Not (Step_read_before_memory_copy_gt (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]))) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_COPY]), [(Admininstr.CONST (Numtype.I32, ((j + n) - 1))), (Admininstr.CONST (Numtype.I32, ((i + n) - 1))), (Admininstr.LOAD (Numtype.I32, (some (8, Sx.U)), 0, 0)), (Admininstr.STORE (Numtype.I32, (some 8), 0, 0)), (Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, (n - 1))), Admininstr.MEMORY_COPY]))
+  | memory_init_trap (i : Nat) (j : Nat) (n : N) (x : Idx) (y : Idx) (z : State) : 
+    (((i + n) > («$data» (z, y)).length) || ((j + n) > («$mem» (z, 0)).length)) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]), [Admininstr.TRAP]))
+  | memory_init_zero (i : Nat) (j : Nat) (n : N) (x : Idx) (z : State) : 
+    (Not (Step_read_before_memory_init_zero (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))) -> 
+    (n == 0) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]), []))
+  | memory_init_succ (i : Nat) (j : Nat) (n : N) (x : Idx) (z : State) : 
+    (i < («$data» (z, x)).length) -> 
+    (Not (Step_read_before_memory_init_succ (z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]))) -> 
+    (Step_read ((z, [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.MEMORY_INIT x)]), [(Admininstr.CONST (Numtype.I32, j)), (Admininstr.CONST (Numtype.I32, ((«$data» (z, x)).get! i))), (Admininstr.STORE (Numtype.I32, (some 8), 0, 0)), (Admininstr.CONST (Numtype.I32, (j + 1))), (Admininstr.CONST (Numtype.I32, (i + 1))), (Admininstr.CONST (Numtype.I32, (n - 1))), (Admininstr.MEMORY_INIT x)]))
 
 inductive Step : (Config × Config) -> Prop where
   | pure (instr : (List Instr)) (instr' : (List Instr)) (z : State) : 
@@ -1371,10 +1760,42 @@ inductive Step : (Config × Config) -> Prop where
     (Step ((z, [(«$admininstr_val» val), (Admininstr.LOCAL_SET x)]), ((«$with_local» (z, x, val)), [])))
   | global_set (val : Val) (x : Idx) (z : State) : 
     (Step ((z, [(«$admininstr_val» val), (Admininstr.GLOBAL_SET x)]), ((«$with_global» (z, x, val)), [])))
+  | table_set_trap (i : Nat) (ref : Ref) (x : Idx) (z : State) : 
+    (i >= («$table» (z, x)).length) -> 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), (z, [Admininstr.TRAP])))
   | table_set_val (i : Nat) (ref : Ref) (x : Idx) (z : State) : 
     (i < («$table» (z, x)).length) -> 
     (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), («$admininstr_ref» ref), (Admininstr.TABLE_GET x)]), ((«$with_table» (z, x, i, ref)), [])))
   | table_grow_succeed (n : N) (ref : Ref) (x : Idx) (z : State) : 
     (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), ((«$with_tableext» (z, x, [ref])), [(Admininstr.CONST (Numtype.I32, («$table» (z, x)).length))])))
+  | table_grow_fail (n : N) (ref : Ref) (x : Idx) (z : State) : 
+    (Step ((z, [(«$admininstr_ref» ref), (Admininstr.CONST (Numtype.I32, n)), (Admininstr.TABLE_GROW x)]), (z, [(Admininstr.CONST (Numtype.I32, (0 - 1)))])))
   | elem_drop (x : Idx) (z : State) : 
     (Step ((z, [(Admininstr.ELEM_DROP x)]), ((«$with_elem» (z, x, [])), [])))
+  | store_num_trap (c : C_numtype) (i : Nat) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (((i + n_O) + (((Nat.div o0) 8))) >= («$mem» (z, 0)).length) -> 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.STORE (nt, none, n_A, n_O))]), (z, [Admininstr.TRAP])))
+  | store_num_val (b : (List Byte)) (c : C_numtype) (i : Nat) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) (o1 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    ((«$size» («$valtype_numtype» nt)) == (some o1)) -> 
+    (b == («$bytes_» (o1, c))) -> 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.STORE (nt, none, n_A, n_O))]), ((«$with_mem» (z, 0, (i + n_O), (((Nat.div o0) 8)), b)), [])))
+  | store_pack_trap (c : C_numtype) (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (z : State) : 
+    (((i + n_O) + (((Nat.div n) 8))) >= («$mem» (z, 0)).length) -> 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.STORE (nt, (some n), n_A, n_O))]), (z, [Admininstr.TRAP])))
+  | store_pack_val (b : (List Byte)) (c : C_numtype) (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) : 
+    ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
+    (b == («$bytes_» (n, («$wrap_» ((o0, n), c))))) -> 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (Numtype.I32, c)), (Admininstr.STORE (nt, (some n), n_A, n_O))]), ((«$with_mem» (z, 0, (i + n_O), (((Nat.div n) 8)), b)), [])))
+  | memory_grow_succeed (n : N) (z : State) : 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_GROW]), ((«$with_memext» (z, 0, [0])), [(Admininstr.CONST (Numtype.I32, («$mem» (z, 0)).length))])))
+  | memory_grow_fail (n : N) (z : State) : 
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_GROW]), (z, [(Admininstr.CONST (Numtype.I32, (0 - 1)))])))
+  | data_drop (x : Idx) (z : State) : 
+    (Step ((z, [(Admininstr.DATA_DROP x)]), ((«$with_data» (z, x, [])), [])))
+
+
+
+
+

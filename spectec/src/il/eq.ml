@@ -90,7 +90,10 @@ and eq_path p1 p2 =
   match p1.it, p2.it with
   | RootP, RootP -> true
   | IdxP (p11, e1), IdxP (p21, e2) -> eq_path p11 p21 && eq_exp e1 e2
-  | DotP (p11, atom1), DotP (p21, atom2) -> eq_path p11 p21 && atom1 = atom2
+  | SliceP (p11, e11, e12), SliceP (p21, e21, e22) ->
+    eq_path p11 p21 && eq_exp e11 e21 && eq_exp e12 e22
+  | DotP (p11, t1, atom1), DotP (p21, t2, atom2) ->
+    eq_path p11 p21 && eq_typ t1 t2 && atom1 = atom2
   | _, _ -> false
 
 and eq_iterexp (iter1, ids1) (iter2, ids2) =
@@ -103,7 +106,7 @@ let rec eq_prem prem1 prem2 =
     eq_id id1 id2 && op1 = op2 && eq_exp e1 e2
   | IfPr e1, IfPr e2 -> eq_exp e1 e2
   | ElsePr, ElsePr -> true
-  | IterPr (prem1, iterexp1), IterPr (prem2, iterexp2) ->
-  eq_prem prem1 prem2 && eq_iterexp iterexp1 iterexp2
+  | IterPr (prem1, e1), IterPr (prem2, e2) ->
+    eq_prem prem1 prem2 && eq_iterexp e1 e2
   | NegPr prem1, NegPr prem2 -> eq_prem prem1 prem2
   | _, _ -> false
