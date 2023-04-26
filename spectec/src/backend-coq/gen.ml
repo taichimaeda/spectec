@@ -22,6 +22,7 @@ let render_list how tys =
 
 let is_reserved = function
  | "in"
+ | "In"
  | "()"
  | "tt"
  | "Import"
@@ -33,7 +34,7 @@ let is_reserved = function
  -> false
 
 let make_id s = match s with
- | s when is_reserved s -> "reserved_" ^ s
+ | s when is_reserved s -> "reserved__" ^ s
  | s -> String.map (function
     | '.' -> '_'
     | '-' -> '_'
