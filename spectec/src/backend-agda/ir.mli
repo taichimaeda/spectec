@@ -1,9 +1,11 @@
 type id = string
 
 type exp =
+  | VarE of id
+  | SetE
   | YetE of string
 
-type cons = id * (id * exp) list
+type cons = id * (id option * exp) list
 
 type def =
   | DefD of id * exp

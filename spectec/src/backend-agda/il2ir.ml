@@ -1,24 +1,28 @@
 module Translate = struct
   open Util.Source
   open Il
-  let _clause _c = failwith __LOC__
 
-  let exp _e = failwith __LOC__
+  let id i = i.it
+
+  let atom a = Print.string_of_atom a
+
+  let typ t = Ir.YetE (Print.string_of_typ t)
+
+  let typecase (a, t, _hints) =
+    (atom a, [(None, typ t)])
+
+  let deftyp x deftyp =
+    match deftyp.it with
+    | Ast.AliasT ty -> Ir.DefD (id x, typ ty)
+    | NotationT _ -> YetD ("notation " ^ id x ^ " = " ^ Print.string_of_deftyp deftyp)
+    | StructT _ -> YetD ("struct " ^ id x ^ " = " ^ Print.string_of_deftyp deftyp)
+    | VariantT tcs ->
+        DataD (id x, SetE, List.map typecase tcs) 
 
   let def d =
     match d.it with
-    | Ast.SynD (id, deftyp) ->
-      begin match deftyp.it with
-        | Ast.AliasT ty ->
-          Ir.DefD (id.it, exp ty)
-        | NotationT (_mop, _ty) -> failwith __LOC__
-        | VariantT _cases -> failwith __LOC__
-        | StructT _fields -> failwith __LOC__
-
-      end
-    | DecD (_id, _typ1, _typ2, _clauses) -> failwith __LOC__
-    | RecD _defs -> failwith __LOC__
-    | _ -> failwith __LOC__
+    | Ast.SynD (id, dt) -> deftyp id dt
+    | (Ast.RelD _ | DecD _ | RecD _ | HintD _) -> YetD (Print.string_of_def d)
 
   let script = List.map def
 end
