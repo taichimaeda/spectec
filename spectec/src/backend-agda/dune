@@ -1,5 +1,4 @@
 (library
   (name backend_agda)
-  (libraries util el frontend str)
-  (modules gen render)
+  (libraries util il)
 )

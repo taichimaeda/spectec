@@ -142,9 +142,9 @@ let () =
     | Agda ->
       log "Agda Generation...";
       if !odst = "" then
-        print_endline (Backend_agda.Gen.gen_string el);
+        print_endline (Backend_agda.Gen.gen_string il);
       if !odst <> "" then
-        Backend_agda.Gen.gen_file !odst el;
+        Backend_agda.Gen.gen_file !odst il;
     );
     log "Complete."
   with
