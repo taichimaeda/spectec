@@ -13,6 +13,7 @@ type target =
  | Check
  | Latex of Backend_latex.Config.config
  | Prose
+ | Agda
 
 let target = ref (Latex Backend_latex.Config.latex)
 
@@ -58,6 +59,7 @@ let argspec = Arg.align
   "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
     " Generate Latex for Sphinx";
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
+  "--agda", Arg.Unit (fun () -> target := Agda), " Generate Agda";
 
   "--print-il", Arg.Set print_elab_il, "Print il (after elaboration)";
   "--print-final-il", Arg.Set print_final_il, "Print final il";
@@ -137,6 +139,12 @@ let () =
         let prose = Backend_prose.Translate.translate el in
         print_endline prose
       )
+    | Agda ->
+      log "Agda Generation...";
+      if !odst = "" then
+        print_endline (Backend_agda.Gen.gen_string el);
+      if !odst <> "" then
+        Backend_agda.Gen.gen_file !odst el;
     );
     log "Complete."
   with
