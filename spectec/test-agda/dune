@@ -1,0 +1,6 @@
+(mdx
+ (libraries spectec)
+ (deps
+  (file ../src/exe-watsup/main.exe)
+  (glob_files ../minispec/*.watsup))
+ (files TEST.md))
