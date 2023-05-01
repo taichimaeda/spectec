@@ -21,8 +21,8 @@ module Translate = struct
 
   let deftyp x deftyp =
     match deftyp.it with
-    | Ast.AliasT ty -> Ir.DefD (id x, typ ty)
-    | NotationT (_op, ty) -> Ir.DefD (id x, typ ty)
+    | Ast.AliasT ty -> Ir.DefD (id x, Some SetE, typ ty)
+    | NotationT (_op, ty) -> Ir.DefD (id x, None, typ ty)
     | StructT tfs -> Ir.RecordD (id x, SetE, List.map typefield tfs)
     | VariantT tcs -> DataD (id x, SetE, List.map typecase tcs)
 

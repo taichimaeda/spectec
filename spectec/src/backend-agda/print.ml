@@ -36,7 +36,9 @@ module Render = struct
   let field (i, arg) = id i ^ " : " ^ exp arg
 
   let def = function
-    | Ir.DefD (i, e) -> id i ^ " = " ^ exp e
+    | Ir.DefD (i, None, e) -> id i ^ " = " ^ exp e
+    | Ir.DefD (i, Some t, e) ->
+        id i ^ " : " ^ exp t ^ "\n" ^ id i ^ " = " ^ exp e
     | Ir.DataD (i, e, cs) ->
         "data " ^ id i ^ " : " ^ exp e ^ " where\n  "
         ^ (cs |> List.map (cons (Ir.VarE i)) |> String.concat "\n  ")

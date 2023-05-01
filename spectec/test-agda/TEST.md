@@ -13,22 +13,31 @@ open import Agda.Builtin.Unit
 data _×_ (A B : Set) : Set where
   ⟨_,_⟩ : A → B → A × B
 
+n : Set
 n = Nat
 
+name : Set
 name = String
 
+byte : Set
 byte = Nat
 
+u32 : Set
 u32 = Nat
 
+idx : Set
 idx = Nat
 
+funcidx : Set
 funcidx = idx
 
+globalidx : Set
 globalidx = idx
 
+labelidx : Set
 labelidx = idx
 
+localidx : Set
 localidx = idx
 
 data numtype : Set where
@@ -41,6 +50,7 @@ data valtype : Set where
 data in' : Set where
   I32 : ⊤ -> in'
 
+resulttype : Set
 resulttype = List valtype
 
 globaltype = (Maybe ⊤ × valtype)
@@ -93,8 +103,10 @@ data testop_numtype : Set where
 data relop_numtype : Set where
   _I : relop_IXX -> relop_numtype
 
+c_numtype : Set
 c_numtype = Nat
 
+blocktype : Set
 blocktype = functype
 
 data instr : Set where
@@ -120,6 +132,7 @@ data instr : Set where
   GLOBAL-GET : globalidx -> instr
   GLOBAL-SET : globalidx -> instr
 
+expr : Set
 expr = List instr
 
 func = ((functype × List valtype) × expr)
@@ -431,14 +444,19 @@ relation Module_ok: `|-%:OK`(module)
     -- if (|start*{start}| <= 1)
  -}
 
+addr : Set
 addr = Nat
 
+funcaddr : Set
 funcaddr = addr
 
+globaladdr : Set
 globaladdr = addr
 
+labeladdr : Set
 labeladdr = addr
 
+hostaddr : Set
 hostaddr = addr
 
 data num : Set where
@@ -465,6 +483,7 @@ record moduleinst : Set where
 
 funcinst = (moduleinst × func)
 
+globalinst : Set
 globalinst = val
 
 record store : Set where

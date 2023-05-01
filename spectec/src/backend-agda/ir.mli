@@ -16,7 +16,7 @@ type cons = id * (id option * exp) list
 type field = id * exp
 
 type def =
-  | DefD of id * exp
+  | DefD of id * exp option * exp
   | DataD of id * exp * cons list
   | RecordD of id * exp * field list
   | YetD of string
