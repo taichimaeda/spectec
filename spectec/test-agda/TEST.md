@@ -758,14 +758,8 @@ relation Step: `%~>%`(config, config)
   rule global.set {val : val, x : idx, z : state}:
     `%~>%`(`%;%*`(z, [(val <: admininstr) GLOBAL.SET_admininstr(x)]), `%;%*`($with_global(z, x, val), []))
  -}
-$ agda output.agda | sed -e "s/(.*\/_build\//(/g"
+$ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
 ```
 
-The `sed` incantation is needed to replace
-
-    Checking output (/ABSOLUTE/PATH/TO/USER/FOLDER/spectec/_build/default/test-agda/output.agda).
-
-with
-
-    Checking output (default/test-agda/output.agda).
+The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
