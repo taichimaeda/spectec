@@ -2,7 +2,7 @@ let comment s = "{- " ^ s ^ " -}"
 let keywords = [ "in"; "module" ]
 
 let id (Ir.Id str) =
-  let str = String.map (function '.' -> '-' | c -> c) str in
+  let str = String.map (function '_' | '.' -> '-' | c -> c) str in
   if List.mem str keywords then str ^ "'" else str
 
 let _list strs = "[ " ^ String.concat " , " strs ^ " ]"
@@ -18,6 +18,16 @@ module Render = struct
     | BoolC -> "Bool"
     | NatC -> "Nat"
     | TextC -> "String"
+    | Bool b -> string_of_bool b
+    | Nat n -> string_of_int n
+    | Text s -> s
+
+  let rec pat = function
+    | Ir.VarP i -> id i
+    | Ir.ConstP c -> const c
+    | Ir.TupleP ps ->
+        fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
+    | YetP s -> "_ " ^ comment s
 
   let rec exp = function
     | Ir.VarE i -> id i
@@ -27,6 +37,7 @@ module Render = struct
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
     | MaybeE e -> "Maybe " ^ exp e
     | ListE e -> "List " ^ exp e
+    | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
     | Ir.YetE s -> "? " ^ comment s
 
   let cons_arg = function
@@ -38,10 +49,15 @@ module Render = struct
 
   let field (i, arg) = id i ^ " : " ^ exp arg
 
+  let clauses i cls =
+    let clause (pats, e) =
+      id i ^ " " ^ String.concat " " (List.map pat pats) ^ " = " ^ exp e
+    in
+    List.map clause cls |> String.concat "\n"
+
   let def = function
-    | Ir.DefD (i, None, e) -> id i ^ " = " ^ exp e
-    | Ir.DefD (i, Some t, e) ->
-        id i ^ " : " ^ exp t ^ "\n" ^ id i ^ " = " ^ exp e
+    | Ir.DefD (i, None, cls) -> clauses i cls
+    | Ir.DefD (i, Some t, cls) -> id i ^ " : " ^ exp t ^ "\n" ^ clauses i cls
     | Ir.DataD (i, e, cs) ->
         "data " ^ id i ^ " : " ^ exp e ^ " where\n  "
         ^ (cs |> List.map (cons (Ir.VarE i)) |> String.concat "\n  ")

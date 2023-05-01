@@ -1,5 +1,15 @@
 type id = Id of string
-type const = SetC | BoolC | NatC | TextC
+
+type const =
+  | SetC
+  | BoolC
+  | NatC
+  | TextC
+  | Bool of bool
+  | Nat of int
+  | Text of string
+
+type pat = VarP of id | ConstP of const | TupleP of pat list | YetP of string
 
 type exp =
   | VarE of id
@@ -9,12 +19,14 @@ type exp =
   | ListE of exp
   | MaybeE of exp
   | YetE of string
+  | ArrowE of exp * exp
 
 type cons = id * (id option * exp) list
 type field = id * exp
+type clause = pat list * exp
 
 type def =
-  | DefD of id * exp option * exp
+  | DefD of id * exp option * clause list
   | DataD of id * exp * cons list
   | RecordD of id * exp * field list
   | YetD of string
