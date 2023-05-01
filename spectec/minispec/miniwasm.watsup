@@ -178,7 +178,7 @@ syntax testfuse =
 
 syntax context hint(desc "context") =
   { FUNC functype*, GLOBAL globaltype*,
-    LOCAL valtype*, LABEL resulttype*, RETURN resulttype? }
+    LOCAL valtype*, LABEL resulttype*, RETURNS resulttype? }
 
 var C : context
 
@@ -277,7 +277,7 @@ rule Instr_ok/br_if:
 
 rule Instr_ok/return:
   C |- RETURN : t_1* t* -> t_2*
-  -- if C.RETURN = (t*)
+  -- if C.RETURNS = (t*)
 
 rule Instr_ok/call:
   C |- CALL x : t_1* -> t_2*
@@ -357,7 +357,7 @@ rule Func_ok:
   C |- FUNC ft t* expr : ft
   -- if ft = t_1* -> t_2*
   -- Functype_ok: |- ft : OK
-  -- Expr_ok: C, LOCAL t_1* t*, LABEL (t_2*), RETURN (t_2*) |- expr : t_2*
+  -- Expr_ok: C, LOCAL t_1* t*, LABEL (t_2*), RETURNS (t_2*) |- expr : t_2*
 
 rule Global_ok:
   C |- GLOBAL gt expr : gt
