@@ -20,8 +20,9 @@ type exp =
   | MaybeE of exp
   | YetE of string
   | ArrowE of exp * exp
+  | ApplyE of exp * exp
 
-type cons = id * exp
+type cons = id * (id * exp) list * exp list * exp
 type field = id * exp
 type clause = pat list * exp
 

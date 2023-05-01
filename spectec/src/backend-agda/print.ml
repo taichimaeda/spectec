@@ -2,7 +2,9 @@ let comment s = "{- " ^ s ^ " -}"
 let keywords = [ "in"; "module" ]
 
 let id (Ir.Id str) =
-  let str = String.map (function '_' | '.' -> '-' | c -> c) str in
+  let str =
+    String.map (function '_' | '.' -> '-' | ';' -> ',' | c -> c) str
+  in
   if List.mem str keywords then str ^ "'" else str
 
 let _list strs = "[ " ^ String.concat " , " strs ^ " ]"
@@ -38,9 +40,23 @@ module Render = struct
     | MaybeE e -> "Maybe " ^ exp e
     | ListE e -> "List " ^ exp e
     | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
+    | ApplyE (e1, e2) -> exp e1 ^ " " ^ exp e2
     | Ir.YetE s -> "? " ^ comment s
 
-  let cons (i, t) = id i ^ " : " ^ exp t
+  let cons (i, bs, prems, t) =
+    id i ^ " :\n    "
+    ^ (if bs <> [] then
+         String.concat " "
+           (List.map (fun (i, ty) -> "(" ^ id i ^ " : " ^ exp ty ^ ")") bs)
+         ^ " ->\n    "
+       else "")
+    ^ (if prems <> [] then
+         String.concat " ->\n    " (List.map exp prems) ^ " ->\n    "
+       else "")
+    ^
+    let conc = exp t in
+    String.make (String.length conc) '-' ^ "\n    " ^ conc
+
   let field (i, arg) = id i ^ " : " ^ exp arg
 
   let clauses i cls =
