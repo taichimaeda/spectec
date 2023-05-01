@@ -38,13 +38,13 @@ module Translate = struct
     | TupE es -> TupleE (List.map exp es)
     | MixE (_op, e1) ->
         exp e1 (* mixops arise only from notations, so they are identities *)
-    | CallE (_id, _e1) -> YetE (Print.string_of_exp e)
+    | CallE (x, e) -> ApplyE (VarE (funid x), exp e)
     | IterE (_e1, _iter) -> YetE (Print.string_of_exp e)
     | OptE _eo -> YetE (Print.string_of_exp e)
     | TheE _e1 -> YetE (Print.string_of_exp e)
-    | ListE _es -> YetE (Print.string_of_exp e)
+    | ListE es -> List (List.map exp es)
     | CatE (_e1, _e2) -> YetE (Print.string_of_exp e)
-    | CaseE (_atom, _e1) -> YetE (Print.string_of_exp e)
+    | CaseE (a, e) -> ApplyE (VarE (atom a), exp e)
     | SubE (_e1, _t1, _t2) -> YetE (Print.string_of_exp e)
 
   let rec pat e =

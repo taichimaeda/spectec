@@ -145,7 +145,7 @@ def $Ki = 1024
 def $min(nat, nat) : nat
 def $min(0, j) = 0
 def $min(i, 0) = 0
-def $min($(i+1), $(j+1)) = $min(i, j)
+def $min(i, j) = $min($(i - 1), $(j - 1))
 
 
 ;; Auxiliary Definitions on Types
