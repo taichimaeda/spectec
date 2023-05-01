@@ -21,7 +21,7 @@ type exp =
   | YetE of string
   | ArrowE of exp * exp
 
-type cons = id * (id option * exp) list
+type cons = id * exp
 type field = id * exp
 type clause = pat list * exp
 

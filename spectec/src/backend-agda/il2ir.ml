@@ -73,7 +73,6 @@ module Translate = struct
     | CaseE (_atom, _e1) -> YetP (Print.string_of_exp e)
     | SubE (_e1, _t1, _t2) -> YetP (Print.string_of_exp e)
 
-  let typecase (a, t, _hints) = (atom a, [ (None, typ t) ])
   let typefield (a, t, _hints) = (atom a, typ t)
 
   let deftyp x deftyp =
@@ -81,7 +80,13 @@ module Translate = struct
     | Ast.AliasT ty -> Ir.DefD (id x, Some (ConstE SetC), [ ([], typ ty) ])
     | NotationT (_op, ty) -> Ir.DefD (id x, None, [ ([], typ ty) ])
     | StructT tfs -> Ir.RecordD (id x, ConstE SetC, List.map typefield tfs)
-    | VariantT tcs -> DataD (id x, ConstE SetC, List.map typecase tcs)
+    | VariantT tcs ->
+        DataD
+          ( id x,
+            ConstE SetC,
+            List.map
+              (fun (a, t, _hints) -> (atom a, Ir.ArrowE (typ t, VarE (id x))))
+              tcs )
 
   let clause cls =
     let (Ast.DefD (_binds, p, e, hints)) = cls.it in

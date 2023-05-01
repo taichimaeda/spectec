@@ -40,13 +40,7 @@ module Render = struct
     | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
     | Ir.YetE s -> "? " ^ comment s
 
-  let cons_arg = function
-    | None, e -> exp e
-    | Some x, e -> "(" ^ id x ^ " : " ^ exp e ^ ")"
-
-  let cons t (i, args) =
-    id i ^ " : " ^ String.concat " -> " (List.map cons_arg args @ [ exp t ])
-
+  let cons (i, t) = id i ^ " : " ^ exp t
   let field (i, arg) = id i ^ " : " ^ exp arg
 
   let clauses i cls =
@@ -60,7 +54,7 @@ module Render = struct
     | Ir.DefD (i, Some t, cls) -> id i ^ " : " ^ exp t ^ "\n" ^ clauses i cls
     | Ir.DataD (i, e, cs) ->
         "data " ^ id i ^ " : " ^ exp e ^ " where\n  "
-        ^ (cs |> List.map (cons (Ir.VarE i)) |> String.concat "\n  ")
+        ^ (cs |> List.map cons |> String.concat "\n  ")
     | Ir.RecordD (i, e, fs) ->
         "record " ^ id i ^ " : " ^ exp e ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
