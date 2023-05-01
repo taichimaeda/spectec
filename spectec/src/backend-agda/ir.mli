@@ -1,11 +1,9 @@
 type id = Id of string
+type const = SetC | BoolC | NatC | TextC
 
 type exp =
   | VarE of id
-  | SetE
-  | BoolE
-  | NatE
-  | TextE
+  | ConstE of const
   | ProdE of exp list
   | TupleE of exp list
   | ListE of exp

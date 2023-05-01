@@ -9,9 +9,9 @@ module Translate = struct
   let rec typ t =
     match t.it with
     | Ast.VarT n -> Ir.VarE (id n)
-    | BoolT -> BoolE
-    | NatT -> NatE
-    | TextT -> TextE
+    | BoolT -> ConstE BoolC
+    | NatT -> ConstE NatC
+    | TextT -> ConstE TextC
     | TupT ts -> ProdE (List.map typ ts)
     | IterT (t, Opt) -> MaybeE (typ t)
     | IterT (t, (List | List1 | ListN _)) -> ListE (typ t)
@@ -21,10 +21,10 @@ module Translate = struct
 
   let deftyp x deftyp =
     match deftyp.it with
-    | Ast.AliasT ty -> Ir.DefD (id x, Some SetE, typ ty)
+    | Ast.AliasT ty -> Ir.DefD (id x, Some (ConstE SetC), typ ty)
     | NotationT (_op, ty) -> Ir.DefD (id x, None, typ ty)
-    | StructT tfs -> Ir.RecordD (id x, SetE, List.map typefield tfs)
-    | VariantT tcs -> DataD (id x, SetE, List.map typecase tcs)
+    | StructT tfs -> Ir.RecordD (id x, ConstE SetC, List.map typefield tfs)
+    | VariantT tcs -> DataD (id x, ConstE SetC, List.map typecase tcs)
 
   let rec def d =
     match d.it with

@@ -13,12 +13,15 @@ let fold_left op default str =
   | hd :: tl -> List.fold_left (fun acc x -> op acc x) hd tl
 
 module Render = struct
+  let const = function
+    | Ir.SetC -> "Set"
+    | BoolC -> "Bool"
+    | NatC -> "Nat"
+    | TextC -> "String"
+
   let rec exp = function
     | Ir.VarE i -> id i
-    | Ir.SetE -> "Set"
-    | BoolE -> "Bool"
-    | NatE -> "Nat"
-    | TextE -> "String"
+    | Ir.ConstE c -> const c
     | ProdE es -> fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map exp es)
     | TupleE es ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
