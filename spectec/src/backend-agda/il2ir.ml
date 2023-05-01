@@ -80,8 +80,8 @@ module Translate = struct
 
   let deftyp x deftyp =
     match deftyp.it with
-    | Ast.AliasT ty -> Ir.DefD (tyid x, Some (ConstE SetC), [ ([], typ ty) ])
-    | NotationT (_op, ty) -> Ir.DefD (tyid x, None, [ ([], typ ty) ])
+    | Ast.AliasT ty -> Ir.DefD (tyid x, ConstE SetC, [ ([], typ ty) ])
+    | NotationT (_op, ty) -> Ir.DefD (tyid x, ConstE SetC, [ ([], typ ty) ])
     | StructT tfs -> Ir.RecordD (tyid x, ConstE SetC, List.map typefield tfs)
     | VariantT tcs ->
         DataD
@@ -125,14 +125,9 @@ module Translate = struct
           (match clss with
           | [] ->
               Ir.DefD
-                ( funid i,
-                  Some (ArrowE (typ tin, typ tout)),
-                  [ ([], Ir.YetE "TODO") ] )
+                (funid i, ArrowE (typ tin, typ tout), [ ([], Ir.YetE "TODO") ])
           | _ :: _ ->
-              Ir.DefD
-                ( funid i,
-                  Some (ArrowE (typ tin, typ tout)),
-                  List.map clause clss ));
+              Ir.DefD (funid i, ArrowE (typ tin, typ tout), List.map clause clss));
         ]
     | RecD defs -> [ Ir.MutualD (script defs) ]
     | HintD _ -> []

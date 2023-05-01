@@ -66,8 +66,7 @@ module Render = struct
     List.map clause cls |> String.concat "\n"
 
   let rec decl_def = function
-    | Ir.DefD (_i, None, _cls) -> ""
-    | Ir.DefD (i, Some t, _cls) -> id i ^ " : " ^ exp t
+    | Ir.DefD (i, t, _cls) -> id i ^ " : " ^ exp t
     | Ir.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
     | Ir.RecordD (i, e, _fs) -> "record " ^ id i ^ " : " ^ exp e
     | Ir.MutualD defs -> String.concat "\n" (List.map decl_def defs)

@@ -68,10 +68,10 @@ data ty-in where
 ty-resulttype : Set
 ty-resulttype  = List ty-valtype
 
-
+ty-globaltype : Set
 ty-globaltype  = (Maybe ⊤ × ty-valtype)
 
-
+ty-functype : Set
 ty-functype  = (ty-resulttype × ty-resulttype)
 
 data ty-sx : Set
@@ -309,16 +309,16 @@ data ty-instr where
 ty-expr : Set
 ty-expr  = List ty-instr
 
-
+ty-func : Set
 ty-func  = ((ty-functype × List ty-valtype) × ty-expr)
 
-
+ty-global : Set
 ty-global  = (ty-globaltype × ty-expr)
 
-
+ty-start : Set
 ty-start  = ty-funcidx
 
-
+ty-module : Set
 ty-module  = ((List ty-func × List ty-global) × List ty-start)
 
 $Ki : ⊤ → Nat
@@ -664,7 +664,7 @@ record ty-moduleinst where
     FUNC : List ty-funcaddr
     GLOBAL : List ty-globaladdr
 
-
+ty-funcinst : Set
 ty-funcinst  = (ty-moduleinst × ty-func)
 
 ty-globalinst : Set
@@ -682,7 +682,7 @@ record ty-frame where
     LOCAL : List ty-val
     MODULE : ty-moduleinst
 
-
+ty-state : Set
 ty-state  = (ty-store × ty-frame)
 
 data ty-admininstr : Set
@@ -788,7 +788,7 @@ data ty-admininstr where
     -------------
     ty-admininstr
 
-
+ty-config : Set
 ty-config  = (ty-state × List ty-admininstr)
 
 $funcaddr : ty-state → List ty-funcaddr
