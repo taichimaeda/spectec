@@ -13,753 +13,1233 @@ open import Agda.Builtin.Unit
 data _×_ (A B : Set) : Set where
   ⟨_,_⟩ : A → B → A × B
 
-n : Set
-n = Nat
+ty-n : Set
+ty-n  = Nat
 
-name : Set
-name = String
+ty-name : Set
+ty-name  = String
 
-byte : Set
-byte = Nat
+ty-byte : Set
+ty-byte  = Nat
 
-u32 : Set
-u32 = Nat
+ty-u32 : Set
+ty-u32  = Nat
 
-idx : Set
-idx = Nat
+ty-idx : Set
+ty-idx  = Nat
 
-funcidx : Set
-funcidx = idx
+ty-funcidx : Set
+ty-funcidx  = ty-idx
 
-globalidx : Set
-globalidx = idx
+ty-globalidx : Set
+ty-globalidx  = ty-idx
 
-labelidx : Set
-labelidx = idx
+ty-labelidx : Set
+ty-labelidx  = ty-idx
 
-localidx : Set
-localidx = idx
+ty-localidx : Set
+ty-localidx  = ty-idx
 
-data numtype : Set where
-  I32 : ⊤ -> numtype
+data ty-numtype : Set
+data ty-numtype where
+  I32 :
+    ⊤ ->
+    ----------
+    ty-numtype
 
-data valtype : Set where
-  I32 : ⊤ -> valtype
-  BOT : ⊤ -> valtype
+data ty-valtype : Set
+data ty-valtype where
+  I32 :
+    ⊤ ->
+    ----------
+    ty-valtype
+  BOT :
+    ⊤ ->
+    ----------
+    ty-valtype
 
-data in' : Set where
-  I32 : ⊤ -> in'
+data ty-in : Set
+data ty-in where
+  I32 :
+    ⊤ ->
+    -----
+    ty-in
 
-resulttype : Set
-resulttype = List valtype
+ty-resulttype : Set
+ty-resulttype  = List ty-valtype
 
-globaltype = (Maybe ⊤ × valtype)
 
-functype = (resulttype × resulttype)
+ty-globaltype  = (Maybe ⊤ × ty-valtype)
 
-data sx : Set where
-  U : ⊤ -> sx
-  S : ⊤ -> sx
 
-data unop_IXX : Set where
-  CLZ : ⊤ -> unop_IXX
-  CTZ : ⊤ -> unop_IXX
-  POPCNT : ⊤ -> unop_IXX
+ty-functype  = (ty-resulttype × ty-resulttype)
 
-data binop_IXX : Set where
-  ADD : ⊤ -> binop_IXX
-  SUB : ⊤ -> binop_IXX
-  MUL : ⊤ -> binop_IXX
-  DIV : sx -> binop_IXX
-  REM : sx -> binop_IXX
-  AND : ⊤ -> binop_IXX
-  OR : ⊤ -> binop_IXX
-  XOR : ⊤ -> binop_IXX
-  SHL : ⊤ -> binop_IXX
-  SHR : sx -> binop_IXX
-  ROTL : ⊤ -> binop_IXX
-  ROTR : ⊤ -> binop_IXX
+data ty-sx : Set
+data ty-sx where
+  U :
+    ⊤ ->
+    -----
+    ty-sx
+  S :
+    ⊤ ->
+    -----
+    ty-sx
 
-data testop_IXX : Set where
-  EQZ : ⊤ -> testop_IXX
+data ty-unop-IXX : Set
+data ty-unop-IXX where
+  CLZ :
+    ⊤ ->
+    -----------
+    ty-unop-IXX
+  CTZ :
+    ⊤ ->
+    -----------
+    ty-unop-IXX
+  POPCNT :
+    ⊤ ->
+    -----------
+    ty-unop-IXX
 
-data relop_IXX : Set where
-  EQ : ⊤ -> relop_IXX
-  NE : ⊤ -> relop_IXX
-  LT : sx -> relop_IXX
-  GT : sx -> relop_IXX
-  LE : sx -> relop_IXX
-  GE : sx -> relop_IXX
+data ty-binop-IXX : Set
+data ty-binop-IXX where
+  ADD :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  SUB :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  MUL :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  DIV :
+    ty-sx ->
+    ------------
+    ty-binop-IXX
+  REM :
+    ty-sx ->
+    ------------
+    ty-binop-IXX
+  AND :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  OR :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  XOR :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  SHL :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  SHR :
+    ty-sx ->
+    ------------
+    ty-binop-IXX
+  ROTL :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
+  ROTR :
+    ⊤ ->
+    ------------
+    ty-binop-IXX
 
-data unop_numtype : Set where
-  _I : unop_IXX -> unop_numtype
+data ty-testop-IXX : Set
+data ty-testop-IXX where
+  EQZ :
+    ⊤ ->
+    -------------
+    ty-testop-IXX
 
-data binop_numtype : Set where
-  _I : binop_IXX -> binop_numtype
+data ty-relop-IXX : Set
+data ty-relop-IXX where
+  EQ :
+    ⊤ ->
+    ------------
+    ty-relop-IXX
+  NE :
+    ⊤ ->
+    ------------
+    ty-relop-IXX
+  LT :
+    ty-sx ->
+    ------------
+    ty-relop-IXX
+  GT :
+    ty-sx ->
+    ------------
+    ty-relop-IXX
+  LE :
+    ty-sx ->
+    ------------
+    ty-relop-IXX
+  GE :
+    ty-sx ->
+    ------------
+    ty-relop-IXX
 
-data testop_numtype : Set where
-  _I : testop_IXX -> testop_numtype
+data ty-unop-numtype : Set
+data ty-unop-numtype where
+  -I :
+    ty-unop-IXX ->
+    ---------------
+    ty-unop-numtype
 
-data relop_numtype : Set where
-  _I : relop_IXX -> relop_numtype
+data ty-binop-numtype : Set
+data ty-binop-numtype where
+  -I :
+    ty-binop-IXX ->
+    ----------------
+    ty-binop-numtype
 
-c_numtype : Set
-c_numtype = Nat
+data ty-testop-numtype : Set
+data ty-testop-numtype where
+  -I :
+    ty-testop-IXX ->
+    -----------------
+    ty-testop-numtype
 
-blocktype : Set
-blocktype = functype
+data ty-relop-numtype : Set
+data ty-relop-numtype where
+  -I :
+    ty-relop-IXX ->
+    ----------------
+    ty-relop-numtype
 
-data instr : Set where
-  UNREACHABLE : ⊤ -> instr
-  NOP : ⊤ -> instr
-  DROP : ⊤ -> instr
-  SELECT : Maybe valtype -> instr
-  BLOCK : (blocktype × List instr) -> instr
-  LOOP : (blocktype × List instr) -> instr
-  IF : ((blocktype × List instr) × List instr) -> instr
-  BR : labelidx -> instr
-  BR_IF : labelidx -> instr
-  CALL : funcidx -> instr
-  RETURN : ⊤ -> instr
-  CONST : (numtype × c_numtype) -> instr
-  UNOP : (numtype × unop_numtype) -> instr
-  BINOP : (numtype × binop_numtype) -> instr
-  TESTOP : (numtype × testop_numtype) -> instr
-  RELOP : (numtype × relop_numtype) -> instr
-  LOCAL-GET : localidx -> instr
-  LOCAL-SET : localidx -> instr
-  LOCAL-TEE : localidx -> instr
-  GLOBAL-GET : globalidx -> instr
-  GLOBAL-SET : globalidx -> instr
+ty-c-numtype : Set
+ty-c-numtype  = Nat
 
-expr : Set
-expr = List instr
+ty-blocktype : Set
+ty-blocktype  = ty-functype
 
-func = ((functype × List valtype) × expr)
+data ty-instr : Set
+data ty-instr where
+  UNREACHABLE :
+    ⊤ ->
+    --------
+    ty-instr
+  NOP :
+    ⊤ ->
+    --------
+    ty-instr
+  DROP :
+    ⊤ ->
+    --------
+    ty-instr
+  SELECT :
+    Maybe ty-valtype ->
+    --------
+    ty-instr
+  BLOCK :
+    (ty-blocktype × List ty-instr) ->
+    --------
+    ty-instr
+  LOOP :
+    (ty-blocktype × List ty-instr) ->
+    --------
+    ty-instr
+  IF :
+    ((ty-blocktype × List ty-instr) × List ty-instr) ->
+    --------
+    ty-instr
+  BR :
+    ty-labelidx ->
+    --------
+    ty-instr
+  BR-IF :
+    ty-labelidx ->
+    --------
+    ty-instr
+  CALL :
+    ty-funcidx ->
+    --------
+    ty-instr
+  RETURN :
+    ⊤ ->
+    --------
+    ty-instr
+  CONST :
+    (ty-numtype × ty-c-numtype) ->
+    --------
+    ty-instr
+  UNOP :
+    (ty-numtype × ty-unop-numtype) ->
+    --------
+    ty-instr
+  BINOP :
+    (ty-numtype × ty-binop-numtype) ->
+    --------
+    ty-instr
+  TESTOP :
+    (ty-numtype × ty-testop-numtype) ->
+    --------
+    ty-instr
+  RELOP :
+    (ty-numtype × ty-relop-numtype) ->
+    --------
+    ty-instr
+  LOCAL-GET :
+    ty-localidx ->
+    --------
+    ty-instr
+  LOCAL-SET :
+    ty-localidx ->
+    --------
+    ty-instr
+  LOCAL-TEE :
+    ty-localidx ->
+    --------
+    ty-instr
+  GLOBAL-GET :
+    ty-globalidx ->
+    --------
+    ty-instr
+  GLOBAL-SET :
+    ty-globalidx ->
+    --------
+    ty-instr
 
-global = (globaltype × expr)
+ty-expr : Set
+ty-expr  = List ty-instr
 
-start = funcidx
 
-module' = ((List func × List global) × List start)
+ty-func  = ((ty-functype × List ty-valtype) × ty-expr)
 
-{-
-;; ../minispec/miniwasm.watsup:139.1-139.14
-def Ki : nat
-  ;; ../minispec/miniwasm.watsup:140.1-140.15
-  def Ki = 1024
- -}
 
-{-
-;; ../minispec/miniwasm.watsup:145.1-145.25
-def min : (nat, nat) -> nat
-  ;; ../minispec/miniwasm.watsup:146.1-146.19
-  def {j : nat} min(0, j) = 0
-  ;; ../minispec/miniwasm.watsup:147.1-147.19
-  def {i : nat} min(i, 0) = 0
-  ;; ../minispec/miniwasm.watsup:148.1-148.38
-  def {i : nat, j : nat} min((i + 1), (j + 1)) = $min(i, j)
- -}
+ty-global  = (ty-globaltype × ty-expr)
 
-{-
-;; ../minispec/miniwasm.watsup:155.1-155.55
-def size : valtype -> nat
-  ;; ../minispec/miniwasm.watsup:156.1-156.20
-  def size(I32_valtype) = 32
- -}
 
-{-
-;; ../minispec/miniwasm.watsup:161.1-161.40
-def test_sub_ATOM_22 : n -> nat
-  ;; ../minispec/miniwasm.watsup:162.1-162.38
-  def {n_3_ATOM_y : n} test_sub_ATOM_22(n_3_ATOM_y) = 0
- -}
+ty-start  = ty-funcidx
 
-{-
-;; ../minispec/miniwasm.watsup:164.1-164.26
-def curried_ : (n, n) -> nat
-  ;; ../minispec/miniwasm.watsup:165.1-165.39
-  def {n_1 : n, n_2 : n} curried_(n_1, n_2) = (n_1 + n_2)
- -}
 
-data testfuse : Set where
-  AB_ : ((Nat × Nat) × Nat) -> testfuse
-  CD : ((Nat × Nat) × Nat) -> testfuse
-  EF : ((Nat × Nat) × Nat) -> testfuse
-  GH : ((Nat × Nat) × Nat) -> testfuse
-  IJ : ((Nat × Nat) × Nat) -> testfuse
-  KL : ((Nat × Nat) × Nat) -> testfuse
-  MN : ((Nat × Nat) × Nat) -> testfuse
-  OP : ((Nat × Nat) × Nat) -> testfuse
-  QR : ((Nat × Nat) × Nat) -> testfuse
+ty-module  = ((List ty-func × List ty-global) × List ty-start)
 
-record context : Set where
+$Ki : ⊤ → Nat
+$Ki _ = 1024
+
+$min : (Nat × Nat) → Nat
+$min ⟨ 0 , j ⟩ = 0
+$min ⟨ i , 0 ⟩ = 0
+$min ⟨ _ {- (i + 1) -} , _ {- (j + 1) -} ⟩ = ? {- $min(i, j) -}
+
+$size : ty-valtype → Nat
+$size _ {- I32_valtype -} = 32
+
+$test-sub-ATOM-22 : ty-n → Nat
+$test-sub-ATOM-22 n-3-ATOM-y = 0
+
+$curried- : (ty-n × ty-n) → Nat
+$curried- ⟨ n-1 , n-2 ⟩ = ? {- (n_1 + n_2) -}
+
+data ty-testfuse : Set
+data ty-testfuse where
+  AB- :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  CD :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  EF :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  GH :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  IJ :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  KL :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  MN :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  OP :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+  QR :
+    ((Nat × Nat) × Nat) ->
+    -----------
+    ty-testfuse
+
+record ty-context : Set
+record ty-context where
   field
-    FUNC : List functype
-    GLOBAL : List globaltype
-    LOCAL : List valtype
-    LABEL : List resulttype
-    RETURNS : Maybe resulttype
+    FUNC : List ty-functype
+    GLOBAL : List ty-globaltype
+    LOCAL : List ty-valtype
+    LABEL : List ty-resulttype
+    RETURNS : Maybe ty-resulttype
 
-{-
-;; ../minispec/miniwasm.watsup:189.1-189.64
-relation Functype_ok: `|-%:OK`(functype)
-  ;; ../minispec/miniwasm.watsup:193.1-194.13
-  rule _ {ft : functype}:
-    `|-%:OK`(ft)
- -}
+data ty-Functype-ok : ty-functype → Set
+data ty-Functype-ok where
+  - :
+    (ft : ty-functype) ->
+    -----------------
+    ty-Functype-ok ft
 
-{-
-;; ../minispec/miniwasm.watsup:190.1-190.66
-relation Globaltype_ok: `|-%:OK`(globaltype)
-  ;; ../minispec/miniwasm.watsup:196.1-197.13
-  rule _ {gt : globaltype}:
-    `|-%:OK`(gt)
- -}
+data ty-Globaltype-ok : ty-globaltype → Set
+data ty-Globaltype-ok where
+  - :
+    (gt : ty-globaltype) ->
+    -------------------
+    ty-Globaltype-ok gt
 
-{-
-;; ../minispec/miniwasm.watsup:247.1-247.76
-relation Blocktype_ok: `%|-%:%`(context, blocktype, functype)
-  ;; ../minispec/miniwasm.watsup:249.1-251.29
-  rule _ {C : context, ft : functype}:
-    `%|-%:%`(C, ft, ft)
-    -- Functype_ok: `|-%:OK`(ft)
- -}
+data ty-Blocktype-ok : ((ty-context × ty-blocktype) × ty-functype) → Set
+data ty-Blocktype-ok where
+  - :
+    (C : ty-context) (ft : ty-functype) ->
+    ty-Functype-ok ft ->
+    -------------------------------------------
+    ty-Blocktype-ok ⟨ ⟨ C , ft ⟩ , ft ⟩
 
-{-
-;; ../minispec/miniwasm.watsup:202.1-202.66
-relation Instr_ok: `%|-%:%`(context, instr, functype)
-  ;; ../minispec/miniwasm.watsup:229.1-230.34
-  rule unreachable {C : context, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, UNREACHABLE_instr, `%->%`(t_1*{t_1}, t_2*{t_2}))
+data ty-Instr-ok : ((ty-context × ty-instr) × ty-functype) → Set
+data ty-InstrSeq-ok : ((ty-context × List ty-instr) × ty-functype) → Set
+data ty-Instr-ok where
+  unreachable :
+    (C : ty-context) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ---------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- UNREACHABLE_instr -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  nop :
+    (C : ty-context) ->
+    -----------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- NOP_instr -} ⟩ , ⟨ ? {- [] -} , ? {- [] -} ⟩ ⟩
+  drop :
+    (C : ty-context) (t : ty-valtype) ->
+    -------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- DROP_instr -} ⟩ , ⟨ ? {- [t] -} , ? {- [] -} ⟩ ⟩
+  select-expl :
+    (C : ty-context) (t : ty-valtype) ->
+    ------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- SELECT_instr(?(t)) -} ⟩ , ⟨ ? {- [t t I32_valtype] -} , ? {- [t] -} ⟩ ⟩
+  select-impl :
+    (C : ty-context) (numtype : ty-numtype) (t : ty-valtype) ->
+    ? {- PREM -} ->
+    -----------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- SELECT_instr(?()) -} ⟩ , ⟨ ? {- [t t I32_valtype] -} , ? {- [t] -} ⟩ ⟩
+  block :
+    (C : ty-context) (bt : ty-blocktype) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ ? {- C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , ? {- instr*{instr} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ----------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- BLOCK_instr(bt, instr*{instr}) -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  loop :
+    (C : ty-context) (bt : ty-blocktype) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ ? {- C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_1]*{t_1}, RETURNS ?()} -} , ? {- instr*{instr} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ---------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- LOOP_instr(bt, instr*{instr}) -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  if :
+    (C : ty-context) (bt : ty-blocktype) (instr-1 : ty-instr) (instr-2 : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ ? {- C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , ? {- instr_1*{instr_1} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ ? {- C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , ? {- instr_2*{instr_2} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- IF_instr(bt, instr_1*{instr_1}, instr_2*{instr_2}) -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  br :
+    (C : ty-context) (l : ty-labelidx) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ? {- PREM -} ->
+    ------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- BR_instr(l) -} ⟩ , ⟨ ? {- t_1*{t_1} :: t*{t} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  br-if :
+    (C : ty-context) (l : ty-labelidx) (t : ty-valtype) ->
+    ? {- PREM -} ->
+    ---------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- BR_IF_instr(l) -} ⟩ , ⟨ ? {- t*{t} :: [I32_valtype] -} , ? {- t*{t} -} ⟩ ⟩
+  return :
+    (C : ty-context) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ? {- PREM -} ->
+    -------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- RETURN_instr -} ⟩ , ⟨ ? {- t_1*{t_1} :: t*{t} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  call :
+    (C : ty-context) (t-1 : ty-valtype) (t-2 : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    -----------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- CALL_instr(x) -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  const :
+    (C : ty-context) (c-nt : ty-c-numtype) (nt : ty-numtype) ->
+    --------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- CONST_instr(nt, c_nt) -} ⟩ , ⟨ ? {- [] -} , ? {- [(nt <: valtype)] -} ⟩ ⟩
+  unop :
+    (C : ty-context) (nt : ty-numtype) (unop : ty-unop-numtype) ->
+    ----------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- UNOP_instr(nt, unop) -} ⟩ , ⟨ ? {- [(nt <: valtype)] -} , ? {- [(nt <: valtype)] -} ⟩ ⟩
+  binop :
+    (C : ty-context) (binop : ty-binop-numtype) (nt : ty-numtype) ->
+    ----------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- BINOP_instr(nt, binop) -} ⟩ , ⟨ ? {- [(nt <: valtype) (nt <: valtype)] -} , ? {- [(nt <: valtype)] -} ⟩ ⟩
+  testop :
+    (C : ty-context) (nt : ty-numtype) (testop : ty-testop-numtype) ->
+    ----------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- TESTOP_instr(nt, testop) -} ⟩ , ⟨ ? {- [(nt <: valtype)] -} , ? {- [I32_valtype] -} ⟩ ⟩
+  relop :
+    (C : ty-context) (nt : ty-numtype) (relop : ty-relop-numtype) ->
+    ------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- RELOP_instr(nt, relop) -} ⟩ , ⟨ ? {- [(nt <: valtype) (nt <: valtype)] -} , ? {- [I32_valtype] -} ⟩ ⟩
+  local-get :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ---------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- LOCAL.GET_instr(x) -} ⟩ , ⟨ ? {- [] -} , ? {- [t] -} ⟩ ⟩
+  local-set :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ---------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- LOCAL.SET_instr(x) -} ⟩ , ⟨ ? {- [t] -} , ? {- [] -} ⟩ ⟩
+  local-tee :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- LOCAL.TEE_instr(x) -} ⟩ , ⟨ ? {- [t] -} , ? {- [t] -} ⟩ ⟩
+  global-get :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- GLOBAL.GET_instr(x) -} ⟩ , ⟨ ? {- [] -} , ? {- [t] -} ⟩ ⟩
+  global-set :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , ? {- GLOBAL.SET_instr(x) -} ⟩ , ⟨ ? {- [t] -} , ? {- [] -} ⟩ ⟩
+data ty-InstrSeq-ok where
+  empty :
+    (C : ty-context) ->
+    -------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- [] -} ⟩ , ⟨ ? {- [] -} , ? {- [] -} ⟩ ⟩
+  seq :
+    (C : ty-context) (instr-1 : ty-instr) (instr-2 : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) (t-3 : ty-valtype) ->
+    ty-Instr-ok ⟨ ⟨ C , instr-1 ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- [instr_2] -} ⟩ , ⟨ ? {- t_2*{t_2} -} , ? {- t_3*{t_3} -} ⟩ ⟩ ->
+    ------------------------------------------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- [instr_1] :: instr_2*{} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_3*{t_3} -} ⟩ ⟩
+  weak :
+    (C : ty-context) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ⟨ ? {- t_1*{} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    ----------------------------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ⟨ ? {- [t_1] -} , ? {- t_2*{t_2} -} ⟩ ⟩
+  frame :
+    (C : ty-context) (instr : ty-instr) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ⟨ ? {- t_1*{t_1} -} , ? {- t_2*{t_2} -} ⟩ ⟩ ->
+    --------------------------------------------------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ⟨ ? {- t*{t} :: t_1*{t_1} -} , ? {- t*{t} :: t_2*{t_2} -} ⟩ ⟩
 
-  ;; ../minispec/miniwasm.watsup:232.1-233.32
-  rule nop {C : context}:
-    `%|-%:%`(C, NOP_instr, `%->%`([], []))
+data ty-Expr-ok : ((ty-context × ty-expr) × ty-resulttype) → Set
+data ty-Expr-ok where
+  - :
+    (C : ty-context) (instr : ty-instr) (t : ty-valtype) ->
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ⟨ ? {- [] -} , ? {- t*{t} -} ⟩ ⟩ ->
+    --------------------------------------------------------------------
+    ty-Expr-ok ⟨ ⟨ C , ? {- instr*{instr} -} ⟩ , ? {- t*{t} -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:235.1-236.27
-  rule drop {C : context, t : valtype}:
-    `%|-%:%`(C, DROP_instr, `%->%`([t], []))
+data ty-Instr-const : (ty-context × ty-instr) → Set
+data ty-Instr-const where
+  const :
+    (C : ty-context) (c : ty-c-numtype) (nt : ty-numtype) ->
+    -----------------------------------------------------
+    ty-Instr-const ⟨ C , ? {- CONST_instr(nt, c) -} ⟩
+  global-get :
+    (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
+    ? {- PREM -} ->
+    ------------------------------------------------------
+    ty-Instr-const ⟨ C , ? {- GLOBAL.GET_instr(x) -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:239.1-240.31
-  rule select-expl {C : context, t : valtype}:
-    `%|-%:%`(C, SELECT_instr(?(t)), `%->%`([t t I32_valtype], [t]))
+data ty-Expr-const : (ty-context × ty-expr) → Set
+data ty-Expr-const where
+  - :
+    (C : ty-context) (instr : ty-instr) ->
+    ? {- PREM -} ->
+    -----------------------------------------------
+    ty-Expr-const ⟨ C , ? {- instr*{instr} -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:242.1-244.20
-  rule select-impl {C : context, numtype : numtype, t : valtype}:
-    `%|-%:%`(C, SELECT_instr(?()), `%->%`([t t I32_valtype], [t]))
-    -- if (t = (numtype <: valtype))
+data ty-Expr-ok-const : ((ty-context × ty-expr) × ty-valtype) → Set
+data ty-Expr-ok-const where
+  - :
+    (C : ty-context) (expr : ty-expr) (t : ty-valtype) ->
+    ty-Expr-ok ⟨ ⟨ C , expr ⟩ , ? {- [t] -} ⟩ ->
+    ty-Expr-const ⟨ C , expr ⟩ ->
+    ---------------------------------------------
+    ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩
 
-  ;; ../minispec/miniwasm.watsup:253.1-256.57
-  rule block {C : context, bt : blocktype, instr* : instr*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, BLOCK_instr(bt, instr*{instr}), `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+data ty-Func-ok : ((ty-context × ty-func) × ty-functype) → Set
+data ty-Func-ok where
+  - :
+    (C : ty-context) (expr : ty-expr) (ft : ty-functype) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
+    ? {- PREM -} ->
+    ty-Functype-ok ft ->
+    ty-Expr-ok ⟨ ⟨ ? {- C ++ {FUNC [], GLOBAL [], LOCAL t_1*{t_1} :: t*{t}, LABEL [], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2*{t_2}], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [], RETURNS ?(t_2*{t_2})} -} , expr ⟩ , ? {- t_2*{t_2} -} ⟩ ->
+    -----------------------------------------------------------------------------
+    ty-Func-ok ⟨ ⟨ C , ⟨ ⟨ ft , ? {- t*{t} -} ⟩ , expr ⟩ ⟩ , ft ⟩
 
-  ;; ../minispec/miniwasm.watsup:258.1-261.57
-  rule loop {C : context, bt : blocktype, instr* : instr*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, LOOP_instr(bt, instr*{instr}), `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_1]*{t_1}, RETURNS ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+data ty-Global-ok : ((ty-context × ty-global) × ty-globaltype) → Set
+data ty-Global-ok where
+  - :
+    (C : ty-context) (expr : ty-expr) (gt : ty-globaltype) (t : ty-valtype) ->
+    ty-Globaltype-ok gt ->
+    ? {- PREM -} ->
+    ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩ ->
+    -------------------------------------------------------
+    ty-Global-ok ⟨ ⟨ C , ⟨ gt , expr ⟩ ⟩ , gt ⟩
 
-  ;; ../minispec/miniwasm.watsup:263.1-267.59
-  rule if {C : context, bt : blocktype, instr_1* : instr*, instr_2* : instr*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, IF_instr(bt, instr_1*{instr_1}, instr_2*{instr_2}), `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()}, instr_1*{instr_1}, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()}, instr_2*{instr_2}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+data ty-Start-ok : (ty-context × ty-start) → Set
+data ty-Start-ok where
+  - :
+    (C : ty-context) (x : ty-idx) ->
+    ? {- PREM -} ->
+    -------------------------
+    ty-Start-ok ⟨ C , x ⟩
 
-  ;; ../minispec/miniwasm.watsup:270.1-272.24
-  rule br {C : context, l : labelidx, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, BR_instr(l), `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
-    -- if (C.LABEL_context[l] = t*{t})
+data ty-Module-ok : ty-module → Set
+data ty-Module-ok where
+  - :
+    (C : ty-context) (ft : ty-functype) (func : ty-func) (global : ty-global) (gt : ty-globaltype) (start : ty-start) ->
+    ? {- PREM -} ->
+    ? {- PREM -} ->
+    ? {- PREM -} ->
+    ? {- PREM -} ->
+    ? {- PREM -} ->
+    --------------------------------------------------------------------------------------------------
+    ty-Module-ok ⟨ ⟨ ? {- func*{func} -} , ? {- global*{global} -} ⟩ , ? {- start*{start} -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:274.1-276.24
-  rule br_if {C : context, l : labelidx, t* : valtype*}:
-    `%|-%:%`(C, BR_IF_instr(l), `%->%`(t*{t} :: [I32_valtype], t*{t}))
-    -- if (C.LABEL_context[l] = t*{t})
+ty-addr : Set
+ty-addr  = Nat
 
-  ;; ../minispec/miniwasm.watsup:278.1-280.25
-  rule return {C : context, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, RETURN_instr, `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
-    -- if (C.RETURNS_context = ?(t*{t}))
+ty-funcaddr : Set
+ty-funcaddr  = ty-addr
 
-  ;; ../minispec/miniwasm.watsup:282.1-284.33
-  rule call {C : context, t_1* : valtype*, t_2* : valtype*, x : idx}:
-    `%|-%:%`(C, CALL_instr(x), `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- if (C.FUNC_context[x] = `%->%`(t_1*{t_1}, t_2*{t_2}))
+ty-globaladdr : Set
+ty-globaladdr  = ty-addr
 
-  ;; ../minispec/miniwasm.watsup:287.1-288.37
-  rule const {C : context, c_nt : c_numtype, nt : numtype}:
-    `%|-%:%`(C, CONST_instr(nt, c_nt), `%->%`([], [(nt <: valtype)]))
+ty-labeladdr : Set
+ty-labeladdr  = ty-addr
 
-  ;; ../minispec/miniwasm.watsup:290.1-291.31
-  rule unop {C : context, nt : numtype, unop : unop_numtype}:
-    `%|-%:%`(C, UNOP_instr(nt, unop), `%->%`([(nt <: valtype)], [(nt <: valtype)]))
+ty-hostaddr : Set
+ty-hostaddr  = ty-addr
 
-  ;; ../minispec/miniwasm.watsup:293.1-294.36
-  rule binop {C : context, binop : binop_numtype, nt : numtype}:
-    `%|-%:%`(C, BINOP_instr(nt, binop), `%->%`([(nt <: valtype) (nt <: valtype)], [(nt <: valtype)]))
+data ty-num : Set
+data ty-num where
+  CONST :
+    (ty-numtype × ty-c-numtype) ->
+    ------
+    ty-num
 
-  ;; ../minispec/miniwasm.watsup:296.1-297.36
-  rule testop {C : context, nt : numtype, testop : testop_numtype}:
-    `%|-%:%`(C, TESTOP_instr(nt, testop), `%->%`([(nt <: valtype)], [I32_valtype]))
+data ty-val : Set
+data ty-val where
+  CONST :
+    (ty-numtype × ty-c-numtype) ->
+    ------
+    ty-val
 
-  ;; ../minispec/miniwasm.watsup:299.1-300.37
-  rule relop {C : context, nt : numtype, relop : relop_numtype}:
-    `%|-%:%`(C, RELOP_instr(nt, relop), `%->%`([(nt <: valtype) (nt <: valtype)], [I32_valtype]))
+data ty-result : Set
+data ty-result where
+  -VALS :
+    List ty-val ->
+    ---------
+    ty-result
+  TRAP :
+    ⊤ ->
+    ---------
+    ty-result
 
-  ;; ../minispec/miniwasm.watsup:303.1-305.23
-  rule local.get {C : context, t : valtype, x : idx}:
-    `%|-%:%`(C, LOCAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.LOCAL_context[x] = t)
+$default- : ty-valtype → ty-val
+$default- _ {- I32_valtype -} = ? {- CONST_val(I32_numtype, 0) -}
 
-  ;; ../minispec/miniwasm.watsup:307.1-309.23
-  rule local.set {C : context, t : valtype, x : idx}:
-    `%|-%:%`(C, LOCAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.LOCAL_context[x] = t)
-
-  ;; ../minispec/miniwasm.watsup:311.1-313.23
-  rule local.tee {C : context, t : valtype, x : idx}:
-    `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
-    -- if (C.LOCAL_context[x] = t)
-
-  ;; ../minispec/miniwasm.watsup:316.1-318.29
-  rule global.get {C : context, t : valtype, x : idx}:
-    `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
-
-  ;; ../minispec/miniwasm.watsup:320.1-322.28
-  rule global.set {C : context, t : valtype, x : idx}:
-    `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:203.1-203.67
-relation InstrSeq_ok: `%|-%*:%`(context, instr*, functype)
-  ;; ../minispec/miniwasm.watsup:212.1-213.36
-  rule empty {C : context}:
-    `%|-%*:%`(C, [], `%->%`([], []))
-
-  ;; ../minispec/miniwasm.watsup:215.1-218.46
-  rule seq {C : context, instr_1 : instr, instr_2 : instr, t_1* : valtype*, t_2* : valtype*, t_3* : valtype*}:
-    `%|-%*:%`(C, [instr_1] :: instr_2*{}, `%->%`(t_1*{t_1}, t_3*{t_3}))
-    -- Instr_ok: `%|-%:%`(C, instr_1, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C, [instr_2], `%->%`(t_2*{t_2}, t_3*{t_3}))
-
-  ;; ../minispec/miniwasm.watsup:220.1-222.45
-  rule weak {C : context, instr* : instr*, t_1 : valtype, t_2* : valtype*}:
-    `%|-%*:%`(C, instr*{instr}, `%->%`([t_1], t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`(t_1*{}, t_2*{t_2}))
-
-  ;; ../minispec/miniwasm.watsup:224.1-226.45
-  rule frame {C : context, instr* : instr*, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%*:%`(C, instr*{instr}, `%->%`(t*{t} :: t_1*{t_1}, t*{t} :: t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:204.1-204.71
-relation Expr_ok: `%|-%:%`(context, expr, resulttype)
-  ;; ../minispec/miniwasm.watsup:207.1-209.46
-  rule _ {C : context, instr* : instr*, t* : valtype*}:
-    `%|-%:%`(C, instr*{instr}, t*{t})
-    -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`([], t*{t}))
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:327.1-327.78
-relation Instr_const: `%|-%CONST`(context, instr)
-  ;; ../minispec/miniwasm.watsup:331.1-332.26
-  rule const {C : context, c : c_numtype, nt : numtype}:
-    `%|-%CONST`(C, CONST_instr(nt, c))
-
-  ;; ../minispec/miniwasm.watsup:334.1-336.32
-  rule global.get {C : context, t : valtype, x : idx}:
-    `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:328.1-328.77
-relation Expr_const: `%|-%CONST`(context, expr)
-  ;; ../minispec/miniwasm.watsup:339.1-340.38
-  rule _ {C : context, instr* : instr*}:
-    `%|-%CONST`(C, instr*{instr})
-    -- (Instr_const: `%|-%CONST`(C, instr))*{instr}
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:329.1-329.78
-relation Expr_ok_const: `%|-%:%CONST`(context, expr, valtype)
-  ;; ../minispec/miniwasm.watsup:343.1-346.33
-  rule _ {C : context, expr : expr, t : valtype}:
-    `%|-%:%CONST`(C, expr, t)
-    -- Expr_ok: `%|-%:%`(C, expr, [t])
-    -- Expr_const: `%|-%CONST`(C, expr)
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:351.1-351.73
-relation Func_ok: `%|-%:%`(context, func, functype)
-  ;; ../minispec/miniwasm.watsup:356.1-360.76
-  rule _ {C : context, expr : expr, ft : functype, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, `FUNC%%*%`(ft, t*{t}, expr), ft)
-    -- if (ft = `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- Functype_ok: `|-%:OK`(ft)
-    -- Expr_ok: `%|-%:%`(C ++ {FUNC [], GLOBAL [], LOCAL t_1*{t_1} :: t*{t}, LABEL [], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2*{t_2}], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [], RETURNS ?(t_2*{t_2})}, expr, t_2*{t_2})
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:352.1-352.75
-relation Global_ok: `%|-%:%`(context, global, globaltype)
-  ;; ../minispec/miniwasm.watsup:362.1-366.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
-    `%|-%:%`(C, GLOBAL(gt, expr), gt)
-    -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
-    -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:353.1-353.74
-relation Start_ok: `%|-%:OK`(context, start)
-  ;; ../minispec/miniwasm.watsup:368.1-370.39
-  rule _ {C : context, x : idx}:
-    `%|-%:OK`(C, START(x))
-    -- if (C.FUNC_context[x] = `%->%`([], []))
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:373.1-373.62
-relation Module_ok: `|-%:OK`(module)
-  ;; ../minispec/miniwasm.watsup:375.1-385.18
-  rule _ {C : context, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, start* : start*}:
-    `|-%:OK`(`MODULE%*%*%*`(func*{func}, global*{global}, start*{start}))
-    -- if (C = {FUNC ft*{ft}, GLOBAL gt*{gt}, LOCAL [], LABEL [], RETURNS ?()})
-    -- (Func_ok: `%|-%:%`(C, func, ft))*{ft func}
-    -- (Global_ok: `%|-%:%`(C, global, gt))*{global gt}
-    -- (Start_ok: `%|-%:OK`(C, start))*{start}
-    -- if (|start*{start}| <= 1)
- -}
-
-addr : Set
-addr = Nat
-
-funcaddr : Set
-funcaddr = addr
-
-globaladdr : Set
-globaladdr = addr
-
-labeladdr : Set
-labeladdr = addr
-
-hostaddr : Set
-hostaddr = addr
-
-data num : Set where
-  CONST : (numtype × c_numtype) -> num
-
-data val : Set where
-  CONST : (numtype × c_numtype) -> val
-
-data result : Set where
-  _VALS : List val -> result
-  TRAP : ⊤ -> result
-
-{-
-;; ../minispec/miniwasm.watsup:414.1-414.44
-def default_ : valtype -> val
-  ;; ../minispec/miniwasm.watsup:415.1-415.35
-  def default_(I32_valtype) = CONST_val(I32_numtype, 0)
- -}
-
-record moduleinst : Set where
+record ty-moduleinst : Set
+record ty-moduleinst where
   field
-    FUNC : List funcaddr
-    GLOBAL : List globaladdr
+    FUNC : List ty-funcaddr
+    GLOBAL : List ty-globaladdr
 
-funcinst = (moduleinst × func)
 
-globalinst : Set
-globalinst = val
+ty-funcinst  = (ty-moduleinst × ty-func)
 
-record store : Set where
+ty-globalinst : Set
+ty-globalinst  = ty-val
+
+record ty-store : Set
+record ty-store where
   field
-    FUNC : List funcinst
-    GLOBAL : List globalinst
+    FUNC : List ty-funcinst
+    GLOBAL : List ty-globalinst
 
-record frame : Set where
+record ty-frame : Set
+record ty-frame where
   field
-    LOCAL : List val
-    MODULE : moduleinst
+    LOCAL : List ty-val
+    MODULE : ty-moduleinst
 
-state = (store × frame)
 
-data admininstr : Set where
-  UNREACHABLE : ⊤ -> admininstr
-  NOP : ⊤ -> admininstr
-  DROP : ⊤ -> admininstr
-  SELECT : Maybe valtype -> admininstr
-  BLOCK : (blocktype × List instr) -> admininstr
-  LOOP : (blocktype × List instr) -> admininstr
-  IF : ((blocktype × List instr) × List instr) -> admininstr
-  BR : labelidx -> admininstr
-  BR_IF : labelidx -> admininstr
-  CALL : funcidx -> admininstr
-  RETURN : ⊤ -> admininstr
-  CONST : (numtype × c_numtype) -> admininstr
-  UNOP : (numtype × unop_numtype) -> admininstr
-  BINOP : (numtype × binop_numtype) -> admininstr
-  TESTOP : (numtype × testop_numtype) -> admininstr
-  RELOP : (numtype × relop_numtype) -> admininstr
-  LOCAL-GET : localidx -> admininstr
-  LOCAL-SET : localidx -> admininstr
-  LOCAL-TEE : localidx -> admininstr
-  GLOBAL-GET : globalidx -> admininstr
-  GLOBAL-SET : globalidx -> admininstr
-  CALL_ADDR : funcaddr -> admininstr
-  LABEL_ : ((n × List instr) × List admininstr) -> admininstr
-  FRAME_ : ((n × frame) × List admininstr) -> admininstr
-  TRAP : ⊤ -> admininstr
+ty-state  = (ty-store × ty-frame)
 
-config = (state × List admininstr)
+data ty-admininstr : Set
+data ty-admininstr where
+  UNREACHABLE :
+    ⊤ ->
+    -------------
+    ty-admininstr
+  NOP :
+    ⊤ ->
+    -------------
+    ty-admininstr
+  DROP :
+    ⊤ ->
+    -------------
+    ty-admininstr
+  SELECT :
+    Maybe ty-valtype ->
+    -------------
+    ty-admininstr
+  BLOCK :
+    (ty-blocktype × List ty-instr) ->
+    -------------
+    ty-admininstr
+  LOOP :
+    (ty-blocktype × List ty-instr) ->
+    -------------
+    ty-admininstr
+  IF :
+    ((ty-blocktype × List ty-instr) × List ty-instr) ->
+    -------------
+    ty-admininstr
+  BR :
+    ty-labelidx ->
+    -------------
+    ty-admininstr
+  BR-IF :
+    ty-labelidx ->
+    -------------
+    ty-admininstr
+  CALL :
+    ty-funcidx ->
+    -------------
+    ty-admininstr
+  RETURN :
+    ⊤ ->
+    -------------
+    ty-admininstr
+  CONST :
+    (ty-numtype × ty-c-numtype) ->
+    -------------
+    ty-admininstr
+  UNOP :
+    (ty-numtype × ty-unop-numtype) ->
+    -------------
+    ty-admininstr
+  BINOP :
+    (ty-numtype × ty-binop-numtype) ->
+    -------------
+    ty-admininstr
+  TESTOP :
+    (ty-numtype × ty-testop-numtype) ->
+    -------------
+    ty-admininstr
+  RELOP :
+    (ty-numtype × ty-relop-numtype) ->
+    -------------
+    ty-admininstr
+  LOCAL-GET :
+    ty-localidx ->
+    -------------
+    ty-admininstr
+  LOCAL-SET :
+    ty-localidx ->
+    -------------
+    ty-admininstr
+  LOCAL-TEE :
+    ty-localidx ->
+    -------------
+    ty-admininstr
+  GLOBAL-GET :
+    ty-globalidx ->
+    -------------
+    ty-admininstr
+  GLOBAL-SET :
+    ty-globalidx ->
+    -------------
+    ty-admininstr
+  CALL-ADDR :
+    ty-funcaddr ->
+    -------------
+    ty-admininstr
+  LABEL- :
+    ((ty-n × List ty-instr) × List ty-admininstr) ->
+    -------------
+    ty-admininstr
+  FRAME- :
+    ((ty-n × ty-frame) × List ty-admininstr) ->
+    -------------
+    ty-admininstr
+  TRAP :
+    ⊤ ->
+    -------------
+    ty-admininstr
 
-{-
-;; ../minispec/miniwasm.watsup:448.1-448.59
-def funcaddr : state -> funcaddr*
-  ;; ../minispec/miniwasm.watsup:449.1-449.38
-  def {f : frame, s : store} funcaddr(`%;%`(s, f)) = f.MODULE_frame.FUNC_moduleinst
- -}
 
-{-
-;; ../minispec/miniwasm.watsup:451.1-451.52
-def funcinst : state -> funcinst*
-  ;; ../minispec/miniwasm.watsup:452.1-452.31
-  def {f : frame, s : store} funcinst(`%;%`(s, f)) = s.FUNC_store
- -}
+ty-config  = (ty-state × List ty-admininstr)
 
-{-
-;; ../minispec/miniwasm.watsup:454.1-454.67
-def func : (state, funcidx) -> funcinst
-  ;; ../minispec/miniwasm.watsup:458.1-458.48
-  def {f : frame, s : store, x : idx} func(`%;%`(s, f), x) = s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]]
- -}
+$funcaddr : ty-state → List ty-funcaddr
+$funcaddr ⟨ s , f ⟩ = ? {- f.MODULE_frame.FUNC_moduleinst -}
 
-{-
-;; ../minispec/miniwasm.watsup:455.1-455.69
-def global : (state, globalidx) -> globalinst
-  ;; ../minispec/miniwasm.watsup:459.1-459.54
-  def {f : frame, s : store, x : idx} global(`%;%`(s, f), x) = s.GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]]
- -}
+$funcinst : ty-state → List ty-funcinst
+$funcinst ⟨ s , f ⟩ = ? {- s.FUNC_store -}
 
-{-
-;; ../minispec/miniwasm.watsup:456.1-456.68
-def local : (state, localidx) -> val
-  ;; ../minispec/miniwasm.watsup:460.1-460.35
-  def {f : frame, s : store, x : idx} local(`%;%`(s, f), x) = f.LOCAL_frame[x]
- -}
+$func : (ty-state × ty-funcidx) → ty-funcinst
+$func ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]] -}
 
-{-
-;; ../minispec/miniwasm.watsup:463.1-463.78
-def with_local : (state, localidx, val) -> state
-  ;; ../minispec/miniwasm.watsup:466.1-466.52
-  def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
- -}
+$global : (ty-state × ty-globalidx) → ty-globalinst
+$global ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- s.GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] -}
 
-{-
-;; ../minispec/miniwasm.watsup:464.1-464.79
-def with_global : (state, globalidx, val) -> state
-  ;; ../minispec/miniwasm.watsup:467.1-467.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
- -}
+$local : (ty-state × ty-localidx) → ty-val
+$local ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- f.LOCAL_frame[x] -}
 
-data E : Set where
-  _HOLE : ⊤ -> E
-  _SEQ : ((List val × E) × List instr) -> E
-  LABEL_ : ((n × List instr) × E) -> E
+$with-local : ((ty-state × ty-localidx) × ty-val) → ty-state
+$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , ? {- f[LOCAL_frame[x] = v] -} ⟩
 
-{-
-;; ../minispec/miniwasm.watsup:485.1-485.79
-def unop : (unop_numtype, numtype, c_numtype) -> c_numtype*
- -}
+$with-global : ((ty-state × ty-globalidx) × ty-val) → ty-state
+$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ ? {- s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -} , f ⟩
 
-{-
-;; ../minispec/miniwasm.watsup:486.1-486.80
-def binop : (binop_numtype, numtype, c_numtype, c_numtype) -> c_numtype*
- -}
+data ty-E : Set
+data ty-E where
+  -HOLE :
+    ⊤ ->
+    ----
+    ty-E
+  -SEQ :
+    ((List ty-val × ty-E) × List ty-instr) ->
+    ----
+    ty-E
+  LABEL- :
+    ((ty-n × List ty-instr) × ty-E) ->
+    ----
+    ty-E
 
-{-
-;; ../minispec/miniwasm.watsup:487.1-487.79
-def testop : (testop_numtype, numtype, c_numtype) -> c_numtype
- -}
+$unop : ((ty-unop-numtype × ty-numtype) × ty-c-numtype) → List ty-c-numtype
+$unop  = ? {- TODO -}
 
-{-
-;; ../minispec/miniwasm.watsup:488.1-488.80
-def relop : (relop_numtype, numtype, c_numtype, c_numtype) -> c_numtype
- -}
+$binop : (((ty-binop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype) → List ty-c-numtype
+$binop  = ? {- TODO -}
 
-{-
-;; ../minispec/miniwasm.watsup:493.1-493.63
-relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
-  ;; ../minispec/miniwasm.watsup:505.1-506.24
-  rule unreachable:
-    `%*~>%*`([UNREACHABLE_admininstr], [TRAP_admininstr])
+$testop : ((ty-testop-numtype × ty-numtype) × ty-c-numtype) → ty-c-numtype
+$testop  = ? {- TODO -}
 
-  ;; ../minispec/miniwasm.watsup:508.1-509.19
-  rule nop:
-    `%*~>%*`([NOP_admininstr], [])
+$relop : (((ty-relop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype) → ty-c-numtype
+$relop  = ? {- TODO -}
 
-  ;; ../minispec/miniwasm.watsup:511.1-512.24
-  rule drop {val : val}:
-    `%*~>%*`([(val <: admininstr) DROP_admininstr], [])
+data ty-Step-pure : (List ty-admininstr × List ty-admininstr) → Set
+data ty-Step-pure where
+  unreachable :
+    ---------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [UNREACHABLE_admininstr] -} , ? {- [TRAP_admininstr] -} ⟩
+  nop :
+    ----------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [NOP_admininstr] -} , ? {- [] -} ⟩
+  drop :
+    (val : ty-val) ->
+    -------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [(val <: admininstr) DROP_admininstr] -} , ? {- [] -} ⟩
+  select-true :
+    (c : ty-c-numtype) (t : ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})] -} , ? {- [(val_1 <: admininstr)] -} ⟩
+  select-false :
+    (c : ty-c-numtype) (t : ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})] -} , ? {- [(val_2 <: admininstr)] -} ⟩
+  block :
+    (bt : ty-blocktype) (instr : ty-instr) (k : Nat) (n : ty-n) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) ->
+    ? {- PREM -} ->
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- (val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})] -} , ? {- [LABEL__admininstr(n, [], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})] -} ⟩
+  loop :
+    (bt : ty-blocktype) (instr : ty-instr) (k : Nat) (n : ty-n) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) ->
+    ? {- PREM -} ->
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- (val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})] -} , ? {- [LABEL__admininstr(n, [LOOP_instr(bt, instr*{instr})], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})] -} ⟩
+  if-true :
+    (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : ty-instr) (instr-2 : ty-instr) ->
+    ? {- PREM -} ->
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})] -} , ? {- [BLOCK_admininstr(bt, instr_1*{instr_1})] -} ⟩
+  if-false :
+    (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : ty-instr) (instr-2 : ty-instr) ->
+    ? {- PREM -} ->
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})] -} , ? {- [BLOCK_admininstr(bt, instr_2*{instr_2})] -} ⟩
+  label-vals :
+    (instr : ty-instr) (n : ty-n) (val : ty-val) ->
+    ---------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [LABEL__admininstr(n, instr*{instr}, (val <: admininstr)*{val})] -} , ? {- (val <: admininstr)*{val} -} ⟩
+  br-zero :
+    (instr : ty-instr) (instr' : ty-instr) (n : ty-n) (val : ty-val) (val' : ty-val) ->
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [LABEL__admininstr(n, instr'*{instr'}, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr})] -} , ? {- (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'} -} ⟩
+  br-succ :
+    (instr : ty-instr) (instr' : ty-instr) (l : ty-labelidx) (n : ty-n) (val : ty-val) ->
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [LABEL__admininstr(n, instr'*{instr'}, (val <: admininstr)*{val} :: [BR_admininstr(l + 1)] :: (instr <: admininstr)*{instr})] -} , ? {- (val <: admininstr)*{val} :: [BR_admininstr(l)] -} ⟩
+  br-if-true :
+    (c : ty-c-numtype) (l : ty-labelidx) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)] -} , ? {- [BR_admininstr(l)] -} ⟩
+  br-if-false :
+    (c : ty-c-numtype) (l : ty-labelidx) ->
+    ? {- PREM -} ->
+    ------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)] -} , ? {- [] -} ⟩
+  frame-vals :
+    (f : ty-frame) (n : ty-n) (val : ty-val) ->
+    -----------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [FRAME__admininstr(n, f, (val <: admininstr)^n{val})] -} , ? {- (val <: admininstr)^n{val} -} ⟩
+  return-frame :
+    (f : ty-frame) (instr : ty-instr) (n : ty-n) (val : ty-val) (val' : ty-val) ->
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [FRAME__admininstr(n, f, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})] -} , ? {- (val <: admininstr)^n{val} -} ⟩
+  return-label :
+    (instr : ty-instr) (instr' : ty-instr) (k : Nat) (val : ty-val) ->
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [LABEL__admininstr(k, instr'*{instr'}, (val <: admininstr)*{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})] -} , ? {- (val <: admininstr)*{val} :: [RETURN_admininstr] -} ⟩
+  unop-val :
+    (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
+    ? {- PREM -} ->
+    ----------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)] -} , ? {- [CONST_admininstr(nt, c)] -} ⟩
+  unop-trap :
+    (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
+    ? {- PREM -} ->
+    --------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)] -} , ? {- [TRAP_admininstr] -} ⟩
+  binop-val :
+    (binop : ty-binop-numtype) (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
+    ? {- PREM -} ->
+    --------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)] -} , ? {- [CONST_admininstr(nt, c)] -} ⟩
+  binop-trap :
+    (binop : ty-binop-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
+    ? {- PREM -} ->
+    ------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)] -} , ? {- [TRAP_admininstr] -} ⟩
+  testop :
+    (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (testop : ty-testop-numtype) ->
+    ? {- PREM -} ->
+    -----------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) TESTOP_admininstr(nt, testop)] -} , ? {- [CONST_admininstr(I32_numtype, c)] -} ⟩
+  relop :
+    (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) (relop : ty-relop-numtype) ->
+    ? {- PREM -} ->
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) RELOP_admininstr(nt, relop)] -} , ? {- [CONST_admininstr(I32_numtype, c)] -} ⟩
+  local-tee :
+    (val : ty-val) (x : ty-idx) ->
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- [(val <: admininstr) LOCAL.TEE_admininstr(x)] -} , ? {- [(val <: admininstr) (val <: admininstr) LOCAL.SET_admininstr(x)] -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:515.1-517.16
-  rule select-true {c : c_numtype, t? : valtype?, val_1 : val, val_2 : val}:
-    `%*~>%*`([(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})], [(val_1 <: admininstr)])
-    -- if (c =/= 0)
+data ty-Step-read : (ty-config × List ty-admininstr) → Set
+data ty-Step-read where
+  call :
+    (x : ty-idx) (z : ty-state) ->
+    ---------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ? {- [CALL_admininstr(x)] -} ⟩ , ? {- [CALL_ADDR_admininstr($funcaddr(z)[x])] -} ⟩
+  call-addr :
+    (a : ty-addr) (f : ty-frame) (instr : ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) (z : ty-state) ->
+    ? {- PREM -} ->
+    ? {- PREM -} ->
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ? {- (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)] -} ⟩ , ? {- [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], (instr <: admininstr)*{instr})])] -} ⟩
+  local-get :
+    (x : ty-idx) (z : ty-state) ->
+    -----------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ? {- [LOCAL.GET_admininstr(x)] -} ⟩ , ? {- [($local(z, x) <: admininstr)] -} ⟩
+  global-get :
+    (x : ty-idx) (z : ty-state) ->
+    -------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ? {- [GLOBAL.GET_admininstr(x)] -} ⟩ , ? {- [($global(z, x) <: admininstr)] -} ⟩
 
-  ;; ../minispec/miniwasm.watsup:519.1-521.14
-  rule select-false {c : c_numtype, t? : valtype?, val_1 : val, val_2 : val}:
-    `%*~>%*`([(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})], [(val_2 <: admininstr)])
-    -- if (c = 0)
-
-  ;; ../minispec/miniwasm.watsup:524.1-526.28
-  rule block {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
-    `%*~>%*`((val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
-    -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
-
-  ;; ../minispec/miniwasm.watsup:528.1-530.28
-  rule loop {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
-    `%*~>%*`((val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [LOOP_instr(bt, instr*{instr})], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
-    -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
-
-  ;; ../minispec/miniwasm.watsup:532.1-534.16
-  rule if-true {bt : blocktype, c : c_numtype, instr_1* : instr*, instr_2* : instr*}:
-    `%*~>%*`([CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})], [BLOCK_admininstr(bt, instr_1*{instr_1})])
-    -- if (c =/= 0)
-
-  ;; ../minispec/miniwasm.watsup:536.1-538.14
-  rule if-false {bt : blocktype, c : c_numtype, instr_1* : instr*, instr_2* : instr*}:
-    `%*~>%*`([CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})], [BLOCK_admininstr(bt, instr_2*{instr_2})])
-    -- if (c = 0)
-
-  ;; ../minispec/miniwasm.watsup:541.1-542.38
-  rule label-vals {instr* : instr*, n : n, val* : val*}:
-    `%*~>%*`([LABEL__admininstr(n, instr*{instr}, (val <: admininstr)*{val})], (val <: admininstr)*{val})
-
-  ;; ../minispec/miniwasm.watsup:546.1-547.69
-  rule br-zero {instr* : instr*, instr'* : instr*, n : n, val^n : val^n, val'* : val*}:
-    `%*~>%*`([LABEL__admininstr(n, instr'*{instr'}, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'})
-
-  ;; ../minispec/miniwasm.watsup:549.1-550.65
-  rule br-succ {instr* : instr*, instr'* : instr*, l : labelidx, n : n, val* : val*}:
-    `%*~>%*`([LABEL__admininstr(n, instr'*{instr'}, (val <: admininstr)*{val} :: [BR_admininstr(l + 1)] :: (instr <: admininstr)*{instr})], (val <: admininstr)*{val} :: [BR_admininstr(l)])
-
-  ;; ../minispec/miniwasm.watsup:553.1-555.16
-  rule br_if-true {c : c_numtype, l : labelidx}:
-    `%*~>%*`([CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)], [BR_admininstr(l)])
-    -- if (c =/= 0)
-
-  ;; ../minispec/miniwasm.watsup:557.1-559.14
-  rule br_if-false {c : c_numtype, l : labelidx}:
-    `%*~>%*`([CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)], [])
-    -- if (c = 0)
-
-  ;; ../minispec/miniwasm.watsup:571.1-572.35
-  rule frame-vals {f : frame, n : n, val^n : val^n}:
-    `%*~>%*`([FRAME__admininstr(n, f, (val <: admininstr)^n{val})], (val <: admininstr)^n{val})
-
-  ;; ../minispec/miniwasm.watsup:574.1-575.55
-  rule return-frame {f : frame, instr* : instr*, n : n, val^n : val^n, val'* : val*}:
-    `%*~>%*`([FRAME__admininstr(n, f, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val})
-
-  ;; ../minispec/miniwasm.watsup:577.1-578.60
-  rule return-label {instr* : instr*, instr'* : instr*, k : nat, val* : val*}:
-    `%*~>%*`([LABEL__admininstr(k, instr'*{instr'}, (val <: admininstr)*{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})], (val <: admininstr)*{val} :: [RETURN_admininstr])
-
-  ;; ../minispec/miniwasm.watsup:581.1-583.33
-  rule unop-val {c : c_numtype, c_1 : c_numtype, nt : numtype, unop : unop_numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)], [CONST_admininstr(nt, c)])
-    -- if ($unop(unop, nt, c_1) = [c])
-
-  ;; ../minispec/miniwasm.watsup:585.1-587.39
-  rule unop-trap {c_1 : c_numtype, nt : numtype, unop : unop_numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)], [TRAP_admininstr])
-    -- if ($unop(unop, nt, c_1) = [])
-
-  ;; ../minispec/miniwasm.watsup:590.1-592.40
-  rule binop-val {binop : binop_numtype, c : c_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)], [CONST_admininstr(nt, c)])
-    -- if ($binop(binop, nt, c_1, c_2) = [c])
-
-  ;; ../minispec/miniwasm.watsup:594.1-596.46
-  rule binop-trap {binop : binop_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)], [TRAP_admininstr])
-    -- if ($binop(binop, nt, c_1, c_2) = [])
-
-  ;; ../minispec/miniwasm.watsup:599.1-601.37
-  rule testop {c : c_numtype, c_1 : c_numtype, nt : numtype, testop : testop_numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) TESTOP_admininstr(nt, testop)], [CONST_admininstr(I32_numtype, c)])
-    -- if (c = $testop(testop, nt, c_1))
-
-  ;; ../minispec/miniwasm.watsup:603.1-605.40
-  rule relop {c : c_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype, relop : relop_numtype}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) RELOP_admininstr(nt, relop)], [CONST_admininstr(I32_numtype, c)])
-    -- if (c = $relop(relop, nt, c_1, c_2))
-
-  ;; ../minispec/miniwasm.watsup:614.1-615.47
-  rule local.tee {val : val, x : idx}:
-    `%*~>%*`([(val <: admininstr) LOCAL.TEE_admininstr(x)], [(val <: admininstr) (val <: admininstr) LOCAL.SET_admininstr(x)])
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:494.1-494.63
-relation Step_read: `%~>%*`(config, admininstr*)
-  ;; ../minispec/miniwasm.watsup:562.1-563.47
-  rule call {x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [CALL_admininstr(x)]), [CALL_ADDR_admininstr($funcaddr(z)[x])])
-
-  ;; ../minispec/miniwasm.watsup:565.1-568.52
-  rule call_addr {a : addr, f : frame, instr* : instr*, k : nat, m : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state}:
-    `%~>%*`(`%;%*`(z, (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], (instr <: admininstr)*{instr})])])
-    -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
-    -- if (f = {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m})
-
-  ;; ../minispec/miniwasm.watsup:608.1-609.37
-  rule local.get {x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [LOCAL.GET_admininstr(x)]), [($local(z, x) <: admininstr)])
-
-  ;; ../minispec/miniwasm.watsup:618.1-619.39
-  rule global.get {x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [GLOBAL.GET_admininstr(x)]), [($global(z, x) <: admininstr)])
- -}
-
-{-
-;; ../minispec/miniwasm.watsup:492.1-492.63
-relation Step: `%~>%`(config, config)
-  ;; ../minispec/miniwasm.watsup:496.1-498.34
-  rule pure {instr* : instr*, instr'* : instr*, z : state}:
-    `%~>%`(`%;%*`(z, (instr <: admininstr)*{instr}), `%;%*`(z, (instr' <: admininstr)*{instr'}))
-    -- Step_pure: `%*~>%*`((instr <: admininstr)*{instr}, (instr' <: admininstr)*{instr'})
-
-  ;; ../minispec/miniwasm.watsup:500.1-502.37
-  rule read {instr* : instr*, instr'* : instr*, z : state}:
-    `%~>%`(`%;%*`(z, (instr <: admininstr)*{instr}), `%;%*`(z, (instr' <: admininstr)*{instr'}))
-    -- Step_read: `%~>%*`(`%;%*`(z, (instr <: admininstr)*{instr}), (instr' <: admininstr)*{instr'})
-
-  ;; ../minispec/miniwasm.watsup:611.1-612.60
-  rule local.set {val : val, x : idx, z : state}:
-    `%~>%`(`%;%*`(z, [(val <: admininstr) LOCAL.SET_admininstr(x)]), `%;%*`($with_local(z, x, val), []))
-
-  ;; ../minispec/miniwasm.watsup:621.1-622.62
-  rule global.set {val : val, x : idx, z : state}:
-    `%~>%`(`%;%*`(z, [(val <: admininstr) GLOBAL.SET_admininstr(x)]), `%;%*`($with_global(z, x, val), []))
- -}
+data ty-Step : (ty-config × ty-config) → Set
+data ty-Step where
+  pure :
+    (instr : ty-instr) (instr' : ty-instr) (z : ty-state) ->
+    ty-Step-pure ⟨ ? {- (instr <: admininstr)*{instr} -} , ? {- (instr' <: admininstr)*{instr'} -} ⟩ ->
+    -----------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , ? {- (instr <: admininstr)*{instr} -} ⟩ , ⟨ z , ? {- (instr' <: admininstr)*{instr'} -} ⟩ ⟩
+  read :
+    (instr : ty-instr) (instr' : ty-instr) (z : ty-state) ->
+    ty-Step-read ⟨ ⟨ z , ? {- (instr <: admininstr)*{instr} -} ⟩ , ? {- (instr' <: admininstr)*{instr'} -} ⟩ ->
+    -----------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , ? {- (instr <: admininstr)*{instr} -} ⟩ , ⟨ z , ? {- (instr' <: admininstr)*{instr'} -} ⟩ ⟩
+  local-set :
+    (val : ty-val) (x : ty-idx) (z : ty-state) ->
+    ---------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , ? {- [(val <: admininstr) LOCAL.SET_admininstr(x)] -} ⟩ , ⟨ ? {- $with_local(z, x, val) -} , ? {- [] -} ⟩ ⟩
+  global-set :
+    (val : ty-val) (x : ty-idx) (z : ty-state) ->
+    -----------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , ? {- [(val <: admininstr) GLOBAL.SET_admininstr(x)] -} ⟩ , ⟨ ? {- $with_global(z, x, val) -} , ? {- [] -} ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
+Unsolved interaction metas at the following locations:
+  default/test-agda/output.agda:325,46-47
+  default/test-agda/output.agda:334,27-28
+  default/test-agda/output.agda:412,25-26
+  default/test-agda/output.agda:412,57-58
+  default/test-agda/output.agda:412,77-78
+  default/test-agda/output.agda:416,25-26
+  default/test-agda/output.agda:416,49-50
+  default/test-agda/output.agda:416,62-63
+  default/test-agda/output.agda:420,25-26
+  default/test-agda/output.agda:420,50-51
+  default/test-agda/output.agda:420,64-65
+  default/test-agda/output.agda:424,25-26
+  default/test-agda/output.agda:424,58-59
+  default/test-agda/output.agda:424,86-87
+  default/test-agda/output.agda:427,5-6
+  default/test-agda/output.agda:429,25-26
+  default/test-agda/output.agda:429,57-58
+  default/test-agda/output.agda:429,85-86
+  default/test-agda/output.agda:432,38-39
+  default/test-agda/output.agda:432,58-59
+  default/test-agda/output.agda:433,24-25
+  default/test-agda/output.agda:433,102-103
+  default/test-agda/output.agda:433,130-131
+  default/test-agda/output.agda:433,150-151
+  default/test-agda/output.agda:435,25-26
+  default/test-agda/output.agda:435,70-71
+  default/test-agda/output.agda:435,90-91
+  default/test-agda/output.agda:438,38-39
+  default/test-agda/output.agda:438,58-59
+  default/test-agda/output.agda:439,24-25
+  default/test-agda/output.agda:439,102-103
+  default/test-agda/output.agda:439,130-131
+  default/test-agda/output.agda:439,150-151
+  default/test-agda/output.agda:441,25-26
+  default/test-agda/output.agda:441,69-70
+  default/test-agda/output.agda:441,89-90
+  default/test-agda/output.agda:444,38-39
+  default/test-agda/output.agda:444,58-59
+  default/test-agda/output.agda:445,24-25
+  default/test-agda/output.agda:445,102-103
+  default/test-agda/output.agda:445,134-135
+  default/test-agda/output.agda:445,154-155
+  default/test-agda/output.agda:446,24-25
+  default/test-agda/output.agda:446,102-103
+  default/test-agda/output.agda:446,134-135
+  default/test-agda/output.agda:446,154-155
+  default/test-agda/output.agda:448,25-26
+  default/test-agda/output.agda:448,90-91
+  default/test-agda/output.agda:448,110-111
+  default/test-agda/output.agda:451,5-6
+  default/test-agda/output.agda:453,25-26
+  default/test-agda/output.agda:453,51-52
+  default/test-agda/output.agda:453,80-81
+  default/test-agda/output.agda:456,5-6
+  default/test-agda/output.agda:458,25-26
+  default/test-agda/output.agda:458,54-55
+  default/test-agda/output.agda:458,87-88
+  default/test-agda/output.agda:461,5-6
+  default/test-agda/output.agda:463,25-26
+  default/test-agda/output.agda:463,52-53
+  default/test-agda/output.agda:463,81-82
+  default/test-agda/output.agda:466,5-6
+  default/test-agda/output.agda:468,25-26
+  default/test-agda/output.agda:468,53-54
+  default/test-agda/output.agda:468,73-74
+  default/test-agda/output.agda:472,25-26
+  default/test-agda/output.agda:472,61-62
+  default/test-agda/output.agda:472,74-75
+  default/test-agda/output.agda:476,25-26
+  default/test-agda/output.agda:476,60-61
+  default/test-agda/output.agda:476,88-89
+  default/test-agda/output.agda:480,25-26
+  default/test-agda/output.agda:480,62-63
+  default/test-agda/output.agda:480,106-107
+  default/test-agda/output.agda:484,25-26
+  default/test-agda/output.agda:484,64-65
+  default/test-agda/output.agda:484,92-93
+  default/test-agda/output.agda:488,25-26
+  default/test-agda/output.agda:488,62-63
+  default/test-agda/output.agda:488,106-107
+  default/test-agda/output.agda:491,5-6
+  default/test-agda/output.agda:493,25-26
+  default/test-agda/output.agda:493,58-59
+  default/test-agda/output.agda:493,71-72
+  default/test-agda/output.agda:496,5-6
+  default/test-agda/output.agda:498,25-26
+  default/test-agda/output.agda:498,58-59
+  default/test-agda/output.agda:498,72-73
+  default/test-agda/output.agda:501,5-6
+  default/test-agda/output.agda:503,25-26
+  default/test-agda/output.agda:503,58-59
+  default/test-agda/output.agda:503,72-73
+  default/test-agda/output.agda:506,5-6
+  default/test-agda/output.agda:508,25-26
+  default/test-agda/output.agda:508,59-60
+  default/test-agda/output.agda:508,72-73
+  default/test-agda/output.agda:511,5-6
+  default/test-agda/output.agda:513,25-26
+  default/test-agda/output.agda:513,59-60
+  default/test-agda/output.agda:513,73-74
+  default/test-agda/output.agda:518,28-29
+  default/test-agda/output.agda:518,45-46
+  default/test-agda/output.agda:518,58-59
+  default/test-agda/output.agda:521,39-40
+  default/test-agda/output.agda:521,59-60
+  default/test-agda/output.agda:522,28-29
+  default/test-agda/output.agda:522,52-53
+  default/test-agda/output.agda:522,72-73
+  default/test-agda/output.agda:524,28-29
+  default/test-agda/output.agda:524,66-67
+  default/test-agda/output.agda:524,86-87
+  default/test-agda/output.agda:527,28-29
+  default/test-agda/output.agda:527,56-57
+  default/test-agda/output.agda:527,73-74
+  default/test-agda/output.agda:529,28-29
+  default/test-agda/output.agda:529,56-57
+  default/test-agda/output.agda:529,72-73
+  default/test-agda/output.agda:532,28-29
+  default/test-agda/output.agda:532,56-57
+  default/test-agda/output.agda:532,76-77
+  default/test-agda/output.agda:534,28-29
+  default/test-agda/output.agda:534,56-57
+  default/test-agda/output.agda:534,85-86
+  default/test-agda/output.agda:540,28-29
+  default/test-agda/output.agda:540,56-57
+  default/test-agda/output.agda:540,69-70
+  default/test-agda/output.agda:542,24-25
+  default/test-agda/output.agda:542,50-51
+  default/test-agda/output.agda:549,26-27
+  default/test-agda/output.agda:552,5-6
+  default/test-agda/output.agda:554,26-27
+  default/test-agda/output.agda:560,5-6
+  default/test-agda/output.agda:562,25-26
+  default/test-agda/output.agda:568,33-34
+  default/test-agda/output.agda:577,5-6
+  default/test-agda/output.agda:579,20-21
+  default/test-agda/output.agda:579,246-247
+  default/test-agda/output.agda:581,33-34
+  default/test-agda/output.agda:588,5-6
+  default/test-agda/output.agda:597,5-6
+  default/test-agda/output.agda:605,5-6
+  default/test-agda/output.agda:606,5-6
+  default/test-agda/output.agda:607,5-6
+  default/test-agda/output.agda:608,5-6
+  default/test-agda/output.agda:609,5-6
+  default/test-agda/output.agda:611,22-23
+  default/test-agda/output.agda:611,44-45
+  default/test-agda/output.agda:611,72-73
+  default/test-agda/output.agda:654,33-34
+  default/test-agda/output.agda:790,23-24
+  default/test-agda/output.agda:793,23-24
+  default/test-agda/output.agda:796,27-28
+  default/test-agda/output.agda:799,29-30
+  default/test-agda/output.agda:802,28-29
+  default/test-agda/output.agda:805,47-48
+  default/test-agda/output.agda:808,44-45
+  default/test-agda/output.agda:826,10-11
+  default/test-agda/output.agda:829,11-12
+  default/test-agda/output.agda:832,12-13
+  default/test-agda/output.agda:835,11-12
+  default/test-agda/output.agda:841,20-21
+  default/test-agda/output.agda:841,55-56
+  default/test-agda/output.agda:844,20-21
+  default/test-agda/output.agda:844,47-48
+  default/test-agda/output.agda:848,20-21
+  default/test-agda/output.agda:848,68-69
+  default/test-agda/output.agda:851,5-6
+  default/test-agda/output.agda:853,20-21
+  default/test-agda/output.agda:853,134-135
+  default/test-agda/output.agda:856,5-6
+  default/test-agda/output.agda:858,20-21
+  default/test-agda/output.agda:858,134-135
+  default/test-agda/output.agda:861,5-6
+  default/test-agda/output.agda:863,20-21
+  default/test-agda/output.agda:863,98-99
+  default/test-agda/output.agda:866,5-6
+  default/test-agda/output.agda:868,20-21
+  default/test-agda/output.agda:868,97-98
+  default/test-agda/output.agda:871,5-6
+  default/test-agda/output.agda:873,20-21
+  default/test-agda/output.agda:873,121-122
+  default/test-agda/output.agda:876,5-6
+  default/test-agda/output.agda:878,20-21
+  default/test-agda/output.agda:878,121-122
+  default/test-agda/output.agda:882,20-21
+  default/test-agda/output.agda:882,95-96
+  default/test-agda/output.agda:886,20-21
+  default/test-agda/output.agda:886,184-185
+  default/test-agda/output.agda:890,20-21
+  default/test-agda/output.agda:890,156-157
+  default/test-agda/output.agda:893,5-6
+  default/test-agda/output.agda:895,20-21
+  default/test-agda/output.agda:895,85-86
+  default/test-agda/output.agda:898,5-6
+  default/test-agda/output.agda:900,20-21
+  default/test-agda/output.agda:900,85-86
+  default/test-agda/output.agda:904,20-21
+  default/test-agda/output.agda:904,84-85
+  default/test-agda/output.agda:908,20-21
+  default/test-agda/output.agda:908,171-172
+  default/test-agda/output.agda:912,20-21
+  default/test-agda/output.agda:912,153-154
+  default/test-agda/output.agda:915,5-6
+  default/test-agda/output.agda:917,20-21
+  default/test-agda/output.agda:917,84-85
+  default/test-agda/output.agda:920,5-6
+  default/test-agda/output.agda:922,20-21
+  default/test-agda/output.agda:922,84-85
+  default/test-agda/output.agda:925,5-6
+  default/test-agda/output.agda:927,20-21
+  default/test-agda/output.agda:927,112-113
+  default/test-agda/output.agda:930,5-6
+  default/test-agda/output.agda:932,20-21
+  default/test-agda/output.agda:932,112-113
+  default/test-agda/output.agda:935,5-6
+  default/test-agda/output.agda:937,20-21
+  default/test-agda/output.agda:937,88-89
+  default/test-agda/output.agda:940,5-6
+  default/test-agda/output.agda:942,20-21
+  default/test-agda/output.agda:942,112-113
+  default/test-agda/output.agda:946,20-21
+  default/test-agda/output.agda:946,76-77
+  default/test-agda/output.agda:953,26-27
+  default/test-agda/output.agda:953,59-60
+  default/test-agda/output.agda:956,5-6
+  default/test-agda/output.agda:957,5-6
+  default/test-agda/output.agda:959,26-27
+  default/test-agda/output.agda:959,94-95
+  default/test-agda/output.agda:963,26-27
+  default/test-agda/output.agda:963,64-65
+  default/test-agda/output.agda:967,26-27
+  default/test-agda/output.agda:967,65-66
+  default/test-agda/output.agda:973,20-21
+  default/test-agda/output.agda:973,60-61
+  default/test-agda/output.agda:975,21-22
+  default/test-agda/output.agda:975,69-70
+  default/test-agda/output.agda:978,26-27
+  default/test-agda/output.agda:978,68-69
+  default/test-agda/output.agda:980,21-22
+  default/test-agda/output.agda:980,69-70
+  default/test-agda/output.agda:984,21-22
+  default/test-agda/output.agda:984,81-82
+  default/test-agda/output.agda:984,114-115
+  default/test-agda/output.agda:988,21-22
+  default/test-agda/output.agda:988,82-83
+  default/test-agda/output.agda:988,116-117
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.

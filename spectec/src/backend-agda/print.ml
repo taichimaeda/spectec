@@ -65,17 +65,26 @@ module Render = struct
     in
     List.map clause cls |> String.concat "\n"
 
-  let def = function
-    | Ir.DefD (i, None, cls) -> clauses i cls
-    | Ir.DefD (i, Some t, cls) -> id i ^ " : " ^ exp t ^ "\n" ^ clauses i cls
-    | Ir.DataD (i, e, cs) ->
-        "data " ^ id i ^ " : " ^ exp e ^ " where\n  "
+  let rec decl_def = function
+    | Ir.DefD (_i, None, _cls) -> ""
+    | Ir.DefD (i, Some t, _cls) -> id i ^ " : " ^ exp t
+    | Ir.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
+    | Ir.RecordD (i, e, _fs) -> "record " ^ id i ^ " : " ^ exp e
+    | Ir.MutualD defs -> String.concat "\n" (List.map decl_def defs)
+    | Ir.YetD _s -> ""
+
+  and def_def = function
+    | Ir.DefD (i, _, cls) -> clauses i cls
+    | Ir.DataD (i, _, cs) ->
+        "data " ^ id i ^ " where\n  "
         ^ (cs |> List.map cons |> String.concat "\n  ")
-    | Ir.RecordD (i, e, fs) ->
-        "record " ^ id i ^ " : " ^ exp e ^ " where\n  field\n    "
+    | Ir.RecordD (i, _, fs) ->
+        "record " ^ id i ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
+    | Ir.MutualD defs -> String.concat "\n" (List.map def_def defs)
     | Ir.YetD s -> comment s
 
+  let def d = decl_def d ^ "\n" ^ def_def d
   let program defs = List.map def defs |> String.concat "\n\n"
 end
 

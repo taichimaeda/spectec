@@ -134,10 +134,10 @@ module Translate = struct
                   Some (ArrowE (typ tin, typ tout)),
                   List.map clause clss ));
         ]
-    | RecD defs -> List.concat_map def defs
+    | RecD defs -> [ Ir.MutualD (script defs) ]
     | HintD _ -> []
 
-  let script = List.concat_map def
+  and script sc = List.concat_map def sc
 end
 
 let translate = Translate.script

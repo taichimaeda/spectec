@@ -31,5 +31,6 @@ type def =
   | DataD of id * exp * cons list
   | RecordD of id * exp * field list
   | YetD of string
+  | MutualD of def list
 
 type program = def list
