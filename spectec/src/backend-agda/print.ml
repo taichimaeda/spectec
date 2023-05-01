@@ -72,7 +72,6 @@ module Render = struct
     | Ir.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
     | Ir.RecordD (i, e, _fs) -> "record " ^ id i ^ " : " ^ exp e
     | Ir.MutualD defs -> String.concat "\n" (List.map decl_def defs)
-    | Ir.YetD _s -> ""
 
   and def_def = function
     | Ir.DefD (i, _, cls) -> clauses i cls
@@ -83,7 +82,6 @@ module Render = struct
         "record " ^ id i ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
     | Ir.MutualD defs -> String.concat "\n" (List.map def_def defs)
-    | Ir.YetD s -> comment s
 
   let def d = decl_def d ^ "\n" ^ def_def d
   let program defs = List.map def defs |> String.concat "\n\n"

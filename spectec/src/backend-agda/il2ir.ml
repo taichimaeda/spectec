@@ -24,28 +24,28 @@ module Translate = struct
     | BoolE b -> ConstE (Bool b)
     | NatE n -> ConstE (Nat n)
     | TextE t -> ConstE (Text t)
-    | UnE (_op, _e2) -> YetE (Print.string_of_exp e)
-    | BinE (_op, _e1, _e2) -> YetE (Print.string_of_exp e)
-    | CmpE (_op, _e1, _e2) -> YetE (Print.string_of_exp e)
-    | IdxE (_e1, _e2) -> YetE (Print.string_of_exp e)
-    | SliceE (_e1, _e2, _e3) -> YetE (Print.string_of_exp e)
-    | UpdE (_e1, _p, _e2) -> YetE (Print.string_of_exp e)
-    | ExtE (_e1, _p, _e2) -> YetE (Print.string_of_exp e)
-    | StrE _efs -> YetE (Print.string_of_exp e)
-    | DotE (_e1, _atom) -> YetE (Print.string_of_exp e)
-    | CompE (_e1, _e2) -> YetE (Print.string_of_exp e)
-    | LenE _e1 -> YetE (Print.string_of_exp e)
+    | UnE (_op, _e2) -> YetE ("UnE: " ^ Print.string_of_exp e)
+    | BinE (_op, _e1, _e2) -> YetE ("BinE: " ^ Print.string_of_exp e)
+    | CmpE (_op, _e1, _e2) -> YetE ("CmpE: " ^ Print.string_of_exp e)
+    | IdxE (_e1, _e2) -> YetE ("IdxE: " ^ Print.string_of_exp e)
+    | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
+    | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
+    | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
+    | StrE _efs -> YetE ("StrE: " ^ Print.string_of_exp e)
+    | DotE (_e1, _atom) -> YetE ("DotE: " ^ Print.string_of_exp e)
+    | CompE (_e1, _e2) -> YetE ("CompE: " ^ Print.string_of_exp e)
+    | LenE _e1 -> YetE ("LenE: " ^ Print.string_of_exp e)
     | TupE es -> TupleE (List.map exp es)
     | MixE (_op, e1) ->
         exp e1 (* mixops arise only from notations, so they are identities *)
     | CallE (x, e) -> ApplyE (VarE (funid x), exp e)
-    | IterE (_e1, _iter) -> YetE (Print.string_of_exp e)
-    | OptE _eo -> YetE (Print.string_of_exp e)
-    | TheE _e1 -> YetE (Print.string_of_exp e)
+    | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
+    | OptE _eo -> YetE ("OptE: " ^ Print.string_of_exp e)
+    | TheE _e1 -> YetE ("TheE: " ^ Print.string_of_exp e)
     | ListE es -> List (List.map exp es)
-    | CatE (_e1, _e2) -> YetE (Print.string_of_exp e)
+    | CatE (_e1, _e2) -> YetE ("CatE: " ^ Print.string_of_exp e)
     | CaseE (a, e) -> ApplyE (VarE (atom a), exp e)
-    | SubE (_e1, _t1, _t2) -> YetE (Print.string_of_exp e)
+    | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
   let rec pat e =
     match e.it with
@@ -53,28 +53,28 @@ module Translate = struct
     | BoolE b -> ConstP (Bool b)
     | NatE n -> ConstP (Nat n)
     | TextE t -> ConstP (Text t)
-    | UnE (_op, _e2) -> YetP (Print.string_of_exp e)
-    | BinE (_op, _e1, _e2) -> YetP (Print.string_of_exp e)
-    | CmpE (_op, _e1, _e2) -> YetP (Print.string_of_exp e)
-    | IdxE (_e1, _e2) -> YetP (Print.string_of_exp e)
-    | SliceE (_e1, _e2, _e3) -> YetP (Print.string_of_exp e)
-    | UpdE (_e1, _p, _e2) -> YetP (Print.string_of_exp e)
-    | ExtE (_e1, _p, _e2) -> YetP (Print.string_of_exp e)
-    | StrE _efs -> YetP (Print.string_of_exp e)
-    | DotE (_e1, _atom) -> YetP (Print.string_of_exp e)
-    | CompE (_e1, _e2) -> YetP (Print.string_of_exp e)
-    | LenE _e1 -> YetP (Print.string_of_exp e)
+    | UnE (_op, _e2) -> YetP ("UnE: " ^ Print.string_of_exp e)
+    | BinE (_op, _e1, _e2) -> YetP ("BinE: " ^ Print.string_of_exp e)
+    | CmpE (_op, _e1, _e2) -> YetP ("CmpE: " ^ Print.string_of_exp e)
+    | IdxE (_e1, _e2) -> YetP ("IdxE: " ^ Print.string_of_exp e)
+    | SliceE (_e1, _e2, _e3) -> YetP ("SliceE: " ^ Print.string_of_exp e)
+    | UpdE (_e1, _p, _e2) -> YetP ("UpdE: " ^ Print.string_of_exp e)
+    | ExtE (_e1, _p, _e2) -> YetP ("ExtE: " ^ Print.string_of_exp e)
+    | StrE _efs -> YetP ("StrE: " ^ Print.string_of_exp e)
+    | DotE (_e1, _atom) -> YetP ("DotE: " ^ Print.string_of_exp e)
+    | CompE (_e1, _e2) -> YetP ("CompE: " ^ Print.string_of_exp e)
+    | LenE _e1 -> YetP ("LenE: " ^ Print.string_of_exp e)
     | TupE es -> TupleP (List.map pat es)
     | MixE (_op, e1) ->
         pat e1 (* mixops arise only from notations, so they are identities *)
-    | CallE (_id, _e1) -> YetP (Print.string_of_exp e)
-    | IterE (_e1, _iter) -> YetP (Print.string_of_exp e)
-    | OptE _eo -> YetP (Print.string_of_exp e)
-    | TheE _e1 -> YetP (Print.string_of_exp e)
-    | ListE _es -> YetP (Print.string_of_exp e)
-    | CatE (_e1, _e2) -> YetP (Print.string_of_exp e)
-    | CaseE (_atom, _e1) -> YetP (Print.string_of_exp e)
-    | SubE (_e1, _t1, _t2) -> YetP (Print.string_of_exp e)
+    | CallE (_id, _e1) -> YetP ("CallE: " ^ Print.string_of_exp e)
+    | IterE (_e1, _iter) -> YetP ("IterE: " ^ Print.string_of_exp e)
+    | OptE _eo -> YetP ("OptE: " ^ Print.string_of_exp e)
+    | TheE _e1 -> YetP ("TheE: " ^ Print.string_of_exp e)
+    | ListE _es -> YetP ("ListE: " ^ Print.string_of_exp e)
+    | CatE (_e1, _e2) -> YetP ("CatE: " ^ Print.string_of_exp e)
+    | CaseE (_atom, _e1) -> YetP ("CaseE: " ^ Print.string_of_exp e)
+    | SubE (_e1, _t1, _t2) -> YetP ("SubE: " ^ Print.string_of_exp e)
 
   let typefield (a, t, _hints) = (atom a, typ t)
 
@@ -101,8 +101,13 @@ module Translate = struct
     let premise p =
       match p.it with
       | Ast.RulePr (x, _op, e) -> Ir.ApplyE (VarE (tyid x), exp e)
-      | _ -> Ir.YetE "PREM"
+      | IfPr e -> exp e
+      | ElsePr ->
+          failwith
+            __LOC__ (* Apparently, this should be removed in the middlend *)
+      | IterPr (_prem, _iter) -> YetE ("IterPr: " ^ "ITER")
     in
+
     let premises ps = List.map premise ps in
     ( (if x.it <> "" then id x else str "-"),
       binds bs,
