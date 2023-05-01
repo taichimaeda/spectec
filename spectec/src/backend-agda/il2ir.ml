@@ -2,30 +2,39 @@ module Translate = struct
   open Util.Source
   open Il
 
-  let id i = i.it
+  let str i = Ir.Id i
+  let id i = str i.it
+  let atom = function Ast.Atom a -> str a | _ -> failwith __LOC__
 
-  let atom a = Print.string_of_atom a
+  let rec typ t =
+    match t.it with
+    | Ast.VarT n -> Ir.VarE (id n)
+    | BoolT -> BoolE
+    | NatT -> NatE
+    | TextT -> TextE
+    | TupT ts -> ProdE (List.map typ ts)
+    | IterT (t, Opt) -> MaybeE (typ t)
+    | IterT (t, (List | List1 | ListN _)) -> ListE (typ t)
 
-  let typ t = Ir.YetE (Print.string_of_typ t)
-
-  let typecase (a, t, _hints) =
-    (atom a, [(None, typ t)])
+  let typecase (a, t, _hints) = (atom a, [ (None, typ t) ])
+  let typefield (a, t, _hints) = (atom a, typ t)
 
   let deftyp x deftyp =
     match deftyp.it with
     | Ast.AliasT ty -> Ir.DefD (id x, typ ty)
-    | NotationT _ -> YetD ("notation " ^ id x ^ " = " ^ Print.string_of_deftyp deftyp)
-    | StructT _ -> YetD ("struct " ^ id x ^ " = " ^ Print.string_of_deftyp deftyp)
-    | VariantT tcs ->
-        DataD (id x, SetE, List.map typecase tcs) 
+    | NotationT (_op, ty) -> Ir.DefD (id x, typ ty)
+    | StructT tfs -> Ir.RecordD (id x, SetE, List.map typefield tfs)
+    | VariantT tcs -> DataD (id x, SetE, List.map typecase tcs)
 
-  let def d =
+  let rec def d =
     match d.it with
-    | Ast.SynD (id, dt) -> deftyp id dt
-    | (Ast.RelD _ | DecD _ | RecD _ | HintD _) -> YetD (Print.string_of_def d)
+    | Ast.SynD (id, dt) -> [ deftyp id dt ]
+    | Ast.RelD _ -> [ YetD (Print.string_of_def d) ]
+    | DecD _ -> [ YetD (Print.string_of_def d) ]
+    | RecD defs -> List.concat_map def defs
+    | HintD _ -> []
 
-  let script = List.map def
+  let script = List.concat_map def
 end
-
 
 let translate = Translate.script
