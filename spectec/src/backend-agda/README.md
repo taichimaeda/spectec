@@ -26,3 +26,25 @@ A backend translating a Wasm specification into Agda.
 A list of minor issues that need to be resolved at some point. (We are working on a branch and we do not want to pollute the main GitHub repo with them.)
 
 - use a pretty-printer for Agda output
+- translate the following from `Il` to `Ir`:
+  - `BinE`
+  - `CaseE`
+  - `CatE`
+  - `CmpE`
+  - `CompE`
+  - `IdxE`
+  - `IterE`
+  - `IterPr`
+  - `OptE`
+  - `SubE`
+  - `UpdE`
+- expand products in constructor types and tuples in constructor arguments
+
+## Workflow
+
+    ocamlformat --enable-outside-detected-project -i src/backend-agda/*.{ml,mli}
+    && make
+    && patch -i minispec.patch -d spec
+    && ./watsup --agda spec/*.watsup -o minispec.agda
+    && patch -R -i minispec.patch -d spec
+    && agda minispec.agda
