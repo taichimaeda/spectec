@@ -11,7 +11,8 @@ let translate_expr exp = match exp.it with
 let insert_assert exp = match exp.it with
   | Ast.CaseE (
     Atom "CONST",
-    { it = TupE({ it = CaseE (Atom "I32", _); _ } :: _); _ }
+    { it = TupE({ it = CaseE (Atom "I32", _, _); _ } :: _); _ },
+    _
   ) ->
       Ir.AssertI
         "Due to validation, a value of value type i32 is on the top of the stack"
@@ -35,16 +36,16 @@ let rec lhs2pop exp = match exp.it with
 
 (* `Ast.CaseE | Ast.SubE` -> `Ir.instr list` *)
 let casesub2instrs exp = match exp.it with
-  | Ast.CaseE (Atom "TRAP", _) -> [Ir.TrapI]
-  | Ast.CaseE (Atom atomid, _)
+  | Ast.CaseE (Atom "TRAP", _, _) -> [Ir.TrapI]
+  | Ast.CaseE (Atom atomid, _, _)
     when atomid = "CONST" || atomid = "REF.FUNC_ADDR" ->
       [Ir.PushI (translate_expr exp)]
-  | Ast.CaseE (Atom "FRAME_", tupexp) ->
+  | Ast.CaseE (Atom "FRAME_", tupexp, _) ->
       [Ir.LetI (Ir.NameE (Ir.N "F"), Ir.FrameE); Ir.PushI (translate_expr tupexp)]
-  | Ast.CaseE (Atom "LABEL_", _) ->
+  | Ast.CaseE (Atom "LABEL_", _, _) ->
       (* TODO *)
       [ Ir.LetI (Ir.NameE (Ir.N "L"), Ir.YetE ""); Ir.EnterI ("Yet", YetE "") ]
-  | Ast.CaseE (Atom atomid, argexp)
+  | Ast.CaseE (Atom atomid, argexp, _)
     when String.starts_with ~prefix: "TABLE." atomid ||
     String.starts_with ~prefix: "MEMORY." atomid ||
     atomid = "LOAD" || atomid = "STORE" ||
