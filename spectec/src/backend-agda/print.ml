@@ -43,6 +43,7 @@ module Render = struct
     | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
     | ApplyE (e1, e2) -> exp e1 ^ " " ^ exp e2
     | List es -> list (List.map exp es)
+    | DotE (e, t, f) -> id t ^ "." ^ id f ^ " (" ^ exp e ^ ")"
     | Ir.YetE s -> "? " ^ comment s
 
   let cons (i, bs, prems, t) =

@@ -35,7 +35,8 @@ module Translate = struct
     | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
     | StrE _efs -> YetE ("StrE: " ^ Print.string_of_exp e)
-    | DotE (_ty, _e1, _atom) -> YetE ("DotE: " ^ Print.string_of_exp e)
+    | DotE ({ it = Ast.VarT i; _ }, e, a) -> DotE (exp env e, tyid i, atom a)
+    | DotE (_, _, _) -> assert false
     | CompE (_e1, _e2) -> YetE ("CompE: " ^ Print.string_of_exp e)
     | LenE _e1 -> YetE ("LenE: " ^ Print.string_of_exp e)
     | TupE es -> TupleE (List.map (exp env) es)

@@ -794,10 +794,10 @@ ty-config : Set
 ty-config  = (ty-state × List ty-admininstr)
 
 $funcaddr : ty-state → List ty-funcaddr
-$funcaddr ⟨ s , f ⟩ = ? {- DotE: f.MODULE_frame.FUNC_moduleinst -}
+$funcaddr ⟨ s , f ⟩ = ty-moduleinst.FUNC (ty-frame.MODULE (f))
 
 $funcinst : ty-state → List ty-funcinst
-$funcinst ⟨ s , f ⟩ = ? {- DotE: s.FUNC_store -}
+$funcinst ⟨ s , f ⟩ = ty-store.FUNC (s)
 
 $func : (ty-state × ty-funcidx) → ty-funcinst
 $func ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- IdxE: s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]] -}
@@ -1107,8 +1107,6 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:611,22-23
   default/test-agda/output.agda:611,51-52
   default/test-agda/output.agda:611,86-87
-  default/test-agda/output.agda:790,23-24
-  default/test-agda/output.agda:793,23-24
   default/test-agda/output.agda:796,27-28
   default/test-agda/output.agda:799,29-30
   default/test-agda/output.agda:802,28-29
