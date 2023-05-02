@@ -2,5 +2,5 @@
  (libraries spectec)
  (deps
   (file ../src/exe-watsup/main.exe)
-  (glob_files ../minispec/*.watsup))
+  (glob_files ../spec/*))
  (files TEST.md))

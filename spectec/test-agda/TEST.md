@@ -1,7 +1,8 @@
 # Preview
 
 ```sh
-$ dune exec ../src/exe-watsup/main.exe -- --agda ../minispec/*.watsup -o output.agda
+$ patch -s -p0 -i ../spec/minispec.patch -d ../spec --read-only=ignore
+$ dune exec ../src/exe-watsup/main.exe -- --agda ../spec/*.watsup -o output.agda
 $ cat output.agda
 open import Agda.Builtin.Bool
 open import Agda.Builtin.List

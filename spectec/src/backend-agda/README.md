@@ -26,5 +26,3 @@ A backend translating a Wasm specification into Agda.
 A list of minor issues that need to be resolved at some point. (We are working on a branch and we do not want to pollute the main GitHub repo with them.)
 
 - use a pretty-printer for Agda output
-- store only the diff between `minispec` and `spec`
-- write instructions on how to use the above

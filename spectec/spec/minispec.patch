@@ -1,0 +1,1045 @@
+diff -ruN 1-syntax.watsup 1-syntax.watsup
+--- 1-syntax.watsup	2023-04-28 16:42:58
++++ 1-syntax.watsup	2023-05-02 17:09:42
+@@ -22,10 +22,6 @@
+ syntax idx hint(desc "index") = nat
+ syntax funcidx hint(desc "function index") = idx
+ syntax globalidx hint(desc "global index") = idx
+-syntax tableidx hint(desc "table index") = idx
+-syntax memidx hint(desc "memory index") = idx
+-syntax elemidx hint(desc "elem index") = idx
+-syntax dataidx hint(desc "data index") = idx
+ syntax labelidx hint(desc "label index") = idx
+ syntax localidx hint(desc "local index") = idx
+ 
+@@ -37,48 +33,25 @@
+ ;; Types
+ 
+ syntax numtype hint(desc "number type") =
+-  | I32 | I64 | F32 | F64
+-syntax vectype hint(desc "vector type") =
+-  | V128
+-syntax reftype hint(desc "reference type") =
+-  | FUNCREF | EXTERNREF
++  | I32
+ syntax valtype hint(desc "value type") =
+-  | numtype | vectype | reftype | BOT
++  | numtype | BOT
+ 
+-syntax in hint(show I#n) = | I32 | I64
+-syntax fn hint(show F#n) = | F32 | F64
++syntax in hint(show I#n) = | I32
+ 
+ var t : valtype
+ var nt : numtype
+-var vt : vectype
+-var rt : reftype
+ 
+ syntax resulttype hint(desc "result type") =
+   valtype*
+ 
+-syntax limits hint(desc "limits") =
+-  `[u32 .. u32]
+ syntax globaltype hint(desc "global type") =
+   MUT? valtype
+ syntax functype hint(desc "function type") =
+   resulttype -> resulttype
+-syntax tabletype hint(desc "table type") =
+-  limits reftype
+-syntax memtype hint(desc "memory type") =
+-  limits I8
+-syntax elemtype hint(desc "element type") =
+-  reftype
+-syntax datatype hint(desc "data type") =
+-  OK
+-syntax externtype hint(desc "external type") =
+-  | GLOBAL globaltype | FUNC functype | TABLE tabletype | MEMORY memtype
+ 
+-var lim : limits
+ var ft : functype
+ var gt : globaltype
+-var tt : tabletype
+-var mt : memtype
+-var xt : externtype
+ 
+ 
+ ;; Operators
+@@ -86,25 +59,20 @@
+ syntax sx hint(desc "signedness") = | U | S
+ 
+ syntax unop_IXX = | CLZ | CTZ | POPCNT
+-syntax unop_FXX = | ABS | NEG | SQRT | CEIL | FLOOR | TRUNC | NEAREST
+ 
+ syntax binop_IXX =
+   | ADD | SUB | MUL | DIV sx hint(show DIV_#%) | REM sx hint(show REM_#%)
+   | AND | OR | XOR | SHL | SHR sx hint(show SHR_#%) | ROTL | ROTR
+-syntax binop_FXX = | ADD | SUB | MUL | DIV | MIN | MAX | COPYSIGN
+ 
+ syntax testop_IXX = | EQZ
+-syntax testop_FXX = |      ;; uninhabited
+ 
+ syntax relop_IXX =
+   | EQ | NE | LT sx hint(show LT_#%) | GT sx hint(show GT_#%) | LE sx hint(show LE_#%) | GE sx hint(show GE_#%)
+-syntax relop_FXX = | EQ | NE | LT | GT | LE | GE
+ 
+-syntax unop_numtype = | _I unop_IXX | _F unop_FXX
+-syntax binop_numtype = | _I binop_IXX | _F binop_FXX
+-syntax testop_numtype = | _I testop_IXX | _F testop_FXX
+-syntax relop_numtype = | _I relop_IXX | _F relop_FXX
+-syntax cvtop = | CONVERT | REINTERPRET
++syntax unop_numtype = | _I unop_IXX
++syntax binop_numtype = | _I binop_IXX
++syntax testop_numtype = | _I testop_IXX
++syntax relop_numtype = | _I relop_IXX
+ 
+ var unop : unop_numtype
+ var binop : binop_numtype
+@@ -115,7 +83,6 @@
+ ;; Instructions
+ 
+ syntax c_numtype = nat  ;; TODO
+-syntax c_vectype = nat  ;; TODO
+ var c : c_numtype
+ 
+ syntax blocktype hint(desc "block type") = functype  ;; TODO
+@@ -131,9 +98,7 @@
+   | IF blocktype instr* ELSE instr*
+   | BR labelidx
+   | BR_IF labelidx
+-  | BR_TABLE labelidx* labelidx
+   | CALL funcidx
+-  | CALL_INDIRECT tableidx functype
+   | RETURN
+   | ...
+ 
+@@ -143,38 +108,14 @@
+   | BINOP numtype binop_numtype      hint(show %.%)
+   | TESTOP numtype testop_numtype    hint(show %.%)
+   | RELOP numtype relop_numtype      hint(show %.%)
+-  | EXTEND numtype n                 hint(show %.EXTEND#%)
+-  | CVTOP numtype cvtop numtype sx?  hint(show %.%#_#%#_#%)
+   | ...
+ 
+-syntax instr/reference hint(desc "reference instruction") = ...
+-  | REF.NULL reftype
+-  | REF.FUNC funcidx
+-  | REF.IS_NULL
+-  | ...
+-
+ syntax instr/state hint(desc "state instruction") = ...
+   | LOCAL.GET localidx
+   | LOCAL.SET localidx
+   | LOCAL.TEE localidx
+   | GLOBAL.GET globalidx
+   | GLOBAL.SET globalidx
+-  | TABLE.GET tableidx
+-  | TABLE.SET tableidx
+-  | TABLE.SIZE tableidx
+-  | TABLE.GROW tableidx
+-  | TABLE.FILL tableidx
+-  | TABLE.COPY tableidx tableidx
+-  | TABLE.INIT tableidx elemidx
+-  | ELEM.DROP elemidx
+-  | MEMORY.SIZE
+-  | MEMORY.GROW
+-  | MEMORY.FILL
+-  | MEMORY.COPY
+-  | MEMORY.INIT dataidx
+-  | DATA.DROP dataidx
+-  | LOAD numtype (n _ sx)? u32 u32  hint(show %.LOAD % %)  hint(show %.LOAD#% % %)
+-  | STORE numtype n? u32 u32        hint(show %.STORE % %) hint(show %.STORE#% % %)
+ 
+ syntax expr hint(desc "expression") =
+   instr*
+@@ -184,30 +125,12 @@
+ 
+ ;; Modules
+ 
+-syntax elemmode = | TABLE tableidx expr | DECLARE
+-syntax datamode = | MEMORY memidx expr
+-
+ syntax func hint(desc "function") =
+   FUNC functype valtype* expr
+ syntax global hint(desc "global") =
+   GLOBAL globaltype expr
+-syntax table hint(desc "table") =
+-  TABLE tabletype
+-syntax mem hint(desc "memory") =
+-  MEMORY memtype
+-syntax elem hint(desc "table segment") =
+-  ELEM reftype expr* elemmode?
+-syntax data hint(desc "memory segment") =
+-  DATA (byte*)* datamode?
+ syntax start hint(desc "start function") =
+   START funcidx
+ 
+-syntax externuse hint(desc "external use") =
+-  | FUNC funcidx | GLOBAL globalidx | TABLE tableidx | MEMORY memidx
+-syntax export hint(desc "export") =
+-  EXPORT name externuse
+-syntax import hint(desc "import") =
+-  IMPORT name name externtype
+-
+ syntax module hint(desc "module") =
+-  MODULE import* func* global* table* mem* elem* data* start* export*
++  MODULE func* global* start*
+diff -ruN 2-aux.watsup 2-aux.watsup
+--- 2-aux.watsup	2023-04-24 07:16:00
++++ 2-aux.watsup	2023-05-02 17:10:02
+@@ -9,7 +9,7 @@
+ def $min(nat, nat) : nat
+ def $min(0, j) = 0
+ def $min(i, 0) = 0
+-def $min($(i+1), $(j+1)) = $min(i, j)
++def $min(i, j) = $min($(i - 1), $(j - 1))
+ 
+ 
+ ;; Auxiliary Definitions on Types
+@@ -18,10 +18,6 @@
+ 
+ def $size(valtype) : nat  hint(partial) hint(show |%|)
+ def $size(I32) = 32
+-def $size(I64) = 64
+-def $size(F32) = 32
+-def $size(F64) = 64
+-def $size(V128) = 128
+ 
+ 
+ ;; Some notation tests
+diff -ruN 3-typing.watsup 3-typing.watsup
+--- 3-typing.watsup	2023-04-28 16:42:58
++++ 3-typing.watsup	2023-05-02 17:10:20
+@@ -1,9 +1,8 @@
+ ;; Contexts
+ 
+ syntax context hint(desc "context") =
+-  { FUNC functype*, GLOBAL globaltype*, TABLE tabletype*, MEM memtype*,
+-    ELEM elemtype*, DATA datatype*,
+-    LOCAL valtype*, LABEL resulttype*, RETURN resulttype? }
++  { FUNC functype*, GLOBAL globaltype*,
++    LOCAL valtype*, LABEL resulttype*, RETURNS resulttype? }
+ 
+ var C : context
+ 
+@@ -11,113 +10,17 @@
+ 
+ ;; Types
+ 
+-relation Limits_ok: |- limits : nat         hint(show "K-limits")
+ relation Functype_ok: |- functype : OK      hint(show "K-func")
+ relation Globaltype_ok: |- globaltype : OK  hint(show "K-global")
+-relation Tabletype_ok: |- tabletype : OK    hint(show "K-table")
+-relation Memtype_ok: |- memtype : OK        hint(show "K-mem")
+-relation Externtype_ok: |- externtype : OK  hint(show "K-extern")
+ 
+ 
+-rule Limits_ok:
+-  |- `[n_1 .. n_2] : k
+-  -- if n_1 <= n_2 <= k
+-
+ rule Functype_ok:
+   |- ft : OK
+ 
+ rule Globaltype_ok:
+   |- gt : OK
+ 
+-rule Tabletype_ok:
+-  |- lim rt : OK
+-  -- Limits_ok: |- lim : $(2^32-1)
+ 
+-rule Memtype_ok:
+-  |- lim I8 : OK
+-  -- Limits_ok: |- lim : $(2^16)
+-
+-
+-rule Externtype_ok/func:
+-  |- FUNC functype : OK
+-  -- Functype_ok: |- functype : OK
+-
+-rule Externtype_ok/global:
+-  |- GLOBAL globaltype : OK
+-  -- Globaltype_ok: |- globaltype : OK
+-
+-rule Externtype_ok/table:
+-  |- TABLE tabletype : OK
+-  -- Tabletype_ok: |- tabletype : OK
+-
+-rule Externtype_ok/mem:
+-  |- MEMORY memtype : OK
+-  -- Memtype_ok: |- memtype : OK
+-
+-
+-
+-;; Subtyping
+-
+-relation Valtype_sub: |- valtype <: valtype       hint(show "S")
+-relation Resulttype_sub: |- valtype* <: valtype*  hint(show "S-result")
+-
+-rule Valtype_sub/refl:
+-  |- t <: t
+-
+-rule Valtype_sub/bot:
+-  |- BOT <: t
+-
+-rule Resulttype_sub:
+-  |- t_1* <: t_2*
+-  -- (Valtype_sub: |- t_1 <: t_2)*
+-
+-
+-relation Limits_sub: |- limits <: limits             hint(show "S-limits")
+-relation Functype_sub: |- functype <: functype       hint(show "S-func")
+-relation Globaltype_sub: |- globaltype <: globaltype hint(show "S-global")
+-relation Tabletype_sub: |- tabletype <: tabletype    hint(show "S-table")
+-relation Memtype_sub: |- memtype <: memtype          hint(show "S-mem")
+-relation Externtype_sub: |- externtype <: externtype hint(show "S-extern")
+-
+-
+-rule Limits_sub:
+-  |- `[n_11 .. n_12] <: `[n_21 .. n_22]
+-  -- if n_11 >= n_21
+-  -- if n_12 <= n_22
+-
+-rule Functype_sub:
+-  |- ft <: ft
+-
+-rule Globaltype_sub:
+-  |- gt <: gt
+-
+-rule Tabletype_sub:
+-  |- lim_1 rt <: lim_2 rt
+-  -- Limits_sub: |- lim_1 <: lim_2
+-
+-rule Memtype_sub:
+-  |- lim_1 I8 <: lim_2 I8
+-  -- Limits_sub: |- lim_1 <: lim_2
+-
+-
+-rule Externtype_sub/func:
+-  |- FUNC ft_1 <: FUNC ft_2
+-  -- Functype_sub: |- ft_1 <: ft_2
+-
+-rule Externtype_sub/global:
+-  |- GLOBAL gt_1 <: GLOBAL gt_2
+-  -- Globaltype_sub: |- gt_1 <: gt_2
+-
+-rule Externtype_sub/table:
+-  |- TABLE tt_1 <: TABLE tt_2
+-  -- Tabletype_sub: |- tt_1 <: tt_2
+-
+-rule Externtype_sub/mem:
+-  |- MEMORY mt_1 <: MEMORY mt_2
+-  -- Memtype_sub: |- mt_1 <: mt_2
+-
+-
+-
+ ;; Instructions
+ 
+ relation Instr_ok: context |- instr : functype     hint(show "T")
+@@ -139,12 +42,9 @@
+   -- InstrSeq_ok: C |- instr_2 : t_2* -> t_3*
+ 
+ rule InstrSeq_ok/weak:
+-  C |- instr* : t'_1 -> t'_2*
++  C |- instr* : t_1 -> t_2*
+   -- InstrSeq_ok: C |- instr* : t_1* -> t_2*
+ 
+-  -- Resulttype_sub: |- t'_1* <: t_1*
+-  -- Resulttype_sub: |- t_2* <: t'_2*
+-
+ rule InstrSeq_ok/frame:
+   C |- instr* : t* t_1* -> t* t_2*
+   -- InstrSeq_ok: C |- instr* : t_1* -> t_2*
+@@ -165,8 +65,7 @@
+ 
+ rule Instr_ok/select-impl:
+   C |- SELECT : t t I32 -> t
+-  -- Valtype_sub: |- t <: t'
+-  -- if t' = numtype \/ t' = vectype
++  -- if t = numtype
+ 
+ 
+ relation Blocktype_ok: context |- blocktype : functype hint(show "K-block")
+@@ -200,25 +99,15 @@
+   C |- BR_IF l : t* I32 -> t*
+   -- if C.LABEL[l] = t*
+ 
+-rule Instr_ok/br_table:
+-  C |- BR_TABLE l* l' : t_1* t* -> t_2*
+-  -- (Resulttype_sub: |- t* <: C.LABEL[l])*
+-  -- Resulttype_sub: |- t* <: C.LABEL[l']
+-
+ rule Instr_ok/return:
+   C |- RETURN : t_1* t* -> t_2*
+-  -- if C.RETURN = (t*)
++  -- if C.RETURNS = (t*)
+ 
+ rule Instr_ok/call:
+   C |- CALL x : t_1* -> t_2*
+   -- if C.FUNC[x] = t_1* -> t_2*
+ 
+-rule Instr_ok/call_indirect:
+-  C |- CALL_INDIRECT x ft : t_1* I32 -> t_2*
+-  -- if C.TABLE[x] = lim FUNCREF
+-  -- if ft = t_1* -> t_2*
+ 
+-
+ rule Instr_ok/const:
+   C |- CONST nt c_nt : epsilon -> nt
+ 
+@@ -235,36 +124,6 @@
+   C |- RELOP nt relop : nt nt -> I32
+ 
+ 
+-rule Instr_ok/extend:
+-  C |- EXTEND nt n : nt -> nt
+-  -- if n <= $size(nt)
+-
+-rule Instr_ok/reinterpret:
+-  C |- CVTOP nt_1 REINTERPRET nt_2 : nt_2 -> nt_1
+-  -- if nt_1 =/= nt_2
+-  -- if $size(nt_1) = $size(nt_2)
+-
+-rule Instr_ok/convert-i:
+-  C |- CVTOP in_1 CONVERT in_2 sx? : in_2 -> in_1
+-  -- if in_1 =/= in_2
+-  -- if sx? = epsilon <=> $size(in_1) > $size(in_2)
+-
+-rule Instr_ok/convert-f:
+-  C |- CVTOP fn_1 CONVERT fn_2 : fn_2 -> fn_1
+-  -- if fn_1 =/= fn_2
+-
+-
+-rule Instr_ok/ref.null:
+-  C |- REF.NULL rt : epsilon -> rt
+-
+-rule Instr_ok/ref.func:
+-  C |- REF.FUNC x : epsilon -> FUNCREF
+-  -- if C.FUNC[x] = ft
+-
+-rule Instr_ok/ref.is_null:
+-  C |- REF.IS_NULL : rt -> I32
+-
+-
+ rule Instr_ok/local.get:
+   C |- LOCAL.GET x : epsilon -> t
+   -- if C.LOCAL[x] = t
+@@ -287,81 +146,6 @@
+   -- if C.GLOBAL[x] = MUT t
+ 
+ 
+-rule Instr_ok/table.get:
+-  C |- TABLE.GET x : I32 -> rt
+-  -- if C.TABLE[x] = lim rt
+-
+-rule Instr_ok/table.set:
+-  C |- TABLE.SET x : I32 rt -> epsilon
+-  -- if C.TABLE[x] = lim rt
+-
+-rule Instr_ok/table.size:
+-  C |- TABLE.SIZE x : epsilon -> I32
+-  -- if C.TABLE[x] = tt
+-
+-rule Instr_ok/table.grow:
+-  C |- TABLE.GROW x : rt I32 -> I32
+-  -- if C.TABLE[x] = lim rt
+-
+-rule Instr_ok/table.fill:
+-  C |- TABLE.FILL x : I32 rt I32 -> epsilon
+-  -- if C.TABLE[x] = lim rt
+-
+-rule Instr_ok/table.copy:
+-  C |- TABLE.COPY x_1 x_2 : I32 I32 I32 -> epsilon
+-  -- if C.TABLE[x_1] = lim_1 rt
+-  -- if C.TABLE[x_2] = lim_2 rt
+-
+-rule Instr_ok/table.init:
+-  C |- TABLE.INIT x_1 x_2 : I32 I32 I32 -> epsilon
+-  -- if C.TABLE[x_1] = lim rt
+-  -- if C.ELEM[x_2] = rt
+-
+-rule Instr_ok/elem.drop:
+-  C |- ELEM.DROP x : epsilon -> epsilon
+-  -- if C.ELEM[x] = rt
+-
+-
+-rule Instr_ok/memory.size:
+-  C |- MEMORY.SIZE : epsilon -> I32
+-  -- if C.MEM[0] = mt
+-
+-rule Instr_ok/memory.grow:
+-  C |- MEMORY.GROW : I32 -> I32
+-  -- if C.MEM[0] = mt
+-
+-rule Instr_ok/memory.fill:
+-  C |- MEMORY.FILL : I32 I32 I32 -> I32
+-  -- if C.MEM[0] = mt
+-
+-rule Instr_ok/memory.copy:
+-  C |- MEMORY.COPY : I32 I32 I32 -> I32
+-  -- if C.MEM[0] = mt
+-
+-rule Instr_ok/memory.init:
+-  C |- MEMORY.INIT x : I32 I32 I32 -> I32
+-  -- if C.MEM[0] = mt
+-  -- if C.DATA[x] = OK
+-
+-rule Instr_ok/data.drop:
+-  C |- DATA.DROP x : epsilon -> epsilon
+-  -- if C.DATA[x] = OK
+-
+-rule Instr_ok/load:
+-  C |- LOAD nt (n _ sx)? n_A n_O : I32 -> nt
+-  -- if C.MEM[0] = mt
+-  -- if $(2^(n_A) <= $size(nt)/8)
+-  -- if $(2^(n_A) <= n/8 < $size(nt)/8)?
+-  -- if n? = epsilon \/ nt = in
+-
+-rule Instr_ok/store:
+-  C |- STORE nt n? n_A n_O : I32 nt -> epsilon
+-  -- if C.MEM[0] = mt
+-  -- if $(2^(n_A) <= $size(nt)/8)
+-  -- if $(2^(n_A) <= n/8 < $size(nt)/8)?
+-  -- if n? = epsilon \/ nt = in
+-
+-
+ ;; Constant Expressions
+ 
+ relation Instr_const: context |- instr CONST             hint(show "C-instr")
+@@ -371,12 +155,6 @@
+ rule Instr_const/const:
+   C |- (CONST nt c) CONST
+ 
+-rule Instr_const/ref.null:
+-  C |- (REF.NULL rt) CONST
+-
+-rule Instr_const/ref.func:
+-  C |- (REF.FUNC x) CONST
+-
+ rule Instr_const/global.get:
+   C |- (GLOBAL.GET x) CONST
+   -- if C.GLOBAL[x] = epsilon t
+@@ -396,12 +174,6 @@
+ 
+ relation Func_ok: context |- func : functype         hint(show "T-func")
+ relation Global_ok: context |- global : globaltype   hint(show "T-global")
+-relation Table_ok: context |- table : tabletype      hint(show "T-table")
+-relation Mem_ok: context |- mem : memtype            hint(show "T-mem")
+-relation Elem_ok: context |- elem : reftype          hint(show "T-elem")
+-relation Data_ok: context |- data : OK               hint(show "T-data")
+-relation Elemmode_ok: context |- elemmode : reftype  hint(show "T-elemmode")
+-relation Datamode_ok: context |- datamode : OK       hint(show "T-datamode")
+ relation Start_ok: context |- start : OK             hint(show "T-start")
+ 
+ 
+@@ -409,7 +181,7 @@
+   C |- FUNC ft t* expr : ft
+   -- if ft = t_1* -> t_2*
+   -- Functype_ok: |- ft : OK
+-  -- Expr_ok: C, LOCAL t_1* t*, LABEL (t_2*), RETURN (t_2*) |- expr : t_2*
++  -- Expr_ok: C, LOCAL t_1* t*, LABEL (t_2*), RETURNS (t_2*) |- expr : t_2*
+ 
+ rule Global_ok:
+   C |- GLOBAL gt expr : gt
+@@ -417,86 +189,22 @@
+   -- if gt = MUT? t
+   -- Expr_ok_const: C |- expr : t CONST
+ 
+-rule Table_ok:
+-  C |- TABLE tt : tt
+-  -- Tabletype_ok: |- tt : OK
+-
+-rule Mem_ok:
+-  C |- MEMORY mt : mt
+-  -- Memtype_ok: |- mt : OK
+-
+-rule Elem_ok:
+-  C |- ELEM rt expr* elemmode? : rt
+-  -- (Expr_ok: C |- expr : rt)*
+-  -- (Elemmode_ok: C |- elemmode : rt)?
+-
+-rule Data_ok:
+-  C |- DATA (b*)* datamode? : OK
+-  -- (Datamode_ok: C |- datamode : OK)?
+-
+-rule Elemmode_ok/active:
+-  C |- TABLE x expr : rt
+-  -- if C.TABLE[x] = lim rt
+-  -- (Expr_ok_const: C |- expr : I32 CONST)*
+-
+-rule Elemmode_ok/declare:
+-  C |- DECLARE : rt
+-
+-rule Datamode_ok:
+-  C |- MEMORY 0 expr : OK
+-  -- if C.MEM[0] = mt
+-  -- (Expr_ok_const: C |- expr : I32 CONST)*
+-
+ rule Start_ok:
+   C |- START x : OK
+   -- if C.FUNC[x] = epsilon -> epsilon
+ 
+ 
+-relation Import_ok: context |- import : externtype        hint(show "T-import")
+-relation Export_ok: context |- export : externtype        hint(show "T-export")
+-relation Externuse_ok: context |- externuse : externtype  hint(show "T-externuse")
+-
+-rule Import_ok:
+-  C |- IMPORT name_1 name_2 xt : xt
+-  -- Externtype_ok: |- xt : OK
+-
+-rule Export_ok:
+-  C |- EXPORT name externuse : xt
+-  -- Externuse_ok: C |- externuse : xt
+-
+-rule Externuse_ok/func:
+-  C |- FUNC x : FUNC ft
+-  -- if C.FUNC[x] = ft
+-
+-rule Externuse_ok/global:
+-  C |- GLOBAL x : GLOBAL gt
+-  -- if C.GLOBAL[x] = gt
+-
+-rule Externuse_ok/table:
+-  C |- TABLE x : TABLE tt
+-  -- if C.TABLE[x] = tt
+-
+-rule Externuse_ok/mem:
+-  C |- MEMORY x : MEMORY mt
+-  -- if C.MEM[x] = mt
+-
+-
+ relation Module_ok: |- module : OK      hint(show "T-module")
+ 
+ rule Module_ok:
+-  |- MODULE import* func* global* table* mem* elem* data^n start* export* : OK
++  |- MODULE func* global* start* : OK
+   ;; TODO: incremental contexts for globals
+-  -- if C = {FUNC ft*, GLOBAL gt*, TABLE tt*, MEM mt*, ELEM rt*, DATA OK^n}
++  -- if C = {FUNC ft*, GLOBAL gt*}
+ 
+   -- (Func_ok: C |- func : ft)*
+   -- (Global_ok: C |- global : gt)*
+-  -- (Table_ok: C |- table : tt)*
+-  -- (Mem_ok: C |- mem : mt)*
+ 
+-  -- (Elem_ok: C |- elem : rt)*
+-  -- (Data_ok: C |- data : OK)^n
+   -- (Start_ok: C |- start : OK)*
+ 
+-  -- if |mem*| <= 1
+   -- if |start*| <= 1
+   ;; -- TODO: disjoint export names
+diff -ruN 4-runtime.watsup 4-runtime.watsup
+--- 4-runtime.watsup	2023-04-28 16:42:58
++++ 4-runtime.watsup	2023-05-02 17:10:43
+@@ -3,78 +3,44 @@
+ syntax addr hint(desc "address") = nat
+ syntax funcaddr hint(desc "function address") = addr
+ syntax globaladdr hint(desc "global address") = addr
+-syntax tableaddr hint(desc "table address") = addr
+-syntax memaddr hint(desc "memory address") = addr
+-syntax elemaddr hint(desc "elem address") = addr
+-syntax dataaddr hint(desc "data address") = addr
+ syntax labeladdr hint(desc "label address") = addr
+ syntax hostaddr hint(desc "host address") = addr
+ 
+ var a : addr
+ var fa : funcaddr
+ var ga : globaladdr
+-var ta : tableaddr
+-var ma : memaddr
+-var ea : elemaddr
+-var da : dataaddr
+ 
+ 
+ ;; Values
+ 
+ syntax num hint(desc "number") =
+   | CONST numtype c_numtype
+-syntax ref hint(desc "reference") =
+-  | REF.NULL reftype | REF.FUNC_ADDR funcaddr | REF.HOST_ADDR hostaddr
+ syntax val hint(desc "value") =
+-  | num | ref
++  | num
+ 
+ syntax result hint(desc "result") =
+   | _VALS val* | TRAP
+ 
+-var r : ref
+ var v : val
+ var res : result
+ 
+-syntax externval hint(desc "external value") =
+-  | FUNC funcaddr | GLOBAL globaladdr | TABLE tableaddr | MEM memaddr
+ 
+-var xv : externval
+-
+-
+ def $default_(valtype) : val  hint(partial)
+ def $default_(I32) = (CONST I32 0)
+-def $default_(I64) = (CONST I64 0)
+-def $default_(F32) = (CONST F32 0)
+-def $default_(F64) = (CONST F64 0)
+-def $default_(rt) = (REF.NULL rt)
+ 
+ 
+ ;; Configurations
+ 
+ syntax funcinst hint(desc "function instance") = moduleinst; func
+ syntax globalinst hint(desc "global instance") = val
+-syntax tableinst hint(desc "table instance") = ref*
+-syntax meminst hint(desc "memory instance") = byte*
+-syntax eleminst hint(desc "element instance") = ref*
+-syntax datainst hint(desc "data instance") = byte*
+-syntax exportinst hint(desc "export instance") = EXPORT name externval
+ 
+ syntax store hint(desc "store") =
+   { FUNC funcinst*,
+-    GLOBAL globalinst*,
+-    TABLE tableinst*,
+-    MEM meminst*,
+-    ELEM eleminst*,
+-    DATA datainst* }
++    GLOBAL globalinst* }
+ 
+ syntax moduleinst hint(desc "module instance") =
+   { FUNC funcaddr*,
+-    GLOBAL globaladdr*,
+-    TABLE tableaddr*,
+-    MEM memaddr*,
+-    ELEM elemaddr*,
+-    DATA dataaddr*,
+-    EXPORT exportinst* }
++    GLOBAL globaladdr* }
+ 
+ syntax frame hint(desc "frame") =
+   { LOCAL val*,
+@@ -89,11 +55,6 @@
+ var m : moduleinst
+ var fi : funcinst
+ var gi : globalinst
+-var ti : tableinst
+-var mi : meminst
+-var ei : eleminst
+-var di : datainst
+-var xi : exportinst
+ 
+ 
+ ;; Auxiliary notation
+@@ -106,46 +67,24 @@
+ 
+ def $func(state, funcidx) : funcinst        hint(show %.FUNC#`[%])
+ def $global(state, globalidx) : globalinst  hint(show %.GLOBAL#`[%])
+-def $table(state, tableidx) : tableinst     hint(show %.TABLE#`[%])
+-def $mem(state, memidx) : meminst           hint(show %.MEM#`[%])
+-def $elem(state, tableidx) : eleminst       hint(show %.ELEM#`[%])
+-def $data(state, dataidx) : datainst        hint(show %.DATA#`[%])
+ def $local(state, localidx) : val           hint(show %.LOCAL#`[%])
+ 
+ def $func((s; f), x) = s.FUNC[f.MODULE.FUNC[x]]
+ def $global((s; f), x) = s.GLOBAL[f.MODULE.GLOBAL[x]]
+-def $table((s; f), x) = s.TABLE[f.MODULE.TABLE[x]]
+-def $mem((s; f), x) = s.MEM[f.MODULE.MEM[x]]
+-def $elem((s; f), x) = s.ELEM[f.MODULE.ELEM[x]]
+-def $data((s; f), x) = s.DATA[f.MODULE.DATA[x]]
+ def $local((s; f), x) = f.LOCAL[x]
+ 
+ 
+ def $with_local(state, localidx, val) : state     hint(show %[.LOCAL[%] = %])
+ def $with_global(state, globalidx, val) : state   hint(show %[.GLOBAL[%] = %])
+-def $with_table(state, tableidx, nat, ref) : state  hint(show %[.TABLE[%][%] = %])
+-def $with_tableext(state, tableidx, ref*) : state hint(show %[.TABLE[%] =.. %])
+-def $with_mem(state, tableidx, nat, nat, byte*) : state  hint(show %[.MEM[%][% : %] = %])
+-def $with_memext(state, tableidx, byte*) : state  hint(show %[.MEM[%] =.. %])
+-def $with_elem(state, elemidx, ref*) : state      hint(show %[.ELEM[%] = %])
+-def $with_data(state, dataidx, byte*) : state     hint(show %[.DATA[%] = %])
+ 
+ def $with_local((s; f), x, v) = s; f[.LOCAL[x] = v]
+ def $with_global((s; f), x, v) = s[.GLOBAL[f.MODULE.GLOBAL[x]] = v]; f
+-def $with_table((s; f), x, i, r) = s[.TABLE[f.MODULE.TABLE[x]][i] = r]; f
+-def $with_tableext((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] =.. r*]; f
+-def $with_mem((s; f), x, i, j, b*) = s[.MEM[f.MODULE.MEM[x]][i : j] = b*]; f
+-def $with_memext((s; f), x, b*) = s[.MEM[f.MODULE.MEM[x]] =.. b*]; f
+-def $with_elem((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] = r*]; f
+-def $with_data((s; f), x, b*) = s[.MEM[f.MODULE.MEM[x]] = b*]; f
+ 
+ 
+ ;; Administrative Instructions
+ 
+ syntax admininstr hint(show instr) hint(desc "administrative instruction") =
+   | instr
+-  | REF.FUNC_ADDR funcaddr         hint(show REF.FUNC %)
+-  | REF.HOST_ADDR hostaddr         hint(show REF.EXTERN %)
+   | CALL_ADDR funcaddr             hint(show CALL %)
+   | LABEL_ n `{instr*} admininstr* hint(show LABEL_%#% %%)
+   | FRAME_ n `{frame} admininstr*  hint(show FRAME_%#% %%)
+diff -ruN 5-numerics.watsup 5-numerics.watsup
+--- 5-numerics.watsup	2023-04-24 07:16:00
++++ 5-numerics.watsup	2023-05-02 17:10:55
+@@ -4,10 +4,3 @@
+ def $binop(binop_numtype, numtype, c, c) : c_numtype*    hint(show %#_%#(%, %))
+ def $testop(testop_numtype, numtype, c) : c_numtype      hint(show %#_%#((%)))
+ def $relop(relop_numtype, numtype, c, c) : c_numtype     hint(show %#_%#(%, %))
+-
+-def $ext(nat, nat, sx, c) : c_numtype                    hint(show $ext_(%,%)^%(%))
+-def $cvtop(numtype, cvtop, numtype, sx?, c) : c_numtype* hint(show $ext_(%,%)^%(%))
+-
+-def $wrap_((nat, nat), c) : nat
+-
+-def $bytes_(nat, c) : byte*
+diff -ruN 6-reduction.watsup 6-reduction.watsup
+--- 6-reduction.watsup	2023-04-27 15:30:00
++++ 6-reduction.watsup	2023-05-02 17:11:03
+@@ -70,27 +70,9 @@
+   -- if c = 0
+ 
+ 
+-rule Step_pure/br_table-lt:
+-  (CONST I32 i) (BR_TABLE l* l')  ~>  (BR l*[i])
+-  -- if i < |l*|
+-
+-rule Step_pure/br_table-ge:
+-  (CONST I32 i) (BR_TABLE l* l')  ~>  (BR l')
+-  -- if i >= |l*|
+-
+-
+ rule Step_read/call:
+   z; (CALL x)  ~>  (CALL_ADDR $funcaddr(z)[x])  ;; TODO
+ 
+-rule Step_read/call_indirect-call:
+-  z; (CONST I32 i) (CALL_INDIRECT x ft)  ~>  (CALL_ADDR a)
+-  -- if $table(z, x)[i] = (REF.FUNC_ADDR a)
+-  -- if $funcinst(z)[a] = m; func
+-
+-rule Step_read/call_indirect-trap:
+-  z; (CONST I32 i) (CALL_INDIRECT x ft)  ~>  TRAP
+-  -- otherwise
+-
+ rule Step_read/call_addr:
+   z; val^k (CALL_ADDR a)  ~>  (FRAME_ n `{f} (LABEL_ n `{epsilon} instr*))
+   -- if $funcinst(z)[a] = m; FUNC (t_1^k -> t_2^n) t* instr*
+@@ -134,32 +116,6 @@
+   -- if c = $relop(relop, nt, c_1, c_2)
+ 
+ 
+-rule Step_pure/extend:
+-  (CONST nt c) (EXTEND nt n)  ~>  (CONST nt $ext(n, $size(nt), S, c))
+-
+-
+-rule Step_pure/cvtop-val:
+-  (CONST nt c_1) (CVTOP nt_1 cvtop nt_2 sx?)  ~>  (CONST nt c)
+-  -- if $cvtop(nt_1, cvtop, nt_2, sx?, c_1) = c  ;; TODO
+-
+-rule Step_pure/cvtop-trap:
+-  (CONST nt c_1) (CVTOP nt_1 cvtop nt_2 sx?)  ~>  TRAP
+-  -- if $cvtop(nt_1, cvtop, nt_2, sx?, c_1) = epsilon  ;; TODO
+-
+-
+-rule Step_read/ref.func:
+-  z; (REF.FUNC x) ~> (REF.FUNC_ADDR $funcaddr(z)[x])
+-
+-
+-rule Step_pure/ref.is_null-true:
+-  val REF.IS_NULL  ~>  (CONST I32 1)
+-  -- if val = (REF.NULL rt)
+-
+-rule Step_pure/ref.is_null-false:
+-  val REF.IS_NULL  ~>  (CONST I32 0)
+-  -- otherwise
+-
+-
+ rule Step_read/local.get:
+   z; (LOCAL.GET x)  ~>  $local(z, x)
+ 
+@@ -175,191 +131,3 @@
+ 
+ rule Step/global.set:
+   z; val (GLOBAL.SET x)  ~>  $with_global(z, x, val); epsilon
+-
+-
+-rule Step_read/table.get-trap:
+-  z; (CONST I32 i) (TABLE.GET x)  ~>  TRAP
+-  -- if i >= |$table(z, x)|
+-
+-rule Step_read/table.get-val:
+-  z; (CONST I32 i) (TABLE.GET x)  ~>  $table(z,x)[i]
+-  -- if i < |$table(z, x)|
+-
+-rule Step/table.set-trap:
+-  z; (CONST I32 i) ref (TABLE.GET x)  ~>  z; TRAP
+-  -- if i >= |$table(z, x)|
+-
+-rule Step/table.set-val:
+-  z; (CONST I32 i) ref (TABLE.GET x)  ~>  $with_table(z, x, i, ref); epsilon
+-  -- if i < |$table(z, x)|
+-
+-
+-rule Step_read/table.size:
+-  z; (TABLE.SIZE x)  ~>  (CONST I32 n)
+-  -- if |$table(z, x)| = n  ;; TODO: inline this
+-
+-
+-rule Step/table.grow-succeed:
+-  z; ref (CONST I32 n) (TABLE.GROW x)  ~>  $with_tableext(z, x, ref^n); (CONST I32 $(|$table(z, x)|))
+-
+-rule Step/table.grow-fail:
+-  z; ref (CONST I32 n) (TABLE.GROW x)  ~>  z; (CONST I32 $(-1))
+-
+-
+-rule Step_read/table.fill-trap:
+-  z; (CONST I32 i) val (CONST I32 n) (TABLE.FILL x)  ~>  TRAP
+-  -- if $(i + n) > |$table(z, x)|
+-
+-rule Step_read/table.fill-zero:
+-  z; (CONST I32 i) val (CONST I32 n) (TABLE.FILL x)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/table.fill-succ:
+-  z; (CONST I32 i) val (CONST I32 n) (TABLE.FILL x)  ~>
+-    (CONST I32 i) val (TABLE.SET x)
+-    (CONST I32 $(i+1)) val (CONST I32 $(n-1)) (TABLE.FILL x)
+-  -- otherwise
+-
+-
+-rule Step_read/table.copy-trap:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.COPY x y)  ~>  TRAP
+-  -- if $(i + n) > |$table(z, y)| \/ $(j + n) > |$table(z, x)|
+-
+-rule Step_read/table.copy-zero:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.COPY x y)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/table.copy-le:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.COPY x y)  ~>
+-    (CONST I32 j) (CONST I32 i) (TABLE.GET y) (TABLE.SET x)
+-    (CONST I32 $(j+1)) (CONST I32 $(i+1)) (CONST I32 $(n-1)) (TABLE.COPY x y)
+-  -- otherwise
+-  -- if j <= i
+-
+-rule Step_read/table.copy-gt:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.COPY x y)  ~>
+-    (CONST I32 $(j+n-1)) (CONST I32 $(i+n-1)) (TABLE.GET y) (TABLE.SET x)
+-    (CONST I32 $(j+1)) (CONST I32 $(i+1)) (CONST I32 $(n-1)) (TABLE.COPY x y)
+-  -- otherwise
+-
+-
+-rule Step_read/table.init-trap:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.INIT x y)  ~>  TRAP
+-  -- if $(i + n) > |$elem(z, y)| \/ $(j + n) > |$table(z, x)|
+-
+-rule Step_read/table.init-zero:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.INIT x y)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/table.init-succ:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (TABLE.INIT x y)  ~>
+-    (CONST I32 j) $elem(z,y)[i] (TABLE.SET x)
+-    (CONST I32 $(j+1)) (CONST I32 $(i+1)) (CONST I32 $(n-1)) (TABLE.INIT x y)
+-  -- otherwise
+-
+-
+-rule Step/elem.drop:
+-  z; (ELEM.DROP x)  ~>  $with_elem(z, x, epsilon); epsilon
+-
+-
+-rule Step_read/load-num-trap:
+-  z; (CONST I32 i) (LOAD nt n_A n_O)  ~>  TRAP
+-  -- if $(i + n_O + $size(nt)/8 >= |$mem(z, 0)|)
+-
+-rule Step_read/load-num-val:
+-  z; (CONST I32 i) (LOAD nt n_A n_O)  ~>  (CONST nt c)
+-  -- if $bytes_($size(nt), c) = $mem(z, 0)[i + n_O : $size(nt)/8]
+-
+-rule Step_read/load-pack-trap:
+-  z; (CONST I32 i) (LOAD nt (n _ sx) n_A n_O)  ~>  TRAP
+-  -- if $(i + n_O + n/8 >= |$mem(z, 0)|)
+-
+-rule Step_read/load-pack-val:
+-  z; (CONST I32 i) (LOAD nt (n _ sx) n_A n_O)  ~>  (CONST nt c)
+-  -- if $bytes_(n, c) = $mem(z, 0)[i + n_O : n/8]
+-
+-
+-rule Step/store-num-trap:
+-  z; (CONST I32 i) (CONST I32 c) (STORE nt n_A n_O)  ~>  z; TRAP
+-  -- if $(i + n_O + $size(nt)/8) >= |$mem(z, 0)|
+-
+-rule Step/store-num-val:
+-  z; (CONST I32 i) (CONST I32 c) (STORE nt n_A n_O)  ~>  $with_mem(z, 0, $(i + n_O), $($size(nt)/8), b*); epsilon
+-  -- if b* = $bytes_($size(nt), c)
+-
+-rule Step/store-pack-trap:
+-  z; (CONST I32 i) (CONST I32 c) (STORE nt n n_A n_O)  ~>  z; TRAP
+-  -- if $(i + n_O + n/8) >= |$mem(z, 0)|
+-
+-rule Step/store-pack-val:
+-  z; (CONST I32 i) (CONST I32 c) (STORE nt n n_A n_O)  ~>  $with_mem(z, 0, $(i + n_O), $(n/8), b*); epsilon
+-  -- if b* = $bytes_(n, $wrap_(($size(nt),n), c))
+-
+-
+-rule Step/memory.grow-succeed:
+-  z; (CONST I32 n) (MEMORY.GROW)  ~>  $with_memext(z, 0, 0^(n * 64 * $Ki)); (CONST I32 $(|$mem(z, 0)|))
+-
+-rule Step/memory.grow-fail:
+-  z; (CONST I32 n) (MEMORY.GROW)  ~>  z; (CONST I32 $(-1))
+-
+-
+-rule Step_read/memory.fill-trap:
+-  z; (CONST I32 i) val (CONST I32 n) (MEMORY.FILL)  ~>  TRAP
+-  -- if $(i + n) > |$mem(z, 0)|
+-
+-rule Step_read/memory.fill-zero:
+-  z; (CONST I32 i) val (CONST I32 n) (MEMORY.FILL)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/memory.fill-succ:
+-  z; (CONST I32 i) val (CONST I32 n) (MEMORY.FILL)  ~>
+-    (CONST I32 i) val (STORE I32 8 0 0)
+-    (CONST I32 $(i+1)) val (CONST I32 $(n-1)) (MEMORY.FILL)
+-  -- otherwise
+-
+-
+-rule Step_read/memory.copy-trap:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.COPY)  ~>  TRAP
+-  -- if $(i + n) > |$table(z, 0)| \/ $(j + n) > |$table(z, 0)|
+-
+-rule Step_read/memory.copy-zero:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.COPY)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/memory.copy-le:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.COPY)  ~>
+-    (CONST I32 j) (CONST I32 i) (LOAD I32 (8 _ U) 0 0) (STORE I32 8 0 0)
+-    (CONST I32 $(j+1)) (CONST I32 $(i+1)) (CONST I32 $(n-1)) (MEMORY.COPY)
+-  -- otherwise
+-  -- if j <= i
+-
+-rule Step_read/memory.copy-gt:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.COPY)  ~>
+-    (CONST I32 $(j+n-1)) (CONST I32 $(i+n-1)) (LOAD I32 (8 _ U) 0 0) (STORE I32 8 0 0)
+-    (CONST I32 j) (CONST I32 i) (CONST I32 $(n-1)) (MEMORY.COPY)
+-  -- otherwise
+-
+-
+-rule Step_read/memory.init-trap:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.INIT x)  ~>  TRAP
+-  -- if $(i + n) > |$data(z, y)| \/ $(j + n) > |$mem(z, 0)|
+-
+-rule Step_read/memory.init-zero:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.INIT x)  ~>  epsilon
+-  -- otherwise
+-  -- if n = 0
+-
+-rule Step_read/memory.init-succ:
+-  z; (CONST I32 j) (CONST I32 i) (CONST I32 n) (MEMORY.INIT x)  ~>
+-    (CONST I32 j) (CONST I32 $data(z,x)[i]) (STORE I32 8 0 0)
+-    (CONST I32 $(j+1)) (CONST I32 $(i+1)) (CONST I32 $(n-1)) (MEMORY.INIT x)
+-  -- otherwise
+-
+-
+-rule Step/data.drop:
+-  z; (DATA.DROP x)  ~>  $with_data(z, x, epsilon); epsilon
