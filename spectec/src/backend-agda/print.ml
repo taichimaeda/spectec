@@ -38,8 +38,8 @@ module Render = struct
     | ProdE es -> fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map exp es)
     | TupleE es ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
-    | MaybeE e -> "Maybe " ^ exp e
-    | ListE e -> "List " ^ exp e
+    | MaybeE e -> "Maybe (" ^ exp e ^ ")"
+    | ListE e -> "List (" ^ exp e ^ ")"
     | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
     | ApplyE (e1, e2) -> exp e1 ^ " " ^ exp e2
     | List es -> list (List.map exp es)

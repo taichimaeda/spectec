@@ -68,10 +68,10 @@ data ty-in where
     ty-in
 
 ty-resulttype : Set
-ty-resulttype  = List ty-valtype
+ty-resulttype  = List (ty-valtype)
 
 ty-globaltype : Set
-ty-globaltype  = (Maybe ⊤ × ty-valtype)
+ty-globaltype  = (Maybe (⊤) × ty-valtype)
 
 ty-functype : Set
 ty-functype  = (ty-resulttype × ty-resulttype)
@@ -236,19 +236,19 @@ data ty-instr where
     --------
     ty-instr
   SELECT :
-    Maybe ty-valtype ->
+    Maybe (ty-valtype) ->
     --------
     ty-instr
   BLOCK :
-    (ty-blocktype × List ty-instr) ->
+    (ty-blocktype × List (ty-instr)) ->
     --------
     ty-instr
   LOOP :
-    (ty-blocktype × List ty-instr) ->
+    (ty-blocktype × List (ty-instr)) ->
     --------
     ty-instr
   IF :
-    ((ty-blocktype × List ty-instr) × List ty-instr) ->
+    ((ty-blocktype × List (ty-instr)) × List (ty-instr)) ->
     --------
     ty-instr
   BR :
@@ -309,10 +309,10 @@ data ty-instr where
     ty-instr
 
 ty-expr : Set
-ty-expr  = List ty-instr
+ty-expr  = List (ty-instr)
 
 ty-func : Set
-ty-func  = ((ty-functype × List ty-valtype) × ty-expr)
+ty-func  = ((ty-functype × List (ty-valtype)) × ty-expr)
 
 ty-global : Set
 ty-global  = (ty-globaltype × ty-expr)
@@ -321,7 +321,7 @@ ty-start : Set
 ty-start  = ty-funcidx
 
 ty-module : Set
-ty-module  = ((List ty-func × List ty-global) × List ty-start)
+ty-module  = ((List (ty-func) × List (ty-global)) × List (ty-start))
 
 $Ki : ⊤ → Nat
 $Ki _ = 1024
@@ -382,11 +382,11 @@ data ty-testfuse where
 record ty-context : Set
 record ty-context where
   field
-    FUNC : List ty-functype
-    GLOBAL : List ty-globaltype
-    LOCAL : List ty-valtype
-    LABEL : List ty-resulttype
-    RETURNS : Maybe ty-resulttype
+    FUNC : List (ty-functype)
+    GLOBAL : List (ty-globaltype)
+    LOCAL : List (ty-valtype)
+    LABEL : List (ty-resulttype)
+    RETURNS : Maybe (ty-resulttype)
 
 data ty-Functype-ok : ty-functype → Set
 data ty-Functype-ok where
@@ -411,7 +411,7 @@ data ty-Blocktype-ok where
     ty-Blocktype-ok ⟨ ⟨ C , ft ⟩ , ft ⟩
 
 data ty-Instr-ok : ((ty-context × ty-instr) × ty-functype) → Set
-data ty-InstrSeq-ok : ((ty-context × List ty-instr) × ty-functype) → Set
+data ty-InstrSeq-ok : ((ty-context × List (ty-instr)) × ty-functype) → Set
 data ty-Instr-ok where
   unreachable :
     (C : ty-context) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
@@ -649,7 +649,7 @@ data ty-val where
 data ty-result : Set
 data ty-result where
   -VALS :
-    List ty-val ->
+    List (ty-val) ->
     ---------
     ty-result
   TRAP :
@@ -663,8 +663,8 @@ $default- _ {- CaseE: I32_valtype -} = CONST ⟨ I32 record { } , 0 ⟩
 record ty-moduleinst : Set
 record ty-moduleinst where
   field
-    FUNC : List ty-funcaddr
-    GLOBAL : List ty-globaladdr
+    FUNC : List (ty-funcaddr)
+    GLOBAL : List (ty-globaladdr)
 
 ty-funcinst : Set
 ty-funcinst  = (ty-moduleinst × ty-func)
@@ -675,13 +675,13 @@ ty-globalinst  = ty-val
 record ty-store : Set
 record ty-store where
   field
-    FUNC : List ty-funcinst
-    GLOBAL : List ty-globalinst
+    FUNC : List (ty-funcinst)
+    GLOBAL : List (ty-globalinst)
 
 record ty-frame : Set
 record ty-frame where
   field
-    LOCAL : List ty-val
+    LOCAL : List (ty-val)
     MODULE : ty-moduleinst
 
 ty-state : Set
@@ -702,19 +702,19 @@ data ty-admininstr where
     -------------
     ty-admininstr
   SELECT :
-    Maybe ty-valtype ->
+    Maybe (ty-valtype) ->
     -------------
     ty-admininstr
   BLOCK :
-    (ty-blocktype × List ty-instr) ->
+    (ty-blocktype × List (ty-instr)) ->
     -------------
     ty-admininstr
   LOOP :
-    (ty-blocktype × List ty-instr) ->
+    (ty-blocktype × List (ty-instr)) ->
     -------------
     ty-admininstr
   IF :
-    ((ty-blocktype × List ty-instr) × List ty-instr) ->
+    ((ty-blocktype × List (ty-instr)) × List (ty-instr)) ->
     -------------
     ty-admininstr
   BR :
@@ -778,11 +778,11 @@ data ty-admininstr where
     -------------
     ty-admininstr
   LABEL- :
-    ((ty-n × List ty-instr) × List ty-admininstr) ->
+    ((ty-n × List (ty-instr)) × List (ty-admininstr)) ->
     -------------
     ty-admininstr
   FRAME- :
-    ((ty-n × ty-frame) × List ty-admininstr) ->
+    ((ty-n × ty-frame) × List (ty-admininstr)) ->
     -------------
     ty-admininstr
   TRAP :
@@ -791,12 +791,12 @@ data ty-admininstr where
     ty-admininstr
 
 ty-config : Set
-ty-config  = (ty-state × List ty-admininstr)
+ty-config  = (ty-state × List (ty-admininstr))
 
-$funcaddr : ty-state → List ty-funcaddr
+$funcaddr : ty-state → List (ty-funcaddr)
 $funcaddr ⟨ s , f ⟩ = ty-moduleinst.FUNC (ty-frame.MODULE (f))
 
-$funcinst : ty-state → List ty-funcinst
+$funcinst : ty-state → List (ty-funcinst)
 $funcinst ⟨ s , f ⟩ = ty-store.FUNC (s)
 
 $func : (ty-state × ty-funcidx) → ty-funcinst
@@ -821,18 +821,18 @@ data ty-E where
     ----
     ty-E
   -SEQ :
-    ((List ty-val × ty-E) × List ty-instr) ->
+    ((List (ty-val) × ty-E) × List (ty-instr)) ->
     ----
     ty-E
   LABEL- :
-    ((ty-n × List ty-instr) × ty-E) ->
+    ((ty-n × List (ty-instr)) × ty-E) ->
     ----
     ty-E
 
-$unop : ((ty-unop-numtype × ty-numtype) × ty-c-numtype) → List ty-c-numtype
+$unop : ((ty-unop-numtype × ty-numtype) × ty-c-numtype) → List (ty-c-numtype)
 $unop  = ? {- TODO -}
 
-$binop : (((ty-binop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype) → List ty-c-numtype
+$binop : (((ty-binop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype) → List (ty-c-numtype)
 $binop  = ? {- TODO -}
 
 $testop : ((ty-testop-numtype × ty-numtype) × ty-c-numtype) → ty-c-numtype
@@ -841,7 +841,7 @@ $testop  = ? {- TODO -}
 $relop : (((ty-relop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype) → ty-c-numtype
 $relop  = ? {- TODO -}
 
-data ty-Step-pure : (List ty-admininstr × List ty-admininstr) → Set
+data ty-Step-pure : (List (ty-admininstr) × List (ty-admininstr)) → Set
 data ty-Step-pure where
   unreachable :
     ---------------------------------------------------------------------------
@@ -952,7 +952,7 @@ data ty-Step-pure where
     ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-pure ⟨ LOCAL-TEE x ∷ ? {- SubE: (val <: admininstr) -} ∷ [] , LOCAL-SET x ∷ ? {- SubE: (val <: admininstr) -} ∷ ? {- SubE: (val <: admininstr) -} ∷ [] ⟩
 
-data ty-Step-read : (ty-config × List ty-admininstr) → Set
+data ty-Step-read : (ty-config × List (ty-admininstr)) → Set
 data ty-Step-read where
   call :
     (x : ty-idx) (z : ty-state) ->
