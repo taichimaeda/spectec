@@ -22,6 +22,8 @@ data _<=_ {A : Set} : A -> A -> Set where
 data _>=_ {A : Set} : A -> A -> Set where
 _++_ : {A : Set} -> List A -> List A -> List A
 _ ++ _ = ?
+length : {A : Set} -> List A -> Nat
+length _ = ?
 
 ty-n : Set
 ty-n  = Nat
@@ -621,7 +623,7 @@ data ty-Module-ok where
     ? {- IterPr: ITER -} ->
     ? {- IterPr: ITER -} ->
     ? {- IterPr: ITER -} ->
-    (_<=_ ? {- LenE: |start*{start}| -}) 1 ->
+    (_<=_ (length start)) 1 ->
     --------------------------------------------------
     ty-Module-ok ⟨ ⟨ func , global ⟩ , start ⟩
 
@@ -1003,126 +1005,126 @@ data ty-Step where
     ty-Step ⟨ ⟨ z , ? {- SubE: (val <: admininstr) -} ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:330,1-333,48
+default/test-agda/output.agda:332,1-335,48
 Termination checking failed for the following functions:
   $min
 Problematic calls:
   $min ⟨ i - 1 , j - 1 ⟩
-    (at default/test-agda/output.agda:333,18-22)
-default/test-agda/output.agda:336,1-14
+    (at default/test-agda/output.agda:335,18-22)
+default/test-agda/output.agda:338,1-14
 Incomplete pattern matching for $size. Missing cases:
   $size (BOT x)
 when checking the definition of $size
-default/test-agda/output.agda:662,1-18
+default/test-agda/output.agda:664,1-18
 Incomplete pattern matching for $default-. Missing cases:
   $default- (BOT x)
 when checking the definition of $default-
 Unsolved constraints
 Unsolved metas at the following locations:
-  default/test-agda/output.agda:514,47-75
-  default/test-agda/output.agda:519,49-53
-  default/test-agda/output.agda:519,55-65
-  default/test-agda/output.agda:560,49-56
-  default/test-agda/output.agda:605,47-49
-  default/test-agda/output.agda:605,52-54
+  default/test-agda/output.agda:516,47-75
+  default/test-agda/output.agda:521,49-53
+  default/test-agda/output.agda:521,55-65
+  default/test-agda/output.agda:562,49-56
+  default/test-agda/output.agda:607,47-49
+  default/test-agda/output.agda:607,52-54
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:17,10-11
-  default/test-agda/output.agda:435,15-16
-  default/test-agda/output.agda:441,24-25
-  default/test-agda/output.agda:447,24-25
-  default/test-agda/output.agda:453,24-25
-  default/test-agda/output.agda:454,24-25
-  default/test-agda/output.agda:459,12-13
-  default/test-agda/output.agda:464,12-13
-  default/test-agda/output.agda:474,12-13
-  default/test-agda/output.agda:480,56-57
-  default/test-agda/output.agda:484,50-51
-  default/test-agda/output.agda:484,87-88
-  default/test-agda/output.agda:488,52-53
-  default/test-agda/output.agda:488,85-86
-  default/test-agda/output.agda:488,123-124
-  default/test-agda/output.agda:492,54-55
-  default/test-agda/output.agda:496,52-53
-  default/test-agda/output.agda:496,85-86
-  default/test-agda/output.agda:499,12-13
-  default/test-agda/output.agda:504,12-13
-  default/test-agda/output.agda:509,12-13
-  default/test-agda/output.agda:514,12-13
-  default/test-agda/output.agda:514,49-50
-  default/test-agda/output.agda:519,12-13
-  default/test-agda/output.agda:532,50-51
-  default/test-agda/output.agda:535,40-41
-  default/test-agda/output.agda:560,12-13
-  default/test-agda/output.agda:568,5-6
-  default/test-agda/output.agda:587,20-21
-  default/test-agda/output.agda:596,18-19
-  default/test-agda/output.agda:605,12-13
-  default/test-agda/output.agda:613,15-16
-  default/test-agda/output.agda:614,5-6
-  default/test-agda/output.agda:615,5-6
+  default/test-agda/output.agda:19,12-13
+  default/test-agda/output.agda:437,15-16
+  default/test-agda/output.agda:443,24-25
+  default/test-agda/output.agda:449,24-25
+  default/test-agda/output.agda:455,24-25
+  default/test-agda/output.agda:456,24-25
+  default/test-agda/output.agda:461,12-13
+  default/test-agda/output.agda:466,12-13
+  default/test-agda/output.agda:476,12-13
+  default/test-agda/output.agda:482,56-57
+  default/test-agda/output.agda:486,50-51
+  default/test-agda/output.agda:486,87-88
+  default/test-agda/output.agda:490,52-53
+  default/test-agda/output.agda:490,85-86
+  default/test-agda/output.agda:490,123-124
+  default/test-agda/output.agda:494,54-55
+  default/test-agda/output.agda:498,52-53
+  default/test-agda/output.agda:498,85-86
+  default/test-agda/output.agda:501,12-13
+  default/test-agda/output.agda:506,12-13
+  default/test-agda/output.agda:511,12-13
+  default/test-agda/output.agda:516,12-13
+  default/test-agda/output.agda:516,49-50
+  default/test-agda/output.agda:521,12-13
+  default/test-agda/output.agda:534,50-51
+  default/test-agda/output.agda:537,40-41
+  default/test-agda/output.agda:562,12-13
+  default/test-agda/output.agda:570,5-6
+  default/test-agda/output.agda:589,20-21
+  default/test-agda/output.agda:598,18-19
+  default/test-agda/output.agda:607,12-13
+  default/test-agda/output.agda:615,15-16
   default/test-agda/output.agda:616,5-6
-  default/test-agda/output.agda:617,11-12
-  default/test-agda/output.agda:804,27-28
-  default/test-agda/output.agda:807,29-30
-  default/test-agda/output.agda:810,28-29
-  default/test-agda/output.agda:813,47-48
-  default/test-agda/output.agda:816,44-45
-  default/test-agda/output.agda:834,10-11
-  default/test-agda/output.agda:837,11-12
-  default/test-agda/output.agda:840,12-13
-  default/test-agda/output.agda:843,11-12
-  default/test-agda/output.agda:856,20-21
-  default/test-agda/output.agda:861,20-21
-  default/test-agda/output.agda:861,59-60
-  default/test-agda/output.agda:861,155-156
-  default/test-agda/output.agda:866,20-21
-  default/test-agda/output.agda:866,59-60
-  default/test-agda/output.agda:866,155-156
-  default/test-agda/output.agda:871,26-27
-  default/test-agda/output.agda:871,122-123
-  default/test-agda/output.agda:871,157-158
-  default/test-agda/output.agda:876,26-27
-  default/test-agda/output.agda:876,145-146
-  default/test-agda/output.agda:876,180-181
-  default/test-agda/output.agda:890,46-47
-  default/test-agda/output.agda:890,90-91
-  default/test-agda/output.agda:894,53-54
-  default/test-agda/output.agda:894,96-97
-  default/test-agda/output.agda:894,153-154
-  default/test-agda/output.agda:894,207-208
-  default/test-agda/output.agda:894,242-243
-  default/test-agda/output.agda:898,53-54
-  default/test-agda/output.agda:898,120-121
-  default/test-agda/output.agda:898,173-174
-  default/test-agda/output.agda:912,42-43
-  default/test-agda/output.agda:912,86-87
-  default/test-agda/output.agda:916,48-49
-  default/test-agda/output.agda:916,91-92
-  default/test-agda/output.agda:916,163-164
-  default/test-agda/output.agda:916,211-212
-  default/test-agda/output.agda:920,53-54
-  default/test-agda/output.agda:920,125-126
-  default/test-agda/output.agda:920,178-179
-  default/test-agda/output.agda:954,20-21
-  default/test-agda/output.agda:954,79-80
-  default/test-agda/output.agda:954,116-117
-  default/test-agda/output.agda:961,55-56
-  default/test-agda/output.agda:964,12-13
-  default/test-agda/output.agda:965,15-16
-  default/test-agda/output.agda:967,32-33
-  default/test-agda/output.agda:967,137-138
-  default/test-agda/output.agda:971,49-50
-  default/test-agda/output.agda:975,50-51
-  default/test-agda/output.agda:981,20-21
-  default/test-agda/output.agda:981,58-59
-  default/test-agda/output.agda:983,21-22
-  default/test-agda/output.agda:983,67-68
-  default/test-agda/output.agda:986,26-27
-  default/test-agda/output.agda:986,66-67
-  default/test-agda/output.agda:988,21-22
-  default/test-agda/output.agda:988,67-68
-  default/test-agda/output.agda:992,21-22
-  default/test-agda/output.agda:996,21-22
+  default/test-agda/output.agda:617,5-6
+  default/test-agda/output.agda:618,5-6
+  default/test-agda/output.agda:806,27-28
+  default/test-agda/output.agda:809,29-30
+  default/test-agda/output.agda:812,28-29
+  default/test-agda/output.agda:815,47-48
+  default/test-agda/output.agda:818,44-45
+  default/test-agda/output.agda:836,10-11
+  default/test-agda/output.agda:839,11-12
+  default/test-agda/output.agda:842,12-13
+  default/test-agda/output.agda:845,11-12
+  default/test-agda/output.agda:858,20-21
+  default/test-agda/output.agda:863,20-21
+  default/test-agda/output.agda:863,59-60
+  default/test-agda/output.agda:863,155-156
+  default/test-agda/output.agda:868,20-21
+  default/test-agda/output.agda:868,59-60
+  default/test-agda/output.agda:868,155-156
+  default/test-agda/output.agda:873,26-27
+  default/test-agda/output.agda:873,122-123
+  default/test-agda/output.agda:873,157-158
+  default/test-agda/output.agda:878,26-27
+  default/test-agda/output.agda:878,145-146
+  default/test-agda/output.agda:878,180-181
+  default/test-agda/output.agda:892,46-47
+  default/test-agda/output.agda:892,90-91
+  default/test-agda/output.agda:896,53-54
+  default/test-agda/output.agda:896,96-97
+  default/test-agda/output.agda:896,153-154
+  default/test-agda/output.agda:896,207-208
+  default/test-agda/output.agda:896,242-243
+  default/test-agda/output.agda:900,53-54
+  default/test-agda/output.agda:900,120-121
+  default/test-agda/output.agda:900,173-174
+  default/test-agda/output.agda:914,42-43
+  default/test-agda/output.agda:914,86-87
+  default/test-agda/output.agda:918,48-49
+  default/test-agda/output.agda:918,91-92
+  default/test-agda/output.agda:918,163-164
+  default/test-agda/output.agda:918,211-212
+  default/test-agda/output.agda:922,53-54
+  default/test-agda/output.agda:922,125-126
+  default/test-agda/output.agda:922,178-179
+  default/test-agda/output.agda:956,20-21
+  default/test-agda/output.agda:956,79-80
+  default/test-agda/output.agda:956,116-117
+  default/test-agda/output.agda:963,55-56
+  default/test-agda/output.agda:966,12-13
+  default/test-agda/output.agda:967,15-16
+  default/test-agda/output.agda:969,32-33
+  default/test-agda/output.agda:969,137-138
+  default/test-agda/output.agda:973,49-50
+  default/test-agda/output.agda:977,50-51
+  default/test-agda/output.agda:983,20-21
+  default/test-agda/output.agda:983,58-59
+  default/test-agda/output.agda:985,21-22
+  default/test-agda/output.agda:985,67-68
+  default/test-agda/output.agda:988,26-27
+  default/test-agda/output.agda:988,66-67
+  default/test-agda/output.agda:990,21-22
+  default/test-agda/output.agda:990,67-68
+  default/test-agda/output.agda:994,21-22
+  default/test-agda/output.agda:998,21-22
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.

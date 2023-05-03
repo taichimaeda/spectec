@@ -68,7 +68,7 @@ module Translate = struct
         | { it = Ast.VarT i; _ } -> DotE (exp env e1, tyid i, atom a)
         | _ -> assert false)
     | CompE (_e1, _e2) -> YetE ("CompE: " ^ Print.string_of_exp e)
-    | LenE _e1 -> YetE ("LenE: " ^ Print.string_of_exp e)
+    | LenE e -> ApplyE (VarE (str "length"), exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
         (exp env)

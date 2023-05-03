@@ -115,6 +115,8 @@ let string_of_program prog =
       "data _>=_ {A : Set} : A -> A -> Set where";
       "_++_ : {A : Set} -> List A -> List A -> List A";
       "_ ++ _ = ?";
+      "length : {A : Set} -> List A -> Nat";
+      "length _ = ?";
       "";
       Render.program prog;
     ]
