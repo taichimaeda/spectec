@@ -21,25 +21,29 @@ data _>_ {A : Set} : A -> A -> Set where
 data _<=_ {A : Set} : A -> A -> Set where
 data _>=_ {A : Set} : A -> A -> Set where
 _++_ : {A : Set} -> List A -> List A -> List A
-_ ++ _ = ?
+[] ++ ys = ys
+(x ∷ xs) ++ ys = x ∷ (xs ++ ys)
 maybeMap : {A B : Set} -> (A -> B) -> Maybe A -> Maybe B
-maybeMap _ _ = ?
+maybeMap f (just x) = just (f x)
+maybeMap _ nothing = nothing
 maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set
-maybeTrue _ _ = ?
+maybeTrue _ _ = {!   !}
 maybeThe : {A : Set} -> Maybe A -> A
-maybeThe _ = ?
+maybeThe _ = {!   !}
 map : {A B : Set} -> (A -> B) -> List A -> List B
-map _ _ = ?
+map f [] = []
+map f (x ∷ xs) = f x ∷ map f xs
 forAll : {A : Set} -> (A -> Set) -> List A -> Set
-forAll _ _ = ?
+forAll _ _ = {!   !}
 forAll2 : {A B : Set} -> (A -> B -> Set) -> List A -> List B -> Set
-forAll2 _ _ = ?
+forAll2 _ _ = {!   !}
 length : {A : Set} -> List A -> Nat
-length _ = ?
+length [] = 0
+length (x ∷ xs) = suc (length xs)
 idx : {A : Set} -> List A -> Nat -> A
-idx _ _ = ?
+idx _ _ = {!   !}
 upd : {A : Set} -> List A -> Nat -> A -> List A
-upd _ _ _ = ?
+upd _ _ _ = {!   !}
 
 ty-n : Set
 ty-n  = Nat
@@ -1063,31 +1067,27 @@ data ty-Step where
     ty-Step ⟨ ⟨ z , ($admininstr-val val) ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:351,1-354,48
+default/test-agda/output.agda:355,1-358,48
 Termination checking failed for the following functions:
   $min
 Problematic calls:
   $min ⟨ i - 1 , j - 1 ⟩
-    (at default/test-agda/output.agda:354,18-22)
+    (at default/test-agda/output.agda:358,18-22)
 Unsolved interaction metas at the following locations:
-  default/test-agda/output.agda:17,10-11
-  default/test-agda/output.agda:19,16-17
-  default/test-agda/output.agda:21,17-18
-  default/test-agda/output.agda:23,14-15
-  default/test-agda/output.agda:25,11-12
-  default/test-agda/output.agda:27,14-15
-  default/test-agda/output.agda:29,15-16
-  default/test-agda/output.agda:31,12-13
-  default/test-agda/output.agda:33,11-12
-  default/test-agda/output.agda:35,13-14
-  default/test-agda/output.agda:414,18-19
-  default/test-agda/output.agda:695,21-22
-  default/test-agda/output.agda:709,16-17
-  default/test-agda/output.agda:717,16-17
-  default/test-agda/output.agda:894,10-11
-  default/test-agda/output.agda:897,11-12
-  default/test-agda/output.agda:900,12-13
-  default/test-agda/output.agda:903,11-12
+  default/test-agda/output.agda:23,17-24
+  default/test-agda/output.agda:25,14-21
+  default/test-agda/output.agda:30,14-21
+  default/test-agda/output.agda:32,15-22
+  default/test-agda/output.agda:37,11-18
+  default/test-agda/output.agda:39,13-20
+  default/test-agda/output.agda:418,18-19
+  default/test-agda/output.agda:699,21-22
+  default/test-agda/output.agda:713,16-17
+  default/test-agda/output.agda:721,16-17
+  default/test-agda/output.agda:898,10-11
+  default/test-agda/output.agda:901,11-12
+  default/test-agda/output.agda:904,12-13
+  default/test-agda/output.agda:907,11-12
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
