@@ -131,6 +131,8 @@ let string_of_program prog =
       "map _ _ = ?";
       "forAll : {A : Set} -> (A -> Set) -> List A -> Set";
       "forAll _ _ = ?";
+      "forAll2 : {A B : Set} -> (A -> B -> Set) -> List A -> List B -> Set";
+      "forAll2 _ _ = ?";
       "length : {A : Set} -> List A -> Nat";
       "length _ = ?";
       "idx : {A : Set} {n : Nat} -> (xs : List A) -> n << length xs -> A";

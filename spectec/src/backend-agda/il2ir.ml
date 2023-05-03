@@ -187,6 +187,14 @@ module Translate = struct
           ApplyE
             ( ApplyE (VarE (str "forAll"), FunE (id v, premise p')),
               Ir.VarE (id v) )
+      | IterPr (p', ((List | List1 | ListN _), [ v1; v2 ])) ->
+          ApplyE
+            ( ApplyE
+                ( ApplyE
+                    ( VarE (str "forAll2"),
+                      FunE (id v1, FunE (id v2, premise p')) ),
+                  Ir.VarE (id v1) ),
+              Ir.VarE (id v2) )
       | IterPr (_prem, _iter) -> YetE ("IterPr: " ^ "ITER")
     in
 
