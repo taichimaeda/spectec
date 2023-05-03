@@ -27,26 +27,37 @@ module Render = struct
     | Text s -> s
 
   let rec pat = function
+    | Ir.CaseP (i, p) -> id i ^ " " ^ atomic_pat p
+    | (VarP _ | ConstP _ | TupleP _ | YetP _) as p -> atomic_pat p
+
+  and atomic_pat = function
     | Ir.VarP i -> id i
-    | Ir.ConstP c -> const c
-    | Ir.TupleP ps ->
+    | ConstP c -> const c
+    | TupleP ps ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
-    | Ir.CaseP (i, p) -> "(" ^ id i ^ " (" ^ pat p ^ "))"
     | YetP s -> "_ " ^ comment s
+    | CaseP _ as p -> "(" ^ pat p ^ ")"
 
   let rec exp = function
+    | Ir.ProdE es ->
+        fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map atomic_exp es)
+    | MaybeE e -> "Maybe " ^ atomic_exp e
+    | ListE e -> "List " ^ atomic_exp e
+    | ArrowE (e1, e2) -> atomic_exp e1 ^ " → " ^ atomic_exp e2
+    | ApplyE (e1, e2) -> atomic_exp e1 ^ " " ^ atomic_exp e2
+    | DotE (e, t, f) -> id t ^ "." ^ id f ^ " " ^ atomic_exp e
+    | List (_ :: _ as es) -> list (List.map exp es)
+    | (VarE _ | ConstE _ | TupleE _ | List [] | YetE _) as e -> atomic_exp e
+
+  and atomic_exp = function
     | Ir.VarE i -> id i
-    | Ir.ConstE c -> const c
-    | ProdE es -> fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map exp es)
+    | ConstE c -> const c
     | TupleE es ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
-    | MaybeE e -> "Maybe (" ^ exp e ^ ")"
-    | ListE e -> "List (" ^ exp e ^ ")"
-    | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
-    | ApplyE (e1, e2) -> "(" ^ exp e1 ^ " " ^ exp e2 ^ ")"
     | List es -> list (List.map exp es)
-    | DotE (e, t, f) -> "(" ^ id t ^ "." ^ id f ^ " (" ^ exp e ^ "))"
-    | Ir.YetE s -> "? " ^ comment s
+    | YetE s -> "? " ^ comment s
+    | (ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _) as e ->
+        "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =
     id i ^ " :\n    "
@@ -66,7 +77,7 @@ module Render = struct
 
   let clauses i cls =
     let clause (pats, e) =
-      id i ^ " " ^ String.concat " " (List.map pat pats) ^ " = " ^ exp e
+      id i ^ " " ^ String.concat " " (List.map atomic_pat pats) ^ " = " ^ exp e
     in
     List.map clause cls |> String.concat "\n"
 
