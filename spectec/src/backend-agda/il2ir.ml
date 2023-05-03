@@ -72,7 +72,13 @@ module Translate = struct
         match e1.note with
         | { it = Ast.VarT i; _ } -> DotE (exp env e1, tyid i, atom a)
         | _ -> assert false)
-    | CompE (_e1, _e2) -> YetE ("CompE: " ^ Print.string_of_exp e)
+    | CompE (e1, e2) -> (
+        match e1.note with
+        | { it = Ast.VarT i; _ } ->
+            ApplyE
+              ( ApplyE (VarE (unsafe_str ("_++ty-" ^ i.it ^ "_")), exp env e1),
+                exp env e2 )
+        | _ -> assert false)
     | LenE e -> ApplyE (VarE (str "length"), exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
