@@ -32,6 +32,7 @@ let print_all_il = ref false
 let pass_sub = ref false
 let pass_totalize = ref false
 let pass_sideconditions = ref false
+let pass_else_elim = ref false
 
 
 (* Argument parsing *)
@@ -67,6 +68,7 @@ let argspec = Arg.align
   "--sub", Arg.Set pass_sub, "Synthesize explicit subtype coercions";
   "--totalize", Arg.Set pass_totalize, "Run function totalization";
   "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
+  "--else-elimination", Arg.Set pass_else_elim, "Eliminate otherwise/else";
 
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
@@ -114,6 +116,17 @@ let () =
     let il = if not !pass_sideconditions then il else
       ( log "Side condition inference";
         let il = Middlend.Sideconditions.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_else_elim then il else
+      ( log "Else elimination";
+        let il = Middlend.Else.transform il in
         if !print_all_il then
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
