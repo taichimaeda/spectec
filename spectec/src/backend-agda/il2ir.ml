@@ -63,8 +63,10 @@ module Translate = struct
     | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
     | StrE _efs -> YetE ("StrE: " ^ Print.string_of_exp e)
-    | DotE ({ it = Ast.VarT i; _ }, e, a) -> DotE (exp env e, tyid i, atom a)
-    | DotE (_, _, _) -> assert false
+    | DotE (e1, a) -> (
+        match e1.note with
+        | { it = Ast.VarT i; _ } -> DotE (exp env e1, tyid i, atom a)
+        | _ -> assert false)
     | CompE (_e1, _e2) -> YetE ("CompE: " ^ Print.string_of_exp e)
     | LenE _e1 -> YetE ("LenE: " ^ Print.string_of_exp e)
     | TupE es -> TupleE (List.map (exp env) es)
@@ -79,7 +81,7 @@ module Translate = struct
     | ListE es ->
         List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE
     | CatE (_e1, _e2) -> YetE ("CatE: " ^ Print.string_of_exp e)
-    | CaseE (a, e, _) -> ApplyE (VarE (atom a), (exp env) e)
+    | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
   let rec pat env e =
@@ -96,7 +98,7 @@ module Translate = struct
     | UpdE (_e1, _p, _e2) -> YetP ("UpdE: " ^ Print.string_of_exp e)
     | ExtE (_e1, _p, _e2) -> YetP ("ExtE: " ^ Print.string_of_exp e)
     | StrE _efs -> YetP ("StrE: " ^ Print.string_of_exp e)
-    | DotE (_ty, _e1, _atom) -> YetP ("DotE: " ^ Print.string_of_exp e)
+    | DotE (_e1, _atom) -> YetP ("DotE: " ^ Print.string_of_exp e)
     | CompE (_e1, _e2) -> YetP ("CompE: " ^ Print.string_of_exp e)
     | LenE _e1 -> YetP ("LenE: " ^ Print.string_of_exp e)
     | TupE es -> TupleP (List.map (pat env) es)
@@ -109,7 +111,7 @@ module Translate = struct
     | TheE _e1 -> YetP ("TheE: " ^ Print.string_of_exp e)
     | ListE _es -> YetP ("ListE: " ^ Print.string_of_exp e)
     | CatE (_e1, _e2) -> YetP ("CatE: " ^ Print.string_of_exp e)
-    | CaseE (a, e, _ty) -> CaseP (atom a, pat env e)
+    | CaseE (a, e) -> CaseP (atom a, pat env e)
     | SubE (_e1, _t1, _t2) -> YetP ("SubE: " ^ Print.string_of_exp e)
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)
