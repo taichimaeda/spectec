@@ -74,6 +74,7 @@ module Translate = struct
         (exp env)
           e1 (* mixops arise only from notations, so they are identities *)
     | CallE (x, e) -> ApplyE (VarE (funid x), (exp env) e)
+    | IterE (e, (_iter, [ _ ])) -> exp env e
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
     | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
@@ -138,9 +139,17 @@ module Translate = struct
     | [] -> ([ (pat env) p ], (exp env) e)
     | _ :: _ -> failwith __LOC__
 
+  let iterate_ty ty = function
+    | Ast.Opt -> Ir.MaybeE ty
+    | Ast.List | Ast.List1 | Ast.ListN _ -> Ir.ListE ty
+
   let rule env rel r =
     let (Ast.RuleD (x, bs, _op, e, ps)) = r.it in
-    let binds bs = List.map (fun (x, t, _iter) -> (id x, (typ env) t)) bs in
+    let binds bs =
+      List.map
+        (fun (x, t, iter) -> (id x, List.fold_left iterate_ty (typ env t) iter))
+        bs
+    in
     let premise p =
       match p.it with
       | Ast.RulePr (x, _op, e) -> Ir.ApplyE (VarE (tyid x), (exp env) e)

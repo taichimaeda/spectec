@@ -44,7 +44,9 @@ module Render = struct
     | Ir.VarE i -> id i
     | ConstE c -> const c
     | TupleE es ->
-        fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
+        fold_left
+          (Format.sprintf "⟨ %s , %s ⟩")
+          "(record { })" (List.map exp es)
     | NilE -> "[]"
     | YetE s -> "? " ^ comment s
     | (ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _ | ConsE _) as
