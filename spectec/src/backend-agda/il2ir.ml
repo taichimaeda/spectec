@@ -73,7 +73,8 @@ module Translate = struct
           e1 (* mixops arise only from notations, so they are identities *)
     | CallE (x, e) -> ApplyE (VarE (funid x), (exp env) e)
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
-    | OptE _eo -> YetE ("OptE: " ^ Print.string_of_exp e)
+    | OptE None -> VarE (str "nothing")
+    | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
     | TheE _e1 -> YetE ("TheE: " ^ Print.string_of_exp e)
     | ListE es ->
         List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE

@@ -32,7 +32,6 @@ A list of minor issues that need to be resolved at some point. (We are working o
   - `IdxE`
   - `IterE`
   - `IterPr`
-  - `OptE`
   - `SubE`
   - `UpdE`
 - expand products in constructor types and tuples in constructor arguments
