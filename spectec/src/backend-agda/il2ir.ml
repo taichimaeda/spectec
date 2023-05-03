@@ -16,6 +16,9 @@ module Translate = struct
   let funid i = str ("$" ^ i.it)
   let atom = function Ast.Atom a -> str a | _ -> failwith __LOC__
 
+  let record_id (exp : Ast.exp) =
+    match exp.note with { it = Ast.VarT i; _ } -> tyid i | _ -> assert false
+
   let rec typ env t =
     match t.it with
     | Ast.VarT n -> Ir.VarE (tyid n)
@@ -58,27 +61,16 @@ module Translate = struct
         ApplyE (ApplyE (VarE (unsafe_str (binop op)), exp env e1), exp env e2)
     | CmpE (op, e1, e2) ->
         ApplyE (ApplyE (VarE (unsafe_str (cmpop op)), exp env e1), exp env e2)
-    | IdxE (e1, e2) ->
-        ApplyE
-          ( ApplyE (VarE (str "idx"), exp env e1),
-            YetE
-              ("TODO: " ^ Print.string_of_exp e2 ^ " < |"
-             ^ Print.string_of_exp e1 ^ "|") )
+    | IdxE (e1, e2) -> ApplyE (ApplyE (VarE (str "idx"), exp env e1), exp env e2)
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
-    | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
+    | UpdE (e1, path, e2) -> update_path env path e1 (fun _ -> exp env e2)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
     | StrE efs -> StrE (List.map (fun (f, e) -> (atom f, exp env e)) efs)
-    | DotE (e1, a) -> (
-        match e1.note with
-        | { it = Ast.VarT i; _ } -> DotE (exp env e1, tyid i, atom a)
-        | _ -> assert false)
-    | CompE (e1, e2) -> (
-        match e1.note with
-        | { it = Ast.VarT i; _ } ->
-            ApplyE
-              ( ApplyE (VarE (unsafe_str ("_++ty-" ^ i.it ^ "_")), exp env e1),
-                exp env e2 )
-        | _ -> assert false)
+    | DotE (e1, a) -> DotE (exp env e1, record_id e1, atom a)
+    | CompE (e1, e2) ->
+        let (Ir.Id i) = record_id e1 in
+        ApplyE
+          (ApplyE (VarE (unsafe_str ("_++" ^ i ^ "_")), exp env e1), exp env e2)
     | LenE e -> ApplyE (VarE (str "length"), exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
@@ -99,13 +91,29 @@ module Translate = struct
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
     | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
-    | TheE _e1 -> YetE ("TheE: " ^ Print.string_of_exp e)
+    | TheE e -> ApplyE (VarE (str "maybeThe"), exp env e)
     | ListE es ->
         List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE
     | CatE (e1, e2) ->
         ApplyE (ApplyE (VarE (unsafe_str "_++_"), exp env e1), exp env e2)
     | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
+
+  and update_path env path (old_val : Ast.exp) (k : Ir.exp -> Ir.exp) =
+    match path.it with
+    | Ast.RootP -> k (exp env old_val)
+    | Ast.DotP (p, a) ->
+        update_path env p old_val (fun old_val' ->
+            Ir.UpdE
+              ( old_val',
+                atom a,
+                k (Ir.DotE (old_val', record_id old_val, atom a)) ))
+    | Ast.IdxP (p, e) ->
+        update_path env p old_val (fun old_val' ->
+            Ir.ApplyE
+              ( Ir.ApplyE (Ir.ApplyE (Ir.VarE (str "upd"), old_val'), exp env e),
+                k (ApplyE (ApplyE (VarE (str "idx"), old_val'), exp env e)) ))
+    | Ast.SliceP (_p, _e1, _e2) -> Ir.YetE "SliceP"
 
   let rec pat env e =
     match e.it with

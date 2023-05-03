@@ -43,6 +43,8 @@ module Render = struct
         "record { "
         ^ String.concat " ; " (List.map (fun (f, e) -> id f ^ " = " ^ exp e) es)
         ^ " }"
+    | UpdE (e1, f, e2) ->
+        "record " ^ atomic_exp e1 ^ " { " ^ id f ^ " = " ^ atomic_exp e2 ^ " }"
     | (VarE _ | ConstE _ | TupleE _ | NilE | YetE _) as e -> atomic_exp e
 
   and atomic_exp = function
@@ -55,7 +57,7 @@ module Render = struct
     | NilE -> "[]"
     | YetE s -> "? " ^ comment s
     | ( ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _ | ConsE _
-      | FunE _ | StrE _ ) as e ->
+      | FunE _ | StrE _ | UpdE _ ) as e ->
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =
@@ -127,6 +129,8 @@ let string_of_program prog =
       "maybeMap _ _ = ?";
       "maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set";
       "maybeTrue _ _ = ?";
+      "maybeThe : {A : Set} -> Maybe A -> A";
+      "maybeThe _ = ?";
       "map : {A B : Set} -> (A -> B) -> List A -> List B";
       "map _ _ = ?";
       "forAll : {A : Set} -> (A -> Set) -> List A -> Set";
@@ -135,8 +139,10 @@ let string_of_program prog =
       "forAll2 _ _ = ?";
       "length : {A : Set} -> List A -> Nat";
       "length _ = ?";
-      "idx : {A : Set} {n : Nat} -> (xs : List A) -> n << length xs -> A";
+      "idx : {A : Set} -> List A -> Nat -> A";
       "idx _ _ = ?";
+      "upd : {A : Set} -> List A -> Nat -> A -> List A";
+      "upd _ _ _ = ?";
       "";
       Render.program prog;
     ]

@@ -31,6 +31,7 @@ type exp =
   | ApplyE of exp * exp
   | DotE of exp * id * id
   | FunE of id * exp
+  | UpdE of exp * id * exp
 
 type cons = id * (id * exp) list * exp list * exp
 type field = id * exp

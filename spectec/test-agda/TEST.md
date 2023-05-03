@@ -2,7 +2,7 @@
 
 ```sh
 $ patch -s -p0 -i ../spec/minispec.patch -d ../spec --read-only=ignore
-$ dune exec ../src/exe-watsup/main.exe -- --agda --sub ../spec/*.watsup -o output.agda
+$ dune exec ../src/exe-watsup/main.exe -- --agda --sub --totalize ../spec/*.watsup -o output.agda
 $ patch -R -s -p0 -i ../spec/minispec.patch -d ../spec --read-only=ignore
 $ cat output.agda
 open import Agda.Builtin.Bool
@@ -24,10 +24,22 @@ _++_ : {A : Set} -> List A -> List A -> List A
 _ ++ _ = ?
 maybeMap : {A B : Set} -> (A -> B) -> Maybe A -> Maybe B
 maybeMap _ _ = ?
+maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set
+maybeTrue _ _ = ?
+maybeThe : {A : Set} -> Maybe A -> A
+maybeThe _ = ?
 map : {A B : Set} -> (A -> B) -> List A -> List B
 map _ _ = ?
+forAll : {A : Set} -> (A -> Set) -> List A -> Set
+forAll _ _ = ?
+forAll2 : {A B : Set} -> (A -> B -> Set) -> List A -> List B -> Set
+forAll2 _ _ = ?
 length : {A : Set} -> List A -> Nat
 length _ = ?
+idx : {A : Set} -> List A -> Nat -> A
+idx _ _ = ?
+upd : {A : Set} -> List A -> Nat -> A -> List A
+upd _ _ _ = ?
 
 ty-n : Set
 ty-n  = Nat
@@ -348,8 +360,9 @@ $min ⟨ 0 , j ⟩ = 0
 $min ⟨ i , 0 ⟩ = 0
 $min ⟨ i , j ⟩ = $min ⟨ (_-_ i) 1 , (_-_ j) 1 ⟩
 
-$size : ty-valtype → Nat
-$size (I32 _) = 32
+$size : ty-valtype → (Maybe Nat)
+$size (I32 _) = just 32
+$size x = nothing
 
 $test-sub-ATOM-22 : ty-n → Nat
 $test-sub-ATOM-22 n-3-ATOM-y = 0
@@ -397,6 +410,7 @@ data ty-testfuse where
     ty-testfuse
 
 record ty-context : Set
+_++ty-context_ : ty-context -> ty-context -> ty-context
 record ty-context where
   field
     FUNC : List ty-functype
@@ -404,6 +418,7 @@ record ty-context where
     LOCAL : List ty-valtype
     LABEL : List ty-resulttype
     RETURNS : Maybe ty-resulttype
+_++ty-context_ = ?
 
 data ty-Functype-ok : ty-functype → Set
 data ty-Functype-ok where
@@ -454,30 +469,30 @@ data ty-Instr-ok where
   block :
     (C : ty-context) (bt : ty-blocktype) (instr : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ty-InstrSeq-ok ⟨ ⟨ ? {- CompE: C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ (_++ty-context_ C) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ----------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BLOCK ⟨ bt , instr ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   loop :
     (C : ty-context) (bt : ty-blocktype) (instr : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ty-InstrSeq-ok ⟨ ⟨ ? {- CompE: C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_1]*{t_1}, RETURNS ?()} -} , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ (_++ty-context_ C) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-1 -> (t-1 ∷ []))) t-1 ; RETURNS = nothing }) , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ---------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOOP ⟨ bt , instr ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   if :
     (C : ty-context) (bt : ty-blocktype) (instr-1 : List ty-instr) (instr-2 : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ty-InstrSeq-ok ⟨ ⟨ ? {- CompE: C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , instr-1 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ty-InstrSeq-ok ⟨ ⟨ ? {- CompE: C ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2]*{t_2}, RETURNS ?()} -} , instr-2 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ (_++ty-context_ C) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr-1 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ (_++ty-context_ C) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr-2 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ---------------------------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , IF ⟨ ⟨ bt , instr-1 ⟩ , instr-2 ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   br :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
-    (_===_ ? {- IdxE: C.LABEL_context[l] -}) t ->
+    (_===_ ((idx (ty-context.LABEL C)) l)) t ->
     -----------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BR l ⟩ , ⟨ (_++_ t-1) t , t-2 ⟩ ⟩
   br-if :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) ->
-    (_===_ ? {- IdxE: C.LABEL_context[l] -}) t ->
+    (_===_ ((idx (ty-context.LABEL C)) l)) t ->
     ------------------------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BR-IF l ⟩ , ⟨ (_++_ t) ((I32 (record { })) ∷ []) , t ⟩ ⟩
   return :
@@ -487,7 +502,7 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , RETURN (record { }) ⟩ , ⟨ (_++_ t-1) t , t-2 ⟩ ⟩
   call :
     (C : ty-context) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.FUNC_context[x] -}) ⟨ t-1 , t-2 ⟩ ->
+    (_===_ ((idx (ty-context.FUNC C)) x)) ⟨ t-1 , t-2 ⟩ ->
     ----------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , CALL x ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   const :
@@ -512,27 +527,27 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , RELOP ⟨ nt , relop ⟩ ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , (I32 (record { })) ∷ [] ⟩ ⟩
   local-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.LOCAL_context[x] -}) t ->
+    (_===_ ((idx (ty-context.LOCAL C)) x)) t ->
     -------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   local-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.LOCAL_context[x] -}) t ->
+    (_===_ ((idx (ty-context.LOCAL C)) x)) t ->
     -------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   local-tee :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.LOCAL_context[x] -}) t ->
+    (_===_ ((idx (ty-context.LOCAL C)) x)) t ->
     -------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ t ∷ [] , t ∷ [] ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ just (record { }) , t ⟩ ->
+    (_===_ ((idx (ty-context.GLOBAL C)) x)) ⟨ just (record { }) , t ⟩ ->
     --------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ just (record { }) , t ⟩ ->
+    (_===_ ((idx (ty-context.GLOBAL C)) x)) ⟨ just (record { }) , t ⟩ ->
     --------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
 data ty-InstrSeq-ok where
@@ -573,7 +588,7 @@ data ty-Instr-const where
     ty-Instr-const ⟨ C , CONST ⟨ nt , c ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ nothing , t ⟩ ->
+    (_===_ ((idx (ty-context.GLOBAL C)) x)) ⟨ nothing , t ⟩ ->
     ---------------------------------------
     ty-Instr-const ⟨ C , GLOBAL-GET x ⟩
 
@@ -581,7 +596,7 @@ data ty-Expr-const : ((ty-context × ty-expr)) → Set
 data ty-Expr-const where
   - :
     (C : ty-context) (instr : List ty-instr) ->
-    ? {- IterPr: ITER -} ->
+    (forAll (λ instr -> (ty-Instr-const ⟨ C , instr ⟩))) instr ->
     -------------------------------
     ty-Expr-const ⟨ C , instr ⟩
 
@@ -600,7 +615,7 @@ data ty-Func-ok where
     (C : ty-context) (expr : ty-expr) (ft : ty-functype) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     (_===_ ft) ⟨ t-1 , t-2 ⟩ ->
     ty-Functype-ok ft ->
-    ty-Expr-ok ⟨ ⟨ ? {- CompE: C ++ {FUNC [], GLOBAL [], LOCAL t_1*{t_1} :: t*{t}, LABEL [], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [t_2*{t_2}], RETURNS ?()} ++ {FUNC [], GLOBAL [], LOCAL [], LABEL [], RETURNS ?(t_2*{t_2})} -} , expr ⟩ , t-2 ⟩ ->
+    ty-Expr-ok ⟨ ⟨ (_++ty-context_ ((_++ty-context_ ((_++ty-context_ C) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = (_++_ t-1) t ; LABEL = [] ; RETURNS = nothing }))) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = t-2 ∷ [] ; RETURNS = nothing }))) (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = [] ; RETURNS = just t-2 }) , expr ⟩ , t-2 ⟩ ->
     -----------------------------------------------------------------
     ty-Func-ok ⟨ ⟨ C , ⟨ ⟨ ft , t ⟩ , expr ⟩ ⟩ , ft ⟩
 
@@ -618,7 +633,7 @@ data ty-Start-ok : ((ty-context × ty-start)) → Set
 data ty-Start-ok where
   - :
     (C : ty-context) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.FUNC_context[x] -}) ⟨ [] , [] ⟩ ->
+    (_===_ ((idx (ty-context.FUNC C)) x)) ⟨ [] , [] ⟩ ->
     -------------------------
     ty-Start-ok ⟨ C , x ⟩
 
@@ -627,9 +642,9 @@ data ty-Module-ok where
   - :
     (C : ty-context) (ft : List ty-functype) (func : List ty-func) (global : List ty-global) (gt : List ty-globaltype) (start : List ty-start) ->
     (_===_ C) (record { FUNC = ft ; GLOBAL = gt ; LOCAL = [] ; LABEL = [] ; RETURNS = nothing }) ->
-    ? {- IterPr: ITER -} ->
-    ? {- IterPr: ITER -} ->
-    ? {- IterPr: ITER -} ->
+    ((forAll2 (λ ft -> (λ func -> (ty-Func-ok ⟨ ⟨ C , func ⟩ , ft ⟩)))) ft) func ->
+    ((forAll2 (λ global -> (λ gt -> (ty-Global-ok ⟨ ⟨ C , global ⟩ , gt ⟩)))) global) gt ->
+    (forAll (λ start -> (ty-Start-ok ⟨ C , start ⟩))) start ->
     (_<=_ (length start)) 1 ->
     --------------------------------------------------
     ty-Module-ok ⟨ ⟨ func , global ⟩ , start ⟩
@@ -674,14 +689,17 @@ data ty-result where
     ---------
     ty-result
 
-$default- : ty-valtype → ty-val
-$default- (I32 _) = CONST ⟨ I32 (record { }) , 0 ⟩
+$default- : ty-valtype → (Maybe ty-val)
+$default- (I32 _) = just (CONST ⟨ I32 (record { }) , 0 ⟩)
+$default- x = nothing
 
 record ty-moduleinst : Set
+_++ty-moduleinst_ : ty-moduleinst -> ty-moduleinst -> ty-moduleinst
 record ty-moduleinst where
   field
     FUNC : List ty-funcaddr
     GLOBAL : List ty-globaladdr
+_++ty-moduleinst_ = ?
 
 ty-funcinst : Set
 ty-funcinst  = (ty-moduleinst × ty-func)
@@ -690,16 +708,20 @@ ty-globalinst : Set
 ty-globalinst  = ty-val
 
 record ty-store : Set
+_++ty-store_ : ty-store -> ty-store -> ty-store
 record ty-store where
   field
     FUNC : List ty-funcinst
     GLOBAL : List ty-globalinst
+_++ty-store_ = ?
 
 record ty-frame : Set
+_++ty-frame_ : ty-frame -> ty-frame -> ty-frame
 record ty-frame where
   field
     LOCAL : List ty-val
     MODULE : ty-moduleinst
+_++ty-frame_ = ?
 
 ty-state : Set
 ty-state  = (ty-store × ty-frame)
@@ -846,19 +868,19 @@ $funcinst : ty-state → (List ty-funcinst)
 $funcinst ⟨ s , f ⟩ = ty-store.FUNC s
 
 $func : ((ty-state × ty-funcidx)) → ty-funcinst
-$func ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- IdxE: s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]] -}
+$func ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-store.FUNC s)) ((idx (ty-moduleinst.FUNC (ty-frame.MODULE f))) x)
 
 $global : ((ty-state × ty-globalidx)) → ty-globalinst
-$global ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- IdxE: s.GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] -}
+$global ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-store.GLOBAL s)) ((idx (ty-moduleinst.GLOBAL (ty-frame.MODULE f))) x)
 
 $local : ((ty-state × ty-localidx)) → ty-val
-$local ⟨ ⟨ s , f ⟩ , x ⟩ = ? {- IdxE: f.LOCAL_frame[x] -}
+$local ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-frame.LOCAL f)) x
 
 $with-local : (((ty-state × ty-localidx) × ty-val)) → ty-state
-$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , ? {- UpdE: f[LOCAL_frame[x] = v] -} ⟩
+$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , record f { LOCAL = (((upd (ty-frame.LOCAL f)) x) v) } ⟩
 
 $with-global : (((ty-state × ty-globalidx) × ty-val)) → ty-state
-$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ ? {- UpdE: s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v] -} , f ⟩
+$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = (((upd (ty-store.GLOBAL s)) ((idx (ty-moduleinst.GLOBAL (ty-frame.MODULE f))) x)) v) } , f ⟩
 
 data ty-E : Set
 data ty-E where
@@ -1002,12 +1024,12 @@ data ty-Step-read : ((ty-config × (List ty-admininstr))) → Set
 data ty-Step-read where
   call :
     (x : ty-idx) (z : ty-state) ->
-    ---------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ? {- IdxE: $funcaddr(z)[x] -}) ∷ [] ⟩
+    ---------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ((idx ($funcaddr z)) x)) ∷ [] ⟩
   call-addr :
     (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
-    (_===_ ? {- IdxE: $funcinst(z)[a] -}) ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
-    (_===_ f) (record { LOCAL = (_++_ val) ((map (λ t -> ($default- t))) t) ; MODULE = m }) ->
+    (_===_ ((idx ($funcinst z)) a)) ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
+    (_===_ f) (record { LOCAL = (_++_ val) ((map (λ t -> (maybeThe ($default- t)))) t) ; MODULE = m }) ->
     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (_++_ ((map (λ val -> ($admininstr-val val))) val)) ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , (map (λ instr -> ($admininstr-instr instr))) instr ⟩) ∷ [] ⟩) ∷ [] ⟩
   local-get :
@@ -1041,64 +1063,31 @@ data ty-Step where
     ty-Step ⟨ ⟨ z , ($admininstr-val val) ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:339,1-342,48
+default/test-agda/output.agda:351,1-354,48
 Termination checking failed for the following functions:
   $min
 Problematic calls:
   $min ⟨ i - 1 , j - 1 ⟩
-    (at default/test-agda/output.agda:342,18-22)
-default/test-agda/output.agda:345,1-14
-Incomplete pattern matching for $size. Missing cases:
-  $size (BOT x)
-when checking the definition of $size
-default/test-agda/output.agda:671,1-18
-Incomplete pattern matching for $default-. Missing cases:
-  $default- (BOT x)
-when checking the definition of $default-
-Unsolved constraints
-Unsolved metas at the following locations:
-  default/test-agda/output.agda:523,49-53
-  default/test-agda/output.agda:523,55-65
-  default/test-agda/output.agda:528,49-53
-  default/test-agda/output.agda:528,55-65
-  default/test-agda/output.agda:569,49-56
-  default/test-agda/output.agda:614,47-49
-  default/test-agda/output.agda:614,52-54
+    (at default/test-agda/output.agda:354,18-22)
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:17,10-11
   default/test-agda/output.agda:19,16-17
-  default/test-agda/output.agda:21,11-12
-  default/test-agda/output.agda:23,12-13
-  default/test-agda/output.agda:450,24-25
-  default/test-agda/output.agda:456,24-25
-  default/test-agda/output.agda:462,24-25
-  default/test-agda/output.agda:463,24-25
-  default/test-agda/output.agda:468,12-13
-  default/test-agda/output.agda:473,12-13
-  default/test-agda/output.agda:483,12-13
-  default/test-agda/output.agda:508,12-13
-  default/test-agda/output.agda:513,12-13
-  default/test-agda/output.agda:518,12-13
-  default/test-agda/output.agda:523,12-13
-  default/test-agda/output.agda:528,12-13
-  default/test-agda/output.agda:569,12-13
-  default/test-agda/output.agda:577,5-6
-  default/test-agda/output.agda:596,20-21
-  default/test-agda/output.agda:614,12-13
-  default/test-agda/output.agda:623,5-6
-  default/test-agda/output.agda:624,5-6
-  default/test-agda/output.agda:625,5-6
-  default/test-agda/output.agda:842,27-28
-  default/test-agda/output.agda:845,29-30
-  default/test-agda/output.agda:848,28-29
-  default/test-agda/output.agda:851,47-48
-  default/test-agda/output.agda:854,44-45
-  default/test-agda/output.agda:872,10-11
-  default/test-agda/output.agda:875,11-12
-  default/test-agda/output.agda:878,12-13
-  default/test-agda/output.agda:881,11-12
-  default/test-agda/output.agda:999,55-56
-  default/test-agda/output.agda:1002,12-13
+  default/test-agda/output.agda:21,17-18
+  default/test-agda/output.agda:23,14-15
+  default/test-agda/output.agda:25,11-12
+  default/test-agda/output.agda:27,14-15
+  default/test-agda/output.agda:29,15-16
+  default/test-agda/output.agda:31,12-13
+  default/test-agda/output.agda:33,11-12
+  default/test-agda/output.agda:35,13-14
+  default/test-agda/output.agda:414,18-19
+  default/test-agda/output.agda:695,21-22
+  default/test-agda/output.agda:709,16-17
+  default/test-agda/output.agda:717,16-17
+  default/test-agda/output.agda:894,10-11
+  default/test-agda/output.agda:897,11-12
+  default/test-agda/output.agda:900,12-13
+  default/test-agda/output.agda:903,11-12
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
