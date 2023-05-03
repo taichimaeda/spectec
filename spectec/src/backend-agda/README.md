@@ -29,7 +29,6 @@ A list of minor issues that need to be resolved at some point. (We are working o
 - translate the following from `Il` to `Ir`:
   - `CompE`
   - `IdxE`
-  - `IterE`
   - `IterPr`
   - `StrE`
   - `SubE`

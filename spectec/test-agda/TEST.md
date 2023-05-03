@@ -22,6 +22,10 @@ data _<=_ {A : Set} : A -> A -> Set where
 data _>=_ {A : Set} : A -> A -> Set where
 _++_ : {A : Set} -> List A -> List A -> List A
 _ ++ _ = ?
+maybeMap : {A B : Set} -> (A -> B) -> Maybe A -> Maybe B
+maybeMap _ _ = ?
+map : {A B : Set} -> (A -> B) -> List A -> List B
+map _ _ = ?
 length : {A : Set} -> List A -> Nat
 length _ = ?
 
@@ -520,7 +524,7 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ t ∷ [] , t ∷ [] ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ ? {- IterE: ()?{} -} , t ⟩ ->
+    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ just (record { }) , t ⟩ ->
     --------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
@@ -537,11 +541,11 @@ data ty-InstrSeq-ok where
     (C : ty-context) (instr-1 : ty-instr) (instr-2 : ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (t-3 : List ty-valtype) ->
     ty-Instr-ok ⟨ ⟨ C , instr-1 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr-2 ∷ [] ⟩ , ⟨ t-2 , t-3 ⟩ ⟩ ->
-    --------------------------------------------------------------------------------------------------------
-    ty-InstrSeq-ok ⟨ ⟨ C , (_++_ (instr-1 ∷ [])) ? {- IterE: instr_2*{} -} ⟩ , ⟨ t-1 , t-3 ⟩ ⟩
+    -----------------------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , (_++_ (instr-1 ∷ [])) (instr-2 ∷ []) ⟩ , ⟨ t-1 , t-3 ⟩ ⟩
   weak :
     (C : ty-context) (instr : List ty-instr) (t-1 : ty-valtype) (t-2 : List ty-valtype) ->
-    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ ? {- IterE: t_1*{} -} , t-2 ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩ ->
     -------------------------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩
   frame :
@@ -602,7 +606,7 @@ data ty-Global-ok where
   - :
     (C : ty-context) (expr : ty-expr) (gt : ty-globaltype) (t : ty-valtype) ->
     ty-Globaltype-ok gt ->
-    (_===_ gt) ⟨ ? {- IterE: ()?{} -} , t ⟩ ->
+    (_===_ gt) ⟨ just (record { }) , t ⟩ ->
     ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩ ->
     -------------------------------------------------------
     ty-Global-ok ⟨ ⟨ C , ⟨ gt , expr ⟩ ⟩ , gt ⟩
@@ -876,13 +880,13 @@ data ty-Step-pure where
   block :
     (bt : ty-blocktype) (instr : List ty-instr) (k : Nat) (n : ty-n) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) ->
     (_===_ bt) ⟨ t-1 , t-2 ⟩ ->
-    -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (_++_ ? {- SubE: (val <: admininstr) -}) ((BLOCK ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , [] ⟩ , (_++_ ? {- SubE: (val <: admininstr) -}) ? {- SubE: (instr <: admininstr) -} ⟩) ∷ [] ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((BLOCK ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , [] ⟩ , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr) ⟩) ∷ [] ⟩
   loop :
     (bt : ty-blocktype) (instr : List ty-instr) (k : Nat) (n : ty-n) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) ->
     (_===_ bt) ⟨ t-1 , t-2 ⟩ ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (_++_ ? {- SubE: (val <: admininstr) -}) ((LOOP ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , (LOOP ⟨ bt , instr ⟩) ∷ [] ⟩ , (_++_ ? {- SubE: (val <: admininstr) -}) ? {- SubE: (instr <: admininstr) -} ⟩) ∷ [] ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((LOOP ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , (LOOP ⟨ bt , instr ⟩) ∷ [] ⟩ , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr) ⟩) ∷ [] ⟩
   if-true :
     (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : List ty-instr) (instr-2 : List ty-instr) ->
     (_=/=_ c) 0 ->
@@ -895,16 +899,16 @@ data ty-Step-pure where
     ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((IF ⟨ ⟨ bt , instr-1 ⟩ , instr-2 ⟩) ∷ []) , (BLOCK ⟨ bt , instr-2 ⟩) ∷ [] ⟩
   label-vals :
     (instr : List ty-instr) (n : ty-n) (val : List ty-val) ->
-    --------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr ⟩ , ? {- SubE: (val <: admininstr) -} ⟩) ∷ [] , ? {- SubE: (val <: admininstr) -} ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr ⟩ , (map (λ val -> ? {- SubE: (val <: admininstr) -})) val ⟩) ∷ [] , (map (λ val -> ? {- SubE: (val <: admininstr) -})) val ⟩
   br-zero :
     (instr : List ty-instr) (instr' : List ty-instr) (n : ty-n) (val : List ty-val) (val' : List ty-val) ->
-    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , (_++_ ? {- SubE: (val' <: admininstr) -}) ((_++_ ? {- SubE: (val <: admininstr) -}) ((_++_ ((BR 0) ∷ [])) ? {- SubE: (instr <: admininstr) -})) ⟩) ∷ [] , (_++_ ? {- SubE: (val <: admininstr) -}) ? {- SubE: (instr' <: admininstr) -} ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , (_++_ ((map (λ val' -> ? {- SubE: (val' <: admininstr) -})) val')) ((_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((_++_ ((BR 0) ∷ [])) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr))) ⟩) ∷ [] , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((map (λ instr' -> ? {- SubE: (instr' <: admininstr) -})) instr') ⟩
   br-succ :
     (instr : List ty-instr) (instr' : List ty-instr) (l : ty-labelidx) (n : ty-n) (val : List ty-val) ->
-    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , (_++_ ? {- SubE: (val <: admininstr) -}) ((_++_ ((BR ((_+_ l) 1)) ∷ [])) ? {- SubE: (instr <: admininstr) -}) ⟩) ∷ [] , (_++_ ? {- SubE: (val <: admininstr) -}) ((BR l) ∷ []) ⟩
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((_++_ ((BR ((_+_ l) 1)) ∷ [])) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr)) ⟩) ∷ [] , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((BR l) ∷ []) ⟩
   br-if-true :
     (c : ty-c-numtype) (l : ty-labelidx) ->
     (_=/=_ c) 0 ->
@@ -917,16 +921,16 @@ data ty-Step-pure where
     ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((BR-IF l) ∷ []) , [] ⟩
   frame-vals :
     (f : ty-frame) (n : ty-n) (val : List ty-val) ->
-    ----------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ? {- SubE: (val <: admininstr) -} ⟩) ∷ [] , ? {- SubE: (val <: admininstr) -} ⟩
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , (map (λ val -> ? {- SubE: (val <: admininstr) -})) val ⟩) ∷ [] , (map (λ val -> ? {- SubE: (val <: admininstr) -})) val ⟩
   return-frame :
     (f : ty-frame) (instr : List ty-instr) (n : ty-n) (val : List ty-val) (val' : List ty-val) ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , (_++_ ? {- SubE: (val' <: admininstr) -}) ((_++_ ? {- SubE: (val <: admininstr) -}) ((_++_ ((RETURN (record { })) ∷ [])) ? {- SubE: (instr <: admininstr) -})) ⟩) ∷ [] , ? {- SubE: (val <: admininstr) -} ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , (_++_ ((map (λ val' -> ? {- SubE: (val' <: admininstr) -})) val')) ((_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((_++_ ((RETURN (record { })) ∷ [])) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr))) ⟩) ∷ [] , (map (λ val -> ? {- SubE: (val <: admininstr) -})) val ⟩
   return-label :
     (instr : List ty-instr) (instr' : List ty-instr) (k : Nat) (val : List ty-val) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ k , instr' ⟩ , (_++_ ? {- SubE: (val <: admininstr) -}) ((_++_ ((RETURN (record { })) ∷ [])) ? {- SubE: (instr <: admininstr) -}) ⟩) ∷ [] , (_++_ ? {- SubE: (val <: admininstr) -}) ((RETURN (record { })) ∷ []) ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ k , instr' ⟩ , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((_++_ ((RETURN (record { })) ∷ [])) ((map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr)) ⟩) ∷ [] , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((RETURN (record { })) ∷ []) ⟩
   unop-val :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
     (_===_ ($unop ⟨ ⟨ unop , nt ⟩ , c-1 ⟩)) (c ∷ []) ->
@@ -972,8 +976,8 @@ data ty-Step-read where
     (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
     (_===_ ? {- IdxE: $funcinst(z)[a] -}) ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
     (_===_ f) ? {- StrE: {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m} -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (_++_ ? {- SubE: (val <: admininstr) -}) ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , ? {- SubE: (instr <: admininstr) -} ⟩) ∷ [] ⟩) ∷ [] ⟩
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , (_++_ ((map (λ val -> ? {- SubE: (val <: admininstr) -})) val)) ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , (map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr ⟩) ∷ [] ⟩) ∷ [] ⟩
   local-get :
     (x : ty-idx) (z : ty-state) ->
     ---------------------------------------------------------------------------------------------------------
@@ -987,14 +991,14 @@ data ty-Step : ((ty-config × ty-config)) → Set
 data ty-Step where
   pure :
     (instr : List ty-instr) (instr' : List ty-instr) (z : ty-state) ->
-    ty-Step-pure ⟨ ? {- SubE: (instr <: admininstr) -} , ? {- SubE: (instr' <: admininstr) -} ⟩ ->
-    ------------------------------------------------------------------------------------------------------------------
-    ty-Step ⟨ ⟨ z , ? {- SubE: (instr <: admininstr) -} ⟩ , ⟨ z , ? {- SubE: (instr' <: admininstr) -} ⟩ ⟩
+    ty-Step-pure ⟨ (map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr , (map (λ instr' -> ? {- SubE: (instr' <: admininstr) -})) instr' ⟩ ->
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , (map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr ⟩ , ⟨ z , (map (λ instr' -> ? {- SubE: (instr' <: admininstr) -})) instr' ⟩ ⟩
   read :
     (instr : List ty-instr) (instr' : List ty-instr) (z : ty-state) ->
-    ty-Step-read ⟨ ⟨ z , ? {- SubE: (instr <: admininstr) -} ⟩ , ? {- SubE: (instr' <: admininstr) -} ⟩ ->
-    ------------------------------------------------------------------------------------------------------------------
-    ty-Step ⟨ ⟨ z , ? {- SubE: (instr <: admininstr) -} ⟩ , ⟨ z , ? {- SubE: (instr' <: admininstr) -} ⟩ ⟩
+    ty-Step-read ⟨ ⟨ z , (map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr ⟩ , (map (λ instr' -> ? {- SubE: (instr' <: admininstr) -})) instr' ⟩ ->
+    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step ⟨ ⟨ z , (map (λ instr -> ? {- SubE: (instr <: admininstr) -})) instr ⟩ , ⟨ z , (map (λ instr' -> ? {- SubE: (instr' <: admininstr) -})) instr' ⟩ ⟩
   local-set :
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
     -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -1005,126 +1009,125 @@ data ty-Step where
     ty-Step ⟨ ⟨ z , ? {- SubE: (val <: admininstr) -} ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:332,1-335,48
+default/test-agda/output.agda:336,1-339,48
 Termination checking failed for the following functions:
   $min
 Problematic calls:
   $min ⟨ i - 1 , j - 1 ⟩
-    (at default/test-agda/output.agda:335,18-22)
-default/test-agda/output.agda:338,1-14
+    (at default/test-agda/output.agda:339,18-22)
+default/test-agda/output.agda:342,1-14
 Incomplete pattern matching for $size. Missing cases:
   $size (BOT x)
 when checking the definition of $size
-default/test-agda/output.agda:664,1-18
+default/test-agda/output.agda:668,1-18
 Incomplete pattern matching for $default-. Missing cases:
   $default- (BOT x)
 when checking the definition of $default-
 Unsolved constraints
 Unsolved metas at the following locations:
-  default/test-agda/output.agda:516,47-75
-  default/test-agda/output.agda:521,49-53
-  default/test-agda/output.agda:521,55-65
-  default/test-agda/output.agda:562,49-56
-  default/test-agda/output.agda:607,47-49
-  default/test-agda/output.agda:607,52-54
+  default/test-agda/output.agda:520,49-53
+  default/test-agda/output.agda:520,55-65
+  default/test-agda/output.agda:525,49-53
+  default/test-agda/output.agda:525,55-65
+  default/test-agda/output.agda:566,49-56
+  default/test-agda/output.agda:611,47-49
+  default/test-agda/output.agda:611,52-54
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:17,10-11
-  default/test-agda/output.agda:19,12-13
-  default/test-agda/output.agda:437,15-16
-  default/test-agda/output.agda:443,24-25
-  default/test-agda/output.agda:449,24-25
-  default/test-agda/output.agda:455,24-25
-  default/test-agda/output.agda:456,24-25
-  default/test-agda/output.agda:461,12-13
-  default/test-agda/output.agda:466,12-13
-  default/test-agda/output.agda:476,12-13
-  default/test-agda/output.agda:482,56-57
-  default/test-agda/output.agda:486,50-51
-  default/test-agda/output.agda:486,87-88
-  default/test-agda/output.agda:490,52-53
-  default/test-agda/output.agda:490,85-86
-  default/test-agda/output.agda:490,123-124
-  default/test-agda/output.agda:494,54-55
-  default/test-agda/output.agda:498,52-53
-  default/test-agda/output.agda:498,85-86
-  default/test-agda/output.agda:501,12-13
-  default/test-agda/output.agda:506,12-13
-  default/test-agda/output.agda:511,12-13
-  default/test-agda/output.agda:516,12-13
-  default/test-agda/output.agda:516,49-50
-  default/test-agda/output.agda:521,12-13
-  default/test-agda/output.agda:534,50-51
-  default/test-agda/output.agda:537,40-41
-  default/test-agda/output.agda:562,12-13
-  default/test-agda/output.agda:570,5-6
-  default/test-agda/output.agda:589,20-21
-  default/test-agda/output.agda:598,18-19
-  default/test-agda/output.agda:607,12-13
-  default/test-agda/output.agda:615,15-16
-  default/test-agda/output.agda:616,5-6
-  default/test-agda/output.agda:617,5-6
-  default/test-agda/output.agda:618,5-6
-  default/test-agda/output.agda:806,27-28
-  default/test-agda/output.agda:809,29-30
-  default/test-agda/output.agda:812,28-29
-  default/test-agda/output.agda:815,47-48
-  default/test-agda/output.agda:818,44-45
-  default/test-agda/output.agda:836,10-11
-  default/test-agda/output.agda:839,11-12
-  default/test-agda/output.agda:842,12-13
-  default/test-agda/output.agda:845,11-12
-  default/test-agda/output.agda:858,20-21
-  default/test-agda/output.agda:863,20-21
-  default/test-agda/output.agda:863,59-60
-  default/test-agda/output.agda:863,155-156
-  default/test-agda/output.agda:868,20-21
-  default/test-agda/output.agda:868,59-60
-  default/test-agda/output.agda:868,155-156
-  default/test-agda/output.agda:873,26-27
-  default/test-agda/output.agda:873,122-123
-  default/test-agda/output.agda:873,157-158
-  default/test-agda/output.agda:878,26-27
-  default/test-agda/output.agda:878,145-146
-  default/test-agda/output.agda:878,180-181
-  default/test-agda/output.agda:892,46-47
-  default/test-agda/output.agda:892,90-91
-  default/test-agda/output.agda:896,53-54
-  default/test-agda/output.agda:896,96-97
-  default/test-agda/output.agda:896,153-154
-  default/test-agda/output.agda:896,207-208
-  default/test-agda/output.agda:896,242-243
-  default/test-agda/output.agda:900,53-54
-  default/test-agda/output.agda:900,120-121
-  default/test-agda/output.agda:900,173-174
-  default/test-agda/output.agda:914,42-43
-  default/test-agda/output.agda:914,86-87
-  default/test-agda/output.agda:918,48-49
-  default/test-agda/output.agda:918,91-92
-  default/test-agda/output.agda:918,163-164
-  default/test-agda/output.agda:918,211-212
-  default/test-agda/output.agda:922,53-54
-  default/test-agda/output.agda:922,125-126
-  default/test-agda/output.agda:922,178-179
-  default/test-agda/output.agda:956,20-21
-  default/test-agda/output.agda:956,79-80
-  default/test-agda/output.agda:956,116-117
-  default/test-agda/output.agda:963,55-56
-  default/test-agda/output.agda:966,12-13
-  default/test-agda/output.agda:967,15-16
-  default/test-agda/output.agda:969,32-33
-  default/test-agda/output.agda:969,137-138
-  default/test-agda/output.agda:973,49-50
-  default/test-agda/output.agda:977,50-51
-  default/test-agda/output.agda:983,20-21
-  default/test-agda/output.agda:983,58-59
-  default/test-agda/output.agda:985,21-22
-  default/test-agda/output.agda:985,67-68
-  default/test-agda/output.agda:988,26-27
-  default/test-agda/output.agda:988,66-67
-  default/test-agda/output.agda:990,21-22
-  default/test-agda/output.agda:990,67-68
-  default/test-agda/output.agda:994,21-22
+  default/test-agda/output.agda:19,16-17
+  default/test-agda/output.agda:21,11-12
+  default/test-agda/output.agda:23,12-13
+  default/test-agda/output.agda:441,15-16
+  default/test-agda/output.agda:447,24-25
+  default/test-agda/output.agda:453,24-25
+  default/test-agda/output.agda:459,24-25
+  default/test-agda/output.agda:460,24-25
+  default/test-agda/output.agda:465,12-13
+  default/test-agda/output.agda:470,12-13
+  default/test-agda/output.agda:480,12-13
+  default/test-agda/output.agda:486,56-57
+  default/test-agda/output.agda:490,50-51
+  default/test-agda/output.agda:490,87-88
+  default/test-agda/output.agda:494,52-53
+  default/test-agda/output.agda:494,85-86
+  default/test-agda/output.agda:494,123-124
+  default/test-agda/output.agda:498,54-55
+  default/test-agda/output.agda:502,52-53
+  default/test-agda/output.agda:502,85-86
+  default/test-agda/output.agda:505,12-13
+  default/test-agda/output.agda:510,12-13
+  default/test-agda/output.agda:515,12-13
+  default/test-agda/output.agda:520,12-13
+  default/test-agda/output.agda:525,12-13
+  default/test-agda/output.agda:566,12-13
+  default/test-agda/output.agda:574,5-6
+  default/test-agda/output.agda:593,20-21
+  default/test-agda/output.agda:611,12-13
+  default/test-agda/output.agda:619,15-16
+  default/test-agda/output.agda:620,5-6
+  default/test-agda/output.agda:621,5-6
+  default/test-agda/output.agda:622,5-6
+  default/test-agda/output.agda:810,27-28
+  default/test-agda/output.agda:813,29-30
+  default/test-agda/output.agda:816,28-29
+  default/test-agda/output.agda:819,47-48
+  default/test-agda/output.agda:822,44-45
+  default/test-agda/output.agda:840,10-11
+  default/test-agda/output.agda:843,11-12
+  default/test-agda/output.agda:846,12-13
+  default/test-agda/output.agda:849,11-12
+  default/test-agda/output.agda:862,20-21
+  default/test-agda/output.agda:867,20-21
+  default/test-agda/output.agda:867,59-60
+  default/test-agda/output.agda:867,155-156
+  default/test-agda/output.agda:872,20-21
+  default/test-agda/output.agda:872,59-60
+  default/test-agda/output.agda:872,155-156
+  default/test-agda/output.agda:877,42-43
+  default/test-agda/output.agda:877,161-162
+  default/test-agda/output.agda:877,221-222
+  default/test-agda/output.agda:882,42-43
+  default/test-agda/output.agda:882,184-185
+  default/test-agda/output.agda:882,244-245
+  default/test-agda/output.agda:896,61-62
+  default/test-agda/output.agda:896,126-127
+  default/test-agda/output.agda:900,70-71
+  default/test-agda/output.agda:900,137-138
+  default/test-agda/output.agda:900,219-220
+  default/test-agda/output.agda:900,298-299
+  default/test-agda/output.agda:900,359-360
+  default/test-agda/output.agda:904,69-70
+  default/test-agda/output.agda:904,161-162
+  default/test-agda/output.agda:904,239-240
+  default/test-agda/output.agda:918,57-58
+  default/test-agda/output.agda:918,122-123
+  default/test-agda/output.agda:922,65-66
+  default/test-agda/output.agda:922,132-133
+  default/test-agda/output.agda:922,229-230
+  default/test-agda/output.agda:922,301-302
+  default/test-agda/output.agda:926,69-70
+  default/test-agda/output.agda:926,166-167
+  default/test-agda/output.agda:926,244-245
+  default/test-agda/output.agda:960,20-21
+  default/test-agda/output.agda:960,79-80
+  default/test-agda/output.agda:960,116-117
+  default/test-agda/output.agda:967,55-56
+  default/test-agda/output.agda:970,12-13
+  default/test-agda/output.agda:971,15-16
+  default/test-agda/output.agda:973,48-49
+  default/test-agda/output.agda:973,177-178
+  default/test-agda/output.agda:977,49-50
+  default/test-agda/output.agda:981,50-51
+  default/test-agda/output.agda:987,37-38
+  default/test-agda/output.agda:987,101-102
+  default/test-agda/output.agda:989,38-39
+  default/test-agda/output.agda:989,110-111
+  default/test-agda/output.agda:992,43-44
+  default/test-agda/output.agda:992,109-110
+  default/test-agda/output.agda:994,38-39
+  default/test-agda/output.agda:994,110-111
   default/test-agda/output.agda:998,21-22
+  default/test-agda/output.agda:1002,21-22
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
