@@ -79,7 +79,7 @@ module Translate = struct
     | TheE _e1 -> YetP ("TheE: " ^ Print.string_of_exp e)
     | ListE _es -> YetP ("ListE: " ^ Print.string_of_exp e)
     | CatE (_e1, _e2) -> YetP ("CatE: " ^ Print.string_of_exp e)
-    | CaseE (_atom, _e1, _ty) -> YetP ("CaseE: " ^ Print.string_of_exp e)
+    | CaseE (a, e, _ty) -> CaseP (atom a, pat env e)
     | SubE (_e1, _t1, _t2) -> YetP ("SubE: " ^ Print.string_of_exp e)
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)

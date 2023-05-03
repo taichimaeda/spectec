@@ -332,7 +332,7 @@ $min ⟨ i , 0 ⟩ = 0
 $min ⟨ i , j ⟩ = $min ⟨ ? {- BinE: (i - 1) -} , ? {- BinE: (j - 1) -} ⟩
 
 $size : ty-valtype → Nat
-$size _ {- CaseE: I32_valtype -} = 32
+$size (I32 (_)) = 32
 
 $test-sub-ATOM-22 : ty-n → Nat
 $test-sub-ATOM-22 n-3-ATOM-y = 0
@@ -658,7 +658,7 @@ data ty-result where
     ty-result
 
 $default- : ty-valtype → ty-val
-$default- _ {- CaseE: I32_valtype -} = CONST ⟨ I32 record { } , 0 ⟩
+$default- (I32 (_)) = CONST ⟨ I32 record { } , 0 ⟩
 
 record ty-moduleinst : Set
 record ty-moduleinst where
@@ -1001,6 +1001,14 @@ Termination checking failed for the following functions:
 Problematic calls:
   $min ⟨ ?0 (i = i) (j = j) , ?1 (i = i) (j = j) ⟩
     (at default/test-agda/output.agda:325,18-22)
+default/test-agda/output.agda:328,1-16
+Incomplete pattern matching for $size. Missing cases:
+  $size (BOT x)
+when checking the definition of $size
+default/test-agda/output.agda:654,1-20
+Incomplete pattern matching for $default-. Missing cases:
+  $default- (BOT x)
+when checking the definition of $default-
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:325,25-26
   default/test-agda/output.agda:325,49-50

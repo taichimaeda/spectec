@@ -30,6 +30,7 @@ module Render = struct
     | Ir.ConstP c -> const c
     | Ir.TupleP ps ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
+    | Ir.CaseP (i, p) -> "(" ^ id i ^ " (" ^ pat p ^ "))"
     | YetP s -> "_ " ^ comment s
 
   let rec exp = function

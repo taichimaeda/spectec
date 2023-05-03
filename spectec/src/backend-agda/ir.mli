@@ -9,7 +9,12 @@ type const =
   | Nat of int
   | Text of string
 
-type pat = VarP of id | ConstP of const | TupleP of pat list | YetP of string
+type pat =
+  | VarP of id
+  | ConstP of const
+  | TupleP of pat list
+  | YetP of string
+  | CaseP of id * pat
 
 type exp =
   | VarE of id
