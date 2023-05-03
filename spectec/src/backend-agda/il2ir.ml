@@ -62,7 +62,7 @@ module Translate = struct
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
-    | StrE _efs -> YetE ("StrE: " ^ Print.string_of_exp e)
+    | StrE efs -> StrE (List.map (fun (f, e) -> (atom f, exp env e)) efs)
     | DotE (e1, a) -> (
         match e1.note with
         | { it = Ast.VarT i; _ } -> DotE (exp env e1, tyid i, atom a)

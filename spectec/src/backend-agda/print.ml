@@ -39,6 +39,10 @@ module Render = struct
     | DotE (e, t, f) -> id t ^ "." ^ id f ^ " " ^ atomic_exp e
     | ConsE (e1, e2) -> atomic_exp e1 ^ " ∷ " ^ atomic_exp e2
     | FunE (x, e) -> "λ " ^ id x ^ " -> " ^ atomic_exp e
+    | StrE es ->
+        "record { "
+        ^ String.concat " ; " (List.map (fun (f, e) -> id f ^ " = " ^ exp e) es)
+        ^ " }"
     | (VarE _ | ConstE _ | TupleE _ | NilE | YetE _) as e -> atomic_exp e
 
   and atomic_exp = function
@@ -51,7 +55,7 @@ module Render = struct
     | NilE -> "[]"
     | YetE s -> "? " ^ comment s
     | ( ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _ | ConsE _
-      | FunE _ ) as e ->
+      | FunE _ | StrE _ ) as e ->
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =

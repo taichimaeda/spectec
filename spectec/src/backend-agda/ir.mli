@@ -21,6 +21,7 @@ type exp =
   | ConstE of const
   | ProdE of exp list
   | TupleE of exp list
+  | StrE of (id * exp) list
   | ListE of exp
   | NilE
   | ConsE of exp * exp

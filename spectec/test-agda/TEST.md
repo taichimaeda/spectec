@@ -626,7 +626,7 @@ data ty-Module-ok : ty-module → Set
 data ty-Module-ok where
   - :
     (C : ty-context) (ft : List ty-functype) (func : List ty-func) (global : List ty-global) (gt : List ty-globaltype) (start : List ty-start) ->
-    (_===_ C) ? {- StrE: {FUNC ft*{ft}, GLOBAL gt*{gt}, LOCAL [], LABEL [], RETURNS ?()} -} ->
+    (_===_ C) (record { FUNC = ft ; GLOBAL = gt ; LOCAL = [] ; LABEL = [] ; RETURNS = nothing }) ->
     ? {- IterPr: ITER -} ->
     ? {- IterPr: ITER -} ->
     ? {- IterPr: ITER -} ->
@@ -1007,7 +1007,7 @@ data ty-Step-read where
   call-addr :
     (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
     (_===_ ? {- IdxE: $funcinst(z)[a] -}) ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
-    (_===_ f) ? {- StrE: {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m} -} ->
+    (_===_ f) (record { LOCAL = (_++_ val) ((map (λ t -> ($default- t))) t) ; MODULE = m }) ->
     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (_++_ ((map (λ val -> ($admininstr-val val))) val)) ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , (map (λ instr -> ($admininstr-instr instr))) instr ⟩) ∷ [] ⟩) ∷ [] ⟩
   local-get :
@@ -1085,7 +1085,6 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:577,5-6
   default/test-agda/output.agda:596,20-21
   default/test-agda/output.agda:614,12-13
-  default/test-agda/output.agda:622,15-16
   default/test-agda/output.agda:623,5-6
   default/test-agda/output.agda:624,5-6
   default/test-agda/output.agda:625,5-6
@@ -1100,7 +1099,6 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:881,11-12
   default/test-agda/output.agda:999,55-56
   default/test-agda/output.agda:1002,12-13
-  default/test-agda/output.agda:1003,15-16
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
