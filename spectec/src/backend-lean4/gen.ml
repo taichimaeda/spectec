@@ -53,8 +53,7 @@ let render_con_name qual id : atom -> string = function
 
 let render_con_name' qual (typ : typ) a = match typ.it with
   | VarT id -> render_con_name qual id a
-  | _ -> "_ {- render_con_name': Typ not id -}"
-
+  | _ -> "_ {- render_con_name': Typ not id " ^ Il.Print.string_of_typ typ ^ " -}"
 
 let render_field_name : atom -> string = function
   | Atom s -> make_id s
@@ -114,12 +113,12 @@ let rec render_exp (exp : exp) = match exp.it with
       | _, _ ->
       render_exp e ^ " /- " ^ Il.Print.string_of_iterexp (iter, vs) ^ " -/"
   end
-  | CaseE (a, e, typ) -> render_case a e typ
+  | CaseE (a, e) -> render_case a e exp.note
   | StrE fields -> braces ( String.concat ", " (List.map (fun (a, e) ->
     render_field_name a ^ " := " ^ render_exp e
     ) fields))
   | SubE _ -> error exp.at "SubE encountered. Did the SubE elimination pass run?"
-  | DotE (_ty, e, a) -> render_dot (render_exp e) a
+  | DotE (e, a) -> render_dot (render_exp e) a
   | UpdE (exp1, path, exp2) ->
     render_path path (render_exp exp1) (fun _ -> render_exp exp2)
   | ExtE (exp1, path, exp2) ->
@@ -152,7 +151,7 @@ and render_idx e_string exp = parens (e_string ^ ".get! " ^ render_exp exp)
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
-  | DotP (path', _, a) ->
+  | DotP (path', a) ->
     render_path path' old_val (fun old_val ->
      "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
     )

@@ -37,7 +37,7 @@ let render_con_name id : atom -> string = function
 
 let render_con_name' (typ : typ) a = match typ.it with
   | VarT id -> render_con_name id a
-  | _ -> "_ {- render_con_name': Typ not id -}"
+  | _ -> "_ {- render_con_name': Typ not id " ^ Il.Print.string_of_typ typ ^ " -}"
 
 let render_field_name : atom -> string = function
   | Atom s -> String.uncapitalize_ascii (make_id s)
@@ -83,9 +83,9 @@ let rec render_exp (exp : exp) = match exp.it with
   | MixE (_, e) -> render_exp e
   | TupE es -> render_tuple render_exp es
   | IterE (e, _) -> render_exp e
-  | CaseE (a, e, typ) -> render_case a e typ
+  | CaseE (a, e) -> render_case a e exp.note
   | SubE (e, typ1, typ2) -> render_variant_inj' typ2 typ1 $$ render_exp e
-  | DotE (_typ, e, a) -> render_exp e ^ "." ^ render_field_name a
+  | DotE (e, a) -> render_exp e ^ "." ^ render_field_name a
   | IdxE (e1, e2) -> parens (render_exp e1 ^ " !! " ^ ("fromIntegral" $$ render_exp e2))
   | BinE (AddOp, e1, e2) -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | _ -> "undefined {- " ^ Il.Print.string_of_exp exp ^ " -}"

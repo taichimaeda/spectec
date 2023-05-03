@@ -138,8 +138,8 @@ and string_of_exp e =
     string_of_exp e1 ^
       "[" ^ string_of_path p ^ " =.. " ^ string_of_exp e2 ^ "]"
   | StrE efs -> "{" ^ concat ", " (List.map string_of_expfield efs) ^ "}"
-  | DotE (t, e1, atom) ->
-    string_of_exp e1 ^ "." ^ string_of_atom atom ^ "_" ^ string_of_typ t
+  | DotE (e1, atom) ->
+    string_of_exp e1 ^ "." ^ string_of_atom atom ^ "_" ^ string_of_typ e1.note
   | CompE (e1, e2) -> string_of_exp e1 ^ " ++ " ^ string_of_exp e2
   | LenE e1 -> "|" ^ string_of_exp e1 ^ "|"
   | TupE es -> "(" ^ string_of_exps ", " es ^ ")"
@@ -150,8 +150,8 @@ and string_of_exp e =
   | TheE e1 -> "!(" ^ string_of_exp e1 ^ ")"
   | ListE es -> "[" ^ string_of_exps " " es ^ "]"
   | CatE (e1, e2) -> string_of_exp e1 ^ " :: " ^ string_of_exp e2
-  | CaseE (atom, e1, t) ->
-    string_of_atom atom ^ "_" ^ string_of_typ t ^ string_of_exp_args e1
+  | CaseE (atom, e1) ->
+    string_of_atom atom ^ "_" ^ string_of_typ e.note ^ string_of_exp_args e1
   | SubE (e1, _t1, t2) ->
     "(" ^ string_of_exp e1 ^ " <: " ^ string_of_typ t2 ^ ")"
 
@@ -174,10 +174,10 @@ and string_of_path p =
     string_of_path p1 ^ "[" ^ string_of_exp e ^ "]"
   | SliceP (p1, e1, e2) ->
     string_of_path p1 ^ "[" ^ string_of_exp e1 ^ " : " ^ string_of_exp e2 ^ "]"
-  | DotP ({it = RootP; _}, t, atom) ->
-    string_of_atom atom ^ "_" ^ string_of_typ t
-  | DotP (p1, t, atom) ->
-    string_of_path p1 ^ "." ^ string_of_atom atom ^ "_" ^ string_of_typ t
+  | DotP ({it = RootP; note; _}, atom) ->
+    string_of_atom atom ^ "_" ^ string_of_typ note
+  | DotP (p1, atom) ->
+    string_of_path p1 ^ "." ^ string_of_atom atom ^ "_" ^ string_of_typ p1.note
 
 and string_of_iterexp (iter, ids) =
   string_of_iter iter ^ "{" ^ String.concat " " (List.map Source.it ids) ^ "}"
@@ -196,7 +196,7 @@ let string_of_binds = function
 
 let rec string_of_prem prem =
   match prem.it with
-  | RulePr (id, op, e) -> id.it ^ ": " ^ string_of_exp (MixE (op, e) $ e.at)
+  | RulePr (id, op, e) -> id.it ^ ": " ^ string_of_exp {e with it = MixE (op, e)}
   | IfPr e -> "if " ^ string_of_exp e
   | ElsePr -> "otherwise"
   | IterPr ({it = IterPr _; _} as prem', iter) ->
@@ -215,7 +215,7 @@ let string_of_rule rule =
     let id' = if id.it = "" then "_" else id.it in
     "\n" ^ region_comment "  " rule.at ^
     "  rule " ^ id' ^ string_of_binds binds ^ ":\n    " ^
-      string_of_exp (MixE (mixop, e) $ e.at) ^
+      string_of_exp {e with it = MixE (mixop, e)} ^
       concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
 let string_of_clause id clause =
