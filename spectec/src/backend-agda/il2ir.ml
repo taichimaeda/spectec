@@ -58,7 +58,12 @@ module Translate = struct
         ApplyE (ApplyE (VarE (unsafe_str (binop op)), exp env e1), exp env e2)
     | CmpE (op, e1, e2) ->
         ApplyE (ApplyE (VarE (unsafe_str (cmpop op)), exp env e1), exp env e2)
-    | IdxE (_e1, _e2) -> YetE ("IdxE: " ^ Print.string_of_exp e)
+    | IdxE (e1, e2) ->
+        ApplyE
+          ( ApplyE (VarE (str "idx"), exp env e1),
+            YetE
+              ("TODO: " ^ Print.string_of_exp e2 ^ " < |"
+             ^ Print.string_of_exp e1 ^ "|") )
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)

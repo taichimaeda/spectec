@@ -130,6 +130,8 @@ let string_of_program prog =
       "forAll _ _ = ?";
       "length : {A : Set} -> List A -> Nat";
       "length _ = ?";
+      "idx : {A : Set} {n : Nat} -> (xs : List A) -> n << length xs -> A";
+      "idx _ _ = ?";
       "";
       Render.program prog;
     ]
