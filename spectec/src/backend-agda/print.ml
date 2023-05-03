@@ -122,8 +122,12 @@ let string_of_program prog =
       "_ ++ _ = ?";
       "maybeMap : {A B : Set} -> (A -> B) -> Maybe A -> Maybe B";
       "maybeMap _ _ = ?";
+      "maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set";
+      "maybeTrue _ _ = ?";
       "map : {A B : Set} -> (A -> B) -> List A -> List B";
       "map _ _ = ?";
+      "forAll : {A : Set} -> (A -> Set) -> List A -> Set";
+      "forAll _ _ = ?";
       "length : {A : Set} -> List A -> Nat";
       "length _ = ?";
       "";

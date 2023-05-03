@@ -85,7 +85,6 @@ module Translate = struct
     | IterE (e, ((List | List1 | ListN _), [ v ])) ->
         ApplyE
           (ApplyE (VarE (str "map"), FunE (id v, exp env e)), Ir.VarE (id v))
-    (* | IterE (e, ((List | List1 | ListN _), [ v ])) -> exp env e *)
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
     | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
@@ -162,13 +161,21 @@ module Translate = struct
         (fun (x, t, iter) -> (id x, List.fold_left iterate_ty (typ env t) iter))
         bs
     in
-    let premise p =
+    let rec premise p =
       match p.it with
       | Ast.RulePr (x, _op, e) -> Ir.ApplyE (VarE (tyid x), (exp env) e)
       | IfPr e -> (exp env) e
       | ElsePr ->
           failwith
             __LOC__ (* Apparently, this should be removed in the middlend *)
+      | IterPr (p', (Opt, [ v ])) ->
+          ApplyE
+            ( ApplyE (VarE (str "maybeTrue"), FunE (id v, premise p')),
+              Ir.VarE (id v) )
+      | IterPr (p', ((List | List1 | ListN _), [ v ])) ->
+          ApplyE
+            ( ApplyE (VarE (str "forAll"), FunE (id v, premise p')),
+              Ir.VarE (id v) )
       | IterPr (_prem, _iter) -> YetE ("IterPr: " ^ "ITER")
     in
 
