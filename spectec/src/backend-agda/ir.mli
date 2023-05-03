@@ -22,7 +22,8 @@ type exp =
   | ProdE of exp list
   | TupleE of exp list
   | ListE of exp
-  | List of exp list
+  | NilE
+  | ConsE of exp * exp
   | MaybeE of exp
   | YetE of string
   | ArrowE of exp * exp

@@ -419,21 +419,21 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , UNREACHABLE record { } ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩
   nop :
     (C : ty-context) ->
-    --------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , NOP record { } ⟩ , ⟨ ([]) , ([]) ⟩ ⟩
+    ----------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , NOP record { } ⟩ , ⟨ [] , [] ⟩ ⟩
   drop :
     (C : ty-context) (t : ty-valtype) ->
-    ---------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , DROP record { } ⟩ , ⟨ (t ∷ []) , ([]) ⟩ ⟩
+    -----------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , DROP record { } ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   select-expl :
     (C : ty-context) (t : ty-valtype) ->
-    --------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?(t) -} ⟩ , ⟨ (I32 record { } ∷ t ∷ t ∷ []) , (t ∷ []) ⟩ ⟩
+    ----------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?(t) -} ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
   select-impl :
     (C : ty-context) (numtype : ty-numtype) (t : ty-valtype) ->
     ? {- CmpE: (t = (numtype <: valtype)) -} ->
-    -------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?() -} ⟩ , ⟨ (I32 record { } ∷ t ∷ t ∷ []) , (t ∷ []) ⟩ ⟩
+    ---------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?() -} ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
   block :
     (C : ty-context) (bt : ty-blocktype) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩ ->
@@ -475,65 +475,65 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , CALL x ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩
   const :
     (C : ty-context) (c-nt : ty-c-numtype) (nt : ty-numtype) ->
-    ---------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , CONST ⟨ nt , c-nt ⟩ ⟩ , ⟨ ([]) , (? {- SubE: (nt <: valtype) -} ∷ []) ⟩ ⟩
+    -----------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , CONST ⟨ nt , c-nt ⟩ ⟩ , ⟨ [] , ? {- SubE: (nt <: valtype) -} ∷ [] ⟩ ⟩
   unop :
     (C : ty-context) (nt : ty-numtype) (unop : ty-unop-numtype) ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , UNOP ⟨ nt , unop ⟩ ⟩ , ⟨ (? {- SubE: (nt <: valtype) -} ∷ []) , (? {- SubE: (nt <: valtype) -} ∷ []) ⟩ ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , UNOP ⟨ nt , unop ⟩ ⟩ , ⟨ ? {- SubE: (nt <: valtype) -} ∷ [] , ? {- SubE: (nt <: valtype) -} ∷ [] ⟩ ⟩
   binop :
     (C : ty-context) (binop : ty-binop-numtype) (nt : ty-numtype) ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , BINOP ⟨ nt , binop ⟩ ⟩ , ⟨ (? {- SubE: (nt <: valtype) -} ∷ ? {- SubE: (nt <: valtype) -} ∷ []) , (? {- SubE: (nt <: valtype) -} ∷ []) ⟩ ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , BINOP ⟨ nt , binop ⟩ ⟩ , ⟨ ? {- SubE: (nt <: valtype) -} ∷ (? {- SubE: (nt <: valtype) -} ∷ []) , ? {- SubE: (nt <: valtype) -} ∷ [] ⟩ ⟩
   testop :
     (C : ty-context) (nt : ty-numtype) (testop : ty-testop-numtype) ->
-    -------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , TESTOP ⟨ nt , testop ⟩ ⟩ , ⟨ (? {- SubE: (nt <: valtype) -} ∷ []) , (I32 record { } ∷ []) ⟩ ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , TESTOP ⟨ nt , testop ⟩ ⟩ , ⟨ ? {- SubE: (nt <: valtype) -} ∷ [] , (I32 record { }) ∷ [] ⟩ ⟩
   relop :
     (C : ty-context) (nt : ty-numtype) (relop : ty-relop-numtype) ->
     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , RELOP ⟨ nt , relop ⟩ ⟩ , ⟨ (? {- SubE: (nt <: valtype) -} ∷ ? {- SubE: (nt <: valtype) -} ∷ []) , (I32 record { } ∷ []) ⟩ ⟩
+    ty-Instr-ok ⟨ ⟨ C , RELOP ⟨ nt , relop ⟩ ⟩ , ⟨ ? {- SubE: (nt <: valtype) -} ∷ (? {- SubE: (nt <: valtype) -} ∷ []) , (I32 record { }) ∷ [] ⟩ ⟩
   local-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ? {- CmpE: (C.LOCAL_context[x] = t) -} ->
-    -----------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , LOCAL-GET x ⟩ , ⟨ ([]) , (t ∷ []) ⟩ ⟩
+    -------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , LOCAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   local-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ? {- CmpE: (C.LOCAL_context[x] = t) -} ->
-    -----------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , LOCAL-SET x ⟩ , ⟨ (t ∷ []) , ([]) ⟩ ⟩
+    -------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , LOCAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   local-tee :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ? {- CmpE: (C.LOCAL_context[x] = t) -} ->
-    -----------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ (t ∷ []) , (t ∷ []) ⟩ ⟩
+    -------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ t ∷ [] , t ∷ [] ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ? {- CmpE: (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t)) -} ->
-    ------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ ([]) , (t ∷ []) ⟩ ⟩
+    --------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ? {- CmpE: (C.GLOBAL_context[x] = `MUT%?%`(?(()), t)) -} ->
-    ------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ (t ∷ []) , ([]) ⟩ ⟩
+    --------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
 data ty-InstrSeq-ok where
   empty :
     (C : ty-context) ->
-    -------------------------------------------------------------
-    ty-InstrSeq-ok ⟨ ⟨ C , ([]) ⟩ , ⟨ ([]) , ([]) ⟩ ⟩
+    -------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , [] ⟩ , ⟨ [] , [] ⟩ ⟩
   seq :
     (C : ty-context) (instr-1 : ty-instr) (instr-2 : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) (t-3 : ty-valtype) ->
     ty-Instr-ok ⟨ ⟨ C , instr-1 ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩ ->
-    ty-InstrSeq-ok ⟨ ⟨ C , (instr-2 ∷ []) ⟩ , ⟨ ? {- IterE: t_2*{t_2} -} , ? {- IterE: t_3*{t_3} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ C , instr-2 ∷ [] ⟩ , ⟨ ? {- IterE: t_2*{t_2} -} , ? {- IterE: t_3*{t_3} -} ⟩ ⟩ ->
     --------------------------------------------------------------------------------------------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , ? {- CatE: [instr_1] :: instr_2*{} -} ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_3*{t_3} -} ⟩ ⟩
   weak :
     (C : ty-context) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ ? {- IterE: t_1*{} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩ ->
-    -----------------------------------------------------------------------------------------------------------------
-    ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ (t-1 ∷ []) , ? {- IterE: t_2*{t_2} -} ⟩ ⟩
+    ---------------------------------------------------------------------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ t-1 ∷ [] , ? {- IterE: t_2*{t_2} -} ⟩ ⟩
   frame :
     (C : ty-context) (instr : ty-instr) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩ ->
@@ -544,7 +544,7 @@ data ty-Expr-ok : (((ty-context × ty-expr) × ty-resulttype)) → Set
 data ty-Expr-ok where
   - :
     (C : ty-context) (instr : ty-instr) (t : ty-valtype) ->
-    ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ ([]) , ? {- IterE: t*{t} -} ⟩ ⟩ ->
+    ty-InstrSeq-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ⟨ [] , ? {- IterE: t*{t} -} ⟩ ⟩ ->
     ----------------------------------------------------------------------------------
     ty-Expr-ok ⟨ ⟨ C , ? {- IterE: instr*{instr} -} ⟩ , ? {- IterE: t*{t} -} ⟩
 
@@ -572,7 +572,7 @@ data ty-Expr-ok-const : (((ty-context × ty-expr) × ty-valtype)) → Set
 data ty-Expr-ok-const where
   - :
     (C : ty-context) (expr : ty-expr) (t : ty-valtype) ->
-    ty-Expr-ok ⟨ ⟨ C , expr ⟩ , (t ∷ []) ⟩ ->
+    ty-Expr-ok ⟨ ⟨ C , expr ⟩ , t ∷ [] ⟩ ->
     ty-Expr-const ⟨ C , expr ⟩ ->
     ---------------------------------------------
     ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩
@@ -845,133 +845,133 @@ data ty-Step-pure : (((List ty-admininstr) × (List ty-admininstr))) → Set
 data ty-Step-pure where
   unreachable :
     -------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (UNREACHABLE record { } ∷ []) , (TRAP record { } ∷ []) ⟩
+    ty-Step-pure ⟨ (UNREACHABLE record { }) ∷ [] , (TRAP record { }) ∷ [] ⟩
   nop :
-    ---------------------------------------------------
-    ty-Step-pure ⟨ (NOP record { } ∷ []) , ([]) ⟩
+    -------------------------------------------------
+    ty-Step-pure ⟨ (NOP record { }) ∷ [] , [] ⟩
   drop :
     (val : ty-val) ->
     ------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (DROP record { } ∷ ? {- SubE: (val <: admininstr) -} ∷ []) , ([]) ⟩
+    ty-Step-pure ⟨ ? {- SubE: (val <: admininstr) -} ∷ ((DROP record { }) ∷ []) , [] ⟩
   select-true :
     (c : ty-c-numtype) (t : ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
     ? {- CmpE: (c =/= 0) -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (SELECT ? {- IterE: t?{t} -} ∷ CONST ⟨ I32 record { } , c ⟩ ∷ ? {- SubE: (val_2 <: admininstr) -} ∷ ? {- SubE: (val_1 <: admininstr) -} ∷ []) , (? {- SubE: (val_1 <: admininstr) -} ∷ []) ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- SubE: (val_1 <: admininstr) -} ∷ (? {- SubE: (val_2 <: admininstr) -} ∷ ((CONST ⟨ I32 record { } , c ⟩) ∷ ((SELECT ? {- IterE: t?{t} -}) ∷ []))) , ? {- SubE: (val_1 <: admininstr) -} ∷ [] ⟩
   select-false :
     (c : ty-c-numtype) (t : ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
     ? {- CmpE: (c = 0) -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (SELECT ? {- IterE: t?{t} -} ∷ CONST ⟨ I32 record { } , c ⟩ ∷ ? {- SubE: (val_2 <: admininstr) -} ∷ ? {- SubE: (val_1 <: admininstr) -} ∷ []) , (? {- SubE: (val_2 <: admininstr) -} ∷ []) ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- SubE: (val_1 <: admininstr) -} ∷ (? {- SubE: (val_2 <: admininstr) -} ∷ ((CONST ⟨ I32 record { } , c ⟩) ∷ ((SELECT ? {- IterE: t?{t} -}) ∷ []))) , ? {- SubE: (val_2 <: admininstr) -} ∷ [] ⟩
   block :
     (bt : ty-blocktype) (instr : ty-instr) (k : Nat) (n : ty-n) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) ->
     ? {- CmpE: (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2})) -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ? {- CatE: (val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})] -} , (LABEL- ⟨ ⟨ n , ([]) ⟩ , ? {- CatE: (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- CatE: (val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})] -} , (LABEL- ⟨ ⟨ n , [] ⟩ , ? {- CatE: (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] ⟩
   loop :
     (bt : ty-blocktype) (instr : ty-instr) (k : Nat) (n : ty-n) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) ->
     ? {- CmpE: (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2})) -} ->
     -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ? {- CatE: (val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})] -} , (LABEL- ⟨ ⟨ n , (LOOP ⟨ bt , ? {- IterE: instr*{instr} -} ⟩ ∷ []) ⟩ , ? {- CatE: (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) ⟩
+    ty-Step-pure ⟨ ? {- CatE: (val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})] -} , (LABEL- ⟨ ⟨ n , (LOOP ⟨ bt , ? {- IterE: instr*{instr} -} ⟩) ∷ [] ⟩ , ? {- CatE: (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] ⟩
   if-true :
     (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : ty-instr) (instr-2 : ty-instr) ->
     ? {- CmpE: (c =/= 0) -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (IF ⟨ ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩ , ? {- IterE: instr_2*{instr_2} -} ⟩ ∷ CONST ⟨ I32 record { } , c ⟩ ∷ []) , (BLOCK ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩ ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ I32 record { } , c ⟩) ∷ ((IF ⟨ ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩ , ? {- IterE: instr_2*{instr_2} -} ⟩) ∷ []) , (BLOCK ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩) ∷ [] ⟩
   if-false :
     (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : ty-instr) (instr-2 : ty-instr) ->
     ? {- CmpE: (c = 0) -} ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (IF ⟨ ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩ , ? {- IterE: instr_2*{instr_2} -} ⟩ ∷ CONST ⟨ I32 record { } , c ⟩ ∷ []) , (BLOCK ⟨ bt , ? {- IterE: instr_2*{instr_2} -} ⟩ ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ I32 record { } , c ⟩) ∷ ((IF ⟨ ⟨ bt , ? {- IterE: instr_1*{instr_1} -} ⟩ , ? {- IterE: instr_2*{instr_2} -} ⟩) ∷ []) , (BLOCK ⟨ bt , ? {- IterE: instr_2*{instr_2} -} ⟩) ∷ [] ⟩
   label-vals :
     (instr : ty-instr) (n : ty-n) (val : ty-val) ->
     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr*{instr} -} ⟩ , ? {- IterE: (val <: admininstr)*{val} -} ⟩ ∷ []) , ? {- IterE: (val <: admininstr)*{val} -} ⟩
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr*{instr} -} ⟩ , ? {- IterE: (val <: admininstr)*{val} -} ⟩) ∷ [] , ? {- IterE: (val <: admininstr)*{val} -} ⟩
   br-zero :
     (instr : ty-instr) (instr' : ty-instr) (n : ty-n) (val : ty-val) (val' : ty-val) ->
     ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) , ? {- CatE: (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'} -} ⟩
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] , ? {- CatE: (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'} -} ⟩
   br-succ :
     (instr : ty-instr) (instr' : ty-instr) (l : ty-labelidx) (n : ty-n) (val : ty-val) ->
     ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val <: admininstr)*{val} :: [BR_admininstr(l + 1)] :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) , ? {- CatE: (val <: admininstr)*{val} :: [BR_admininstr(l)] -} ⟩
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val <: admininstr)*{val} :: [BR_admininstr(l + 1)] :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] , ? {- CatE: (val <: admininstr)*{val} :: [BR_admininstr(l)] -} ⟩
   br-if-true :
     (c : ty-c-numtype) (l : ty-labelidx) ->
     ? {- CmpE: (c =/= 0) -} ->
-    ------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (BR-IF l ∷ CONST ⟨ I32 record { } , c ⟩ ∷ []) , (BR l ∷ []) ⟩
+    ----------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ I32 record { } , c ⟩) ∷ ((BR-IF l) ∷ []) , (BR l) ∷ [] ⟩
   br-if-false :
     (c : ty-c-numtype) (l : ty-labelidx) ->
     ? {- CmpE: (c = 0) -} ->
-    ---------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (BR-IF l ∷ CONST ⟨ I32 record { } , c ⟩ ∷ []) , ([]) ⟩
+    -----------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ I32 record { } , c ⟩) ∷ ((BR-IF l) ∷ []) , [] ⟩
   frame-vals :
     (f : ty-frame) (n : ty-n) (val : ty-val) ->
     --------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ? {- IterE: (val <: admininstr)^n{val} -} ⟩ ∷ []) , ? {- IterE: (val <: admininstr)^n{val} -} ⟩
+    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ? {- IterE: (val <: admininstr)^n{val} -} ⟩) ∷ [] , ? {- IterE: (val <: admininstr)^n{val} -} ⟩
   return-frame :
     (f : ty-frame) (instr : ty-instr) (n : ty-n) (val : ty-val) (val' : ty-val) ->
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ? {- CatE: (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) , ? {- IterE: (val <: admininstr)^n{val} -} ⟩
+    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ? {- CatE: (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] , ? {- IterE: (val <: admininstr)^n{val} -} ⟩
   return-label :
     (instr : ty-instr) (instr' : ty-instr) (k : Nat) (val : ty-val) ->
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ k , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val <: admininstr)*{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr} -} ⟩ ∷ []) , ? {- CatE: (val <: admininstr)*{val} :: [RETURN_admininstr] -} ⟩
+    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ k , ? {- IterE: instr'*{instr'} -} ⟩ , ? {- CatE: (val <: admininstr)*{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr} -} ⟩) ∷ [] , ? {- CatE: (val <: admininstr)*{val} :: [RETURN_admininstr] -} ⟩
   unop-val :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
     ? {- CmpE: ($unop(unop, nt, c_1) = [c]) -} ->
-    ---------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (UNOP ⟨ nt , unop ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (CONST ⟨ nt , c ⟩ ∷ []) ⟩
+    -------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((UNOP ⟨ nt , unop ⟩) ∷ []) , (CONST ⟨ nt , c ⟩) ∷ [] ⟩
   unop-trap :
     (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
     ? {- CmpE: ($unop(unop, nt, c_1) = []) -} ->
-    ----------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (UNOP ⟨ nt , unop ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (TRAP record { } ∷ []) ⟩
+    --------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((UNOP ⟨ nt , unop ⟩) ∷ []) , (TRAP record { }) ∷ [] ⟩
   binop-val :
     (binop : ty-binop-numtype) (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
     ? {- CmpE: ($binop(binop, nt, c_1, c_2) = [c]) -} ->
-    --------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (BINOP ⟨ nt , binop ⟩ ∷ CONST ⟨ nt , c-2 ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (CONST ⟨ nt , c ⟩ ∷ []) ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((BINOP ⟨ nt , binop ⟩) ∷ [])) , (CONST ⟨ nt , c ⟩) ∷ [] ⟩
   binop-trap :
     (binop : ty-binop-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
     ? {- CmpE: ($binop(binop, nt, c_1, c_2) = []) -} ->
-    ---------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (BINOP ⟨ nt , binop ⟩ ∷ CONST ⟨ nt , c-2 ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (TRAP record { } ∷ []) ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((BINOP ⟨ nt , binop ⟩) ∷ [])) , (TRAP record { }) ∷ [] ⟩
   testop :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (testop : ty-testop-numtype) ->
     ? {- CmpE: (c = $testop(testop, nt, c_1)) -} ->
-    -------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (TESTOP ⟨ nt , testop ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (CONST ⟨ I32 record { } , c ⟩ ∷ []) ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((TESTOP ⟨ nt , testop ⟩) ∷ []) , (CONST ⟨ I32 record { } , c ⟩) ∷ [] ⟩
   relop :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) (relop : ty-relop-numtype) ->
     ? {- CmpE: (c = $relop(relop, nt, c_1, c_2)) -} ->
-    --------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (RELOP ⟨ nt , relop ⟩ ∷ CONST ⟨ nt , c-2 ⟩ ∷ CONST ⟨ nt , c-1 ⟩ ∷ []) , (CONST ⟨ I32 record { } , c ⟩ ∷ []) ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((RELOP ⟨ nt , relop ⟩) ∷ [])) , (CONST ⟨ I32 record { } , c ⟩) ∷ [] ⟩
   local-tee :
     (val : ty-val) (x : ty-idx) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LOCAL-TEE x ∷ ? {- SubE: (val <: admininstr) -} ∷ []) , (LOCAL-SET x ∷ ? {- SubE: (val <: admininstr) -} ∷ ? {- SubE: (val <: admininstr) -} ∷ []) ⟩
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ? {- SubE: (val <: admininstr) -} ∷ ((LOCAL-TEE x) ∷ []) , ? {- SubE: (val <: admininstr) -} ∷ (? {- SubE: (val <: admininstr) -} ∷ ((LOCAL-SET x) ∷ [])) ⟩
 
 data ty-Step-read : ((ty-config × (List ty-admininstr))) → Set
 data ty-Step-read where
   call :
     (x : ty-idx) (z : ty-state) ->
     ---------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (CALL x ∷ []) ⟩ , (CALL-ADDR ? {- IdxE: $funcaddr(z)[x] -} ∷ []) ⟩
+    ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ? {- IdxE: $funcaddr(z)[x] -}) ∷ [] ⟩
   call-addr :
     (a : ty-addr) (f : ty-frame) (instr : ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) (val : ty-val) (z : ty-state) ->
     ? {- CmpE: ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr}))) -} ->
     ? {- CmpE: (f = {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m}) -} ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , ? {- CatE: (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)] -} ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , ([]) ⟩ , ? {- IterE: (instr <: admininstr)*{instr} -} ⟩ ∷ []) ⟩ ∷ []) ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ? {- CatE: (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)] -} ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , ? {- IterE: (instr <: admininstr)*{instr} -} ⟩) ∷ [] ⟩) ∷ [] ⟩
   local-get :
     (x : ty-idx) (z : ty-state) ->
-    -----------------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (LOCAL-GET x ∷ []) ⟩ , (? {- SubE: ($local(z, x) <: admininstr) -} ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , (LOCAL-GET x) ∷ [] ⟩ , ? {- SubE: ($local(z, x) <: admininstr) -} ∷ [] ⟩
   global-get :
     (x : ty-idx) (z : ty-state) ->
-    -------------------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (GLOBAL-GET x ∷ []) ⟩ , (? {- SubE: ($global(z, x) <: admininstr) -} ∷ []) ⟩
+    -----------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , (GLOBAL-GET x) ∷ [] ⟩ , ? {- SubE: ($global(z, x) <: admininstr) -} ∷ [] ⟩
 
 data ty-Step : ((ty-config × ty-config)) → Set
 data ty-Step where
@@ -988,11 +988,11 @@ data ty-Step where
   local-set :
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
     -----------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step ⟨ ⟨ z , (LOCAL-SET x ∷ ? {- SubE: (val <: admininstr) -} ∷ []) ⟩ , ⟨ $with-local ⟨ ⟨ z , x ⟩ , val ⟩ , ([]) ⟩ ⟩
+    ty-Step ⟨ ⟨ z , ? {- SubE: (val <: admininstr) -} ∷ ((LOCAL-SET x) ∷ []) ⟩ , ⟨ $with-local ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
   global-set :
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
     -------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step ⟨ ⟨ z , (GLOBAL-SET x ∷ ? {- SubE: (val <: admininstr) -} ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , ([]) ⟩ ⟩
+    ty-Step ⟨ ⟨ z , ? {- SubE: (val <: admininstr) -} ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
 default/test-agda/output.agda:322,1-325,72
@@ -1062,14 +1062,14 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:466,5-6
   default/test-agda/output.agda:468,38-39
   default/test-agda/output.agda:468,65-66
-  default/test-agda/output.agda:472,59-60
-  default/test-agda/output.agda:476,51-52
-  default/test-agda/output.agda:476,90-91
-  default/test-agda/output.agda:480,53-54
+  default/test-agda/output.agda:472,56-57
+  default/test-agda/output.agda:476,50-51
+  default/test-agda/output.agda:476,87-88
+  default/test-agda/output.agda:480,52-53
   default/test-agda/output.agda:480,85-86
-  default/test-agda/output.agda:480,124-125
-  default/test-agda/output.agda:484,55-56
-  default/test-agda/output.agda:488,53-54
+  default/test-agda/output.agda:480,123-124
+  default/test-agda/output.agda:484,54-55
+  default/test-agda/output.agda:488,52-53
   default/test-agda/output.agda:488,85-86
   default/test-agda/output.agda:491,5-6
   default/test-agda/output.agda:496,5-6
@@ -1078,8 +1078,8 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:511,5-6
   default/test-agda/output.agda:521,39-40
   default/test-agda/output.agda:521,66-67
-  default/test-agda/output.agda:522,49-50
-  default/test-agda/output.agda:522,76-77
+  default/test-agda/output.agda:522,47-48
+  default/test-agda/output.agda:522,74-75
   default/test-agda/output.agda:524,28-29
   default/test-agda/output.agda:524,72-73
   default/test-agda/output.agda:524,99-100
@@ -1087,7 +1087,7 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:527,63-64
   default/test-agda/output.agda:527,87-88
   default/test-agda/output.agda:529,28-29
-  default/test-agda/output.agda:529,76-77
+  default/test-agda/output.agda:529,74-75
   default/test-agda/output.agda:532,28-29
   default/test-agda/output.agda:532,63-64
   default/test-agda/output.agda:532,90-91
@@ -1095,7 +1095,7 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:534,63-64
   default/test-agda/output.agda:534,98-99
   default/test-agda/output.agda:540,28-29
-  default/test-agda/output.agda:540,70-71
+  default/test-agda/output.agda:540,68-69
   default/test-agda/output.agda:542,24-25
   default/test-agda/output.agda:542,57-58
   default/test-agda/output.agda:552,5-6
@@ -1124,32 +1124,32 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:829,11-12
   default/test-agda/output.agda:832,12-13
   default/test-agda/output.agda:835,11-12
-  default/test-agda/output.agda:848,39-40
+  default/test-agda/output.agda:848,20-21
   default/test-agda/output.agda:851,5-6
-  default/test-agda/output.agda:853,28-29
-  default/test-agda/output.agda:853,82-83
-  default/test-agda/output.agda:853,120-121
-  default/test-agda/output.agda:853,165-166
+  default/test-agda/output.agda:853,20-21
+  default/test-agda/output.agda:853,59-60
+  default/test-agda/output.agda:853,140-141
+  default/test-agda/output.agda:853,172-173
   default/test-agda/output.agda:856,5-6
-  default/test-agda/output.agda:858,28-29
-  default/test-agda/output.agda:858,82-83
-  default/test-agda/output.agda:858,120-121
-  default/test-agda/output.agda:858,165-166
+  default/test-agda/output.agda:858,20-21
+  default/test-agda/output.agda:858,59-60
+  default/test-agda/output.agda:858,140-141
+  default/test-agda/output.agda:858,172-173
   default/test-agda/output.agda:861,5-6
   default/test-agda/output.agda:863,20-21
-  default/test-agda/output.agda:863,129-130
+  default/test-agda/output.agda:863,127-128
   default/test-agda/output.agda:866,5-6
   default/test-agda/output.agda:868,20-21
   default/test-agda/output.agda:868,132-133
   default/test-agda/output.agda:868,173-174
   default/test-agda/output.agda:871,5-6
-  default/test-agda/output.agda:873,33-34
-  default/test-agda/output.agda:873,70-71
-  default/test-agda/output.agda:873,158-159
+  default/test-agda/output.agda:873,67-68
+  default/test-agda/output.agda:873,104-105
+  default/test-agda/output.agda:873,162-163
   default/test-agda/output.agda:876,5-6
-  default/test-agda/output.agda:878,33-34
-  default/test-agda/output.agda:878,70-71
-  default/test-agda/output.agda:878,158-159
+  default/test-agda/output.agda:878,67-68
+  default/test-agda/output.agda:878,104-105
+  default/test-agda/output.agda:878,162-163
   default/test-agda/output.agda:882,36-37
   default/test-agda/output.agda:882,69-70
   default/test-agda/output.agda:882,120-121
@@ -1174,16 +1174,16 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:930,5-6
   default/test-agda/output.agda:935,5-6
   default/test-agda/output.agda:940,5-6
-  default/test-agda/output.agda:946,35-36
-  default/test-agda/output.agda:946,92-93
-  default/test-agda/output.agda:946,128-129
+  default/test-agda/output.agda:946,20-21
+  default/test-agda/output.agda:946,79-80
+  default/test-agda/output.agda:946,116-117
   default/test-agda/output.agda:953,55-56
   default/test-agda/output.agda:956,5-6
   default/test-agda/output.agda:957,5-6
   default/test-agda/output.agda:959,26-27
-  default/test-agda/output.agda:959,147-148
-  default/test-agda/output.agda:963,50-51
-  default/test-agda/output.agda:967,51-52
+  default/test-agda/output.agda:959,145-146
+  default/test-agda/output.agda:963,49-50
+  default/test-agda/output.agda:967,50-51
   default/test-agda/output.agda:973,20-21
   default/test-agda/output.agda:973,67-68
   default/test-agda/output.agda:975,21-22
@@ -1192,8 +1192,8 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:978,75-76
   default/test-agda/output.agda:980,21-22
   default/test-agda/output.agda:980,76-77
-  default/test-agda/output.agda:984,36-37
-  default/test-agda/output.agda:988,37-38
+  default/test-agda/output.agda:984,21-22
+  default/test-agda/output.agda:988,21-22
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.

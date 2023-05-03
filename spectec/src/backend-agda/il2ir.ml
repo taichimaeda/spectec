@@ -47,7 +47,8 @@ module Translate = struct
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE _eo -> YetE ("OptE: " ^ Print.string_of_exp e)
     | TheE _e1 -> YetE ("TheE: " ^ Print.string_of_exp e)
-    | ListE es -> List (List.map (exp env) es)
+    | ListE es ->
+        List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE
     | CatE (_e1, _e2) -> YetE ("CatE: " ^ Print.string_of_exp e)
     | CaseE (a, e, _) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)

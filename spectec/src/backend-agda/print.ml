@@ -7,10 +7,6 @@ let id (Ir.Id str) =
   in
   if List.mem str keywords then str ^ "'" else str
 
-(* let list strs = "[ " ^ String.concat " , " strs ^ " ]" *)
-let list strs =
-  "(" ^ List.fold_left (fun lst str -> str ^ " ∷ " ^ lst) "[]" strs ^ ")"
-
 let fold_left op default str =
   match str with
   | [] -> default
@@ -46,17 +42,18 @@ module Render = struct
     | ArrowE (e1, e2) -> atomic_exp e1 ^ " → " ^ atomic_exp e2
     | ApplyE (e1, e2) -> atomic_exp e1 ^ " " ^ atomic_exp e2
     | DotE (e, t, f) -> id t ^ "." ^ id f ^ " " ^ atomic_exp e
-    | List (_ :: _ as es) -> list (List.map exp es)
-    | (VarE _ | ConstE _ | TupleE _ | List [] | YetE _) as e -> atomic_exp e
+    | ConsE (e1, e2) -> atomic_exp e1 ^ " ∷ " ^ atomic_exp e2
+    | (VarE _ | ConstE _ | TupleE _ | NilE | YetE _) as e -> atomic_exp e
 
   and atomic_exp = function
     | Ir.VarE i -> id i
     | ConstE c -> const c
     | TupleE es ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "record { }" (List.map exp es)
-    | List es -> list (List.map exp es)
+    | NilE -> "[]"
     | YetE s -> "? " ^ comment s
-    | (ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _) as e ->
+    | (ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _ | ConsE _) as
+      e ->
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =
