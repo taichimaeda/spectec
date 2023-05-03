@@ -81,7 +81,8 @@ module Translate = struct
     | TheE _e1 -> YetE ("TheE: " ^ Print.string_of_exp e)
     | ListE es ->
         List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE
-    | CatE (_e1, _e2) -> YetE ("CatE: " ^ Print.string_of_exp e)
+    | CatE (e1, e2) ->
+        ApplyE (ApplyE (VarE (unsafe_str "_++_"), exp env e1), exp env e2)
     | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
