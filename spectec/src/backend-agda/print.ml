@@ -1,11 +1,6 @@
 let comment s = "{- " ^ s ^ " -}"
 let keywords = [ "in"; "module" ]
-
-let id (Ir.Id str) =
-  let str =
-    String.map (function '_' | '.' -> '-' | ';' -> ',' | c -> c) str
-  in
-  if List.mem str keywords then str ^ "'" else str
+let id (Ir.Id str) = if List.mem str keywords then str ^ "'" else str
 
 let fold_left op default str =
   match str with
@@ -110,6 +105,12 @@ let string_of_program prog =
       "";
       "data _×_ (A B : Set) : Set where";
       "  ⟨_,_⟩ : A → B → A × B";
+      "data _===_ : {A : Set} -> A -> A -> Set where";
+      "data _=/=_ : {A : Set} -> A -> A -> Set where";
+      "data _<<_ : {A : Set} -> A -> A -> Set where";
+      "data _>_ : {A : Set} -> A -> A -> Set where";
+      "data _<=_ : {A : Set} -> A -> A -> Set where";
+      "data _>=_ : {A : Set} -> A -> A -> Set where";
       "";
       Render.program prog;
     ]

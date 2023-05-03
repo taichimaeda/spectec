@@ -5,7 +5,12 @@ module Translate = struct
   type _env = unit
 
   let initial_env = ()
-  let str i = Ir.Id i
+  let unsafe_str i = Ir.Id i
+
+  let str i =
+    unsafe_str
+      (String.map (function '_' | '.' -> '-' | ';' -> ',' | c -> c) i)
+
   let tyid i = str ("ty-" ^ i.it)
   let id i = str i.it
   let funid i = str ("$" ^ i.it)
@@ -21,15 +26,38 @@ module Translate = struct
     | IterT (t, Opt) -> MaybeE ((typ env) t)
     | IterT (t, (List | List1 | ListN _)) -> ListE ((typ env) t)
 
+  let unop = function Ast.NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
+
+  let binop = function
+    | Ast.AndOp -> "_/\\_"
+    | OrOp -> "_\\/_"
+    | ImplOp -> "_=>_"
+    | EquivOp -> "_<=>_"
+    | AddOp -> "_+_"
+    | SubOp -> "_-_"
+    | MulOp -> "_*_"
+    | DivOp -> "_/_"
+    | ExpOp -> "_^_"
+
+  let cmpop = function
+    | Ast.EqOp -> "_===_"
+    | NeOp -> "_=/=_"
+    | LtOp -> "_<<_"
+    | GtOp -> "_>_"
+    | LeOp -> "_<=_"
+    | GeOp -> "_>=_"
+
   let rec exp env e =
     match e.it with
     | Ast.VarE n -> Ir.VarE (id n)
     | BoolE b -> ConstE (Bool b)
     | NatE n -> ConstE (Nat n)
     | TextE t -> ConstE (Text t)
-    | UnE (_op, _e2) -> YetE ("UnE: " ^ Print.string_of_exp e)
-    | BinE (_op, _e1, _e2) -> YetE ("BinE: " ^ Print.string_of_exp e)
-    | CmpE (_op, _e1, _e2) -> YetE ("CmpE: " ^ Print.string_of_exp e)
+    | UnE (op, e) -> ApplyE (VarE (unsafe_str (unop op)), exp env e)
+    | BinE (op, e1, e2) ->
+        ApplyE (ApplyE (VarE (unsafe_str (binop op)), exp env e1), exp env e2)
+    | CmpE (op, e1, e2) ->
+        ApplyE (ApplyE (VarE (unsafe_str (cmpop op)), exp env e1), exp env e2)
     | IdxE (_e1, _e2) -> YetE ("IdxE: " ^ Print.string_of_exp e)
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (_e1, _p, _e2) -> YetE ("UpdE: " ^ Print.string_of_exp e)
