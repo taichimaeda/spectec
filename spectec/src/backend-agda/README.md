@@ -28,7 +28,7 @@ A list of minor issues that need to be resolved at some point. (We are working o
 - use a pretty-printer for Agda output
 - translate the following from `Il` to `Ir`:
   - `CatE`
-  - `CmpE`
+  - `CompE`
   - `IdxE`
   - `IterE`
   - `IterPr`

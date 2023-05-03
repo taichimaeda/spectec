@@ -14,12 +14,12 @@ open import Agda.Builtin.Unit
 
 data _×_ (A B : Set) : Set where
   ⟨_,_⟩ : A → B → A × B
-data _===_ : {A : Set} -> A -> A -> Set where
-data _=/=_ : {A : Set} -> A -> A -> Set where
-data _<<_ : {A : Set} -> A -> A -> Set where
-data _>_ : {A : Set} -> A -> A -> Set where
-data _<=_ : {A : Set} -> A -> A -> Set where
-data _>=_ : {A : Set} -> A -> A -> Set where
+data _===_ {A : Set} : A -> A -> Set where
+data _=/=_ {A : Set} : A -> A -> Set where
+data _<<_ {A : Set} : A -> A -> Set where
+data _>_ {A : Set} : A -> A -> Set where
+data _<=_ {A : Set} : A -> A -> Set where
+data _>=_ {A : Set} : A -> A -> Set where
 
 ty-n : Set
 ty-n  = Nat
@@ -433,13 +433,13 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , DROP record { } ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   select-expl :
     (C : ty-context) (t : ty-valtype) ->
-    ----------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?(t) -} ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
+    ------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT (just t) ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
   select-impl :
     (C : ty-context) (numtype : ty-numtype) (t : ty-valtype) ->
     (_===_ t) ? {- SubE: (numtype <: valtype) -} ->
-    ---------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT ? {- OptE: ?() -} ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
+    -----------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT nothing ⟩ , ⟨ t ∷ (t ∷ ((I32 record { }) ∷ [])) , t ∷ [] ⟩ ⟩
   block :
     (C : ty-context) (bt : ty-blocktype) (instr : ty-instr) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ ? {- IterE: t_1*{t_1} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩ ->
@@ -471,7 +471,7 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , BR-IF l ⟩ , ⟨ ? {- CatE: t*{t} :: [I32_valtype] -} , ? {- IterE: t*{t} -} ⟩ ⟩
   return :
     (C : ty-context) (t : ty-valtype) (t-1 : ty-valtype) (t-2 : ty-valtype) ->
-    (_===_ (ty-context.RETURNS C)) ? {- OptE: ?(t*{t}) -} ->
+    (_===_ (ty-context.RETURNS C)) (just ? {- IterE: t*{t} -}) ->
     -----------------------------------------------------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , RETURN record { } ⟩ , ⟨ ? {- CatE: t_1*{t_1} :: t*{t} -} , ? {- IterE: t_2*{t_2} -} ⟩ ⟩
   call :
@@ -521,7 +521,7 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ ? {- OptE: ?(()) -} , t ⟩ ->
+    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ just record { } , t ⟩ ->
     --------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
 data ty-InstrSeq-ok where
@@ -562,7 +562,7 @@ data ty-Instr-const where
     ty-Instr-const ⟨ C , CONST ⟨ nt , c ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ ? {- OptE: ?() -} , t ⟩ ->
+    (_===_ ? {- IdxE: C.GLOBAL_context[x] -}) ⟨ nothing , t ⟩ ->
     ---------------------------------------
     ty-Instr-const ⟨ C , GLOBAL-GET x ⟩
 
@@ -1015,13 +1015,15 @@ default/test-agda/output.agda:660,1-18
 Incomplete pattern matching for $default-. Missing cases:
   $default- (BOT x)
 when checking the definition of $default-
+Unsolved constraints
 Unsolved metas at the following locations:
   default/test-agda/output.agda:457,6-11
   default/test-agda/output.agda:462,6-11
   default/test-agda/output.agda:472,45-100
   default/test-agda/output.agda:512,47-75
-  default/test-agda/output.agda:517,47-74
-  default/test-agda/output.agda:558,47-72
+  default/test-agda/output.agda:517,49-53
+  default/test-agda/output.agda:517,54-64
+  default/test-agda/output.agda:558,49-56
   default/test-agda/output.agda:603,47-49
   default/test-agda/output.agda:603,52-54
   default/test-agda/output.agda:962,49-168
@@ -1030,9 +1032,7 @@ Unsolved metas at the following locations:
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:418,54-55
   default/test-agda/output.agda:418,81-82
-  default/test-agda/output.agda:430,32-33
   default/test-agda/output.agda:433,15-16
-  default/test-agda/output.agda:435,32-33
   default/test-agda/output.agda:438,38-39
   default/test-agda/output.agda:438,65-66
   default/test-agda/output.agda:439,24-25
@@ -1073,7 +1073,7 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:462,46-47
   default/test-agda/output.agda:464,39-40
   default/test-agda/output.agda:464,78-79
-  default/test-agda/output.agda:467,36-37
+  default/test-agda/output.agda:467,42-43
   default/test-agda/output.agda:469,49-50
   default/test-agda/output.agda:469,84-85
   default/test-agda/output.agda:472,12-13
@@ -1096,7 +1096,6 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:512,12-13
   default/test-agda/output.agda:512,49-50
   default/test-agda/output.agda:517,12-13
-  default/test-agda/output.agda:517,49-50
   default/test-agda/output.agda:527,39-40
   default/test-agda/output.agda:527,66-67
   default/test-agda/output.agda:528,47-48
@@ -1120,7 +1119,6 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:548,24-25
   default/test-agda/output.agda:548,57-58
   default/test-agda/output.agda:558,12-13
-  default/test-agda/output.agda:558,49-50
   default/test-agda/output.agda:566,5-6
   default/test-agda/output.agda:568,25-26
   default/test-agda/output.agda:583,18-19

@@ -105,12 +105,12 @@ let string_of_program prog =
       "";
       "data _×_ (A B : Set) : Set where";
       "  ⟨_,_⟩ : A → B → A × B";
-      "data _===_ : {A : Set} -> A -> A -> Set where";
-      "data _=/=_ : {A : Set} -> A -> A -> Set where";
-      "data _<<_ : {A : Set} -> A -> A -> Set where";
-      "data _>_ : {A : Set} -> A -> A -> Set where";
-      "data _<=_ : {A : Set} -> A -> A -> Set where";
-      "data _>=_ : {A : Set} -> A -> A -> Set where";
+      "data _===_ {A : Set} : A -> A -> Set where";
+      "data _=/=_ {A : Set} : A -> A -> Set where";
+      "data _<<_ {A : Set} : A -> A -> Set where";
+      "data _>_ {A : Set} : A -> A -> Set where";
+      "data _<=_ {A : Set} : A -> A -> Set where";
+      "data _>=_ {A : Set} : A -> A -> Set where";
       "";
       Render.program prog;
     ]
