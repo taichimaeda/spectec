@@ -8,7 +8,8 @@ let id (Ir.Id str) =
   if List.mem str keywords then str ^ "'" else str
 
 (* let list strs = "[ " ^ String.concat " , " strs ^ " ]" *)
-let list strs = List.fold_left (fun lst str -> str ^ " ∷ " ^ lst) "[]" strs
+let list strs =
+  "(" ^ List.fold_left (fun lst str -> str ^ " ∷ " ^ lst) "[]" strs ^ ")"
 
 let fold_left op default str =
   match str with
@@ -42,9 +43,9 @@ module Render = struct
     | MaybeE e -> "Maybe (" ^ exp e ^ ")"
     | ListE e -> "List (" ^ exp e ^ ")"
     | ArrowE (e1, e2) -> exp e1 ^ " → " ^ exp e2
-    | ApplyE (e1, e2) -> exp e1 ^ " " ^ exp e2
+    | ApplyE (e1, e2) -> "(" ^ exp e1 ^ " " ^ exp e2 ^ ")"
     | List es -> list (List.map exp es)
-    | DotE (e, t, f) -> id t ^ "." ^ id f ^ " (" ^ exp e ^ ")"
+    | DotE (e, t, f) -> "(" ^ id t ^ "." ^ id f ^ " (" ^ exp e ^ "))"
     | Ir.YetE s -> "? " ^ comment s
 
   let cons (i, bs, prems, t) =
