@@ -26,7 +26,6 @@ A backend translating a Wasm specification into Agda.
 A list of minor issues that need to be resolved at some point. (We are working on a branch and we do not want to pollute the main GitHub repo with them.)
 
 - use a pretty-printer for Agda output
-- expand products in constructor types and tuples in constructor arguments
 - switch to Agda standard library
 - use size proofs when indexing
 

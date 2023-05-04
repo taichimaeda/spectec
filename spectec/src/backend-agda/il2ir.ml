@@ -120,7 +120,8 @@ module Translate = struct
           (fun e lst -> builtin_infix "∷" (exp env e) lst)
           es (builtin_const "[]")
     | CatE (e1, e2) -> builtin_infix "++" (exp env e1) (exp env e2)
-    | CaseE (a, e) -> ApplyE (VarE (atom a), exp env e)
+    | CaseE (a, { it = TupE es; _ }) -> CaseE (atom a, List.map (exp env) es)
+    | CaseE (a, e) -> CaseE (atom a, [ exp env e ])
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
   and update_path env path old_val (k : Ir.exp -> Ir.exp) =
@@ -144,7 +145,7 @@ module Translate = struct
     | TextE t -> ConstP (Text t)
     | UnE (_op, _e2) -> YetP ("UnE: " ^ Print.string_of_exp e)
     | BinE (AddOp, e, { it = Ast.NatE 1; _ }) ->
-        CaseP (unsafe_str "suc", pat env e)
+        CaseP (unsafe_str "suc", [ pat env e ])
     | BinE (_op, _e1, _e2) -> YetP ("BinE: " ^ Print.string_of_exp e)
     | CmpE (_op, _e1, _e2) -> YetP ("CmpE: " ^ Print.string_of_exp e)
     | IdxE (_e1, _e2) -> YetP ("IdxE: " ^ Print.string_of_exp e)
@@ -165,7 +166,8 @@ module Translate = struct
     | TheE _e1 -> YetP ("TheE: " ^ Print.string_of_exp e)
     | ListE _es -> YetP ("ListE: " ^ Print.string_of_exp e)
     | CatE (_e1, _e2) -> YetP ("CatE: " ^ Print.string_of_exp e)
-    | CaseE (a, e) -> CaseP (atom a, pat env e)
+    | CaseE (a, { it = TupE es; _ }) -> CaseP (atom a, List.map (pat env) es)
+    | CaseE (a, e) -> CaseP (atom a, [ pat env e ])
     | SubE (_e1, _t1, _t2) -> YetP ("SubE: " ^ Print.string_of_exp e)
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)
@@ -181,7 +183,12 @@ module Translate = struct
             ConstE SetC,
             List.map
               (fun (a, t, _hints) ->
-                (atom a, [], [ (typ env) t ], Ir.VarE (tyid x)))
+                ( atom a,
+                  [],
+                  (match t.it with
+                  | Ast.TupT ts -> List.map (typ env) ts
+                  | _ -> [ typ env t ]),
+                  Ir.VarE (tyid x) ))
               tcs )
 
   let clause env (cls : Ast.clause) =

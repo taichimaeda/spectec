@@ -18,8 +18,10 @@ module Render = struct
     | Text s -> s
 
   let rec pat = function
-    | Ir.CaseP (i, p) -> id i ^ " " ^ atomic_pat p
-    | (VarP _ | ConstP _ | TupleP _ | YetP _) as p -> atomic_pat p
+    | Ir.CaseP (i, (_ :: _ as ps)) ->
+        id i ^ " " ^ String.concat " " (List.map atomic_pat ps)
+    | (VarP _ | ConstP _ | TupleP _ | YetP _ | CaseP (_, [])) as p ->
+        atomic_pat p
 
   and atomic_pat = function
     | Ir.VarP i -> id i
@@ -27,7 +29,8 @@ module Render = struct
     | TupleP ps ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
     | YetP s -> "_ " ^ comment s
-    | CaseP _ as p -> "(" ^ pat p ^ ")"
+    | CaseP (i, []) -> id i
+    | CaseP (_, _ :: _) as p -> "(" ^ pat p ^ ")"
 
   let rec exp = function
     | Ir.ProdE es ->
@@ -43,7 +46,10 @@ module Render = struct
     | UpdE (e1, f, e2) ->
         "record " ^ atomic_exp e1 ^ " { " ^ id f ^ " = " ^ atomic_exp e2 ^ " }"
     | InfixE (op, e1, e2) -> atomic_exp e1 ^ " " ^ id op ^ " " ^ atomic_exp e2
-    | (VarE _ | ConstE _ | TupleE _ | YetE _) as e -> atomic_exp e
+    | CaseE (i, (_ :: _ as es)) ->
+        id i ^ " " ^ String.concat " " (List.map atomic_exp es)
+    | (VarE _ | ConstE _ | TupleE _ | CaseE (_, []) | YetE _) as e ->
+        atomic_exp e
 
   and atomic_exp = function
     | Ir.VarE i -> id i
@@ -52,9 +58,11 @@ module Render = struct
         fold_left
           (Format.sprintf "⟨ %s , %s ⟩")
           "(record { })" (List.map exp es)
+    | CaseE (i, []) -> id i
     | YetE s -> "? " ^ comment s
     | ( ProdE _ | ArrowE _ | ApplyE _ | DotE _ | FunE _ | StrE _ | UpdE _
-      | InfixE _ ) as e ->
+      | InfixE _
+      | CaseE (_, _ :: _) ) as e ->
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =

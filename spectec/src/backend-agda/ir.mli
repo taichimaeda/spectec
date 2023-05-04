@@ -14,7 +14,7 @@ type pat =
   | ConstP of const
   | TupleP of pat list
   | YetP of string
-  | CaseP of id * pat
+  | CaseP of id * pat list
 
 type exp =
   | VarE of id
@@ -25,6 +25,7 @@ type exp =
   | YetE of string
   | ArrowE of exp * exp
   | ApplyE of exp * exp
+  | CaseE of id * exp list
   | DotE of exp * id * id
   | FunE of id * exp
   | UpdE of exp * id * exp
