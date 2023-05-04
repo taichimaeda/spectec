@@ -22,6 +22,18 @@ module Translate = struct
   let record_id (exp : Ast.exp) =
     match exp.note with { it = VarT i; _ } -> tyid i | _ -> assert false
 
+  let builtin_const name : Ir.exp = VarE (unsafe_str name)
+  let builtin_unary name (e : Ir.exp) : Ir.exp = ApplyE (builtin_const name, e)
+
+  let builtin_binary name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
+    ApplyE (ApplyE (builtin_const name, e1), e2)
+
+  let builtin_infix name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
+    builtin_binary ("_" ^ name ^ "_") e1 e2
+
+  let builtin_ternary name (e1 : Ir.exp) (e2 : Ir.exp) (e3 : Ir.exp) : Ir.exp =
+    ApplyE (ApplyE (ApplyE (builtin_const name, e1), e2), e3)
+
   let rec typ env (t : Ast.typ) : Ir.exp =
     match t.it with
     | VarT n -> VarE (tyid n)
@@ -32,29 +44,39 @@ module Translate = struct
     | IterT (t, Opt) -> MaybeE ((typ env) t)
     | IterT (t, (List | List1 | ListN _)) -> ListE ((typ env) t)
 
-  let unop : Ast.unop -> string = function
-    | NotOp -> "~"
-    | PlusOp -> "+"
-    | MinusOp -> "-"
+  let unop (op : Ast.unop) : Ir.exp -> Ir.exp =
+    let opname =
+      match op with NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
+    in
 
-  let binop : Ast.binop -> string = function
-    | AndOp -> "_/\\_"
-    | OrOp -> "_\\/_"
-    | ImplOp -> "_=>_"
-    | EquivOp -> "_<=>_"
-    | AddOp -> "_+_"
-    | SubOp -> "_-_"
-    | MulOp -> "_*_"
-    | DivOp -> "_/_"
-    | ExpOp -> "_^_"
+    builtin_unary opname
 
-  let cmpop : Ast.cmpop -> string = function
-    | EqOp -> "_===_"
-    | NeOp -> "_=/=_"
-    | LtOp -> "_<<_"
-    | GtOp -> "_>_"
-    | LeOp -> "_<=_"
-    | GeOp -> "_>=_"
+  let binop (op : Ast.binop) : Ir.exp -> Ir.exp -> Ir.exp =
+    let opname =
+      match op with
+      | AndOp -> "/\\"
+      | OrOp -> "\\/"
+      | ImplOp -> "=>"
+      | EquivOp -> "<=>"
+      | AddOp -> "+"
+      | SubOp -> "-"
+      | MulOp -> "*"
+      | DivOp -> "/"
+      | ExpOp -> "^"
+    in
+    builtin_infix opname
+
+  let cmpop (op : Ast.cmpop) : Ir.exp -> Ir.exp -> Ir.exp =
+    let opname =
+      match op with
+      | EqOp -> "==="
+      | NeOp -> "=/="
+      | LtOp -> "<<"
+      | GtOp -> ">"
+      | LeOp -> "<="
+      | GeOp -> ">="
+    in
+    builtin_infix opname
 
   let rec exp env (e : Ast.exp) : Ir.exp =
     match e.it with
@@ -62,12 +84,10 @@ module Translate = struct
     | BoolE b -> ConstE (Bool b)
     | NatE n -> ConstE (Nat n)
     | TextE t -> ConstE (Text t)
-    | UnE (op, e) -> ApplyE (VarE (unsafe_str (unop op)), exp env e)
-    | BinE (op, e1, e2) ->
-        ApplyE (ApplyE (VarE (unsafe_str (binop op)), exp env e1), exp env e2)
-    | CmpE (op, e1, e2) ->
-        ApplyE (ApplyE (VarE (unsafe_str (cmpop op)), exp env e1), exp env e2)
-    | IdxE (e1, e2) -> ApplyE (ApplyE (VarE (str "idx"), exp env e1), exp env e2)
+    | UnE (op, e) -> (unop op) (exp env e)
+    | BinE (op, e1, e2) -> (binop op) (exp env e1) (exp env e2)
+    | CmpE (op, e1, e2) -> (cmpop op) (exp env e1) (exp env e2)
+    | IdxE (e1, e2) -> builtin_binary "idx" (exp env e1) (exp env e2)
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (e1, path, e2) -> update_path env path e1 (fun _ -> exp env e2)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
@@ -75,9 +95,8 @@ module Translate = struct
     | DotE (e1, a) -> DotE (exp env e1, record_id e1, atom a)
     | CompE (e1, e2) ->
         let (Ir.Id i) = record_id e1 in
-        ApplyE
-          (ApplyE (VarE (unsafe_str ("_++" ^ i ^ "_")), exp env e1), exp env e2)
-    | LenE e -> ApplyE (VarE (str "length"), exp env e)
+        builtin_infix ("++" ^ i) (exp env e1) (exp env e2)
+    | LenE e -> builtin_unary "length" (exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
         (exp env)
@@ -85,21 +104,19 @@ module Translate = struct
     | CallE (x, e) -> ApplyE (VarE (funid x), (exp env) e)
     | IterE (({ it = VarE v; _ } as e), (_, [ v' ])) when v.it = v'.it ->
         exp env e
-    | IterE (e, (Opt, [])) -> ApplyE (VarE (str "just"), exp env e)
+    | IterE (e, (Opt, [])) -> builtin_unary "just" (exp env e)
     | IterE (e, ((List | List1 | ListN _), [])) -> ConsE (exp env e, NilE)
     | IterE (e, (Opt, [ v ])) ->
-        ApplyE
-          (ApplyE (VarE (str "maybeMap"), FunE (id v, exp env e)), VarE (id v))
+        builtin_binary "maybeMap" (FunE (id v, exp env e)) (VarE (id v))
     | IterE (e, ((List | List1 | ListN _), [ v ])) ->
-        ApplyE (ApplyE (VarE (str "map"), FunE (id v, exp env e)), VarE (id v))
+        builtin_binary "map" (FunE (id v, exp env e)) (VarE (id v))
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
-    | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
-    | TheE e -> ApplyE (VarE (str "maybeThe"), exp env e)
+    | OptE (Some e) -> builtin_unary "just" (exp env e)
+    | TheE e -> builtin_unary "maybeThe" (exp env e)
     | ListE es ->
         List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es Ir.NilE
-    | CatE (e1, e2) ->
-        ApplyE (ApplyE (VarE (unsafe_str "_++_"), exp env e1), exp env e2)
+    | CatE (e1, e2) -> builtin_infix "++" (exp env e1) (exp env e2)
     | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
@@ -112,9 +129,8 @@ module Translate = struct
               (old_val', atom a, k (DotE (old_val', record_id old_val, atom a))))
     | IdxP (p, e) ->
         update_path env p old_val (fun old_val' ->
-            ApplyE
-              ( ApplyE (ApplyE (VarE (str "upd"), old_val'), exp env e),
-                k (ApplyE (ApplyE (VarE (str "idx"), old_val'), exp env e)) ))
+            builtin_ternary "upd" old_val' (exp env e)
+              (k (builtin_binary "idx" old_val' (exp env e))))
     | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
   let rec pat env (e : Ast.exp) : Ir.pat =
@@ -188,20 +204,14 @@ module Translate = struct
           failwith
             __LOC__ (* Apparently, this should be removed in the middlend *)
       | IterPr (p', (Opt, [ v ])) ->
-          ApplyE
-            ( ApplyE (VarE (str "maybeTrue"), FunE (id v, premise p')),
-              VarE (id v) )
+          builtin_binary "maybeTrue" (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v ])) ->
-          ApplyE
-            (ApplyE (VarE (str "forAll"), FunE (id v, premise p')), VarE (id v))
+          builtin_binary "forAll" (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v1; v2 ])) ->
-          ApplyE
-            ( ApplyE
-                ( ApplyE
-                    ( VarE (str "forAll2"),
-                      FunE (id v1, FunE (id v2, premise p')) ),
-                  VarE (id v1) ),
-              VarE (id v2) )
+          builtin_ternary "forAll2"
+            (FunE (id v1, FunE (id v2, premise p')))
+            (VarE (id v1))
+            (VarE (id v2))
       | IterPr (_prem, _iter) -> YetE ("IterPr: " ^ "ITER")
     in
 
