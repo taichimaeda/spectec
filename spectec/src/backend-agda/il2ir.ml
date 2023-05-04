@@ -5,7 +5,7 @@ module Translate = struct
   type _env = unit
 
   let initial_env = ()
-  let unsafe_str i = Ir.Id i
+  let unsafe_str (i : string) : Ir.id = Id i
 
   let str i =
     unsafe_str
@@ -14,14 +14,17 @@ module Translate = struct
   let tyid i = str ("ty-" ^ i.it)
   let id i = str i.it
   let funid i = str ("$" ^ i.it)
-  let atom = function Ast.Atom a -> str a | _ -> failwith __LOC__
+
+  let atom : Ast.atom -> Ir.id = function
+    | Atom a -> str a
+    | _ -> failwith __LOC__
 
   let record_id (exp : Ast.exp) =
-    match exp.note with { it = Ast.VarT i; _ } -> tyid i | _ -> assert false
+    match exp.note with { it = VarT i; _ } -> tyid i | _ -> assert false
 
-  let rec typ env t =
+  let rec typ env (t : Ast.typ) : Ir.exp =
     match t.it with
-    | Ast.VarT n -> Ir.VarE (tyid n)
+    | VarT n -> VarE (tyid n)
     | BoolT -> ConstE BoolC
     | NatT -> ConstE NatC
     | TextT -> ConstE TextC
@@ -29,10 +32,13 @@ module Translate = struct
     | IterT (t, Opt) -> MaybeE ((typ env) t)
     | IterT (t, (List | List1 | ListN _)) -> ListE ((typ env) t)
 
-  let unop = function Ast.NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
+  let unop : Ast.unop -> string = function
+    | NotOp -> "~"
+    | PlusOp -> "+"
+    | MinusOp -> "-"
 
-  let binop = function
-    | Ast.AndOp -> "_/\\_"
+  let binop : Ast.binop -> string = function
+    | AndOp -> "_/\\_"
     | OrOp -> "_\\/_"
     | ImplOp -> "_=>_"
     | EquivOp -> "_<=>_"
@@ -42,17 +48,17 @@ module Translate = struct
     | DivOp -> "_/_"
     | ExpOp -> "_^_"
 
-  let cmpop = function
-    | Ast.EqOp -> "_===_"
+  let cmpop : Ast.cmpop -> string = function
+    | EqOp -> "_===_"
     | NeOp -> "_=/=_"
     | LtOp -> "_<<_"
     | GtOp -> "_>_"
     | LeOp -> "_<=_"
     | GeOp -> "_>=_"
 
-  let rec exp env e =
+  let rec exp env (e : Ast.exp) : Ir.exp =
     match e.it with
-    | Ast.VarE n -> Ir.VarE (id n)
+    | VarE n -> VarE (id n)
     | BoolE b -> ConstE (Bool b)
     | NatE n -> ConstE (Nat n)
     | TextE t -> ConstE (Text t)
@@ -80,44 +86,40 @@ module Translate = struct
     | IterE (({ it = VarE v; _ } as e), (_, [ v' ])) when v.it = v'.it ->
         exp env e
     | IterE (e, (Opt, [])) -> ApplyE (VarE (str "just"), exp env e)
-    | IterE (e, ((List | List1 | ListN _), [])) -> Ir.ConsE (exp env e, Ir.NilE)
+    | IterE (e, ((List | List1 | ListN _), [])) -> ConsE (exp env e, NilE)
     | IterE (e, (Opt, [ v ])) ->
         ApplyE
-          ( ApplyE (VarE (str "maybeMap"), FunE (id v, exp env e)),
-            Ir.VarE (id v) )
+          (ApplyE (VarE (str "maybeMap"), FunE (id v, exp env e)), VarE (id v))
     | IterE (e, ((List | List1 | ListN _), [ v ])) ->
-        ApplyE
-          (ApplyE (VarE (str "map"), FunE (id v, exp env e)), Ir.VarE (id v))
+        ApplyE (ApplyE (VarE (str "map"), FunE (id v, exp env e)), VarE (id v))
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
     | OptE (Some e) -> ApplyE (VarE (str "just"), exp env e)
     | TheE e -> ApplyE (VarE (str "maybeThe"), exp env e)
     | ListE es ->
-        List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es NilE
+        List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es Ir.NilE
     | CatE (e1, e2) ->
         ApplyE (ApplyE (VarE (unsafe_str "_++_"), exp env e1), exp env e2)
     | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
-  and update_path env path (old_val : Ast.exp) (k : Ir.exp -> Ir.exp) =
+  and update_path env path old_val (k : Ir.exp -> Ir.exp) =
     match path.it with
-    | Ast.RootP -> k (exp env old_val)
-    | Ast.DotP (p, a) ->
+    | RootP -> k (exp env old_val)
+    | DotP (p, a) ->
         update_path env p old_val (fun old_val' ->
-            Ir.UpdE
-              ( old_val',
-                atom a,
-                k (Ir.DotE (old_val', record_id old_val, atom a)) ))
-    | Ast.IdxP (p, e) ->
+            UpdE
+              (old_val', atom a, k (DotE (old_val', record_id old_val, atom a))))
+    | IdxP (p, e) ->
         update_path env p old_val (fun old_val' ->
-            Ir.ApplyE
-              ( Ir.ApplyE (Ir.ApplyE (Ir.VarE (str "upd"), old_val'), exp env e),
+            ApplyE
+              ( ApplyE (ApplyE (VarE (str "upd"), old_val'), exp env e),
                 k (ApplyE (ApplyE (VarE (str "idx"), old_val'), exp env e)) ))
-    | Ast.SliceP (_p, _e1, _e2) -> Ir.YetE "SliceP"
+    | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
-  let rec pat env e =
+  let rec pat env (e : Ast.exp) : Ir.pat =
     match e.it with
-    | Ast.VarE n -> Ir.VarP (id n)
+    | VarE n -> VarP (id n)
     | BoolE b -> ConstP (Bool b)
     | NatE n -> ConstP (Nat n)
     | TextE t -> ConstP (Text t)
@@ -147,13 +149,11 @@ module Translate = struct
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)
 
-  let deftyp env x dt =
+  let deftyp env x (dt : Ast.deftyp) : Ir.def =
     match dt.it with
-    | Ast.AliasT ty -> Ir.DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
-    | NotationT (_op, ty) ->
-        Ir.DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
-    | StructT tfs ->
-        Ir.RecordD (tyid x, ConstE SetC, List.map (typefield env) tfs)
+    | AliasT ty -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
+    | NotationT (_op, ty) -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
+    | StructT tfs -> RecordD (tyid x, ConstE SetC, List.map (typefield env) tfs)
     | VariantT tcs ->
         DataD
           ( tyid x,
@@ -163,26 +163,26 @@ module Translate = struct
                 (atom a, [], [ (typ env) t ], Ir.VarE (tyid x)))
               tcs )
 
-  let clause env cls =
-    let (Ast.DefD (_binds, p, e, premises)) = cls.it in
+  let clause env (cls : Ast.clause) =
+    let (DefD (_binds, p, e, premises)) = cls.it in
     match premises with
     | [] -> ([ (pat env) p ], (exp env) e)
     | _ :: _ -> failwith __LOC__
 
-  let iterate_ty ty = function
-    | Ast.Opt -> Ir.MaybeE ty
-    | Ast.List | Ast.List1 | Ast.ListN _ -> Ir.ListE ty
+  let iterate_ty (ty : Ir.exp) : Ast.iter -> Ir.exp = function
+    | Opt -> MaybeE ty
+    | List | List1 | ListN _ -> ListE ty
 
-  let rule env rel r =
-    let (Ast.RuleD (x, bs, _op, e, ps)) = r.it in
+  let rule env (rel : Ir.exp) (r : Ast.rule) =
+    let (RuleD (x, bs, _op, e, ps)) = r.it in
     let binds bs =
       List.map
         (fun (x, t, iter) -> (id x, List.fold_left iterate_ty (typ env t) iter))
         bs
     in
-    let rec premise p =
+    let rec premise (p : Ast.premise) : Ir.exp =
       match p.it with
-      | Ast.RulePr (x, _op, e) -> Ir.ApplyE (VarE (tyid x), (exp env) e)
+      | RulePr (x, _op, e) -> ApplyE (VarE (tyid x), (exp env) e)
       | IfPr e -> (exp env) e
       | ElsePr ->
           failwith
@@ -190,19 +190,18 @@ module Translate = struct
       | IterPr (p', (Opt, [ v ])) ->
           ApplyE
             ( ApplyE (VarE (str "maybeTrue"), FunE (id v, premise p')),
-              Ir.VarE (id v) )
+              VarE (id v) )
       | IterPr (p', ((List | List1 | ListN _), [ v ])) ->
           ApplyE
-            ( ApplyE (VarE (str "forAll"), FunE (id v, premise p')),
-              Ir.VarE (id v) )
+            (ApplyE (VarE (str "forAll"), FunE (id v, premise p')), VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v1; v2 ])) ->
           ApplyE
             ( ApplyE
                 ( ApplyE
                     ( VarE (str "forAll2"),
                       FunE (id v1, FunE (id v2, premise p')) ),
-                  Ir.VarE (id v1) ),
-              Ir.VarE (id v2) )
+                  VarE (id v1) ),
+              VarE (id v2) )
       | IterPr (_prem, _iter) -> YetE ("IterPr: " ^ "ITER")
     in
 
@@ -212,24 +211,24 @@ module Translate = struct
       premises ps,
       Ir.ApplyE (rel, (exp env) e) )
 
-  let rec def env d =
+  let rec def env (d : Ast.def) : Ir.def list =
     match d.it with
-    | Ast.SynD (id, dt) -> [ deftyp env id dt ]
-    | Ast.RelD (x, _op, ty, rules) ->
+    | SynD (id, dt) -> [ deftyp env id dt ]
+    | RelD (x, _op, ty, rules) ->
         [
-          Ir.DataD
+          DataD
             ( tyid x,
               ArrowE ((typ env) ty, ConstE SetC),
               List.map (rule env (VarE (tyid x))) rules );
         ]
     | DecD (i, tin, tout, clss) ->
         [
-          Ir.DefD
+          DefD
             ( funid i,
               ArrowE ((typ env) tin, (typ env) tout),
               List.map (clause env) clss );
         ]
-    | RecD defs -> [ Ir.MutualD (script defs) ]
+    | RecD defs -> [ MutualD (script defs) ]
     | HintD _ -> []
 
   and script sc = List.concat_map (def initial_env) sc
