@@ -22,16 +22,13 @@ type exp =
   | ProdE of exp list
   | TupleE of exp list
   | StrE of (id * exp) list
-  | ListE of exp
-  | NilE
-  | ConsE of exp * exp
-  | MaybeE of exp
   | YetE of string
   | ArrowE of exp * exp
   | ApplyE of exp * exp
   | DotE of exp * id * id
   | FunE of id * exp
   | UpdE of exp * id * exp
+  | InfixE of id * exp * exp
 
 type cons = id * (id * exp) list * exp list * exp
 type field = id * exp

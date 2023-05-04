@@ -32,12 +32,9 @@ module Render = struct
   let rec exp = function
     | Ir.ProdE es ->
         fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map atomic_exp es)
-    | MaybeE e -> "Maybe " ^ atomic_exp e
-    | ListE e -> "List " ^ atomic_exp e
     | ArrowE (e1, e2) -> atomic_exp e1 ^ " → " ^ atomic_exp e2
     | ApplyE (e1, e2) -> atomic_exp e1 ^ " " ^ atomic_exp e2
     | DotE (e, t, f) -> id t ^ "." ^ id f ^ " " ^ atomic_exp e
-    | ConsE (e1, e2) -> atomic_exp e1 ^ " ∷ " ^ atomic_exp e2
     | FunE (x, e) -> "λ " ^ id x ^ " -> " ^ atomic_exp e
     | StrE es ->
         "record { "
@@ -45,7 +42,8 @@ module Render = struct
         ^ " }"
     | UpdE (e1, f, e2) ->
         "record " ^ atomic_exp e1 ^ " { " ^ id f ^ " = " ^ atomic_exp e2 ^ " }"
-    | (VarE _ | ConstE _ | TupleE _ | NilE | YetE _) as e -> atomic_exp e
+    | InfixE (op, e1, e2) -> atomic_exp e1 ^ " " ^ id op ^ " " ^ atomic_exp e2
+    | (VarE _ | ConstE _ | TupleE _ | YetE _) as e -> atomic_exp e
 
   and atomic_exp = function
     | Ir.VarE i -> id i
@@ -54,10 +52,9 @@ module Render = struct
         fold_left
           (Format.sprintf "⟨ %s , %s ⟩")
           "(record { })" (List.map exp es)
-    | NilE -> "[]"
     | YetE s -> "? " ^ comment s
-    | ( ProdE _ | MaybeE _ | ListE _ | ArrowE _ | ApplyE _ | DotE _ | ConsE _
-      | FunE _ | StrE _ | UpdE _ ) as e ->
+    | ( ProdE _ | ArrowE _ | ApplyE _ | DotE _ | FunE _ | StrE _ | UpdE _
+      | InfixE _ ) as e ->
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =

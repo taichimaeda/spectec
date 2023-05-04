@@ -29,7 +29,7 @@ module Translate = struct
     ApplyE (ApplyE (builtin_const name, e1), e2)
 
   let builtin_infix name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
-    builtin_binary ("_" ^ name ^ "_") e1 e2
+    InfixE (unsafe_str name, e1, e2)
 
   let builtin_ternary name (e1 : Ir.exp) (e2 : Ir.exp) (e3 : Ir.exp) : Ir.exp =
     ApplyE (ApplyE (ApplyE (builtin_const name, e1), e2), e3)
@@ -41,8 +41,8 @@ module Translate = struct
     | NatT -> ConstE NatC
     | TextT -> ConstE TextC
     | TupT ts -> ProdE (List.map (typ env) ts)
-    | IterT (t, Opt) -> MaybeE ((typ env) t)
-    | IterT (t, (List | List1 | ListN _)) -> ListE ((typ env) t)
+    | IterT (t, Opt) -> builtin_unary "Maybe" (typ env t)
+    | IterT (t, (List | List1 | ListN _)) -> builtin_unary "List" (typ env t)
 
   let unop (op : Ast.unop) : Ir.exp -> Ir.exp =
     let opname =
@@ -105,7 +105,8 @@ module Translate = struct
     | IterE (({ it = VarE v; _ } as e), (_, [ v' ])) when v.it = v'.it ->
         exp env e
     | IterE (e, (Opt, [])) -> builtin_unary "just" (exp env e)
-    | IterE (e, ((List | List1 | ListN _), [])) -> ConsE (exp env e, NilE)
+    | IterE (e, ((List | List1 | ListN _), [])) ->
+        builtin_infix "∷" (exp env e) (builtin_const "[]")
     | IterE (e, (Opt, [ v ])) ->
         builtin_binary "maybeMap" (FunE (id v, exp env e)) (VarE (id v))
     | IterE (e, ((List | List1 | ListN _), [ v ])) ->
@@ -115,7 +116,9 @@ module Translate = struct
     | OptE (Some e) -> builtin_unary "just" (exp env e)
     | TheE e -> builtin_unary "maybeThe" (exp env e)
     | ListE es ->
-        List.fold_right (fun e lst -> Ir.ConsE (exp env e, lst)) es Ir.NilE
+        List.fold_right
+          (fun e lst -> builtin_infix "∷" (exp env e) lst)
+          es (builtin_const "[]")
     | CatE (e1, e2) -> builtin_infix "++" (exp env e1) (exp env e2)
     | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
@@ -186,8 +189,8 @@ module Translate = struct
     | _ :: _ -> failwith __LOC__
 
   let iterate_ty (ty : Ir.exp) : Ast.iter -> Ir.exp = function
-    | Opt -> MaybeE ty
-    | List | List1 | ListN _ -> ListE ty
+    | Opt -> builtin_unary "Maybe" ty
+    | List | List1 | ListN _ -> builtin_unary "List" ty
 
   let rule env (rel : Ir.exp) (r : Ast.rule) =
     let (RuleD (x, bs, _op, e, ps)) = r.it in
