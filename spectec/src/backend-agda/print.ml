@@ -58,18 +58,20 @@ module Render = struct
         "(" ^ exp e ^ ")"
 
   let cons (i, bs, prems, t) =
+    let prems' = List.map exp prems and t' = exp t in
     id i ^ " :\n    "
     ^ (if bs <> [] then
          String.concat " "
            (List.map (fun (i, ty) -> "(" ^ id i ^ " : " ^ exp ty ^ ")") bs)
          ^ " ->\n    "
        else "")
-    ^ (if prems <> [] then
-         String.concat " ->\n    " (List.map exp prems) ^ " ->\n    "
+    ^ (if prems <> [] then String.concat " ->\n    " prems' ^ " ->\n    "
        else "")
-    ^
-    let conc = exp t in
-    String.make (String.length conc) '-' ^ "\n    " ^ conc
+    ^ String.make
+        (List.fold_left max 0
+           (List.map (fun s -> List.length (Util.Utf8.decode s)) (t' :: prems')))
+        '-'
+    ^ "\n    " ^ t'
 
   let field (i, arg) = id i ^ " : " ^ exp arg
 
