@@ -224,17 +224,10 @@ module Translate = struct
         ]
     | DecD (i, tin, tout, clss) ->
         [
-          (match clss with
-          | [] ->
-              Ir.DefD
-                ( funid i,
-                  ArrowE ((typ env) tin, (typ env) tout),
-                  [ ([], Ir.YetE "TODO") ] )
-          | _ :: _ ->
-              Ir.DefD
-                ( funid i,
-                  ArrowE ((typ env) tin, (typ env) tout),
-                  List.map (clause env) clss ));
+          Ir.DefD
+            ( funid i,
+              ArrowE ((typ env) tin, (typ env) tout),
+              List.map (clause env) clss );
         ]
     | RecD defs -> [ Ir.MutualD (script defs) ]
     | HintD _ -> []
