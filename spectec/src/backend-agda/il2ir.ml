@@ -101,7 +101,7 @@ module Translate = struct
     | MixE (_op, e1) ->
         (exp env)
           e1 (* mixops arise only from notations, so they are identities *)
-    | CallE (x, e) -> ApplyE (VarE (funid x), (exp env) e)
+    | CallE (x, e) -> ApplyE (VarE (funid x), exp env e)
     | IterE (({ it = VarE v; _ } as e), (_, [ v' ])) when v.it = v'.it ->
         exp env e
     | IterE (e, (Opt, [])) -> builtin_unary "just" (exp env e)
@@ -120,7 +120,7 @@ module Translate = struct
           (fun e lst -> builtin_infix "∷" (exp env e) lst)
           es (builtin_const "[]")
     | CatE (e1, e2) -> builtin_infix "++" (exp env e1) (exp env e2)
-    | CaseE (a, e) -> ApplyE (VarE (atom a), (exp env) e)
+    | CaseE (a, e) -> ApplyE (VarE (atom a), exp env e)
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
   and update_path env path old_val (k : Ir.exp -> Ir.exp) =
@@ -187,7 +187,7 @@ module Translate = struct
   let clause env (cls : Ast.clause) =
     let (DefD (_binds, p, e, premises)) = cls.it in
     match premises with
-    | [] -> ([ (pat env) p ], (exp env) e)
+    | [] -> ([ (pat env) p ], exp env e)
     | _ :: _ -> failwith __LOC__
 
   let iterate_ty (ty : Ir.exp) : Ast.iter -> Ir.exp = function
@@ -203,8 +203,8 @@ module Translate = struct
     in
     let rec premise (p : Ast.premise) : Ir.exp =
       match p.it with
-      | RulePr (x, _op, e) -> ApplyE (VarE (tyid x), (exp env) e)
-      | IfPr e -> (exp env) e
+      | RulePr (x, _op, e) -> ApplyE (VarE (tyid x), exp env e)
+      | IfPr e -> exp env e
       | ElsePr ->
           failwith
             __LOC__ (* Apparently, this should be removed in the middlend *)
@@ -224,7 +224,7 @@ module Translate = struct
     ( (if x.it <> "" then id x else str "-"),
       binds bs,
       premises ps,
-      Ir.ApplyE (rel, (exp env) e) )
+      Ir.ApplyE (rel, exp env e) )
 
   let rec def env (d : Ast.def) : Ir.def list =
     match d.it with
