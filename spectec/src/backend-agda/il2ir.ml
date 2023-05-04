@@ -143,6 +143,8 @@ module Translate = struct
     | NatE n -> ConstP (Nat n)
     | TextE t -> ConstP (Text t)
     | UnE (_op, _e2) -> YetP ("UnE: " ^ Print.string_of_exp e)
+    | BinE (AddOp, e, { it = Ast.NatE 1; _ }) ->
+        CaseP (unsafe_str "suc", pat env e)
     | BinE (_op, _e1, _e2) -> YetP ("BinE: " ^ Print.string_of_exp e)
     | CmpE (_op, _e1, _e2) -> YetP ("CmpE: " ^ Print.string_of_exp e)
     | IdxE (_e1, _e2) -> YetP ("IdxE: " ^ Print.string_of_exp e)

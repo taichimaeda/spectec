@@ -186,15 +186,6 @@ diff -ruN 1-syntax.watsup 1-syntax.watsup
 diff -ruN 2-aux.watsup 2-aux.watsup
 --- 2-aux.watsup	2023-04-24 07:16:00
 +++ 2-aux.watsup	2023-05-02 17:10:02
-@@ -9,7 +9,7 @@
- def $min(nat, nat) : nat
- def $min(0, j) = 0
- def $min(i, 0) = 0
--def $min($(i+1), $(j+1)) = $min(i, j)
-+def $min(i, j) = $min($(i - 1), $(j - 1))
- 
- 
- ;; Auxiliary Definitions on Types
 @@ -18,10 +18,6 @@
  
  def $size(valtype) : nat  hint(partial) hint(show |%|)
