@@ -1,10 +1,3 @@
-# Preview
-
-```sh
-$ cp -r ../spec minispec
-$ cd minispec && patch -s -p0 -i minispec.patch  --read-only=ignore
-$ dune exec ../src/exe-watsup/main.exe -- --agda --sub --totalize minispec/*.watsup -o output.agda
-$ cat output.agda
 open import Agda.Builtin.Bool
 open import Agda.Builtin.List
 open import Agda.Builtin.Maybe
@@ -1079,22 +1072,3 @@ data ty-Step where
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
     -------------------------------------------------------------------------------------------------------------
     ty-Step ⟨ ⟨ z , ($admininstr-val val) ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
-$ agda output.agda | sed -e "s/\/.*\/_build\///g"
-Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:911,1-920,7
-The following names are declared but not accompanied by a
-definition: $binop, $relop, $testop, $unop
-Unsolved interaction metas at the following locations:
-  default/test-agda/output.agda:23,17-24
-  default/test-agda/output.agda:25,14-21
-  default/test-agda/output.agda:30,14-21
-  default/test-agda/output.agda:32,15-22
-  default/test-agda/output.agda:37,11-18
-  default/test-agda/output.agda:39,13-20
-  default/test-agda/output.agda:420,18-19
-  default/test-agda/output.agda:702,21-22
-  default/test-agda/output.agda:716,16-17
-  default/test-agda/output.agda:724,16-17
-```
-
-The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.

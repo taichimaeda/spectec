@@ -1,6 +1,21 @@
-(mdx
- (libraries spectec)
- (deps
-  (file ../src/exe-watsup/main.exe)
-  (glob_files ../spec/*))
- (files TEST.md))
+(rule
+  (targets current.agda current.output)
+  (deps
+    (file ../src/exe-watsup/main.exe)
+    (glob_files ../spec/*)
+  )
+  (action
+    (progn
+      (with-outputs-to current.output (run ./run.sh current.agda))
+    )
+  )
+)
+
+(rule
+ (alias runtest)
+ (action (diff minispec.agda current.agda))
+)
+(rule
+ (alias runtest)
+ (action (diff output current.output))
+)

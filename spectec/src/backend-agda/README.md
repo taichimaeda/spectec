@@ -36,6 +36,6 @@ A list of minor issues that need to be resolved at some point. (We are working o
     ocamlformat --enable-outside-detected-project -i src/backend-agda/*.{ml,mli}
     && make
     && patch -i minispec.patch -d spec
-    && ./watsup --agda --sub --totalize spec/*.watsup -o minispec.agda
+    && ./watsup --agda --sub --totalize spec/*.watsup -o test-agda/minispec.agda
     && patch -R -i minispec.patch -d spec
-    && agda minispec.agda
+    && (cd test-agda && agda minispec.agda)

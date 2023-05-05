@@ -156,4 +156,5 @@ let string_of_program prog =
       "upd _ _ _ = {!   !}";
       "";
       Render.program prog;
+      "";
     ]
