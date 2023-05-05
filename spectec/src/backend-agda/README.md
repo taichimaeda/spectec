@@ -25,10 +25,10 @@ A backend translating a Wasm specification into Agda.
 
 A list of minor issues that need to be resolved at some point. (We are working on a branch and we do not want to pollute the main GitHub repo with them.)
 
-- sort out whether comparison is a boolean or an operation
 - mixfix operators
 - use a pretty-printer for Agda output
 - use size proofs when indexing
+- generate record concatenation
 
 ## Workflow
 

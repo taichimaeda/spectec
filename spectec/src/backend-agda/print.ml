@@ -59,7 +59,7 @@ module Render = struct
           (Format.sprintf "⟨ %s , %s ⟩")
           "(record { })" (List.map exp es)
     | CaseE (i, []) -> id i
-    | YetE s -> "? " ^ comment s
+    | YetE s -> "{!   !} " ^ comment s
     | ( ProdE _ | ArrowE _ | ApplyE _ | DotE _ | FunE _ | StrE _ | UpdE _
       | InfixE _
       | CaseE (_, _ :: _) ) as e ->
@@ -105,7 +105,7 @@ module Render = struct
     | Ir.RecordD (i, _, fs) ->
         "record " ^ id i ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
-        ^ "\n" ^ "_++" ^ id i ^ "_ = ?"
+        ^ "\n" ^ "_++" ^ id i ^ "_ = {!   !}"
     | Ir.MutualD defs -> String.concat "\n" (List.map def_def defs)
 
   let def d = decl_def d ^ "\n" ^ def_def d
@@ -116,7 +116,11 @@ let string_of_program prog =
   String.concat "\n"
     [
       "open import Data.Bool using (Bool; true; false)";
-      "open import Data.List using (List; map; _∷_; []; length; _++_)";
+      "open import Data.Product using (_×_) renaming (_,_ to  ⟨_,_⟩)";
+      "open import Data.List using (List; map; _∷_; []; length; _++_; lookup; \
+       _[_]∷=_)";
+      "open import Data.List.Relation.Unary.All using (All)";
+      "open import Data.List.Relation.Binary.Pointwise using (Pointwise)";
       "open import Data.Maybe using (Maybe; just; nothing) renaming (map to \
        maybeMap)";
       "open import Data.String using (String)";
@@ -125,22 +129,6 @@ let string_of_program prog =
       "open import Data.Unit using (⊤; tt)";
       "open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)";
       "";
-      "data _×_ (A B : Set) : Set where";
-      "  ⟨_,_⟩ : A → B → A × B";
-      "data _===_ {A : Set} : A → A → Set where";
-      "data _=/=_ {A : Set} : A → A → Set where";
-      "maybeTrue : {A : Set} → (A → Set) → Maybe A → Set";
-      "maybeTrue _ _ = {!   !}";
-      "maybeThe : {A : Set} → Maybe A → A";
-      "maybeThe _ = {!   !}";
-      "forAll : {A : Set} → (A → Set) → List A → Set";
-      "forAll _ _ = {!   !}";
-      "forAll2 : {A B : Set} → (A → B → Set) → List A → List B → Set";
-      "forAll2 _ _ = {!   !}";
-      "idx : {A : Set} → List A → ℕ → A";
-      "idx _ _ = {!   !}";
-      "upd : {A : Set} → List A → ℕ → A → List A";
-      "upd _ _ _ = {!   !}";
       "";
       Render.program prog;
       "";

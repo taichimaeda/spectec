@@ -1,27 +1,14 @@
 open import Data.Bool using (Bool; true; false)
-open import Data.List using (List; map; _∷_; []; length; _++_)
+open import Data.Product using (_×_) renaming (_,_ to  ⟨_,_⟩)
+open import Data.List using (List; map; _∷_; []; length; _++_; lookup; _[_]∷=_)
+open import Data.List.Relation.Unary.All using (All)
+open import Data.List.Relation.Binary.Pointwise using (Pointwise)
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to maybeMap)
 open import Data.String using (String)
 open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _^_; _≤_; _<_; _≥_; _>_)
 open import Data.Unit using (⊤; tt)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)
 
-data _×_ (A B : Set) : Set where
-  ⟨_,_⟩ : A → B → A × B
-data _===_ {A : Set} : A → A → Set where
-data _=/=_ {A : Set} : A → A → Set where
-maybeTrue : {A : Set} → (A → Set) → Maybe A → Set
-maybeTrue _ _ = {!   !}
-maybeThe : {A : Set} → Maybe A → A
-maybeThe _ = {!   !}
-forAll : {A : Set} → (A → Set) → List A → Set
-forAll _ _ = {!   !}
-forAll2 : {A B : Set} → (A → B → Set) → List A → List B → Set
-forAll2 _ _ = {!   !}
-idx : {A : Set} → List A → ℕ → A
-idx _ _ = {!   !}
-upd : {A : Set} → List A → ℕ → A → List A
-upd _ _ _ = {!   !}
 
 ty-n : Set
 ty-n  = ℕ
@@ -402,7 +389,7 @@ record ty-context where
     LOCAL : List ty-valtype
     LABEL : List ty-resulttype
     RETURNS : Maybe ty-resulttype
-_++ty-context_ = ?
+_++ty-context_ = {!   !}
 
 data ty-Functype-ok : ty-functype → Set
 data ty-Functype-ok where
@@ -471,12 +458,12 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , IF bt instr-1 instr-2 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   br :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
-    ((idx (ty-context.LABEL C)) l) ≡ t ->
-    -------------------------------------------------
+    ((lookup (ty-context.LABEL C)) {!   !} {- idx -}) ≡ t ->
+    -----------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BR l ⟩ , ⟨ t-1 ++ t , t-2 ⟩ ⟩
   br-if :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) ->
-    ((idx (ty-context.LABEL C)) l) ≡ t ->
+    ((lookup (ty-context.LABEL C)) {!   !} {- idx -}) ≡ t ->
     ---------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BR-IF l ⟩ , ⟨ t ++ (I32 ∷ []) , t ⟩ ⟩
   return :
@@ -486,8 +473,8 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , RETURN ⟩ , ⟨ t-1 ++ t , t-2 ⟩ ⟩
   call :
     (C : ty-context) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.FUNC C)) x) ≡ ⟨ t-1 , t-2 ⟩ ->
-    ----------------------------------------------
+    ((lookup (ty-context.FUNC C)) {!   !} {- idx -}) ≡ ⟨ t-1 , t-2 ⟩ ->
+    ----------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , CALL x ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   const :
     (C : ty-context) (c-nt : ty-c-numtype) (nt : ty-numtype) ->
@@ -511,28 +498,28 @@ data ty-Instr-ok where
     ty-Instr-ok ⟨ ⟨ C , RELOP nt relop ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , I32 ∷ [] ⟩ ⟩
   local-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.LOCAL C)) x) ≡ t ->
+    ((lookup (ty-context.LOCAL C)) {!   !} {- idx -}) ≡ t ->
     -----------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   local-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.LOCAL C)) x) ≡ t ->
+    ((lookup (ty-context.LOCAL C)) {!   !} {- idx -}) ≡ t ->
     -----------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   local-tee :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.LOCAL C)) x) ≡ t ->
+    ((lookup (ty-context.LOCAL C)) {!   !} {- idx -}) ≡ t ->
     ---------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ t ∷ [] , t ∷ [] ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.GLOBAL C)) x) ≡ ⟨ just (record { }) , t ⟩ ->
-    -----------------------------------------------------------
+    ((lookup (ty-context.GLOBAL C)) {!   !} {- idx -}) ≡ ⟨ just (record { }) , t ⟩ ->
+    ------------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.GLOBAL C)) x) ≡ ⟨ just (record { }) , t ⟩ ->
-    -----------------------------------------------------------
+    ((lookup (ty-context.GLOBAL C)) {!   !} {- idx -}) ≡ ⟨ just (record { }) , t ⟩ ->
+    ------------------------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
 data ty-InstrSeq-ok where
   empty :
@@ -572,16 +559,16 @@ data ty-Instr-const where
     ty-Instr-const ⟨ C , CONST nt c ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
-    ((idx (ty-context.GLOBAL C)) x) ≡ ⟨ nothing , t ⟩ ->
-    -------------------------------------------------
+    ((lookup (ty-context.GLOBAL C)) {!   !} {- idx -}) ≡ ⟨ nothing , t ⟩ ->
+    --------------------------------------------------------------------
     ty-Instr-const ⟨ C , GLOBAL-GET x ⟩
 
 data ty-Expr-const : ((ty-context × ty-expr)) → Set
 data ty-Expr-const where
   - :
     (C : ty-context) (instr : List ty-instr) ->
-    (forAll (λ instr -> (ty-Instr-const ⟨ C , instr ⟩))) instr ->
-    ----------------------------------------------------------
+    (All (λ instr -> (ty-Instr-const ⟨ C , instr ⟩))) instr ->
+    -------------------------------------------------------
     ty-Expr-const ⟨ C , instr ⟩
 
 data ty-Expr-ok-const : (((ty-context × ty-expr) × ty-valtype)) → Set
@@ -617,8 +604,8 @@ data ty-Start-ok : ((ty-context × ty-start)) → Set
 data ty-Start-ok where
   - :
     (C : ty-context) (x : ty-idx) ->
-    ((idx (ty-context.FUNC C)) x) ≡ ⟨ [] , [] ⟩ ->
-    -------------------------------------------
+    ((lookup (ty-context.FUNC C)) {!   !} {- idx -}) ≡ ⟨ [] , [] ⟩ ->
+    --------------------------------------------------------------
     ty-Start-ok ⟨ C , x ⟩
 
 data ty-Module-ok : ty-module → Set
@@ -626,9 +613,9 @@ data ty-Module-ok where
   - :
     (C : ty-context) (ft : List ty-functype) (func : List ty-func) (global : List ty-global) (gt : List ty-globaltype) (start : List ty-start) ->
     C ≡ (record { FUNC = ft ; GLOBAL = gt ; LOCAL = [] ; LABEL = [] ; RETURNS = nothing }) ->
-    ((forAll2 (λ ft -> (λ func -> (ty-Func-ok ⟨ ⟨ C , func ⟩ , ft ⟩)))) ft) func ->
-    ((forAll2 (λ global -> (λ gt -> (ty-Global-ok ⟨ ⟨ C , global ⟩ , gt ⟩)))) global) gt ->
-    (forAll (λ start -> (ty-Start-ok ⟨ C , start ⟩))) start ->
+    ((Pointwise (λ ft -> (λ func -> (ty-Func-ok ⟨ ⟨ C , func ⟩ , ft ⟩)))) ft) func ->
+    ((Pointwise (λ global -> (λ gt -> (ty-Global-ok ⟨ ⟨ C , global ⟩ , gt ⟩)))) global) gt ->
+    (All (λ start -> (ty-Start-ok ⟨ C , start ⟩))) start ->
     (length start) ≤ 1 ->
     --------------------------------------------------------------------------------------
     ty-Module-ok ⟨ ⟨ func , global ⟩ , start ⟩
@@ -684,7 +671,7 @@ record ty-moduleinst where
   field
     FUNC : List ty-funcaddr
     GLOBAL : List ty-globaladdr
-_++ty-moduleinst_ = ?
+_++ty-moduleinst_ = {!   !}
 
 ty-funcinst : Set
 ty-funcinst  = (ty-moduleinst × ty-func)
@@ -698,7 +685,7 @@ record ty-store where
   field
     FUNC : List ty-funcinst
     GLOBAL : List ty-globalinst
-_++ty-store_ = ?
+_++ty-store_ = {!   !}
 
 record ty-frame : Set
 _++ty-frame_ : ty-frame -> ty-frame -> ty-frame
@@ -706,7 +693,7 @@ record ty-frame where
   field
     LOCAL : List ty-val
     MODULE : ty-moduleinst
-_++ty-frame_ = ?
+_++ty-frame_ = {!   !}
 
 ty-state : Set
 ty-state  = (ty-store × ty-frame)
@@ -861,19 +848,19 @@ $funcinst : ty-state → (List ty-funcinst)
 $funcinst ⟨ s , f ⟩ = ty-store.FUNC s
 
 $func : ((ty-state × ty-funcidx)) → ty-funcinst
-$func ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-store.FUNC s)) ((idx (ty-moduleinst.FUNC (ty-frame.MODULE f))) x)
+$func ⟨ ⟨ s , f ⟩ , x ⟩ = (lookup (ty-store.FUNC s)) {!   !} {- idx -}
 
 $global : ((ty-state × ty-globalidx)) → ty-globalinst
-$global ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-store.GLOBAL s)) ((idx (ty-moduleinst.GLOBAL (ty-frame.MODULE f))) x)
+$global ⟨ ⟨ s , f ⟩ , x ⟩ = (lookup (ty-store.GLOBAL s)) {!   !} {- idx -}
 
 $local : ((ty-state × ty-localidx)) → ty-val
-$local ⟨ ⟨ s , f ⟩ , x ⟩ = (idx (ty-frame.LOCAL f)) x
+$local ⟨ ⟨ s , f ⟩ , x ⟩ = (lookup (ty-frame.LOCAL f)) {!   !} {- idx -}
 
 $with-local : (((ty-state × ty-localidx) × ty-val)) → ty-state
-$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , record f { LOCAL = (((upd (ty-frame.LOCAL f)) x) v) } ⟩
+$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , record f { LOCAL = (((_[_]∷=_ (ty-frame.LOCAL f)) {!   !} {- upd -}) v) } ⟩
 
 $with-global : (((ty-state × ty-globalidx) × ty-val)) → ty-state
-$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = (((upd (ty-store.GLOBAL s)) ((idx (ty-moduleinst.GLOBAL (ty-frame.MODULE f))) x)) v) } , f ⟩
+$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = (((_[_]∷=_ (ty-store.GLOBAL s)) {!   !} {- upd -}) v) } , f ⟩
 
 data ty-E : Set
 data ty-E where
@@ -1020,12 +1007,12 @@ data ty-Step-read : ((ty-config × (List ty-admininstr))) → Set
 data ty-Step-read where
   call :
     (x : ty-idx) (z : ty-state) ->
-    ---------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ((idx ($funcaddr z)) x)) ∷ [] ⟩
+    ----------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ((lookup ($funcaddr z)) {!   !} {- idx -})) ∷ [] ⟩
   call-addr :
     (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : ℕ) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
-    ((idx ($funcinst z)) a) ≡ ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
-    f ≡ (record { LOCAL = val ++ ((map (λ t -> (maybeThe ($default- t)))) t) ; MODULE = m }) ->
+    ((lookup ($funcinst z)) {!   !} {- idx -}) ≡ ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
+    f ≡ (record { LOCAL = val ++ ((map (λ t -> {!   !} {- TheE: !($default_(t)) -})) t) ; MODULE = m }) ->
     -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , ((map (λ val -> ($admininstr-val val))) val) ++ ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- n f ((LABEL- n [] ((map (λ instr -> ($admininstr-instr instr))) instr)) ∷ [])) ∷ [] ⟩
   local-get :

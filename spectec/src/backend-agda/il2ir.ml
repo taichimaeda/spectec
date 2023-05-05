@@ -66,17 +66,14 @@ module Translate = struct
     in
     builtin_infix opname
 
-  let cmpop (op : Ast.cmpop) : Ir.exp -> Ir.exp -> Ir.exp =
-    let opname =
-      match op with
-      | EqOp -> "≡"
-      | NeOp -> "≢"
-      | LtOp -> "<"
-      | GtOp -> ">"
-      | LeOp -> "≤"
-      | GeOp -> "≥"
-    in
-    builtin_infix opname
+  let cmpop (op : Ast.cmpop) (e1 : Ir.exp) (e2 : Ir.exp) =
+    match op with
+    | EqOp -> builtin_infix "≡" e1 e2
+    | NeOp -> builtin_infix "≢" e1 e2
+    | LtOp -> builtin_infix "<" e1 e2
+    | GtOp -> builtin_infix "<" e2 e1
+    | LeOp -> builtin_infix "≤" e1 e2
+    | GeOp -> builtin_infix "≤" e2 e1
 
   let rec exp env (e : Ast.exp) : Ir.exp =
     match e.it with
@@ -87,7 +84,7 @@ module Translate = struct
     | UnE (op, e) -> (unop op) (exp env e)
     | BinE (op, e1, e2) -> (binop op) (exp env e1) (exp env e2)
     | CmpE (op, e1, e2) -> (cmpop op) (exp env e1) (exp env e2)
-    | IdxE (e1, e2) -> builtin_binary "idx" (exp env e1) (exp env e2)
+    | IdxE (e1, _e2) -> builtin_binary "lookup" (exp env e1) (YetE "idx")
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (e1, path, e2) -> update_path env path e1 (fun _ -> exp env e2)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
@@ -114,7 +111,7 @@ module Translate = struct
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
     | OptE None -> VarE (str "nothing")
     | OptE (Some e) -> builtin_unary "just" (exp env e)
-    | TheE e -> builtin_unary "maybeThe" (exp env e)
+    | TheE _e -> YetE ("TheE: " ^ Print.string_of_exp e)
     | ListE es ->
         List.fold_right
           (fun e lst -> builtin_infix "∷" (exp env e) lst)
@@ -131,10 +128,10 @@ module Translate = struct
         update_path env p old_val (fun old_val' ->
             UpdE
               (old_val', atom a, k (DotE (old_val', record_id old_val, atom a))))
-    | IdxP (p, e) ->
+    | IdxP (p, _e) ->
         update_path env p old_val (fun old_val' ->
-            builtin_ternary "upd" old_val' (exp env e)
-              (k (builtin_binary "idx" old_val' (exp env e))))
+            builtin_ternary "_[_]∷=_" old_val' (YetE "upd")
+              (k (builtin_binary "lookup" old_val' (YetE "upd"))))
     | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
   let rec pat env (e : Ast.exp) : Ir.pat =
@@ -216,11 +213,11 @@ module Translate = struct
           failwith
             __LOC__ (* Apparently, this should be removed in the middlend *)
       | IterPr (p', (Opt, [ v ])) ->
-          builtin_binary "maybeTrue" (FunE (id v, premise p')) (VarE (id v))
+          builtin_binary "maybeAll" (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v ])) ->
-          builtin_binary "forAll" (FunE (id v, premise p')) (VarE (id v))
+          builtin_binary "All" (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v1; v2 ])) ->
-          builtin_ternary "forAll2"
+          builtin_ternary "Pointwise"
             (FunE (id v1, FunE (id v2, premise p')))
             (VarE (id v1))
             (VarE (id v2))
