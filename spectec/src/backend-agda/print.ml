@@ -115,41 +115,26 @@ end
 let string_of_program prog =
   String.concat "\n"
     [
-      "open import Agda.Builtin.Bool";
-      "open import Agda.Builtin.List";
-      "open import Agda.Builtin.Maybe";
-      "open import Agda.Builtin.Nat";
-      "open import Agda.Builtin.String";
-      "open import Agda.Builtin.Unit";
+      "open import Data.Bool using (Bool; true; false)";
+      "open import Data.List using (List; map; _∷_; []; length; _++_)";
+      "open import Data.Maybe using (Maybe; just; nothing) renaming (map to \
+       maybeMap)";
+      "open import Data.String using (String)";
+      "open import Data.Nat renaming (ℕ to Nat; _≤_ to _<=_)";
+      "open import Data.Unit";
       "";
       "data _×_ (A B : Set) : Set where";
       "  ⟨_,_⟩ : A → B → A × B";
       "data _===_ {A : Set} : A -> A -> Set where";
       "data _=/=_ {A : Set} : A -> A -> Set where";
-      "data _<<_ {A : Set} : A -> A -> Set where";
-      "data _>_ {A : Set} : A -> A -> Set where";
-      "data _<=_ {A : Set} : A -> A -> Set where";
-      "data _>=_ {A : Set} : A -> A -> Set where";
-      "_++_ : {A : Set} -> List A -> List A -> List A";
-      "[] ++ ys = ys";
-      "(x ∷ xs) ++ ys = x ∷ (xs ++ ys)";
-      "maybeMap : {A B : Set} -> (A -> B) -> Maybe A -> Maybe B";
-      "maybeMap f (just x) = just (f x)";
-      "maybeMap _ nothing = nothing";
       "maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set";
       "maybeTrue _ _ = {!   !}";
       "maybeThe : {A : Set} -> Maybe A -> A";
       "maybeThe _ = {!   !}";
-      "map : {A B : Set} -> (A -> B) -> List A -> List B";
-      "map f [] = []";
-      "map f (x ∷ xs) = f x ∷ map f xs";
       "forAll : {A : Set} -> (A -> Set) -> List A -> Set";
       "forAll _ _ = {!   !}";
       "forAll2 : {A B : Set} -> (A -> B -> Set) -> List A -> List B -> Set";
       "forAll2 _ _ = {!   !}";
-      "length : {A : Set} -> List A -> Nat";
-      "length [] = 0";
-      "length (x ∷ xs) = suc (length xs)";
       "idx : {A : Set} -> List A -> Nat -> A";
       "idx _ _ = {!   !}";
       "upd : {A : Set} -> List A -> Nat -> A -> List A";
