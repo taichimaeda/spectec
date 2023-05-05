@@ -75,28 +75,24 @@ ty-localidx  = ty-idx
 data ty-numtype : Set
 data ty-numtype where
   I32 :
-    ⊤ ->
     ----------
     ty-numtype
 
 data ty-valtype : Set
 data ty-valtype where
   I32 :
-    ⊤ ->
     ----------
     ty-valtype
   BOT :
-    ⊤ ->
     ----------
     ty-valtype
 
 $valtype-numtype : ty-numtype → ty-valtype
-$valtype-numtype (I32 _) = I32 (record { })
+$valtype-numtype I32 = I32
 
 data ty-in : Set
 data ty-in where
   I32 :
-    ⊤ ->
     -----
     ty-in
 
@@ -112,41 +108,33 @@ ty-functype  = (ty-resulttype × ty-resulttype)
 data ty-sx : Set
 data ty-sx where
   U :
-    ⊤ ->
     -----
     ty-sx
   S :
-    ⊤ ->
     -----
     ty-sx
 
 data ty-unop-IXX : Set
 data ty-unop-IXX where
   CLZ :
-    ⊤ ->
     -----------
     ty-unop-IXX
   CTZ :
-    ⊤ ->
     -----------
     ty-unop-IXX
   POPCNT :
-    ⊤ ->
     -----------
     ty-unop-IXX
 
 data ty-binop-IXX : Set
 data ty-binop-IXX where
   ADD :
-    ⊤ ->
     ------------
     ty-binop-IXX
   SUB :
-    ⊤ ->
     ------------
     ty-binop-IXX
   MUL :
-    ⊤ ->
     ------------
     ty-binop-IXX
   DIV :
@@ -158,19 +146,15 @@ data ty-binop-IXX where
     ------------
     ty-binop-IXX
   AND :
-    ⊤ ->
     ------------
     ty-binop-IXX
   OR :
-    ⊤ ->
     ------------
     ty-binop-IXX
   XOR :
-    ⊤ ->
     ------------
     ty-binop-IXX
   SHL :
-    ⊤ ->
     ------------
     ty-binop-IXX
   SHR :
@@ -178,29 +162,24 @@ data ty-binop-IXX where
     ------------
     ty-binop-IXX
   ROTL :
-    ⊤ ->
     ------------
     ty-binop-IXX
   ROTR :
-    ⊤ ->
     ------------
     ty-binop-IXX
 
 data ty-testop-IXX : Set
 data ty-testop-IXX where
   EQZ :
-    ⊤ ->
     -------------
     ty-testop-IXX
 
 data ty-relop-IXX : Set
 data ty-relop-IXX where
   EQ :
-    ⊤ ->
     ------------
     ty-relop-IXX
   NE :
-    ⊤ ->
     ------------
     ty-relop-IXX
   LT :
@@ -257,88 +236,93 @@ ty-blocktype  = ty-functype
 data ty-instr : Set
 data ty-instr where
   UNREACHABLE :
-    ⊤ ->
     --------
     ty-instr
   NOP :
-    ⊤ ->
     --------
     ty-instr
   DROP :
-    ⊤ ->
     --------
     ty-instr
   SELECT :
     Maybe ty-valtype ->
-    --------
+    ----------------
     ty-instr
   BLOCK :
-    (ty-blocktype × (List ty-instr)) ->
-    --------
+    ty-blocktype ->
+    List ty-instr ->
+    -------------
     ty-instr
   LOOP :
-    (ty-blocktype × (List ty-instr)) ->
-    --------
+    ty-blocktype ->
+    List ty-instr ->
+    -------------
     ty-instr
   IF :
-    ((ty-blocktype × (List ty-instr)) × (List ty-instr)) ->
-    --------
+    ty-blocktype ->
+    List ty-instr ->
+    List ty-instr ->
+    -------------
     ty-instr
   BR :
     ty-labelidx ->
-    --------
+    -----------
     ty-instr
   BR-IF :
     ty-labelidx ->
-    --------
+    -----------
     ty-instr
   CALL :
     ty-funcidx ->
-    --------
+    ----------
     ty-instr
   RETURN :
-    ⊤ ->
     --------
     ty-instr
   CONST :
-    (ty-numtype × ty-c-numtype) ->
-    --------
+    ty-numtype ->
+    ty-c-numtype ->
+    ------------
     ty-instr
   UNOP :
-    (ty-numtype × ty-unop-numtype) ->
-    --------
+    ty-numtype ->
+    ty-unop-numtype ->
+    ---------------
     ty-instr
   BINOP :
-    (ty-numtype × ty-binop-numtype) ->
-    --------
+    ty-numtype ->
+    ty-binop-numtype ->
+    ----------------
     ty-instr
   TESTOP :
-    (ty-numtype × ty-testop-numtype) ->
-    --------
+    ty-numtype ->
+    ty-testop-numtype ->
+    -----------------
     ty-instr
   RELOP :
-    (ty-numtype × ty-relop-numtype) ->
-    --------
+    ty-numtype ->
+    ty-relop-numtype ->
+    ----------------
     ty-instr
   LOCAL-GET :
     ty-localidx ->
-    --------
+    -----------
     ty-instr
   LOCAL-SET :
     ty-localidx ->
-    --------
+    -----------
     ty-instr
   LOCAL-TEE :
     ty-localidx ->
-    --------
+    -----------
     ty-instr
   GLOBAL-GET :
     ty-globalidx ->
-    --------
+    ------------
     ty-instr
   GLOBAL-SET :
     ty-globalidx ->
-    --------
+    ------------
     ty-instr
 
 ty-expr : Set
@@ -362,10 +346,10 @@ $Ki _ = 1024
 $min : ((Nat × Nat)) → Nat
 $min ⟨ 0 , j ⟩ = 0
 $min ⟨ i , 0 ⟩ = 0
-$min ⟨ i , j ⟩ = $min ⟨ i - 1 , j - 1 ⟩
+$min ⟨ suc i , suc j ⟩ = $min ⟨ i , j ⟩
 
 $size : ty-valtype → (Maybe Nat)
-$size (I32 _) = just 32
+$size I32 = just 32
 $size x = nothing
 
 $test-sub-ATOM-22 : ty-n → Nat
@@ -377,39 +361,57 @@ $curried- ⟨ n-1 , n-2 ⟩ = n-1 + n-2
 data ty-testfuse : Set
 data ty-testfuse where
   AB- :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   CD :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   EF :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   GH :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   IJ :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   KL :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   MN :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   OP :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
   QR :
-    ((Nat × Nat) × Nat) ->
+    Nat ->
+    Nat ->
+    Nat ->
     -----------
     ty-testfuse
 
@@ -443,7 +445,7 @@ data ty-Blocktype-ok where
   - :
     (C : ty-context) (ft : ty-functype) ->
     ty-Functype-ok ft ->
-    -------------------------------------------
+    -----------------------------------
     ty-Blocktype-ok ⟨ ⟨ C , ft ⟩ , ft ⟩
 
 data ty-Instr-ok : (((ty-context × ty-instr) × ty-functype)) → Set
@@ -451,129 +453,129 @@ data ty-InstrSeq-ok : (((ty-context × (List ty-instr)) × ty-functype)) → Set
 data ty-Instr-ok where
   unreachable :
     (C : ty-context) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
-    ----------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , UNREACHABLE (record { }) ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
+    ---------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , UNREACHABLE ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   nop :
     (C : ty-context) ->
-    ------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , NOP (record { }) ⟩ , ⟨ [] , [] ⟩ ⟩
+    -----------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , NOP ⟩ , ⟨ [] , [] ⟩ ⟩
   drop :
     (C : ty-context) (t : ty-valtype) ->
-    -------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , DROP (record { }) ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
+    ----------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , DROP ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   select-expl :
     (C : ty-context) (t : ty-valtype) ->
-    --------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT (just t) ⟩ , ⟨ t ∷ (t ∷ ((I32 (record { })) ∷ [])) , t ∷ [] ⟩ ⟩
+    ---------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT (just t) ⟩ , ⟨ t ∷ (t ∷ (I32 ∷ [])) , t ∷ [] ⟩ ⟩
   select-impl :
     (C : ty-context) (numtype : ty-numtype) (t : ty-valtype) ->
     t === ($valtype-numtype numtype) ->
-    -------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , SELECT nothing ⟩ , ⟨ t ∷ (t ∷ ((I32 (record { })) ∷ [])) , t ∷ [] ⟩ ⟩
+    --------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , SELECT nothing ⟩ , ⟨ t ∷ (t ∷ (I32 ∷ [])) , t ∷ [] ⟩ ⟩
   block :
     (C : ty-context) (bt : ty-blocktype) (instr : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ----------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , BLOCK ⟨ bt , instr ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , BLOCK bt instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   loop :
     (C : ty-context) (bt : ty-blocktype) (instr : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-1 -> (t-1 ∷ []))) t-1 ; RETURNS = nothing }) , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ---------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , LOOP ⟨ bt , instr ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , LOOP bt instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   if :
     (C : ty-context) (bt : ty-blocktype) (instr-1 : List ty-instr) (instr-2 : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-Blocktype-ok ⟨ ⟨ C , bt ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr-1 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = (map (λ t-2 -> (t-2 ∷ []))) t-2 ; RETURNS = nothing }) , instr-2 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ---------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , IF ⟨ ⟨ bt , instr-1 ⟩ , instr-2 ⟩ ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , IF bt instr-1 instr-2 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   br :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ((idx (ty-context.LABEL C)) l) === t ->
-    -------------------------------------------------------------
+    -------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , BR l ⟩ , ⟨ t-1 ++ t , t-2 ⟩ ⟩
   br-if :
     (C : ty-context) (l : ty-labelidx) (t : List ty-valtype) ->
     ((idx (ty-context.LABEL C)) l) === t ->
-    --------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , BR-IF l ⟩ , ⟨ t ++ ((I32 (record { })) ∷ []) , t ⟩ ⟩
+    ---------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , BR-IF l ⟩ , ⟨ t ++ (I32 ∷ []) , t ⟩ ⟩
   return :
     (C : ty-context) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     (ty-context.RETURNS C) === (just t) ->
-    ----------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , RETURN (record { }) ⟩ , ⟨ t-1 ++ t , t-2 ⟩ ⟩
+    ---------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , RETURN ⟩ , ⟨ t-1 ++ t , t-2 ⟩ ⟩
   call :
     (C : ty-context) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.FUNC C)) x) === ⟨ t-1 , t-2 ⟩ ->
-    ----------------------------------------------------------
+    -----------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , CALL x ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   const :
     (C : ty-context) (c-nt : ty-c-numtype) (nt : ty-numtype) ->
-    ---------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , CONST ⟨ nt , c-nt ⟩ ⟩ , ⟨ [] , ($valtype-numtype nt) ∷ [] ⟩ ⟩
+    ---------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , CONST nt c-nt ⟩ , ⟨ [] , ($valtype-numtype nt) ∷ [] ⟩ ⟩
   unop :
     (C : ty-context) (nt : ty-numtype) (unop : ty-unop-numtype) ->
-    ----------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , UNOP ⟨ nt , unop ⟩ ⟩ , ⟨ ($valtype-numtype nt) ∷ [] , ($valtype-numtype nt) ∷ [] ⟩ ⟩
+    --------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , UNOP nt unop ⟩ , ⟨ ($valtype-numtype nt) ∷ [] , ($valtype-numtype nt) ∷ [] ⟩ ⟩
   binop :
     (C : ty-context) (binop : ty-binop-numtype) (nt : ty-numtype) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , BINOP ⟨ nt , binop ⟩ ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , ($valtype-numtype nt) ∷ [] ⟩ ⟩
+    ------------------------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , BINOP nt binop ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , ($valtype-numtype nt) ∷ [] ⟩ ⟩
   testop :
     (C : ty-context) (nt : ty-numtype) (testop : ty-testop-numtype) ->
-    -----------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , TESTOP ⟨ nt , testop ⟩ ⟩ , ⟨ ($valtype-numtype nt) ∷ [] , (I32 (record { })) ∷ [] ⟩ ⟩
+    ------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , TESTOP nt testop ⟩ , ⟨ ($valtype-numtype nt) ∷ [] , I32 ∷ [] ⟩ ⟩
   relop :
     (C : ty-context) (nt : ty-numtype) (relop : ty-relop-numtype) ->
-    -------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Instr-ok ⟨ ⟨ C , RELOP ⟨ nt , relop ⟩ ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , (I32 (record { })) ∷ [] ⟩ ⟩
+    ------------------------------------------------------------------------------------------------------------
+    ty-Instr-ok ⟨ ⟨ C , RELOP nt relop ⟩ , ⟨ ($valtype-numtype nt) ∷ (($valtype-numtype nt) ∷ []) , I32 ∷ [] ⟩ ⟩
   local-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.LOCAL C)) x) === t ->
-    -------------------------------------------------------------------
+    -----------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   local-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.LOCAL C)) x) === t ->
-    -------------------------------------------------------------------
+    -----------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
   local-tee :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.LOCAL C)) x) === t ->
-    -------------------------------------------------------------------------
+    ---------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , LOCAL-TEE x ⟩ , ⟨ t ∷ [] , t ∷ [] ⟩ ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.GLOBAL C)) x) === ⟨ just (record { }) , t ⟩ ->
-    --------------------------------------------------------------------
+    -------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-GET x ⟩ , ⟨ [] , t ∷ [] ⟩ ⟩
   global-set :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.GLOBAL C)) x) === ⟨ just (record { }) , t ⟩ ->
-    --------------------------------------------------------------------
+    -------------------------------------------------------------
     ty-Instr-ok ⟨ ⟨ C , GLOBAL-SET x ⟩ , ⟨ t ∷ [] , [] ⟩ ⟩
 data ty-InstrSeq-ok where
   empty :
     (C : ty-context) ->
-    -------------------------------------------------------
+    -------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , [] ⟩ , ⟨ [] , [] ⟩ ⟩
   seq :
     (C : ty-context) (instr-1 : ty-instr) (instr-2 : ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (t-3 : List ty-valtype) ->
     ty-Instr-ok ⟨ ⟨ C , instr-1 ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr-2 ∷ [] ⟩ , ⟨ t-2 , t-3 ⟩ ⟩ ->
-    -------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , (instr-1 ∷ []) ++ (instr-2 ∷ []) ⟩ , ⟨ t-1 , t-3 ⟩ ⟩
   weak :
     (C : ty-context) (instr : List ty-instr) (t-1 : ty-valtype) (t-2 : List ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩ ->
-    -------------------------------------------------------------------
+    -----------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩
   frame :
     (C : ty-context) (instr : List ty-instr) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
-    ----------------------------------------------------------------------
+    ----------------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t ++ t-1 , t ++ t-2 ⟩ ⟩
 
 data ty-Expr-ok : (((ty-context × ty-expr) × ty-resulttype)) → Set
@@ -581,19 +583,19 @@ data ty-Expr-ok where
   - :
     (C : ty-context) (instr : List ty-instr) (t : List ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ [] , t ⟩ ⟩ ->
-    ----------------------------------------
+    ---------------------------------------------
     ty-Expr-ok ⟨ ⟨ C , instr ⟩ , t ⟩
 
 data ty-Instr-const : ((ty-context × ty-instr)) → Set
 data ty-Instr-const where
   const :
     (C : ty-context) (c : ty-c-numtype) (nt : ty-numtype) ->
-    -----------------------------------------------
-    ty-Instr-const ⟨ C , CONST ⟨ nt , c ⟩ ⟩
+    ---------------------------------
+    ty-Instr-const ⟨ C , CONST nt c ⟩
   global-get :
     (C : ty-context) (t : ty-valtype) (x : ty-idx) ->
     ((idx (ty-context.GLOBAL C)) x) === ⟨ nothing , t ⟩ ->
-    ---------------------------------------
+    ---------------------------------------------------
     ty-Instr-const ⟨ C , GLOBAL-GET x ⟩
 
 data ty-Expr-const : ((ty-context × ty-expr)) → Set
@@ -601,7 +603,7 @@ data ty-Expr-const where
   - :
     (C : ty-context) (instr : List ty-instr) ->
     (forAll (λ instr -> (ty-Instr-const ⟨ C , instr ⟩))) instr ->
-    -------------------------------
+    ----------------------------------------------------------
     ty-Expr-const ⟨ C , instr ⟩
 
 data ty-Expr-ok-const : (((ty-context × ty-expr) × ty-valtype)) → Set
@@ -610,7 +612,7 @@ data ty-Expr-ok-const where
     (C : ty-context) (expr : ty-expr) (t : ty-valtype) ->
     ty-Expr-ok ⟨ ⟨ C , expr ⟩ , t ∷ [] ⟩ ->
     ty-Expr-const ⟨ C , expr ⟩ ->
-    ---------------------------------------------
+    -------------------------------------
     ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩
 
 data ty-Func-ok : (((ty-context × ty-func) × ty-functype)) → Set
@@ -620,7 +622,7 @@ data ty-Func-ok where
     ft === ⟨ t-1 , t-2 ⟩ ->
     ty-Functype-ok ft ->
     ty-Expr-ok ⟨ ⟨ ((C ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = t-1 ++ t ; LABEL = [] ; RETURNS = nothing })) ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = t-2 ∷ [] ; RETURNS = nothing })) ++ty-context (record { FUNC = [] ; GLOBAL = [] ; LOCAL = [] ; LABEL = [] ; RETURNS = just t-2 }) , expr ⟩ , t-2 ⟩ ->
-    -----------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Func-ok ⟨ ⟨ C , ⟨ ⟨ ft , t ⟩ , expr ⟩ ⟩ , ft ⟩
 
 data ty-Global-ok : (((ty-context × ty-global) × ty-globaltype)) → Set
@@ -630,7 +632,7 @@ data ty-Global-ok where
     ty-Globaltype-ok gt ->
     gt === ⟨ just (record { }) , t ⟩ ->
     ty-Expr-ok-const ⟨ ⟨ C , expr ⟩ , t ⟩ ->
-    -------------------------------------------------------
+    -------------------------------------------
     ty-Global-ok ⟨ ⟨ C , ⟨ gt , expr ⟩ ⟩ , gt ⟩
 
 data ty-Start-ok : ((ty-context × ty-start)) → Set
@@ -638,7 +640,7 @@ data ty-Start-ok where
   - :
     (C : ty-context) (x : ty-idx) ->
     ((idx (ty-context.FUNC C)) x) === ⟨ [] , [] ⟩ ->
-    -------------------------
+    ---------------------------------------------
     ty-Start-ok ⟨ C , x ⟩
 
 data ty-Module-ok : ty-module → Set
@@ -650,7 +652,7 @@ data ty-Module-ok where
     ((forAll2 (λ global -> (λ gt -> (ty-Global-ok ⟨ ⟨ C , global ⟩ , gt ⟩)))) global) gt ->
     (forAll (λ start -> (ty-Start-ok ⟨ C , start ⟩))) start ->
     (length start) <= 1 ->
-    --------------------------------------------------
+    ----------------------------------------------------------------------------------------
     ty-Module-ok ⟨ ⟨ func , global ⟩ , start ⟩
 
 ty-addr : Set
@@ -671,30 +673,31 @@ ty-hostaddr  = ty-addr
 data ty-num : Set
 data ty-num where
   CONST :
-    (ty-numtype × ty-c-numtype) ->
-    ------
+    ty-numtype ->
+    ty-c-numtype ->
+    ------------
     ty-num
 
 data ty-val : Set
 data ty-val where
   CONST :
-    (ty-numtype × ty-c-numtype) ->
-    ------
+    ty-numtype ->
+    ty-c-numtype ->
+    ------------
     ty-val
 
 data ty-result : Set
 data ty-result where
   -VALS :
     List ty-val ->
-    ---------
+    -----------
     ty-result
   TRAP :
-    ⊤ ->
     ---------
     ty-result
 
 $default- : ty-valtype → (Maybe ty-val)
-$default- (I32 _) = just (CONST ⟨ I32 (record { }) , 0 ⟩)
+$default- I32 = just (CONST I32 0)
 $default- x = nothing
 
 record ty-moduleinst : Set
@@ -733,31 +736,32 @@ ty-state  = (ty-store × ty-frame)
 data ty-admininstr : Set
 data ty-admininstr where
   UNREACHABLE :
-    ⊤ ->
     -------------
     ty-admininstr
   NOP :
-    ⊤ ->
     -------------
     ty-admininstr
   DROP :
-    ⊤ ->
     -------------
     ty-admininstr
   SELECT :
     Maybe ty-valtype ->
-    -------------
+    ----------------
     ty-admininstr
   BLOCK :
-    (ty-blocktype × (List ty-instr)) ->
+    ty-blocktype ->
+    List ty-instr ->
     -------------
     ty-admininstr
   LOOP :
-    (ty-blocktype × (List ty-instr)) ->
+    ty-blocktype ->
+    List ty-instr ->
     -------------
     ty-admininstr
   IF :
-    ((ty-blocktype × (List ty-instr)) × (List ty-instr)) ->
+    ty-blocktype ->
+    List ty-instr ->
+    List ty-instr ->
     -------------
     ty-admininstr
   BR :
@@ -773,28 +777,32 @@ data ty-admininstr where
     -------------
     ty-admininstr
   RETURN :
-    ⊤ ->
     -------------
     ty-admininstr
   CONST :
-    (ty-numtype × ty-c-numtype) ->
+    ty-numtype ->
+    ty-c-numtype ->
     -------------
     ty-admininstr
   UNOP :
-    (ty-numtype × ty-unop-numtype) ->
-    -------------
+    ty-numtype ->
+    ty-unop-numtype ->
+    ---------------
     ty-admininstr
   BINOP :
-    (ty-numtype × ty-binop-numtype) ->
-    -------------
+    ty-numtype ->
+    ty-binop-numtype ->
+    ----------------
     ty-admininstr
   TESTOP :
-    (ty-numtype × ty-testop-numtype) ->
-    -------------
+    ty-numtype ->
+    ty-testop-numtype ->
+    -----------------
     ty-admininstr
   RELOP :
-    (ty-numtype × ty-relop-numtype) ->
-    -------------
+    ty-numtype ->
+    ty-relop-numtype ->
+    ----------------
     ty-admininstr
   LOCAL-GET :
     ty-localidx ->
@@ -821,38 +829,41 @@ data ty-admininstr where
     -------------
     ty-admininstr
   LABEL- :
-    ((ty-n × (List ty-instr)) × (List ty-admininstr)) ->
-    -------------
+    ty-n ->
+    List ty-instr ->
+    List ty-admininstr ->
+    ------------------
     ty-admininstr
   FRAME- :
-    ((ty-n × ty-frame) × (List ty-admininstr)) ->
-    -------------
+    ty-n ->
+    ty-frame ->
+    List ty-admininstr ->
+    ------------------
     ty-admininstr
   TRAP :
-    ⊤ ->
     -------------
     ty-admininstr
 
 $admininstr-globalinst : ty-globalinst → ty-admininstr
-$admininstr-globalinst (CONST x) = CONST x
+$admininstr-globalinst (CONST x0 x1) = CONST x0 x1
 
 $admininstr-instr : ty-instr → ty-admininstr
-$admininstr-instr (UNREACHABLE _) = UNREACHABLE (record { })
-$admininstr-instr (NOP _) = NOP (record { })
-$admininstr-instr (DROP _) = DROP (record { })
+$admininstr-instr UNREACHABLE = UNREACHABLE
+$admininstr-instr NOP = NOP
+$admininstr-instr DROP = DROP
 $admininstr-instr (SELECT x) = SELECT x
-$admininstr-instr (BLOCK x) = BLOCK x
-$admininstr-instr (LOOP x) = LOOP x
-$admininstr-instr (IF x) = IF x
+$admininstr-instr (BLOCK x0 x1) = BLOCK x0 x1
+$admininstr-instr (LOOP x0 x1) = LOOP x0 x1
+$admininstr-instr (IF x0 x1 x2) = IF x0 x1 x2
 $admininstr-instr (BR x) = BR x
 $admininstr-instr (BR-IF x) = BR-IF x
 $admininstr-instr (CALL x) = CALL x
-$admininstr-instr (RETURN _) = RETURN (record { })
-$admininstr-instr (CONST x) = CONST x
-$admininstr-instr (UNOP x) = UNOP x
-$admininstr-instr (BINOP x) = BINOP x
-$admininstr-instr (TESTOP x) = TESTOP x
-$admininstr-instr (RELOP x) = RELOP x
+$admininstr-instr RETURN = RETURN
+$admininstr-instr (CONST x0 x1) = CONST x0 x1
+$admininstr-instr (UNOP x0 x1) = UNOP x0 x1
+$admininstr-instr (BINOP x0 x1) = BINOP x0 x1
+$admininstr-instr (TESTOP x0 x1) = TESTOP x0 x1
+$admininstr-instr (RELOP x0 x1) = RELOP x0 x1
 $admininstr-instr (LOCAL-GET x) = LOCAL-GET x
 $admininstr-instr (LOCAL-SET x) = LOCAL-SET x
 $admininstr-instr (LOCAL-TEE x) = LOCAL-TEE x
@@ -860,7 +871,7 @@ $admininstr-instr (GLOBAL-GET x) = GLOBAL-GET x
 $admininstr-instr (GLOBAL-SET x) = GLOBAL-SET x
 
 $admininstr-val : ty-val → ty-admininstr
-$admininstr-val (CONST x) = CONST x
+$admininstr-val (CONST x0 x1) = CONST x0 x1
 
 ty-config : Set
 ty-config  = (ty-state × (List ty-admininstr))
@@ -889,16 +900,19 @@ $with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = (((
 data ty-E : Set
 data ty-E where
   -HOLE :
-    ⊤ ->
     ----
     ty-E
   -SEQ :
-    (((List ty-val) × ty-E) × (List ty-instr)) ->
-    ----
+    List ty-val ->
+    ty-E ->
+    List ty-instr ->
+    -------------
     ty-E
   LABEL- :
-    ((ty-n × (List ty-instr)) × ty-E) ->
-    ----
+    ty-n ->
+    List ty-instr ->
+    ty-E ->
+    -------------
     ty-E
 
 $unop : (((ty-unop-numtype × ty-numtype) × ty-c-numtype)) → (List ty-c-numtype)
@@ -916,133 +930,133 @@ $relop : ((((ty-relop-numtype × ty-numtype) × ty-c-numtype) × ty-c-numtype)) 
 data ty-Step-pure : (((List ty-admininstr) × (List ty-admininstr))) → Set
 data ty-Step-pure where
   unreachable :
-    -----------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (UNREACHABLE (record { })) ∷ [] , (TRAP (record { })) ∷ [] ⟩
+    ---------------------------------------------
+    ty-Step-pure ⟨ UNREACHABLE ∷ [] , TRAP ∷ [] ⟩
   nop :
-    ---------------------------------------------------
-    ty-Step-pure ⟨ (NOP (record { })) ∷ [] , [] ⟩
+    ------------------------------
+    ty-Step-pure ⟨ NOP ∷ [] , [] ⟩
   drop :
     (val : ty-val) ->
-    --------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ($admininstr-val val) ∷ ((DROP (record { })) ∷ []) , [] ⟩
+    ---------------------------------------------------------
+    ty-Step-pure ⟨ ($admininstr-val val) ∷ (DROP ∷ []) , [] ⟩
   select-true :
     (c : ty-c-numtype) (t : Maybe ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
     c =/= 0 ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ($admininstr-val val-1) ∷ (($admininstr-val val-2) ∷ ((CONST ⟨ I32 (record { }) , c ⟩) ∷ ((SELECT t) ∷ []))) , ($admininstr-val val-1) ∷ [] ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ($admininstr-val val-1) ∷ (($admininstr-val val-2) ∷ ((CONST I32 c) ∷ ((SELECT t) ∷ []))) , ($admininstr-val val-1) ∷ [] ⟩
   select-false :
     (c : ty-c-numtype) (t : Maybe ty-valtype) (val-1 : ty-val) (val-2 : ty-val) ->
     c === 0 ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ($admininstr-val val-1) ∷ (($admininstr-val val-2) ∷ ((CONST ⟨ I32 (record { }) , c ⟩) ∷ ((SELECT t) ∷ []))) , ($admininstr-val val-2) ∷ [] ⟩
+    -----------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ($admininstr-val val-1) ∷ (($admininstr-val val-2) ∷ ((CONST I32 c) ∷ ((SELECT t) ∷ []))) , ($admininstr-val val-2) ∷ [] ⟩
   block :
     (bt : ty-blocktype) (instr : List ty-instr) (k : Nat) (n : ty-n) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) ->
     bt === ⟨ t-1 , t-2 ⟩ ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ((map (λ val -> ($admininstr-val val))) val) ++ ((BLOCK ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , [] ⟩ , ((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr -> ($admininstr-instr instr))) instr) ⟩) ∷ [] ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ((map (λ val -> ($admininstr-val val))) val) ++ ((BLOCK bt instr) ∷ []) , (LABEL- n [] (((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))) ∷ [] ⟩
   loop :
     (bt : ty-blocktype) (instr : List ty-instr) (k : Nat) (n : ty-n) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) ->
     bt === ⟨ t-1 , t-2 ⟩ ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ ((map (λ val -> ($admininstr-val val))) val) ++ ((LOOP ⟨ bt , instr ⟩) ∷ []) , (LABEL- ⟨ ⟨ n , (LOOP ⟨ bt , instr ⟩) ∷ [] ⟩ , ((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr -> ($admininstr-instr instr))) instr) ⟩) ∷ [] ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ ((map (λ val -> ($admininstr-val val))) val) ++ ((LOOP bt instr) ∷ []) , (LABEL- n ((LOOP bt instr) ∷ []) (((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))) ∷ [] ⟩
   if-true :
     (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : List ty-instr) (instr-2 : List ty-instr) ->
     c =/= 0 ->
-    --------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((IF ⟨ ⟨ bt , instr-1 ⟩ , instr-2 ⟩) ∷ []) , (BLOCK ⟨ bt , instr-1 ⟩) ∷ [] ⟩
+    -----------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST I32 c) ∷ ((IF bt instr-1 instr-2) ∷ []) , (BLOCK bt instr-1) ∷ [] ⟩
   if-false :
     (bt : ty-blocktype) (c : ty-c-numtype) (instr-1 : List ty-instr) (instr-2 : List ty-instr) ->
     c === 0 ->
-    --------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((IF ⟨ ⟨ bt , instr-1 ⟩ , instr-2 ⟩) ∷ []) , (BLOCK ⟨ bt , instr-2 ⟩) ∷ [] ⟩
+    -----------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST I32 c) ∷ ((IF bt instr-1 instr-2) ∷ []) , (BLOCK bt instr-2) ∷ [] ⟩
   label-vals :
     (instr : List ty-instr) (n : ty-n) (val : List ty-val) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr ⟩ , (map (λ val -> ($admininstr-val val))) val ⟩) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
+    --------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- n instr ((map (λ val -> ($admininstr-val val))) val)) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
   br-zero :
     (instr : List ty-instr) (instr' : List ty-instr) (n : ty-n) (val : List ty-val) (val' : List ty-val) ->
-    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , ((map (λ val' -> ($admininstr-val val'))) val') ++ (((map (λ val -> ($admininstr-val val))) val) ++ (((BR 0) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))) ⟩) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr' -> ($admininstr-instr instr'))) instr') ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- n instr' (((map (λ val' -> ($admininstr-val val'))) val') ++ (((map (λ val -> ($admininstr-val val))) val) ++ (((BR 0) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))))) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ ((map (λ instr' -> ($admininstr-instr instr'))) instr') ⟩
   br-succ :
     (instr : List ty-instr) (instr' : List ty-instr) (l : ty-labelidx) (n : ty-n) (val : List ty-val) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ n , instr' ⟩ , ((map (λ val -> ($admininstr-val val))) val) ++ (((BR (l + 1)) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr)) ⟩) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ ((BR l) ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- n instr' (((map (λ val -> ($admininstr-val val))) val) ++ (((BR (l + 1)) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr)))) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ ((BR l) ∷ []) ⟩
   br-if-true :
     (c : ty-c-numtype) (l : ty-labelidx) ->
     c =/= 0 ->
-    ------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((BR-IF l) ∷ []) , (BR l) ∷ [] ⟩
+    ---------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST I32 c) ∷ ((BR-IF l) ∷ []) , (BR l) ∷ [] ⟩
   br-if-false :
     (c : ty-c-numtype) (l : ty-labelidx) ->
     c === 0 ->
-    -------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ I32 (record { }) , c ⟩) ∷ ((BR-IF l) ∷ []) , [] ⟩
+    ------------------------------------------------------
+    ty-Step-pure ⟨ (CONST I32 c) ∷ ((BR-IF l) ∷ []) , [] ⟩
   frame-vals :
     (f : ty-frame) (n : ty-n) (val : List ty-val) ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , (map (λ val -> ($admininstr-val val))) val ⟩) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
+    ----------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (FRAME- n f ((map (λ val -> ($admininstr-val val))) val)) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
   return-frame :
     (f : ty-frame) (instr : List ty-instr) (n : ty-n) (val : List ty-val) (val' : List ty-val) ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (FRAME- ⟨ ⟨ n , f ⟩ , ((map (λ val' -> ($admininstr-val val'))) val') ++ (((map (λ val -> ($admininstr-val val))) val) ++ (((RETURN (record { })) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))) ⟩) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (FRAME- n f (((map (λ val' -> ($admininstr-val val'))) val') ++ (((map (λ val -> ($admininstr-val val))) val) ++ ((RETURN ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr))))) ∷ [] , (map (λ val -> ($admininstr-val val))) val ⟩
   return-label :
     (instr : List ty-instr) (instr' : List ty-instr) (k : Nat) (val : List ty-val) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (LABEL- ⟨ ⟨ k , instr' ⟩ , ((map (λ val -> ($admininstr-val val))) val) ++ (((RETURN (record { })) ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr)) ⟩) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ ((RETURN (record { })) ∷ []) ⟩
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (LABEL- k instr' (((map (λ val -> ($admininstr-val val))) val) ++ ((RETURN ∷ []) ++ ((map (λ instr -> ($admininstr-instr instr))) instr)))) ∷ [] , ((map (λ val -> ($admininstr-val val))) val) ++ (RETURN ∷ []) ⟩
   unop-val :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
     ($unop ⟨ ⟨ unop , nt ⟩ , c-1 ⟩) === (c ∷ []) ->
-    -------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((UNOP ⟨ nt , unop ⟩) ∷ []) , (CONST ⟨ nt , c ⟩) ∷ [] ⟩
+    ---------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((UNOP nt unop) ∷ []) , (CONST nt c) ∷ [] ⟩
   unop-trap :
     (c-1 : ty-c-numtype) (nt : ty-numtype) (unop : ty-unop-numtype) ->
     ($unop ⟨ ⟨ unop , nt ⟩ , c-1 ⟩) === [] ->
-    ----------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((UNOP ⟨ nt , unop ⟩) ∷ []) , (TRAP (record { })) ∷ [] ⟩
+    -------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((UNOP nt unop) ∷ []) , TRAP ∷ [] ⟩
   binop-val :
     (binop : ty-binop-numtype) (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
     ($binop ⟨ ⟨ ⟨ binop , nt ⟩ , c-1 ⟩ , c-2 ⟩) === (c ∷ []) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((BINOP ⟨ nt , binop ⟩) ∷ [])) , (CONST ⟨ nt , c ⟩) ∷ [] ⟩
+    ------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((CONST nt c-2) ∷ ((BINOP nt binop) ∷ [])) , (CONST nt c) ∷ [] ⟩
   binop-trap :
     (binop : ty-binop-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) ->
     ($binop ⟨ ⟨ ⟨ binop , nt ⟩ , c-1 ⟩ , c-2 ⟩) === [] ->
-    -------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((BINOP ⟨ nt , binop ⟩) ∷ [])) , (TRAP (record { })) ∷ [] ⟩
+    ----------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((CONST nt c-2) ∷ ((BINOP nt binop) ∷ [])) , TRAP ∷ [] ⟩
   testop :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (nt : ty-numtype) (testop : ty-testop-numtype) ->
     c === ($testop ⟨ ⟨ testop , nt ⟩ , c-1 ⟩) ->
-    -------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((TESTOP ⟨ nt , testop ⟩) ∷ []) , (CONST ⟨ I32 (record { }) , c ⟩) ∷ [] ⟩
+    --------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((TESTOP nt testop) ∷ []) , (CONST I32 c) ∷ [] ⟩
   relop :
     (c : ty-c-numtype) (c-1 : ty-c-numtype) (c-2 : ty-c-numtype) (nt : ty-numtype) (relop : ty-relop-numtype) ->
     c === ($relop ⟨ ⟨ ⟨ relop , nt ⟩ , c-1 ⟩ , c-2 ⟩) ->
-    ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-pure ⟨ (CONST ⟨ nt , c-1 ⟩) ∷ ((CONST ⟨ nt , c-2 ⟩) ∷ ((RELOP ⟨ nt , relop ⟩) ∷ [])) , (CONST ⟨ I32 (record { }) , c ⟩) ∷ [] ⟩
+    -------------------------------------------------------------------------------------------------
+    ty-Step-pure ⟨ (CONST nt c-1) ∷ ((CONST nt c-2) ∷ ((RELOP nt relop) ∷ [])) , (CONST I32 c) ∷ [] ⟩
   local-tee :
     (val : ty-val) (x : ty-idx) ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-pure ⟨ ($admininstr-val val) ∷ ((LOCAL-TEE x) ∷ []) , ($admininstr-val val) ∷ (($admininstr-val val) ∷ ((LOCAL-SET x) ∷ [])) ⟩
 
 data ty-Step-read : ((ty-config × (List ty-admininstr))) → Set
 data ty-Step-read where
   call :
     (x : ty-idx) (z : ty-state) ->
-    ---------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ((idx ($funcaddr z)) x)) ∷ [] ⟩
   call-addr :
     (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : Nat) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
     ((idx ($funcinst z)) a) === ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
     f === (record { LOCAL = val ++ ((map (λ t -> (maybeThe ($default- t)))) t) ; MODULE = m }) ->
-    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ty-Step-read ⟨ ⟨ z , ((map (λ val -> ($admininstr-val val))) val) ++ ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- ⟨ ⟨ n , f ⟩ , (LABEL- ⟨ ⟨ n , [] ⟩ , (map (λ instr -> ($admininstr-instr instr))) instr ⟩) ∷ [] ⟩) ∷ [] ⟩
+    -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ty-Step-read ⟨ ⟨ z , ((map (λ val -> ($admininstr-val val))) val) ++ ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- n f ((LABEL- n [] ((map (λ instr -> ($admininstr-instr instr))) instr)) ∷ [])) ∷ [] ⟩
   local-get :
     (x : ty-idx) (z : ty-state) ->
-    -------------------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (LOCAL-GET x) ∷ [] ⟩ , ($admininstr-val ($local ⟨ z , x ⟩)) ∷ [] ⟩
   global-get :
     (x : ty-idx) (z : ty-state) ->
-    ----------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (GLOBAL-GET x) ∷ [] ⟩ , ($admininstr-globalinst ($global ⟨ z , x ⟩)) ∷ [] ⟩
 
 data ty-Step : ((ty-config × ty-config)) → Set
@@ -1050,32 +1064,26 @@ data ty-Step where
   pure :
     (instr : List ty-instr) (instr' : List ty-instr) (z : ty-state) ->
     ty-Step-pure ⟨ (map (λ instr -> ($admininstr-instr instr))) instr , (map (λ instr' -> ($admininstr-instr instr'))) instr' ⟩ ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------
     ty-Step ⟨ ⟨ z , (map (λ instr -> ($admininstr-instr instr))) instr ⟩ , ⟨ z , (map (λ instr' -> ($admininstr-instr instr'))) instr' ⟩ ⟩
   read :
     (instr : List ty-instr) (instr' : List ty-instr) (z : ty-state) ->
     ty-Step-read ⟨ ⟨ z , (map (λ instr -> ($admininstr-instr instr))) instr ⟩ , (map (λ instr' -> ($admininstr-instr instr'))) instr' ⟩ ->
-    ----------------------------------------------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------
     ty-Step ⟨ ⟨ z , (map (λ instr -> ($admininstr-instr instr))) instr ⟩ , ⟨ z , (map (λ instr' -> ($admininstr-instr instr'))) instr' ⟩ ⟩
   local-set :
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
-    -----------------------------------------------------------------------------------------------------------------------------------
+    -----------------------------------------------------------------------------------------------------------
     ty-Step ⟨ ⟨ z , ($admininstr-val val) ∷ ((LOCAL-SET x) ∷ []) ⟩ , ⟨ $with-local ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
   global-set :
     (val : ty-val) (x : ty-idx) (z : ty-state) ->
-    -------------------------------------------------------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------------------------------
     ty-Step ⟨ ⟨ z , ($admininstr-val val) ∷ ((GLOBAL-SET x) ∷ []) ⟩ , ⟨ $with-global ⟨ ⟨ z , x ⟩ , val ⟩ , [] ⟩ ⟩
 $ agda output.agda | sed -e "s/\/.*\/_build\///g"
 Checking output (default/test-agda/output.agda).
-default/test-agda/output.agda:897,1-906,7
+default/test-agda/output.agda:911,1-920,7
 The following names are declared but not accompanied by a
 definition: $binop, $relop, $testop, $unop
-default/test-agda/output.agda:355,1-358,40
-Termination checking failed for the following functions:
-  $min
-Problematic calls:
-  $min ⟨ i - 1 , j - 1 ⟩
-    (at default/test-agda/output.agda:358,18-22)
 Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:23,17-24
   default/test-agda/output.agda:25,14-21
@@ -1083,10 +1091,10 @@ Unsolved interaction metas at the following locations:
   default/test-agda/output.agda:32,15-22
   default/test-agda/output.agda:37,11-18
   default/test-agda/output.agda:39,13-20
-  default/test-agda/output.agda:418,18-19
-  default/test-agda/output.agda:699,21-22
-  default/test-agda/output.agda:713,16-17
-  default/test-agda/output.agda:721,16-17
+  default/test-agda/output.agda:420,18-19
+  default/test-agda/output.agda:702,21-22
+  default/test-agda/output.agda:716,16-17
+  default/test-agda/output.agda:724,16-17
 ```
 
 The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.
