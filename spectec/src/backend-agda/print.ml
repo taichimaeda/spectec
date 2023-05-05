@@ -11,7 +11,7 @@ module Render = struct
   let const = function
     | Ir.SetC -> "Set"
     | BoolC -> "Bool"
-    | NatC -> "Nat"
+    | NatC -> "ℕ"
     | TextC -> "String"
     | Bool b -> string_of_bool b
     | Nat n -> string_of_int n
@@ -120,24 +120,26 @@ let string_of_program prog =
       "open import Data.Maybe using (Maybe; just; nothing) renaming (map to \
        maybeMap)";
       "open import Data.String using (String)";
-      "open import Data.Nat renaming (ℕ to Nat; _≤_ to _<=_)";
-      "open import Data.Unit";
+      "open import Data.Nat using (ℕ; zero; suc; _+_; _*_; _^_; _≤_; _<_; _≥_; \
+       _>_)";
+      "open import Data.Unit using (⊤; tt)";
+      "open import Relation.Binary.PropositionalEquality using (_≡_; _≢_)";
       "";
       "data _×_ (A B : Set) : Set where";
       "  ⟨_,_⟩ : A → B → A × B";
-      "data _===_ {A : Set} : A -> A -> Set where";
-      "data _=/=_ {A : Set} : A -> A -> Set where";
-      "maybeTrue : {A : Set} -> (A -> Set) -> Maybe A -> Set";
+      "data _===_ {A : Set} : A → A → Set where";
+      "data _=/=_ {A : Set} : A → A → Set where";
+      "maybeTrue : {A : Set} → (A → Set) → Maybe A → Set";
       "maybeTrue _ _ = {!   !}";
-      "maybeThe : {A : Set} -> Maybe A -> A";
+      "maybeThe : {A : Set} → Maybe A → A";
       "maybeThe _ = {!   !}";
-      "forAll : {A : Set} -> (A -> Set) -> List A -> Set";
+      "forAll : {A : Set} → (A → Set) → List A → Set";
       "forAll _ _ = {!   !}";
-      "forAll2 : {A B : Set} -> (A -> B -> Set) -> List A -> List B -> Set";
+      "forAll2 : {A B : Set} → (A → B → Set) → List A → List B → Set";
       "forAll2 _ _ = {!   !}";
-      "idx : {A : Set} -> List A -> Nat -> A";
+      "idx : {A : Set} → List A → ℕ → A";
       "idx _ _ = {!   !}";
-      "upd : {A : Set} -> List A -> Nat -> A -> List A";
+      "upd : {A : Set} → List A → ℕ → A → List A";
       "upd _ _ _ = {!   !}";
       "";
       Render.program prog;

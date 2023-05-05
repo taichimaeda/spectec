@@ -1,15 +1,15 @@
 Checking current (default/test-agda/current.agda).
-default/test-agda/current.agda:911,1-920,7
+default/test-agda/current.agda:896,1-905,7
 The following names are declared but not accompanied by a
 definition: $binop, $relop, $testop, $unop
 Unsolved interaction metas at the following locations:
-  default/test-agda/current.agda:23,17-24
-  default/test-agda/current.agda:25,14-21
-  default/test-agda/current.agda:30,14-21
-  default/test-agda/current.agda:32,15-22
-  default/test-agda/current.agda:37,11-18
-  default/test-agda/current.agda:39,13-20
-  default/test-agda/current.agda:420,18-19
-  default/test-agda/current.agda:702,21-22
-  default/test-agda/current.agda:716,16-17
-  default/test-agda/current.agda:724,16-17
+  default/test-agda/current.agda:14,17-24
+  default/test-agda/current.agda:16,14-21
+  default/test-agda/current.agda:18,14-21
+  default/test-agda/current.agda:20,15-22
+  default/test-agda/current.agda:22,11-18
+  default/test-agda/current.agda:24,13-20
+  default/test-agda/current.agda:405,18-19
+  default/test-agda/current.agda:687,21-22
+  default/test-agda/current.agda:701,16-17
+  default/test-agda/current.agda:709,16-17

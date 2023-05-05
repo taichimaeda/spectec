@@ -69,12 +69,12 @@ module Translate = struct
   let cmpop (op : Ast.cmpop) : Ir.exp -> Ir.exp -> Ir.exp =
     let opname =
       match op with
-      | EqOp -> "==="
-      | NeOp -> "=/="
-      | LtOp -> "<<"
+      | EqOp -> "≡"
+      | NeOp -> "≢"
+      | LtOp -> "<"
       | GtOp -> ">"
-      | LeOp -> "<="
-      | GeOp -> ">="
+      | LeOp -> "≤"
+      | GeOp -> "≥"
     in
     builtin_infix opname
 
