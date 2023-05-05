@@ -32,6 +32,17 @@ module Render = struct
     | CaseP (i, []) -> id i
     | CaseP (_, _ :: _) as p -> "(" ^ pat p ^ ")"
 
+  let mixfix op strs =
+    let op_parts = String.split_on_char '_' op in
+    match op_parts with
+    | part :: parts ->
+        part
+        ^ String.concat " "
+            (List.map2
+               (fun str part -> if part = "" then str else str ^ " " ^ part)
+               strs parts)
+    | [] -> failwith "mixfix"
+
   let rec exp = function
     | Ir.ProdE es ->
         fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map atomic_exp es)
@@ -45,7 +56,7 @@ module Render = struct
         ^ " }"
     | UpdE (e1, f, e2) ->
         "record " ^ atomic_exp e1 ^ " { " ^ id f ^ " = " ^ atomic_exp e2 ^ " }"
-    | InfixE (op, e1, e2) -> atomic_exp e1 ^ " " ^ id op ^ " " ^ atomic_exp e2
+    | MixfixE (op, es) -> mixfix (id op) (List.map atomic_exp es)
     | CaseE (i, (_ :: _ as es)) ->
         id i ^ " " ^ String.concat " " (List.map atomic_exp es)
     | (VarE _ | ConstE _ | TupleE _ | CaseE (_, []) | YetE _) as e ->
@@ -61,7 +72,7 @@ module Render = struct
     | CaseE (i, []) -> id i
     | YetE s -> "{!   !} " ^ comment s
     | ( ProdE _ | ArrowE _ | ApplyE _ | DotE _ | FunE _ | StrE _ | UpdE _
-      | InfixE _
+      | MixfixE _
       | CaseE (_, _ :: _) ) as e ->
         "(" ^ exp e ^ ")"
 

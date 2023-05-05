@@ -29,7 +29,7 @@ type exp =
   | DotE of exp * id * id
   | FunE of id * exp
   | UpdE of exp * id * exp
-  | InfixE of id * exp * exp
+  | MixfixE of id * exp list
 
 type cons = id * (id * exp) list * exp list * exp
 type field = id * exp

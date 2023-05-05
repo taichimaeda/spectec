@@ -25,7 +25,7 @@ A backend translating a Wasm specification into Agda.
 
 A list of minor issues that need to be resolved at some point. (We are working on a branch and we do not want to pollute the main GitHub repo with them.)
 
-- mixfix operators
+- use Watsup mixfix notation
 - use a pretty-printer for Agda output
 - use size proofs when indexing
 - generate record concatenation

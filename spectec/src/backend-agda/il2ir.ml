@@ -29,7 +29,10 @@ module Translate = struct
     ApplyE (ApplyE (builtin_const name, e1), e2)
 
   let builtin_infix name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
-    InfixE (unsafe_str name, e1, e2)
+    MixfixE (unsafe_str ("_" ^ name ^ "_"), [ e1; e2 ])
+
+  let builtin_mixfix name (es : Ir.exp list) : Ir.exp =
+    MixfixE (unsafe_str name, es)
 
   let builtin_ternary name (e1 : Ir.exp) (e2 : Ir.exp) (e3 : Ir.exp) : Ir.exp =
     ApplyE (ApplyE (ApplyE (builtin_const name, e1), e2), e3)
@@ -130,8 +133,12 @@ module Translate = struct
               (old_val', atom a, k (DotE (old_val', record_id old_val, atom a))))
     | IdxP (p, _e) ->
         update_path env p old_val (fun old_val' ->
-            builtin_ternary "_[_]∷=_" old_val' (YetE "upd")
-              (k (builtin_binary "lookup" old_val' (YetE "upd"))))
+            builtin_mixfix "_[_]∷=_"
+              [
+                old_val';
+                YetE "upd";
+                k (builtin_binary "lookup" old_val' (YetE "upd"));
+              ])
     | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
   let rec pat env (e : Ast.exp) : Ir.pat =

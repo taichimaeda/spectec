@@ -857,10 +857,10 @@ $local : ((ty-state × ty-localidx)) → ty-val
 $local ⟨ ⟨ s , f ⟩ , x ⟩ = (lookup (ty-frame.LOCAL f)) {!   !} {- idx -}
 
 $with-local : (((ty-state × ty-localidx) × ty-val)) → ty-state
-$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , record f { LOCAL = (((_[_]∷=_ (ty-frame.LOCAL f)) {!   !} {- upd -}) v) } ⟩
+$with-local ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ s , record f { LOCAL = ((ty-frame.LOCAL f) [ {!   !} {- upd -} ]∷= v) } ⟩
 
 $with-global : (((ty-state × ty-globalidx) × ty-val)) → ty-state
-$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = (((_[_]∷=_ (ty-store.GLOBAL s)) {!   !} {- upd -}) v) } , f ⟩
+$with-global ⟨ ⟨ ⟨ s , f ⟩ , x ⟩ , v ⟩ = ⟨ record s { GLOBAL = ((ty-store.GLOBAL s) [ {!   !} {- upd -} ]∷= v) } , f ⟩
 
 data ty-E : Set
 data ty-E where
