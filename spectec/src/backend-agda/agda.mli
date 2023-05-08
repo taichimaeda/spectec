@@ -1,4 +1,4 @@
-type id = Id of string
+type id = Id of string | TyId of string | FunId of string | BuiltIn of string
 
 type const =
   | SetC

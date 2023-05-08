@@ -1,6 +1,17 @@
 let comment s = "{- " ^ s ^ " -}"
 let keywords = [ "in"; "module" ]
-let id (Agda.Id str) = if List.mem str keywords then str ^ "'" else str
+
+let make_safe (str : string) =
+  let str' =
+    String.map (function '_' | '.' -> '-' | ';' -> ',' | c -> c) str
+  in
+  if List.mem str' keywords then str' ^ "'" else str'
+
+let id = function
+  | Agda.Id str -> make_safe str
+  | Agda.TyId str -> make_safe ("ty-" ^ str)
+  | Agda.FunId str -> make_safe ("$" ^ str)
+  | Agda.BuiltIn str -> str
 
 let fold_left op default str =
   match str with
