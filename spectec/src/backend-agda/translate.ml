@@ -17,64 +17,30 @@ module Translate = struct
   let record_id (exp : Ast.exp) =
     match exp.note with { it = VarT i; _ } -> tyid i | _ -> assert false
 
-  let builtin_const name : Agda.exp = VarE (builtin name)
+  let builtin_const b : Agda.exp = VarE (builtin b)
+  let builtin_unary b (e : Agda.exp) : Agda.exp = ApplyE (builtin_const b, e)
 
-  let builtin_unary name (e : Agda.exp) : Agda.exp =
-    ApplyE (builtin_const name, e)
+  let builtin_binary b (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
+    ApplyE (ApplyE (builtin_const b, e1), e2)
 
-  let builtin_binary name (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
-    ApplyE (ApplyE (builtin_const name, e1), e2)
+  let builtin_infix b (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
+    MixfixE (builtin b, [ e1; e2 ])
 
-  let builtin_infix name (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
-    MixfixE (builtin ("_" ^ name ^ "_"), [ e1; e2 ])
+  let builtin_mixfix b (es : Agda.exp list) : Agda.exp = MixfixE (builtin b, es)
 
-  let builtin_mixfix name (es : Agda.exp list) : Agda.exp =
-    MixfixE (builtin name, es)
-
-  let builtin_ternary name (e1 : Agda.exp) (e2 : Agda.exp) (e3 : Agda.exp) :
+  let builtin_ternary b (e1 : Agda.exp) (e2 : Agda.exp) (e3 : Agda.exp) :
       Agda.exp =
-    ApplyE (ApplyE (ApplyE (builtin_const name, e1), e2), e3)
+    ApplyE (ApplyE (ApplyE (builtin_const b, e1), e2), e3)
 
   let rec typ env (t : Ast.typ) : Agda.exp =
     match t.it with
     | VarT n -> VarE (tyid n)
-    | BoolT -> ConstE BoolC
-    | NatT -> ConstE NatC
-    | TextT -> ConstE TextC
+    | BoolT -> VarE (BuiltIn BoolB)
+    | NatT -> VarE (BuiltIn NatB)
+    | TextT -> VarE (BuiltIn TextB)
     | TupT ts -> ProdE (List.map (typ env) ts)
-    | IterT (t, Opt) -> builtin_unary "Maybe" (typ env t)
-    | IterT (t, (List | List1 | ListN _)) -> builtin_unary "List" (typ env t)
-
-  let unop (op : Ast.unop) : Agda.exp -> Agda.exp =
-    let opname =
-      match op with NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
-    in
-
-    builtin_unary opname
-
-  let binop (op : Ast.binop) : Agda.exp -> Agda.exp -> Agda.exp =
-    let opname =
-      match op with
-      | AndOp -> "/\\"
-      | OrOp -> "\\/"
-      | ImplOp -> "=>"
-      | EquivOp -> "<=>"
-      | AddOp -> "+"
-      | SubOp -> "-"
-      | MulOp -> "*"
-      | DivOp -> "/"
-      | ExpOp -> "^"
-    in
-    builtin_infix opname
-
-  let cmpop (op : Ast.cmpop) (e1 : Agda.exp) (e2 : Agda.exp) =
-    match op with
-    | EqOp -> builtin_infix "≡" e1 e2
-    | NeOp -> builtin_infix "≢" e1 e2
-    | LtOp -> builtin_infix "<" e1 e2
-    | GtOp -> builtin_infix "<" e2 e1
-    | LeOp -> builtin_infix "≤" e1 e2
-    | GeOp -> builtin_infix "≤" e2 e1
+    | IterT (t, Opt) -> builtin_unary MaybeB (typ env t)
+    | IterT (t, (List | List1 | ListN _)) -> builtin_unary ListB (typ env t)
 
   let rec exp env (e : Ast.exp) : Agda.exp =
     match e.it with
@@ -82,10 +48,10 @@ module Translate = struct
     | BoolE b -> LiteralE (BoolL b)
     | NatE n -> LiteralE (NatL n)
     | TextE t -> LiteralE (TextL t)
-    | UnE (op, e) -> (unop op) (exp env e)
-    | BinE (op, e1, e2) -> (binop op) (exp env e1) (exp env e2)
-    | CmpE (op, e1, e2) -> (cmpop op) (exp env e1) (exp env e2)
-    | IdxE (e1, _e2) -> builtin_binary "lookup" (exp env e1) (YetE "idx")
+    | UnE (op, e) -> builtin_unary (UnOpB op) (exp env e)
+    | BinE (op, e1, e2) -> builtin_infix (BinOpB op) (exp env e1) (exp env e2)
+    | CmpE (op, e1, e2) -> builtin_infix (CmpOpB op) (exp env e1) (exp env e2)
+    | IdxE (e1, _e2) -> builtin_binary LookupB (exp env e1) (YetE "idx")
     | SliceE (_e1, _e2, _e3) -> YetE ("SliceE: " ^ Print.string_of_exp e)
     | UpdE (e1, path, e2) -> update_path env path e1 (fun _ -> exp env e2)
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
@@ -93,9 +59,9 @@ module Translate = struct
     | DotE (e1, a) -> DotE (exp env e1, record_id e1, atom a)
     | CompE (e1, e2) -> (
         match record_id e1 with
-        | Agda.TyId i -> builtin_infix ("++ty-" ^ i) (exp env e1) (exp env e2)
+        | Agda.TyId i -> builtin_infix (CompB i) (exp env e1) (exp env e2)
         | _ -> assert false)
-    | LenE e -> builtin_unary "length" (exp env e)
+    | LenE e -> builtin_unary LengthB (exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
         (exp env)
@@ -103,22 +69,22 @@ module Translate = struct
     | CallE (x, e) -> ApplyE (VarE (funid x), exp env e)
     | IterE (({ it = VarE v; _ } as e), (_, [ v' ])) when v.it = v'.it ->
         exp env e
-    | IterE (e, (Opt, [])) -> builtin_unary "just" (exp env e)
+    | IterE (e, (Opt, [])) -> builtin_unary JustB (exp env e)
     | IterE (e, ((List | List1 | ListN _), [])) ->
-        builtin_infix "∷" (exp env e) (builtin_const "[]")
+        builtin_infix ConsB (exp env e) (builtin_const NilB)
     | IterE (e, (Opt, [ v ])) ->
-        builtin_binary "maybeMap" (FunE (id v, exp env e)) (VarE (id v))
+        builtin_binary MaybeMapB (FunE (id v, exp env e)) (VarE (id v))
     | IterE (e, ((List | List1 | ListN _), [ v ])) ->
-        builtin_binary "map" (FunE (id v, exp env e)) (VarE (id v))
+        builtin_binary ListMapB (FunE (id v, exp env e)) (VarE (id v))
     | IterE (_e1, _iter) -> YetE ("IterE: " ^ Print.string_of_exp e)
-    | OptE None -> builtin_const "nothing"
-    | OptE (Some e) -> builtin_unary "just" (exp env e)
+    | OptE None -> builtin_const NothingB
+    | OptE (Some e) -> builtin_unary JustB (exp env e)
     | TheE _e -> YetE ("TheE: " ^ Print.string_of_exp e)
     | ListE es ->
         List.fold_right
-          (fun e lst -> builtin_infix "∷" (exp env e) lst)
-          es (builtin_const "[]")
-    | CatE (e1, e2) -> builtin_infix "++" (exp env e1) (exp env e2)
+          (fun e lst -> builtin_infix ConsB (exp env e) lst)
+          es (builtin_const NilB)
+    | CatE (e1, e2) -> builtin_infix ConcatB (exp env e1) (exp env e2)
     | CaseE (a, { it = TupE es; _ }) -> CaseE (atom a, List.map (exp env) es)
     | CaseE (a, e) -> CaseE (atom a, [ exp env e ])
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
@@ -132,11 +98,11 @@ module Translate = struct
               (old_val', atom a, k (DotE (old_val', record_id old_val, atom a))))
     | IdxP (p, _e) ->
         update_path env p old_val (fun old_val' ->
-            builtin_mixfix "_[_]∷=_"
+            builtin_mixfix UpdateB
               [
                 old_val';
                 YetE "upd";
-                k (builtin_binary "lookup" old_val' (YetE "upd"));
+                k (builtin_binary LookupB old_val' (YetE "upd"));
               ])
     | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
@@ -148,7 +114,7 @@ module Translate = struct
     | TextE t -> LiteralP (TextL t)
     | UnE (_op, _e2) -> YetP ("UnE: " ^ Print.string_of_exp e)
     | BinE (AddOp, e, { it = Ast.NatE 1; _ }) ->
-        CaseP (builtin "suc", [ pat env e ])
+        CaseP (builtin SucB, [ pat env e ])
     | BinE (_op, _e1, _e2) -> YetP ("BinE: " ^ Print.string_of_exp e)
     | CmpE (_op, _e1, _e2) -> YetP ("CmpE: " ^ Print.string_of_exp e)
     | IdxE (_e1, _e2) -> YetP ("IdxE: " ^ Print.string_of_exp e)
@@ -177,13 +143,15 @@ module Translate = struct
 
   let deftyp env x (dt : Ast.deftyp) : Agda.def =
     match dt.it with
-    | AliasT ty -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
-    | NotationT (_op, ty) -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
-    | StructT tfs -> RecordD (tyid x, ConstE SetC, List.map (typefield env) tfs)
+    | AliasT ty -> DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ])
+    | NotationT (_op, ty) ->
+        DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ])
+    | StructT tfs ->
+        RecordD (tyid x, builtin_const SetB, List.map (typefield env) tfs)
     | VariantT tcs ->
         DataD
           ( tyid x,
-            ConstE SetC,
+            builtin_const SetB,
             List.map
               (fun (a, t, _hints) ->
                 ( atom a,
@@ -201,8 +169,8 @@ module Translate = struct
     | _ :: _ -> failwith __LOC__
 
   let iterate_ty (ty : Agda.exp) : Ast.iter -> Agda.exp = function
-    | Opt -> builtin_unary "Maybe" ty
-    | List | List1 | ListN _ -> builtin_unary "List" ty
+    | Opt -> builtin_unary MaybeB ty
+    | List | List1 | ListN _ -> builtin_unary ListB ty
 
   let rule env (rel : Agda.exp) (r : Ast.rule) =
     let (RuleD (x, bs, _op, e, ps)) = r.it in
@@ -219,11 +187,11 @@ module Translate = struct
           failwith
             __LOC__ (* Apparently, this should be removed in the middlend *)
       | IterPr (p', (Opt, [ v ])) ->
-          builtin_binary "maybeAll" (FunE (id v, premise p')) (VarE (id v))
+          builtin_binary MaybeAllB (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v ])) ->
-          builtin_binary "All" (FunE (id v, premise p')) (VarE (id v))
+          builtin_binary ListAllB (FunE (id v, premise p')) (VarE (id v))
       | IterPr (p', ((List | List1 | ListN _), [ v1; v2 ])) ->
-          builtin_ternary "Pointwise"
+          builtin_ternary ListAll2B
             (FunE (id v1, FunE (id v2, premise p')))
             (VarE (id v1))
             (VarE (id v2))
@@ -231,7 +199,7 @@ module Translate = struct
     in
 
     let premises ps = List.map premise ps in
-    ( (if x.it <> "" then id x else builtin "-"),
+    ( (if x.it <> "" then id x else Agda.Id "-"),
       binds bs,
       premises ps,
       Agda.ApplyE (rel, exp env e) )
@@ -243,7 +211,7 @@ module Translate = struct
         [
           DataD
             ( tyid x,
-              ArrowE ((typ env) ty, ConstE SetC),
+              ArrowE ((typ env) ty, builtin_const SetB),
               List.map (rule env (VarE (tyid x))) rules );
         ]
     | DecD (i, tin, tout, clss) ->

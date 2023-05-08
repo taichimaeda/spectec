@@ -7,11 +7,58 @@ let make_safe (str : string) =
   in
   if List.mem str' keywords then str' ^ "'" else str'
 
+let unop = function Il.Ast.NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
+
+let binop = function
+  | Il.Ast.AndOp -> "/\\"
+  | OrOp -> "\\/"
+  | ImplOp -> "=>"
+  | EquivOp -> "<=>"
+  | AddOp -> "+"
+  | SubOp -> "-"
+  | MulOp -> "*"
+  | DivOp -> "/"
+  | ExpOp -> "^"
+
+let cmpop = function
+  | Il.Ast.EqOp -> "≡"
+  | NeOp -> "≢"
+  | LtOp -> "<"
+  | GtOp -> ">"
+  | LeOp -> "≤"
+  | GeOp -> "≥"
+
+let builtin = function
+  | Agda.SetB -> "Set"
+  | BoolB -> "Bool"
+  | NatB -> "ℕ"
+  | TextB -> "String"
+  | MaybeB -> "Maybe"
+  | ListB -> "List"
+  | UnOpB op -> unop op
+  | BinOpB op -> "_" ^ binop op ^ "_"
+  | CmpOpB op -> "_" ^ cmpop op ^ "_"
+  | LookupB -> "lookup"
+  | LengthB -> "length"
+  | JustB -> "just"
+  | ConsB -> "_∷_"
+  | NilB -> "[]"
+  | CompB i -> "_++ty-" ^ i ^ "_"
+  | ConcatB -> "_++_"
+  | MaybeMapB -> "maybeMap"
+  | ListMapB -> "map"
+  | NothingB -> "nothing"
+  | SucB -> "suc"
+  | MaybeAllB -> "MaybeAll"
+  | ListAllB -> "All"
+  | ListAll2B -> "Pointwise"
+  | UpdateB -> "_[_]∷=_"
+
 let id = function
   | Agda.Id str -> make_safe str
   | Agda.TyId str -> make_safe ("ty-" ^ str)
   | Agda.FunId str -> make_safe ("$" ^ str)
-  | Agda.BuiltIn str -> str
+  | Agda.BuiltIn b -> builtin b
 
 let fold_left op default str =
   match str with
@@ -23,12 +70,6 @@ module Render = struct
     | Agda.BoolL b -> string_of_bool b
     | NatL n -> string_of_int n
     | TextL s -> s
-
-  let const = function
-    | Agda.SetC -> "Set"
-    | BoolC -> "Bool"
-    | NatC -> "ℕ"
-    | TextC -> "String"
 
   let rec pat = function
     | Agda.CaseP (i, (_ :: _ as ps)) ->
@@ -72,13 +113,11 @@ module Render = struct
     | MixfixE (op, es) -> mixfix (id op) (List.map atomic_exp es)
     | CaseE (i, (_ :: _ as es)) ->
         id i ^ " " ^ String.concat " " (List.map atomic_exp es)
-    | (VarE _ | ConstE _ | LiteralE _ | TupleE _ | CaseE (_, []) | YetE _) as e
-      ->
+    | (VarE _ | LiteralE _ | TupleE _ | CaseE (_, []) | YetE _) as e ->
         atomic_exp e
 
   and atomic_exp = function
     | Agda.VarE i -> id i
-    | ConstE c -> const c
     | LiteralE l -> literal l
     | TupleE es ->
         fold_left

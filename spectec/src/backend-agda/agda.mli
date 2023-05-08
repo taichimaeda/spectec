@@ -1,5 +1,30 @@
-type id = Id of string | TyId of string | FunId of string | BuiltIn of string
-type const = SetC | BoolC | NatC | TextC
+type builtin =
+  | SetB
+  | BoolB
+  | NatB
+  | TextB
+  | MaybeB
+  | ListB
+  | UnOpB of Il.Ast.unop
+  | BinOpB of Il.Ast.binop
+  | CmpOpB of Il.Ast.cmpop
+  | LookupB
+  | CompB of string
+  | LengthB
+  | JustB
+  | ConsB
+  | NilB
+  | ConcatB
+  | MaybeMapB
+  | ListMapB
+  | NothingB
+  | SucB
+  | MaybeAllB
+  | ListAllB
+  | ListAll2B
+  | UpdateB
+
+type id = Id of string | TyId of string | FunId of string | BuiltIn of builtin
 type literal = BoolL of bool | NatL of int | TextL of string
 
 type pat =
@@ -11,7 +36,6 @@ type pat =
 
 type exp =
   | VarE of id
-  | ConstE of const
   | LiteralE of literal
   | ProdE of exp list
   | TupleE of exp list
