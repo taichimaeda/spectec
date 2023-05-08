@@ -1,4 +1,4 @@
-let gen_string il = Print.string_of_program (Il2ir.translate il)
+let gen_string il = Print.string_of_program (Translate.script il)
 
 let gen_file file il =
   let latex = gen_string il in

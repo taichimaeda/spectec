@@ -1,6 +1,6 @@
 let comment s = "{- " ^ s ^ " -}"
 let keywords = [ "in"; "module" ]
-let id (Ir.Id str) = if List.mem str keywords then str ^ "'" else str
+let id (Agda.Id str) = if List.mem str keywords then str ^ "'" else str
 
 let fold_left op default str =
   match str with
@@ -9,7 +9,7 @@ let fold_left op default str =
 
 module Render = struct
   let const = function
-    | Ir.SetC -> "Set"
+    | Agda.SetC -> "Set"
     | BoolC -> "Bool"
     | NatC -> "ℕ"
     | TextC -> "String"
@@ -18,13 +18,13 @@ module Render = struct
     | Text s -> s
 
   let rec pat = function
-    | Ir.CaseP (i, (_ :: _ as ps)) ->
+    | Agda.CaseP (i, (_ :: _ as ps)) ->
         id i ^ " " ^ String.concat " " (List.map atomic_pat ps)
     | (VarP _ | ConstP _ | TupleP _ | YetP _ | CaseP (_, [])) as p ->
         atomic_pat p
 
   and atomic_pat = function
-    | Ir.VarP i -> id i
+    | Agda.VarP i -> id i
     | ConstP c -> const c
     | TupleP ps ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
@@ -44,7 +44,7 @@ module Render = struct
     | [] -> failwith "mixfix"
 
   let rec exp = function
-    | Ir.ProdE es ->
+    | Agda.ProdE es ->
         fold_left (Format.sprintf "(%s × %s)") "⊤" (List.map atomic_exp es)
     | ArrowE (e1, e2) -> atomic_exp e1 ^ " → " ^ atomic_exp e2
     | ApplyE (e1, e2) -> atomic_exp e1 ^ " " ^ atomic_exp e2
@@ -63,7 +63,7 @@ module Render = struct
         atomic_exp e
 
   and atomic_exp = function
-    | Ir.VarE i -> id i
+    | Agda.VarE i -> id i
     | ConstE c -> const c
     | TupleE es ->
         fold_left
@@ -101,23 +101,23 @@ module Render = struct
     List.map clause cls |> String.concat "\n"
 
   let rec decl_def = function
-    | Ir.DefD (i, t, _cls) -> id i ^ " : " ^ exp t
-    | Ir.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
-    | Ir.RecordD (i, e, _fs) ->
+    | Agda.DefD (i, t, _cls) -> id i ^ " : " ^ exp t
+    | Agda.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
+    | Agda.RecordD (i, e, _fs) ->
         "record " ^ id i ^ " : " ^ exp e ^ "\n" ^ "_++" ^ id i ^ "_ : " ^ id i
         ^ " -> " ^ id i ^ " -> " ^ id i
-    | Ir.MutualD defs -> String.concat "\n" (List.map decl_def defs)
+    | Agda.MutualD defs -> String.concat "\n" (List.map decl_def defs)
 
   and def_def = function
-    | Ir.DefD (i, _, cls) -> clauses i cls
-    | Ir.DataD (i, _, cs) ->
+    | Agda.DefD (i, _, cls) -> clauses i cls
+    | Agda.DataD (i, _, cs) ->
         "data " ^ id i ^ " where\n  "
         ^ (cs |> List.map cons |> String.concat "\n  ")
-    | Ir.RecordD (i, _, fs) ->
+    | Agda.RecordD (i, _, fs) ->
         "record " ^ id i ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
         ^ "\n" ^ "_++" ^ id i ^ "_ = {!   !}"
-    | Ir.MutualD defs -> String.concat "\n" (List.map def_def defs)
+    | Agda.MutualD defs -> String.concat "\n" (List.map def_def defs)
 
   let def d = decl_def d ^ "\n" ^ def_def d
   let program defs = List.map def defs |> String.concat "\n\n"

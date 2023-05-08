@@ -5,7 +5,7 @@ module Translate = struct
   type _env = unit
 
   let initial_env = ()
-  let unsafe_str (i : string) : Ir.id = Id i
+  let unsafe_str (i : string) : Agda.id = Id i
 
   let str i =
     unsafe_str
@@ -15,29 +15,29 @@ module Translate = struct
   let id i = str i.it
   let funid i = str ("$" ^ i.it)
 
-  let atom : Ast.atom -> Ir.id = function
+  let atom : Ast.atom -> Agda.id = function
     | Atom a -> str a
     | _ -> failwith __LOC__
 
   let record_id (exp : Ast.exp) =
     match exp.note with { it = VarT i; _ } -> tyid i | _ -> assert false
 
-  let builtin_const name : Ir.exp = VarE (unsafe_str name)
-  let builtin_unary name (e : Ir.exp) : Ir.exp = ApplyE (builtin_const name, e)
+  let builtin_const name : Agda.exp = VarE (unsafe_str name)
+  let builtin_unary name (e : Agda.exp) : Agda.exp = ApplyE (builtin_const name, e)
 
-  let builtin_binary name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
+  let builtin_binary name (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
     ApplyE (ApplyE (builtin_const name, e1), e2)
 
-  let builtin_infix name (e1 : Ir.exp) (e2 : Ir.exp) : Ir.exp =
+  let builtin_infix name (e1 : Agda.exp) (e2 : Agda.exp) : Agda.exp =
     MixfixE (unsafe_str ("_" ^ name ^ "_"), [ e1; e2 ])
 
-  let builtin_mixfix name (es : Ir.exp list) : Ir.exp =
+  let builtin_mixfix name (es : Agda.exp list) : Agda.exp =
     MixfixE (unsafe_str name, es)
 
-  let builtin_ternary name (e1 : Ir.exp) (e2 : Ir.exp) (e3 : Ir.exp) : Ir.exp =
+  let builtin_ternary name (e1 : Agda.exp) (e2 : Agda.exp) (e3 : Agda.exp) : Agda.exp =
     ApplyE (ApplyE (ApplyE (builtin_const name, e1), e2), e3)
 
-  let rec typ env (t : Ast.typ) : Ir.exp =
+  let rec typ env (t : Ast.typ) : Agda.exp =
     match t.it with
     | VarT n -> VarE (tyid n)
     | BoolT -> ConstE BoolC
@@ -47,14 +47,14 @@ module Translate = struct
     | IterT (t, Opt) -> builtin_unary "Maybe" (typ env t)
     | IterT (t, (List | List1 | ListN _)) -> builtin_unary "List" (typ env t)
 
-  let unop (op : Ast.unop) : Ir.exp -> Ir.exp =
+  let unop (op : Ast.unop) : Agda.exp -> Agda.exp =
     let opname =
       match op with NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
     in
 
     builtin_unary opname
 
-  let binop (op : Ast.binop) : Ir.exp -> Ir.exp -> Ir.exp =
+  let binop (op : Ast.binop) : Agda.exp -> Agda.exp -> Agda.exp =
     let opname =
       match op with
       | AndOp -> "/\\"
@@ -69,7 +69,7 @@ module Translate = struct
     in
     builtin_infix opname
 
-  let cmpop (op : Ast.cmpop) (e1 : Ir.exp) (e2 : Ir.exp) =
+  let cmpop (op : Ast.cmpop) (e1 : Agda.exp) (e2 : Agda.exp) =
     match op with
     | EqOp -> builtin_infix "≡" e1 e2
     | NeOp -> builtin_infix "≢" e1 e2
@@ -78,7 +78,7 @@ module Translate = struct
     | LeOp -> builtin_infix "≤" e1 e2
     | GeOp -> builtin_infix "≤" e2 e1
 
-  let rec exp env (e : Ast.exp) : Ir.exp =
+  let rec exp env (e : Ast.exp) : Agda.exp =
     match e.it with
     | VarE n -> VarE (id n)
     | BoolE b -> ConstE (Bool b)
@@ -94,7 +94,7 @@ module Translate = struct
     | StrE efs -> StrE (List.map (fun (f, e) -> (atom f, exp env e)) efs)
     | DotE (e1, a) -> DotE (exp env e1, record_id e1, atom a)
     | CompE (e1, e2) ->
-        let (Ir.Id i) = record_id e1 in
+        let (Agda.Id i) = record_id e1 in
         builtin_infix ("++" ^ i) (exp env e1) (exp env e2)
     | LenE e -> builtin_unary "length" (exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
@@ -124,7 +124,7 @@ module Translate = struct
     | CaseE (a, e) -> CaseE (atom a, [ exp env e ])
     | SubE (_e1, _t1, _t2) -> YetE ("SubE: " ^ Print.string_of_exp e)
 
-  and update_path env path old_val (k : Ir.exp -> Ir.exp) =
+  and update_path env path old_val (k : Agda.exp -> Agda.exp) =
     match path.it with
     | RootP -> k (exp env old_val)
     | DotP (p, a) ->
@@ -141,7 +141,7 @@ module Translate = struct
               ])
     | SliceP (_p, _e1, _e2) -> YetE "SliceP"
 
-  let rec pat env (e : Ast.exp) : Ir.pat =
+  let rec pat env (e : Ast.exp) : Agda.pat =
     match e.it with
     | VarE n -> VarP (id n)
     | BoolE b -> ConstP (Bool b)
@@ -176,7 +176,7 @@ module Translate = struct
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)
 
-  let deftyp env x (dt : Ast.deftyp) : Ir.def =
+  let deftyp env x (dt : Ast.deftyp) : Agda.def =
     match dt.it with
     | AliasT ty -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
     | NotationT (_op, ty) -> DefD (tyid x, ConstE SetC, [ ([], (typ env) ty) ])
@@ -192,7 +192,7 @@ module Translate = struct
                   (match t.it with
                   | Ast.TupT ts -> List.map (typ env) ts
                   | _ -> [ typ env t ]),
-                  Ir.VarE (tyid x) ))
+                  Agda.VarE (tyid x) ))
               tcs )
 
   let clause env (cls : Ast.clause) =
@@ -201,18 +201,18 @@ module Translate = struct
     | [] -> ([ (pat env) p ], exp env e)
     | _ :: _ -> failwith __LOC__
 
-  let iterate_ty (ty : Ir.exp) : Ast.iter -> Ir.exp = function
+  let iterate_ty (ty : Agda.exp) : Ast.iter -> Agda.exp = function
     | Opt -> builtin_unary "Maybe" ty
     | List | List1 | ListN _ -> builtin_unary "List" ty
 
-  let rule env (rel : Ir.exp) (r : Ast.rule) =
+  let rule env (rel : Agda.exp) (r : Ast.rule) =
     let (RuleD (x, bs, _op, e, ps)) = r.it in
     let binds bs =
       List.map
         (fun (x, t, iter) -> (id x, List.fold_left iterate_ty (typ env t) iter))
         bs
     in
-    let rec premise (p : Ast.premise) : Ir.exp =
+    let rec premise (p : Ast.premise) : Agda.exp =
       match p.it with
       | RulePr (x, _op, e) -> ApplyE (VarE (tyid x), exp env e)
       | IfPr e -> exp env e
@@ -235,9 +235,9 @@ module Translate = struct
     ( (if x.it <> "" then id x else str "-"),
       binds bs,
       premises ps,
-      Ir.ApplyE (rel, exp env e) )
+      Agda.ApplyE (rel, exp env e) )
 
-  let rec def env (d : Ast.def) : Ir.def list =
+  let rec def env (d : Ast.def) : Agda.def list =
     match d.it with
     | SynD (id, dt) -> [ deftyp env id dt ]
     | RelD (x, _op, ty, rules) ->
@@ -260,4 +260,4 @@ module Translate = struct
   and script sc = List.concat_map (def initial_env) sc
 end
 
-let translate = Translate.script
+let script = Translate.script

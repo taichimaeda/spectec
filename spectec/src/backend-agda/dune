@@ -1,5 +1,5 @@
 (library
   (name backend_agda)
   (libraries util il)
-  (modules_without_implementation ir)
+  (modules_without_implementation agda)
 )
