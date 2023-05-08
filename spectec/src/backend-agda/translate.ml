@@ -79,9 +79,9 @@ module Translate = struct
   let rec exp env (e : Ast.exp) : Agda.exp =
     match e.it with
     | VarE n -> VarE (id n)
-    | BoolE b -> ConstE (Bool b)
-    | NatE n -> ConstE (Nat n)
-    | TextE t -> ConstE (Text t)
+    | BoolE b -> LiteralE (BoolL b)
+    | NatE n -> LiteralE (NatL n)
+    | TextE t -> LiteralE (TextL t)
     | UnE (op, e) -> (unop op) (exp env e)
     | BinE (op, e1, e2) -> (binop op) (exp env e1) (exp env e2)
     | CmpE (op, e1, e2) -> (cmpop op) (exp env e1) (exp env e2)
@@ -143,9 +143,9 @@ module Translate = struct
   let rec pat env (e : Ast.exp) : Agda.pat =
     match e.it with
     | VarE n -> VarP (id n)
-    | BoolE b -> ConstP (Bool b)
-    | NatE n -> ConstP (Nat n)
-    | TextE t -> ConstP (Text t)
+    | BoolE b -> LiteralP (BoolL b)
+    | NatE n -> LiteralP (NatL n)
+    | TextE t -> LiteralP (TextL t)
     | UnE (_op, _e2) -> YetP ("UnE: " ^ Print.string_of_exp e)
     | BinE (AddOp, e, { it = Ast.NatE 1; _ }) ->
         CaseP (builtin "suc", [ pat env e ])

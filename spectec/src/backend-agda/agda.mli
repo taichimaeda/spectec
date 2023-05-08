@@ -1,17 +1,10 @@
 type id = Id of string | TyId of string | FunId of string | BuiltIn of string
-
-type const =
-  | SetC
-  | BoolC
-  | NatC
-  | TextC
-  | Bool of bool
-  | Nat of int
-  | Text of string
+type const = SetC | BoolC | NatC | TextC
+type literal = BoolL of bool | NatL of int | TextL of string
 
 type pat =
   | VarP of id
-  | ConstP of const
+  | LiteralP of literal
   | TupleP of pat list
   | YetP of string
   | CaseP of id * pat list
@@ -19,6 +12,7 @@ type pat =
 type exp =
   | VarE of id
   | ConstE of const
+  | LiteralE of literal
   | ProdE of exp list
   | TupleE of exp list
   | StrE of (id * exp) list

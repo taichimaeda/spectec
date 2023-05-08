@@ -19,24 +19,26 @@ let fold_left op default str =
   | hd :: tl -> List.fold_left (fun acc x -> op acc x) hd tl
 
 module Render = struct
+  let literal = function
+    | Agda.BoolL b -> string_of_bool b
+    | NatL n -> string_of_int n
+    | TextL s -> s
+
   let const = function
     | Agda.SetC -> "Set"
     | BoolC -> "Bool"
     | NatC -> "ℕ"
     | TextC -> "String"
-    | Bool b -> string_of_bool b
-    | Nat n -> string_of_int n
-    | Text s -> s
 
   let rec pat = function
     | Agda.CaseP (i, (_ :: _ as ps)) ->
         id i ^ " " ^ String.concat " " (List.map atomic_pat ps)
-    | (VarP _ | ConstP _ | TupleP _ | YetP _ | CaseP (_, [])) as p ->
+    | (VarP _ | LiteralP _ | TupleP _ | YetP _ | CaseP (_, [])) as p ->
         atomic_pat p
 
   and atomic_pat = function
     | Agda.VarP i -> id i
-    | ConstP c -> const c
+    | LiteralP c -> literal c
     | TupleP ps ->
         fold_left (Format.sprintf "⟨ %s , %s ⟩") "_" (List.map pat ps)
     | YetP s -> "_ " ^ comment s
@@ -70,12 +72,14 @@ module Render = struct
     | MixfixE (op, es) -> mixfix (id op) (List.map atomic_exp es)
     | CaseE (i, (_ :: _ as es)) ->
         id i ^ " " ^ String.concat " " (List.map atomic_exp es)
-    | (VarE _ | ConstE _ | TupleE _ | CaseE (_, []) | YetE _) as e ->
+    | (VarE _ | ConstE _ | LiteralE _ | TupleE _ | CaseE (_, []) | YetE _) as e
+      ->
         atomic_exp e
 
   and atomic_exp = function
     | Agda.VarE i -> id i
     | ConstE c -> const c
+    | LiteralE l -> literal l
     | TupleE es ->
         fold_left
           (Format.sprintf "⟨ %s , %s ⟩")
