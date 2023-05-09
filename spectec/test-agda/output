@@ -1,27 +1,27 @@
 Checking current (default/test-agda/current.agda).
-default/test-agda/current.agda:895,1-904,7
+default/test-agda/current.agda:896,1-905,7
 The following names are declared but not accompanied by a
 definition: $binop, $relop, $testop, $unop
 Unsolved interaction metas at the following locations:
-  default/test-agda/current.agda:392,18-25
-  default/test-agda/current.agda:462,36-43
-  default/test-agda/current.agda:468,36-43
-  default/test-agda/current.agda:479,35-42
-  default/test-agda/current.agda:505,36-43
-  default/test-agda/current.agda:511,36-43
-  default/test-agda/current.agda:517,36-43
-  default/test-agda/current.agda:523,37-44
-  default/test-agda/current.agda:529,37-44
-  default/test-agda/current.agda:571,37-44
-  default/test-agda/current.agda:617,35-42
-  default/test-agda/current.agda:686,21-28
-  default/test-agda/current.agda:700,16-23
-  default/test-agda/current.agda:708,16-23
-  default/test-agda/current.agda:863,54-61
-  default/test-agda/current.agda:866,58-65
-  default/test-agda/current.agda:869,56-63
-  default/test-agda/current.agda:872,88-95
-  default/test-agda/current.agda:875,87-94
-  default/test-agda/current.agda:1033,79-86
-  default/test-agda/current.agda:1041,29-36
-  default/test-agda/current.agda:1042,48-55
+  default/test-agda/current.agda:393,18-25
+  default/test-agda/current.agda:463,36-43
+  default/test-agda/current.agda:469,36-43
+  default/test-agda/current.agda:480,35-42
+  default/test-agda/current.agda:506,36-43
+  default/test-agda/current.agda:512,36-43
+  default/test-agda/current.agda:518,36-43
+  default/test-agda/current.agda:524,37-44
+  default/test-agda/current.agda:530,37-44
+  default/test-agda/current.agda:572,37-44
+  default/test-agda/current.agda:618,35-42
+  default/test-agda/current.agda:687,21-28
+  default/test-agda/current.agda:701,16-23
+  default/test-agda/current.agda:709,16-23
+  default/test-agda/current.agda:864,54-61
+  default/test-agda/current.agda:867,58-65
+  default/test-agda/current.agda:870,56-63
+  default/test-agda/current.agda:873,88-95
+  default/test-agda/current.agda:876,87-94
+  default/test-agda/current.agda:1034,79-86
+  default/test-agda/current.agda:1042,29-36
+  default/test-agda/current.agda:1043,48-55
