@@ -114,14 +114,16 @@ let reduction_group2program reduction_group acc =
 
   let instrs = match reduction_group with
     (* one reduction rule: assignment *)
-    | [(_, _, rhs, prems)] ->
+    | [(_, _, rhs, named_prems)] ->
+        let prems = List.map snd named_prems in
         let let_instrs = prem2let prems in
         let push_instrs = rhs2instrs rhs in
         let_instrs @ push_instrs
     (* multiple reduction rules: conditions *)
     | _ ->
         List.map
-          (fun (_, _, rhs, prems) ->
+          (fun (_, _, rhs, named_prems) ->
+            let prems = List.map snd named_prems in
             let cond = prem2cond prems in
             let rhs_instrs = rhs2instrs rhs |> check_nop in
             Ir.IfI(cond, rhs_instrs, [])
@@ -136,7 +138,7 @@ let reduction_group2program reduction_group acc =
 
 (** Temporarily convert `Ast.RuleD` into `reduction_group` **)
 
-type reduction_group = (string * Ast.exp * Ast.exp * Ast.premise list) list
+type reduction_group = (string * Ast.exp * Ast.exp * (Ast.id option * Ast.premise) list) list
 
 (* extract rules except Step/pure and Step/read *)
 let extract_rules def acc = match def.it with

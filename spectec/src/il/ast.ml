@@ -146,7 +146,7 @@ and def' =
 
 and rule = rule' phrase
 and rule' =
-  | RuleD of id * binds * mixop * exp * premise list  (* relation rule *)
+  | RuleD of id * binds * mixop * exp * (id option * premise) list  (* relation rule *)
 
 and clause = clause' phrase
 and clause' =

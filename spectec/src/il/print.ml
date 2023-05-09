@@ -210,12 +210,17 @@ let region_comment indent at =
 
 let string_of_rule rule =
   match rule.it with
-  | RuleD (id, binds, mixop, e, prems) ->
+  | RuleD (id, binds, mixop, e, named_prems) ->
     let id' = if id.it = "" then "_" else id.it in
+    let string_of_named_prem (id, prem) =
+      match id with
+      | None -> string_of_prem prem
+      | Some id -> id.it ^ ": " ^ string_of_prem prem
+    in
     "\n" ^ region_comment "  " rule.at ^
     "  rule " ^ id' ^ string_of_binds binds ^ ":\n    " ^
       string_of_exp {e with it = MixE (mixop, e)} ^
-      concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
+      concat "" (List.map (prefix "\n    -- " string_of_named_prem) named_prems)
 
 let string_of_clause id clause =
   match clause.it with

@@ -1017,9 +1017,10 @@ let elab_def env d : Il.def list =
     let es' = List.map (Multiplicity.annot_exp dims') (elab_exp_notation' env e t) in
     let prems' = List.map (Multiplicity.annot_prem dims')
       (map_nl_list (elab_prem env) prems) in
+    let named_prems' = List.map (fun prem -> (None, prem)) prems' in
     let free = (Free.free_def d).Free.varid in
     let binds' = make_binds env free dims d.at in
-    let rule' = Il.RuleD (id2, binds', mixop, tup_exp' es' e.at, prems') $ d.at in
+    let rule' = Il.RuleD (id2, binds', mixop, tup_exp' es' e.at, named_prems') $ d.at in
     env.rels <- rebind "relation" env.rels id1 (t, rule'::rules');
     []
   | VarD (id, t, _hints) ->

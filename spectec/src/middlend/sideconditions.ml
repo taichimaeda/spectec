@@ -25,25 +25,25 @@ let iffE e1 e2 = IfPr (BinE (EquivOp, e1, e2) $$ no_region % (BoolT $ no_region)
 let same_len e1 e2 = IfPr (CmpE (EqOp, LenE e1 $$ no_region % (NatT $ e1.at), LenE e2 $$ no_region % (NatT $ e2.at)) $$ no_region % (BoolT $ no_region)) $ no_region
 let has_len ne e = IfPr (CmpE (EqOp, LenE e $$ no_region % (NatT $ e.at), ne) $$ no_region % (BoolT $ no_region)) $ no_region
 
-let iter_side_conditions env ((iter, vs) : iterexp) : premise list =
+let iter_side_conditions env ((iter, vs) : iterexp) : (id option * premise) list =
   let iter' = if iter = Opt then Opt else List in
   let ves = List.map (fun v ->
     let t = Env.find v.it env in
     IterE (VarE v $$ no_region % t, (iter, [v])) $$ no_region % (IterT (t, iter') $ no_region)) vs in
  match iter, ves with
   | _, [] -> []
-  | Opt, (e::es) -> List.map (fun e' -> iffE (is_null e) (is_null e')) es
-  | (List|List1), (e::es) -> List.map (same_len e) es
-  | ListN ne, es -> List.map (has_len ne) es
+  | Opt, (e::es) -> List.map (fun e' -> (None, iffE (is_null e) (is_null e'))) es
+  | (List|List1), (e::es) -> List.map (fun e2 -> (None, same_len e e2)) es
+  | ListN ne, es -> List.map (fun e -> (None, has_len ne e)) es
 
 (* Expr traversal *)
-let rec t_exp env e : premise list =
+let rec t_exp env e : (id option * premise) list =
   (* First the conditions to be generated here *)
   begin match e.it with
   | IdxE (exp1, exp2) ->
-    [IfPr (CmpE (LtOp, exp2, LenE exp1 $$ no_region % exp2.note) $$ no_region % (BoolT $ no_region)) $ no_region]
+    [(None, IfPr (CmpE (LtOp, exp2, LenE exp1 $$ no_region % exp2.note) $$ no_region % (BoolT $ no_region)) $ no_region)]
   | TheE exp ->
-    [IfPr (CmpE (NeOp, exp, OptE None $$ no_region % exp.note) $$ no_region % (BoolT $ no_region)) $ no_region]
+    [(None, IfPr (CmpE (NeOp, exp, OptE None $$ no_region % exp.note) $$ no_region % (BoolT $ no_region)) $ no_region)]
   | IterE (_exp, iterexp) -> iter_side_conditions env iterexp
   | _ -> []
   end @
@@ -77,7 +77,7 @@ let rec t_exp env e : premise list =
   | TupE es | ListE es
   -> List.concat_map (t_exp env) es
   | IterE (e, iterexp)
-  -> List.map (fun pr -> IterPr (pr, iterexp) $ no_region) (t_exp env e) @ t_iterexp env iterexp
+  -> List.map (fun (id, pr) -> (id, IterPr (pr, iterexp) $ no_region)) (t_exp env e) @ t_iterexp env iterexp
 
 and t_iterexp env (iter, _) = t_iter env iter
 
@@ -98,9 +98,11 @@ let rec t_prem env prem = match prem.it with
   | ElsePr -> []
   | IterPr (prem, iterexp)
   -> iter_side_conditions env iterexp @
-     List.map (fun pr -> IterPr (pr, iterexp) $ no_region) (t_prem env prem) @ t_iterexp env iterexp
+     List.map (fun (id, pr) -> (id, IterPr (pr, iterexp) $ no_region)) (t_prem env prem) @ t_iterexp env iterexp
 
-let t_prems env = List.concat_map (t_prem env)
+let t_named_prem env (_id, prem) = t_prem env prem
+
+let t_named_prems env = List.concat_map (t_named_prem env)
 
 (* Does prem1 obviously imply prem2? *)
 let rec implies prem1 prem2 = Il.Eq.eq_prem prem1 prem2 ||
@@ -108,13 +110,14 @@ let rec implies prem1 prem2 = Il.Eq.eq_prem prem1 prem2 ||
   | IterPr (prem2', _) -> implies prem1 prem2'
   | _ -> false
 
+let named_implies (_id1, prem1) (_id2, prem2) = implies prem1 prem2
 
 let t_rule' = function
-  | RuleD (id, binds, mixop, exp, prems) ->
+  | RuleD (id, binds, mixop, exp, named_prems) ->
     let env = List.fold_left (fun env (v, t, _) -> Env.add v.it t env) Env.empty binds in
-    let extra_prems = t_prems env prems @ t_exp env exp in
-    let prems' = Util.Lib.List.nub implies (extra_prems @ prems) in
-    RuleD (id, binds, mixop, exp, prems')
+    let extra_prems = t_named_prems env named_prems @ t_exp env exp in
+    let named_prems' = Util.Lib.List.nub named_implies (extra_prems @ named_prems) in
+    RuleD (id, binds, mixop, exp, named_prems')
 
 let t_rule x = { x with it = t_rule' x.it }
 

@@ -20,7 +20,7 @@ let error at msg = Source.error at "sideconditions" msg
 (* We pull out fresh variables and equating side conditions. *)
 
 type bind = (id * typ * iter list)
-type eqn = (bind * premise)
+type eqn = (bind * (id option * premise))
 type eqns = eqn list
 
 (* Fresh name generation *)
@@ -43,10 +43,10 @@ let update_iterexp_vars (sets : Il.Free.sets) ((iter, vs) : iterexp) : iterexp =
 let under_iterexp (iter, vs) eqns : iterexp * eqns =
    let new_vs = List.map (fun ((v, _, _), _) -> v) eqns in
    let iterexp' = (iter, vs @ new_vs) in
-   let eqns' = List.map (fun ((v, t, is), pr) ->
+   let eqns' = List.map (fun ((v, t, is), (id, pr)) ->
      let pr_iterexp = update_iterexp_vars (Il.Free.free_prem pr) (iter, vs @ new_vs) in
      let pr' = IterPr (pr, pr_iterexp) $ no_region in
-     ((v, t, is@[iter]), pr')
+     ((v, t, is@[iter]), (id, pr'))
    ) eqns in
    iterexp', eqns'
 
@@ -100,7 +100,7 @@ let rec t_exp n e : eqns * exp =
     let prem = IfPr (
       CmpE (EqOp, exp, OptE (Some xe) $$ no_region % ot) $$ no_region % (BoolT $ no_region)
     ) $ no_region in
-    eqns @ [(bind, prem)], xe
+    eqns @ [(bind, (None, prem))], xe
   | _ -> eqns, e'
 
 (* Traversal helpers *)
@@ -182,13 +182,17 @@ and t_prem' n prem : eqns * premise' =
     let iterexp''' = update_iterexp_vars (Il.Free.free_prem prem') iterexp'' in
     eqns1' @ eqns2, IterPr (prem', iterexp''')
 
-let t_prems n k  = t_list t_prem n k (fun x -> x)
+let t_named_prem n (id, prem) =
+  let eqns, prem' = t_prem n prem in
+  eqns, (id, prem')
+
+let t_named_prems n k  = t_list t_named_prem n k (fun x -> x)
 
 let t_rule' = function
   | RuleD (id, binds, mixop, exp, prems) ->
     (* Counter for fresh variables *)
     let n = ref 0 in
-    let eqns, (exp', prems') = binary t_exp t_prems n (exp, prems) (fun x -> x) in
+    let eqns, (exp', prems') = binary t_exp t_named_prems n (exp, prems) (fun x -> x) in
     let extra_binds, extra_prems = List.split eqns in
     RuleD (id, binds @ extra_binds, mixop, exp', extra_prems @ prems')
 

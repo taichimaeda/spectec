@@ -504,13 +504,16 @@ let rec valid_prem env prem =
     let env' = valid_iterexp env iter in
     valid_prem env' prem'
 
+let valid_named_prem env (_id, prem) =
+  (* TODO: How to validate/bind id? *)
+  valid_prem env prem
 
 let valid_rule env mixop t rule =
   match rule.it with
   | RuleD (_id, binds, mixop', e, prems) ->
     valid_binds env binds;
     valid_expmix env mixop' e (mixop, t) e.at;
-    List.iter (valid_prem env) prems;
+    List.iter (valid_named_prem env) prems;
     env.vars <- Env.empty
 
 let valid_clause env t1 t2 clause =

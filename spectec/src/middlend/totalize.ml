@@ -107,9 +107,11 @@ let t_clause' env = function
 
 let t_clause env (clause : clause) = { clause with it = t_clause' env clause.it }
 
+let t_named_prems env = List.map (fun (id, prem) -> (id, t_prem env prem))
+
 let t_rule' env = function
   | RuleD (id, binds, mixop, exp, prems) ->
-    RuleD (id, binds, mixop, t_exp env exp, t_prems env prems)
+    RuleD (id, binds, mixop, t_exp env exp, t_named_prems env prems)
 
 let t_rule env x = { x with it = t_rule' env x.it }
 

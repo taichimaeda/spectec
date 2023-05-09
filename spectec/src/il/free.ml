@@ -128,12 +128,17 @@ let rec free_prem prem =
   | ElsePr -> empty
   | IterPr (prem', iter) -> union (free_prem prem') (free_iterexp iter)
 
+let free_named_prem =
+  function
+  | (None, prem) -> free_prem prem
+  | (Some id, prem) -> union (free_varid id) (free_prem prem)
+
 let free_rule rule =
   match rule.it with
   | RuleD (_id, binds, _op, e, prems) ->
     union (free_binds binds)
       (diff
-        (union (free_exp e) (free_list free_prem prems))
+        (union (free_exp e) (free_list free_named_prem prems))
         (bound_binds binds)
       )
 
