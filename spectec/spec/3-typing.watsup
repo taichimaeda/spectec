@@ -280,7 +280,7 @@ rule Instr_ok/local.tee:
 
 rule Instr_ok/global.get:
   C |- GLOBAL.GET x : epsilon -> t
-  -- if C.GLOBAL[x] = MUT? t
+  -- if C.GLOBAL[x] = mf t
 
 rule Instr_ok/global.set:
   C |- GLOBAL.SET x : t -> epsilon
@@ -379,7 +379,7 @@ rule Instr_const/ref.func:
 
 rule Instr_const/global.get:
   C |- (GLOBAL.GET x) CONST
-  -- if C.GLOBAL[x] = epsilon t
+  -- if C.GLOBAL[x] = IMMUT t
 
 
 rule Expr_const: C |- instr* CONST
@@ -414,7 +414,7 @@ rule Func_ok:
 rule Global_ok:
   C |- GLOBAL gt expr : gt
   -- Globaltype_ok: |- gt : OK
-  -- if gt = MUT? t
+  -- if gt = mf t
   -- Expr_ok_const: C |- expr : t CONST
 
 rule Table_ok:

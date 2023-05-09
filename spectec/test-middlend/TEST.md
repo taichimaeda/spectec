@@ -87,43 +87,48 @@ syntax resulttype = valtype*
 ;; 1-syntax.watsup:59.1-60.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
-syntax globaltype = `MUT%?%`(()?, valtype)
+;; 1-syntax.watsup:61.1-62.12
+syntax mutflag =
+  | MUT
+  | IMMUT
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:63.1-64.18
+syntax globaltype = `%%`(mutflag, valtype)
+
+;; 1-syntax.watsup:65.1-66.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:67.1-68.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:69.1-70.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:71.1-72.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:73.1-74.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:75.1-76.69
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
   | MEMORY(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:89.1-89.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:91.1-91.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:92.1-92.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -133,7 +138,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:94.1-96.62
 syntax binop_IXX =
   | ADD
   | SUB
@@ -148,7 +153,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:97.1-97.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -158,15 +163,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:99.1-99.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:100.1-100.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:102.1-103.108
 syntax relop_IXX =
   | EQ
   | NE
@@ -175,7 +180,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:104.1-104.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -184,44 +189,44 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:106.1-106.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:107.1-107.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:108.1-108.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:109.1-109.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:110.1-110.39
 syntax cvtop =
   | CONVERT
   | REINTERPRET
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:120.1-120.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:121.1-121.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:124.1-124.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -269,53 +274,53 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:182.1-183.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:190.1-190.50
 syntax elemmode =
   | TABLE(tableidx, expr)
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:191.1-191.39
 syntax datamode =
   | MEMORY(memidx, expr)
 
-;; 1-syntax.watsup:190.1-191.30
+;; 1-syntax.watsup:193.1-194.30
 syntax func = `FUNC%%*%`(functype, valtype*, expr)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:195.1-196.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:197.1-198.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:199.1-200.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
+;; 1-syntax.watsup:201.1-202.31
 syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
 
-;; 1-syntax.watsup:200.1-201.26
+;; 1-syntax.watsup:203.1-204.26
 syntax data = `DATA(*)%*%?`(byte**, datamode?)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:205.1-206.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:208.1-209.65
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
   | MEMORY(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
+;; 1-syntax.watsup:210.1-211.24
 syntax export = EXPORT(name, externuse)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:212.1-213.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
+;; 1-syntax.watsup:215.1-216.70
 syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
 
 ;; 2-aux.watsup:3.1-3.14
@@ -657,15 +662,15 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
-  rule global.get {C : context, t : valtype, x : idx}:
+  ;; 3-typing.watsup:281.1-283.27
+  rule global.get {C : context, mf : mutflag, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
+    -- if (C.GLOBAL_context[x] = `%%`(mf, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
+    -- if (C.GLOBAL_context[x] = `%%`(MUT_mutflag, t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
@@ -802,10 +807,10 @@ relation Instr_const: `%|-%CONST`(context, instr)
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:380.1-382.30
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
+    -- if (C.GLOBAL_context[x] = `%%`(IMMUT_mutflag, t))
 
 ;; 3-typing.watsup:368.1-368.77
 relation Expr_const: `%|-%CONST`(context, expr)
@@ -834,10 +839,10 @@ relation Func_ok: `%|-%:%`(context, func, functype)
 ;; 3-typing.watsup:398.1-398.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
   ;; 3-typing.watsup:414.1-418.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
+  rule _ {C : context, expr : expr, gt : globaltype, mf : mutflag, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
+    -- if (gt = `%%`(mf, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
 ;; 3-typing.watsup:399.1-399.74
@@ -1741,43 +1746,48 @@ syntax resulttype = valtype*
 ;; 1-syntax.watsup:59.1-60.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
-syntax globaltype = `MUT%?%`(()?, valtype)
+;; 1-syntax.watsup:61.1-62.12
+syntax mutflag =
+  | MUT
+  | IMMUT
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:63.1-64.18
+syntax globaltype = `%%`(mutflag, valtype)
+
+;; 1-syntax.watsup:65.1-66.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:67.1-68.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:69.1-70.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:71.1-72.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:73.1-74.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:75.1-76.69
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
   | MEMORY(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:89.1-89.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:91.1-91.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:92.1-92.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -1787,7 +1797,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:94.1-96.62
 syntax binop_IXX =
   | ADD
   | SUB
@@ -1802,7 +1812,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:97.1-97.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -1812,15 +1822,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:99.1-99.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:100.1-100.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:102.1-103.108
 syntax relop_IXX =
   | EQ
   | NE
@@ -1829,7 +1839,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:104.1-104.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -1838,44 +1848,44 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:106.1-106.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:107.1-107.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:108.1-108.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:109.1-109.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:110.1-110.39
 syntax cvtop =
   | CONVERT
   | REINTERPRET
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:120.1-120.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:121.1-121.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:124.1-124.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -1923,53 +1933,53 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:182.1-183.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:190.1-190.50
 syntax elemmode =
   | TABLE(tableidx, expr)
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:191.1-191.39
 syntax datamode =
   | MEMORY(memidx, expr)
 
-;; 1-syntax.watsup:190.1-191.30
+;; 1-syntax.watsup:193.1-194.30
 syntax func = `FUNC%%*%`(functype, valtype*, expr)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:195.1-196.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:197.1-198.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:199.1-200.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
+;; 1-syntax.watsup:201.1-202.31
 syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
 
-;; 1-syntax.watsup:200.1-201.26
+;; 1-syntax.watsup:203.1-204.26
 syntax data = `DATA(*)%*%?`(byte**, datamode?)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:205.1-206.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:208.1-209.65
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
   | MEMORY(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
+;; 1-syntax.watsup:210.1-211.24
 syntax export = EXPORT(name, externuse)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:212.1-213.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
+;; 1-syntax.watsup:215.1-216.70
 syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
 
 ;; 2-aux.watsup:3.1-3.14
@@ -2311,15 +2321,15 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
-  rule global.get {C : context, t : valtype, x : idx}:
+  ;; 3-typing.watsup:281.1-283.27
+  rule global.get {C : context, mf : mutflag, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
+    -- if (C.GLOBAL_context[x] = `%%`(mf, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
+    -- if (C.GLOBAL_context[x] = `%%`(MUT_mutflag, t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
@@ -2456,10 +2466,10 @@ relation Instr_const: `%|-%CONST`(context, instr)
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:380.1-382.30
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
+    -- if (C.GLOBAL_context[x] = `%%`(IMMUT_mutflag, t))
 
 ;; 3-typing.watsup:368.1-368.77
 relation Expr_const: `%|-%CONST`(context, expr)
@@ -2488,10 +2498,10 @@ relation Func_ok: `%|-%:%`(context, func, functype)
 ;; 3-typing.watsup:398.1-398.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
   ;; 3-typing.watsup:414.1-418.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
+  rule _ {C : context, expr : expr, gt : globaltype, mf : mutflag, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
+    -- if (gt = `%%`(mf, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
 ;; 3-typing.watsup:399.1-399.74
@@ -3458,43 +3468,48 @@ syntax resulttype = valtype*
 ;; 1-syntax.watsup:59.1-60.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
-syntax globaltype = `MUT%?%`(()?, valtype)
+;; 1-syntax.watsup:61.1-62.12
+syntax mutflag =
+  | MUT
+  | IMMUT
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:63.1-64.18
+syntax globaltype = `%%`(mutflag, valtype)
+
+;; 1-syntax.watsup:65.1-66.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:67.1-68.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:69.1-70.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:71.1-72.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:73.1-74.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:75.1-76.69
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
   | MEMORY(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:89.1-89.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:91.1-91.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:92.1-92.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -3504,7 +3519,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:94.1-96.62
 syntax binop_IXX =
   | ADD
   | SUB
@@ -3519,7 +3534,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:97.1-97.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -3529,15 +3544,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:99.1-99.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:100.1-100.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:102.1-103.108
 syntax relop_IXX =
   | EQ
   | NE
@@ -3546,7 +3561,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:104.1-104.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -3555,44 +3570,44 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:106.1-106.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:107.1-107.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:108.1-108.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:109.1-109.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:110.1-110.39
 syntax cvtop =
   | CONVERT
   | REINTERPRET
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:120.1-120.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:121.1-121.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:124.1-124.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -3640,53 +3655,53 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:182.1-183.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:190.1-190.50
 syntax elemmode =
   | TABLE(tableidx, expr)
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:191.1-191.39
 syntax datamode =
   | MEMORY(memidx, expr)
 
-;; 1-syntax.watsup:190.1-191.30
+;; 1-syntax.watsup:193.1-194.30
 syntax func = `FUNC%%*%`(functype, valtype*, expr)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:195.1-196.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:197.1-198.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:199.1-200.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
+;; 1-syntax.watsup:201.1-202.31
 syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
 
-;; 1-syntax.watsup:200.1-201.26
+;; 1-syntax.watsup:203.1-204.26
 syntax data = `DATA(*)%*%?`(byte**, datamode?)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:205.1-206.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:208.1-209.65
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
   | MEMORY(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
+;; 1-syntax.watsup:210.1-211.24
 syntax export = EXPORT(name, externuse)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:212.1-213.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
+;; 1-syntax.watsup:215.1-216.70
 syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
 
 ;; 2-aux.watsup:3.1-3.14
@@ -4029,15 +4044,15 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
-  rule global.get {C : context, t : valtype, x : idx}:
+  ;; 3-typing.watsup:281.1-283.27
+  rule global.get {C : context, mf : mutflag, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
+    -- if (C.GLOBAL_context[x] = `%%`(mf, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
+    -- if (C.GLOBAL_context[x] = `%%`(MUT_mutflag, t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
@@ -4174,10 +4189,10 @@ relation Instr_const: `%|-%CONST`(context, instr)
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:380.1-382.30
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
+    -- if (C.GLOBAL_context[x] = `%%`(IMMUT_mutflag, t))
 
 ;; 3-typing.watsup:368.1-368.77
 relation Expr_const: `%|-%CONST`(context, expr)
@@ -4206,10 +4221,10 @@ relation Func_ok: `%|-%:%`(context, func, functype)
 ;; 3-typing.watsup:398.1-398.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
   ;; 3-typing.watsup:414.1-418.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
+  rule _ {C : context, expr : expr, gt : globaltype, mf : mutflag, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
+    -- if (gt = `%%`(mf, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
 ;; 3-typing.watsup:399.1-399.74
@@ -5177,43 +5192,48 @@ syntax resulttype = valtype*
 ;; 1-syntax.watsup:59.1-60.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
-syntax globaltype = `MUT%?%`(()?, valtype)
+;; 1-syntax.watsup:61.1-62.12
+syntax mutflag =
+  | MUT
+  | IMMUT
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:63.1-64.18
+syntax globaltype = `%%`(mutflag, valtype)
+
+;; 1-syntax.watsup:65.1-66.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:67.1-68.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:69.1-70.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:71.1-72.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:73.1-74.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:75.1-76.69
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
   | MEMORY(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:89.1-89.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:91.1-91.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:92.1-92.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -5223,7 +5243,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:94.1-96.62
 syntax binop_IXX =
   | ADD
   | SUB
@@ -5238,7 +5258,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:97.1-97.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -5248,15 +5268,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:99.1-99.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:100.1-100.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:102.1-103.108
 syntax relop_IXX =
   | EQ
   | NE
@@ -5265,7 +5285,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:104.1-104.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -5274,44 +5294,44 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:106.1-106.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:107.1-107.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:108.1-108.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:109.1-109.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:110.1-110.39
 syntax cvtop =
   | CONVERT
   | REINTERPRET
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:120.1-120.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:121.1-121.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:124.1-124.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -5359,53 +5379,53 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:182.1-183.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:190.1-190.50
 syntax elemmode =
   | TABLE(tableidx, expr)
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:191.1-191.39
 syntax datamode =
   | MEMORY(memidx, expr)
 
-;; 1-syntax.watsup:190.1-191.30
+;; 1-syntax.watsup:193.1-194.30
 syntax func = `FUNC%%*%`(functype, valtype*, expr)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:195.1-196.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:197.1-198.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:199.1-200.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
+;; 1-syntax.watsup:201.1-202.31
 syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
 
-;; 1-syntax.watsup:200.1-201.26
+;; 1-syntax.watsup:203.1-204.26
 syntax data = `DATA(*)%*%?`(byte**, datamode?)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:205.1-206.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:208.1-209.65
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
   | MEMORY(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
+;; 1-syntax.watsup:210.1-211.24
 syntax export = EXPORT(name, externuse)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:212.1-213.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
+;; 1-syntax.watsup:215.1-216.70
 syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
 
 ;; 2-aux.watsup:3.1-3.14
@@ -5753,15 +5773,15 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
-  rule global.get {C : context, t : valtype, x : idx}:
+  ;; 3-typing.watsup:281.1-283.27
+  rule global.get {C : context, mf : mutflag, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
+    -- if (C.GLOBAL_context[x] = `%%`(mf, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
+    -- if (C.GLOBAL_context[x] = `%%`(MUT_mutflag, t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
@@ -5902,10 +5922,10 @@ relation Instr_const: `%|-%CONST`(context, instr)
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:380.1-382.30
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
+    -- if (C.GLOBAL_context[x] = `%%`(IMMUT_mutflag, t))
 
 ;; 3-typing.watsup:368.1-368.77
 relation Expr_const: `%|-%CONST`(context, expr)
@@ -5934,10 +5954,10 @@ relation Func_ok: `%|-%:%`(context, func, functype)
 ;; 3-typing.watsup:398.1-398.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
   ;; 3-typing.watsup:414.1-418.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
+  rule _ {C : context, expr : expr, gt : globaltype, mf : mutflag, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
+    -- if (gt = `%%`(mf, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
 ;; 3-typing.watsup:399.1-399.74
@@ -6914,43 +6934,48 @@ syntax resulttype = valtype*
 ;; 1-syntax.watsup:59.1-60.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
-syntax globaltype = `MUT%?%`(()?, valtype)
+;; 1-syntax.watsup:61.1-62.12
+syntax mutflag =
+  | MUT
+  | IMMUT
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:63.1-64.18
+syntax globaltype = `%%`(mutflag, valtype)
+
+;; 1-syntax.watsup:65.1-66.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:67.1-68.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:69.1-70.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:71.1-72.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:73.1-74.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:75.1-76.69
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
   | MEMORY(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:89.1-89.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:91.1-91.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:92.1-92.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -6960,7 +6985,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:94.1-96.62
 syntax binop_IXX =
   | ADD
   | SUB
@@ -6975,7 +7000,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:97.1-97.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -6985,15 +7010,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:99.1-99.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:100.1-100.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:102.1-103.108
 syntax relop_IXX =
   | EQ
   | NE
@@ -7002,7 +7027,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:104.1-104.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -7011,44 +7036,44 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:106.1-106.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:107.1-107.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:108.1-108.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:109.1-109.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:110.1-110.39
 syntax cvtop =
   | CONVERT
   | REINTERPRET
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:120.1-120.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:121.1-121.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:124.1-124.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:159.1-180.80
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -7096,53 +7121,53 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:182.1-183.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:190.1-190.50
 syntax elemmode =
   | TABLE(tableidx, expr)
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:191.1-191.39
 syntax datamode =
   | MEMORY(memidx, expr)
 
-;; 1-syntax.watsup:190.1-191.30
+;; 1-syntax.watsup:193.1-194.30
 syntax func = `FUNC%%*%`(functype, valtype*, expr)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:195.1-196.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:197.1-198.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:199.1-200.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
+;; 1-syntax.watsup:201.1-202.31
 syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
 
-;; 1-syntax.watsup:200.1-201.26
+;; 1-syntax.watsup:203.1-204.26
 syntax data = `DATA(*)%*%?`(byte**, datamode?)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:205.1-206.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:208.1-209.65
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
   | MEMORY(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
+;; 1-syntax.watsup:210.1-211.24
 syntax export = EXPORT(name, externuse)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:212.1-213.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
+;; 1-syntax.watsup:215.1-216.70
 syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
 
 ;; 2-aux.watsup:3.1-3.14
@@ -7501,17 +7526,17 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (x < |C.LOCAL_context|)
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
-  rule global.get {C : context, t : valtype, x : idx}:
+  ;; 3-typing.watsup:281.1-283.27
+  rule global.get {C : context, mf : mutflag, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
     -- if (x < |C.GLOBAL_context|)
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
+    -- if (C.GLOBAL_context[x] = `%%`(mf, t))
 
   ;; 3-typing.watsup:285.1-287.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
     -- if (x < |C.GLOBAL_context|)
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
+    -- if (C.GLOBAL_context[x] = `%%`(MUT_mutflag, t))
 
   ;; 3-typing.watsup:290.1-292.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
@@ -7674,11 +7699,11 @@ relation Instr_const: `%|-%CONST`(context, instr)
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:380.1-382.30
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
     -- if (x < |C.GLOBAL_context|)
-    -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
+    -- if (C.GLOBAL_context[x] = `%%`(IMMUT_mutflag, t))
 
 ;; 3-typing.watsup:368.1-368.77
 relation Expr_const: `%|-%CONST`(context, expr)
@@ -7707,10 +7732,10 @@ relation Func_ok: `%|-%:%`(context, func, functype)
 ;; 3-typing.watsup:398.1-398.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
   ;; 3-typing.watsup:414.1-418.40
-  rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
+  rule _ {C : context, expr : expr, gt : globaltype, mf : mutflag, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
-    -- if (gt = `MUT%?%`(()?{}, t))
+    -- if (gt = `%%`(mf, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
 ;; 3-typing.watsup:399.1-399.74

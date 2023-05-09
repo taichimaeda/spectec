@@ -58,6 +58,7 @@ warning: syntax `memidx` was never spliced
 warning: syntax `meminst` was never spliced
 warning: syntax `module` was never spliced
 warning: syntax `moduleinst` was never spliced
+warning: syntax `mutflag` was never spliced
 warning: syntax `n` was never spliced
 warning: syntax `name` was never spliced
 warning: syntax `num` was never spliced
