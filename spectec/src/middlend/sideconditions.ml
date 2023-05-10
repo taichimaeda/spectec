@@ -25,6 +25,10 @@ let iffE e1 e2 = IfPr (BinE (EquivOp, e1, e2) $$ no_region % (BoolT $ no_region)
 let same_len e1 e2 = IfPr (CmpE (EqOp, LenE e1 $$ no_region % (NatT $ e1.at), LenE e2 $$ no_region % (NatT $ e2.at)) $$ no_region % (BoolT $ no_region)) $ no_region
 let has_len ne e = IfPr (CmpE (EqOp, LenE e $$ no_region % (NatT $ e.at), ne) $$ no_region % (BoolT $ no_region)) $ no_region
 
+let t_list t xs =
+  let xs', extra_premss = List.split (List.map t xs) in
+  xs', List.concat extra_premss
+
 let iter_side_conditions env ((iter, vs) : iterexp) : (id option * premise) list =
   let iter' = if iter = Opt then Opt else List in
   let ves = List.map (fun v ->
@@ -34,75 +38,156 @@ let iter_side_conditions env ((iter, vs) : iterexp) : (id option * premise) list
   | _, [] -> []
   | Opt, (e::es) -> List.map (fun e' -> (None, iffE (is_null e) (is_null e'))) es
   | (List|List1), (e::es) -> List.map (fun e2 -> (None, same_len e e2)) es
+  (* Note that even if ne is an expression, we do not generate side conditions for it, as in practice, it is atomic *)
   | ListN ne, es -> List.map (fun e -> (None, has_len ne e)) es
 
 (* Expr traversal *)
-let rec t_exp env e : (id option * premise) list =
-  (* First the conditions to be generated here *)
-  begin match e.it with
-  | IdxE (exp1, exp2) ->
-    [(None, IfPr (CmpE (LtOp, exp2, LenE exp1 $$ no_region % exp2.note) $$ no_region % (BoolT $ no_region)) $ no_region)]
-  | TheE exp ->
-    [(None, IfPr (CmpE (NeOp, exp, OptE None $$ no_region % exp.note) $$ no_region % (BoolT $ no_region)) $ no_region)]
-  | IterE (_exp, iterexp) -> iter_side_conditions env iterexp
-  | _ -> []
-  end @
-  (* And now descend *)
-  match e.it with
-  | VarE _ | BoolE _ | NatE _ | TextE _ | OptE None
-  -> []
-  | UnE (_, exp)
-  | DotE (exp, _)
-  | LenE exp
-  | MixE (_, exp)
-  | CallE (_, exp)
-  | OptE (Some exp)
-  | TheE exp
-  | CaseE (_, exp)
-  | SubE (exp, _, _)
-  -> t_exp env exp
-  | BinE (_, exp1, exp2)
-  | CmpE (_, exp1, exp2)
-  | IdxE (exp1, exp2)
-  | CompE (exp1, exp2)
-  | CatE (exp1, exp2)
-  -> t_exp env exp1 @ t_exp env exp2
-  | SliceE (exp1, exp2, exp3)
-  -> t_exp env exp1 @ t_exp env exp2 @ t_exp env exp3
-  | UpdE (exp1, path, exp2)
-  | ExtE (exp1, path, exp2)
-  -> t_exp env exp1 @ t_path env path @ t_exp env exp2
-  | StrE fields
-  -> List.concat_map (fun (_, e) -> t_exp env e) fields
-  | TupE es | ListE es
-  -> List.concat_map (t_exp env) es
-  | IterE (e, iterexp)
-  -> List.map (fun (id, pr) -> (id, IterPr (pr, iterexp) $ no_region)) (t_exp env e) @ t_iterexp env iterexp
+let rec t_exp env e : exp * (id option * premise) list =
+  let it, extra_prems = t_exp' env e.it in
+  {e with it}, extra_prems
 
-and t_iterexp env (iter, _) = t_iter env iter
+and t_exp' env = function
+  (* First the conditions to be generated here *)
+  | IdxE (e1, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    let prem = IfPr (CmpE (LtOp, e2', LenE e1' $$ no_region % e2'.note) $$ no_region % (BoolT $ no_region)) $ no_region in
+    IdxE (e1', e2'), [(None, prem)] @ extra_prems1 @ extra_prems2
+  | TheE e ->
+    let e', extra_prems1 = t_exp env e in
+    let prem = IfPr (CmpE (NeOp, e', OptE None $$ no_region % e'.note) $$ no_region % (BoolT $ no_region)) $ no_region in
+    TheE e', [(None, prem)] @ extra_prems1
+  | IterE (e, iter) ->
+    let e', extra_prems1 = t_exp env e in
+    let extra_prems2 = iter_side_conditions env iter in
+    IterE (e', iter), extra_prems1 @ extra_prems2
+  (* And now descend *)
+  | (VarE _ | BoolE _ | NatE _ | TextE _) as e ->
+    e, []
+  | UnE (op, e1) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    UnE (op, e1'), extra_prems1
+  | BinE (op, e1, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    BinE (op, e1', e2'), extra_prems1 @ extra_prems2
+  | CmpE (op, e1, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    CmpE (op, e1', e2'), extra_prems1 @ extra_prems2
+  | SliceE (e1, e2, e3) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    let e3', extra_prems3 = t_exp env e3 in
+    SliceE (e1', e2', e3'), extra_prems1 @ extra_prems2 @ extra_prems3
+  | UpdE (e1, p, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let p', extra_prems2 = t_path env p in
+    let e2', extra_prems3 = t_exp env e2 in
+    UpdE (e1', p', e2'), extra_prems1 @ extra_prems2 @ extra_prems3
+  | ExtE (e1, p, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let p', extra_prems2 = t_path env p in
+    let e2', extra_prems3 = t_exp env e2 in
+    ExtE (e1', p', e2'), extra_prems1 @ extra_prems2 @ extra_prems3
+  | StrE efs ->
+    let t_expfield (a, e) =
+      let e', extra_prems = t_exp env e in
+      (a, e'), extra_prems
+    in
+    let efs', extra_prems = t_list t_expfield efs in
+    StrE efs', extra_prems
+  | DotE (e1, atom) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    DotE (e1', atom), extra_prems1
+  | CompE (e1, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    CompE (e1', e2'), extra_prems1 @ extra_prems2
+  | LenE e1 ->
+    let e1', extra_prems1 = t_exp env e1 in
+    LenE e1', extra_prems1
+  | TupE es ->
+    let es', extra_prems = t_list (t_exp env) es in
+    TupE es', extra_prems
+  | MixE (op, e1) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    MixE (op, e1'), extra_prems1
+  | CallE (id, e1) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    CallE (id, e1'), extra_prems1
+  | OptE None ->
+    OptE None, []
+  | OptE (Some e1) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    OptE (Some e1'), extra_prems1
+  | ListE es ->
+    let es', extra_prems = t_list (t_exp env) es in
+    ListE es', extra_prems
+  | CatE (e1, e2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    let e2', extra_prems2 = t_exp env e2 in
+    CatE (e1', e2'), extra_prems1 @ extra_prems2
+  | CaseE (atom, e1) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    CaseE (atom, e1'), extra_prems1
+  | SubE (e1, t1, t2) ->
+    let e1', extra_prems1 = t_exp env e1 in
+    SubE (e1', t1, t2), extra_prems1
+
+and t_iterexp env (iter, vs) =
+  let iter', extra_prems = t_iter env iter in
+  (iter', vs), extra_prems
 
 and t_iter env = function
-  | ListN e -> t_exp env e
-  | _ -> []
+  | ListN e ->
+      let e', extra_prems = t_exp env e in
+      ListN e', extra_prems
+  | (Opt | List | List1) as iter -> iter, []
 
-and t_path env path = match path.it with
-  | RootP -> []
-  | IdxP (path, e) -> t_path env path @ t_exp env e
-  | SliceP (path, e1, e2) -> t_path env path @ t_exp env e1 @ t_exp env e2
-  | DotP (path, _) -> t_path env path
+and t_path env path =
+  let it, extra_prems = t_path' env path.it in
+  {path with it}, extra_prems
+
+and t_path' env = function
+  | RootP -> RootP, []
+  | IdxP (path, e) ->
+      let path', extra_prems = t_path env path in
+      let e', extra_prems1 = t_exp env e in
+      IdxP (path', e'), extra_prems @ extra_prems1
+  | SliceP (path, e1, e2) ->
+      let path', extra_prems = t_path env path in
+      let e1', extra_prems1 = t_exp env e1 in
+      let e2', extra_prems2 = t_exp env e2 in
+      SliceP (path', e1', e2'), extra_prems @ extra_prems1 @ extra_prems2
+  | DotP (path, a) ->
+      let path', extra_prems = t_path env path in
+      DotP (path', a), extra_prems
 
 
-let rec t_prem env prem = match prem.it with
-  | RulePr (_, _, exp) -> t_exp env exp
-  | IfPr e -> t_exp env e
-  | ElsePr -> []
-  | IterPr (prem, iterexp)
-  -> iter_side_conditions env iterexp @
-     List.map (fun (id, pr) -> (id, IterPr (pr, iterexp) $ no_region)) (t_prem env prem) @ t_iterexp env iterexp
+let rec t_prem env prem =
+  let it, extra_prems = t_prem' env prem.it in
+  {prem with it}, extra_prems
+  
+and t_prem' env = function
+  | RulePr (id, op, e) ->
+      let e', extra_prems = t_exp env e in
+      RulePr (id, op, e'), extra_prems
+  | IfPr e ->
+      let e', extra_prems = t_exp env e in
+      IfPr e', extra_prems
+  | ElsePr -> ElsePr, []
+  | IterPr (prem, iterexp) ->
+      let prem', extra_prems1 = t_prem env prem in
+      let iterexp', extra_prems2 = t_iterexp env iterexp in
+      let iter_extra_prems1 = List.map (fun (id, pr) -> (id, IterPr (pr, iterexp') $ no_region)) extra_prems1 in
+      IterPr (prem', iterexp'), iter_side_conditions env iterexp @ iter_extra_prems1 @ extra_prems2
 
-let t_named_prem env (_id, prem) = t_prem env prem
+let t_named_prem env (id, prem) =
+  let prem', extra_prems = t_prem env prem in
+  (id, prem'), extra_prems
 
-let t_named_prems env = List.concat_map (t_named_prem env)
+let t_named_prems env = t_list (t_named_prem env)
 
 (* Does prem1 obviously imply prem2? *)
 let rec implies prem1 prem2 = Il.Eq.eq_prem prem1 prem2 ||
@@ -115,9 +200,10 @@ let named_implies (_id1, prem1) (_id2, prem2) = implies prem1 prem2
 let t_rule' = function
   | RuleD (id, binds, mixop, exp, named_prems) ->
     let env = List.fold_left (fun env (v, t, _) -> Env.add v.it t env) Env.empty binds in
-    let extra_prems = t_named_prems env named_prems @ t_exp env exp in
-    let named_prems' = Util.Lib.List.nub named_implies (extra_prems @ named_prems) in
-    RuleD (id, binds, mixop, exp, named_prems')
+    let exp', extra_prems1 = t_exp env exp in
+    let named_prems', extra_prems2 = t_named_prems env named_prems in
+    let named_prems'' = Util.Lib.List.nub named_implies (extra_prems2 @ extra_prems1 @ named_prems') in
+    RuleD (id, binds, mixop, exp', named_prems'')
 
 let t_rule x = { x with it = t_rule' x.it }
 
