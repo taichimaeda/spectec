@@ -1033,14 +1033,15 @@ data ty-Step-read where
     ----------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , (CALL x) ∷ [] ⟩ , (CALL-ADDR ((lookup ($funcaddr z)) {!   !} {- idx -})) ∷ [] ⟩
   call-addr :
-    (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : ℕ) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) ->
+    (a : ty-addr) (f : ty-frame) (instr : List ty-instr) (k : ℕ) (m : ty-moduleinst) (n : ty-n) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) (val : List ty-val) (z : ty-state) (o0 : List ty-val) ->
+    (length t) ≡ (length o0) ->
     a < (length ($funcinst z)) ->
     (length t-1) ≡ k ->
     (length t-2) ≡ n ->
     (length val) ≡ k ->
-    (All (λ t -> (($default- t) ≢ nothing))) t ->
+    ((Pointwise (λ t -> (λ o0 -> (($default- t) ≡ (just o0))))) t) o0 ->
     ((lookup ($funcinst z)) {!   !} {- idx -}) ≡ ⟨ m , ⟨ ⟨ ⟨ t-1 , t-2 ⟩ , t ⟩ , instr ⟩ ⟩ ->
-    f ≡ (record { LOCAL = val ++ ((map (λ t -> {!   !} {- TheE: !($default_(t)) -})) t) ; MODULE = m }) ->
+    f ≡ (record { LOCAL = val ++ o0 ; MODULE = m }) ->
     -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ty-Step-read ⟨ ⟨ z , ((map (λ val -> ($admininstr-val val))) val) ++ ((CALL-ADDR a) ∷ []) ⟩ , (FRAME- n f ((LABEL- n [] ((map (λ instr -> ($admininstr-instr instr))) instr)) ∷ [])) ∷ [] ⟩
   local-get :
