@@ -20,10 +20,24 @@ let _error at msg = Source.error at "sideconditions" msg
 
 module Env = Map.Make(String)
 
+type env = {
+  vars : typ Env.t;
+  var_counter : int ref;
+}
+
 let is_null e = CmpE (EqOp, e, OptE None $$ no_region % e.note) $$ no_region % (BoolT $ e.at)
 let iffE e1 e2 = IfPr (BinE (EquivOp, e1, e2) $$ no_region % (BoolT $ no_region)) $ no_region
 let same_len e1 e2 = IfPr (CmpE (EqOp, LenE e1 $$ no_region % (NatT $ e1.at), LenE e2 $$ no_region % (NatT $ e2.at)) $$ no_region % (BoolT $ no_region)) $ no_region
 let has_len ne e = IfPr (CmpE (EqOp, LenE e $$ no_region % (NatT $ e.at), ne) $$ no_region % (BoolT $ no_region)) $ no_region
+
+(* Fresh name generation *)
+
+let name i = "i" ^ string_of_int i (* no clash avoidance *)
+
+let fresh_id env : id =
+  let i = !(env.var_counter) in
+  incr env.var_counter;
+  name i $ no_region
 
 let t_list t xs =
   let xs', extra_premss = List.split (List.map t xs) in
@@ -32,7 +46,7 @@ let t_list t xs =
 let iter_side_conditions env ((iter, vs) : iterexp) : (id option * premise) list =
   let iter' = if iter = Opt then Opt else List in
   let ves = List.map (fun v ->
-    let t = Env.find v.it env in
+    let t = Env.find v.it env.vars in
     IterE (VarE v $$ no_region % t, (iter, [v])) $$ no_region % (IterT (t, iter') $ no_region)) vs in
  match iter, ves with
   | _, [] -> []
@@ -48,11 +62,12 @@ let rec t_exp env e : exp * (id option * premise) list =
 
 and t_exp' env = function
   (* First the conditions to be generated here *)
-  | IdxE (e1, e2) ->
+  | IdxE (e1, e2, _) ->
     let e1', extra_prems1 = t_exp env e1 in
     let e2', extra_prems2 = t_exp env e2 in
+    let id = fresh_id env in
     let prem = IfPr (CmpE (LtOp, e2', LenE e1' $$ no_region % e2'.note) $$ no_region % (BoolT $ no_region)) $ no_region in
-    IdxE (e1', e2'), [(None, prem)] @ extra_prems1 @ extra_prems2
+    IdxE (e1', e2', Some id), [(Some id, prem)] @ extra_prems1 @ extra_prems2
   | TheE e ->
     let e', extra_prems1 = t_exp env e in
     let prem = IfPr (CmpE (NeOp, e', OptE None $$ no_region % e'.note) $$ no_region % (BoolT $ no_region)) $ no_region in
@@ -199,7 +214,11 @@ let named_implies (_id1, prem1) (_id2, prem2) = implies prem1 prem2
 
 let t_rule' = function
   | RuleD (id, binds, mixop, exp, named_prems) ->
-    let env = List.fold_left (fun env (v, t, _) -> Env.add v.it t env) Env.empty binds in
+    (* Counter for fresh variables *)
+    let env = {
+      vars = List.fold_left (fun env (v, t, _) -> Env.add v.it t env) Env.empty binds;
+      var_counter = ref 0;
+    } in
     let exp', extra_prems1 = t_exp env exp in
     let named_prems', extra_prems2 = t_named_prems env named_prems in
     let named_prems'' = Util.Lib.List.nub named_implies (extra_prems2 @ extra_prems1 @ named_prems') in

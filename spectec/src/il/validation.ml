@@ -301,7 +301,7 @@ and infer_exp env e : typ =
   | UnE (op, _) -> infer_unop op $ e.at
   | BinE (op, _, _) -> infer_binop op $ e.at
   | CmpE _ -> BoolT $ e.at
-  | IdxE (e1, _) -> as_list_typ "expression" env Infer (infer_exp env e1) e1.at
+  | IdxE (e1, _, _) -> as_list_typ "expression" env Infer (infer_exp env e1) e1.at
   | SliceE (e1, _, _)
   | UpdE (e1, _, _)
   | ExtE (e1, _, _)
@@ -359,12 +359,18 @@ and valid_exp env e t =
     valid_exp env e1 t';
     valid_exp env e2 t';
     equiv_typ env (BoolT $ e.at) t e.at
-  | IdxE (e1, e2) ->
+  | IdxE (e1, e2, id) ->
     let t1 = infer_exp env e1 in
     let t' = as_list_typ "expression" env Infer t1 e1.at in
     valid_exp env e1 t1;
     valid_exp env e2 (NatT $ e2.at);
-    equiv_typ env t' t e.at
+    equiv_typ env t' t e.at;
+    begin match id with
+    | None -> ()
+    | Some id ->
+      let t', _ = find "variable" env.vars id in
+      equiv_typ env (BoolT $ e.at) t' e.at
+    end;
   | SliceE (e1, e2, e3) ->
     let _typ' = as_list_typ "expression" env Check t e1.at in
     valid_exp env e1 t;

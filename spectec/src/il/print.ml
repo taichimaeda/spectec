@@ -127,7 +127,7 @@ and string_of_exp e =
     "(" ^ string_of_exp e1 ^ space string_of_binop op ^ string_of_exp e2 ^ ")"
   | CmpE (op, e1, e2) ->
     "(" ^ string_of_exp e1 ^ space string_of_cmpop op ^ string_of_exp e2 ^ ")"
-  | IdxE (e1, e2) -> string_of_exp e1 ^ "[" ^ string_of_exp e2 ^ "]"
+  | IdxE (e1, e2, _) -> string_of_exp e1 ^ "[" ^ string_of_exp e2 ^ "]"
   | SliceE (e1, e2, e3) ->
     string_of_exp e1 ^
       "[" ^ string_of_exp e2 ^ " : " ^ string_of_exp e3 ^ "]"

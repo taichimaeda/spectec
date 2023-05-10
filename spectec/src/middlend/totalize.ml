@@ -57,7 +57,7 @@ and t_exp' env = function
   | UnE (unop, exp) -> UnE (unop, t_exp env exp)
   | BinE (binop, exp1, exp2) -> BinE (binop, t_exp env exp1, t_exp env exp2)
   | CmpE (cmpop, exp1, exp2) -> CmpE (cmpop, t_exp env exp1, t_exp env exp2)
-  | IdxE (exp1, exp2) -> IdxE (t_exp env exp1, t_exp env exp2)
+  | IdxE (exp1, exp2, id) -> IdxE (t_exp env exp1, t_exp env exp2, id)
   | SliceE (exp1, exp2, exp3) -> SliceE (t_exp env exp1, t_exp env exp2, t_exp env exp3)
   | UpdE (exp1, path, exp2) -> UpdE (t_exp env exp1, t_path env path, t_exp env exp2)
   | ExtE (exp1, path, exp2) -> ExtE (t_exp env exp1, t_path env path, t_exp env exp2)

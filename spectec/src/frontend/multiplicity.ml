@@ -183,10 +183,11 @@ and annot_exp env e : Il.Ast.exp * occur =
       let e1', occur1 = annot_exp env e1 in
       let e2', occur2 = annot_exp env e2 in
       CmpE (op, e1', e2'), union occur1 occur2
-    | IdxE (e1, e2) ->
+    | IdxE (e1, e2, id) ->
       let e1', occur1 = annot_exp env e1 in
       let e2', occur2 = annot_exp env e2 in
-      IdxE (e1', e2'), union occur1 occur2
+      let occur3 = match id with None -> Env.empty | Some id -> Env.singleton id.it (Env.find id.it env) in
+      IdxE (e1', e2', id), union (union occur1 occur2) occur3
     | SliceE (e1, e2, e3) ->
       let e1', occur1 = annot_exp env e1 in
       let e2', occur2 = annot_exp env e2 in

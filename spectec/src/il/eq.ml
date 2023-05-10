@@ -58,7 +58,8 @@ and eq_exp e1 e2 =
   | CmpE (op1, e11, e12), CmpE (op2, e21, e22) ->
     op1 = op2 && eq_exp e11 e21 && eq_exp e12 e22
   | LenE e11, LenE e21 -> eq_exp e11 e21
-  | IdxE (e11, e12), IdxE (e21, e22)
+  | IdxE (e11, e12, id1), IdxE (e21, e22, id2) ->
+    eq_exp e11 e21 && eq_exp e12 e22 && eq_opt eq_id id1 id2
   | CompE (e11, e12), CompE (e21, e22)
   | CatE (e11, e12), CatE (e21, e22) -> eq_exp e11 e21 && eq_exp e12 e22
   | SliceE (e11, e12, e13), SliceE (e21, e22, e23) ->

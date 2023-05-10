@@ -539,7 +539,7 @@ and elab_exp env e t : Il.exp =
     let t' = as_list_typ "expression" env Infer t1 e1.at in
     let e1' = elab_exp env e1 t1 in
     let e2' = elab_exp env e2 (NatT $ e2.at) in
-    let e' = Il.IdxE (e1', e2') $$ e.at % !!env t' in
+    let e' = Il.IdxE (e1', e2', None) $$ e.at % !!env t' in
     cast_exp "list element" env e' t' t
   | SliceE (e1, e2, e3) ->
     let _t' = as_list_typ "expression" env Check t e1.at in
