@@ -1,79 +1,71 @@
 open Util
 
-
 (* Configuration *)
 
 let name = "watsup"
 let version = "0.3"
 
-
 (* Flags and parameters *)
 
 type target =
- | Check
- | Latex of Backend_latex.Config.config
- | Prose
+  | Check
+  | Latex of Backend_latex.Config.config
+  | Prose
 
 let target = ref (Latex Backend_latex.Config.latex)
-
-let log = ref false  (* log execution steps *)
-let dst = ref false  (* patch files *)
-let dry = ref false  (* dry run for patching *)
+let log = ref false (* log execution steps *)
+let dst = ref false (* patch files *)
+let dry = ref false (* dry run for patching *)
 let warn = ref false (* warn about unused or reused splices *)
-
-let srcs = ref []    (* src file arguments *)
-let dsts = ref []    (* destination file arguments *)
-let odst = ref ""    (* generation file argument *)
-
+let srcs = ref [] (* src file arguments *)
+let dsts = ref [] (* destination file arguments *)
+let odst = ref "" (* generation file argument *)
 let print_elab_il = ref false
 let print_final_il = ref false
 let print_all_il = ref false
-
 let pass_sub = ref false
 let pass_totalize = ref false
 let pass_unthe = ref false
 let pass_sideconditions = ref false
 
-
 (* Argument parsing *)
 
-let banner () =
-  print_endline (name ^ " " ^ version ^ " generator")
-
+let banner () = print_endline (name ^ " " ^ version ^ " generator")
 let usage = "Usage: " ^ name ^ " [option] [file ...] [-p file ...]"
 
 let add_arg source =
-  let args = if !dst then dsts else srcs in args := !args @ [source]
+  let args = if !dst then dsts else srcs in
+  args := !args @ [source]
 
-let argspec = Arg.align
-[
-  "-v", Arg.Unit banner, " Show version";
-  "-o", Arg.String (fun s -> odst := s), " Generate file";
-  "-p", Arg.Set dst, " Patch files";
-  "-d", Arg.Set dry, " Dry run (when -p) ";
-  "-l", Arg.Set log, " Log execution steps";
-  "-w", Arg.Set warn, " Warn about unused or multiply used splices";
-
-  "--check", Arg.Unit (fun () -> target := Check), " Check only";
-  "--latex", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex),
-    " Generate Latex (default)";
-  "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
-    " Generate Latex for Sphinx";
-  "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
-
-  "--print-il", Arg.Set print_elab_il, " Print il (after elaboration)";
-  "--print-final-il", Arg.Set print_final_il, " Print final il";
-  "--print-all-il", Arg.Set print_all_il, " Print il after each step";
-
-  "--sub", Arg.Set pass_sub, " Synthesize explicit subtype coercions";
-  "--totalize", Arg.Set pass_totalize, " Run function totalization";
-  "--the-elimination", Arg.Set pass_unthe, " Eliminate the ! operator in relations";
-  "--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions";
-
-  "-help", Arg.Unit ignore, "";
-  "--help", Arg.Unit ignore, "";
-]
-
+let argspec =
+  Arg.align
+    [
+      ("-v", Arg.Unit banner, " Show version");
+      ("-o", Arg.String (fun s -> odst := s), " Generate file");
+      ("-p", Arg.Set dst, " Patch files");
+      ("-d", Arg.Set dry, " Dry run (when -p) ");
+      ("-l", Arg.Set log, " Log execution steps");
+      ("-w", Arg.Set warn, " Warn about unused or multiply used splices");
+      ("--check", Arg.Unit (fun () -> target := Check), " Check only");
+      ( "--latex",
+        Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex),
+        " Generate Latex (default)" );
+      ( "--sphinx",
+        Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
+        " Generate Latex for Sphinx" );
+      ("--prose", Arg.Unit (fun () -> target := Prose), " Generate prose");
+      ("--print-il", Arg.Set print_elab_il, " Print il (after elaboration)");
+      ("--print-final-il", Arg.Set print_final_il, " Print final il");
+      ("--print-all-il", Arg.Set print_all_il, " Print il after each step");
+      ("--sub", Arg.Set pass_sub, " Synthesize explicit subtype coercions");
+      ("--totalize", Arg.Set pass_totalize, " Run function totalization");
+      ( "--the-elimination",
+        Arg.Set pass_unthe,
+        " Eliminate the ! operator in relations" );
+      ("--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions");
+      ("-help", Arg.Unit ignore, "");
+      ("--help", Arg.Unit ignore, "");
+    ]
 
 (* Main *)
 
@@ -92,47 +84,52 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
 
-    let il = if not !pass_sub then il else
-      ( log "Subtype injection...";
+    let il =
+      if not !pass_sub then il
+      else (
+        log "Subtype injection...";
         let il = Middlend.Sub.transform il in
-        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il
-      )
+        il)
     in
 
-    let il = if not !pass_totalize then il else
-      ( log "Function totalization...";
+    let il =
+      if not !pass_totalize then il
+      else (
+        log "Function totalization...";
         let il = Middlend.Totalize.transform il in
         if !print_all_il then
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il
-      )
+        il)
     in
 
-    let il = if not !pass_unthe then il else
-      ( log "Option projection eliminiation";
+    let il =
+      if not !pass_unthe then il
+      else (
+        log "Option projection eliminiation";
         let il = Middlend.Unthe.transform il in
         if !print_all_il then
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il
-      )
+        il)
     in
 
-    let il = if not !pass_sideconditions then il else
-      ( log "Side condition inference";
+    let il =
+      if not !pass_sideconditions then il
+      else (
+        log "Side condition inference";
         let il = Middlend.Sideconditions.transform il in
         if !print_all_il then
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il
-      )
+        il)
     in
 
     if !print_final_il && not !print_all_il then
@@ -144,13 +141,11 @@ let () =
       log "Latex Generation...";
       if !odst = "" && !dsts = [] then
         print_endline (Backend_latex.Gen.gen_string el);
-      if !odst <> "" then
-        Backend_latex.Gen.gen_file !odst el;
+      if !odst <> "" then Backend_latex.Gen.gen_file !odst el;
       if !dsts <> [] then (
         let env = Backend_latex.Splice.(env config el) in
         List.iter (Backend_latex.Splice.splice_file ~dry:!dry env) !dsts;
-        if !warn then Backend_latex.Splice.warn env;
-      );
+        if !warn then Backend_latex.Splice.warn env)
     | Prose ->
       log "Prose Generation...";
       let ir = true in
@@ -158,11 +153,9 @@ let () =
         let program = Backend_prose.Il2ir.translate il in
         List.map Backend_prose.Print.string_of_program program
         |> List.iter print_endline
-      else (
+      else
         let prose = Backend_prose.Translate.translate el in
-        print_endline prose
-      )
-    );
+        print_endline prose);
     log "Complete."
   with
   | Source.Error (at, msg) ->
