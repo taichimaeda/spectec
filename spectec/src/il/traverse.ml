@@ -2,8 +2,6 @@ open Util
 open Ast
 open Source
 
-let id_fold x acc = (x, acc)
-
 let traverse_phrase traverse p trv acc =
   let it, acc' = traverse p.it trv acc in
   ({ p with it }, acc')
@@ -49,22 +47,15 @@ let rec traverse_fieldlist f es trv acc =
       let es', acc'' = traverse_fieldlist f es trv acc' in
       ((x, e') :: es', acc'')
 
-type 'acc t = {
-  exp : exp -> 'acc -> exp * 'acc;
-  iter : iter -> 'acc -> iter * 'acc;
-  iterexp : iterexp -> 'acc -> iterexp * 'acc;
-  path : path -> 'acc -> path * 'acc;
-  def : def -> 'acc -> def * 'acc;
-}
+type ('acc, 't) visitor = 't -> 'acc -> 't * 'acc
 
-let id () =
-  {
-    exp = id_fold;
-    iter = id_fold;
-    iterexp = id_fold;
-    path = id_fold;
-    def = id_fold;
-  }
+type 'acc t = {
+  exp : ('acc, exp) visitor;
+  iter : ('acc, iter) visitor;
+  iterexp : ('acc, iterexp) visitor;
+  path : ('acc, path) visitor;
+  def : ('acc, def) visitor;
+}
 
 let rec traverse_exp e trv acc =
   let e', acc' = traverse_phrase traverse_exp' e trv acc in
@@ -259,20 +250,14 @@ and traverse_premise' p trv acc =
       in
       (IterPr (p', ie'), acc')
 
-and traverse_hintdef hd trv acc = traverse_phrase traverse_hintdef' hd trv acc
-
-and traverse_hintdef' hs _trv acc =
-  match hs with
-  | SynH (x, hs) -> (SynH (x, hs), acc)
-  | RelH (x, hs) -> (RelH (x, hs), acc)
-  | DecH (x, hs) -> (DecH (x, hs), acc)
-
 let traverse_script s trv acc =
   let s', acc' = traverse_list traverse_def s trv acc in
   (s', acc')
 
-let traverse traverse ?(exp = id_fold) ?(iter = id_fold) ?(iterexp = id_fold)
-    ?(path = id_fold) ?(def = id_fold) x acc =
+let id_fold x acc = (x, acc)
+
+let traverse ?(exp = id_fold) ?(iter = id_fold) ?(iterexp = id_fold)
+    ?(path = id_fold) ?(def = id_fold) (s : script) acc =
   let trv = { exp; iter; iterexp; path; def } in
-  let x', acc' = traverse x trv acc in
-  (x', acc')
+  let s', acc' = traverse_script s trv acc in
+  (s', acc')
