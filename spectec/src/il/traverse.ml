@@ -167,5 +167,38 @@ module Exp = struct
           let e', acc' = fold e acc in
           let es', acc'' = fold_fieldlist es acc' in
           ((x, e') :: es', acc'')
-  end
+
+    and fold_iterexp (ie, vs) acc =
+      let ie', acc' = fold_iter ie acc in
+      ((ie', vs), acc')
+
+    and fold_iter ie acc =
+      match ie with
+      | Opt -> (Opt, acc)
+      | List -> (List, acc)
+      | List1 -> (List1, acc)
+      | ListN e ->
+          let e', acc' = fold e acc in
+          (ListN e', acc')
+    
+    and fold_path p acc =
+      let p', acc' = fold_path' p.it acc in
+      {p with it = p'}, acc'
+
+    and fold_path' p acc =
+      match p with
+      | RootP -> RootP, acc
+      | IdxP (p, e) -> 
+          let p', acc' = fold_path p acc in
+          let e', acc'' = fold e acc' in
+          IdxP (p', e'), acc''
+      | SliceP (p, e1, e2) ->
+          let p', acc' = fold_path p acc in
+          let e1', acc'' = fold e1 acc' in
+          let e2', acc''' = fold e2 acc'' in
+          SliceP (p', e1', e2'), acc'''
+      | DotP (p, a) ->
+          let p', acc' = fold_path p acc in
+          DotP (p', a), acc'
+      end
 end
