@@ -54,6 +54,7 @@ type 'acc t = {
   iter : ('acc, iter) fold_map;
   iterexp : ('acc, iterexp) fold_map;
   path : ('acc, path) fold_map;
+  rule : ('acc, rule) fold_map;
   def : ('acc, def) fold_map;
 }
 
@@ -209,7 +210,9 @@ and traverse_def' def' trv acc =
       (RecD ds', acc')
   | HintD hd -> (HintD hd, acc)
 
-and traverse_rule r trv acc = traverse_phrase traverse_rule' r trv acc
+and traverse_rule r trv acc =
+  let r', acc' = traverse_phrase traverse_rule' r trv acc in
+  trv.rule r' acc'
 
 and traverse_rule' r trv acc =
   match r with
@@ -256,7 +259,7 @@ let traverse_script s trv acc =
 
 let id_fold x acc = (x, acc)
 
-let fold_map ?exp ?iter ?iterexp ?path ?def (s : script) acc =
+let fold_map ?exp ?iter ?iterexp ?path ?rule ?def (s : script) acc =
   let arg_to_fold_map f = Option.value f ~default:id_fold in
   let trv =
     {
@@ -264,6 +267,7 @@ let fold_map ?exp ?iter ?iterexp ?path ?def (s : script) acc =
       iter = arg_to_fold_map iter;
       iterexp = arg_to_fold_map iterexp;
       path = arg_to_fold_map path;
+      rule = arg_to_fold_map rule;
       def = arg_to_fold_map def;
     }
   in
@@ -272,7 +276,7 @@ let fold_map ?exp ?iter ?iterexp ?path ?def (s : script) acc =
 
 type 't map = 't -> 't
 
-let map ?exp ?iter ?iterexp ?path ?def (s : script) =
+let map ?exp ?iter ?iterexp ?path ?rule ?def (s : script) =
   let arg_to_map = function
     | None -> fun x () -> (x, ())
     | Some f -> fun x () -> (f x, ())
@@ -283,6 +287,7 @@ let map ?exp ?iter ?iterexp ?path ?def (s : script) =
       iter = arg_to_map iter;
       iterexp = arg_to_map iterexp;
       path = arg_to_map path;
+      rule = arg_to_map rule;
       def = arg_to_map def;
     }
   in
@@ -291,7 +296,7 @@ let map ?exp ?iter ?iterexp ?path ?def (s : script) =
 
 type ('acc, 't) fold = 't -> 'acc -> 'acc
 
-let fold ?exp ?iter ?iterexp ?path ?def (s : script) acc =
+let fold ?exp ?iter ?iterexp ?path ?rule ?def (s : script) acc =
   let arg_to_fold = function
     | None -> fun x acc -> (x, acc)
     | Some f -> fun x acc -> (x, f x acc)
@@ -302,6 +307,7 @@ let fold ?exp ?iter ?iterexp ?path ?def (s : script) acc =
       iter = arg_to_fold iter;
       iterexp = arg_to_fold iterexp;
       path = arg_to_fold path;
+      rule = arg_to_fold rule;
       def = arg_to_fold def;
     }
   in
@@ -310,7 +316,7 @@ let fold ?exp ?iter ?iterexp ?path ?def (s : script) acc =
 
 type ('env, 't) reader = 'env -> 't -> 't
 
-let reader ?exp ?iter ?iterexp ?path ?def env (s : script) =
+let reader ?exp ?iter ?iterexp ?path ?rule ?def env (s : script) =
   let arg_to_reader = function
     | None -> fun x env -> (x, env)
     | Some f -> fun x env -> (f env x, env)
@@ -321,6 +327,7 @@ let reader ?exp ?iter ?iterexp ?path ?def env (s : script) =
       iter = arg_to_reader iter;
       iterexp = arg_to_reader iterexp;
       path = arg_to_reader path;
+      rule = arg_to_reader rule;
       def = arg_to_reader def;
     }
   in
