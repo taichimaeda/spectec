@@ -4,146 +4,157 @@ open Source
 
 module Exp = struct
   module type TRAVERSAL = sig
-    val exp : exp' * typ * Source.region -> 'acc -> exp * 'acc
-    val var : id -> 'acc -> exp' * 'acc
-    val bool : bool -> 'acc -> exp' * 'acc
-    val nat : nat -> 'acc -> exp' * 'acc
-    val text : text -> 'acc -> exp' * 'acc
-    val un : unop * exp -> 'acc -> exp' * 'acc
-    val bin : binop * exp * exp -> 'acc -> exp' * 'acc
-    val cmp : cmpop * exp * exp -> 'acc -> exp' * 'acc
-    val idx : exp * exp -> 'acc -> exp' * 'acc
-    val slice : exp * exp * exp -> 'acc -> exp' * 'acc
-    val upd : exp * path * exp -> 'acc -> exp' * 'acc
-    val ext : exp * path * exp -> 'acc -> exp' * 'acc
-    val str : expfield list -> 'acc -> exp' * 'acc
-    val dot : exp * atom -> 'acc -> exp' * 'acc
-    val comp : exp * exp -> 'acc -> exp' * 'acc
-    val len : exp -> 'acc -> exp' * 'acc
-    val tup : exp list -> 'acc -> exp' * 'acc
-    val mix : mixop * exp -> 'acc -> exp' * 'acc
-    val call : id * exp -> 'acc -> exp' * 'acc
-    val iter : exp * iterexp -> 'acc -> exp' * 'acc
-    val opt : exp option -> 'acc -> exp' * 'acc
-    val the : exp -> 'acc -> exp' * 'acc
-    val list : exp list -> 'acc -> exp' * 'acc
-    val cat : exp * exp -> 'acc -> exp' * 'acc
-    val case : atom * exp -> 'acc -> exp' * 'acc
-    val sub : exp * typ * typ -> 'acc -> exp' * 'acc
+    type acc
+    val exp : exp' * typ * Source.region -> acc -> exp * acc
+    val var : typ -> Source.region -> id -> acc -> exp' * acc
+    val bool : typ -> Source.region -> bool -> acc -> exp' * acc
+    val nat : typ -> Source.region -> nat -> acc -> exp' * acc
+    val text : typ -> Source.region -> text -> acc -> exp' * acc
+    val un : typ -> Source.region -> unop * exp -> acc -> exp' * acc
+    val bin : typ -> Source.region -> binop * exp * exp -> acc -> exp' * acc
+    val cmp : typ -> Source.region -> cmpop * exp * exp -> acc -> exp' * acc
+    val idx : typ -> Source.region -> exp * exp -> acc -> exp' * acc
+    val slice : typ -> Source.region -> exp * exp * exp -> acc -> exp' * acc
+    val upd : typ -> Source.region -> exp * path * exp -> acc -> exp' * acc
+    val ext : typ -> Source.region -> exp * path * exp -> acc -> exp' * acc
+    val str : typ -> Source.region -> expfield list -> acc -> exp' * acc
+    val dot : typ -> Source.region -> exp * atom -> acc -> exp' * acc
+    val comp : typ -> Source.region -> exp * exp -> acc -> exp' * acc
+    val len : typ -> Source.region -> exp -> acc -> exp' * acc
+    val tup : typ -> Source.region -> exp list -> acc -> exp' * acc
+    val mix : typ -> Source.region -> mixop * exp -> acc -> exp' * acc
+    val call : typ -> Source.region -> id * exp -> acc -> exp' * acc
+    val iter : typ -> Source.region -> exp * iterexp -> acc -> exp' * acc
+    val opt : typ -> Source.region -> exp option -> acc -> exp' * acc
+    val the : typ -> Source.region -> exp -> acc -> exp' * acc
+    val list : typ -> Source.region -> exp list -> acc -> exp' * acc
+    val cat : typ -> Source.region -> exp * exp -> acc -> exp' * acc
+    val case : typ -> Source.region -> atom * exp -> acc -> exp' * acc
+    val sub : typ -> Source.region -> exp * typ * typ -> acc -> exp' * acc
+    val iter_ : typ -> Source.region -> iter -> acc -> iter * acc
+    val iterexp : typ -> Source.region -> iterexp -> acc -> iterexp * acc
+    val path : typ -> Source.region -> path -> acc -> path * acc
   end
 
-  module Id : TRAVERSAL = struct
+  let identity (type a) = (module struct
+    type acc = a
     let exp (e, t, at) acc = ({ it = e; note = t; at }, acc)
-    let var x acc = (VarE x, acc)
-    let bool b acc = (BoolE b, acc)
-    let nat n acc = (NatE n, acc)
-    let text t acc = (TextE t, acc)
-    let un (op, e) acc = (UnE (op, e), acc)
-    let bin (op, e1, e2) acc = (BinE (op, e1, e2), acc)
-    let cmp (op, e1, e2) acc = (CmpE (op, e1, e2), acc)
-    let idx (e1, e2) acc = (IdxE (e1, e2), acc)
-    let slice (e1, e2, e3) acc = (SliceE (e1, e2, e3), acc)
-    let upd (e1, p, e2) acc = (UpdE (e1, p, e2), acc)
-    let ext (e1, p, e2) acc = (ExtE (e1, p, e2), acc)
-    let str es acc = (StrE es, acc)
-    let dot (e, x) acc = (DotE (e, x), acc)
-    let comp (e1, e2) acc = (CompE (e1, e2), acc)
-    let len e acc = (LenE e, acc)
-    let tup es acc = (TupE es, acc)
-    let mix (op, e) acc = (MixE (op, e), acc)
-    let call (x, e) acc = (CallE (x, e), acc)
-    let iter (e, ie) acc = (IterE (e, ie), acc)
-    let opt eo acc = (OptE eo, acc)
-    let the e acc = (TheE e, acc)
-    let list es acc = (ListE es, acc)
-    let cat (e1, e2) acc = (CatE (e1, e2), acc)
-    let case (x, e) acc = (CaseE (x, e), acc)
-    let sub (e, t1, t2) acc = (SubE (e, t1, t2), acc)
-  end
+    let var _t _at x acc = (VarE x, acc)
+    let bool _t _at b acc = (BoolE b, acc)
+    let nat _t _at n acc = (NatE n, acc)
+    let text _t _at t acc = (TextE t, acc)
+    let un _t _at (op, e) acc = (UnE (op, e), acc)
+    let bin _t _at (op, e1, e2) acc = (BinE (op, e1, e2), acc)
+    let cmp _t _at (op, e1, e2) acc = (CmpE (op, e1, e2), acc)
+    let idx _t _at (e1, e2) acc = (IdxE (e1, e2), acc)
+    let slice _t _at (e1, e2, e3) acc = (SliceE (e1, e2, e3), acc)
+    let upd _t _at (e1, p, e2) acc = (UpdE (e1, p, e2), acc)
+    let ext _t _at (e1, p, e2) acc = (ExtE (e1, p, e2), acc)
+    let str _t _at es acc = (StrE es, acc)
+    let dot _t _at (e, x) acc = (DotE (e, x), acc)
+    let comp _t _at (e1, e2) acc = (CompE (e1, e2), acc)
+    let len _t _at e acc = (LenE e, acc)
+    let tup _t _at es acc = (TupE es, acc)
+    let mix _t _at (op, e) acc = (MixE (op, e), acc)
+    let call _t _at (x, e) acc = (CallE (x, e), acc)
+    let iter _t _at (e, ie) acc = (IterE (e, ie), acc)
+    let opt _t _at eo acc = (OptE eo, acc)
+    let the _t _at e acc = (TheE e, acc)
+    let list _t _at es acc = (ListE es, acc)
+    let cat _t _at (e1, e2) acc = (CatE (e1, e2), acc)
+    let case _t _at (x, e) acc = (CaseE (x, e), acc)
+    let sub _t _at (e, t1, t2) acc = (SubE (e, t1, t2), acc)
+    let iter_ _t _at ie acc = (ie, acc)
+    let iterexp _t _at (ie, vs) acc = ((ie, vs), acc)
+    let path _t _at p acc = (p, acc)
+  end : TRAVERSAL with type acc = a)
 
   module Run (T : TRAVERSAL) = struct
     let rec fold e acc =
-      let e', acc' = fold' e.it acc in
+      let e', acc' = fold' e.it e.note e.at acc in
       T.exp (e', e.note, e.at) acc'
 
-    and fold' exp' acc =
+    and fold' exp' t at acc =
       match exp' with
-      | VarE x -> T.var x acc
-      | BoolE b -> T.bool b acc
-      | NatE n -> T.nat n acc
-      | TextE t -> T.text t acc
+      | VarE x -> T.var t at x acc
+      | BoolE b -> T.bool t at b acc
+      | NatE n -> T.nat t at n acc
+      | TextE tx -> T.text t at tx acc
       | UnE (op, e) ->
           let e', acc' = fold e acc in
-          T.un (op, e') acc'
+          T.un t at (op, e') acc'
       | BinE (op, e1, e2) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
-          T.bin (op, e1', e2') acc''
+          T.bin t at (op, e1', e2') acc''
       | CmpE (op, e1, e2) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
-          T.cmp (op, e1', e2') acc''
+          T.cmp t at (op, e1', e2') acc''
       | IdxE (e1, e2) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
-          T.idx (e1', e2') acc''
+          T.idx t at (e1', e2') acc''
       | SliceE (e1, e2, e3) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
           let e3', acc''' = fold e3 acc'' in
-          T.slice (e1', e2', e3') acc'''
+          T.slice t at (e1', e2', e3') acc'''
       | UpdE (e1, p, e2) ->
           let e1', acc' = fold e1 acc in
-          let e2', acc'' = fold e2 acc' in
-          T.upd (e1', p, e2') acc''
+          let p', acc'' = fold_path p acc' in
+          let e2', acc''' = fold e2 acc'' in
+          T.upd t at (e1', p', e2') acc'''
       | ExtE (e1, p, e2) ->
           let e1', acc' = fold e1 acc in
-          let e2', acc'' = fold e2 acc' in
-          T.ext (e1', p, e2') acc''
+          let p', acc'' = fold_path p acc' in
+          let e2', acc''' = fold e2 acc'' in
+          T.ext t at (e1', p', e2') acc'''
       | StrE es ->
           let es', acc' = fold_fieldlist es acc in
-          T.str es' acc'
+          T.str t at es' acc'
       | DotE (e, x) ->
           let e', acc' = fold e acc in
-          T.dot (e', x) acc'
+          T.dot t at (e', x) acc'
       | CompE (e1, e2) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
-          T.comp (e1', e2') acc''
+          T.comp t at (e1', e2') acc''
       | LenE e ->
           let e', acc' = fold e acc in
-          T.len e' acc'
+          T.len t at e' acc'
       | TupE es ->
           let es', acc' = fold_list es acc in
-          T.tup es' acc'
+          T.tup t at es' acc'
       | MixE (op, e) ->
           let e', acc' = fold e acc in
-          T.mix (op, e') acc'
+          T.mix t at (op, e') acc'
       | CallE (x, e) ->
           let e', acc' = fold e acc in
-          T.call (x, e') acc'
+          T.call t at (x, e') acc'
       | IterE (e, ie) ->
           let e', acc' = fold e acc in
-          T.iter (e', ie) acc'
+          let ie', acc'' = fold_iterexp ie acc' in
+          T.iter t at (e', ie') acc''
       | OptE eo ->
           let eo', acc' = fold_option eo acc in
-          T.opt eo' acc'
+          T.opt t at eo' acc'
       | TheE e ->
           let e', acc' = fold e acc in
-          T.the e' acc'
+          T.the t at e' acc'
       | ListE es ->
           let es', acc' = fold_list es acc in
-          T.list es' acc'
+          T.list t at es' acc'
       | CatE (e1, e2) ->
           let e1', acc' = fold e1 acc in
           let e2', acc'' = fold e2 acc' in
-          T.cat (e1', e2') acc''
+          T.cat t at (e1', e2') acc''
       | CaseE (x, e) ->
           let e', acc' = fold e acc in
-          T.case (x, e') acc'
+          T.case t at (x, e') acc'
       | SubE (e, t1, t2) ->
           let e', acc' = fold e acc in
-          T.sub (e', t1, t2) acc'
+          T.sub t at (e', t1, t2) acc'
 
     and fold_list es acc =
       match es with
