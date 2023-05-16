@@ -47,14 +47,14 @@ let rec traverse_fieldlist f es trv acc =
       let es', acc'' = traverse_fieldlist f es trv acc' in
       ((x, e') :: es', acc'')
 
-type ('acc, 't) visitor = 't -> 'acc -> 't * 'acc
+type ('acc, 't) fold_map = 't -> 'acc -> 't * 'acc
 
 type 'acc t = {
-  exp : ('acc, exp) visitor;
-  iter : ('acc, iter) visitor;
-  iterexp : ('acc, iterexp) visitor;
-  path : ('acc, path) visitor;
-  def : ('acc, def) visitor;
+  exp : ('acc, exp) fold_map;
+  iter : ('acc, iter) fold_map;
+  iterexp : ('acc, iterexp) fold_map;
+  path : ('acc, path) fold_map;
+  def : ('acc, def) fold_map;
 }
 
 let rec traverse_exp e trv acc =
@@ -256,8 +256,73 @@ let traverse_script s trv acc =
 
 let id_fold x acc = (x, acc)
 
-let traverse ?(exp = id_fold) ?(iter = id_fold) ?(iterexp = id_fold)
-    ?(path = id_fold) ?(def = id_fold) (s : script) acc =
-  let trv = { exp; iter; iterexp; path; def } in
+let fold_map ?exp ?iter ?iterexp ?path ?def (s : script) acc =
+  let arg_to_fold_map f = Option.value f ~default:id_fold in
+  let trv =
+    {
+      exp = arg_to_fold_map exp;
+      iter = arg_to_fold_map iter;
+      iterexp = arg_to_fold_map iterexp;
+      path = arg_to_fold_map path;
+      def = arg_to_fold_map def;
+    }
+  in
   let s', acc' = traverse_script s trv acc in
   (s', acc')
+
+type 't map = 't -> 't
+
+let map ?exp ?iter ?iterexp ?path ?def (s : script) =
+  let arg_to_map = function
+    | None -> fun x () -> (x, ())
+    | Some f -> fun x () -> (f x, ())
+  in
+  let trv =
+    {
+      exp = arg_to_map exp;
+      iter = arg_to_map iter;
+      iterexp = arg_to_map iterexp;
+      path = arg_to_map path;
+      def = arg_to_map def;
+    }
+  in
+  let s', () = traverse_script s trv () in
+  s'
+
+type ('acc, 't) fold = 't -> 'acc -> 'acc
+
+let fold ?exp ?iter ?iterexp ?path ?def (s : script) acc =
+  let arg_to_fold = function
+    | None -> fun x acc -> (x, acc)
+    | Some f -> fun x acc -> (x, f x acc)
+  in
+  let trv =
+    {
+      exp = arg_to_fold exp;
+      iter = arg_to_fold iter;
+      iterexp = arg_to_fold iterexp;
+      path = arg_to_fold path;
+      def = arg_to_fold def;
+    }
+  in
+  let _, acc' = traverse_script s trv acc in
+  acc'
+
+type ('env, 't) reader = 'env -> 't -> 't
+
+let reader ?exp ?iter ?iterexp ?path ?def env (s : script) =
+  let arg_to_reader = function
+    | None -> fun x env -> (x, env)
+    | Some f -> fun x env -> (f env x, env)
+  in
+  let trv =
+    {
+      exp = arg_to_reader exp;
+      iter = arg_to_reader iter;
+      iterexp = arg_to_reader iterexp;
+      path = arg_to_reader path;
+      def = arg_to_reader def;
+    }
+  in
+  let s', _ = traverse_script s trv env in
+  s'
