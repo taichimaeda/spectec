@@ -38,7 +38,8 @@ let rec check_ctx id (at0, ctx0) = function
         ^ string_of_ctx id ctx
         ^ " ("
         ^ string_of_region at0
-        ^ ")");
+        ^ ")"
+        );
     check_ctx id (at0, ctx0) ctxs
 
 let check_ctxs id ctxs : ctx =
@@ -146,7 +147,8 @@ type occur = Il.Ast.iter list Env.t
 let union =
   Env.union (fun _ ctx1 ctx2 ->
       assert (ctx1 = ctx2);
-      Some ctx1)
+      Some ctx1
+  )
 
 let rec annot_iter env iter : Il.Ast.iter * occur =
   match iter with
@@ -272,7 +274,8 @@ and annot_iterexp env occur1 (iter, ids) at : Il.Ast.iterexp * occur =
         | [] -> None
         | iter1 :: iters' ->
           assert (Il.Eq.eq_iter iter iter1);
-          Some iters')
+          Some iters'
+      )
       occur1
   in
   let ids' = List.map (fun (x, _) -> x $ at) (Env.bindings occur1') in

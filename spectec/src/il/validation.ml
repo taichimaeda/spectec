@@ -20,7 +20,8 @@ type env =
   { mutable vars : var_typ Env.t;
     mutable typs : syn_typ Env.t;
     mutable rels : rel_typ Env.t;
-    mutable defs : def_typ Env.t }
+    mutable defs : def_typ Env.t
+  }
 
 let new_env () =
   {vars = Env.empty; typs = Env.empty; rels = Env.empty; defs = Env.empty}
@@ -58,9 +59,10 @@ let find_case cases atom at =
 
 let rec expand' env = function
   | VarT id as t' ->
-    (match (find "syntax type" env.typs id).it with
+    ( match (find "syntax type" env.typs id).it with
     | AliasT t1 -> expand' env t1.it
-    | _ -> t')
+    | _ -> t'
+    )
   | t' -> t'
 
 let expand env t = expand' env t.it
@@ -76,7 +78,8 @@ let as_error at phrase dir t expected =
       ^ string_of_typ t
       ^ "` does not match expected type `"
       ^ expected
-      ^ "`")
+      ^ "`"
+      )
   | Check ->
     error at
       (phrase ^ "'s type does not match expected type `" ^ string_of_typ t ^ "`")
@@ -156,7 +159,8 @@ let equiv_typ env t1 t2 at =
       ^ "` "
       ^ "does not match expected type `"
       ^ string_of_typ t2
-      ^ "`")
+      ^ "`"
+      )
 
 (* Subtyping *)
 
@@ -170,14 +174,15 @@ let sub_typ' env t1 t2 =
   ||
   match (expand env t1, expand env t2) with
   | VarT id1, VarT id2 ->
-    (match ((find "" env.typs id1).it, (find "" env.typs id2).it) with
+    ( match ((find "" env.typs id1).it, (find "" env.typs id2).it) with
     | StructT tfs1, StructT tfs2 ->
       List.for_all
         (fun (atom, t2, _) ->
           try
             let t1 = find_field tfs1 atom t2.at in
             Eq.eq_typ t1 t2
-          with Error _ -> false)
+          with Error _ -> false
+        )
         tfs2
     | VariantT tcs1, VariantT tcs2 ->
       List.for_all
@@ -185,9 +190,11 @@ let sub_typ' env t1 t2 =
           try
             let t2 = find_case tcs2 atom t1.at in
             Eq.eq_typ t1 t2
-          with Error _ -> false)
+          with Error _ -> false
+        )
         tcs1
-    | _, _ -> false)
+    | _, _ -> false
+    )
   | _, _ -> false
 
 let sub_typ env t1 t2 at =
@@ -198,7 +205,8 @@ let sub_typ env t1 t2 at =
       ^ "` "
       ^ "does not match expected supertype `"
       ^ string_of_typ t2
-      ^ "`")
+      ^ "`"
+      )
 
 (* Operators *)
 
@@ -219,7 +227,8 @@ let check_atoms phrase item list at =
     List.fold_right
       (fun (atom, _, _) (set, dups) ->
         let s = Print.string_of_atom atom in
-        Free.Set.(if mem s set then (set, s :: dups) else (add s set, dups)))
+        Free.Set.(if mem s set then (set, s :: dups) else (add s set, dups))
+      )
       list (Free.Set.empty, [])
   in
   if dups <> [] then
@@ -229,7 +238,8 @@ let check_atoms phrase item list at =
       ^ item
       ^ "(s) `"
       ^ String.concat "`, `" dups
-      ^ "`")
+      ^ "`"
+      )
 
 (* Iteration *)
 
@@ -239,7 +249,8 @@ let valid_list valid_x_y env xs ys at =
       ("arity mismatch for expression list, expected "
       ^ string_of_int (List.length ys)
       ^ ", got "
-      ^ string_of_int (List.length xs));
+      ^ string_of_int (List.length xs)
+      );
   List.iter2 (valid_x_y env) xs ys
 
 let rec valid_iter env iter =
@@ -257,11 +268,12 @@ and valid_typ env t =
   | BoolT | NatT | TextT -> ()
   | TupT ts -> List.iter (valid_typ env) ts
   | IterT (t1, iter) ->
-    (match iter with
+    ( match iter with
     | ListN e -> error e.at "definite iterator not allowed in type"
     | _ ->
       valid_typ env t1;
-      valid_iter env iter)
+      valid_iter env iter
+    )
 
 and valid_deftyp env dt =
   match dt.it with
@@ -281,7 +293,8 @@ and valid_typ_mix env mixop t at =
       ("inconsistent arity in mixin notation, `"
       ^ string_of_mixop mixop
       ^ "` applied to "
-      ^ string_of_typ t);
+      ^ string_of_typ t
+      );
   valid_typ env t
 
 and valid_typfield env (_atom, t, _hints) = valid_typ env t
@@ -333,7 +346,8 @@ and valid_exp env e t =
         ("use of iterated variable `"
         ^ id.it
         ^ String.concat "" (List.map string_of_iter dim)
-        ^ "` outside suitable iteraton context")
+        ^ "` outside suitable iteraton context"
+        )
   | BoolE _ | NatE _ | TextE _ ->
     let t' = infer_exp env e in
     equiv_typ env t' t e.at
@@ -436,7 +450,8 @@ and valid_expmix env mixop e (mixop', t) at =
       ^ string_of_mixop mixop
       ^ "` does not match expected notation `"
       ^ string_of_mixop mixop'
-      ^ "`");
+      ^ "`"
+      );
   valid_exp env e t
 
 and valid_expfield env (atom1, e) (atom2, t, _) =
@@ -476,7 +491,8 @@ and valid_iterexp env (iter, ids) : env =
           vars =
             Env.add id.it
               (t, fst (Lib.List.split_last (iter1 :: iters)))
-              env.vars }
+              env.vars
+        }
       | _, iters ->
         error id.at
           ("iteration variable `"
@@ -486,7 +502,9 @@ and valid_iterexp env (iter, ids) : env =
           ^ String.concat "" (List.map string_of_iter iters)
           ^ "` in iteration `_"
           ^ string_of_iter iter
-          ^ "`"))
+          ^ "`"
+          )
+    )
     env ids
 
 (* Definitions *)
@@ -495,7 +513,8 @@ let valid_binds env binds =
   List.iter
     (fun (id, t, dim) ->
       valid_typ env t;
-      env.vars <- bind "variable" env.vars id (t, dim))
+      env.vars <- bind "variable" env.vars id (t, dim)
+    )
     binds
 
 let rec valid_prem env prem =
@@ -529,7 +548,8 @@ let valid_clause env t1 t2 clause =
       error clause.at
         ("definition contains unbound variable(s) `"
         ^ String.concat "`, `" (Free.Set.elements free_rh)
-        ^ "`")
+        ^ "`"
+        )
 
 let infer_def env d =
   match d.it with
@@ -579,7 +599,9 @@ let rec valid_def {bind} env d =
           error (List.hd ds).at
             (" "
             ^ string_of_region d.at
-            ^ ": invalid recursion between definitions of different sort"))
+            ^ ": invalid recursion between definitions of different sort"
+            )
+      )
       ds
   | HintD _ -> ()
 

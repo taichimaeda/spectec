@@ -52,9 +52,8 @@ let sccs (graph : graph) : Set.t list =
         if w.index = -1 then begin
           connect x;
           v.low <- min v.low w.low
-        end
-        else if w.onstack then
-          v.low <- min v.low w.index
+        end else if w.onstack then
+              v.low <- min v.low w.index
       done
     in
 

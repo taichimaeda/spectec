@@ -26,7 +26,8 @@ type env =
     desc_syn : exp list Map.t ref;
     deco_syn : bool;
     deco_rule : bool;
-    current_rel : string }
+    current_rel : string
+  }
 
 let new_env config =
   { config;
@@ -40,7 +41,8 @@ let new_env config =
     desc_syn = ref Map.empty;
     deco_syn = false;
     deco_rule = false;
-    current_rel = "" }
+    current_rel = ""
+  }
 
 let with_syntax_decoration b env = {env with deco_syn = b}
 let with_rule_decoration b env = {env with deco_rule = b}
@@ -52,7 +54,8 @@ let env_hints name map id hints =
         let exps =
           match Map.find_opt id !map with Some exps -> exps | None -> []
         in
-        map := Map.add id (hintexp :: exps) !map)
+        map := Map.add id (hintexp :: exps) !map
+    )
     hints
 
 let env_typfield env = function
@@ -169,9 +172,10 @@ let rec chop_sub_exp e =
   | AtomE (Atom "_") -> Some (SeqE [] $ e.at)
   | AtomE (Atom id) when ends_sub id -> Some (AtomE (Atom (chop_sub id)) $ e.at)
   | FuseE (e1, e2) ->
-    (match chop_sub_exp e2 with
+    ( match chop_sub_exp e2 with
     | Some e2' -> Some (FuseE (e1, e2') $ e.at)
-    | None -> None)
+    | None -> None
+    )
   | _ -> None
 
 let dash_id = Str.(global_replace (regexp "-") "{-}")
@@ -212,7 +216,8 @@ let rec render_id_sub env style show at = function
         s'
       else
         !render_expand_fwd env show (s' $ at) [] (fun () ->
-            render_id' env style s')
+            render_id' env style s'
+        )
     in
     (if i = n then s'' else "{" ^ s'' ^ String.sub s i (n - i) ^ "}")
     ^
@@ -362,11 +367,12 @@ and expand_exp' args e' =
     let iter' = expand_iter args iter in
     IterE (e1', iter')
   | HoleE false ->
-    (match !args with
+    ( match !args with
     | [] -> raise Arity_mismatch
     | arg :: args' ->
       args := args';
-      arg.it)
+      arg.it
+    )
   | HoleE true ->
     let es = !args in
     args := [];
@@ -400,16 +406,17 @@ and render_expand env (show : exp list Map.t ref) id args f =
     let rec attempt = function
       | [] -> f ()
       | showexp :: showexps' ->
-        (try
-           let rargs = ref args in
-           let e = expand_exp rargs showexp in
-           if !rargs <> [] then raise Arity_mismatch;
-           (* Avoid cyclic expansion *)
-           show := Map.remove id.it !show;
-           Fun.protect
-             (fun () -> render_exp env e)
-             ~finally:(fun () -> show := Map.add id.it showexps !show)
-         with Arity_mismatch -> attempt showexps')
+        ( try
+            let rargs = ref args in
+            let e = expand_exp rargs showexp in
+            if !rargs <> [] then raise Arity_mismatch;
+            (* Avoid cyclic expansion *)
+            show := Map.remove id.it !show;
+            Fun.protect
+              (fun () -> render_exp env e)
+              ~finally:(fun () -> show := Map.add id.it showexps !show)
+          with Arity_mismatch -> attempt showexps'
+        )
       (* HACK: Ignore arity mismatches, such that overloading notation works,
        * e.g., using CONST for both instruction and relation. *)
     in
@@ -445,7 +452,8 @@ and render_typ env t =
       (render_dots dots1
       @ map_nl_list (render_synid env) ids
       @ map_nl_list (render_typcase env t.at) tcases
-      @ render_dots dots2)
+      @ render_dots dots2
+      )
   | AtomT atom -> render_typcase env t.at (atom, [], [])
   | SeqT [] -> "\\epsilon"
   | SeqT ({it = AtomT atom; at; _} :: ts) -> render_typcase env at (atom, ts, [])
@@ -483,7 +491,8 @@ and render_typcase env at (atom, ts, _hints) =
         let s1 = render_atom env atom in
         let s2 = render_typs "~" env ts in
         assert (s1 <> "" || s2 <> "");
-        if s1 <> "" && s2 <> "" then s1 ^ "~" ^ s2 else s1 ^ s2)
+        if s1 <> "" && s2 <> "" then s1 ^ "~" ^ s2 else s1 ^ s2
+    )
 
 (* Expressions *)
 
@@ -579,7 +588,8 @@ and render_exp env e =
           "}_{"
           ^ render_exps "," env (as_tup_exp e1')
           ^ "}"
-          ^ render_exp env e2')
+          ^ render_exp env e2'
+    )
   | IterE (e1, iter) -> "{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
   | FuseE (e1, e2) ->
     (* Hack for printing t.LOADn_sx *)
@@ -631,7 +641,8 @@ and render_expcase env atom es at =
         let s1 = render_atom env atom in
         let s2 = render_exps "~" env es in
         assert (s1 <> "" || s2 <> "");
-        if s1 <> "" && s2 <> "" then s1 ^ "~" ^ s2 else s1 ^ s2)
+        if s1 <> "" && s2 <> "" then s1 ^ "~" ^ s2 else s1 ^ s2
+    )
 
 let () = render_expand_fwd := render_expand
 
@@ -671,11 +682,12 @@ let string_of_desc = function
 let render_syndef env d =
   match d.it with
   | SynD (id1, _id2, t, _) ->
-    (match
-       (env.deco_syn, string_of_desc (Map.find_opt id1.it !(env.desc_syn)))
-     with
+    ( match
+        (env.deco_syn, string_of_desc (Map.find_opt id1.it !(env.desc_syn)))
+      with
     | true, Some s -> "\\mbox{(" ^ s ^ ")} & "
-    | _ -> "& ")
+    | _ -> "& "
+    )
     ^ render_synid env id1
     ^ " &::=& "
     ^ render_typ env t
@@ -753,7 +765,7 @@ let rec classify_rel e : rel_sort option =
 let rec render_defs env = function
   | [] -> ""
   | d :: ds' as ds ->
-    (match d.it with
+    ( match d.it with
     | SynD _ ->
       let ds' = merge_syndefs ds in
       let deco = if env.deco_syn then "l" else "l@{}" in
@@ -768,7 +780,7 @@ let rec render_defs env = function
       ^ "}"
       ^ if ds' = [] then "" else " \\; " ^ render_defs env ds'
     | RuleD (_, _, e, _) ->
-      (match classify_rel e with
+      ( match classify_rel e with
       | Some TypingRel ->
         "\\begin{array}{@{}c@{}}\\displaystyle\n"
         ^ render_sep_defs ~sep:"\n\\qquad\n" ~br:"\n\\\\[3ex]\\displaystyle\n"
@@ -778,13 +790,15 @@ let rec render_defs env = function
         "\\begin{array}{@{}l@{}lcl@{}l@{}}\n"
         ^ render_sep_defs (render_reddef env) ds
         ^ "\\end{array}"
-      | None -> error d.at "unrecognized form of relation")
+      | None -> error d.at "unrecognized form of relation"
+      )
     | DefD _ ->
       "\\begin{array}{@{}lcl@{}l@{}}\n"
       ^ render_sep_defs (render_funcdef env) ds
       ^ "\\end{array}"
     | SepD -> " \\\\\n" ^ render_defs env ds'
-    | VarD _ | DecD _ | HintD _ -> failwith "render_defs")
+    | VarD _ | DecD _ | HintD _ -> failwith "render_defs"
+    )
 
 let render_def env d = render_defs env [d]
 
@@ -793,46 +807,51 @@ let render_def env d = render_defs env [d]
 let rec split_syndefs syndefs = function
   | [] -> (List.rev syndefs, [])
   | d :: ds ->
-    (match d.it with
+    ( match d.it with
     | SynD _ -> split_syndefs (d :: syndefs) ds
-    | _ -> (List.rev syndefs, d :: ds))
+    | _ -> (List.rev syndefs, d :: ds)
+    )
 
 let rec split_reddefs id reddefs = function
   | [] -> (List.rev reddefs, [])
   | d :: ds ->
-    (match d.it with
+    ( match d.it with
     | RuleD (id1, _, _, _) when id1.it = id ->
       split_reddefs id (d :: reddefs) ds
-    | _ -> (List.rev reddefs, d :: ds))
+    | _ -> (List.rev reddefs, d :: ds)
+    )
 
 let rec split_funcdefs id funcdefs = function
   | [] -> (List.rev funcdefs, [])
   | d :: ds ->
-    (match d.it with
+    ( match d.it with
     | DefD (id1, _, _, _) when id1.it = id ->
       split_funcdefs id (d :: funcdefs) ds
-    | _ -> (List.rev funcdefs, d :: ds))
+    | _ -> (List.rev funcdefs, d :: ds)
+    )
 
 let rec render_script env = function
   | [] -> ""
   | d :: ds ->
-    (match d.it with
+    ( match d.it with
     | SynD _ ->
       let syndefs, ds' = split_syndefs [d] ds in
       "$$\n" ^ render_defs env syndefs ^ "\n$$\n\n" ^ render_script env ds'
     | RelD _ -> "$" ^ render_def env d ^ "$\n\n" ^ render_script env ds
     | RuleD (id1, _, e, _) ->
-      (match classify_rel e with
+      ( match classify_rel e with
       | Some TypingRel ->
         "$$\n" ^ render_def env d ^ "\n$$\n\n" ^ render_script env ds
       | Some ReductionRel ->
         let reddefs, ds' = split_reddefs id1.it [d] ds in
         "$$\n" ^ render_defs env reddefs ^ "\n$$\n\n" ^ render_script env ds'
-      | None -> error d.at "unrecognized form of relation")
+      | None -> error d.at "unrecognized form of relation"
+      )
     | VarD _ -> render_script env ds
     | DecD _ -> render_script env ds
     | DefD (id, _, _, _) ->
       let funcdefs, ds' = split_funcdefs id.it [d] ds in
       "$$\n" ^ render_defs env funcdefs ^ "\n$$\n\n" ^ render_script env ds'
     | SepD -> "\\vspace{1ex}\n\n" ^ render_script env ds
-    | HintD _ -> render_script env ds)
+    | HintD _ -> render_script env ds
+    )

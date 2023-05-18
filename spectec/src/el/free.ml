@@ -14,7 +14,8 @@ let union sets1 sets2 =
   { synid = Set.union sets1.synid sets2.synid;
     relid = Set.union sets1.relid sets2.relid;
     varid = Set.union sets1.varid sets2.varid;
-    defid = Set.union sets1.defid sets2.defid }
+    defid = Set.union sets1.defid sets2.defid
+  }
 
 let free_list free_x xs = List.(fold_left union empty (map free_x xs))
 let free_nl_elem free_x = function Nl -> empty | Elem x -> free_x x

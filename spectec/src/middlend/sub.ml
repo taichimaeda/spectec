@@ -73,7 +73,8 @@ let var_of_typ typ =
   | _ ->
     error typ.at
       ("Non-variable type expression not supported:\n"
-      ^ Il.Print.string_of_typ typ)
+      ^ Il.Print.string_of_typ typ
+      )
 
 (* Step 1 and 4: Collect SubE occurrences, and replace with function *)
 
@@ -203,7 +204,8 @@ let insert_injections env (def : def) : def list =
                 let binds =
                   List.mapi
                     (fun i arg_typ_i ->
-                      ("x" ^ string_of_int i $ no_region, arg_typ_i, []))
+                      ("x" ^ string_of_int i $ no_region, arg_typ_i, [])
+                    )
                     ts
                 in
                 let xes =
@@ -216,7 +218,8 @@ let insert_injections env (def : def) : def list =
                   ( binds,
                     CaseE (a, xe) $$ no_region % (VarT real_id $ no_region),
                     CaseE (a, xe) $$ no_region % sup_ty,
-                    [] )
+                    []
+                  )
                 $ no_region
               | _ ->
                 let x = "x" $ no_region in
@@ -225,11 +228,14 @@ let insert_injections env (def : def) : def list =
                   ( [(x, arg_typ, [])],
                     CaseE (a, xe) $$ no_region % (VarT real_id $ no_region),
                     CaseE (a, xe) $$ no_region % sup_ty,
-                    [] )
-                $ no_region)
+                    []
+                  )
+                $ no_region
+            )
             cases
         in
-        DecD (name, sub_ty, sup_ty, clauses) $ no_region)
+        DecD (name, sub_ty, sup_ty, clauses) $ no_region
+      )
       pairs
 
 let transform (defs : script) =
@@ -238,6 +244,7 @@ let transform (defs : script) =
   let defs'' = List.concat_map (insert_injections env) defs' in
   S.iter
     (fun (sub, sup) ->
-      error sub.at ("left-over subtype coercion " ^ sub.it ^ " <: " ^ sup.it))
+      error sub.at ("left-over subtype coercion " ^ sub.it ^ " <: " ^ sup.it)
+    )
     env.pairs;
   defs''

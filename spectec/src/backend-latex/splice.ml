@@ -41,7 +41,8 @@ type env =
     render : Render.env;
     mutable syn : syntax Map.t;
     mutable rel : relation Map.t;
-    mutable def : definition Map.t }
+    mutable def : definition Map.t
+  }
 
 let env_def env def =
   match def.it with
@@ -70,7 +71,8 @@ let env config script : env =
       render = Render.env config script;
       syn = Map.empty;
       rel = Map.empty;
-      def = Map.empty }
+      def = Map.empty
+    }
   in
   List.iter (env_def env) script;
   env
@@ -84,11 +86,13 @@ let warn_use use space id1 id2 =
 let warn env =
   Map.iter
     (fun id1 {fragments; _} ->
-      List.iter (fun (id2, _, use) -> warn_use use "syntax" id1 id2) fragments)
+      List.iter (fun (id2, _, use) -> warn_use use "syntax" id1 id2) fragments
+    )
     env.syn;
   Map.iter
     (fun id1 {rules; _} ->
-      List.iter (fun (id2, _, use) -> warn_use use "rule" id1 id2) rules)
+      List.iter (fun (id2, _, use) -> warn_use use "rule" id1 id2) rules
+    )
     env.rel;
   Map.iter (fun id1 {use; _} -> warn_use use "definition" id1 "") env.def
 
@@ -107,7 +111,8 @@ let find_entries space src id1 id2 entries =
   List.map
     (fun (_, def, use) ->
       incr use;
-      def)
+      def
+    )
     defs
 
 let find_syntax env src id1 id2 =
@@ -143,7 +148,8 @@ let len = String.length
 let rec parse_space src =
   if (not (eos src)) && (get src = ' ' || get src = '\t' || get src = '\n') then (
     adv src;
-    parse_space src)
+    parse_space src
+  )
 
 let rec try_string' s i s' j : bool =
   j = len s' || (s.[i] = s'.[j] && try_string' s (i + 1) s' (j + 1))
@@ -152,8 +158,9 @@ let try_string src s : bool =
   left src >= len s
   && try_string' src.s src.i s 0
   &&
-  (advn src (len s);
-   true)
+  ( advn src (len s);
+    true
+  )
 
 let try_anchor_start src anchor : bool = try_string src (anchor ^ "{")
 
@@ -162,13 +169,14 @@ let rec parse_anchor_end src j depth =
     error {src with i = j} "unclosed anchor"
   else if get src = '{' then (
     adv src;
-    parse_anchor_end src j (depth + 1))
-  else if get src <> '}' then (
+    parse_anchor_end src j (depth + 1)
+  ) else if get src <> '}' then (
     adv src;
-    parse_anchor_end src j depth)
-  else if depth > 0 then (
+    parse_anchor_end src j depth
+  ) else if depth > 0 then (
     adv src;
-    parse_anchor_end src j (depth - 1))
+    parse_anchor_end src j (depth - 1)
+  )
 
 let rec parse_id' src =
   if not (eos src) then
@@ -227,7 +235,8 @@ let try_def_anchor env src r sort space1 space2 find deco : bool =
       |> Render.with_syntax_decoration deco
       |> Render.with_rule_decoration deco
     in
-    r := Render.render_defs env' defs);
+    r := Render.render_defs env' defs
+  );
   b
 
 let try_exp_anchor env src r : bool =
@@ -252,7 +261,8 @@ let try_exp_anchor env src r : bool =
         let at' = {left = shift at.left; right = shift at.right} in
         raise (Source.Error (at', msg))
     in
-    r := Render.render_exp env.render exp);
+    r := Render.render_exp env.render exp
+  );
   b
 
 (* Splicing *)
@@ -269,7 +279,8 @@ let splice_anchor env src anchor buf =
     || try_def_anchor env src r "rule+" "relation" "rule" find_rule true
     || try_def_anchor env src r "rule" "relation" "rule" find_rule false
     || try_def_anchor env src r "definition" "definition" "" find_func false
-    || error src "unknown definition sort");
+    || error src "unknown definition sort"
+    );
   let s =
     if anchor.indent = "" then
       !r
@@ -284,16 +295,18 @@ let rec try_anchors env src buf = function
   | anchor :: anchors ->
     if try_anchor_start src anchor.token then (
       splice_anchor env src anchor buf;
-      true)
-    else
+      true
+    ) else
       try_anchors env src buf anchors
 
 let rec splice_all env src buf =
   if not (eos src) then (
     if not (try_anchors env src buf env.config.anchors) then (
       Buffer.add_char buf (get src);
-      adv src);
-    splice_all env src buf)
+      adv src
+    );
+    splice_all env src buf
+  )
 
 (* Entry points *)
 

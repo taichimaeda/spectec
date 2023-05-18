@@ -45,10 +45,12 @@ let argspec =
       ("--check", Arg.Unit (fun () -> target := Check), " Check only");
       ( "--latex",
         Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex),
-        " Generate Latex (default)" );
+        " Generate Latex (default)"
+      );
       ( "--sphinx",
         Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
-        " Generate Latex for Sphinx" );
+        " Generate Latex for Sphinx"
+      );
       ("--prose", Arg.Unit (fun () -> target := Prose), " Generate prose");
       ("--print-il", Arg.Set print_elab_il, " Print il (after elaboration)");
       ("--print-final-il", Arg.Set print_final_il, " Print final il");
@@ -57,10 +59,12 @@ let argspec =
       ("--totalize", Arg.Set pass_totalize, " Run function totalization");
       ( "--the-elimination",
         Arg.Set pass_unthe,
-        " Eliminate the ! operator in relations" );
+        " Eliminate the ! operator in relations"
+      );
       ("--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions");
       ("-help", Arg.Unit ignore, "");
-      ("--help", Arg.Unit ignore, "") ]
+      ("--help", Arg.Unit ignore, "")
+    ]
 
 (* Main *)
 
@@ -89,7 +93,8 @@ let () =
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il)
+        il
+      )
     in
 
     let il =
@@ -102,7 +107,8 @@ let () =
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il)
+        il
+      )
     in
 
     let il =
@@ -115,7 +121,8 @@ let () =
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il)
+        il
+      )
     in
 
     let il =
@@ -128,13 +135,14 @@ let () =
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
-        il)
+        il
+      )
     in
 
     if !print_final_il && not !print_all_il then
       Printf.printf "%s\n%!" (Il.Print.string_of_script il);
 
-    (match !target with
+    ( match !target with
     | Check -> ()
     | Latex config ->
       log "Latex Generation...";
@@ -144,7 +152,8 @@ let () =
       if !dsts <> [] then (
         let env = Backend_latex.Splice.(env config el) in
         List.iter (Backend_latex.Splice.splice_file ~dry:!dry env) !dsts;
-        if !warn then Backend_latex.Splice.warn env)
+        if !warn then Backend_latex.Splice.warn env
+      )
     | Prose ->
       log "Prose Generation...";
       let ir = true in
@@ -154,7 +163,8 @@ let () =
         |> List.iter print_endline
       else
         let prose = Backend_prose.Translate.translate el in
-        print_endline prose);
+        print_endline prose
+    );
     log "Complete."
   with
   | Source.Error (at, msg) ->

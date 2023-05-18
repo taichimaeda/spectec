@@ -50,9 +50,12 @@ let assert_type e =
             SeqE
               ({it = AtomE (Atom "CONST"); _}
               :: {it = AtomE (Atom "I32"); _}
-              :: _);
-          _ },
-        _ ) ->
+              :: _
+              );
+          _
+        },
+        _
+      ) ->
     printf_step
       "Assert: Due to validation, a value of value type i32 is on the top of the stack."
   | _ ->
@@ -65,7 +68,8 @@ let pop left =
     |> List.iter (fun e ->
            assert_type e;
            let v = Print.string_of_exp e in
-           printf_step "Pop the value %s from the stack." v)
+           printf_step "Pop the value %s from the stack." v
+       )
   | ParenE ({it = SeqE ({it = AtomE (Atom "LABEL_"); _} :: _); _}, _) ->
     printf_step "YET: Bubble-up semantics."
   | _ -> ()
@@ -76,9 +80,9 @@ let calc (prems : premise nl_list) : unit =
   prems
   |> List.iter (fun p ->
          match p with
-         | Elem {it = IfPr e; _} ->
-           printf_step "Let %s." (Print.string_of_exp e)
-         | _ -> ())
+         | Elem {it = IfPr e; _} -> printf_step "Let %s." (Print.string_of_exp e)
+         | _ -> ()
+     )
 
 let cond (prems : premise nl_list) =
   prems
@@ -86,7 +90,8 @@ let cond (prems : premise nl_list) =
          match p with
          | Elem {it = IfPr e; _} -> Print.string_of_exp e
          | Elem p -> Print.string_of_prem p
-         | Nl -> "Nl")
+         | Nl -> "Nl"
+     )
   |> String.concat " and "
   |> printf_step "If %s, then:"
 
@@ -136,14 +141,12 @@ let rec push right =
   | SeqE seq -> List.iter push seq
   | AtomE (Atom "TRAP") -> printf_step "Trap."
   | ParenE ({it = SeqE instr; _}, _) ->
-    (match destruct_instr instr with
+    ( match destruct_instr instr with
     | "LABEL_", n :: cont :: args ->
       printf_step
         "Let L be the label whose arity is %s and whose continuation is the %s of this instruction."
         (Print.string_of_exp n)
-        (match cont.it with
-        | BrackE (_, {it = EpsE; _}) -> "end"
-        | _ -> "start");
+        (match cont.it with BrackE (_, {it = EpsE; _}) -> "end" | _ -> "start");
       printf_step "Enter the block %s with label L."
         (Print.string_of_exps " " args)
     | "FRAME_", [n; frame; label] ->
@@ -158,7 +161,8 @@ let rec push right =
     | name, args ->
       let args = List.map bind args in
       let str = Print.string_of_exps " " args in
-      printf_step "Execute the instruction %s %s." name str)
+      printf_step "Execute the instruction %s %s." name str
+    )
   | VarE id -> printf_step "Push the value %s to the stack." id.it
   | IterE ({it = VarE _; _}, _) ->
     printf_step "Push the values %s to the stack." (Print.string_of_exp right)
@@ -171,13 +175,14 @@ let rec push right =
 let destruct_as_rule r =
   match r.it with
   | RuleD (name, _, e, prems) ->
-    (match e.it with
+    ( match e.it with
     | InfixE (left, SqArrow, right) ->
       if String.starts_with ~prefix:"Step_" name.it then
         Some (left, right, prems)
       else
         None
-    | _ -> None)
+    | _ -> None
+    )
   | _ -> None
 
 let string_of_destructed (left, right, prems) =
@@ -196,7 +201,8 @@ let handle_reduction_group red_group =
   red_group
   |> List.iter (fun red ->
          Buffer.add_string buf (string_of_destructed red);
-         Buffer.add_char buf '\n');
+         Buffer.add_char buf '\n'
+     );
   _stepIdx := 1;
   _freshId := 0;
 
@@ -206,7 +212,7 @@ let handle_reduction_group red_group =
   in
   pop left;
 
-  (match red_group with
+  ( match red_group with
   (* one rule -> premises are highly likely assignment *)
   | [(_, right, prems)] ->
     calc prems;
@@ -219,7 +225,9 @@ let handle_reduction_group red_group =
            indent ();
            push right;
            check_nothing ();
-           unindent ()));
+           unindent ()
+       )
+  );
 
   check_nothing ();
 

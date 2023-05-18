@@ -31,14 +31,17 @@ let same_len e1 e2 =
     (CmpE
        ( EqOp,
          LenE e1 $$ no_region % (NatT $ e1.at),
-         LenE e2 $$ no_region % (NatT $ e2.at) )
-    $$ no_region % (BoolT $ no_region))
+         LenE e2 $$ no_region % (NatT $ e2.at)
+       )
+    $$ no_region % (BoolT $ no_region)
+    )
   $ no_region
 
 let has_len ne e =
   IfPr
     (CmpE (EqOp, LenE e $$ no_region % (NatT $ e.at), ne)
-    $$ no_region % (BoolT $ no_region))
+    $$ no_region % (BoolT $ no_region)
+    )
   $ no_region
 
 let iter_side_conditions env ((iter, vs) : iterexp) : premise list =
@@ -48,7 +51,8 @@ let iter_side_conditions env ((iter, vs) : iterexp) : premise list =
       (fun v ->
         let t = Env.find v.it env in
         IterE (VarE v $$ no_region % t, (iter, [v]))
-        $$ no_region % (IterT (t, iter') $ no_region))
+        $$ no_region % (IterT (t, iter') $ no_region)
+      )
       vs
   in
   match (iter, ves) with
@@ -65,13 +69,17 @@ let rec t_exp env e : premise list =
     | IdxE (exp1, exp2) ->
       [ IfPr
           (CmpE (LtOp, exp2, LenE exp1 $$ no_region % exp2.note)
-          $$ no_region % (BoolT $ no_region))
-        $ no_region ]
+          $$ no_region % (BoolT $ no_region)
+          )
+        $ no_region
+      ]
     | TheE exp ->
       [ IfPr
           (CmpE (NeOp, exp, OptE None $$ no_region % exp.note)
-          $$ no_region % (BoolT $ no_region))
-        $ no_region ]
+          $$ no_region % (BoolT $ no_region)
+          )
+        $ no_region
+      ]
     | IterE (_exp, iterexp) -> iter_side_conditions env iterexp
     | _ -> []
   end

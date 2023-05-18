@@ -60,7 +60,8 @@ let string_of_mixop = function
       String.concat "%"
         (List.map
            (fun atoms -> String.concat "" (List.map string_of_atom atoms))
-           mixop)
+           mixop
+        )
     in
     "`" ^ s ^ "`"
 

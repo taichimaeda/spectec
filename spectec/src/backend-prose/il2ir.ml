@@ -53,11 +53,12 @@ let casesub2instrs exp =
          || atomid = "CALL_ADDR"
          || atomid = "LOCAL.SET"
          || atomid = "RETURN" ->
-    (match argexp.it with
+    ( match argexp.it with
     | Ast.TupE exps ->
       let argexprs = List.map translate_expr exps in
       [Ir.ExecuteI (atomid, argexprs)]
-    | _ -> [Ir.ExecuteI (atomid, [translate_expr argexp])])
+    | _ -> [Ir.ExecuteI (atomid, [translate_expr argexp])]
+    )
   | Ast.SubE (_, _, _) -> [Ir.PushI (YetE (Print.string_of_exp exp))]
   | _ -> failwith "Unreachable"
 
@@ -67,7 +68,8 @@ let rec rhs2instrs exp =
   | Ast.MixE
       ( [[]; [Ast.Semicolon]; [Ast.Star]],
         (* z' ; instr'* *)
-        {it = TupE [callexp; rhs]; _} ) ->
+        {it = TupE [callexp; rhs]; _}
+      ) ->
     let yet_instr = Ir.YetI ("Perform " ^ Print.string_of_exp callexp) in
     let push_instrs = rhs2instrs rhs in
     yet_instr :: push_instrs
@@ -86,7 +88,8 @@ let prem2let prems =
     (function
       | {it = Ast.IfPr {it = Ast.CmpE (Ast.EqOp, exp1, exp2); _}; _} ->
         Some (Ir.LetI (translate_expr exp1, translate_expr exp2))
-      | _ -> None)
+      | _ -> None
+      )
     prems
 
 (* `Ast.prem list` -> `Ir.cond` *)
@@ -104,7 +107,8 @@ let reduction_group2program reduction_group acc =
     (* z; lhs *)
     | Ast.MixE
         ( [[]; [Ast.Semicolon]; [Ast.Star]],
-          {it = Ast.TupE [{it = Ast.VarE {it = "z"; _}; _}; exp]; _} ) ->
+          {it = Ast.TupE [{it = Ast.VarE {it = "z"; _}; _}; exp]; _}
+        ) ->
       lhs2pop exp
     | _ -> lhs2pop lhs
   in
@@ -122,7 +126,8 @@ let reduction_group2program reduction_group acc =
         (fun (_, _, rhs, prems) ->
           let cond = prem2cond prems in
           let rhs_instrs = rhs2instrs rhs |> check_nop in
-          Ir.IfI (cond, rhs_instrs, []))
+          Ir.IfI (cond, rhs_instrs, [])
+        )
         reduction_group
   in
 

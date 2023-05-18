@@ -50,7 +50,8 @@ let under_iterexp (iter, vs) eqns : iterexp * eqns =
           update_iterexp_vars (Il.Free.free_prem pr) (iter, vs @ new_vs)
         in
         let pr' = IterPr (pr, pr_iterexp) $ no_region in
-        ((v, t, is @ [iter]), pr'))
+        ((v, t, is @ [iter]), pr')
+      )
       eqns
   in
   (iterexp', eqns')
@@ -108,7 +109,8 @@ let rec t_exp n e : eqns * exp =
     let prem =
       IfPr
         (CmpE (EqOp, exp, OptE (Some xe) $$ no_region % ot)
-        $$ no_region % (BoolT $ no_region))
+        $$ no_region % (BoolT $ no_region)
+        )
       $ no_region
     in
     (eqns @ [(bind, prem)], xe)
@@ -175,7 +177,8 @@ and t_path' n path =
     binary t_path t_exp n (path, e) (fun (path', e') -> IdxP (path', e'))
   | SliceP (path, e1, e2) ->
     ternary t_path t_exp t_exp n (path, e1, e2) (fun (path', e1', e2') ->
-        SliceP (path', e1', e2'))
+        SliceP (path', e1', e2')
+    )
   | DotP (path, a) -> unary t_path n path (fun path' -> DotP (path', a))
 
 let rec t_prem n : premise -> eqns * premise = phrase t_prem' n

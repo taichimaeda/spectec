@@ -14,13 +14,15 @@ let union sets1 sets2 =
   { synid = Set.union sets1.synid sets2.synid;
     relid = Set.union sets1.relid sets2.relid;
     varid = Set.union sets1.varid sets2.varid;
-    defid = Set.union sets1.defid sets2.defid }
+    defid = Set.union sets1.defid sets2.defid
+  }
 
 let diff sets1 sets2 =
   { synid = Set.diff sets1.synid sets2.synid;
     relid = Set.diff sets1.relid sets2.relid;
     varid = Set.diff sets1.varid sets2.varid;
-    defid = Set.diff sets1.defid sets2.defid }
+    defid = Set.diff sets1.defid sets2.defid
+  }
 
 let subset sets1 sets2 =
   Set.subset sets1.synid sets2.synid
@@ -122,9 +124,7 @@ let free_rule rule =
   match rule.it with
   | RuleD (_id, binds, _op, e, prems) ->
     union (free_binds binds)
-      (diff
-         (union (free_exp e) (free_list free_prem prems))
-         (bound_binds binds))
+      (diff (union (free_exp e) (free_list free_prem prems)) (bound_binds binds))
 
 let free_clause clause =
   match clause.it with
@@ -132,7 +132,8 @@ let free_clause clause =
     union (free_binds binds)
       (diff
          (union (free_list free_exp [e1; e2]) (free_list free_prem prems))
-         (bound_binds binds))
+         (bound_binds binds)
+      )
 
 let free_hintdef hd =
   match hd.it with

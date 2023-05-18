@@ -245,7 +245,8 @@ let rec structured_string_of_instr depth = function
 and structured_string_of_instrs depth instrs =
   List.fold_left
     (fun acc i ->
-      acc ^ repeat indent depth ^ structured_string_of_instr depth i ^ "\n")
+      acc ^ repeat indent depth ^ structured_string_of_instr depth i ^ "\n"
+    )
     "" instrs
 
 let structured_string_of_program = function
@@ -399,7 +400,8 @@ and string_of_instrs depth instrs =
   let index = ref 0 in
   List.fold_left
     (fun acc i ->
-      acc ^ "\n" ^ repeat indent depth ^ string_of_instr index depth i)
+      acc ^ "\n" ^ repeat indent depth ^ string_of_instr index depth i
+    )
     "" instrs
 
 let string_of_program = function

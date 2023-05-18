@@ -5,6 +5,7 @@ cases-exp-indent=2
 dock-collection-brackets = false
 exp-grouping = preserve
 if-then-else = fit-or-vertical
+indicate-multiline-delimiters = closing-on-separate-line
 leading-nested-match-parens = true
 space-around-arrays = false
 space-around-lists = false

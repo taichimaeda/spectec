@@ -122,7 +122,8 @@ let rec t_def' env = function
               { clause with
                 it =
                   DefD (binds, lhs, OptE (Some rhs) $$ no_region % typ2', prems)
-              })
+              }
+          )
           clauses'
       in
       let x = "x" $ no_region in
@@ -131,7 +132,8 @@ let rec t_def' env = function
           ( [(x, typ1, [])],
             VarE x $$ no_region % typ1,
             OptE None $$ no_region % typ2',
-            [] )
+            []
+          )
         $ no_region
       in
       DecD (id, typ1, typ2', clauses'' @ [catch_all])

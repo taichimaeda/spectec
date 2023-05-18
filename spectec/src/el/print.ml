@@ -81,7 +81,8 @@ and string_of_typ t =
         (strings_of_dots dots1
         @ map_nl_list it ids
         @ map_nl_list string_of_typcase tcases
-        @ strings_of_dots dots2)
+        @ strings_of_dots dots2
+        )
   | AtomT atom -> string_of_atom atom
   | SeqT ts -> "{" ^ string_of_typs " " ts ^ "}"
   | InfixT (t1, atom, t2) ->
