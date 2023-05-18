@@ -45,14 +45,12 @@ let assert_type e =
   match e.it with
   (* ({CONST I32 c}) *)
   | ParenE
-      ( {
-          it =
+      ( { it =
             SeqE
               ({it = AtomE (Atom "CONST"); _}
               :: {it = AtomE (Atom "I32"); _}
               :: _);
-          _;
-        },
+          _ },
         _ ) ->
     printf_step
       "Assert: Due to validation, a value of value type i32 is on the top of the stack."

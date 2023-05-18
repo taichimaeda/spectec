@@ -16,24 +16,22 @@ type rel_sort =
   | TypingRel
   | ReductionRel
 
-type env = {
-  config : config;
-  vars : Set.t ref;
-  show_syn : exp list Map.t ref;
-  show_var : exp list Map.t ref;
-  show_rel : exp list Map.t ref;
-  show_def : exp list Map.t ref;
-  show_case : exp list Map.t ref;
-  show_field : exp list Map.t ref;
-  desc_syn : exp list Map.t ref;
-  deco_syn : bool;
-  deco_rule : bool;
-  current_rel : string;
-}
+type env =
+  { config : config;
+    vars : Set.t ref;
+    show_syn : exp list Map.t ref;
+    show_var : exp list Map.t ref;
+    show_rel : exp list Map.t ref;
+    show_def : exp list Map.t ref;
+    show_case : exp list Map.t ref;
+    show_field : exp list Map.t ref;
+    desc_syn : exp list Map.t ref;
+    deco_syn : bool;
+    deco_rule : bool;
+    current_rel : string }
 
 let new_env config =
-  {
-    config;
+  { config;
     vars = ref Set.empty;
     show_syn = ref Map.empty;
     show_var = ref Map.empty;
@@ -44,8 +42,7 @@ let new_env config =
     desc_syn = ref Map.empty;
     deco_syn = false;
     deco_rule = false;
-    current_rel = "";
-  }
+    current_rel = "" }
 
 let with_syntax_decoration b env = {env with deco_syn = b}
 let with_rule_decoration b env = {env with deco_rule = b}

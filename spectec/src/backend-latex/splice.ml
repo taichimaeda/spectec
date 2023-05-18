@@ -5,11 +5,10 @@ open Config
 
 (* Errors *)
 
-type source = {
-  file : string;
-  s : string;
-  mutable i : int;
-}
+type source =
+  { file : string;
+    s : string;
+    mutable i : int }
 
 let eos src = src.i = String.length src.s
 let get src = src.s.[src.i]
@@ -36,29 +35,25 @@ module Map = Map.Make (String)
 
 type use = int ref
 
-type syntax = {
-  sdef : def;
-  fragments : (string * def * use) list;
-}
+type syntax =
+  { sdef : def;
+    fragments : (string * def * use) list }
 
-type relation = {
-  rdef : def;
-  rules : (string * def * use) list;
-}
+type relation =
+  { rdef : def;
+    rules : (string * def * use) list }
 
-type definition = {
-  fdef : def;
-  clauses : def list;
-  use : use;
-}
+type definition =
+  { fdef : def;
+    clauses : def list;
+    use : use }
 
-type env = {
-  config : config;
-  render : Render.env;
-  mutable syn : syntax Map.t;
-  mutable rel : relation Map.t;
-  mutable def : definition Map.t;
-}
+type env =
+  { config : config;
+    render : Render.env;
+    mutable syn : syntax Map.t;
+    mutable rel : relation Map.t;
+    mutable def : definition Map.t }
 
 let env_def env def =
   match def.it with
@@ -83,13 +78,11 @@ let env_def env def =
 
 let env config script : env =
   let env =
-    {
-      config;
+    { config;
       render = Render.env config script;
       syn = Map.empty;
       rel = Map.empty;
-      def = Map.empty;
-    }
+      def = Map.empty }
   in
   List.iter (env_def env) script;
   env
@@ -257,11 +250,10 @@ let try_exp_anchor env src r : bool =
         (* Translate relative positions *)
         let pos = pos {src with i = j} in
         let shift {line; column; _} =
-          {
-            file = src.file;
+          { file = src.file;
             line = line + pos.line - 1;
             column =
-              (if false (*line = 1*) then column + pos.column - 1 else column);
+              (if false (*line = 1*) then column + pos.column - 1 else column)
           }
         in
         let at' = {left = shift at.left; right = shift at.right} in

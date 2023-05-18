@@ -122,10 +122,9 @@ let rec t_def' env = function
           (fun clause ->
             match clause.it with
             | DefD (binds, lhs, rhs, prems) ->
-              {
-                clause with
+              { clause with
                 it =
-                  DefD (binds, lhs, OptE (Some rhs) $$ no_region % typ2', prems);
+                  DefD (binds, lhs, OptE (Some rhs) $$ no_region % typ2', prems)
               })
           clauses'
       in

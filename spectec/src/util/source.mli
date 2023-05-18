@@ -1,15 +1,13 @@
 (* Positions and regions *)
 
-type pos = {
-  file : string;
-  line : int;
-  column : int;
-}
+type pos =
+  { file : string;
+    line : int;
+    column : int }
 
-type region = {
-  left : pos;
-  right : pos;
-}
+type region =
+  { left : pos;
+    right : pos }
 
 val no_pos : pos
 val no_region : region
@@ -20,11 +18,10 @@ val string_of_region : region -> string
 
 (* Phrases *)
 
-type ('a, 'b) note_phrase = {
-  at : region;
-  it : 'a;
-  note : 'b;
-}
+type ('a, 'b) note_phrase =
+  { at : region;
+    it : 'a;
+    note : 'b }
 
 type 'a phrase = ('a, unit) note_phrase
 

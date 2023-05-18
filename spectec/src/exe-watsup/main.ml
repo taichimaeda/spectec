@@ -39,8 +39,7 @@ let add_arg source =
 
 let argspec =
   Arg.align
-    [
-      ("-v", Arg.Unit banner, " Show version");
+    [ ("-v", Arg.Unit banner, " Show version");
       ("-o", Arg.String (fun s -> odst := s), " Generate file");
       ("-p", Arg.Set dst, " Patch files");
       ("-d", Arg.Set dry, " Dry run (when -p) ");
@@ -64,8 +63,7 @@ let argspec =
         " Eliminate the ! operator in relations" );
       ("--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions");
       ("-help", Arg.Unit ignore, "");
-      ("--help", Arg.Unit ignore, "");
-    ]
+      ("--help", Arg.Unit ignore, "") ]
 
 (* Main *)
 

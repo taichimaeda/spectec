@@ -63,19 +63,15 @@ let rec t_exp env e : premise list =
   begin
     match e.it with
     | IdxE (exp1, exp2) ->
-      [
-        IfPr
+      [ IfPr
           (CmpE (LtOp, exp2, LenE exp1 $$ no_region % exp2.note)
           $$ no_region % (BoolT $ no_region))
-        $ no_region;
-      ]
+        $ no_region ]
     | TheE exp ->
-      [
-        IfPr
+      [ IfPr
           (CmpE (NeOp, exp, OptE None $$ no_region % exp.note)
           $$ no_region % (BoolT $ no_region))
-        $ no_region;
-      ]
+        $ no_region ]
     | IterE (_exp, iterexp) -> iter_side_conditions env iterexp
     | _ -> []
   end

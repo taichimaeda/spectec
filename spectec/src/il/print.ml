@@ -183,8 +183,7 @@ let string_of_binds = function
 
 let rec string_of_prem prem =
   match prem.it with
-  | RulePr (id, op, e) ->
-    id.it ^ ": " ^ string_of_exp {e with it = MixE (op, e)}
+  | RulePr (id, op, e) -> id.it ^ ": " ^ string_of_exp {e with it = MixE (op, e)}
   | IfPr e -> "if " ^ string_of_exp e
   | ElsePr -> "otherwise"
   | IterPr (({it = IterPr _; _} as prem'), iter) ->

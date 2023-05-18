@@ -176,10 +176,9 @@ and hintdef' =
   | VarH of id * hint list
   | DecH of id * hint list
 
-and hint = {
-  hintid : id;
-  hintexp : exp;
-}
+and hint =
+  { hintid : id;
+    hintexp : exp }
 (* `(` `hint` hintid exp `)` *)
 
 (* Scripts *)

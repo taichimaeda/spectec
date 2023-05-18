@@ -5,23 +5,20 @@ open Ast
 
 module Set = Set.Make (String)
 
-type sets = {
-  synid : Set.t;
-  relid : Set.t;
-  varid : Set.t;
-  defid : Set.t;
-}
+type sets =
+  { synid : Set.t;
+    relid : Set.t;
+    varid : Set.t;
+    defid : Set.t }
 
 let empty =
   {synid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty}
 
 let union sets1 sets2 =
-  {
-    synid = Set.union sets1.synid sets2.synid;
+  { synid = Set.union sets1.synid sets2.synid;
     relid = Set.union sets1.relid sets2.relid;
     varid = Set.union sets1.varid sets2.varid;
-    defid = Set.union sets1.defid sets2.defid;
-  }
+    defid = Set.union sets1.defid sets2.defid }
 
 let free_list free_x xs = List.(fold_left union empty (map free_x xs))
 

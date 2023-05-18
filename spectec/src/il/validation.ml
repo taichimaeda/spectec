@@ -16,12 +16,11 @@ type syn_typ = deftyp
 type rel_typ = mixop * typ
 type def_typ = typ * typ
 
-type env = {
-  mutable vars : var_typ Env.t;
-  mutable typs : syn_typ Env.t;
-  mutable rels : rel_typ Env.t;
-  mutable defs : def_typ Env.t;
-}
+type env =
+  { mutable vars : var_typ Env.t;
+    mutable typs : syn_typ Env.t;
+    mutable rels : rel_typ Env.t;
+    mutable defs : def_typ Env.t }
 
 let new_env () =
   {vars = Env.empty; typs = Env.empty; rels = Env.empty; defs = Env.empty}
@@ -462,13 +461,11 @@ and valid_iterexp env (iter, ids) : env =
       match find "variable" env.vars id with
       | t, iter1 :: iters
         when Eq.eq_iter (snd (Lib.List.split_last (iter1 :: iters))) iter ->
-        {
-          env with
+        { env with
           vars =
             Env.add id.it
               (t, fst (Lib.List.split_last (iter1 :: iters)))
-              env.vars;
-        }
+              env.vars }
       | _, iters ->
         error id.at
           ("iteration variable `" ^ id.it ^ "` has incompatible dimension `"

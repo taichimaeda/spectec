@@ -70,8 +70,7 @@ let tup_exp' es' at =
   | [e'] -> e'
   | _ -> Il.TupE es' $$ (at, Il.TupT (List.map note es') $ at)
 
-let lift_exp' e' iter' =
-  if iter' = Opt then Il.OptE (Some e') else Il.ListE [e']
+let lift_exp' e' iter' = if iter' = Opt then Il.OptE (Some e') else Il.ListE [e']
 
 let cat_exp' e1' e2' =
   match (e1'.it, e2'.it) with
@@ -91,24 +90,21 @@ type syn_typ = (fwd_typ, typ * Il.deftyp) Either.t
 type rel_typ = typ * Il.rule list
 type def_typ = typ * typ * Il.clause list
 
-type env = {
-  mutable vars : var_typ Map.t;
-  mutable typs : syn_typ Map.t;
-  mutable rels : rel_typ Map.t;
-  mutable defs : def_typ Map.t;
-}
+type env =
+  { mutable vars : var_typ Map.t;
+    mutable typs : syn_typ Map.t;
+    mutable rels : rel_typ Map.t;
+    mutable defs : def_typ Map.t }
 
 let new_env () =
-  {
-    vars =
+  { vars =
       Map.empty
       |> Map.add "bool" (BoolT $ no_region)
       |> Map.add "nat" (NatT $ no_region)
       |> Map.add "text" (TextT $ no_region);
     typs = Map.empty;
     rels = Map.empty;
-    defs = Map.empty;
-  }
+    defs = Map.empty }
 
 let bound env' id = Map.mem id.it env'
 
@@ -1097,11 +1093,9 @@ let recursify_defs ds' : Il.def list =
     Array.map
       (fun free ->
         Array.concat
-          [
-            deps !map_synid free.synid;
+          [ deps !map_synid free.synid;
             deps !map_relid free.relid;
-            deps !map_defid free.defid;
-          ])
+            deps !map_defid free.defid ])
       frees
   in
   let sccs = Scc.sccs graph in
