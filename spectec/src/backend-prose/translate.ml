@@ -132,8 +132,8 @@ let rec push right =
     push stack
   | SeqE seq -> List.iter push seq
   | AtomE (Atom "TRAP") -> printf_step "Trap."
-  | ParenE ({it = SeqE instr; _}, _) -> (
-    match destruct_instr instr with
+  | ParenE ({it = SeqE instr; _}, _) ->
+    (match destruct_instr instr with
     | "LABEL_", n :: cont :: args ->
       printf_step
         "Let L be the label whose arity is %s and whose continuation is the %s of this instruction."
@@ -167,8 +167,8 @@ let rec push right =
 (* if r is a reduction rule, desturct it into triplet of (lhs, rhs, premises) *)
 let destruct_as_rule r =
   match r.it with
-  | RuleD (name, _, e, prems) -> (
-    match e.it with
+  | RuleD (name, _, e, prems) ->
+    (match e.it with
     | InfixE (left, SqArrow, right) ->
       if String.starts_with ~prefix:"Step_" name.it then
         Some (left, right, prems)

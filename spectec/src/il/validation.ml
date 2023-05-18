@@ -56,8 +56,8 @@ let find_case cases atom at =
 (* Type Accessors *)
 
 let rec expand' env = function
-  | VarT id as t' -> (
-    match (find "syntax type" env.typs id).it with
+  | VarT id as t' ->
+    (match (find "syntax type" env.typs id).it with
     | AliasT t1 -> expand' env t1.it
     | _ -> t')
   | t' -> t'
@@ -160,8 +160,8 @@ let sub_typ' env t1 t2 =
   equiv_typ' env t1 t2
   ||
   match (expand env t1, expand env t2) with
-  | VarT id1, VarT id2 -> (
-    match ((find "" env.typs id1).it, (find "" env.typs id2).it) with
+  | VarT id1, VarT id2 ->
+    (match ((find "" env.typs id1).it, (find "" env.typs id2).it) with
     | StructT tfs1, StructT tfs2 ->
       List.for_all
         (fun (atom, t2, _) ->
@@ -239,8 +239,8 @@ and valid_typ env t =
       error t.at ("invalid forward reference to syntax type `" ^ id.it ^ "`")
   | BoolT | NatT | TextT -> ()
   | TupT ts -> List.iter (valid_typ env) ts
-  | IterT (t1, iter) -> (
-    match iter with
+  | IterT (t1, iter) ->
+    (match iter with
     | ListN e -> error e.at "definite iterator not allowed in type"
     | _ ->
       valid_typ env t1;

@@ -125,8 +125,8 @@ let as_defined_typid' env id at : typ' * [`Alias | `NoAlias] =
   | Either.Left _ -> error_id (id.it $ at) "invalid forward use of syntax type"
 
 let rec expand' env = function
-  | VarT id as t' -> (
-    match as_defined_typid' env id id.at with
+  | VarT id as t' ->
+    (match as_defined_typid' env id id.at with
     | t1, `Alias -> expand' env t1
     | _ -> t')
   | ParenT t -> expand' env t.it
@@ -314,8 +314,8 @@ let rec elab_iter env iter : Il.iter =
 
 and elab_typ env t : Il.typ =
   match t.it with
-  | VarT id -> (
-    match find "syntax type" env.typs id with
+  | VarT id ->
+    (match find "syntax type" env.typs id with
     | Either.Left Bad -> error_id id "invalid forward reference to syntax type"
     | _ -> Il.VarT id $ t.at)
   | BoolT -> Il.BoolT $ t.at
@@ -323,8 +323,8 @@ and elab_typ env t : Il.typ =
   | TextT -> Il.TextT $ t.at
   | ParenT t1 -> elab_typ env t1
   | TupT ts -> Il.TupT (List.map (elab_typ env) ts) $ t.at
-  | IterT (t1, iter) -> (
-    match iter with
+  | IterT (t1, iter) ->
+    (match iter with
     | List1 | ListN _ -> error t.at "illegal iterator in syntax type"
     | _ -> Il.IterT (elab_typ env t1, elab_iter env iter) $ t.at)
   | StrT _ | CaseT _ | AtomT _ | SeqT _ | InfixT _ | BrackT _ ->
@@ -347,8 +347,8 @@ and elab_typ_definition env id t : Il.deftyp =
     let tcs' = List.map (elab_typcase env t.at) cases' in
     check_atoms "variant" "case" cases' t.at;
     Il.VariantT tcs'
-  | _ -> (
-    match elab_typ_notation env t with
+  | _ ->
+    (match elab_typ_notation env t with
     | false, _mixop, ts' -> Il.AliasT (tup_typ' ts' t.at)
     | true, mixop, ts' -> Il.NotationT (mixop, tup_typ' ts' t.at)))
   $ t.at
@@ -378,8 +378,8 @@ and elab_typ_notation env t : bool * Il.mixop * Il.typ list =
   | ParenT t1 ->
     let b1, mixop1, ts1' = elab_typ_notation env t1 in
     (b1, merge_mixop (merge_mixop [[Il.LParen]] mixop1) [[Il.RParen]], ts1')
-  | IterT (t1, iter) -> (
-    match iter with
+  | IterT (t1, iter) ->
+    (match iter with
     | List1 | ListN _ -> error t.at "illegal iterator in notation type"
     | _ ->
       let b1, mixop1, ts' = elab_typ_notation env t1 in
@@ -540,11 +540,11 @@ and elab_exp env e t : Il.exp =
     let t' = find_field tfs atom e1.at in
     let e' = Il.DotE (e1', elab_atom atom) $$ e.at % !!env t' in
     cast_exp "field" env e' t' t
-  | CommaE (e1, e2) -> (
+  | CommaE (e1, e2) ->
     let e1' = elab_exp env e1 t in
     let tfs = as_struct_typ "expression" env Check t e1.at in
     (* TODO: this is a bit of a hack *)
-    match e2.it with
+    (match e2.it with
     | SeqE ({it = AtomE atom; at; _} :: es2) ->
       let _t2 = find_field tfs atom at in
       let e2 = match es2 with [e2] -> e2 | _ -> SeqE es2 $ e2.at in
@@ -682,19 +682,21 @@ and elab_exp_notation' env e t : Il.exp list =
   (* Iterations at the end of a sequence may be inlined *)
   | _, SeqT [({it = IterT _; _} as t1)] -> elab_exp_notation' env e t1
   (* Optional iterations may always be inlined, use backtracking *)
-  | SeqE (e1 :: es2), SeqT (({it = IterT (_, Opt); _} as t1) :: ts2) -> (
-    try
-      let es1' = [cast_empty "omitted sequence tail" env t1 e.at (!!!env t1)] in
-      let es2' = elab_exp_notation' env e (SeqT ts2 $ t.at) in
-      es1' @ es2'
-    with Source.Error _ ->
-      (*
+  | SeqE (e1 :: es2), SeqT (({it = IterT (_, Opt); _} as t1) :: ts2) ->
+    (try
+       let es1' =
+         [cast_empty "omitted sequence tail" env t1 e.at (!!!env t1)]
+       in
+       let es2' = elab_exp_notation' env e (SeqT ts2 $ t.at) in
+       es1' @ es2'
+     with Source.Error _ ->
+       (*
       Printf.printf "[backtrack %s] %s  :  %s\n%!"
         (string_of_region e.at) (string_of_exp e) (string_of_typ t);
       *)
-      let es1' = elab_exp_notation' env e1 t1 in
-      let es2' = elab_exp_notation' env (SeqE es2 $ e.at) (SeqT ts2 $ t.at) in
-      es1' @ es2')
+       let es1' = elab_exp_notation' env e1 t1 in
+       let es2' = elab_exp_notation' env (SeqE es2 $ e.at) (SeqT ts2 $ t.at) in
+       es1' @ es2')
   | SeqE (e1 :: es2), SeqT (t1 :: ts2) ->
     let es1' = elab_exp_notation' env (unparen_exp e1) t1 in
     let es2' = elab_exp_notation' env (SeqE es2 $ e.at) (SeqT ts2 $ t.at) in

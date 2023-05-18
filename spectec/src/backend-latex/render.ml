@@ -168,8 +168,8 @@ let rec chop_sub_exp e =
   | VarE id when ends_sub id.it -> Some (VarE (chop_sub id.it $ id.at) $ e.at)
   | AtomE (Atom "_") -> Some (SeqE [] $ e.at)
   | AtomE (Atom id) when ends_sub id -> Some (AtomE (Atom (chop_sub id)) $ e.at)
-  | FuseE (e1, e2) -> (
-    match chop_sub_exp e2 with
+  | FuseE (e1, e2) ->
+    (match chop_sub_exp e2 with
     | Some e2' -> Some (FuseE (e1, e2') $ e.at)
     | None -> None)
   | _ -> None
@@ -352,8 +352,8 @@ and expand_exp' args e' =
     let e1' = expand_exp args e1 in
     let iter' = expand_iter args iter in
     IterE (e1', iter')
-  | HoleE false -> (
-    match !args with
+  | HoleE false ->
+    (match !args with
     | [] -> raise Arity_mismatch
     | arg :: args' ->
       args := args';
@@ -390,17 +390,17 @@ and render_expand env (show : exp list Map.t ref) id args f =
   | Some showexps ->
     let rec attempt = function
       | [] -> f ()
-      | showexp :: showexps' -> (
-        try
-          let rargs = ref args in
-          let e = expand_exp rargs showexp in
-          if !rargs <> [] then raise Arity_mismatch;
-          (* Avoid cyclic expansion *)
-          show := Map.remove id.it !show;
-          Fun.protect
-            (fun () -> render_exp env e)
-            ~finally:(fun () -> show := Map.add id.it showexps !show)
-        with Arity_mismatch -> attempt showexps')
+      | showexp :: showexps' ->
+        (try
+           let rargs = ref args in
+           let e = expand_exp rargs showexp in
+           if !rargs <> [] then raise Arity_mismatch;
+           (* Avoid cyclic expansion *)
+           show := Map.remove id.it !show;
+           Fun.protect
+             (fun () -> render_exp env e)
+             ~finally:(fun () -> show := Map.add id.it showexps !show)
+         with Arity_mismatch -> attempt showexps')
       (* HACK: Ignore arity mismatches, such that overloading notation works,
        * e.g., using CONST for both instruction and relation. *)
     in
@@ -705,14 +705,14 @@ let rec classify_rel e : rel_sort option =
   match e.it with
   | InfixE (_, Turnstile, _) -> Some TypingRel
   | InfixE (_, SqArrow, _) -> Some ReductionRel
-  | InfixE (e1, _, e2) -> (
-    match classify_rel e1 with None -> classify_rel e2 | some -> some)
+  | InfixE (e1, _, e2) ->
+    (match classify_rel e1 with None -> classify_rel e2 | some -> some)
   | _ -> None
 
 let rec render_defs env = function
   | [] -> ""
-  | d :: ds' as ds -> (
-    match d.it with
+  | d :: ds' as ds ->
+    (match d.it with
     | SynD _ ->
       let ds' = merge_syndefs ds in
       let deco = if env.deco_syn then "l" else "l@{}" in
@@ -724,8 +724,8 @@ let rec render_defs env = function
       ^ render_typ {env with current_rel = id.it} t
       ^ "}"
       ^ if ds' = [] then "" else " \\; " ^ render_defs env ds'
-    | RuleD (_, _, e, _) -> (
-      match classify_rel e with
+    | RuleD (_, _, e, _) ->
+      (match classify_rel e with
       | Some TypingRel ->
         "\\begin{array}{@{}c@{}}\\displaystyle\n"
         ^ render_sep_defs ~sep:"\n\\qquad\n" ~br:"\n\\\\[3ex]\\displaystyle\n"
@@ -749,37 +749,37 @@ let render_def env d = render_defs env [d]
 
 let rec split_syndefs syndefs = function
   | [] -> (List.rev syndefs, [])
-  | d :: ds -> (
-    match d.it with
+  | d :: ds ->
+    (match d.it with
     | SynD _ -> split_syndefs (d :: syndefs) ds
     | _ -> (List.rev syndefs, d :: ds))
 
 let rec split_reddefs id reddefs = function
   | [] -> (List.rev reddefs, [])
-  | d :: ds -> (
-    match d.it with
+  | d :: ds ->
+    (match d.it with
     | RuleD (id1, _, _, _) when id1.it = id ->
       split_reddefs id (d :: reddefs) ds
     | _ -> (List.rev reddefs, d :: ds))
 
 let rec split_funcdefs id funcdefs = function
   | [] -> (List.rev funcdefs, [])
-  | d :: ds -> (
-    match d.it with
+  | d :: ds ->
+    (match d.it with
     | DefD (id1, _, _, _) when id1.it = id ->
       split_funcdefs id (d :: funcdefs) ds
     | _ -> (List.rev funcdefs, d :: ds))
 
 let rec render_script env = function
   | [] -> ""
-  | d :: ds -> (
-    match d.it with
+  | d :: ds ->
+    (match d.it with
     | SynD _ ->
       let syndefs, ds' = split_syndefs [d] ds in
       "$$\n" ^ render_defs env syndefs ^ "\n$$\n\n" ^ render_script env ds'
     | RelD _ -> "$" ^ render_def env d ^ "$\n\n" ^ render_script env ds
-    | RuleD (id1, _, e, _) -> (
-      match classify_rel e with
+    | RuleD (id1, _, e, _) ->
+      (match classify_rel e with
       | Some TypingRel ->
         "$$\n" ^ render_def env d ^ "\n$$\n\n" ^ render_script env ds
       | Some ReductionRel ->

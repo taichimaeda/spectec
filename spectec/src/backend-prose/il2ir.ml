@@ -48,8 +48,8 @@ let casesub2instrs exp =
          || String.starts_with ~prefix:"MEMORY." atomid
          || atomid = "LOAD" || atomid = "STORE" || atomid = "BLOCK"
          || atomid = "BR" || atomid = "CALL_ADDR" || atomid = "LOCAL.SET"
-         || atomid = "RETURN" -> (
-    match argexp.it with
+         || atomid = "RETURN" ->
+    (match argexp.it with
     | Ast.TupE exps ->
       let argexprs = List.map translate_expr exps in
       [Ir.ExecuteI (atomid, argexprs)]
