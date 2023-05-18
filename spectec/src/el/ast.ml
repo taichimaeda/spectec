@@ -2,10 +2,7 @@ open Util.Source
 
 (* Lists *)
 
-type 'a nl_elem =
-  | Nl
-  | Elem of 'a
-
+type 'a nl_elem = Nl | Elem of 'a
 type 'a nl_list = 'a nl_elem list
 
 (* Terminals *)
@@ -33,9 +30,7 @@ type brack =
   | Brack (* ``[` ... `]` *)
   | Brace (* ``{` ... `}` *)
 
-type dots =
-  | Dots
-  | NoDots
+type dots = Dots | NoDots
 
 (* Iteration *)
 
@@ -176,9 +171,7 @@ and hintdef' =
   | VarH of id * hint list
   | DecH of id * hint list
 
-and hint =
-  { hintid : id;
-    hintexp : exp }
+and hint = {hintid : id; hintexp : exp}
 (* `(` `hint` hintid exp `)` *)
 
 (* Scripts *)

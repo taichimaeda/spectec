@@ -5,10 +5,7 @@ open Config
 
 (* Errors *)
 
-type source =
-  { file : string;
-    s : string;
-    mutable i : int }
+type source = {file : string; s : string; mutable i : int}
 
 let eos src = src.i = String.length src.s
 let get src = src.s.[src.i]
@@ -34,19 +31,9 @@ let error src msg =
 module Map = Map.Make (String)
 
 type use = int ref
-
-type syntax =
-  { sdef : def;
-    fragments : (string * def * use) list }
-
-type relation =
-  { rdef : def;
-    rules : (string * def * use) list }
-
-type definition =
-  { fdef : def;
-    clauses : def list;
-    use : use }
+type syntax = {sdef : def; fragments : (string * def * use) list}
+type relation = {rdef : def; rules : (string * def * use) list}
+type definition = {fdef : def; clauses : def list; use : use}
 
 type env =
   { config : config;

@@ -64,9 +64,7 @@ let rec expand' env = function
 
 let expand env t = expand' env t.it
 
-type direction =
-  | Infer
-  | Check
+type direction = Infer | Check
 
 let as_error at phrase dir t expected =
   match dir with

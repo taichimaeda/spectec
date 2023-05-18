@@ -7,10 +7,7 @@ let version = "0.3"
 
 (* Flags and parameters *)
 
-type target =
-  | Check
-  | Latex of Backend_latex.Config.config
-  | Prose
+type target = Check | Latex of Backend_latex.Config.config | Prose
 
 let target = ref (Latex Backend_latex.Config.latex)
 let log = ref false (* log execution steps *)

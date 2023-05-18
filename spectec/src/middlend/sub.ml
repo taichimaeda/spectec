@@ -45,9 +45,7 @@ The environment consist of:
   * Which constructors the type has (and their non-aliased concrete type)
   * Which SubE type pairs have been observed, but not yet generated
 *)
-type env =
-  { mutable typ : (id * typcase list) M.t;
-    mutable pairs : S.t }
+type env = {mutable typ : (id * typcase list) M.t; mutable pairs : S.t}
 
 let new_env () : env = {typ = M.empty; pairs = S.empty}
 

@@ -12,9 +12,7 @@ let error at msg = Source.error at "latex generation" msg
 module Set = Set.Make (String)
 module Map = Map.Make (String)
 
-type rel_sort =
-  | TypingRel
-  | ReductionRel
+type rel_sort = TypingRel | ReductionRel
 
 type env =
   { config : config;

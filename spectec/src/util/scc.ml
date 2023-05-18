@@ -13,10 +13,7 @@ module Set = Set.Make (Int)
 
 (* SCC *)
 
-type vert_info =
-  { mutable index : int;
-    mutable low : int;
-    mutable onstack : bool }
+type vert_info = {mutable index : int; mutable low : int; mutable onstack : bool}
 
 let sccs (graph : graph) : Set.t list =
   let len = Array.length graph in

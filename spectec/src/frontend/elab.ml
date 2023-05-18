@@ -35,9 +35,7 @@ let error_typ2 at phrase t1 t2 reason =
     (phrase ^ "'s type `" ^ string_of_typ t1 ^ "`"
    ^ " does not match expected type `" ^ string_of_typ t2 ^ "`" ^ reason)
 
-type direction =
-  | Infer
-  | Check
+type direction = Infer | Check
 
 let error_dir_typ at phrase dir t expected =
   match dir with
@@ -81,10 +79,7 @@ let cat_exp' e1' e2' =
 
 (* Environment *)
 
-type fwd_typ =
-  | Bad
-  | Ok
-
+type fwd_typ = Bad | Ok
 type var_typ = typ
 type syn_typ = (fwd_typ, typ * Il.deftyp) Either.t
 type rel_typ = typ * Il.rule list

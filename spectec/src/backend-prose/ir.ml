@@ -1,7 +1,4 @@
-type name =
-  | N of string
-  | SupN of name * string
-  | SubN of name * string
+type name = N of string | SupN of name * string | SubN of name * string
 
 type expr =
   | ValueE of int

@@ -5,11 +5,7 @@ open Ast
 
 module Set = Set.Make (String)
 
-type sets =
-  { synid : Set.t;
-    relid : Set.t;
-    varid : Set.t;
-    defid : Set.t }
+type sets = {synid : Set.t; relid : Set.t; varid : Set.t; defid : Set.t}
 
 let empty =
   {synid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty}

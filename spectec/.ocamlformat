@@ -8,4 +8,3 @@ space-around-arrays = false
 space-around-lists = false
 space-around-records = false
 space-around-variants = false
-type-decl = sparse

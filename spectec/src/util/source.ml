@@ -1,13 +1,7 @@
 (* Positions and regions *)
 
-type pos =
-  { file : string;
-    line : int;
-    column : int }
-
-type region =
-  { left : pos;
-    right : pos }
+type pos = {file : string; line : int; column : int}
+type region = {left : pos; right : pos}
 
 let no_pos = {file = ""; line = 0; column = 0}
 let no_region = {left = no_pos; right = no_pos}
@@ -33,11 +27,7 @@ let string_of_region r =
 
 (* Phrases *)
 
-type ('a, 'b) note_phrase =
-  { at : region;
-    it : 'a;
-    note : 'b }
-
+type ('a, 'b) note_phrase = {at : region; it : 'a; note : 'b}
 type 'a phrase = ('a, unit) note_phrase
 
 let ( $ ) it at = {it; at; note = ()}
