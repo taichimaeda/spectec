@@ -71,8 +71,12 @@ let as_error at phrase dir t expected =
   match dir with
   | Infer ->
     error at
-      (phrase ^ "'s type `" ^ string_of_typ t
-     ^ "` does not match expected type `" ^ expected ^ "`")
+      (phrase
+      ^ "'s type `"
+      ^ string_of_typ t
+      ^ "` does not match expected type `"
+      ^ expected
+      ^ "`")
   | Check ->
     error at
       (phrase ^ "'s type does not match expected type `" ^ string_of_typ t ^ "`")
@@ -147,8 +151,12 @@ let rec equiv_typ' env t1 t2 =
 let equiv_typ env t1 t2 at =
   if not (equiv_typ' env t1 t2) then
     error at
-      ("expression's type `" ^ string_of_typ t1 ^ "` "
-     ^ "does not match expected type `" ^ string_of_typ t2 ^ "`")
+      ("expression's type `"
+      ^ string_of_typ t1
+      ^ "` "
+      ^ "does not match expected type `"
+      ^ string_of_typ t2
+      ^ "`")
 
 (* Subtyping *)
 
@@ -185,8 +193,12 @@ let sub_typ' env t1 t2 =
 let sub_typ env t1 t2 at =
   if not (sub_typ' env t1 t2) then
     error at
-      ("expression's type `" ^ string_of_typ t1 ^ "` "
-     ^ "does not match expected supertype `" ^ string_of_typ t2 ^ "`")
+      ("expression's type `"
+      ^ string_of_typ t1
+      ^ "` "
+      ^ "does not match expected supertype `"
+      ^ string_of_typ t2
+      ^ "`")
 
 (* Operators *)
 
@@ -212,8 +224,12 @@ let check_atoms phrase item list at =
   in
   if dups <> [] then
     error at
-      (phrase ^ " contains duplicate " ^ item ^ "(s) `"
-     ^ String.concat "`, `" dups ^ "`")
+      (phrase
+      ^ " contains duplicate "
+      ^ item
+      ^ "(s) `"
+      ^ String.concat "`, `" dups
+      ^ "`")
 
 (* Iteration *)
 
@@ -262,8 +278,10 @@ and valid_typ_mix env mixop t at =
   let arity = match t.it with TupT ts -> List.length ts | _ -> 1 in
   if List.length mixop <> arity + 1 then
     error at
-      ("inconsistent arity in mixin notation, `" ^ string_of_mixop mixop
-     ^ "` applied to " ^ string_of_typ t);
+      ("inconsistent arity in mixin notation, `"
+      ^ string_of_mixop mixop
+      ^ "` applied to "
+      ^ string_of_typ t);
   valid_typ env t
 
 and valid_typfield env (_atom, t, _hints) = valid_typ env t
@@ -312,7 +330,8 @@ and valid_exp env e t =
     equiv_typ env t' t e.at;
     if dim <> [] then
       error e.at
-        ("use of iterated variable `" ^ id.it
+        ("use of iterated variable `"
+        ^ id.it
         ^ String.concat "" (List.map string_of_iter dim)
         ^ "` outside suitable iteraton context")
   | BoolE _ | NatE _ | TextE _ ->
@@ -413,8 +432,11 @@ and valid_exp env e t =
 and valid_expmix env mixop e (mixop', t) at =
   if mixop <> mixop' then
     error at
-      ("mixin notation `" ^ string_of_mixop mixop
-     ^ "` does not match expected notation `" ^ string_of_mixop mixop' ^ "`");
+      ("mixin notation `"
+      ^ string_of_mixop mixop
+      ^ "` does not match expected notation `"
+      ^ string_of_mixop mixop'
+      ^ "`");
   valid_exp env e t
 
 and valid_expfield env (atom1, e) (atom2, t, _) =
@@ -457,10 +479,14 @@ and valid_iterexp env (iter, ids) : env =
               env.vars }
       | _, iters ->
         error id.at
-          ("iteration variable `" ^ id.it ^ "` has incompatible dimension `"
-         ^ id.it
+          ("iteration variable `"
+          ^ id.it
+          ^ "` has incompatible dimension `"
+          ^ id.it
           ^ String.concat "" (List.map string_of_iter iters)
-          ^ "` in iteration `_" ^ string_of_iter iter ^ "`"))
+          ^ "` in iteration `_"
+          ^ string_of_iter iter
+          ^ "`"))
     env ids
 
 (* Definitions *)
@@ -551,8 +577,9 @@ let rec valid_def {bind} env d =
           ()
         | _, _ ->
           error (List.hd ds).at
-            (" " ^ string_of_region d.at
-           ^ ": invalid recursion between definitions of different sort"))
+            (" "
+            ^ string_of_region d.at
+            ^ ": invalid recursion between definitions of different sort"))
       ds
   | HintD _ -> ()
 

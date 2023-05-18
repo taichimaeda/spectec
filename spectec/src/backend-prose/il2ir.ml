@@ -46,8 +46,12 @@ let casesub2instrs exp =
   | Ast.CaseE (Atom atomid, argexp)
     when String.starts_with ~prefix:"TABLE." atomid
          || String.starts_with ~prefix:"MEMORY." atomid
-         || atomid = "LOAD" || atomid = "STORE" || atomid = "BLOCK"
-         || atomid = "BR" || atomid = "CALL_ADDR" || atomid = "LOCAL.SET"
+         || atomid = "LOAD"
+         || atomid = "STORE"
+         || atomid = "BLOCK"
+         || atomid = "BR"
+         || atomid = "CALL_ADDR"
+         || atomid = "LOCAL.SET"
          || atomid = "RETURN" ->
     (match argexp.it with
     | Ast.TupE exps ->

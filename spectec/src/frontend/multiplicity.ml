@@ -32,8 +32,13 @@ let rec check_ctx id (at0, ctx0) = function
   | (at, ctx) :: ctxs ->
     if not (is_prefix ctx0 ctx) then
       error at
-        ("inconsistent variable context, " ^ string_of_ctx id ctx0 ^ " vs "
-       ^ string_of_ctx id ctx ^ " (" ^ string_of_region at0 ^ ")");
+        ("inconsistent variable context, "
+        ^ string_of_ctx id ctx0
+        ^ " vs "
+        ^ string_of_ctx id ctx
+        ^ " ("
+        ^ string_of_region at0
+        ^ ")");
     check_ctx id (at0, ctx0) ctxs
 
 let check_ctxs id ctxs : ctx =

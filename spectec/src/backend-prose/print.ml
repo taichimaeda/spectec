@@ -84,7 +84,9 @@ let rec structured_string_of_expr = function
     ^ structured_string_of_name n
     ^ ", "
     ^ structured_string_of_expr e
-    ^ ", " ^ s ^ ")"
+    ^ ", "
+    ^ s
+    ^ ")"
   | ConcatE (e1, e2) ->
     "ConcatE ("
     ^ structured_string_of_expr e1
@@ -177,31 +179,39 @@ let rec structured_string_of_instr depth = function
     "IfI (\n"
     ^ repeat indent (depth + 1)
     ^ structured_string_of_cond c
-    ^ "\n" ^ repeat indent depth ^ "then\n"
+    ^ "\n"
+    ^ repeat indent depth
+    ^ "then\n"
     ^ structured_string_of_instrs (depth + 1) t
-    ^ repeat indent depth ^ "else\n"
+    ^ repeat indent depth
+    ^ "else\n"
     ^ structured_string_of_instrs (depth + 1) e
-    ^ repeat indent depth ^ ")"
+    ^ repeat indent depth
+    ^ ")"
   | WhileI (c, il) ->
     "WhileI (\n"
     ^ repeat indent (depth + 1)
     ^ structured_string_of_cond c
     ^ ":\n"
     ^ structured_string_of_instrs (depth + 1) il
-    ^ repeat indent depth ^ ")"
+    ^ repeat indent depth
+    ^ ")"
   | RepeatI (e, il) ->
     "RepeatI (\n"
     ^ repeat indent (depth + 1)
     ^ structured_string_of_expr e
     ^ ":\n"
     ^ structured_string_of_instrs (depth + 1) il
-    ^ repeat indent depth ^ ")"
+    ^ repeat indent depth
+    ^ ")"
   | EitherI (il1, il2) ->
     "EitherI (\n"
     ^ structured_string_of_instrs (depth + 1) il1
-    ^ repeat indent depth ^ "Or\n"
+    ^ repeat indent depth
+    ^ "Or\n"
     ^ structured_string_of_instrs (depth + 1) il2
-    ^ repeat indent depth ^ ")"
+    ^ repeat indent depth
+    ^ ")"
   | AssertI s -> "AssertI (" ^ s ^ ")"
   | PushI e -> "PushI (" ^ structured_string_of_expr e ^ ")"
   | PopI None -> "PopI"
@@ -218,7 +228,9 @@ let rec structured_string_of_instr depth = function
   | InvokeI e -> "InvokeI (" ^ structured_string_of_expr e ^ ")"
   | EnterI (s, e) -> "EnterI (" ^ s ^ ", " ^ structured_string_of_expr e ^ ")"
   | ExecuteI (s, el) ->
-    "ExecuteI (" ^ s ^ ", "
+    "ExecuteI ("
+    ^ s
+    ^ ", "
     ^ string_of_list structured_string_of_expr "[" ", " "]" el
     ^ ")"
   | ReplaceI (e1, e2) ->

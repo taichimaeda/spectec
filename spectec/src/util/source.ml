@@ -25,7 +25,9 @@ let string_of_region r =
   if r = region_of_file r.left.file then
     r.left.file
   else
-    r.left.file ^ ":" ^ string_of_pos r.left
+    r.left.file
+    ^ ":"
+    ^ string_of_pos r.left
     ^ if r.left = r.right then "" else "-" ^ string_of_pos r.right
 
 (* Phrases *)

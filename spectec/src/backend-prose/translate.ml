@@ -87,7 +87,8 @@ let cond (prems : premise nl_list) =
          | Elem {it = IfPr e; _} -> Print.string_of_exp e
          | Elem p -> Print.string_of_prem p
          | Nl -> "Nl")
-  |> String.concat " and " |> printf_step "If %s, then:"
+  |> String.concat " and "
+  |> printf_step "If %s, then:"
 
 (* 3. Handle rhs of reductino rules *)
 
@@ -184,7 +185,9 @@ let string_of_destructed (left, right, prems) =
     List.filter_map (function Nl -> None | Elem x -> Some x) xs
   in
   let map_nl_list f xs = List.map f (filter_nl xs) in
-  Print.string_of_exp left ^ " ~> " ^ Print.string_of_exp right
+  Print.string_of_exp left
+  ^ " ~> "
+  ^ Print.string_of_exp right
   ^ String.concat ""
       (map_nl_list (fun x -> "\n    -- " ^ Print.string_of_prem x) prems)
 

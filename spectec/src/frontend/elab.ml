@@ -26,8 +26,14 @@ let error_typ at phrase t =
 
 let error_typ2 at phrase t1 t2 reason =
   error at
-    (phrase ^ "'s type `" ^ string_of_typ t1 ^ "`"
-   ^ " does not match expected type `" ^ string_of_typ t2 ^ "`" ^ reason)
+    (phrase
+    ^ "'s type `"
+    ^ string_of_typ t1
+    ^ "`"
+    ^ " does not match expected type `"
+    ^ string_of_typ t2
+    ^ "`"
+    ^ reason)
 
 type direction = Infer | Check
 
@@ -36,8 +42,12 @@ let error_dir_typ at phrase dir t expected =
   | Check -> error_typ at phrase t
   | Infer ->
     error at
-      (phrase ^ "'s type `" ^ string_of_typ t ^ "`"
-     ^ " does not match expected type " ^ expected)
+      (phrase
+      ^ "'s type `"
+      ^ string_of_typ t
+      ^ "`"
+      ^ " does not match expected type "
+      ^ expected)
 
 (* Helpers *)
 
@@ -300,8 +310,12 @@ let check_atoms phrase item list at =
   in
   if dups <> [] then
     error at
-      (phrase ^ " contains duplicate " ^ item ^ "(s) `"
-     ^ String.concat "`, `" dups ^ "`")
+      (phrase
+      ^ " contains duplicate "
+      ^ item
+      ^ "(s) `"
+      ^ String.concat "`, `" dups
+      ^ "`")
 
 (* Iteration *)
 
@@ -1046,8 +1060,9 @@ let check_recursion ds' =
         ()
       | _, _ ->
         error (List.hd ds').at
-          (" " ^ string_of_region d'.at
-         ^ ": invalid recursion between definitions of different sort"))
+          (" "
+          ^ string_of_region d'.at
+          ^ ": invalid recursion between definitions of different sort"))
     ds'
 (* TODO: check that notations are non-recursive and defs are inductive? *)
 

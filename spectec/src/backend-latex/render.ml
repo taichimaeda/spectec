@@ -435,9 +435,11 @@ and render_typ env t =
   | TupT ts -> "(" ^ render_typs ",\\; " env ts ^ ")"
   | IterT (t1, iter) -> "{" ^ render_typ env t1 ^ render_iter env iter ^ "}"
   | StrT tfs ->
-    "\\{\\; " ^ "\\begin{array}[t]{@{}l@{}}\n"
+    "\\{\\; "
+    ^ "\\begin{array}[t]{@{}l@{}}\n"
     ^ concat_map_nl ",\\; " "\\\\\n  " (render_typfield env) tfs
-    ^ " \\;\\}" ^ "\\end{array}"
+    ^ " \\;\\}"
+    ^ "\\end{array}"
   | CaseT (dots1, ids, tcases, dots2) ->
     altern_map_nl " ~|~ " " \\\\ &&|&\n" Fun.id
       (render_dots dots1
@@ -519,18 +521,32 @@ and render_exp env e =
   | SeqE es -> render_exps "~" env es
   | IdxE (e1, e2) -> render_exp env e1 ^ "[" ^ render_exp env e2 ^ "]"
   | SliceE (e1, e2, e3) ->
-    render_exp env e1 ^ "[" ^ render_exp env e2 ^ " : " ^ render_exp env e3
+    render_exp env e1
+    ^ "["
+    ^ render_exp env e2
+    ^ " : "
+    ^ render_exp env e3
     ^ "]"
   | UpdE (e1, p, e2) ->
-    render_exp env e1 ^ "[" ^ render_path env p ^ " = " ^ render_exp env e2
+    render_exp env e1
+    ^ "["
+    ^ render_path env p
+    ^ " = "
+    ^ render_exp env e2
     ^ "]"
   | ExtE (e1, p, e2) ->
-    render_exp env e1 ^ "[" ^ render_path env p ^ " = .." ^ render_exp env e2
+    render_exp env e1
+    ^ "["
+    ^ render_path env p
+    ^ " = .."
+    ^ render_exp env e2
     ^ "]"
   | StrE efs ->
-    "\\{ " ^ "\\begin{array}[t]{@{}l@{}}\n"
+    "\\{ "
+    ^ "\\begin{array}[t]{@{}l@{}}\n"
     ^ concat_map_nl ",\\; " "\\\\\n  " (render_expfield env) efs
-    ^ " \\}" ^ "\\end{array}"
+    ^ " \\}"
+    ^ "\\end{array}"
   | DotE (e1, atom) -> render_exp env e1 ^ "." ^ render_fieldname env atom e.at
   | CommaE (e1, e2) -> render_exp env e1 ^ ", " ^ render_exp env e2
   | CompE (e1, e2) -> render_exp env e1 ^ " \\oplus " ^ render_exp env e2
@@ -562,7 +578,8 @@ and render_exp env e =
           in
           "}_{"
           ^ render_exps "," env (as_tup_exp e1')
-          ^ "}" ^ render_exp env e2')
+          ^ "}"
+          ^ render_exp env e2')
   | IterE (e1, iter) -> "{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
   | FuseE (e1, e2) ->
     (* Hack for printing t.LOADn_sx *)
@@ -581,7 +598,11 @@ and render_path env p =
   | RootP -> ""
   | IdxP (p1, e) -> render_path env p1 ^ "[" ^ render_exp env e ^ "]"
   | SliceP (p1, e1, e2) ->
-    render_path env p1 ^ "[" ^ render_exp env e1 ^ " : " ^ render_exp env e2
+    render_path env p1
+    ^ "["
+    ^ render_exp env e1
+    ^ " : "
+    ^ render_exp env e2
     ^ "]"
   | DotP ({it = RootP; _}, atom) -> render_fieldname env atom p.at
   | DotP (p1, atom) -> render_path env p1 ^ "." ^ render_fieldname env atom p.at
@@ -655,7 +676,9 @@ let render_syndef env d =
      with
     | true, Some s -> "\\mbox{(" ^ s ^ ")} & "
     | _ -> "& ")
-    ^ render_synid env id1 ^ " &::=& " ^ render_typ env t
+    ^ render_synid env id1
+    ^ " &::=& "
+    ^ render_typ env t
   | _ -> assert false
 
 let render_ruledef env d =
@@ -667,7 +690,8 @@ let render_ruledef env d =
     ^ (if has_nl prems then "\\end{array}\n" else "")
     ^ "}{\n"
     ^ render_exp {env with current_rel = id1.it} e
-    ^ "\n" ^ "}"
+    ^ "\n"
+    ^ "}"
     ^ render_rule_deco env " \\, " id1 id2 ""
   | _ -> failwith "render_ruledef"
 
@@ -675,10 +699,14 @@ let render_conditions env = function
   | [] -> " & "
   | [Elem {it = ElsePr; _}] -> " &\\quad\n  " ^ word "otherwise"
   | Elem {it = ElsePr; _} :: prems ->
-    " &\\quad\n  " ^ word "otherwise, if" ^ "~"
+    " &\\quad\n  "
+    ^ word "otherwise, if"
+    ^ "~"
     ^ concat_map_nl " \\\\\n &&&&\\quad {\\land}~" "" (render_prem env) prems
   | prems ->
-    " &\\quad\n  " ^ word "if" ^ "~"
+    " &\\quad\n  "
+    ^ word "if"
+    ^ "~"
     ^ concat_map_nl " \\\\\n &&&&\\quad {\\land}~" "" (render_prem env) prems
 
 let render_reddef env d =
@@ -690,7 +718,11 @@ let render_reddef env d =
       | _ -> error e.at "unrecognized format for reduction rule"
     in
     render_rule_deco env "" id1 id2 " \\quad "
-    ^ "& " ^ render_exp env e1 ^ " &" ^ render_atom env SqArrow ^ "& "
+    ^ "& "
+    ^ render_exp env e1
+    ^ " &"
+    ^ render_atom env SqArrow
+    ^ "& "
     ^ render_exp env e2
     ^ render_conditions env prems
   | _ -> failwith "render_reddef"
@@ -699,7 +731,8 @@ let render_funcdef env d =
   match d.it with
   | DefD (id1, e1, e2, prems) ->
     render_exp env (CallE (id1, e1) $ d.at)
-    ^ " &=& " ^ render_exp env e2
+    ^ " &=& "
+    ^ render_exp env e2
     ^ render_conditions env prems
   | _ -> failwith "render_funcdef"
 
@@ -724,7 +757,9 @@ let rec render_defs env = function
     | SynD _ ->
       let ds' = merge_syndefs ds in
       let deco = if env.deco_syn then "l" else "l@{}" in
-      "\\begin{array}{@{}" ^ deco ^ "rrl@{}}\n"
+      "\\begin{array}{@{}"
+      ^ deco
+      ^ "rrl@{}}\n"
       ^ render_sep_defs (render_syndef env) ds'
       ^ "\\end{array}"
     | RelD (id, t, _hints) ->

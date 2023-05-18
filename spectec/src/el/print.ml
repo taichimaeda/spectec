@@ -78,7 +78,8 @@ and string_of_typ t =
   | CaseT (dots1, ids, tcases, dots2) ->
     "\n  | "
     ^ concat "\n  | "
-        (strings_of_dots dots1 @ map_nl_list it ids
+        (strings_of_dots dots1
+        @ map_nl_list it ids
         @ map_nl_list string_of_typcase tcases
         @ strings_of_dots dots2)
   | AtomT atom -> string_of_atom atom
@@ -174,7 +175,11 @@ let string_of_def d =
   | RelD (id, t, _hints) -> "relation " ^ id.it ^ ": " ^ string_of_typ t
   | RuleD (id1, id2, e, prems) ->
     let id2' = if id2.it = "" then "" else "/" ^ id2.it in
-    "rule " ^ id1.it ^ id2' ^ ":\n  " ^ string_of_exp e
+    "rule "
+    ^ id1.it
+    ^ id2'
+    ^ ":\n  "
+    ^ string_of_exp e
     ^ concat "" (map_nl_list (prefix "\n  -- " string_of_prem) prems)
   | VarD (id, t, _hints) -> "var " ^ id.it ^ " : " ^ string_of_typ t
   | DecD (id, e1, t2, _hints) ->
@@ -182,7 +187,11 @@ let string_of_def d =
     "def " ^ id.it ^ s1 ^ " : " ^ string_of_typ t2
   | DefD (id, e1, e2, prems) ->
     let s1 = match e1.it with SeqE [] -> "" | _ -> " " ^ string_of_exp e1 in
-    "def " ^ id.it ^ s1 ^ " = " ^ string_of_exp e2
+    "def "
+    ^ id.it
+    ^ s1
+    ^ " = "
+    ^ string_of_exp e2
     ^ concat "" (map_nl_list (prefix "\n  -- " string_of_prem) prems)
   | SepD -> "\n\n"
   | HintD _ -> ""

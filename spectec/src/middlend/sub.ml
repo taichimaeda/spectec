@@ -73,7 +73,7 @@ let var_of_typ typ =
   | _ ->
     error typ.at
       ("Non-variable type expression not supported:\n"
-     ^ Il.Print.string_of_typ typ)
+      ^ Il.Print.string_of_typ typ)
 
 (* Step 1 and 4: Collect SubE occurrences, and replace with function *)
 

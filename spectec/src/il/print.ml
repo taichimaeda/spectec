@@ -199,7 +199,10 @@ let string_of_rule rule =
     let id' = if id.it = "" then "_" else id.it in
     "\n"
     ^ region_comment "  " rule.at
-    ^ "  rule " ^ id' ^ string_of_binds binds ^ ":\n    "
+    ^ "  rule "
+    ^ id'
+    ^ string_of_binds binds
+    ^ ":\n    "
     ^ string_of_exp {e with it = MixE (mixop, e)}
     ^ concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
@@ -208,8 +211,13 @@ let string_of_clause id clause =
   | DefD (binds, e1, e2, prems) ->
     "\n"
     ^ region_comment "  " clause.at
-    ^ "  def" ^ string_of_binds binds ^ " " ^ id.it ^ string_of_exp_args e1
-    ^ " = " ^ string_of_exp e2
+    ^ "  def"
+    ^ string_of_binds binds
+    ^ " "
+    ^ id.it
+    ^ string_of_exp_args e1
+    ^ " = "
+    ^ string_of_exp e2
     ^ concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
 let rec string_of_def d =
@@ -218,14 +226,23 @@ let rec string_of_def d =
   | SynD (id, dt) ->
     pre ^ "syntax " ^ id.it ^ " = " ^ string_of_deftyp dt ^ "\n"
   | RelD (id, mixop, t, rules) ->
-    pre ^ "relation " ^ id.it ^ ": " ^ string_of_typ_mix mixop t
+    pre
+    ^ "relation "
+    ^ id.it
+    ^ ": "
+    ^ string_of_typ_mix mixop t
     ^ concat "\n" (List.map string_of_rule rules)
     ^ "\n"
   | DecD (id, t1, t2, clauses) ->
     let s1 =
       match t1.it with TupT [] -> "" | _ -> string_of_typ t1 ^ " -> "
     in
-    pre ^ "def " ^ id.it ^ " : " ^ s1 ^ string_of_typ t2
+    pre
+    ^ "def "
+    ^ id.it
+    ^ " : "
+    ^ s1
+    ^ string_of_typ t2
     ^ concat "" (List.map (string_of_clause id) clauses)
     ^ "\n"
   | RecD ds ->

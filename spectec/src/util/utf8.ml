@@ -18,7 +18,8 @@ and encode' = function
     (0xf0 lor (n lsr 18))
     :: con (n lsr 12)
     :: con (n lsr 6)
-    :: con n :: encode' ns
+    :: con n
+    :: encode' ns
   | _ -> raise Utf8
 
 let con b = if b land 0xc0 = 0x80 then b land 0x3f else raise Utf8

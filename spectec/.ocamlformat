@@ -1,4 +1,5 @@
 profile = default
+break-infix = wrap-or-vertical
 break-string-literals = never
 cases-exp-indent=2
 dock-collection-brackets = false
