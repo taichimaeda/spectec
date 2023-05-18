@@ -12,13 +12,7 @@ end
 module Set = Free.Set
 module Map = Map.Make (String)
 
-let filter_nl xs =
-  List.filter_map
-    (function
-      | Nl -> None
-      | Elem x -> Some x)
-    xs
-
+let filter_nl xs = List.filter_map (function Nl -> None | Elem x -> Some x) xs
 let map_nl_list f xs = List.map f (filter_nl xs)
 
 (* Errors *)
@@ -47,21 +41,9 @@ let error_dir_typ at phrase dir t expected =
 
 (* Helpers *)
 
-let unparen_exp e =
-  match e.it with
-  | ParenE (e1, _) -> e1
-  | _ -> e
-
-let unseq_exp e =
-  match e.it with
-  | EpsE -> []
-  | SeqE es -> es
-  | _ -> [e]
-
-let tup_typ' ts' at =
-  match ts' with
-  | [t'] -> t'
-  | _ -> Il.TupT ts' $ at
+let unparen_exp e = match e.it with ParenE (e1, _) -> e1 | _ -> e
+let unseq_exp e = match e.it with EpsE -> [] | SeqE es -> es | _ -> [e]
+let tup_typ' ts' at = match ts' with [t'] -> t' | _ -> Il.TupT ts' $ at
 
 let tup_exp' es' at =
   match es' with
@@ -403,11 +385,7 @@ and elab_typ_notation env t : bool * Il.mixop * Il.typ list =
       let b1, mixop1, ts' = elab_typ_notation env t1 in
       let iter' = elab_iter env iter in
       let t' = Il.IterT (tup_typ' ts' t1.at, iter') $ t.at in
-      let op =
-        match iter with
-        | Opt -> Il.Quest
-        | _ -> Il.Star
-      in
+      let op = match iter with Opt -> Il.Quest | _ -> Il.Star in
       (b1, [List.flatten mixop1] @ [[op]], [t']))
   | _ -> (false, [[]; []], [elab_typ env t])
 
@@ -429,9 +407,7 @@ and ( !!! ) env t =
 
 (* Expressions *)
 
-and infer_unop = function
-  | NotOp -> BoolT
-  | PlusOp | MinusOp -> NatT
+and infer_unop = function NotOp -> BoolT | PlusOp | MinusOp -> NatT
 
 and infer_binop = function
   | AndOp | OrOp | ImplOp | EquivOp -> BoolT
@@ -474,11 +450,7 @@ and infer_exp env e : typ =
   | InfixE _ -> error e.at "cannot infer type of infix expression"
   | BrackE _ -> error e.at "cannot infer type of bracket expression"
   | IterE (e1, iter) ->
-    let iter' =
-      match iter with
-      | ListN _ -> List
-      | iter' -> iter'
-    in
+    let iter' = match iter with ListN _ -> List | iter' -> iter' in
     IterT (infer_exp env e1, iter') $ e.at
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
@@ -575,11 +547,7 @@ and elab_exp env e t : Il.exp =
     match e2.it with
     | SeqE ({it = AtomE atom; at; _} :: es2) ->
       let _t2 = find_field tfs atom at in
-      let e2 =
-        match es2 with
-        | [e2] -> e2
-        | _ -> SeqE es2 $ e2.at
-      in
+      let e2 = match es2 with [e2] -> e2 | _ -> SeqE es2 $ e2.at in
       let e2' = elab_exp env (StrE [Elem (atom, e2)] $ e2.at) t in
       Il.CompE (e1', e2') $$ e.at % !!env t
     | _ -> failwith "unimplemented check CommaE")
@@ -913,9 +881,7 @@ let rec elab_prem env prem : Il.premise =
     Il.IterPr (prem1', iter') $ prem.at
 
 let infer_typ_definition _env t : syn_typ =
-  match t.it with
-  | StrT _ | CaseT _ -> Either.Left Ok
-  | _ -> Either.Left Bad
+  match t.it with StrT _ | CaseT _ -> Either.Left Ok | _ -> Either.Left Bad
 
 let infer_def env d =
   match d.it with

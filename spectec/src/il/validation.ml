@@ -189,9 +189,7 @@ let sub_typ env t1 t2 at =
 
 (* Operators *)
 
-let infer_unop = function
-  | NotOp -> BoolT
-  | PlusOp | MinusOp -> NatT
+let infer_unop = function NotOp -> BoolT | PlusOp | MinusOp -> NatT
 
 let infer_binop = function
   | AndOp | OrOp | ImplOp | EquivOp -> BoolT
@@ -260,11 +258,7 @@ and valid_deftyp env dt =
     List.iter (valid_typcase env) tcs
 
 and valid_typ_mix env mixop t at =
-  let arity =
-    match t.it with
-    | TupT ts -> List.length ts
-    | _ -> 1
-  in
+  let arity = match t.it with TupT ts -> List.length ts | _ -> 1 in
   if List.length mixop <> arity + 1 then
     error at
       ("inconsistent arity in mixin notation, `" ^ string_of_mixop mixop
@@ -296,11 +290,7 @@ and infer_exp env e : typ =
   | CallE (id, _) -> snd (find "function" env.defs id)
   | MixE _ -> error e.at "cannot infer type of mixin notation"
   | IterE (e1, iter) ->
-    let iter' =
-      match fst iter with
-      | ListN _ -> List
-      | iter' -> iter'
-    in
+    let iter' = match fst iter with ListN _ -> List | iter' -> iter' in
     IterT (infer_exp env e1, iter') $ e.at
   | OptE _ -> error e.at "cannot infer type of option"
   | TheE e1 -> as_iter_typ Opt "option" env Check (infer_exp env e1) e1.at
@@ -518,9 +508,7 @@ let infer_def env d =
   match d.it with
   | SynD (id, dt) ->
     let fwd_deftyp =
-      match dt.it with
-      | NotationT _ -> fwd_deftyp_bad
-      | _ -> fwd_deftyp_ok
+      match dt.it with NotationT _ -> fwd_deftyp_bad | _ -> fwd_deftyp_ok
     in
     env.typs <- bind "syntax" env.typs id fwd_deftyp
   | RelD (id, mixop, t, _rules) ->

@@ -1,9 +1,7 @@
 module List = struct
   include List
 
-  let split_hd = function
-    | x :: xs -> (x, xs)
-    | _ -> failwith "split_hd"
+  let split_hd = function x :: xs -> (x, xs) | _ -> failwith "split_hd"
 
   let rec split_last = function
     | x :: [] -> ([], x)

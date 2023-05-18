@@ -57,17 +57,10 @@ let check_id env ctx id =
   in
   env := Env.add id.it ctxs !env
 
-let iter_nl_list f xs =
-  List.iter
-    (function
-      | Nl -> ()
-      | Elem x -> f x)
-    xs
+let iter_nl_list f xs = List.iter (function Nl -> () | Elem x -> f x) xs
 
 let rec check_iter env ctx iter =
-  match iter with
-  | Opt | List | List1 -> ()
-  | ListN e -> check_exp env ctx e
+  match iter with Opt | List | List1 -> () | ListN e -> check_exp env ctx e
 
 and check_exp env ctx e =
   match e.it with

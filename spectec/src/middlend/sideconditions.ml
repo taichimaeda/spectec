@@ -106,10 +106,7 @@ let rec t_exp env e : premise list =
     @ t_iterexp env iterexp
 
 and t_iterexp env (iter, _) = t_iter env iter
-
-and t_iter env = function
-  | ListN e -> t_exp env e
-  | _ -> []
+and t_iter env = function ListN e -> t_exp env e | _ -> []
 
 and t_path env path =
   match path.it with
@@ -134,9 +131,7 @@ let t_prems env = List.concat_map (t_prem env)
 let rec implies prem1 prem2 =
   Il.Eq.eq_prem prem1 prem2
   ||
-  match prem2.it with
-  | IterPr (prem2', _) -> implies prem1 prem2'
-  | _ -> false
+  match prem2.it with IterPr (prem2', _) -> implies prem1 prem2' | _ -> false
 
 let t_rule' = function
   | RuleD (id, binds, mixop, exp, prems) ->

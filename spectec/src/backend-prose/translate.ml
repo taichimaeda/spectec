@@ -98,11 +98,7 @@ let fresh _ =
   "tmp" ^ string_of_int id
 
 let bind_atomic e =
-  let is_call =
-    match e.it with
-    | CallE _ -> true
-    | _ -> false
-  in
+  let is_call = match e.it with CallE _ -> true | _ -> false in
   let id = fresh () in
   if is_call then
     printf_step "Let %s be the result of computing %s." id
@@ -182,11 +178,7 @@ let destruct_as_rule r =
 
 let string_of_destructed (left, right, prems) =
   let filter_nl xs =
-    List.filter_map
-      (function
-        | Nl -> None
-        | Elem x -> Some x)
-      xs
+    List.filter_map (function Nl -> None | Elem x -> Some x) xs
   in
   let map_nl_list f xs = List.map f (filter_nl xs) in
   Print.string_of_exp left ^ " ~> " ^ Print.string_of_exp right
@@ -204,9 +196,7 @@ let handle_reduction_group red_group =
 
   let left, _, _ = List.hd red_group in
   let left =
-    match left.it with
-    | InfixE (_, Semicolon, left) -> left
-    | _ -> left
+    match left.it with InfixE (_, Semicolon, left) -> left | _ -> left
   in
   pop left;
 

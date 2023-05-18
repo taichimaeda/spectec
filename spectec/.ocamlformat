@@ -1,5 +1,4 @@
 profile = default
-break-cases = toplevel
 break-string-literals = never
 cases-exp-indent=2
 dock-collection-brackets = false

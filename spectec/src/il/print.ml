@@ -32,10 +32,7 @@ let string_of_atom = function
   | Quest -> "?"
   | Star -> "*"
 
-let string_of_unop = function
-  | NotOp -> "~"
-  | PlusOp -> "+"
-  | MinusOp -> "-"
+let string_of_unop = function NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
 
 let string_of_binop = function
   | AndOp -> "/\\"
@@ -224,9 +221,7 @@ let rec string_of_def d =
     ^ "\n"
   | DecD (id, t1, t2, clauses) ->
     let s1 =
-      match t1.it with
-      | TupT [] -> ""
-      | _ -> string_of_typ t1 ^ " -> "
+      match t1.it with TupT [] -> "" | _ -> string_of_typ t1 ^ " -> "
     in
     pre ^ "def " ^ id.it ^ " : " ^ s1 ^ string_of_typ t2
     ^ concat "" (List.map (string_of_clause id) clauses)

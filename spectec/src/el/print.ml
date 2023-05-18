@@ -7,14 +7,7 @@ let concat = String.concat
 let prefix s f x = s ^ f x
 let suffix f s x = f x ^ s
 let space f x = " " ^ f x ^ " "
-
-let filter_nl xs =
-  List.filter_map
-    (function
-      | Nl -> None
-      | Elem x -> Some x)
-    xs
-
+let filter_nl xs = List.filter_map (function Nl -> None | Elem x -> Some x) xs
 let map_nl_list f xs = List.map f (filter_nl xs)
 
 (* Operators *)
@@ -38,10 +31,7 @@ let string_of_brack = function
   | Brack -> ("[", "]")
   | Brace -> ("{", "}")
 
-let string_of_unop = function
-  | NotOp -> "~"
-  | PlusOp -> "+"
-  | MinusOp -> "-"
+let string_of_unop = function NotOp -> "~" | PlusOp -> "+" | MinusOp -> "-"
 
 let string_of_binop = function
   | AndOp -> "/\\"
@@ -62,9 +52,7 @@ let string_of_cmpop = function
   | LeOp -> "<="
   | GeOp -> ">="
 
-let strings_of_dots = function
-  | Dots -> ["..."]
-  | NoDots -> []
+let strings_of_dots = function Dots -> ["..."] | NoDots -> []
 
 (* Iteration *)
 
@@ -188,18 +176,10 @@ let string_of_def d =
     ^ concat "" (map_nl_list (prefix "\n  -- " string_of_prem) prems)
   | VarD (id, t, _hints) -> "var " ^ id.it ^ " : " ^ string_of_typ t
   | DecD (id, e1, t2, _hints) ->
-    let s1 =
-      match e1.it with
-      | SeqE [] -> ""
-      | _ -> " " ^ string_of_exp e1
-    in
+    let s1 = match e1.it with SeqE [] -> "" | _ -> " " ^ string_of_exp e1 in
     "def " ^ id.it ^ s1 ^ " : " ^ string_of_typ t2
   | DefD (id, e1, e2, prems) ->
-    let s1 =
-      match e1.it with
-      | SeqE [] -> ""
-      | _ -> " " ^ string_of_exp e1
-    in
+    let s1 = match e1.it with SeqE [] -> "" | _ -> " " ^ string_of_exp e1 in
     "def " ^ id.it ^ s1 ^ " = " ^ string_of_exp e2
     ^ concat "" (map_nl_list (prefix "\n  -- " string_of_prem) prems)
   | SepD -> "\n\n"

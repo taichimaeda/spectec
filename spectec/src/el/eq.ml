@@ -7,9 +7,7 @@ let eq_list eq_x xs1 xs2 =
   List.length xs1 = List.length xs2 && List.for_all2 eq_x xs1 xs2
 
 let eq_nl_elem eq_x e1 e2 =
-  match (e1, e2) with
-  | Elem x1, Elem x2 -> eq_x x1 x2
-  | _, _ -> false
+  match (e1, e2) with Elem x1, Elem x2 -> eq_x x1 x2 | _, _ -> false
 
 let eq_nl_list eq_x xs1 xs2 = eq_list (eq_nl_elem eq_x) xs1 xs2
 
@@ -18,9 +16,7 @@ let eq_nl_list eq_x xs1 xs2 = eq_list (eq_nl_elem eq_x) xs1 xs2
 let rec eq_iter iter1 iter2 =
   iter1 = iter2
   ||
-  match (iter1, iter2) with
-  | ListN e1, ListN e2 -> eq_exp e1 e2
-  | _, _ -> false
+  match (iter1, iter2) with ListN e1, ListN e2 -> eq_exp e1 e2 | _, _ -> false
 
 (* Types *)
 

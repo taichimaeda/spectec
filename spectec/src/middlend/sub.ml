@@ -119,10 +119,7 @@ and t_exp' env = function
   | CaseE (a, e) -> CaseE (a, t_exp env e)
   | SubE (e, t1, t2) -> SubE (e, t1, t2)
 
-and t_iter env = function
-  | ListN e -> ListN (t_exp env e)
-  | i -> i
-
+and t_iter env = function ListN e -> ListN (t_exp env e) | i -> i
 and t_iterexp env (iter, vs) = (t_iter env iter, vs)
 
 and t_path' env = function

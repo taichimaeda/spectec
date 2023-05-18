@@ -5,8 +5,7 @@ open Il
 
 (* `Ast.exp` -> `Ir.expr` *)
 let translate_expr exp =
-  match exp.it with
-  | _ -> Ir.YetE (Print.string_of_exp exp)
+  match exp.it with _ -> Ir.YetE (Print.string_of_exp exp)
 
 (* `Ast.exp` -> `Ir.AssertI` *)
 let insert_assert exp =
@@ -73,10 +72,7 @@ let rec rhs2instrs exp =
   | Ast.CatE (exp1, exp2) -> rhs2instrs exp1 @ rhs2instrs exp2
   | _ -> failwith "Unreachable"
 
-let check_nop instrs =
-  match instrs with
-  | [] -> [Ir.NopI]
-  | _ -> instrs
+let check_nop instrs = match instrs with [] -> [Ir.NopI] | _ -> instrs
 
 (** Translate `Ast.premise` **)
 

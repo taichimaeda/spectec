@@ -50,9 +50,7 @@ let env_hints name map id hints =
     (fun {hintid; hintexp} ->
       if hintid.it = name then
         let exps =
-          match Map.find_opt id !map with
-          | Some exps -> exps
-          | None -> []
+          match Map.find_opt id !map with Some exps -> exps | None -> []
         in
         map := Map.add id (hintexp :: exps) !map)
     hints
@@ -109,18 +107,8 @@ let env config script : env =
 let concat = String.concat
 let suffix s f x = f x ^ s
 let space f x = " " ^ f x ^ " "
-
-let rec has_nl = function
-  | [] -> false
-  | Nl :: _ -> true
-  | _ :: xs -> has_nl xs
-
-let map_nl_list f xs =
-  List.map
-    (function
-      | Nl -> Nl
-      | Elem x -> Elem (f x))
-    xs
+let rec has_nl = function [] -> false | Nl :: _ -> true | _ :: xs -> has_nl xs
+let map_nl_list f xs = List.map (function Nl -> Nl | Elem x -> Elem (f x)) xs
 
 let rec concat_map_nl sep br f = function
   | [] -> ""
@@ -135,24 +123,10 @@ let rec altern_map_nl sep br f = function
   | Elem x :: xs -> f x ^ sep ^ altern_map_nl sep br f xs
   | Nl :: xs -> br ^ altern_map_nl sep br f xs
 
-let strip_nl = function
-  | Nl :: xs -> xs
-  | xs -> xs
-
-let as_tup_typ t =
-  match t.it with
-  | TupT ts -> ts
-  | _ -> [t]
-
-let as_paren_exp e =
-  match e.it with
-  | ParenE (e1, _) -> e1
-  | _ -> e
-
-let as_tup_exp e =
-  match e.it with
-  | TupE es -> es
-  | _ -> [e]
+let strip_nl = function Nl :: xs -> xs | xs -> xs
+let as_tup_typ t = match t.it with TupT ts -> ts | _ -> [t]
+let as_paren_exp e = match e.it with ParenE (e1, _) -> e1 | _ -> e
+let as_tup_exp e = match e.it with TupE es -> es | _ -> [e]
 
 let rec fuse_exp e deep =
   match e.it with
@@ -289,10 +263,7 @@ let render_brack = function
   | Brack -> ("[", "]")
   | Brace -> ("\\{", "\\}")
 
-let render_unop = function
-  | NotOp -> "\\neg"
-  | PlusOp -> "+"
-  | MinusOp -> "-"
+let render_unop = function NotOp -> "\\neg" | PlusOp -> "+" | MinusOp -> "-"
 
 let render_binop = function
   | AndOp -> "\\land"
@@ -313,9 +284,7 @@ let render_cmpop = function
   | LeOp -> "\\leq"
   | GeOp -> "\\geq"
 
-let render_dots = function
-  | Dots -> [Elem "..."]
-  | NoDots -> []
+let render_dots = function Dots -> [Elem "..."] | NoDots -> []
 
 (* Show expansions *)
 
@@ -508,10 +477,7 @@ and render_typcase env at (atom, ts, _hints) =
 (* Expressions *)
 
 and untup_exp e =
-  match e.it with
-  | TupE es -> es
-  | ParenE (e1, _) -> [e1]
-  | _ -> [e]
+  match e.it with TupE es -> es | ParenE (e1, _) -> [e1] | _ -> [e]
 
 and render_exp env e =
   (*
@@ -740,9 +706,7 @@ let rec classify_rel e : rel_sort option =
   | InfixE (_, Turnstile, _) -> Some TypingRel
   | InfixE (_, SqArrow, _) -> Some ReductionRel
   | InfixE (e1, _, e2) -> (
-    match classify_rel e1 with
-    | None -> classify_rel e2
-    | some -> some)
+    match classify_rel e1 with None -> classify_rel e2 | some -> some)
   | _ -> None
 
 let rec render_defs env = function
