@@ -185,8 +185,10 @@ let id_style = function
   | `Token -> "\\mathtt"
 
 let render_id' env style id =
-  if env.config.macros_for_ids then "\\" ^ id
-  else id_style style ^ "{" ^ shrink_id id ^ "}"
+  if env.config.macros_for_ids then
+    "\\" ^ id
+  else
+    id_style style ^ "{" ^ shrink_id id ^ "}"
 
 let rec render_id_sub env style show at = function
   | [] -> ""
@@ -206,15 +208,18 @@ let rec render_id_sub env style show at = function
     let i = find_primes n in
     let s' = String.sub s 0 i in
     let s'' =
-      if String.for_all is_digit s' then s'
+      if String.for_all is_digit s' then
+        s'
       else
         !render_expand_fwd env show (s' $ at) [] (fun () ->
             render_id' env style s')
     in
     (if i = n then s'' else "{" ^ s'' ^ String.sub s i (n - i) ^ "}")
     ^
-    if ss = [] then ""
-    else "_{" ^ render_id_sub env `Var env.show_var at ss ^ "}"
+    if ss = [] then
+      ""
+    else
+      "_{" ^ render_id_sub env `Var env.show_var at ss ^ "}"
 
 let render_id env style show id =
   render_id_sub env style show id.at (String.split_on_char '_' id.it)
@@ -236,8 +241,10 @@ let render_ruleid env id1 id2 =
   "\\textsc{\\scriptsize " ^ dash_id (quote_id (id1' ^ id2')) ^ "}"
 
 let render_rule_deco env pre id1 id2 post =
-  if not env.deco_rule then ""
-  else pre ^ "{[" ^ render_ruleid env id1 id2 ^ "]}" ^ post
+  if not env.deco_rule then
+    ""
+  else
+    pre ^ "{[" ^ render_ruleid env id1 id2 ^ "]}" ^ post
 
 (* Operators *)
 
@@ -255,8 +262,10 @@ let render_atom env = function
   | SqArrow -> "\\hookrightarrow"
   | Tilesturn -> "\\dashv"
   | Turnstile ->
-    if env.config.macros_for_vdash then "\\vdash" ^ env.current_rel
-    else "\\vdash"
+    if env.config.macros_for_vdash then
+      "\\vdash" ^ env.current_rel
+    else
+      "\\vdash"
 
 let render_brack = function
   | Paren -> ("(", ")")
@@ -541,8 +550,7 @@ and render_exp env e =
           match e1.it with
           | TupE [] -> render_defid env id
           | _ -> render_defid env id ^ render_exp env e1
-        else
-          (* Handle subscripting *)
+        else (* Handle subscripting *)
           "{"
           ^ render_defid env (chop_sub id.it $ id.at)
           ^

@@ -15,9 +15,12 @@ let string_of_list stringifier left sep right = function
     ^ right
 
 let rec repeat str num =
-  if num = 0 then ""
-  else if Int.rem num 2 = 0 then repeat (str ^ str) (num / 2)
-  else str ^ repeat (str ^ str) (num / 2)
+  if num = 0 then
+    ""
+  else if Int.rem num 2 = 0 then
+    repeat (str ^ str) (num / 2)
+  else
+    str ^ repeat (str ^ str) (num / 2)
 
 (* structured stringifier *)
 
@@ -315,10 +318,14 @@ and string_of_cond = function
 
 let make_index index depth =
   index := !index + 1;
-  if depth = 0 then string_of_int !index ^ "."
-  else if depth = 1 then Char.escaped (Char.chr (96 + !index)) ^ "."
-  else if depth = 2 then "i."
-  else failwith "Invalid case"
+  if depth = 0 then
+    string_of_int !index ^ "."
+  else if depth = 1 then
+    Char.escaped (Char.chr (96 + !index)) ^ "."
+  else if depth = 2 then
+    "i."
+  else
+    failwith "Invalid case"
 
 let rec string_of_instr index depth = function
   | IfI (c, il, []) ->

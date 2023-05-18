@@ -57,7 +57,8 @@ let lookup (env : env) (id : id) : id * typcase list =
 let register_variant (env : env) (id : id) (cases : typcase list) =
   if M.mem id.it env.typ then
     error id.at ("duplicate declaration for type `" ^ id.it ^ "`")
-  else env.typ <- M.add id.it (id, cases) env.typ
+  else
+    env.typ <- M.add id.it (id, cases) env.typ
 
 let register_alias (env : env) (id : id) (id2 : id) =
   match M.find_opt id2.it env.typ with

@@ -17,7 +17,8 @@ type vert_info = {mutable index : int; mutable low : int; mutable onstack : bool
 
 let sccs (graph : graph) : Set.t list =
   let len = Array.length graph in
-  if len = 0 then []
+  if len = 0 then
+    []
   else
     let info =
       Array.init len (fun _ -> {index = -1; low = -1; onstack = false})
@@ -52,7 +53,8 @@ let sccs (graph : graph) : Set.t list =
           connect x;
           v.low <- min v.low w.low
         end
-        else if w.onstack then v.low <- min v.low w.index
+        else if w.onstack then
+          v.low <- min v.low w.index
       done
     in
 

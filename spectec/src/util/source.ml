@@ -16,11 +16,14 @@ let over_region = function
       r rs
 
 let string_of_pos pos =
-  if pos.line = -1 then Printf.sprintf "0x%x" pos.column
-  else string_of_int pos.line ^ "." ^ string_of_int (pos.column + 1)
+  if pos.line = -1 then
+    Printf.sprintf "0x%x" pos.column
+  else
+    string_of_int pos.line ^ "." ^ string_of_int (pos.column + 1)
 
 let string_of_region r =
-  if r = region_of_file r.left.file then r.left.file
+  if r = region_of_file r.left.file then
+    r.left.file
   else
     r.left.file ^ ":" ^ string_of_pos r.left
     ^ if r.left = r.right then "" else "-" ^ string_of_pos r.right

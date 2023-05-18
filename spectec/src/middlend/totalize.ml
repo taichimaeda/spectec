@@ -135,7 +135,8 @@ let rec t_def' env = function
         $ no_region
       in
       DecD (id, typ1, typ2', clauses'' @ [catch_all])
-    else DecD (id, typ1, typ2, clauses')
+    else
+      DecD (id, typ1, typ2, clauses')
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, typ, List.map (t_rule env) rules)
   | (SynD _ | HintD _) as def -> def

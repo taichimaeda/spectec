@@ -80,7 +80,8 @@ let () =
     Il.Validation.valid il;
 
     let il =
-      if not !pass_sub then il
+      if not !pass_sub then
+        il
       else (
         log "Subtype injection...";
         let il = Middlend.Sub.transform il in
@@ -92,7 +93,8 @@ let () =
     in
 
     let il =
-      if not !pass_totalize then il
+      if not !pass_totalize then
+        il
       else (
         log "Function totalization...";
         let il = Middlend.Totalize.transform il in
@@ -104,7 +106,8 @@ let () =
     in
 
     let il =
-      if not !pass_unthe then il
+      if not !pass_unthe then
+        il
       else (
         log "Option projection eliminiation";
         let il = Middlend.Unthe.transform il in
@@ -116,7 +119,8 @@ let () =
     in
 
     let il =
-      if not !pass_sideconditions then il
+      if not !pass_sideconditions then
+        il
       else (
         log "Side condition inference";
         let il = Middlend.Sideconditions.transform il in

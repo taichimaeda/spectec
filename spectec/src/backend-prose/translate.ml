@@ -31,7 +31,8 @@ let unindent _ = _indent := false
 let printf_step formatted =
   if !_indent then
     Printf.bprintf buf ("  %d) " ^^ formatted ^^ "\n") (subIdx ())
-  else Printf.bprintf buf ("%d. " ^^ formatted ^^ "\n") (stepIdx ())
+  else
+    Printf.bprintf buf ("%d. " ^^ formatted ^^ "\n") (stepIdx ())
 
 let check_nothing _ =
   if (!_indent && !_subIdx = 1) || ((not !_indent) && !_stepIdx = 1) then
@@ -103,7 +104,8 @@ let bind_atomic e =
   if is_call then
     printf_step "Let %s be the result of computing %s." id
       (Print.string_of_exp e)
-  else printf_step "Let %s be %s." id (Print.string_of_exp e);
+  else
+    printf_step "Let %s be %s." id (Print.string_of_exp e);
   VarE (id $ e.at) $ e.at
 
 let rec bind e =
@@ -172,7 +174,8 @@ let destruct_as_rule r =
     | InfixE (left, SqArrow, right) ->
       if String.starts_with ~prefix:"Step_" name.it then
         Some (left, right, prems)
-      else None
+      else
+        None
     | _ -> None)
   | _ -> None
 

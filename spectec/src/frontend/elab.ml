@@ -91,8 +91,10 @@ let find space env' id =
   | Some t -> t
 
 let bind space env' id t =
-  if Map.mem id.it env' then error_id id ("duplicate declaration for " ^ space)
-  else Map.add id.it t env'
+  if Map.mem id.it env' then
+    error_id id ("duplicate declaration for " ^ space)
+  else
+    Map.add id.it t env'
 
 let rebind _space env' id t =
   assert (Map.mem id.it env');
@@ -592,7 +594,8 @@ and elab_exp env e t : Il.exp =
       elab_exp_variant env (unseq_exp e)
         (fst (as_variant_typ "" env Check t e.at))
         t e.at
-    else error_typ e.at "expression" t
+    else
+      error_typ e.at "expression" t
   | IterE (e1, iter2) ->
     (* An iteration expression must match the expected type directly,
      * significant parentheses have to be used otherwise *)
@@ -823,7 +826,8 @@ and cast_exp phrase env e' t1 t2 : Il.exp =
     (string_of_typ (expand env t2 $ t2.at))
     (equiv_typ env t1 t2);
   *)
-  if equiv_typ env t1 t2 then e'
+  if equiv_typ env t1 t2 then
+    e'
   else
     match expand env t2 with
     | IterT (t21, Opt) ->
@@ -833,7 +837,8 @@ and cast_exp phrase env e' t1 t2 : Il.exp =
     | _ -> cast_exp_variant phrase env e' t1 t2
 
 and cast_exp_variant phrase env e' t1 t2 : Il.exp =
-  if equiv_typ env t1 t2 then e'
+  if equiv_typ env t1 t2 then
+    e'
   else if is_variant_typ env t1 && is_variant_typ env t2 then (
     let cases1, dots1 = as_variant_typ "" env Check t1 e'.at in
     let cases2, _dots2 = as_variant_typ "" env Check t2 e'.at in
@@ -847,11 +852,13 @@ and cast_exp_variant phrase env e' t1 t2 : Il.exp =
            if
              List.length ts1 <> List.length ts2
              || not (List.for_all2 Eq.eq_typ ts1 ts2)
-           then error_atom e'.at atom "type mismatch for case")
+           then
+             error_atom e'.at atom "type mismatch for case")
          cases1
      with Error (_, msg) -> error_typ2 e'.at phrase t1 t2 (", " ^ msg));
     Il.SubE (e', elab_typ env t1, elab_typ env t2) $$ e'.at % !!env t2)
-  else error_typ2 e'.at phrase t1 t2 ""
+  else
+    error_typ2 e'.at phrase t1 t2 ""
 
 and elab_iterexp env iter = (elab_iter env iter, [])
 
@@ -896,14 +903,20 @@ let infer_def env d =
 let elab_hintdef _env hd : Il.def list =
   match hd.it with
   | SynH (id1, _id2, hints) ->
-    if hints = [] then []
-    else [Il.HintD (Il.SynH (id1, elab_hints hints) $ hd.at) $ hd.at]
+    if hints = [] then
+      []
+    else
+      [Il.HintD (Il.SynH (id1, elab_hints hints) $ hd.at) $ hd.at]
   | RelH (id, hints) ->
-    if hints = [] then []
-    else [Il.HintD (Il.RelH (id, elab_hints hints) $ hd.at) $ hd.at]
+    if hints = [] then
+      []
+    else
+      [Il.HintD (Il.RelH (id, elab_hints hints) $ hd.at) $ hd.at]
   | DecH (id, hints) ->
-    if hints = [] then []
-    else [Il.HintD (Il.DecH (id, elab_hints hints) $ hd.at) $ hd.at]
+    if hints = [] then
+      []
+    else
+      [Il.HintD (Il.DecH (id, elab_hints hints) $ hd.at) $ hd.at]
   | AtomH _ | VarH _ -> []
 
 let elab_def env d : Il.def list =

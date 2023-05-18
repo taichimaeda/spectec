@@ -37,7 +37,8 @@ let find space env' id =
 let bind space env' id t =
   if Env.mem id.it env' then
     error id.at ("duplicate declaration for " ^ space ^ " `" ^ id.it ^ "`")
-  else Env.add id.it t env'
+  else
+    Env.add id.it t env'
 
 let rebind _space env' id t =
   assert (Env.mem id.it env');

@@ -98,8 +98,10 @@ and string_of_deftyp dt =
   | VariantT tcs -> "\n  | " ^ concat "\n  | " (List.map string_of_typcase tcs)
 
 and string_of_typ_mix mixop t =
-  if mixop = [[]; []] then string_of_typ t
-  else string_of_mixop mixop ^ string_of_typ_args t
+  if mixop = [[]; []] then
+    string_of_typ t
+  else
+    string_of_mixop mixop ^ string_of_typ_args t
 
 and string_of_typfield (atom, t, _hints) =
   string_of_atom atom ^ " " ^ string_of_typ t

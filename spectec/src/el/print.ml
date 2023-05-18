@@ -95,8 +95,10 @@ and string_of_typfield (atom, t, _hints) =
   string_of_atom atom ^ " " ^ string_of_typ t
 
 and string_of_typcase (atom, ts, _hints) =
-  if ts = [] then string_of_atom atom
-  else string_of_atom atom ^ " " ^ string_of_typs " " ts
+  if ts = [] then
+    string_of_atom atom
+  else
+    string_of_atom atom ^ " " ^ string_of_typs " " ts
 
 (* Expressions *)
 

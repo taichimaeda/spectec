@@ -15,7 +15,8 @@ let adv src = advn src 1
 let left src = String.length src.s - src.i
 
 let rec pos' src j (line, column) : Source.pos =
-  if j = src.i then Source.{file = src.file; line; column}
+  if j = src.i then
+    Source.{file = src.file; line; column}
   else
     pos' src (j + 1)
       (if src.s.[j] = '\n' then (line + 1, 1) else (line, column + 1))
@@ -157,7 +158,8 @@ let try_string src s : bool =
 let try_anchor_start src anchor : bool = try_string src (anchor ^ "{")
 
 let rec parse_anchor_end src j depth =
-  if eos src then error {src with i = j} "unclosed anchor"
+  if eos src then
+    error {src with i = j} "unclosed anchor"
   else if get src = '{' then (
     adv src;
     parse_anchor_end src j (depth + 1))
@@ -193,7 +195,8 @@ let parse_id_id env src space1 space2 find : def list =
 
 let rec parse_id_id_list env src space1 space2 find : def list =
   parse_space src;
-  if try_string src "}" then []
+  if try_string src "}" then
+    []
   else
     let defs1 = parse_id_id env src space1 space2 find in
     let defs2 = parse_id_id_list env src space1 space2 find in
@@ -201,11 +204,14 @@ let rec parse_id_id_list env src space1 space2 find : def list =
 
 let rec parse_group_list env src space1 space2 find : def list list =
   parse_space src;
-  if try_string src "}" then []
+  if try_string src "}" then
+    []
   else
     let groups =
-      if try_string src "{" then [parse_id_id_list env src space1 space2 find]
-      else List.map (fun def -> [def]) (parse_id_id env src space1 space2 find)
+      if try_string src "{" then
+        [parse_id_id_list env src space1 space2 find]
+      else
+        List.map (fun def -> [def]) (parse_id_id env src space1 space2 find)
     in
     groups @ parse_group_list env src space1 space2 find
 
@@ -265,8 +271,10 @@ let splice_anchor env src anchor buf =
     || try_def_anchor env src r "definition" "definition" "" find_func false
     || error src "unknown definition sort");
   let s =
-    if anchor.indent = "" then !r
-    else Str.(global_replace (regexp "\n") ("\n" ^ anchor.indent) !r)
+    if anchor.indent = "" then
+      !r
+    else
+      Str.(global_replace (regexp "\n") ("\n" ^ anchor.indent) !r)
   in
   Buffer.add_string buf s;
   Buffer.add_string buf anchor.suffix
@@ -277,7 +285,8 @@ let rec try_anchors env src buf = function
     if try_anchor_start src anchor.token then (
       splice_anchor env src anchor buf;
       true)
-    else try_anchors env src buf anchors
+    else
+      try_anchors env src buf anchors
 
 let rec splice_all env src buf =
   if not (eos src) then (

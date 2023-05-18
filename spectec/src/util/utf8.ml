@@ -24,8 +24,10 @@ and encode' = function
 let con b = if b land 0xc0 = 0x80 then b land 0x3f else raise Utf8
 
 let code min n =
-  if n < min || (0xd800 <= n && n < 0xe000) || n >= 0x110000 then raise Utf8
-  else n
+  if n < min || (0xd800 <= n && n < 0xe000) || n >= 0x110000 then
+    raise Utf8
+  else
+    n
 
 let rec decode s = decode' (List.map Char.code (Lib.String.explode s))
 
