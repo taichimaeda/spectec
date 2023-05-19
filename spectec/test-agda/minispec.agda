@@ -542,10 +542,10 @@ data ty-InstrSeq-ok where
     ---------------------------------------------------------------------------
     ty-InstrSeq-ok ⟨ ⟨ C , (instr-1 ∷ []) ++ (instr-2 ∷ []) ⟩ , ⟨ t-1 , t-3 ⟩ ⟩
   weak :
-    (C : ty-context) (instr : List ty-instr) (t-1 : ty-valtype) (t-2 : List ty-valtype) ->
-    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩ ->
-    -----------------------------------------------------
-    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 ∷ [] , t-2 ⟩ ⟩
+    (C : ty-context) (instr : List ty-instr) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
+    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
+    ------------------------------------------------
+    ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩
   frame :
     (C : ty-context) (instr : List ty-instr) (t : List ty-valtype) (t-1 : List ty-valtype) (t-2 : List ty-valtype) ->
     ty-InstrSeq-ok ⟨ ⟨ C , instr ⟩ , ⟨ t-1 , t-2 ⟩ ⟩ ->
