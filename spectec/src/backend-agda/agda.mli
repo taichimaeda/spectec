@@ -1,4 +1,8 @@
-type builtin =
+type literal = BoolL of bool | NatL of int | TextL of string
+
+type id = Id of string | TyId of string | FunId of string | BuiltIn of builtin
+
+and builtin =
   | SetB
   | BoolB
   | NatB
@@ -9,12 +13,13 @@ type builtin =
   | BinOpB of Il.Ast.binop
   | CmpOpB of Il.Ast.cmpop
   | LookupB
-  | CompB of string
+  | CompB of id
   | LengthB
   | JustB
   | ConsB
   | NilB
   | ConcatB
+  | MaybeChoiceB
   | MaybeMapB
   | ListMapB
   | NothingB
@@ -23,9 +28,6 @@ type builtin =
   | ListAllB
   | ListAll2B
   | UpdateB
-
-type id = Id of string | TyId of string | FunId of string | BuiltIn of builtin
-type literal = BoolL of bool | NatL of int | TextL of string
 
 type pat =
   | VarP of id

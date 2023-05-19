@@ -28,7 +28,7 @@ let cmpop = function
   | LeOp -> "≤"
   | GeOp -> "≥"
 
-let builtin = function
+let rec builtin = function
   | Agda.SetB -> "Set"
   | BoolB -> "Bool"
   | NatB -> "ℕ"
@@ -43,8 +43,9 @@ let builtin = function
   | JustB -> "just"
   | ConsB -> "_∷_"
   | NilB -> "[]"
-  | CompB i -> "_++ty-" ^ i ^ "_"
+  | CompB i -> "_++" ^ id i ^ "_"
   | ConcatB -> "_++_"
+  | MaybeChoiceB -> "_<∣>_"
   | MaybeMapB -> "maybeMap"
   | ListMapB -> "map"
   | NothingB -> "nothing"
@@ -54,7 +55,7 @@ let builtin = function
   | ListAll2B -> "Pointwise"
   | UpdateB -> "_[_]∷=_"
 
-let id = function
+and id = function
   | Agda.Id str -> make_safe str
   | Agda.TyId str -> make_safe ("ty-" ^ str)
   | Agda.FunId str -> make_safe ("$" ^ str)
@@ -157,9 +158,7 @@ module Render = struct
   let rec decl_def = function
     | Agda.DefD (i, t, _cls) -> id i ^ " : " ^ exp t
     | Agda.DataD (i, e, _cs) -> "data " ^ id i ^ " : " ^ exp e
-    | Agda.RecordD (i, e, _fs) ->
-        "record " ^ id i ^ " : " ^ exp e ^ "\n" ^ "_++" ^ id i ^ "_ : " ^ id i
-        ^ " -> " ^ id i ^ " -> " ^ id i
+    | Agda.RecordD (i, e, _fs) -> "record " ^ id i ^ " : " ^ exp e
     | Agda.MutualD defs -> String.concat "\n" (List.map decl_def defs)
 
   and def_def = function
@@ -170,7 +169,6 @@ module Render = struct
     | Agda.RecordD (i, _, fs) ->
         "record " ^ id i ^ " where\n  field\n    "
         ^ (List.map field fs |> String.concat "\n    ")
-        ^ "\n" ^ "_++" ^ id i ^ "_ = {!   !}"
     | Agda.MutualD defs -> String.concat "\n" (List.map def_def defs)
 
   let def d = decl_def d ^ "\n" ^ def_def d

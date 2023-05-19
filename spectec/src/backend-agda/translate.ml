@@ -2,9 +2,13 @@ module Translate = struct
   open Util.Source
   open Il
 
-  type _env = unit
+  type env = { records_with_comp : Agda.id list }
 
-  let initial_env = ()
+  let initial_env = { records_with_comp = [] }
+
+  let add_record_with_comp env t =
+    { records_with_comp = t :: env.records_with_comp }
+
   let id i = Agda.Id i.it
   let tyid i = Agda.TyId i.it
   let funid i = Agda.FunId i.it
@@ -57,10 +61,8 @@ module Translate = struct
     | ExtE (_e1, _p, _e2) -> YetE ("ExtE: " ^ Print.string_of_exp e)
     | StrE efs -> StrE (List.map (fun (f, e) -> (atom f, exp env e)) efs)
     | DotE (e1, a) -> DotE (exp env e1, record_id e1, atom a)
-    | CompE (e1, e2) -> (
-        match record_id e1 with
-        | Agda.TyId i -> builtin_infix (CompB i) (exp env e1) (exp env e2)
-        | _ -> assert false)
+    | CompE (e1, e2) ->
+        builtin_infix (CompB (record_id e1)) (exp env e1) (exp env e2)
     | LenE e -> builtin_unary LengthB (exp env e)
     | TupE es -> TupleE (List.map (exp env) es)
     | MixE (_op, e1) ->
@@ -141,26 +143,64 @@ module Translate = struct
 
   let typefield env (a, t, _hints) = (atom a, (typ env) t)
 
-  let deftyp env x (dt : Ast.deftyp) : Agda.def =
+  exception NoComp
+
+  let record_comp env x tfs =
+    let x1 = Agda.Id "x1" in
+    let x2 = Agda.Id "x2" in
+    let field (a, t, _) =
+      let op =
+        match typ env t with
+        | ApplyE (VarE (BuiltIn MaybeB), _) -> Agda.MaybeChoiceB
+        | ApplyE (VarE (BuiltIn ListB), _) -> Agda.ConcatB
+        | VarE t when List.mem t env.records_with_comp -> Agda.CompB t
+        | _ -> raise NoComp
+      in
+      ( atom a,
+        Agda.(
+          builtin_mixfix op
+            [ DotE (VarE x1, x, atom a); DotE (VarE x2, x, atom a) ]) )
+    in
+    try
+      Some
+        (Agda.DefD
+           ( builtin (CompB x),
+             ArrowE (Agda.VarE x, ArrowE (Agda.VarE x, Agda.VarE x)),
+             [ ([ VarP x1; VarP x2 ], StrE (List.map field tfs)) ] ))
+    with NoComp -> None
+
+  let deftyp env x (dt : Ast.deftyp) =
     match dt.it with
-    | AliasT ty -> DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ])
+    | AliasT ty ->
+        ([ Agda.DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ]) ], env)
     | NotationT (_op, ty) ->
-        DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ])
-    | StructT tfs ->
-        RecordD (tyid x, builtin_const SetB, List.map (typefield env) tfs)
+        ([ DefD (tyid x, builtin_const SetB, [ ([], (typ env) ty) ]) ], env)
+    | StructT tfs -> (
+        let t = tyid x in
+        let record_def =
+          Agda.RecordD (t, builtin_const SetB, List.map (typefield env) tfs)
+        in
+
+        match record_comp env t tfs with
+        | None -> ([ record_def ], env)
+        | Some comp_def -> ([ record_def; comp_def ], add_record_with_comp env t)
+        )
     | VariantT tcs ->
-        DataD
-          ( tyid x,
-            builtin_const SetB,
-            List.map
-              (fun (a, t, _hints) ->
-                ( atom a,
-                  [],
-                  (match t.it with
-                  | Ast.TupT ts -> List.map (typ env) ts
-                  | _ -> [ typ env t ]),
-                  Agda.VarE (tyid x) ))
-              tcs )
+        ( [
+            DataD
+              ( tyid x,
+                builtin_const SetB,
+                List.map
+                  (fun (a, t, _hints) ->
+                    ( atom a,
+                      [],
+                      (match t.it with
+                      | Ast.TupT ts -> List.map (typ env) ts
+                      | _ -> [ typ env t ]),
+                      Agda.VarE (tyid x) ))
+                  tcs );
+          ],
+          env )
 
   let clause env (cls : Ast.clause) =
     let (DefD (_binds, p, e, premises)) = cls.it in
@@ -204,27 +244,38 @@ module Translate = struct
       premises ps,
       Agda.ApplyE (rel, exp env e) )
 
-  let rec def env (d : Ast.def) : Agda.def list =
+  let rec def env (d : Ast.def) =
     match d.it with
-    | SynD (id, dt) -> [ deftyp env id dt ]
+    | SynD (id, dt) -> deftyp env id dt
     | RelD (x, _op, ty, rules) ->
-        [
-          DataD
-            ( tyid x,
-              ArrowE ((typ env) ty, builtin_const SetB),
-              List.map (rule env (VarE (tyid x))) rules );
-        ]
+        ( [
+            DataD
+              ( tyid x,
+                ArrowE ((typ env) ty, builtin_const SetB),
+                List.map (rule env (VarE (tyid x))) rules );
+          ],
+          env )
     | DecD (i, tin, tout, clss) ->
-        [
-          DefD
-            ( funid i,
-              ArrowE ((typ env) tin, (typ env) tout),
-              List.map (clause env) clss );
-        ]
-    | RecD defs -> [ MutualD (script defs) ]
-    | HintD _ -> []
+        ( [
+            DefD
+              ( funid i,
+                ArrowE ((typ env) tin, (typ env) tout),
+                List.map (clause env) clss );
+          ],
+          env )
+    | RecD defs ->
+        let defs', env = script env defs in
+        ([ MutualD defs' ], env)
+    | HintD _ -> ([], env)
 
-  and script sc = List.concat_map (def initial_env) sc
+  and script env sc =
+    List.fold_left
+      (fun (defs, env) d ->
+        let defs', env' = def env d in
+        (defs @ defs', env'))
+      ([], env) sc
 end
 
-let script = Translate.script
+let script sc =
+  let sc', _env = Translate.script Translate.initial_env sc in
+  sc'

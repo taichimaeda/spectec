@@ -382,7 +382,6 @@ data ty-testfuse where
     ty-testfuse
 
 record ty-context : Set
-_++ty-context_ : ty-context -> ty-context -> ty-context
 record ty-context where
   field
     FUNC : List ty-functype
@@ -390,7 +389,9 @@ record ty-context where
     LOCAL : List ty-valtype
     LABEL : List ty-resulttype
     RETURNS : Maybe ty-resulttype
-_++ty-context_ = {!   !}
+
+_++ty-context_ : ty-context → (ty-context → ty-context)
+_++ty-context_ x1 x2 = record { FUNC = (ty-context.FUNC x1) ++ (ty-context.FUNC x2) ; GLOBAL = (ty-context.GLOBAL x1) ++ (ty-context.GLOBAL x2) ; LOCAL = (ty-context.LOCAL x1) ++ (ty-context.LOCAL x2) ; LABEL = (ty-context.LABEL x1) ++ (ty-context.LABEL x2) ; RETURNS = (ty-context.RETURNS x1) <∣> (ty-context.RETURNS x2) }
 
 data ty-Functype-ok : ty-functype → Set
 data ty-Functype-ok where
@@ -679,12 +680,13 @@ $default- I32 = just (CONST I32 0)
 $default- x = nothing
 
 record ty-moduleinst : Set
-_++ty-moduleinst_ : ty-moduleinst -> ty-moduleinst -> ty-moduleinst
 record ty-moduleinst where
   field
     FUNC : List ty-funcaddr
     GLOBAL : List ty-globaladdr
-_++ty-moduleinst_ = {!   !}
+
+_++ty-moduleinst_ : ty-moduleinst → (ty-moduleinst → ty-moduleinst)
+_++ty-moduleinst_ x1 x2 = record { FUNC = (ty-moduleinst.FUNC x1) ++ (ty-moduleinst.FUNC x2) ; GLOBAL = (ty-moduleinst.GLOBAL x1) ++ (ty-moduleinst.GLOBAL x2) }
 
 ty-funcinst : Set
 ty-funcinst  = (ty-moduleinst × ty-func)
@@ -693,20 +695,22 @@ ty-globalinst : Set
 ty-globalinst  = ty-val
 
 record ty-store : Set
-_++ty-store_ : ty-store -> ty-store -> ty-store
 record ty-store where
   field
     FUNC : List ty-funcinst
     GLOBAL : List ty-globalinst
-_++ty-store_ = {!   !}
+
+_++ty-store_ : ty-store → (ty-store → ty-store)
+_++ty-store_ x1 x2 = record { FUNC = (ty-store.FUNC x1) ++ (ty-store.FUNC x2) ; GLOBAL = (ty-store.GLOBAL x1) ++ (ty-store.GLOBAL x2) }
 
 record ty-frame : Set
-_++ty-frame_ : ty-frame -> ty-frame -> ty-frame
 record ty-frame where
   field
     LOCAL : List ty-val
     MODULE : ty-moduleinst
-_++ty-frame_ = {!   !}
+
+_++ty-frame_ : ty-frame → (ty-frame → ty-frame)
+_++ty-frame_ x1 x2 = record { LOCAL = (ty-frame.LOCAL x1) ++ (ty-frame.LOCAL x2) ; MODULE = (ty-frame.MODULE x1) ++ty-moduleinst (ty-frame.MODULE x2) }
 
 ty-state : Set
 ty-state  = (ty-store × ty-frame)
