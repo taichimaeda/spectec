@@ -135,6 +135,7 @@ and t_path env x = { x with it = t_path' env x.it }
 let rec t_prem' env = function
   | RulePr (id, mixop, exp) -> RulePr (id, mixop, t_exp env exp)
   | IfPr e -> IfPr (t_exp env e)
+  | LetPr (e1, e2) -> LetPr (t_exp env e1, t_exp env e2)
   | ElsePr -> ElsePr
   | IterPr (prem, iterexp) -> IterPr (t_prem env prem, t_iterexp env iterexp)
   | NegPr prem -> NegPr (t_prem env prem)
@@ -198,13 +199,15 @@ let insert_injections env (def : def) : def list =
     let sup_ty = VarT sup $ no_region in
     let (real_id, cases) = lookup env sub in
     let clauses = List.map (fun (a, arg_typ, _hints) ->
-      if arg_typ.it = TupT []
-      then
-        let unitE = TupE [] $$ no_region % arg_typ in
-        DefD ([],
-          CaseE (a, unitE) $$ no_region % (VarT real_id $ no_region),
-          CaseE (a, unitE) $$ no_region % sup_ty, []) $ no_region
-      else
+      match arg_typ.it with
+      | TupT ts ->
+        let binds = List.mapi (fun i arg_typ_i -> ("x" ^ string_of_int i $ no_region, arg_typ_i, [])) ts in
+        let xes = List.map (fun (x, arg_typ_i, _) -> VarE x $$ no_region % arg_typ_i) binds in
+        let xe = TupE xes $$ no_region % arg_typ in
+        DefD (binds,
+          CaseE (a, xe) $$ no_region % (VarT real_id $ no_region),
+          CaseE (a, xe) $$ no_region % sup_ty, []) $ no_region
+      | _ ->
         let x = "x" $ no_region in
         let xe = VarE x $$ no_region % arg_typ in
         DefD ([(x, arg_typ, [])],

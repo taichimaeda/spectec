@@ -202,6 +202,7 @@ let rec render_prem (prem : premise) =
     end
     | ElsePr -> error prem.at "ElsePr encountered. Did the SubE elimination pass run?"
     | NegPr prem -> "Not" $$ render_prem prem
+    | LetPr _ -> error prem.at "LetPr not supported"
 
 let rec render_def (d : def) =
   match d.it with

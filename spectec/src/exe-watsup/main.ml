@@ -34,8 +34,10 @@ let print_all_il = ref false
 let pass_sub = ref false
 let pass_totalize = ref false
 let pass_unthe = ref false
+let pass_wild = ref false
 let pass_sideconditions = ref false
 let pass_else_elim = ref false
+let pass_animate = ref false
 
 
 (* Argument parsing *)
@@ -55,7 +57,7 @@ let argspec = Arg.align
   "-p", Arg.Set dst, " Patch files";
   "-d", Arg.Set dry, " Dry run (when -p) ";
   "-l", Arg.Set log, " Log execution steps";
-  "-w", Arg.Set warn, " Warn about unsed or multiply used splices";
+  "-w", Arg.Set warn, " Warn about unused or multiply used splices";
 
   "--check", Arg.Unit (fun () -> target := Check), " Check only";
   "--latex", Arg.Unit (fun () -> target := Latex Backend_latex.Config.latex),
@@ -67,15 +69,17 @@ let argspec = Arg.align
   "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
 
 
-  "--print-il", Arg.Set print_elab_il, "Print il (after elaboration)";
-  "--print-final-il", Arg.Set print_final_il, "Print final il";
-  "--print-all-il", Arg.Set print_all_il, "Print il after each step";
+  "--print-il", Arg.Set print_elab_il, " Print il (after elaboration)";
+  "--print-final-il", Arg.Set print_final_il, " Print final il";
+  "--print-all-il", Arg.Set print_all_il, " Print il after each step";
 
-  "--sub", Arg.Set pass_sub, "Synthesize explicit subtype coercions";
-  "--totalize", Arg.Set pass_totalize, "Run function totalization";
-  "--the-elimination", Arg.Set pass_unthe, "Eliminate the ! operator in relations";
-  "--sideconditions", Arg.Set pass_sideconditions, "Infer side conditoins";
+  "--sub", Arg.Set pass_sub, " Synthesize explicit subtype coercions";
+  "--totalize", Arg.Set pass_totalize, " Run function totalization";
+  "--the-elimination", Arg.Set pass_unthe, " Eliminate the ! operator in relations";
+  "--wildcards", Arg.Set pass_wild, " Eliminate wildcards and equivalent expressions";
+  "--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions";
   "--else-elimination", Arg.Set pass_else_elim, "Eliminate otherwise/else";
+  "--animate", Arg.Set pass_animate, " Animate equality conditions";
 
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
@@ -141,9 +145,31 @@ let () =
       )
     in
 
+    let il = if not !pass_wild || !target = Lean4 then il else
+      ( log "Wildcard elimination";
+        let il = Middlend.Wild.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
     let il = if not (!pass_else_elim || !target = Lean4) then il else
       ( log "Else elimination";
         let il = Middlend.Else.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_animate then il else
+      ( log "Animate";
+        let il = Middlend.Animate.transform il in
         if !print_all_il then
           Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";

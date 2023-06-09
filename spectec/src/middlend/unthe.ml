@@ -15,7 +15,7 @@ open Il.Ast
 
 (* Errors *)
 
-let error at msg = Source.error at "sideconditions" msg
+let error at msg = Source.error at "unthe" msg
 
 (* We pull out fresh variables and equating side conditions. *)
 
@@ -174,6 +174,7 @@ and t_prem' n prem : eqns * premise' =
   | RulePr (a, b, exp) ->
     unary t_exp n exp (fun exp' -> RulePr (a, b, exp'))
   | IfPr e -> unary t_exp n e (fun e' -> IfPr e')
+  | LetPr (e1, e2) -> binary t_exp t_exp n (e1, e2) (fun (e1', e2') -> LetPr (e1', e2'))
   | ElsePr -> [], prem
   | IterPr (prem, iterexp) ->
     let eqns1, prem' = t_prem n prem in

@@ -1,5 +1,13 @@
 (library
   (name middlend)
   (libraries util il)
-  (modules sub totalize unthe sideconditions else)
+  (modules
+    sub
+    totalize
+    wild
+    unthe
+    sideconditions
+    else
+    animate
+  )
 )
