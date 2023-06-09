@@ -166,11 +166,7 @@ def «$valtype_fn» : Fn -> Valtype
 
 
 
-@[reducible] def Mutflag := /- mixop: MUT -/ Unit
-
-
-
-@[reducible] def Globaltype := /- mixop: `%?%` -/ ((Option Mutflag) × Valtype)
+@[reducible] def Globaltype := /- mixop: `MUT%?%` -/ ((Option Unit) × Valtype)
 
 
 
@@ -712,9 +708,9 @@ inductive Instr_ok : (Context × Instr × Functype) -> Prop where
     (x < C.LOCAL.length) -> 
     ((C.LOCAL.get! x) == t) -> 
     (Instr_ok (C, (Instr.LOCAL_TEE x), ([t], [t])))
-  | global_get (C : Context) («mut» : (Option Mutflag)) (t : Valtype) (x : Idx) : 
+  | global_get (C : Context) (t : Valtype) (x : Idx) (w0 : (Option Unit)) : 
     (x < C.GLOBAL.length) -> 
-    ((C.GLOBAL.get! x) == («mut», t)) -> 
+    ((C.GLOBAL.get! x) == (w0, t)) -> 
     (Instr_ok (C, (Instr.GLOBAL_GET x), ([], [t])))
   | global_set (C : Context) (t : Valtype) (x : Idx) : 
     (x < C.GLOBAL.length) -> 
@@ -871,9 +867,9 @@ inductive Func_ok : (Context × Func × Functype) -> Prop where
 
 
 inductive Global_ok : (Context × Global × Globaltype) -> Prop where
-  | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) : 
+  | rule_0 (C : Context) (expr : Expr) (gt : Globaltype) (t : Valtype) (w0 : (Option Unit)) : 
     (Globaltype_ok gt) -> 
-    (gt == ((some ()), t)) -> 
+    (gt == (w0, t)) -> 
     (Expr_ok_const (C, expr, t)) -> 
     (Global_ok (C, (gt, expr), gt))
 

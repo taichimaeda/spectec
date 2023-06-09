@@ -145,7 +145,7 @@ let () =
       )
     in
 
-    let il = if not !pass_wild || !target = Lean4 then il else
+    let il = if not (!pass_wild || !target = Lean4) then il else
       ( log "Wildcard elimination";
         let il = Middlend.Wild.transform il in
         if !print_all_il then

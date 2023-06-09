@@ -58,10 +58,8 @@ syntax resulttype hint(desc "result type") =
 
 syntax limits hint(desc "limits") =
   `[u32 .. u32]
-syntax mutflag hint(desc "mutability flag") =
-  MUT
 syntax globaltype hint(desc "global type") =
-  mutflag? valtype
+  MUT? valtype
 syntax functype hint(desc "function type") =
   resulttype -> resulttype
 syntax tabletype hint(desc "table type") =
@@ -78,7 +76,6 @@ syntax externtype hint(desc "external type") =
 var lim : limits
 var ft : functype
 var gt : globaltype
-var mut : mutflag
 var tt : tabletype
 var mt : memtype
 var xt : externtype

@@ -280,7 +280,7 @@ rule Instr_ok/local.tee:
 
 rule Instr_ok/global.get:
   C |- GLOBAL.GET x : epsilon -> t
-  -- if C.GLOBAL[x] = mut? t
+  -- if C.GLOBAL[x] = MUT? t
 
 rule Instr_ok/global.set:
   C |- GLOBAL.SET x : t -> epsilon

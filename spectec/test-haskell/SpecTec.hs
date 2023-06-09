@@ -133,11 +133,7 @@ type Limits = {- mixop: `[%..%]` -} (U32, U32)
 
 
 
-type Mutflag = {- mixop: MUT -} ()
-
-
-
-type Globaltype = {- mixop: `%?%` -} ((Maybe Mutflag), Valtype)
+type Globaltype = {- mixop: `MUT%?%` -} ((Maybe ()), Valtype)
 
 
 
