@@ -754,7 +754,7 @@ data Admininstr
  | Admininstr_TRAP
 
 admininstr_globalinst :: Globalinst -> Admininstr
-admininstr_globalinst (Val_CONST x) = (Admininstr_CONST x)
+admininstr_globalinst (Val_CONST (x0, x1)) = (Admininstr_CONST (x0, x1))
 admininstr_globalinst (Val_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_globalinst (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_globalinst (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
@@ -764,22 +764,22 @@ admininstr_instr Instr_UNREACHABLE = Admininstr_UNREACHABLE
 admininstr_instr Instr_NOP = Admininstr_NOP
 admininstr_instr Instr_DROP = Admininstr_DROP
 admininstr_instr (Instr_SELECT x) = (Admininstr_SELECT x)
-admininstr_instr (Instr_BLOCK x) = (Admininstr_BLOCK x)
-admininstr_instr (Instr_LOOP x) = (Admininstr_LOOP x)
-admininstr_instr (Instr_IF x) = (Admininstr_IF x)
+admininstr_instr (Instr_BLOCK (x0, x1)) = (Admininstr_BLOCK (x0, x1))
+admininstr_instr (Instr_LOOP (x0, x1)) = (Admininstr_LOOP (x0, x1))
+admininstr_instr (Instr_IF (x0, x1, x2)) = (Admininstr_IF (x0, x1, x2))
 admininstr_instr (Instr_BR x) = (Admininstr_BR x)
 admininstr_instr (Instr_BR_IF x) = (Admininstr_BR_IF x)
-admininstr_instr (Instr_BR_TABLE x) = (Admininstr_BR_TABLE x)
+admininstr_instr (Instr_BR_TABLE (x0, x1)) = (Admininstr_BR_TABLE (x0, x1))
 admininstr_instr (Instr_CALL x) = (Admininstr_CALL x)
-admininstr_instr (Instr_CALL_INDIRECT x) = (Admininstr_CALL_INDIRECT x)
+admininstr_instr (Instr_CALL_INDIRECT (x0, x1)) = (Admininstr_CALL_INDIRECT (x0, x1))
 admininstr_instr Instr_RETURN = Admininstr_RETURN
-admininstr_instr (Instr_CONST x) = (Admininstr_CONST x)
-admininstr_instr (Instr_UNOP x) = (Admininstr_UNOP x)
-admininstr_instr (Instr_BINOP x) = (Admininstr_BINOP x)
-admininstr_instr (Instr_TESTOP x) = (Admininstr_TESTOP x)
-admininstr_instr (Instr_RELOP x) = (Admininstr_RELOP x)
-admininstr_instr (Instr_EXTEND x) = (Admininstr_EXTEND x)
-admininstr_instr (Instr_CVTOP x) = (Admininstr_CVTOP x)
+admininstr_instr (Instr_CONST (x0, x1)) = (Admininstr_CONST (x0, x1))
+admininstr_instr (Instr_UNOP (x0, x1)) = (Admininstr_UNOP (x0, x1))
+admininstr_instr (Instr_BINOP (x0, x1)) = (Admininstr_BINOP (x0, x1))
+admininstr_instr (Instr_TESTOP (x0, x1)) = (Admininstr_TESTOP (x0, x1))
+admininstr_instr (Instr_RELOP (x0, x1)) = (Admininstr_RELOP (x0, x1))
+admininstr_instr (Instr_EXTEND (x0, x1)) = (Admininstr_EXTEND (x0, x1))
+admininstr_instr (Instr_CVTOP (x0, x1, x2, x3)) = (Admininstr_CVTOP (x0, x1, x2, x3))
 admininstr_instr (Instr_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_instr (Instr_REF_FUNC x) = (Admininstr_REF_FUNC x)
 admininstr_instr Instr_REF_IS_NULL = Admininstr_REF_IS_NULL
@@ -793,8 +793,8 @@ admininstr_instr (Instr_TABLE_SET x) = (Admininstr_TABLE_SET x)
 admininstr_instr (Instr_TABLE_SIZE x) = (Admininstr_TABLE_SIZE x)
 admininstr_instr (Instr_TABLE_GROW x) = (Admininstr_TABLE_GROW x)
 admininstr_instr (Instr_TABLE_FILL x) = (Admininstr_TABLE_FILL x)
-admininstr_instr (Instr_TABLE_COPY x) = (Admininstr_TABLE_COPY x)
-admininstr_instr (Instr_TABLE_INIT x) = (Admininstr_TABLE_INIT x)
+admininstr_instr (Instr_TABLE_COPY (x0, x1)) = (Admininstr_TABLE_COPY (x0, x1))
+admininstr_instr (Instr_TABLE_INIT (x0, x1)) = (Admininstr_TABLE_INIT (x0, x1))
 admininstr_instr (Instr_ELEM_DROP x) = (Admininstr_ELEM_DROP x)
 admininstr_instr Instr_MEMORY_SIZE = Admininstr_MEMORY_SIZE
 admininstr_instr Instr_MEMORY_GROW = Admininstr_MEMORY_GROW
@@ -802,8 +802,8 @@ admininstr_instr Instr_MEMORY_FILL = Admininstr_MEMORY_FILL
 admininstr_instr Instr_MEMORY_COPY = Admininstr_MEMORY_COPY
 admininstr_instr (Instr_MEMORY_INIT x) = (Admininstr_MEMORY_INIT x)
 admininstr_instr (Instr_DATA_DROP x) = (Admininstr_DATA_DROP x)
-admininstr_instr (Instr_LOAD x) = (Admininstr_LOAD x)
-admininstr_instr (Instr_STORE x) = (Admininstr_STORE x)
+admininstr_instr (Instr_LOAD (x0, x1, x2, x3)) = (Admininstr_LOAD (x0, x1, x2, x3))
+admininstr_instr (Instr_STORE (x0, x1, x2, x3)) = (Admininstr_STORE (x0, x1, x2, x3))
 
 admininstr_ref :: Ref -> Admininstr
 admininstr_ref (Ref_REF_NULL x) = (Admininstr_REF_NULL x)
@@ -811,7 +811,7 @@ admininstr_ref (Ref_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_ref (Ref_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
 
 admininstr_val :: Val -> Admininstr
-admininstr_val (Val_CONST x) = (Admininstr_CONST x)
+admininstr_val (Val_CONST (x0, x1)) = (Admininstr_CONST (x0, x1))
 admininstr_val (Val_REF_NULL x) = (Admininstr_REF_NULL x)
 admininstr_val (Val_REF_FUNC_ADDR x) = (Admininstr_REF_FUNC_ADDR x)
 admininstr_val (Val_REF_HOST_ADDR x) = (Admininstr_REF_HOST_ADDR x)
@@ -896,12 +896,12 @@ with_memext ((s, f), x, b) = (undefined {- s[MEM_store[f.MODULE_frame.MEM_module
 
 
 with_elem :: (State, Elemidx, [Ref]) -> State
-with_elem ((s, f), x, r) = (undefined {- s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}] -}, f)
+with_elem ((s, f), x, r) = (undefined {- s[ELEM_store[f.MODULE_frame.ELEM_moduleinst[x]] = r*{r}] -}, f)
 
 
 
 with_data :: (State, Dataidx, [Byte]) -> State
-with_data ((s, f), x, b) = (undefined {- s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}] -}, f)
+with_data ((s, f), x, b) = (undefined {- s[DATA_store[f.MODULE_frame.DATA_moduleinst[x]] = b*{b}] -}, f)
 
 
 
