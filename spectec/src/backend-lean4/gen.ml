@@ -129,6 +129,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | UnE (MinusOp, e1)      -> parens ("0 - " ^ render_exp e1)
   | BinE (AddOp, e1, e2)   -> parens (render_exp e1 ^ " + " ^ render_exp e2)
   | BinE (SubOp, e1, e2)   -> parens (render_exp e1 ^ " - " ^ render_exp e2)
+  | BinE (MulOp, e1, e2)   -> parens (render_exp e1 ^ " * " ^ render_exp e2)
   | BinE (ExpOp, e1, e2)   -> parens ("Nat.pow" $$ render_exp e1 $$ render_exp e2)
   | BinE (DivOp, e1, e2)   -> parens ("Nat.div" $$ render_exp e1 $$ render_exp e2)
   | BinE (AndOp, e1, e2)   -> parens (render_exp e1 ^ " && "  ^ render_exp e2)
@@ -156,7 +157,7 @@ and render_path (path : path) old_val (k : string -> string) : string = match pa
      "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
     )
   | SliceP (_path', _e1, _e2) ->
-    "default /- TODO -/"
+    "default /- TODO: SliceP -/"
   | IdxP (path', idx_exp) ->
     render_path path' old_val (fun old_val ->
       "(" ^ old_val ^ ".upd " ^ render_exp idx_exp ^ " " ^ k (render_idx old_val idx_exp) ^ ")"

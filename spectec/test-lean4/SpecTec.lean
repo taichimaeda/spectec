@@ -1345,7 +1345,7 @@ def «$with_tableext» : (State × Tableidx × (List Ref)) -> State
 
 
 def «$with_mem» : (State × Tableidx × Nat × Nat × (List Byte)) -> State
-  | ((s, f), x, i, j, b) => (default /- TODO -/, f)
+  | ((s, f), x, i, j, b) => (default /- TODO: SliceP -/, f)
 
 
 
@@ -1700,7 +1700,7 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
     ((«$bytes_» (n, c)) == default /- $mem(z, 0)[(i + n_O) : (n / 8)] -/) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, (some (n, sx)), n_A, n_O))]), [(Admininstr.CONST (nt, («$ext» (n, o0, sx, c))))]))
   | memory_size (n : N) (z : State) : 
-    (default /- ((n * 64) * $Ki) -/ == («$mem» (z, 0)).length) -> 
+    (((n * 64) * («$Ki» ())) == («$mem» (z, 0)).length) -> 
     (Step_read ((z, [Admininstr.MEMORY_SIZE]), [(Admininstr.CONST (Numtype.I32, n))]))
   | memory_fill_trap (i : Nat) (n : N) (val : Val) (z : State) : 
     ((i + n) > («$mem» (z, 0)).length) -> 
@@ -1778,7 +1778,7 @@ inductive Step : (Config × Config) -> Prop where
     (b == («$bytes_» (n, («$wrap_» ((o0, n), c))))) -> 
     (Step ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.CONST (nt, c)), (Admininstr.STORE (nt, (some n), n_A, n_O))]), ((«$with_mem» (z, 0, (i + n_O), (((Nat.div n) 8)), b)), [])))
   | memory_grow_succeed (n : N) (z : State) : 
-    (Step ((z, [(Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_GROW]), ((«$with_memext» (z, 0, [0])), [(Admininstr.CONST (Numtype.I32, (((Nat.div («$mem» (z, 0)).length) default /- (64 * $Ki) -/))))])))
+    (Step ((z, [(Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_GROW]), ((«$with_memext» (z, 0, [0])), [(Admininstr.CONST (Numtype.I32, (((Nat.div («$mem» (z, 0)).length) (64 * («$Ki» ()))))))])))
   | memory_grow_fail (n : N) (z : State) : 
     (Step ((z, [(Admininstr.CONST (Numtype.I32, n)), Admininstr.MEMORY_GROW]), (z, [(Admininstr.CONST (Numtype.I32, (0 - 1)))])))
   | data_drop (x : Idx) (z : State) : 
