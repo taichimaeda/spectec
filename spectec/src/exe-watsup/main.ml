@@ -18,6 +18,26 @@ type target =
 
 let target = ref (Latex Backend_latex.Config.latex)
 
+type pass =
+  | Sub
+  | Totalize
+  | Unthe
+  | Wild
+  | Sideconditions
+  | Else
+  | Animate
+
+(* This list declares the intended order of passes.
+
+Because passes have dependencies, and because some flags enable multiple
+passers (--all-passes, some targets), we do _not_ want to use the order of
+flags on the command line.
+*)
+let all_passes = [ Sub; Totalize; Unthe; Wild; Sideconditions; Else; Animate ]
+(* Some backeneds require certain passes *)
+let haskell_passes = [ Sub ]
+let lean4_passes = [ Sub; Totalize; Unthe; Wild; Sideconditions; Else]
+
 let log = ref false  (* log execution steps *)
 let dst = ref false  (* patch files *)
 let dry = ref false  (* dry run for patching *)
@@ -31,14 +51,39 @@ let print_elab_il = ref false
 let print_final_il = ref false
 let print_all_il = ref false
 
-let pass_sub = ref false
-let pass_totalize = ref false
-let pass_unthe = ref false
-let pass_wild = ref false
-let pass_sideconditions = ref false
-let pass_else_elim = ref false
-let pass_animate = ref false
+module PS = Set.Make(struct type t = pass let compare = compare; end)
+let selected_passes = ref (PS.empty)
+let enable_pass pass = selected_passes := PS.add pass !selected_passes
+let enable_passes = List.iter enable_pass
 
+(* Il pass metadata *)
+
+let pass_flag = function
+  | Sub -> "sub"
+  | Totalize -> "totalize"
+  | Unthe -> "the-elimination"
+  | Wild -> "wildcards"
+  | Sideconditions -> "sideconditions"
+  | Else -> "else-elimination"
+  | Animate -> "animate"
+
+let pass_desc = function
+  | Sub -> "Synthesize explicit subtype coercions"
+  | Totalize -> "Run function totalization"
+  | Unthe -> "Eliminate the ! operator in relations"
+  | Wild -> "Eliminate wildcards and equivalent expressions"
+  | Sideconditions -> "Infer side conditions"
+  | Else -> "Eliminate otherwise/else"
+  | Animate -> "Animate equality conditions"
+
+let run_pass : pass -> Il.Ast.script -> Il.Ast.script = function
+  | Sub -> Middlend.Sub.transform
+  | Totalize -> Middlend.Totalize.transform
+  | Unthe -> Middlend.Unthe.transform
+  | Wild -> Middlend.Wild.transform
+  | Sideconditions -> Middlend.Sideconditions.transform
+  | Else -> Middlend.Else.transform
+  | Animate -> Middlend.Animate.transform
 
 (* Argument parsing *)
 
@@ -49,6 +94,9 @@ let usage = "Usage: " ^ name ^ " [option] [file ...] [-p file ...]"
 
 let add_arg source =
   let args = if !dst then dsts else srcs in args := !args @ [source]
+
+let pass_argspec pass : Arg.key * Arg.spec * Arg.doc =
+  "--" ^ pass_flag pass, Arg.Unit (fun () -> enable_pass pass), " " ^ pass_desc pass
 
 let argspec = Arg.align
 [
@@ -65,21 +113,15 @@ let argspec = Arg.align
   "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
     " Generate Latex for Sphinx";
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
-  "--haskell", Arg.Unit (fun () -> target := Haskell), " Produce Haskell code";
-  "--lean4", Arg.Unit (fun () -> target := Lean4), " Produce Lean4 code";
+  "--haskell", Arg.Unit (fun () -> target := Haskell; enable_passes haskell_passes ), " Produce Haskell code";
+  "--lean4", Arg.Unit (fun () -> target := Lean4; enable_passes lean4_passes), " Produce Lean4 code";
 
 
   "--print-il", Arg.Set print_elab_il, " Print il (after elaboration)";
   "--print-final-il", Arg.Set print_final_il, " Print final il";
   "--print-all-il", Arg.Set print_all_il, " Print il after each step";
-
-  "--sub", Arg.Set pass_sub, " Synthesize explicit subtype coercions";
-  "--totalize", Arg.Set pass_totalize, " Run function totalization";
-  "--the-elimination", Arg.Set pass_unthe, " Eliminate the ! operator in relations";
-  "--wildcards", Arg.Set pass_wild, " Eliminate wildcards and equivalent expressions";
-  "--sideconditions", Arg.Set pass_sideconditions, " Infer side conditions";
-  "--else-elimination", Arg.Set pass_else_elim, "Eliminate otherwise/else";
-  "--animate", Arg.Set pass_animate, " Animate equality conditions";
+] @ List.map pass_argspec all_passes @ [
+  "--all-passes", Arg.Unit (fun () -> enable_passes all_passes)," Run all passes";
 
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
@@ -103,80 +145,17 @@ let () =
     log "IL Validation...";
     Il.Validation.valid il;
 
-    let il = if not (!pass_sub || !target = Haskell || !target = Lean4) then il else
-     ( log "Subtype injection...";
-       let il = Middlend.Sub.transform il in
-       if !print_all_il then
-         Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-       log "IL Validation...";
-       Il.Validation.valid il;
-       il
-    ) in
-
-    let il = if not (!pass_totalize || !target = Lean4) then il else
-      ( log "Function totalization...";
-        let il = Middlend.Totalize.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+    let il = List.fold_left (fun il pass ->
+      if PS.mem pass !selected_passes
+      then (
+        log ("Running pass " ^ pass_flag pass);
+        let il = run_pass pass il in
+        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
         log "IL Validation...";
         Il.Validation.valid il;
         il
-      )
-    in
-
-    let il = if not (!pass_unthe || !target = Lean4) then il else
-      ( log "Option projection eliminiation";
-        let il = Middlend.Unthe.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-        log "IL Validation...";
-        Il.Validation.valid il;
-        il
-      ) in
-
-    let il = if not (!pass_sideconditions || !target = Lean4) then il else
-      ( log "Side condition inference";
-        let il = Middlend.Sideconditions.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-        log "IL Validation...";
-        Il.Validation.valid il;
-        il
-      )
-    in
-
-    let il = if not (!pass_wild || !target = Lean4) then il else
-      ( log "Wildcard elimination";
-        let il = Middlend.Wild.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-        log "IL Validation...";
-        Il.Validation.valid il;
-        il
-      )
-    in
-
-    let il = if not (!pass_else_elim || !target = Lean4) then il else
-      ( log "Else elimination";
-        let il = Middlend.Else.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-        log "IL Validation...";
-        Il.Validation.valid il;
-        il
-      )
-    in
-
-    let il = if not !pass_animate then il else
-      ( log "Animate";
-        let il = Middlend.Animate.transform il in
-        if !print_all_il then
-          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
-        log "IL Validation...";
-        Il.Validation.valid il;
-        il
-      )
-    in
+      ) else il
+    ) il all_passes in
 
     if !print_final_il && not !print_all_il then
       Printf.printf "%s\n%!" (Il.Print.string_of_script il);
