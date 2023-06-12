@@ -161,7 +161,7 @@ data Externtype
  = Externtype_GLOBAL Globaltype
  | Externtype_FUNC Functype
  | Externtype_TABLE Tabletype
- | Externtype_MEMORY Memtype
+ | Externtype_MEM Memtype
 
 
 
@@ -356,7 +356,7 @@ data Externuse
  = Externuse_FUNC Funcidx
  | Externuse_GLOBAL Globalidx
  | Externuse_TABLE Tableidx
- | Externuse_MEMORY Memidx
+ | Externuse_MEM Memidx
 
 
 
@@ -368,7 +368,7 @@ type Import = {- mixop: IMPORT -} (Name, Name, Externtype)
 
 
 
-type Module = {- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], [Start], [Export])
+type Module = {- mixop: `MODULE%*%*%*%*%*%*%*%?%*` -} ([Import], [Func], [Global], [Table], [Mem], [Elem], [Data], (Maybe Start), [Export])
 
 
 

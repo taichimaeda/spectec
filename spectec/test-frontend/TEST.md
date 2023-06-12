@@ -106,12 +106,12 @@ syntax elemtype = reftype
 ;; 1-syntax.watsup:71.1-72.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:73.1-74.66
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
-  | MEMORY(memtype)
+  | MEM(memtype)
 
 ;; 1-syntax.watsup:86.1-86.44
 syntax sx =
@@ -303,12 +303,12 @@ syntax data = `DATA(*)%*%?`(byte**, datamode?)
 ;; 1-syntax.watsup:202.1-203.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
+;; 1-syntax.watsup:205.1-206.62
 syntax externuse =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
-  | MEMORY(memidx)
+  | MEM(memidx)
 
 ;; 1-syntax.watsup:207.1-208.24
 syntax export = EXPORT(name, externuse)
@@ -317,7 +317,7 @@ syntax export = EXPORT(name, externuse)
 syntax import = IMPORT(name, name, externtype)
 
 ;; 1-syntax.watsup:212.1-213.70
-syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
+syntax module = `MODULE%*%*%*%*%*%*%*%?%*`(import*, func*, global*, table*, mem*, elem*, data*, start?, export*)
 
 ;; 2-aux.watsup:3.1-3.14
 def Ki : nat
@@ -427,7 +427,7 @@ relation Externtype_ok: `|-%:OK`(externtype)
 
   ;; 3-typing.watsup:53.1-55.33
   rule mem {memtype : memtype}:
-    `|-%:OK`(MEMORY_externtype(memtype))
+    `|-%:OK`(MEM_externtype(memtype))
     -- Memtype_ok: `|-%:OK`(memtype)
 
 ;; 3-typing.watsup:61.1-61.65
@@ -500,7 +500,7 @@ relation Externtype_sub: `|-%<:%`(externtype, externtype)
 
   ;; 3-typing.watsup:115.1-117.34
   rule mem {mt_1 : memtype, mt_2 : memtype}:
-    `|-%<:%`(MEMORY_externtype(mt_1), MEMORY_externtype(mt_2))
+    `|-%<:%`(MEM_externtype(mt_1), MEM_externtype(mt_2))
     -- Memtype_sub: `|-%<:%`(mt_1, mt_2)
 
 ;; 3-typing.watsup:172.1-172.76
@@ -923,7 +923,7 @@ relation Externuse_ok: `%|-%:%`(context, externuse, externtype)
 
   ;; 3-typing.watsup:479.1-481.22
   rule mem {C : context, mt : memtype, x : idx}:
-    `%|-%:%`(C, MEMORY_externuse(x), MEMORY_externtype(mt))
+    `%|-%:%`(C, MEM_externuse(x), MEM_externtype(mt))
     -- if (C.MEM_context[x] = mt)
 
 ;; 3-typing.watsup:456.1-456.80
@@ -935,9 +935,9 @@ relation Export_ok: `%|-%:%`(context, export, externtype)
 
 ;; 3-typing.watsup:484.1-484.62
 relation Module_ok: `|-%:OK`(module)
-  ;; 3-typing.watsup:486.1-501.22
-  rule _ {C : context, data^n : data^n, elem* : elem*, export* : export*, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, import* : import*, mem* : mem*, mt* : memtype*, n : n, rt* : reftype*, start* : start*, table* : table*, tt* : tabletype*}:
-    `|-%:OK`(`MODULE%*%*%*%*%*%*%*%*%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data^n{data}, start*{start}, export*{export}))
+  ;; 3-typing.watsup:486.1-500.16
+  rule _ {C : context, data^n : data^n, elem* : elem*, export* : export*, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, import* : import*, mem* : mem*, mt* : memtype*, n : n, rt* : reftype*, start? : start?, table* : table*, tt* : tabletype*}:
+    `|-%:OK`(`MODULE%*%*%*%*%*%*%*%?%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data^n{data}, start?{start}, export*{export}))
     -- if (C = {FUNC ft*{ft}, GLOBAL gt*{gt}, TABLE tt*{tt}, MEM mt*{mt}, ELEM rt*{rt}, DATA OK^n{}, LOCAL [], LABEL [], RETURN ?()})
     -- (Func_ok: `%|-%:%`(C, func, ft))*{ft func}
     -- (Global_ok: `%|-%:%`(C, global, gt))*{global gt}
@@ -945,9 +945,8 @@ relation Module_ok: `|-%:OK`(module)
     -- (Mem_ok: `%|-%:%`(C, mem, mt))*{mem mt}
     -- (Elem_ok: `%|-%:%`(C, elem, rt))*{elem rt}
     -- (Data_ok: `%|-%:OK`(C, data))^n{data}
-    -- (Start_ok: `%|-%:OK`(C, start))*{start}
+    -- (Start_ok: `%|-%:OK`(C, start))?{start}
     -- if (|mem*{mem}| <= 1)
-    -- if (|start*{start}| <= 1)
 
 ;; 4-runtime.watsup:3.1-3.39
 syntax addr = nat
@@ -1698,7 +1697,7 @@ $$
 \mbox{(memory type)} & \mathit{memtype} &::=& \mathit{limits}~\mathsf{i{\scriptstyle8}} \\
 \mbox{(element type)} & \mathit{elemtype} &::=& \mathit{reftype} \\
 \mbox{(data type)} & \mathit{datatype} &::=& \mathsf{ok} \\
-\mbox{(external type)} & \mathit{externtype} &::=& \mathsf{global}~\mathit{globaltype} ~|~ \mathsf{func}~\mathit{functype} ~|~ \mathsf{table}~\mathit{tabletype} ~|~ \mathsf{memory}~\mathit{memtype} \\
+\mbox{(external type)} & \mathit{externtype} &::=& \mathsf{global}~\mathit{globaltype} ~|~ \mathsf{func}~\mathit{functype} ~|~ \mathsf{table}~\mathit{tabletype} ~|~ \mathsf{mem}~\mathit{memtype} \\
 \end{array}
 $$
 
@@ -1802,10 +1801,10 @@ $$
 \mbox{(table segment)} & \mathit{elem} &::=& \mathsf{elem}~\mathit{reftype}~{\mathit{expr}^\ast}~{\mathit{elemmode}^?} \\
 \mbox{(memory segment)} & \mathit{data} &::=& \mathsf{data}~{({\mathit{byte}^\ast})^\ast}~{\mathit{datamode}^?} \\
 \mbox{(start function)} & \mathit{start} &::=& \mathsf{start}~\mathit{funcidx} \\
-\mbox{(external use)} & \mathit{externuse} &::=& \mathsf{func}~\mathit{funcidx} ~|~ \mathsf{global}~\mathit{globalidx} ~|~ \mathsf{table}~\mathit{tableidx} ~|~ \mathsf{memory}~\mathit{memidx} \\
+\mbox{(external use)} & \mathit{externuse} &::=& \mathsf{func}~\mathit{funcidx} ~|~ \mathsf{global}~\mathit{globalidx} ~|~ \mathsf{table}~\mathit{tableidx} ~|~ \mathsf{mem}~\mathit{memidx} \\
 \mbox{(export)} & \mathit{export} &::=& \mathsf{export}~\mathit{name}~\mathit{externuse} \\
 \mbox{(import)} & \mathit{import} &::=& \mathsf{import}~\mathit{name}~\mathit{name}~\mathit{externtype} \\
-\mbox{(module)} & \mathit{module} &::=& \mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^\ast}~{\mathit{start}^\ast}~{\mathit{export}^\ast} \\
+\mbox{(module)} & \mathit{module} &::=& \mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^\ast}~{\mathit{start}^?}~{\mathit{export}^\ast} \\
 \end{array}
 $$
 
@@ -1978,7 +1977,7 @@ $$
 \frac{
 { \vdash }\;\mathit{memtype} : \mathsf{ok}
 }{
-{ \vdash }\;\mathsf{memory}~\mathit{memtype} : \mathsf{ok}
+{ \vdash }\;\mathsf{mem}~\mathit{memtype} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}extern{-}mem}]}
 \qquad
 \end{array}
@@ -2132,7 +2131,7 @@ $$
 \frac{
 { \vdash }\;\mathit{mt}_{1} \leq \mathit{mt}_{2}
 }{
-{ \vdash }\;\mathsf{memory}~\mathit{mt}_{1} \leq \mathsf{memory}~\mathit{mt}_{2}
+{ \vdash }\;\mathsf{mem}~\mathit{mt}_{1} \leq \mathsf{mem}~\mathit{mt}_{2}
 } \, {[\textsc{\scriptsize S{-}extern{-}mem}]}
 \qquad
 \end{array}
@@ -3079,7 +3078,7 @@ $$
 \frac{
 \mathit{C}.\mathsf{mem}[\mathit{x}] = \mathit{mt}
 }{
-\mathit{C} \vdash \mathsf{memory}~\mathit{x} : \mathsf{memory}~\mathit{mt}
+\mathit{C} \vdash \mathsf{mem}~\mathit{x} : \mathsf{mem}~\mathit{mt}
 } \, {[\textsc{\scriptsize T{-}externuse{-}mem}]}
 \qquad
 \end{array}
@@ -3108,14 +3107,12 @@ $$
  \qquad
 (\mathit{C} \vdash \mathit{data} : \mathsf{ok})^{\mathit{n}}
  \qquad
-(\mathit{C} \vdash \mathit{start} : \mathsf{ok})^\ast
+(\mathit{C} \vdash \mathit{start} : \mathsf{ok})^?
  \\
 {|{\mathit{mem}^\ast}|} \leq 1
- \qquad
-{|{\mathit{start}^\ast}|} \leq 1
 \end{array}
 }{
-{ \vdash }\;\mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^{\mathit{n}}}~{\mathit{start}^\ast}~{\mathit{export}^\ast} : \mathsf{ok}
+{ \vdash }\;\mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^{\mathit{n}}}~{\mathit{start}^?}~{\mathit{export}^\ast} : \mathsf{ok}
 } \, {[\textsc{\scriptsize T{-}module}]}
 \qquad
 \end{array}

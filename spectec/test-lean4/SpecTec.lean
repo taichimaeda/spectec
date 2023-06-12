@@ -194,7 +194,7 @@ inductive Externtype where
  | GLOBAL : Globaltype -> Externtype
  | FUNC : Functype -> Externtype
  | TABLE : Tabletype -> Externtype
- | MEMORY : Memtype -> Externtype
+ | MEM : Memtype -> Externtype
   deriving Inhabited, BEq
 
 
@@ -407,7 +407,7 @@ inductive Externuse where
  | FUNC : Funcidx -> Externuse
  | GLOBAL : Globalidx -> Externuse
  | TABLE : Tableidx -> Externuse
- | MEMORY : Memidx -> Externuse
+ | MEM : Memidx -> Externuse
   deriving Inhabited, BEq
 
 
@@ -420,7 +420,7 @@ inductive Externuse where
 
 
 
-@[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%*%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (List Start) × (List Export))
+@[reducible] def Module := /- mixop: `MODULE%*%*%*%*%*%*%*%?%*` -/ ((List Import) × (List Func) × (List Global) × (List Table) × (List Mem) × (List Elem) × (List Data) × (Option Start) × (List Export))
 
 
 
@@ -531,7 +531,7 @@ inductive Externtype_ok : Externtype -> Prop where
     (Externtype_ok (Externtype.TABLE tabletype))
   | mem (memtype : Memtype) : 
     (Memtype_ok memtype) -> 
-    (Externtype_ok (Externtype.MEMORY memtype))
+    (Externtype_ok (Externtype.MEM memtype))
 
 
 
@@ -597,7 +597,7 @@ inductive Externtype_sub : (Externtype × Externtype) -> Prop where
     (Externtype_sub ((Externtype.TABLE tt_1), (Externtype.TABLE tt_2)))
   | mem (mt_1 : Memtype) (mt_2 : Memtype) : 
     (Memtype_sub (mt_1, mt_2)) -> 
-    (Externtype_sub ((Externtype.MEMORY mt_1), (Externtype.MEMORY mt_2)))
+    (Externtype_sub ((Externtype.MEM mt_1), (Externtype.MEM mt_2)))
 
 
 
@@ -955,7 +955,7 @@ inductive Externuse_ok : (Context × Externuse × Externtype) -> Prop where
   | mem (C : Context) (mt : Memtype) (x : Idx) : 
     (x < C.MEM.length) -> 
     ((C.MEM.get! x) == mt) -> 
-    (Externuse_ok (C, (Externuse.MEMORY x), (Externtype.MEMORY mt)))
+    (Externuse_ok (C, (Externuse.MEM x), (Externtype.MEM mt)))
 
 inductive Export_ok : (Context × Export × Externtype) -> Prop where
   | rule_0 (C : Context) (externuse : Externuse) (name : Name) (xt : Externtype) : 
@@ -967,7 +967,7 @@ inductive Export_ok : (Context × Export × Externtype) -> Prop where
 
 
 inductive Module_ok : Module -> Prop where
-  | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (List Start)) (table : (List Table)) (tt : (List Tabletype)) : 
+  | rule_0 (C : Context) (data : (List Data)) (elem : (List Elem)) («export» : (List Export)) (ft : (List Functype)) (func : (List Func)) («global» : (List Global)) (gt : (List Globaltype)) («import» : (List Import)) (mem : (List Mem)) (mt : (List Memtype)) (n : N) (rt : (List Reftype)) (start : (Option Start)) (table : (List Table)) (tt : (List Tabletype)) : 
     (ft.length == func.length) -> 
     («global».length == gt.length) -> 
     (table.length == tt.length) -> 
@@ -980,9 +980,8 @@ inductive Module_ok : Module -> Prop where
     (Forall₂ (λ mem mt ↦ (Mem_ok (C, mem, mt))) mem mt) -> 
     (Forall₂ (λ elem rt ↦ (Elem_ok (C, elem, rt))) elem rt) -> 
     (Forall (λ data ↦ (Data_ok (C, data))) data) -> 
-    (Forall (λ start ↦ (Start_ok (C, start))) start) -> 
+    (Forall (λ start ↦ (Start_ok (C, start))) start.toList) -> 
     (mem.length <= 1) -> 
-    (start.length <= 1) -> 
     (Module_ok («import», func, «global», table, mem, elem, data, start, «export»))
 
 
