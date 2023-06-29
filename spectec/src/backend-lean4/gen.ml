@@ -124,6 +124,7 @@ let rec render_exp (exp : exp) = match exp.it with
   | ExtE (exp1, path, exp2) ->
     render_path path (render_exp exp1) (fun old_val -> "List.append" $$$ [old_val;  render_exp exp2])
   | IdxE (e1, e2) -> render_idx (render_exp e1) e2
+  | SliceE (e1, e2, e3) -> render_slice (render_exp e1) e2 e3
   | LenE e -> render_exp e ^ ".length"
   | CallE (id, e) -> render_fun_id id $$ render_exp e
   | UnE (MinusOp, e1)      -> parens ("0 - " ^ render_exp e1)
@@ -149,6 +150,8 @@ and render_dot e_string a = e_string ^ "." ^ render_field_name a
 
 and render_idx e_string exp = parens (e_string ^ ".get! " ^ render_exp exp)
 
+and render_slice e_string e1 e2 = parens (e_string ^ ".slice " ^ render_exp e1 ^ " " ^ render_exp e2)
+
 (* The path is inside out, in a way, hence the continuation passing style here *)
 and render_path (path : path) old_val (k : string -> string) : string = match path.it with
   | RootP -> k old_val
@@ -156,8 +159,10 @@ and render_path (path : path) old_val (k : string -> string) : string = match pa
     render_path path' old_val (fun old_val ->
      "{" ^ old_val ^ " with " ^  render_field_name a ^ " := " ^ k (render_dot old_val a) ^ " }"
     )
-  | SliceP (_path', _e1, _e2) ->
-    "default /- TODO: SliceP -/"
+  | SliceP (path', idx1_exp, idx2_exp) ->
+    render_path path' old_val (fun old_val ->
+      "(" ^ old_val ^ ".upds " ^ render_exp idx1_exp ^ " " ^ render_exp idx2_exp ^ " " ^ k (render_slice old_val idx1_exp idx2_exp) ^ ")"
+    )
   | IdxP (path', idx_exp) ->
     render_path path' old_val (fun old_val ->
       "(" ^ old_val ^ ".upd " ^ render_exp idx_exp ^ " " ^ k (render_idx old_val idx_exp) ^ ")"
@@ -294,9 +299,13 @@ let gen_string (el : script) =
   "  | none => List.nil\n" ^
   "  | some x => [x]\n" ^
   "def List.upd : List α → Nat → α → List α\n" ^
-  "| [], _, _ => []\n" ^
-  "| x::xs, 0, y => y :: xs\n" ^
-  "| x::xs, n+1, y => x :: xs.upd n y\n" ^
+  "  | [], _, _ => []\n" ^
+  "  | x::xs, 0, y => y :: xs\n" ^
+  "  | x::xs, n+1, y => x :: xs.upd n y\n" ^
+  "def List.upds : List α → Nat → Nat → List α → List α\n" ^
+  "  | xs, n, m, ys => xs.take n ++ ys ++ xs.drop (n + m)\n" ^
+  "def List.slice : List α → Nat → Nat → List α\n" ^
+  "  | xs, n, m => (xs.drop n)\n" ^
   "\n\n" ^
   "/- Now, the generated code -/\n" ^
   "\n" ^
