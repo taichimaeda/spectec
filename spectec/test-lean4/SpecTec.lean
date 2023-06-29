@@ -23,9 +23,13 @@ def Option.toList : Option α → List α
   | none => List.nil
   | some x => [x]
 def List.upd : List α → Nat → α → List α
-| [], _, _ => []
-| x::xs, 0, y => y :: xs
-| x::xs, n+1, y => x :: xs.upd n y
+  | [], _, _ => []
+  | x::xs, 0, y => y :: xs
+  | x::xs, n+1, y => x :: xs.upd n y
+def List.upds : List α → Nat → Nat → List α → List α
+  | xs, n, m, ys => xs.take n ++ ys ++ xs.drop (n + m)
+def List.slice : List α → Nat → Nat → List α
+  | xs, n, m => (xs.drop n)
 
 
 /- Now, the generated code -/
@@ -1344,7 +1348,7 @@ def «$with_tableext» : (State × Tableidx × (List Ref)) -> State
 
 
 def «$with_mem» : (State × Tableidx × Nat × Nat × (List Byte)) -> State
-  | ((s, f), x, i, j, b) => (default /- TODO: SliceP -/, f)
+  | ((s, f), x, i, j, b) => ({s with MEM := (s.MEM.upd (f.MODULE.MEM.get! x) ((s.MEM.get! (f.MODULE.MEM.get! x)).upds i j b)) }, f)
 
 
 
@@ -1689,14 +1693,14 @@ inductive Step_read : (Config × (List Admininstr)) -> Prop where
   | load_num_val (c : C_numtype) (i : Nat) (n_A : N) (n_O : N) (nt : Numtype) (z : State) (o0 : Nat) (o1 : Nat) : 
     ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
     ((«$size» («$valtype_numtype» nt)) == (some o1)) -> 
-    ((«$bytes_» (o0, c)) == default /- $mem(z, 0)[(i + n_O) : (o1 / 8)] -/) -> 
+    ((«$bytes_» (o0, c)) == ((«$mem» (z, 0)).slice (i + n_O) (((Nat.div o1) 8)))) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, none, n_A, n_O))]), [(Admininstr.CONST (nt, c))]))
   | load_pack_trap (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (sx : Sx) (z : State) : 
     (((i + n_O) + (((Nat.div n) 8))) > («$mem» (z, 0)).length) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, (some (n, sx)), n_A, n_O))]), [Admininstr.TRAP]))
   | load_pack_val (c : C_numtype) (i : Nat) (n : N) (n_A : N) (n_O : N) (nt : Numtype) (sx : Sx) (z : State) (o0 : Nat) : 
     ((«$size» («$valtype_numtype» nt)) == (some o0)) -> 
-    ((«$bytes_» (n, c)) == default /- $mem(z, 0)[(i + n_O) : (n / 8)] -/) -> 
+    ((«$bytes_» (n, c)) == ((«$mem» (z, 0)).slice (i + n_O) (((Nat.div n) 8)))) -> 
     (Step_read ((z, [(Admininstr.CONST (Numtype.I32, i)), (Admininstr.LOAD (nt, (some (n, sx)), n_A, n_O))]), [(Admininstr.CONST (nt, («$ext» (n, o0, sx, c))))]))
   | memory_size (n : N) (z : State) : 
     (((n * 64) * («$Ki» ())) == («$mem» (z, 0)).length) -> 
