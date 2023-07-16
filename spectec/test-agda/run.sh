@@ -5,7 +5,7 @@ cp -r ../spec minispec
 cd minispec && patch -s -p0 -i minispec.patch  --read-only=ignore && cd ..
 
 # Compile the spec to Agda
-../src/exe-watsup/main.exe --agda --sub --totalize --the-elimination --sideconditions minispec/*.watsup -o "$1"
+../watsup --agda --sub --totalize --the-elimination --sideconditions minispec/*.watsup -o "$1"
 
 # Run Agda
 # The `sed` incantation is needed to remove (user-specific) absolute paths in Agda output.

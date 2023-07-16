@@ -1,7 +1,7 @@
 (rule
   (targets current.agda current.output)
   (deps
-    (file ../src/exe-watsup/main.exe)
+    (file ../watsup)
     (glob_files ../spec/*)
   )
   (action
