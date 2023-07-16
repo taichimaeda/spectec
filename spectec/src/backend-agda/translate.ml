@@ -2,12 +2,18 @@ module Translate = struct
   open Util.Source
   open Il
 
-  type env = { records_with_comp : Agda.id list }
+  type env = { records_with_comp : Agda.id list; variants : (Ast.id * Ast.typcase list) list; relations : (Ast.id * Ast.rule list) list }
 
-  let initial_env = { records_with_comp = [] }
+  let initial_env = { records_with_comp = []; variants = []; relations = [] }
 
   let add_record_with_comp env t =
-    { records_with_comp = t :: env.records_with_comp }
+    { env with records_with_comp = t :: env.records_with_comp }
+
+  let add_variant env x tcs =
+    { env with variants = (x, tcs) :: env.variants }
+
+    let add_relation env r rules =
+    { env with relations = (r, rules) :: env.relations }
 
   let id i = Agda.Id i.it
   let tyid i = Agda.TyId i.it
@@ -200,7 +206,7 @@ module Translate = struct
                       Agda.VarE (tyid x) ))
                   tcs );
           ],
-          env )
+          add_variant env x tcs )
 
   let clause env (cls : Ast.clause) =
     let (DefD (_binds, p, e, premises)) = cls.it in
@@ -254,7 +260,7 @@ module Translate = struct
                 ArrowE ((typ env) ty, builtin_const SetB),
                 List.map (rule env (VarE (tyid x))) rules );
           ],
-          env )
+          add_relation env x rules )
     | DecD (i, tin, tout, clss) ->
         ( [
             DefD
