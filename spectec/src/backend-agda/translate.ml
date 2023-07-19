@@ -2,18 +2,21 @@ module Translate = struct
   open Util.Source
   open Il
 
-  type env = { records_with_comp : Agda.id list; variants : (Ast.id * Ast.typcase list) list; relations : (Ast.id * Ast.rule list) list }
+  type env = {
+    records_with_comp : Agda.id list;
+    variants : (string * Ast.typcase list) list;
+    relations : (string * (Ast.typ * Ast.rule list)) list;
+  }
 
   let initial_env = { records_with_comp = []; variants = []; relations = [] }
 
   let add_record_with_comp env t =
     { env with records_with_comp = t :: env.records_with_comp }
 
-  let add_variant env x tcs =
-    { env with variants = (x, tcs) :: env.variants }
+  let add_variant env x tcs = { env with variants = (x, tcs) :: env.variants }
 
-    let add_relation env r rules =
-    { env with relations = (r, rules) :: env.relations }
+  let add_relation env r typ rules =
+    { env with relations = (r, (typ, rules)) :: env.relations }
 
   let id i = Agda.Id i.it
   let tyid i = Agda.TyId i.it
@@ -206,7 +209,7 @@ module Translate = struct
                       Agda.VarE (tyid x) ))
                   tcs );
           ],
-          add_variant env x tcs )
+          add_variant env x.it tcs )
 
   let clause env (cls : Ast.clause) =
     let (DefD (_binds, p, e, premises)) = cls.it in
@@ -250,6 +253,73 @@ module Translate = struct
       premises ps,
       Agda.ApplyE (rel, exp env e) )
 
+  type relation_argument_type = Parameter | PreTerm
+
+  let pair_up_constructors_and_rules argument_kinds constructors rules =
+    let matches_constructor (constructor_id, _, _) rule =
+      match rule.it with
+      | Ast.RuleD (_, _, _, exp, _) -> (
+          match exp.it with
+          | Ast.TupE es ->
+              if
+                List.combine es argument_kinds
+                |> List.exists (function
+                     | Ast.{ it = CaseE (constructor_id', _); _ }, PreTerm ->
+                         constructor_id = constructor_id'
+                     | _ -> false)
+              then Some rule
+              else None
+          | _ -> None)
+    in
+    List.map
+      (fun constructor ->
+        (constructor, List.filter_map (matches_constructor constructor) rules))
+      constructors
+
+  let generate_intrinsic_type env relid synid =
+    let constructors = List.assoc synid env.variants in
+    Format.printf "Found syntax %s with %d constructors.\n" synid
+      (List.length constructors);
+    let reltyp, rules = List.assoc relid env.relations in
+    Format.printf "Found relation %s : %s with %d rules.\n" relid
+      (Il.Print.string_of_typ reltyp)
+      (List.length rules);
+    let parameter_kinds =
+      match reltyp.it with
+      | Ast.TupT typs ->
+          let is_syntype typ =
+            match typ.it with
+            | Ast.VarT { it; _ } when it = synid -> PreTerm
+            | _ -> Parameter
+          in
+          List.map is_syntype typs
+      | _ -> assert false
+    in
+    let pairs =
+      pair_up_constructors_and_rules parameter_kinds constructors rules
+    in
+    Format.printf "Constructors map with rules as follows:\n";
+    List.iter
+      (fun ((constructor_id, _, _), rules) ->
+        Format.printf "- %s -> %s\n"
+          (Print.string_of_atom constructor_id)
+          (String.concat "/"
+             (List.map
+                (fun { it = Ast.RuleD (id, _, _, _, _); _ } -> id.it)
+                rules)))
+      pairs;
+    []
+
+  let process_hint relid (defs, env) Ast.{ hintid; hintexp } =
+    match (hintid.it, hintexp) with
+    | "agda", [ "intrinsic"; synstr ] ->
+        let new_defs = generate_intrinsic_type env relid synstr in
+        (defs @ new_defs, env)
+    | _ -> (defs, env)
+
+  let process_hints env id hints =
+    List.fold_left (process_hint id) ([], env) hints
+
   let rec def env (d : Ast.def) =
     match d.it with
     | SynD (id, dt) -> deftyp env id dt
@@ -260,7 +330,7 @@ module Translate = struct
                 ArrowE ((typ env) ty, builtin_const SetB),
                 List.map (rule env (VarE (tyid x))) rules );
           ],
-          add_relation env x rules )
+          add_relation env x.it ty rules )
     | DecD (i, tin, tout, clss) ->
         ( [
             DefD
@@ -272,6 +342,7 @@ module Translate = struct
     | RecD defs ->
         let defs', env = script env defs in
         ([ MutualD defs' ], env)
+    | HintD { it = RelH (id, hints); _ } -> process_hints env id.it hints
     | HintD _ -> ([], env)
 
   and script env sc =

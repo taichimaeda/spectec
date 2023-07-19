@@ -1,3 +1,27 @@
+Found syntax instr with 21 constructors.
+Found relation Instr_ok : (context, instr, functype) with 22 rules.
+Constructors map with rules as follows:
+- UNREACHABLE -> unreachable
+- NOP -> nop
+- DROP -> drop
+- SELECT -> select-expl/select-impl
+- BLOCK -> block
+- LOOP -> loop
+- IF -> if
+- BR -> br
+- BR_IF -> br_if
+- CALL -> call
+- RETURN -> return
+- CONST -> const
+- UNOP -> unop
+- BINOP -> binop
+- TESTOP -> testop
+- RELOP -> relop
+- LOCAL.GET -> local.get
+- LOCAL.SET -> local.set
+- LOCAL.TEE -> local.tee
+- GLOBAL.GET -> global.get
+- GLOBAL.SET -> global.set
 Checking current (default/test-agda/current.agda).
 default/test-agda/current.agda:900,1-909,7
 The following names are declared but not accompanied by a
