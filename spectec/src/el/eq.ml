@@ -4,6 +4,11 @@ open Ast
 
 (* Helpers *)
 
+let eq_opt eq_x xo1 xo2 =
+  match xo1, xo2 with
+  | Some x1, Some x2 -> eq_x x1 x2
+  | _, _ -> xo1 = xo2
+
 let eq_list eq_x xs1 xs2 =
   List.length xs1 = List.length xs2 && List.for_all2 eq_x xs1 xs2
 
@@ -20,9 +25,8 @@ let eq_nl_list eq_x xs1 xs2 = eq_list (eq_nl_elem eq_x) xs1 xs2
 let rec eq_iter iter1 iter2 =
   iter1 = iter2 ||
   match iter1, iter2 with
-  | ListN (e1, None), ListN (e2, None) -> eq_exp e1 e2
-  | ListN (e1, Some id1), ListN (e2, Some id2) ->
-    eq_exp e1 e2 && id1.it = id2.it
+  | ListN (e1, e1_opt), ListN (e2, e2_opt) ->
+    eq_exp e1 e2 && eq_opt eq_exp e1_opt e2_opt
   | _, _ -> false
 
 

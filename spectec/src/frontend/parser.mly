@@ -141,8 +141,7 @@ iter :
   | STAR { List }
   | UP arith_prim
     { match $2.it with
-      | ParenE ({it = CmpE({it = VarE id; _}, LtOp, e); _}, false) ->
-        ListN (e, Some id)
+      | ParenE ({it = CmpE(e1, LtOp, e2); _}, false) -> ListN (e2, Some e1)
       | _ -> ListN ($2, None)
     }
 

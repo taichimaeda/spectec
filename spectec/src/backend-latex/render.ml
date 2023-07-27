@@ -327,7 +327,8 @@ exception Arity_mismatch
 let rec expand_iter args iter =
   match iter with
   | Opt | List | List1 -> iter
-  | ListN (e, id_opt) -> ListN (expand_exp args e, id_opt)
+  | ListN (e, e_opt) ->
+    ListN (expand_exp args e, Option.map (expand_exp args) e_opt)
 
 and expand_exp args e = expand_exp' args e.it $ e.at
 and expand_exp' args e' =
@@ -443,8 +444,8 @@ and render_iter env = function
   | List1 -> "^{+}"
   | ListN ({it = ParenE (e, _); _}, None) | ListN (e, None) ->
     "^{" ^ render_exp env e ^ "}"
-  | ListN (e, Some id) ->
-    "^{" ^ render_varid env id ^ "<" ^ render_exp env e ^ "}"
+  | ListN (e1, Some e2) ->
+    "^{" ^ render_exp env e2 ^ "<" ^ render_exp env e1 ^ "}"
 
 
 (* Types *)

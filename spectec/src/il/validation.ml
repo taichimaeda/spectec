@@ -238,19 +238,12 @@ let valid_list valid_x_y env xs ys at =
   List.iter2 (valid_x_y env) xs ys
 
 
-let rec valid_iter env iter =
+let rec valid_iter env env' iter =
   match iter with
   | Opt | List | List1 -> ()
-  | ListN (e, None) -> valid_exp env e (NatT $ e.at)
-  | ListN (e, Some id) ->
+  | ListN (e, e_opt) ->
     valid_exp env e (NatT $ e.at);
-    let t', dim = find "variable" env.vars id in
-    equiv_typ env t' (NatT $ e.at) e.at;
-    if not Eq.(eq_list eq_iter dim [ListN (e, None)]) then
-      error e.at ("use of iterated variable `" ^
-        id.it ^ String.concat "" (List.map string_of_iter dim) ^
-        "` outside suitable iteraton context")
-
+    Option.iter (fun e2 -> valid_exp env' e2 (NatT $ e2.at)) e_opt
 
 (* Types *)
 
@@ -268,7 +261,7 @@ and valid_typ env t =
   | IterT (t1, iter) ->
     match iter with
     | ListN (e, _) -> error e.at "definite iterator not allowed in type"
-    | _ -> valid_typ env t1; valid_iter env iter
+    | _ -> valid_typ env t1; valid_iter env (new_env ()) iter
 
 and valid_deftyp env dt =
   match dt.it with
@@ -478,24 +471,27 @@ and valid_path env p t : typ =
   t'
 
 and valid_iterexp env (iter, ids) : env =
-  valid_iter env iter;
   let iter' =
     match iter with
     | ListN (e, Some _) -> ListN (e, None)
     | iter -> iter
   in
-  List.fold_left (fun env id ->
-    match find "variable" env.vars id with
-    | t, iter1::iters
-      when Eq.eq_iter (snd (Lib.List.split_last (iter1::iters))) iter' ->
-      {env with vars =
-        Env.add id.it (t, fst (Lib.List.split_last (iter1::iters))) env.vars}
-    | _, iters ->
-      error id.at ("iteration variable `" ^ id.it ^
-        "` has incompatible dimension `" ^ id.it ^
-        String.concat "" (List.map string_of_iter iters) ^
-        "` in iteration `_" ^ string_of_iter iter' ^ "`")
-  ) env ids
+  let env' =
+    List.fold_left (fun env id ->
+      match find "variable" env.vars id with
+      | t, iter1::iters
+        when Eq.eq_iter (snd (Lib.List.split_last (iter1::iters))) iter' ->
+        {env with vars =
+          Env.add id.it (t, fst (Lib.List.split_last (iter1::iters))) env.vars}
+      | _, iters ->
+        error id.at ("iteration variable `" ^ id.it ^
+          "` has incompatible dimension `" ^ id.it ^
+          String.concat "" (List.map string_of_iter iters) ^
+          "` in iteration `_" ^ string_of_iter iter' ^ "`")
+    ) env ids
+  in
+  valid_iter env env' iter;
+  env'
 
 
 (* Definitions *)

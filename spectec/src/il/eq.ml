@@ -24,9 +24,8 @@ let eq_id i1 i2 =
 let rec eq_iter iter1 iter2 =
   iter1 = iter2 ||
   match iter1, iter2 with
-  | ListN (e1, None), ListN (e2, None) -> eq_exp e1 e2
-  | ListN (e1, Some id1), ListN (e2, Some id2) ->
-    eq_exp e1 e2 && id1.it = id2.it
+  | ListN (e1, e1_opt), ListN (e2, e2_opt) ->
+    eq_exp e1 e2 && eq_opt eq_exp e1_opt e2_opt
   | _, _ -> false
 
 
