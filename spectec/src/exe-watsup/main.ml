@@ -13,9 +13,11 @@ type target =
  | Check
  | Latex of Backend_latex.Config.config
  | Prose
+ | Coq
 
 let target = ref (Latex Backend_latex.Config.latex)
 
+(*
 type pass =
   | Sub
   | Totalize
@@ -31,8 +33,28 @@ passers (--all-passes, some targets), we do _not_ want to use the order of
 flags on the command line.
 *)
 let all_passes = [ Sub; Totalize; Unthe; Wild; Sideconditions; Animate ]
+*)
 
-let log = ref false  (* log execution steps *)
+type pass =
+  | Sub
+  | Totalize
+  | Unthe
+  | Wild
+  | Sideconditions
+  | Else
+  | Animate
+
+(* This list declares the intended order of passes.
+
+Because passes have dependencies, and because some flags enable multiple
+passers (--all-passes, some targets), we do _not_ want to use the order of
+flags on the command line.
+*)
+let all_passes = [ Sub; Totalize; Unthe; Wild; Sideconditions; Else; Animate ]
+
+let coq_passes = [ Sub; Totalize; Unthe; Wild; Sideconditions; Else ]
+
+let log = ref false
 let dst = ref false  (* patch files *)
 let dry = ref false  (* dry run for patching *)
 let warn = ref false (* warn about unused or reused splices *)
@@ -48,6 +70,9 @@ let print_all_il = ref false
 module PS = Set.Make(struct type t = pass let compare = compare; end)
 let selected_passes = ref (PS.empty)
 let enable_pass pass = selected_passes := PS.add pass !selected_passes
+let enable_passes = List.iter enable_pass
+
+
 
 (* Il pass metadata *)
 
@@ -57,6 +82,7 @@ let pass_flag = function
   | Unthe -> "the-elimination"
   | Wild -> "wildcards"
   | Sideconditions -> "sideconditions"
+  | Else -> "else-elimination"
   | Animate -> "animate"
 
 let pass_desc = function
@@ -65,7 +91,8 @@ let pass_desc = function
   | Unthe -> "Eliminate the ! operator in relations"
   | Wild -> "Eliminate wildcards and equivalent expressions"
   | Sideconditions -> "Infer side conditions"
-  | Animate -> "Animate equality conditions"
+  | Else -> "Eliminate otherwise/else"
+  | Animate -> "Animate equality conditions" (* dropped *)
 
 let run_pass : pass -> Il.Ast.script -> Il.Ast.script = function
   | Sub -> Middlend.Sub.transform
@@ -73,6 +100,7 @@ let run_pass : pass -> Il.Ast.script -> Il.Ast.script = function
   | Unthe -> Middlend.Unthe.transform
   | Wild -> Middlend.Wild.transform
   | Sideconditions -> Middlend.Sideconditions.transform
+  | Else -> Middlend.Else.transform
   | Animate -> Middlend.Animate.transform
 
 (* Argument parsing *)
@@ -103,6 +131,7 @@ let argspec = Arg.align
   "--sphinx", Arg.Unit (fun () -> target := Latex Backend_latex.Config.sphinx),
     " Generate Latex for Sphinx";
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
+  "--coq", Arg.Unit (fun () -> target := Coq; enable_passes coq_passes), " Generate Coq backend";
 
   "--print-il", Arg.Set print_elab_il, " Print il (after elaboration)";
   "--print-final-il", Arg.Set print_final_il, " Print final il";
@@ -110,9 +139,15 @@ let argspec = Arg.align
 ] @ List.map pass_argspec all_passes @ [
   "--all-passes", Arg.Unit (fun () -> List.iter enable_pass all_passes)," Run all passes";
 
+
+] @ List.map pass_argspec all_passes @ [
+  "--all-passes", Arg.Unit (fun () -> enable_passes all_passes)," Run all passes";
+
   "-help", Arg.Unit ignore, "";
   "--help", Arg.Unit ignore, "";
 ]
+
+
 
 
 (* Main *)
@@ -144,6 +179,61 @@ let () =
       ) else il
     ) il all_passes in
 
+(*
+    let il = if not !pass_sub then il else
+      ( log "Subtype injection...";
+        let il = Middlend.Sub.transform il in
+        if !print_all_il then Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_totalize then il else
+      ( log "Function totalization...";
+        let il = Middlend.Totalize.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_unthe then il else
+      ( log "Option projection eliminiation";
+        let il = Middlend.Unthe.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_sideconditions then il else
+      ( log "Side condition inference";
+        let il = Middlend.Sideconditions.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+
+    let il = if not !pass_animate then il else
+      ( log "Animate";
+        let il = Middlend.Animate.transform il in
+        if !print_all_il then
+          Printf.printf "%s\n%!" (Il.Print.string_of_script il);
+        log "IL Validation...";
+        Il.Validation.valid il;
+        il
+      )
+    in
+*)
     if !print_final_il && not !print_all_il then
       Printf.printf "%s\n%!" (Il.Print.string_of_script il);
 
@@ -171,6 +261,12 @@ let () =
         let prose = Backend_prose.Translate.translate el in
         print_endline prose
       )
+    | Coq ->
+        log "Coq Code Generation...";
+        if !odst = "" then
+          print_endline (Backend_coq.Print.gen_string il);
+        if !odst <> "" then
+          Backend_coq.Print.gen_file !odst il;
     );
     log "Complete."
   with
