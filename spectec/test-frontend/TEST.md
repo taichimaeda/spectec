@@ -2,66 +2,123 @@
 
 ```sh
 $ (cd ../spec && dune exec ../src/exe-watsup/main.exe -- *.watsup -v -l --print-il)
-watsup 0.3 generator
+watsup 0.4 generator
 == Parsing...
 == Elaboration...
 
 ;; 1-syntax.watsup:3.1-3.15
 syntax n = nat
 
-;; 1-syntax.watsup:9.1-9.37
-syntax name = text
+;; 1-syntax.watsup:4.1-4.15
+syntax m = nat
 
-;; 1-syntax.watsup:14.1-14.36
+;; 1-syntax.watsup:16.1-16.50
 syntax byte = nat
 
-;; 1-syntax.watsup:15.1-15.45
+;; 1-syntax.watsup:18.1-18.58
+syntax uN = nat
+
+;; 1-syntax.watsup:19.1-19.86
+syntax sN = nat
+
+;; 1-syntax.watsup:20.1-20.36
+syntax iN = uN
+
+;; 1-syntax.watsup:22.1-22.58
 syntax u32 = nat
 
-;; 1-syntax.watsup:22.1-22.36
+;; 1-syntax.watsup:23.1-23.58
+syntax u64 = nat
+
+;; 1-syntax.watsup:28.1-28.21
+def signif : nat -> nat
+  ;; 1-syntax.watsup:29.1-29.21
+  def signif(32) = 23
+  ;; 1-syntax.watsup:30.1-30.21
+  def signif(64) = 52
+
+;; 1-syntax.watsup:32.1-32.20
+def expon : nat -> nat
+  ;; 1-syntax.watsup:33.1-33.19
+  def expon(32) = 8
+  ;; 1-syntax.watsup:34.1-34.20
+  def expon(64) = 11
+
+;; 1-syntax.watsup:36.1-36.35
+def M : nat -> nat
+  ;; 1-syntax.watsup:37.1-37.23
+  def {N : nat} M(N) = $signif(N)
+
+;; 1-syntax.watsup:39.1-39.35
+def E : nat -> nat
+  ;; 1-syntax.watsup:40.1-40.22
+  def {N : nat} E(N) = $expon(N)
+
+;; 1-syntax.watsup:44.1-48.77
+syntax fNmag =
+  |  {N : nat, n : n}NORM(m, n)
+    -- if (((- (2 ^ ($E(N) - 1)) + 2) <= n) /\ (n <= ((2 ^ ($E(N) - 1)) - 1)))
+  |  {N : nat, n : n}SUBNORM(m, n)
+    -- if ((- (2 ^ ($E(N) - 1)) + 2) = n)
+  | INF
+  |  {N : nat, n : n}NAN(n)
+    -- if ((1 <= n) /\ (n < $M(N)))
+
+;; 1-syntax.watsup:42.1-42.107
+syntax fN =
+  | POS(fNmag)
+  | NEG(fNmag)
+
+;; 1-syntax.watsup:53.1-53.85
+syntax char = nat
+
+;; 1-syntax.watsup:55.1-55.38
+syntax name = char*
+
+;; 1-syntax.watsup:60.1-60.36
 syntax idx = nat
 
-;; 1-syntax.watsup:23.1-23.49
+;; 1-syntax.watsup:61.1-61.49
 syntax funcidx = idx
 
-;; 1-syntax.watsup:24.1-24.49
+;; 1-syntax.watsup:62.1-62.49
 syntax globalidx = idx
 
-;; 1-syntax.watsup:25.1-25.47
+;; 1-syntax.watsup:63.1-63.47
 syntax tableidx = idx
 
-;; 1-syntax.watsup:26.1-26.46
+;; 1-syntax.watsup:64.1-64.46
 syntax memidx = idx
 
-;; 1-syntax.watsup:27.1-27.45
+;; 1-syntax.watsup:65.1-65.45
 syntax elemidx = idx
 
-;; 1-syntax.watsup:28.1-28.45
+;; 1-syntax.watsup:66.1-66.45
 syntax dataidx = idx
 
-;; 1-syntax.watsup:29.1-29.47
+;; 1-syntax.watsup:67.1-67.47
 syntax labelidx = idx
 
-;; 1-syntax.watsup:30.1-30.47
+;; 1-syntax.watsup:68.1-68.47
 syntax localidx = idx
 
-;; 1-syntax.watsup:39.1-40.22
+;; 1-syntax.watsup:77.1-78.26
 syntax numtype =
   | I32
   | I64
   | F32
   | F64
 
-;; 1-syntax.watsup:41.1-42.5
+;; 1-syntax.watsup:79.1-80.9
 syntax vectype =
   | V128
 
-;; 1-syntax.watsup:43.1-44.20
+;; 1-syntax.watsup:81.1-82.24
 syntax reftype =
   | FUNCREF
   | EXTERNREF
 
-;; 1-syntax.watsup:45.1-46.34
+;; 1-syntax.watsup:83.1-84.38
 syntax valtype =
   | I32
   | I64
@@ -72,59 +129,59 @@ syntax valtype =
   | EXTERNREF
   | BOT
 
-;; 1-syntax.watsup:48.1-48.39
-syntax in =
+;; 1-syntax.watsup:86.1-86.40
+syntax inn =
   | I32
   | I64
 
-;; 1-syntax.watsup:49.1-49.39
-syntax fn =
+;; 1-syntax.watsup:87.1-87.40
+syntax fnn =
   | F32
   | F64
 
-;; 1-syntax.watsup:56.1-57.11
+;; 1-syntax.watsup:94.1-95.11
 syntax resulttype = valtype*
 
-;; 1-syntax.watsup:59.1-60.16
+;; 1-syntax.watsup:97.1-98.16
 syntax limits = `[%..%]`(u32, u32)
 
-;; 1-syntax.watsup:61.1-62.15
+;; 1-syntax.watsup:99.1-100.15
 syntax globaltype = `MUT%?%`(()?, valtype)
 
-;; 1-syntax.watsup:63.1-64.27
+;; 1-syntax.watsup:101.1-102.27
 syntax functype = `%->%`(resulttype, resulttype)
 
-;; 1-syntax.watsup:65.1-66.17
+;; 1-syntax.watsup:103.1-104.17
 syntax tabletype = `%%`(limits, reftype)
 
-;; 1-syntax.watsup:67.1-68.12
+;; 1-syntax.watsup:105.1-106.12
 syntax memtype = `%I8`(limits)
 
-;; 1-syntax.watsup:69.1-70.10
+;; 1-syntax.watsup:107.1-108.10
 syntax elemtype = reftype
 
-;; 1-syntax.watsup:71.1-72.5
+;; 1-syntax.watsup:109.1-110.5
 syntax datatype = OK
 
-;; 1-syntax.watsup:73.1-74.69
+;; 1-syntax.watsup:111.1-112.70
 syntax externtype =
   | GLOBAL(globaltype)
   | FUNC(functype)
   | TABLE(tabletype)
-  | MEMORY(memtype)
+  | MEM(memtype)
 
-;; 1-syntax.watsup:86.1-86.44
+;; 1-syntax.watsup:124.1-124.44
 syntax sx =
   | U
   | S
 
-;; 1-syntax.watsup:88.1-88.39
+;; 1-syntax.watsup:126.1-126.39
 syntax unop_IXX =
   | CLZ
   | CTZ
   | POPCNT
 
-;; 1-syntax.watsup:89.1-89.70
+;; 1-syntax.watsup:127.1-127.70
 syntax unop_FXX =
   | ABS
   | NEG
@@ -134,7 +191,7 @@ syntax unop_FXX =
   | TRUNC
   | NEAREST
 
-;; 1-syntax.watsup:91.1-93.62
+;; 1-syntax.watsup:129.1-131.66
 syntax binop_IXX =
   | ADD
   | SUB
@@ -149,7 +206,7 @@ syntax binop_IXX =
   | ROTL
   | ROTR
 
-;; 1-syntax.watsup:94.1-94.66
+;; 1-syntax.watsup:132.1-132.66
 syntax binop_FXX =
   | ADD
   | SUB
@@ -159,15 +216,15 @@ syntax binop_FXX =
   | MAX
   | COPYSIGN
 
-;; 1-syntax.watsup:96.1-96.26
+;; 1-syntax.watsup:134.1-134.26
 syntax testop_IXX =
   | EQZ
 
-;; 1-syntax.watsup:97.1-97.22
+;; 1-syntax.watsup:135.1-135.22
 syntax testop_FXX =
   |
 
-;; 1-syntax.watsup:99.1-100.108
+;; 1-syntax.watsup:137.1-138.112
 syntax relop_IXX =
   | EQ
   | NE
@@ -176,7 +233,7 @@ syntax relop_IXX =
   | LE(sx)
   | GE(sx)
 
-;; 1-syntax.watsup:101.1-101.49
+;; 1-syntax.watsup:139.1-139.49
 syntax relop_FXX =
   | EQ
   | NE
@@ -185,44 +242,45 @@ syntax relop_FXX =
   | LE
   | GE
 
-;; 1-syntax.watsup:103.1-103.50
+;; 1-syntax.watsup:141.1-141.50
 syntax unop_numtype =
   | _I(unop_IXX)
   | _F(unop_FXX)
 
-;; 1-syntax.watsup:104.1-104.53
+;; 1-syntax.watsup:142.1-142.53
 syntax binop_numtype =
   | _I(binop_IXX)
   | _F(binop_FXX)
 
-;; 1-syntax.watsup:105.1-105.56
+;; 1-syntax.watsup:143.1-143.56
 syntax testop_numtype =
   | _I(testop_IXX)
   | _F(testop_FXX)
 
-;; 1-syntax.watsup:106.1-106.53
+;; 1-syntax.watsup:144.1-144.53
 syntax relop_numtype =
   | _I(relop_IXX)
   | _F(relop_FXX)
 
-;; 1-syntax.watsup:107.1-107.39
+;; 1-syntax.watsup:145.1-145.53
 syntax cvtop =
   | CONVERT
   | REINTERPRET
+  | CONVERT_SAT
 
-;; 1-syntax.watsup:117.1-117.23
+;; 1-syntax.watsup:155.1-155.23
 syntax c_numtype = nat
 
-;; 1-syntax.watsup:118.1-118.23
+;; 1-syntax.watsup:156.1-156.23
 syntax c_vectype = nat
 
-;; 1-syntax.watsup:121.1-121.52
+;; 1-syntax.watsup:159.1-159.52
 syntax blocktype = functype
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:216.1-224.86
 rec {
 
-;; 1-syntax.watsup:156.1-177.80
+;; 1-syntax.watsup:216.1-224.86
 syntax instr =
   | UNREACHABLE
   | NOP
@@ -270,97 +328,105 @@ syntax instr =
   | STORE(numtype, n?, u32, u32)
 }
 
-;; 1-syntax.watsup:179.1-180.9
+;; 1-syntax.watsup:226.1-227.9
 syntax expr = instr*
 
-;; 1-syntax.watsup:187.1-187.50
+;; 1-syntax.watsup:237.1-237.61
 syntax elemmode =
-  | TABLE(tableidx, expr)
+  | ACTIVE(tableidx, expr)
+  | PASSIVE
   | DECLARE
 
-;; 1-syntax.watsup:188.1-188.39
+;; 1-syntax.watsup:238.1-238.49
 syntax datamode =
-  | MEMORY(memidx, expr)
+  | ACTIVE(memidx, expr)
+  | PASSIVE
 
-;; 1-syntax.watsup:190.1-191.30
-syntax func = `FUNC%%*%`(functype, valtype*, expr)
+;; 1-syntax.watsup:240.1-241.16
+syntax type = TYPE(functype)
 
-;; 1-syntax.watsup:192.1-193.25
+;; 1-syntax.watsup:242.1-243.16
+syntax local = LOCAL(valtype)
+
+;; 1-syntax.watsup:244.1-245.28
+syntax func = `FUNC%%*%`(functype, local*, expr)
+
+;; 1-syntax.watsup:246.1-247.25
 syntax global = GLOBAL(globaltype, expr)
 
-;; 1-syntax.watsup:194.1-195.18
+;; 1-syntax.watsup:248.1-249.18
 syntax table = TABLE(tabletype)
 
-;; 1-syntax.watsup:196.1-197.17
+;; 1-syntax.watsup:250.1-251.17
 syntax mem = MEMORY(memtype)
 
-;; 1-syntax.watsup:198.1-199.31
-syntax elem = `ELEM%%*%?`(reftype, expr*, elemmode?)
+;; 1-syntax.watsup:252.1-253.30
+syntax elem = `ELEM%%*%`(reftype, expr*, elemmode)
 
-;; 1-syntax.watsup:200.1-201.26
-syntax data = `DATA(*)%*%?`(byte**, datamode?)
+;; 1-syntax.watsup:254.1-255.22
+syntax data = `DATA%*%`(byte*, datamode)
 
-;; 1-syntax.watsup:202.1-203.16
+;; 1-syntax.watsup:256.1-257.16
 syntax start = START(funcidx)
 
-;; 1-syntax.watsup:205.1-206.65
-syntax externuse =
+;; 1-syntax.watsup:259.1-260.66
+syntax externidx =
   | FUNC(funcidx)
   | GLOBAL(globalidx)
   | TABLE(tableidx)
-  | MEMORY(memidx)
+  | MEM(memidx)
 
-;; 1-syntax.watsup:207.1-208.24
-syntax export = EXPORT(name, externuse)
+;; 1-syntax.watsup:261.1-262.24
+syntax export = EXPORT(name, externidx)
 
-;; 1-syntax.watsup:209.1-210.30
+;; 1-syntax.watsup:263.1-264.30
 syntax import = IMPORT(name, name, externtype)
 
-;; 1-syntax.watsup:212.1-213.70
-syntax module = `MODULE%*%*%*%*%*%*%*%*%*`(import*, func*, global*, table*, mem*, elem*, data*, start*, export*)
+;; 1-syntax.watsup:266.1-267.70
+syntax module = `MODULE%*%*%*%*%*%*%*%?%*`(import*, func*, global*, table*, mem*, elem*, data*, start?, export*)
 
-;; 2-aux.watsup:3.1-3.14
+;; 2-aux.watsup:7.1-7.14
 def Ki : nat
-  ;; 2-aux.watsup:4.1-4.15
+  ;; 2-aux.watsup:8.1-8.15
   def Ki = 1024
 
-;; 2-aux.watsup:9.1-9.25
+;; 2-aux.watsup:13.1-13.25
 rec {
 
-;; 2-aux.watsup:9.1-9.25
+;; 2-aux.watsup:13.1-13.25
 def min : (nat, nat) -> nat
-  ;; 2-aux.watsup:10.1-10.19
+  ;; 2-aux.watsup:14.1-14.19
   def {j : nat} min(0, j) = 0
-  ;; 2-aux.watsup:11.1-11.19
+  ;; 2-aux.watsup:15.1-15.19
   def {i : nat} min(i, 0) = 0
-  ;; 2-aux.watsup:12.1-12.38
+  ;; 2-aux.watsup:16.1-16.38
   def {i : nat, j : nat} min((i + 1), (j + 1)) = $min(i, j)
 }
 
-;; 2-aux.watsup:19.1-19.55
+;; 2-aux.watsup:27.1-27.55
 def size : valtype -> nat
-  ;; 2-aux.watsup:20.1-20.20
+  ;; 2-aux.watsup:28.1-28.20
   def size(I32_valtype) = 32
-  ;; 2-aux.watsup:21.1-21.20
+  ;; 2-aux.watsup:29.1-29.20
   def size(I64_valtype) = 64
-  ;; 2-aux.watsup:22.1-22.20
+  ;; 2-aux.watsup:30.1-30.20
   def size(F32_valtype) = 32
-  ;; 2-aux.watsup:23.1-23.20
+  ;; 2-aux.watsup:31.1-31.20
   def size(F64_valtype) = 64
-  ;; 2-aux.watsup:24.1-24.22
+  ;; 2-aux.watsup:32.1-32.22
   def size(V128_valtype) = 128
 
-;; 2-aux.watsup:29.1-29.40
+;; 2-aux.watsup:40.1-40.40
 def test_sub_ATOM_22 : n -> nat
-  ;; 2-aux.watsup:30.1-30.38
+  ;; 2-aux.watsup:41.1-41.38
   def {n_3_ATOM_y : n} test_sub_ATOM_22(n_3_ATOM_y) = 0
 
-;; 2-aux.watsup:32.1-32.26
+;; 2-aux.watsup:43.1-43.26
 def curried_ : (n, n) -> nat
-  ;; 2-aux.watsup:33.1-33.39
+  ;; 2-aux.watsup:44.1-44.39
   def {n_1 : n, n_2 : n} curried_(n_1, n_2) = (n_1 + n_2)
 
-;; 2-aux.watsup:35.1-44.39
+;; 2-aux.watsup:46.1-55.43
 syntax testfuse =
   | AB_(nat, nat, nat)
   | CD(nat, nat, nat)
@@ -372,572 +438,580 @@ syntax testfuse =
   | OP(nat, nat, nat)
   | QR(nat, nat, nat)
 
-;; 3-typing.watsup:3.1-6.60
+;; 3-typing.watsup:5.1-8.60
 syntax context = {FUNC functype*, GLOBAL globaltype*, TABLE tabletype*, MEM memtype*, ELEM elemtype*, DATA datatype*, LOCAL valtype*, LABEL resulttype*, RETURN resulttype?}
 
-;; 3-typing.watsup:14.1-14.66
+;; 3-typing.watsup:18.1-18.66
 relation Limits_ok: `|-%:%`(limits, nat)
-  ;; 3-typing.watsup:22.1-24.24
+  ;; 3-typing.watsup:26.1-28.24
   rule _ {k : nat, n_1 : n, n_2 : n}:
     `|-%:%`(`[%..%]`(n_1, n_2), k)
     -- if ((n_1 <= n_2) /\ (n_2 <= k))
 
-;; 3-typing.watsup:15.1-15.64
+;; 3-typing.watsup:19.1-19.64
 relation Functype_ok: `|-%:OK`(functype)
-  ;; 3-typing.watsup:26.1-27.13
+  ;; 3-typing.watsup:30.1-31.13
   rule _ {ft : functype}:
     `|-%:OK`(ft)
 
-;; 3-typing.watsup:16.1-16.66
+;; 3-typing.watsup:20.1-20.66
 relation Globaltype_ok: `|-%:OK`(globaltype)
-  ;; 3-typing.watsup:29.1-30.13
+  ;; 3-typing.watsup:33.1-34.13
   rule _ {gt : globaltype}:
     `|-%:OK`(gt)
 
-;; 3-typing.watsup:17.1-17.65
+;; 3-typing.watsup:21.1-21.65
 relation Tabletype_ok: `|-%:OK`(tabletype)
-  ;; 3-typing.watsup:32.1-34.35
+  ;; 3-typing.watsup:36.1-38.35
   rule _ {lim : limits, rt : reftype}:
     `|-%:OK`(`%%`(lim, rt))
     -- Limits_ok: `|-%:%`(lim, ((2 ^ 32) - 1))
 
-;; 3-typing.watsup:18.1-18.63
+;; 3-typing.watsup:22.1-22.63
 relation Memtype_ok: `|-%:OK`(memtype)
-  ;; 3-typing.watsup:36.1-38.33
+  ;; 3-typing.watsup:40.1-42.33
   rule _ {lim : limits}:
     `|-%:OK`(`%I8`(lim))
     -- Limits_ok: `|-%:%`(lim, (2 ^ 16))
 
-;; 3-typing.watsup:19.1-19.66
+;; 3-typing.watsup:23.1-23.66
 relation Externtype_ok: `|-%:OK`(externtype)
-  ;; 3-typing.watsup:41.1-43.35
+  ;; 3-typing.watsup:45.1-47.35
   rule func {functype : functype}:
     `|-%:OK`(FUNC_externtype(functype))
     -- Functype_ok: `|-%:OK`(functype)
 
-  ;; 3-typing.watsup:45.1-47.39
+  ;; 3-typing.watsup:49.1-51.39
   rule global {globaltype : globaltype}:
     `|-%:OK`(GLOBAL_externtype(globaltype))
     -- Globaltype_ok: `|-%:OK`(globaltype)
 
-  ;; 3-typing.watsup:49.1-51.37
+  ;; 3-typing.watsup:53.1-55.37
   rule table {tabletype : tabletype}:
     `|-%:OK`(TABLE_externtype(tabletype))
     -- Tabletype_ok: `|-%:OK`(tabletype)
 
-  ;; 3-typing.watsup:53.1-55.33
+  ;; 3-typing.watsup:57.1-59.33
   rule mem {memtype : memtype}:
-    `|-%:OK`(MEMORY_externtype(memtype))
+    `|-%:OK`(MEM_externtype(memtype))
     -- Memtype_ok: `|-%:OK`(memtype)
 
-;; 3-typing.watsup:61.1-61.65
+;; 3-typing.watsup:69.1-69.65
 relation Valtype_sub: `|-%<:%`(valtype, valtype)
-  ;; 3-typing.watsup:64.1-65.12
+  ;; 3-typing.watsup:72.1-73.12
   rule refl {t : valtype}:
     `|-%<:%`(t, t)
 
-  ;; 3-typing.watsup:67.1-68.14
+  ;; 3-typing.watsup:75.1-76.14
   rule bot {t : valtype}:
     `|-%<:%`(BOT_valtype, t)
 
-;; 3-typing.watsup:62.1-62.72
+;; 3-typing.watsup:70.1-70.72
 relation Resulttype_sub: `|-%*<:%*`(valtype*, valtype*)
-  ;; 3-typing.watsup:70.1-72.35
+  ;; 3-typing.watsup:78.1-80.35
   rule _ {t_1* : valtype*, t_2* : valtype*}:
     `|-%*<:%*`(t_1*{t_1}, t_2*{t_2})
     -- (Valtype_sub: `|-%<:%`(t_1, t_2))*{t_1 t_2}
 
-;; 3-typing.watsup:75.1-75.75
+;; 3-typing.watsup:85.1-85.75
 relation Limits_sub: `|-%<:%`(limits, limits)
-  ;; 3-typing.watsup:83.1-86.21
+  ;; 3-typing.watsup:93.1-96.21
   rule _ {n_11 : n, n_12 : n, n_21 : n, n_22 : n}:
     `|-%<:%`(`[%..%]`(n_11, n_12), `[%..%]`(n_21, n_22))
     -- if (n_11 >= n_21)
     -- if (n_12 <= n_22)
 
-;; 3-typing.watsup:76.1-76.73
+;; 3-typing.watsup:86.1-86.73
 relation Functype_sub: `|-%<:%`(functype, functype)
-  ;; 3-typing.watsup:88.1-89.14
+  ;; 3-typing.watsup:98.1-99.14
   rule _ {ft : functype}:
     `|-%<:%`(ft, ft)
 
-;; 3-typing.watsup:77.1-77.75
+;; 3-typing.watsup:87.1-87.75
 relation Globaltype_sub: `|-%<:%`(globaltype, globaltype)
-  ;; 3-typing.watsup:91.1-92.14
+  ;; 3-typing.watsup:101.1-102.14
   rule _ {gt : globaltype}:
     `|-%<:%`(gt, gt)
 
-;; 3-typing.watsup:78.1-78.74
+;; 3-typing.watsup:88.1-88.74
 relation Tabletype_sub: `|-%<:%`(tabletype, tabletype)
-  ;; 3-typing.watsup:94.1-96.35
+  ;; 3-typing.watsup:104.1-106.35
   rule _ {lim_1 : limits, lim_2 : limits, rt : reftype}:
     `|-%<:%`(`%%`(lim_1, rt), `%%`(lim_2, rt))
     -- Limits_sub: `|-%<:%`(lim_1, lim_2)
 
-;; 3-typing.watsup:79.1-79.72
+;; 3-typing.watsup:89.1-89.72
 relation Memtype_sub: `|-%<:%`(memtype, memtype)
-  ;; 3-typing.watsup:98.1-100.35
+  ;; 3-typing.watsup:108.1-110.35
   rule _ {lim_1 : limits, lim_2 : limits}:
     `|-%<:%`(`%I8`(lim_1), `%I8`(lim_2))
     -- Limits_sub: `|-%<:%`(lim_1, lim_2)
 
-;; 3-typing.watsup:80.1-80.75
+;; 3-typing.watsup:90.1-90.75
 relation Externtype_sub: `|-%<:%`(externtype, externtype)
-  ;; 3-typing.watsup:103.1-105.35
+  ;; 3-typing.watsup:113.1-115.35
   rule func {ft_1 : functype, ft_2 : functype}:
     `|-%<:%`(FUNC_externtype(ft_1), FUNC_externtype(ft_2))
     -- Functype_sub: `|-%<:%`(ft_1, ft_2)
 
-  ;; 3-typing.watsup:107.1-109.37
+  ;; 3-typing.watsup:117.1-119.37
   rule global {gt_1 : globaltype, gt_2 : globaltype}:
     `|-%<:%`(GLOBAL_externtype(gt_1), GLOBAL_externtype(gt_2))
     -- Globaltype_sub: `|-%<:%`(gt_1, gt_2)
 
-  ;; 3-typing.watsup:111.1-113.36
+  ;; 3-typing.watsup:121.1-123.36
   rule table {tt_1 : tabletype, tt_2 : tabletype}:
     `|-%<:%`(TABLE_externtype(tt_1), TABLE_externtype(tt_2))
     -- Tabletype_sub: `|-%<:%`(tt_1, tt_2)
 
-  ;; 3-typing.watsup:115.1-117.34
+  ;; 3-typing.watsup:125.1-127.34
   rule mem {mt_1 : memtype, mt_2 : memtype}:
-    `|-%<:%`(MEMORY_externtype(mt_1), MEMORY_externtype(mt_2))
+    `|-%<:%`(MEM_externtype(mt_1), MEM_externtype(mt_2))
     -- Memtype_sub: `|-%<:%`(mt_1, mt_2)
 
-;; 3-typing.watsup:172.1-172.76
+;; 3-typing.watsup:192.1-192.76
 relation Blocktype_ok: `%|-%:%`(context, blocktype, functype)
-  ;; 3-typing.watsup:174.1-176.29
+  ;; 3-typing.watsup:194.1-196.29
   rule _ {C : context, ft : functype}:
     `%|-%:%`(C, ft, ft)
     -- Functype_ok: `|-%:OK`(ft)
 
-;; 3-typing.watsup:123.1-124.67
+;; 3-typing.watsup:135.1-136.67
 rec {
 
-;; 3-typing.watsup:123.1-123.66
+;; 3-typing.watsup:135.1-135.66
 relation Instr_ok: `%|-%:%`(context, instr, functype)
-  ;; 3-typing.watsup:153.1-154.34
+  ;; 3-typing.watsup:171.1-172.34
   rule unreachable {C : context, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, UNREACHABLE_instr, `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:156.1-157.32
+  ;; 3-typing.watsup:174.1-175.32
   rule nop {C : context}:
     `%|-%:%`(C, NOP_instr, `%->%`([], []))
 
-  ;; 3-typing.watsup:159.1-160.27
+  ;; 3-typing.watsup:177.1-178.27
   rule drop {C : context, t : valtype}:
     `%|-%:%`(C, DROP_instr, `%->%`([t], []))
 
-  ;; 3-typing.watsup:163.1-164.31
+  ;; 3-typing.watsup:181.1-182.31
   rule select-expl {C : context, t : valtype}:
     `%|-%:%`(C, SELECT_instr(?(t)), `%->%`([t t I32_valtype], [t]))
 
-  ;; 3-typing.watsup:166.1-169.37
+  ;; 3-typing.watsup:184.1-187.37
   rule select-impl {C : context, numtype : numtype, t : valtype, t' : valtype, vectype : vectype}:
     `%|-%:%`(C, SELECT_instr(?()), `%->%`([t t I32_valtype], [t]))
     -- Valtype_sub: `|-%<:%`(t, t')
     -- if ((t' = (numtype <: valtype)) \/ (t' = (vectype <: valtype)))
 
-  ;; 3-typing.watsup:178.1-181.57
+  ;; 3-typing.watsup:198.1-201.59
   rule block {C : context, bt : blocktype, instr* : instr*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, BLOCK_instr(bt, instr*{instr}), `%->%`(t_1*{t_1}, t_2*{t_2}))
     -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2]*{t_2}, RETURN ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2*{t_2}], RETURN ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:183.1-186.57
+  ;; 3-typing.watsup:203.1-206.59
   rule loop {C : context, bt : blocktype, instr* : instr*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, LOOP_instr(bt, instr*{instr}), `%->%`(t_1*{t_1}, t_2*{t_2}))
     -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_1]*{t_1}, RETURN ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_1*{t_1}], RETURN ?()}, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:188.1-192.59
+  ;; 3-typing.watsup:208.1-212.61
   rule if {C : context, bt : blocktype, instr_1* : instr*, instr_2* : instr*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, IF_instr(bt, instr_1*{instr_1}, instr_2*{instr_2}), `%->%`(t_1*{t_1}, t_2*{t_2}))
+    `%|-%:%`(C, IF_instr(bt, instr_1*{instr_1}, instr_2*{instr_2}), `%->%`(t_1*{t_1} :: [I32_valtype], t_2*{t_2}))
     -- Blocktype_ok: `%|-%:%`(C, bt, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2]*{t_2}, RETURN ?()}, instr_1*{instr_1}, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2]*{t_2}, RETURN ?()}, instr_2*{instr_2}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2*{t_2}], RETURN ?()}, instr_1*{instr_1}, `%->%`(t_1*{t_1}, t_2*{t_2}))
+    -- InstrSeq_ok: `%|-%*:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2*{t_2}], RETURN ?()}, instr_2*{instr_2}, `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:195.1-197.24
+  ;; 3-typing.watsup:217.1-219.24
   rule br {C : context, l : labelidx, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, BR_instr(l), `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
     -- if (C.LABEL_context[l] = t*{t})
 
-  ;; 3-typing.watsup:199.1-201.24
+  ;; 3-typing.watsup:221.1-223.24
   rule br_if {C : context, l : labelidx, t* : valtype*}:
     `%|-%:%`(C, BR_IF_instr(l), `%->%`(t*{t} :: [I32_valtype], t*{t}))
     -- if (C.LABEL_context[l] = t*{t})
 
-  ;; 3-typing.watsup:203.1-206.42
+  ;; 3-typing.watsup:225.1-228.42
   rule br_table {C : context, l* : labelidx*, l' : labelidx, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, BR_TABLE_instr(l*{l}, l'), `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
     -- (Resulttype_sub: `|-%*<:%*`(t*{t}, C.LABEL_context[l]))*{l}
     -- Resulttype_sub: `|-%*<:%*`(t*{t}, C.LABEL_context[l'])
 
-  ;; 3-typing.watsup:208.1-210.24
+  ;; 3-typing.watsup:233.1-235.24
   rule return {C : context, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%:%`(C, RETURN_instr, `%->%`(t_1*{t_1} :: t*{t}, t_2*{t_2}))
     -- if (C.RETURN_context = ?(t*{t}))
 
-  ;; 3-typing.watsup:212.1-214.33
+  ;; 3-typing.watsup:237.1-239.33
   rule call {C : context, t_1* : valtype*, t_2* : valtype*, x : idx}:
     `%|-%:%`(C, CALL_instr(x), `%->%`(t_1*{t_1}, t_2*{t_2}))
     -- if (C.FUNC_context[x] = `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:216.1-219.26
+  ;; 3-typing.watsup:241.1-244.26
   rule call_indirect {C : context, ft : functype, lim : limits, t_1* : valtype*, t_2* : valtype*, x : idx}:
     `%|-%:%`(C, CALL_INDIRECT_instr(x, ft), `%->%`(t_1*{t_1} :: [I32_valtype], t_2*{t_2}))
     -- if (C.TABLE_context[x] = `%%`(lim, FUNCREF_reftype))
     -- if (ft = `%->%`(t_1*{t_1}, t_2*{t_2}))
 
-  ;; 3-typing.watsup:222.1-223.37
+  ;; 3-typing.watsup:249.1-250.37
   rule const {C : context, c_nt : c_numtype, nt : numtype}:
     `%|-%:%`(C, CONST_instr(nt, c_nt), `%->%`([], [(nt <: valtype)]))
 
-  ;; 3-typing.watsup:225.1-226.31
+  ;; 3-typing.watsup:252.1-253.31
   rule unop {C : context, nt : numtype, unop : unop_numtype}:
     `%|-%:%`(C, UNOP_instr(nt, unop), `%->%`([(nt <: valtype)], [(nt <: valtype)]))
 
-  ;; 3-typing.watsup:228.1-229.36
+  ;; 3-typing.watsup:255.1-256.36
   rule binop {C : context, binop : binop_numtype, nt : numtype}:
     `%|-%:%`(C, BINOP_instr(nt, binop), `%->%`([(nt <: valtype) (nt <: valtype)], [(nt <: valtype)]))
 
-  ;; 3-typing.watsup:231.1-232.36
+  ;; 3-typing.watsup:258.1-259.36
   rule testop {C : context, nt : numtype, testop : testop_numtype}:
     `%|-%:%`(C, TESTOP_instr(nt, testop), `%->%`([(nt <: valtype)], [I32_valtype]))
 
-  ;; 3-typing.watsup:234.1-235.37
+  ;; 3-typing.watsup:261.1-262.37
   rule relop {C : context, nt : numtype, relop : relop_numtype}:
     `%|-%:%`(C, RELOP_instr(nt, relop), `%->%`([(nt <: valtype) (nt <: valtype)], [I32_valtype]))
 
-  ;; 3-typing.watsup:238.1-240.23
+  ;; 3-typing.watsup:265.1-267.23
   rule extend {C : context, n : n, nt : numtype}:
     `%|-%:%`(C, EXTEND_instr(nt, n), `%->%`([(nt <: valtype)], [(nt <: valtype)]))
     -- if (n <= $size(nt <: valtype))
 
-  ;; 3-typing.watsup:242.1-245.34
+  ;; 3-typing.watsup:269.1-272.34
   rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([(nt_2 <: valtype)], [(nt_1 <: valtype)]))
     -- if (nt_1 =/= nt_2)
     -- if ($size(nt_1 <: valtype) = $size(nt_2 <: valtype))
 
-  ;; 3-typing.watsup:247.1-250.52
-  rule convert-i {C : context, in_1 : in, in_2 : in, sx? : sx?}:
-    `%|-%:%`(C, CVTOP_instr((in_1 <: numtype), CONVERT_cvtop, (in_2 <: numtype), sx?{sx}), `%->%`([(in_2 <: valtype)], [(in_1 <: valtype)]))
-    -- if (in_1 =/= in_2)
-    -- if ((sx?{sx} = ?()) <=> ($size(in_1 <: valtype) > $size(in_2 <: valtype)))
+  ;; 3-typing.watsup:274.1-277.54
+  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
+    `%|-%:%`(C, CVTOP_instr((inn_1 <: numtype), CONVERT_cvtop, (inn_2 <: numtype), sx?{sx}), `%->%`([(inn_2 <: valtype)], [(inn_1 <: valtype)]))
+    -- if (inn_1 =/= inn_2)
+    -- if ((sx?{sx} = ?()) <=> ($size(inn_1 <: valtype) > $size(inn_2 <: valtype)))
 
-  ;; 3-typing.watsup:252.1-254.22
-  rule convert-f {C : context, fn_1 : fn, fn_2 : fn}:
-    `%|-%:%`(C, CVTOP_instr((fn_1 <: numtype), CONVERT_cvtop, (fn_2 <: numtype), ?()), `%->%`([(fn_2 <: valtype)], [(fn_1 <: valtype)]))
-    -- if (fn_1 =/= fn_2)
+  ;; 3-typing.watsup:279.1-281.24
+  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+    `%|-%:%`(C, CVTOP_instr((fnn_1 <: numtype), CONVERT_cvtop, (fnn_2 <: numtype), ?()), `%->%`([(fnn_2 <: valtype)], [(fnn_1 <: valtype)]))
+    -- if (fnn_1 =/= fnn_2)
 
-  ;; 3-typing.watsup:257.1-258.35
+  ;; 3-typing.watsup:286.1-287.35
   rule ref.null {C : context, rt : reftype}:
     `%|-%:%`(C, REF.NULL_instr(rt), `%->%`([], [(rt <: valtype)]))
 
-  ;; 3-typing.watsup:260.1-262.23
+  ;; 3-typing.watsup:289.1-291.23
   rule ref.func {C : context, ft : functype, x : idx}:
     `%|-%:%`(C, REF.FUNC_instr(x), `%->%`([], [FUNCREF_valtype]))
     -- if (C.FUNC_context[x] = ft)
 
-  ;; 3-typing.watsup:264.1-265.31
+  ;; 3-typing.watsup:293.1-294.31
   rule ref.is_null {C : context, rt : reftype}:
     `%|-%:%`(C, REF.IS_NULL_instr, `%->%`([(rt <: valtype)], [I32_valtype]))
 
-  ;; 3-typing.watsup:268.1-270.23
+  ;; 3-typing.watsup:299.1-301.23
   rule local.get {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.GET_instr(x), `%->%`([], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:272.1-274.23
+  ;; 3-typing.watsup:303.1-305.23
   rule local.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.SET_instr(x), `%->%`([t], []))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:276.1-278.23
+  ;; 3-typing.watsup:307.1-309.23
   rule local.tee {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, LOCAL.TEE_instr(x), `%->%`([t], [t]))
     -- if (C.LOCAL_context[x] = t)
 
-  ;; 3-typing.watsup:281.1-283.29
+  ;; 3-typing.watsup:314.1-316.29
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.GET_instr(x), `%->%`([], [t]))
     -- if (C.GLOBAL_context[x] = `MUT%?%`(()?{}, t))
 
-  ;; 3-typing.watsup:285.1-287.28
+  ;; 3-typing.watsup:318.1-320.28
   rule global.set {C : context, t : valtype, x : idx}:
     `%|-%:%`(C, GLOBAL.SET_instr(x), `%->%`([t], []))
     -- if (C.GLOBAL_context[x] = `MUT%?%`(?(()), t))
 
-  ;; 3-typing.watsup:290.1-292.28
+  ;; 3-typing.watsup:325.1-327.28
   rule table.get {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.GET_instr(x), `%->%`([I32_valtype], [(rt <: valtype)]))
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
-  ;; 3-typing.watsup:294.1-296.28
+  ;; 3-typing.watsup:329.1-331.28
   rule table.set {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.SET_instr(x), `%->%`([I32_valtype (rt <: valtype)], []))
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
-  ;; 3-typing.watsup:298.1-300.24
+  ;; 3-typing.watsup:333.1-335.24
   rule table.size {C : context, tt : tabletype, x : idx}:
     `%|-%:%`(C, TABLE.SIZE_instr(x), `%->%`([], [I32_valtype]))
     -- if (C.TABLE_context[x] = tt)
 
-  ;; 3-typing.watsup:302.1-304.28
+  ;; 3-typing.watsup:337.1-339.28
   rule table.grow {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.GROW_instr(x), `%->%`([(rt <: valtype) I32_valtype], [I32_valtype]))
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
-  ;; 3-typing.watsup:306.1-308.28
+  ;; 3-typing.watsup:341.1-343.28
   rule table.fill {C : context, lim : limits, rt : reftype, x : idx}:
     `%|-%:%`(C, TABLE.FILL_instr(x), `%->%`([I32_valtype (rt <: valtype) I32_valtype], []))
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
 
-  ;; 3-typing.watsup:310.1-313.32
+  ;; 3-typing.watsup:345.1-348.32
   rule table.copy {C : context, lim_1 : limits, lim_2 : limits, rt : reftype, x_1 : idx, x_2 : idx}:
     `%|-%:%`(C, TABLE.COPY_instr(x_1, x_2), `%->%`([I32_valtype I32_valtype I32_valtype], []))
     -- if (C.TABLE_context[x_1] = `%%`(lim_1, rt))
     -- if (C.TABLE_context[x_2] = `%%`(lim_2, rt))
 
-  ;; 3-typing.watsup:315.1-318.25
+  ;; 3-typing.watsup:350.1-353.25
   rule table.init {C : context, lim : limits, rt : reftype, x_1 : idx, x_2 : idx}:
     `%|-%:%`(C, TABLE.INIT_instr(x_1, x_2), `%->%`([I32_valtype I32_valtype I32_valtype], []))
     -- if (C.TABLE_context[x_1] = `%%`(lim, rt))
     -- if (C.ELEM_context[x_2] = rt)
 
-  ;; 3-typing.watsup:320.1-322.23
+  ;; 3-typing.watsup:355.1-357.23
   rule elem.drop {C : context, rt : reftype, x : idx}:
     `%|-%:%`(C, ELEM.DROP_instr(x), `%->%`([], []))
     -- if (C.ELEM_context[x] = rt)
 
-  ;; 3-typing.watsup:325.1-327.22
+  ;; 3-typing.watsup:362.1-364.22
   rule memory.size {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.SIZE_instr, `%->%`([], [I32_valtype]))
     -- if (C.MEM_context[0] = mt)
 
-  ;; 3-typing.watsup:329.1-331.22
+  ;; 3-typing.watsup:366.1-368.22
   rule memory.grow {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY.GROW_instr, `%->%`([I32_valtype], [I32_valtype]))
     -- if (C.MEM_context[0] = mt)
 
-  ;; 3-typing.watsup:333.1-335.22
+  ;; 3-typing.watsup:370.1-372.22
   rule memory.fill {C : context, mt : memtype}:
-    `%|-%:%`(C, MEMORY.FILL_instr, `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
+    `%|-%:%`(C, MEMORY.FILL_instr, `%->%`([I32_valtype I32_valtype I32_valtype], []))
     -- if (C.MEM_context[0] = mt)
 
-  ;; 3-typing.watsup:337.1-339.22
+  ;; 3-typing.watsup:374.1-376.22
   rule memory.copy {C : context, mt : memtype}:
-    `%|-%:%`(C, MEMORY.COPY_instr, `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
+    `%|-%:%`(C, MEMORY.COPY_instr, `%->%`([I32_valtype I32_valtype I32_valtype], []))
     -- if (C.MEM_context[0] = mt)
 
-  ;; 3-typing.watsup:341.1-344.23
+  ;; 3-typing.watsup:378.1-381.23
   rule memory.init {C : context, mt : memtype, x : idx}:
-    `%|-%:%`(C, MEMORY.INIT_instr(x), `%->%`([I32_valtype I32_valtype I32_valtype], [I32_valtype]))
+    `%|-%:%`(C, MEMORY.INIT_instr(x), `%->%`([I32_valtype I32_valtype I32_valtype], []))
     -- if (C.MEM_context[0] = mt)
     -- if (C.DATA_context[x] = OK)
 
-  ;; 3-typing.watsup:346.1-348.23
+  ;; 3-typing.watsup:383.1-385.23
   rule data.drop {C : context, x : idx}:
     `%|-%:%`(C, DATA.DROP_instr(x), `%->%`([], []))
     -- if (C.DATA_context[x] = OK)
 
-  ;; 3-typing.watsup:350.1-355.32
-  rule load {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?}:
+  ;; 3-typing.watsup:387.1-392.33
+  rule load {C : context, inn : inn, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype, sx? : sx?}:
     `%|-%:%`(C, LOAD_instr(nt, (n, sx)?{n sx}, n_A, n_O), `%->%`([I32_valtype], [(nt <: valtype)]))
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= ($size(nt <: valtype) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < ($size(nt <: valtype) / 8))))?{n}
-    -- if ((n?{n} = ?()) \/ (nt = (in <: numtype)))
+    -- if ((n?{n} = ?()) \/ (nt = (inn <: numtype)))
 
-  ;; 3-typing.watsup:357.1-362.32
-  rule store {C : context, in : in, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype}:
+  ;; 3-typing.watsup:394.1-399.33
+  rule store {C : context, inn : inn, mt : memtype, n? : n?, n_A : n, n_O : n, nt : numtype}:
     `%|-%:%`(C, STORE_instr(nt, n?{n}, n_A, n_O), `%->%`([I32_valtype (nt <: valtype)], []))
     -- if (C.MEM_context[0] = mt)
     -- if ((2 ^ n_A) <= ($size(nt <: valtype) / 8))
     -- (if (((2 ^ n_A) <= (n / 8)) /\ ((n / 8) < ($size(nt <: valtype) / 8))))?{n}
-    -- if ((n?{n} = ?()) \/ (nt = (in <: numtype)))
+    -- if ((n?{n} = ?()) \/ (nt = (inn <: numtype)))
 
-;; 3-typing.watsup:124.1-124.67
+;; 3-typing.watsup:136.1-136.67
 relation InstrSeq_ok: `%|-%*:%`(context, instr*, functype)
-  ;; 3-typing.watsup:133.1-134.36
+  ;; 3-typing.watsup:149.1-150.36
   rule empty {C : context}:
     `%|-%*:%`(C, [], `%->%`([], []))
 
-  ;; 3-typing.watsup:136.1-139.46
+  ;; 3-typing.watsup:152.1-155.46
   rule seq {C : context, instr_1 : instr, instr_2 : instr, t_1* : valtype*, t_2* : valtype*, t_3* : valtype*}:
     `%|-%*:%`(C, [instr_1] :: instr_2*{}, `%->%`(t_1*{t_1}, t_3*{t_3}))
     -- Instr_ok: `%|-%:%`(C, instr_1, `%->%`(t_1*{t_1}, t_2*{t_2}))
     -- InstrSeq_ok: `%|-%*:%`(C, [instr_2], `%->%`(t_2*{t_2}, t_3*{t_3}))
 
-  ;; 3-typing.watsup:141.1-146.38
-  rule weak {C : context, instr* : instr*, t'_1 : valtype, t'_2* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%*:%`(C, instr*{instr}, `%->%`([t'_1], t'_2*{t'_2}))
+  ;; 3-typing.watsup:157.1-162.38
+  rule weak {C : context, instr* : instr*, t'_1* : valtype*, t'_2* : valtype*, t_1* : valtype*, t_2* : valtype*}:
+    `%|-%*:%`(C, instr*{instr}, `%->%`(t'_1*{t'_1}, t'_2*{t'_2}))
     -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
-    -- Resulttype_sub: `|-%*<:%*`(t'_1*{}, t_1*{t_1})
+    -- Resulttype_sub: `|-%*<:%*`(t'_1*{t'_1}, t_1*{t_1})
     -- Resulttype_sub: `|-%*<:%*`(t_2*{t_2}, t'_2*{t'_2})
 
-  ;; 3-typing.watsup:148.1-150.45
+  ;; 3-typing.watsup:164.1-166.45
   rule frame {C : context, instr* : instr*, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
     `%|-%*:%`(C, instr*{instr}, `%->%`(t*{t} :: t_1*{t_1}, t*{t} :: t_2*{t_2}))
     -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`(t_1*{t_1}, t_2*{t_2}))
 }
 
-;; 3-typing.watsup:125.1-125.71
+;; 3-typing.watsup:137.1-137.71
 relation Expr_ok: `%|-%:%`(context, expr, resulttype)
-  ;; 3-typing.watsup:128.1-130.46
+  ;; 3-typing.watsup:142.1-144.46
   rule _ {C : context, instr* : instr*, t* : valtype*}:
     `%|-%:%`(C, instr*{instr}, t*{t})
     -- InstrSeq_ok: `%|-%*:%`(C, instr*{instr}, `%->%`([], t*{t}))
 
-;; 3-typing.watsup:367.1-367.78
+;; 3-typing.watsup:406.1-406.78
 relation Instr_const: `%|-%CONST`(context, instr)
-  ;; 3-typing.watsup:371.1-372.26
+  ;; 3-typing.watsup:410.1-411.26
   rule const {C : context, c : c_numtype, nt : numtype}:
     `%|-%CONST`(C, CONST_instr(nt, c))
 
-  ;; 3-typing.watsup:374.1-375.27
+  ;; 3-typing.watsup:413.1-414.27
   rule ref.null {C : context, rt : reftype}:
     `%|-%CONST`(C, REF.NULL_instr(rt))
 
-  ;; 3-typing.watsup:377.1-378.26
+  ;; 3-typing.watsup:416.1-417.26
   rule ref.func {C : context, x : idx}:
     `%|-%CONST`(C, REF.FUNC_instr(x))
 
-  ;; 3-typing.watsup:380.1-382.32
+  ;; 3-typing.watsup:419.1-421.32
   rule global.get {C : context, t : valtype, x : idx}:
     `%|-%CONST`(C, GLOBAL.GET_instr(x))
     -- if (C.GLOBAL_context[x] = `MUT%?%`(?(), t))
 
-;; 3-typing.watsup:368.1-368.77
+;; 3-typing.watsup:407.1-407.77
 relation Expr_const: `%|-%CONST`(context, expr)
-  ;; 3-typing.watsup:385.1-386.38
+  ;; 3-typing.watsup:424.1-425.38
   rule _ {C : context, instr* : instr*}:
     `%|-%CONST`(C, instr*{instr})
     -- (Instr_const: `%|-%CONST`(C, instr))*{instr}
 
-;; 3-typing.watsup:369.1-369.78
+;; 3-typing.watsup:408.1-408.78
 relation Expr_ok_const: `%|-%:%CONST`(context, expr, valtype)
-  ;; 3-typing.watsup:389.1-392.33
+  ;; 3-typing.watsup:428.1-431.33
   rule _ {C : context, expr : expr, t : valtype}:
     `%|-%:%CONST`(C, expr, t)
     -- Expr_ok: `%|-%:%`(C, expr, [t])
     -- Expr_const: `%|-%CONST`(C, expr)
 
-;; 3-typing.watsup:397.1-397.73
+;; 3-typing.watsup:438.1-438.73
 relation Func_ok: `%|-%:%`(context, func, functype)
-  ;; 3-typing.watsup:408.1-412.75
+  ;; 3-typing.watsup:451.1-455.75
   rule _ {C : context, expr : expr, ft : functype, t* : valtype*, t_1* : valtype*, t_2* : valtype*}:
-    `%|-%:%`(C, `FUNC%%*%`(ft, t*{t}, expr), ft)
+    `%|-%:%`(C, `FUNC%%*%`(ft, LOCAL(t)*{t}, expr), ft)
     -- if (ft = `%->%`(t_1*{t_1}, t_2*{t_2}))
     -- Functype_ok: `|-%:OK`(ft)
     -- Expr_ok: `%|-%:%`(C ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL t_1*{t_1} :: t*{t}, LABEL [], RETURN ?()} ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [t_2*{t_2}], RETURN ?()} ++ {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], LOCAL [], LABEL [], RETURN ?(t_2*{t_2})}, expr, t_2*{t_2})
 
-;; 3-typing.watsup:398.1-398.75
+;; 3-typing.watsup:439.1-439.75
 relation Global_ok: `%|-%:%`(context, global, globaltype)
-  ;; 3-typing.watsup:414.1-418.40
+  ;; 3-typing.watsup:457.1-461.40
   rule _ {C : context, expr : expr, gt : globaltype, t : valtype}:
     `%|-%:%`(C, GLOBAL(gt, expr), gt)
     -- Globaltype_ok: `|-%:OK`(gt)
     -- if (gt = `MUT%?%`(()?{}, t))
     -- Expr_ok_const: `%|-%:%CONST`(C, expr, t)
 
-;; 3-typing.watsup:399.1-399.74
+;; 3-typing.watsup:440.1-440.74
 relation Table_ok: `%|-%:%`(context, table, tabletype)
-  ;; 3-typing.watsup:420.1-422.30
+  ;; 3-typing.watsup:463.1-465.30
   rule _ {C : context, tt : tabletype}:
     `%|-%:%`(C, TABLE(tt), tt)
     -- Tabletype_ok: `|-%:OK`(tt)
 
-;; 3-typing.watsup:400.1-400.72
+;; 3-typing.watsup:441.1-441.72
 relation Mem_ok: `%|-%:%`(context, mem, memtype)
-  ;; 3-typing.watsup:424.1-426.28
+  ;; 3-typing.watsup:467.1-469.28
   rule _ {C : context, mt : memtype}:
     `%|-%:%`(C, MEMORY(mt), mt)
     -- Memtype_ok: `|-%:OK`(mt)
 
-;; 3-typing.watsup:403.1-403.77
+;; 3-typing.watsup:444.1-444.77
 relation Elemmode_ok: `%|-%:%`(context, elemmode, reftype)
-  ;; 3-typing.watsup:437.1-440.45
+  ;; 3-typing.watsup:480.1-483.45
   rule active {C : context, expr : expr, lim : limits, rt : reftype, x : idx}:
-    `%|-%:%`(C, TABLE_elemmode(x, expr), rt)
+    `%|-%:%`(C, ACTIVE_elemmode(x, expr), rt)
     -- if (C.TABLE_context[x] = `%%`(lim, rt))
     -- (Expr_ok_const: `%|-%:%CONST`(C, expr, I32_valtype))*{}
 
-  ;; 3-typing.watsup:442.1-443.20
+  ;; 3-typing.watsup:485.1-486.20
+  rule passive {C : context, rt : reftype}:
+    `%|-%:%`(C, PASSIVE_elemmode, rt)
+
+  ;; 3-typing.watsup:488.1-489.20
   rule declare {C : context, rt : reftype}:
     `%|-%:%`(C, DECLARE_elemmode, rt)
 
-;; 3-typing.watsup:401.1-401.73
+;; 3-typing.watsup:442.1-442.73
 relation Elem_ok: `%|-%:%`(context, elem, reftype)
-  ;; 3-typing.watsup:428.1-431.40
-  rule _ {C : context, elemmode? : elemmode?, expr* : expr*, rt : reftype}:
-    `%|-%:%`(C, `ELEM%%*%?`(rt, expr*{expr}, elemmode?{elemmode}), rt)
+  ;; 3-typing.watsup:471.1-474.37
+  rule _ {C : context, elemmode : elemmode, expr* : expr*, rt : reftype}:
+    `%|-%:%`(C, `ELEM%%*%`(rt, expr*{expr}, elemmode), rt)
     -- (Expr_ok: `%|-%:%`(C, expr, [(rt <: valtype)]))*{expr}
-    -- (Elemmode_ok: `%|-%:%`(C, elemmode, rt))?{elemmode}
+    -- Elemmode_ok: `%|-%:%`(C, elemmode, rt)
 
-;; 3-typing.watsup:404.1-404.77
+;; 3-typing.watsup:445.1-445.77
 relation Datamode_ok: `%|-%:OK`(context, datamode)
-  ;; 3-typing.watsup:445.1-448.45
+  ;; 3-typing.watsup:491.1-494.45
   rule _ {C : context, expr : expr, mt : memtype}:
-    `%|-%:OK`(C, MEMORY_datamode(0, expr))
+    `%|-%:OK`(C, ACTIVE_datamode(0, expr))
     -- if (C.MEM_context[0] = mt)
     -- (Expr_ok_const: `%|-%:%CONST`(C, expr, I32_valtype))*{}
 
-;; 3-typing.watsup:402.1-402.73
-relation Data_ok: `%|-%:OK`(context, data)
-  ;; 3-typing.watsup:433.1-435.40
-  rule _ {C : context, b** : byte**, datamode? : datamode?}:
-    `%|-%:OK`(C, `DATA(*)%*%?`(b*{b}*{b}, datamode?{datamode}))
-    -- (Datamode_ok: `%|-%:OK`(C, datamode))?{datamode}
+  ;; 3-typing.watsup:496.1-497.20
+  rule passive {C : context}:
+    `%|-%:OK`(C, PASSIVE_datamode)
 
-;; 3-typing.watsup:405.1-405.74
+;; 3-typing.watsup:443.1-443.73
+relation Data_ok: `%|-%:OK`(context, data)
+  ;; 3-typing.watsup:476.1-478.37
+  rule _ {C : context, b* : byte*, datamode : datamode}:
+    `%|-%:OK`(C, `DATA%*%`(b*{b}, datamode))
+    -- Datamode_ok: `%|-%:OK`(C, datamode)
+
+;; 3-typing.watsup:446.1-446.74
 relation Start_ok: `%|-%:OK`(context, start)
-  ;; 3-typing.watsup:450.1-452.39
+  ;; 3-typing.watsup:499.1-501.39
   rule _ {C : context, x : idx}:
     `%|-%:OK`(C, START(x))
     -- if (C.FUNC_context[x] = `%->%`([], []))
 
-;; 3-typing.watsup:455.1-455.80
+;; 3-typing.watsup:506.1-506.80
 relation Import_ok: `%|-%:%`(context, import, externtype)
-  ;; 3-typing.watsup:459.1-461.31
+  ;; 3-typing.watsup:510.1-512.31
   rule _ {C : context, name_1 : name, name_2 : name, xt : externtype}:
     `%|-%:%`(C, IMPORT(name_1, name_2, xt), xt)
     -- Externtype_ok: `|-%:OK`(xt)
 
-;; 3-typing.watsup:457.1-457.83
-relation Externuse_ok: `%|-%:%`(context, externuse, externtype)
-  ;; 3-typing.watsup:467.1-469.23
+;; 3-typing.watsup:508.1-508.83
+relation Externidx_ok: `%|-%:%`(context, externidx, externtype)
+  ;; 3-typing.watsup:519.1-521.23
   rule func {C : context, ft : functype, x : idx}:
-    `%|-%:%`(C, FUNC_externuse(x), FUNC_externtype(ft))
+    `%|-%:%`(C, FUNC_externidx(x), FUNC_externtype(ft))
     -- if (C.FUNC_context[x] = ft)
 
-  ;; 3-typing.watsup:471.1-473.25
+  ;; 3-typing.watsup:523.1-525.25
   rule global {C : context, gt : globaltype, x : idx}:
-    `%|-%:%`(C, GLOBAL_externuse(x), GLOBAL_externtype(gt))
+    `%|-%:%`(C, GLOBAL_externidx(x), GLOBAL_externtype(gt))
     -- if (C.GLOBAL_context[x] = gt)
 
-  ;; 3-typing.watsup:475.1-477.24
+  ;; 3-typing.watsup:527.1-529.24
   rule table {C : context, tt : tabletype, x : idx}:
-    `%|-%:%`(C, TABLE_externuse(x), TABLE_externtype(tt))
+    `%|-%:%`(C, TABLE_externidx(x), TABLE_externtype(tt))
     -- if (C.TABLE_context[x] = tt)
 
-  ;; 3-typing.watsup:479.1-481.22
+  ;; 3-typing.watsup:531.1-533.22
   rule mem {C : context, mt : memtype, x : idx}:
-    `%|-%:%`(C, MEMORY_externuse(x), MEMORY_externtype(mt))
+    `%|-%:%`(C, MEM_externidx(x), MEM_externtype(mt))
     -- if (C.MEM_context[x] = mt)
 
-;; 3-typing.watsup:456.1-456.80
+;; 3-typing.watsup:507.1-507.80
 relation Export_ok: `%|-%:%`(context, export, externtype)
-  ;; 3-typing.watsup:463.1-465.39
-  rule _ {C : context, externuse : externuse, name : name, xt : externtype}:
-    `%|-%:%`(C, EXPORT(name, externuse), xt)
-    -- Externuse_ok: `%|-%:%`(C, externuse, xt)
+  ;; 3-typing.watsup:514.1-516.39
+  rule _ {C : context, externidx : externidx, name : name, xt : externtype}:
+    `%|-%:%`(C, EXPORT(name, externidx), xt)
+    -- Externidx_ok: `%|-%:%`(C, externidx, xt)
 
-;; 3-typing.watsup:484.1-484.62
+;; 3-typing.watsup:538.1-538.62
 relation Module_ok: `|-%:OK`(module)
-  ;; 3-typing.watsup:486.1-501.22
-  rule _ {C : context, data^n : data^n, elem* : elem*, export* : export*, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, import* : import*, mem* : mem*, mt* : memtype*, n : n, rt* : reftype*, start* : start*, table* : table*, tt* : tabletype*}:
-    `|-%:OK`(`MODULE%*%*%*%*%*%*%*%*%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data^n{data}, start*{start}, export*{export}))
+  ;; 3-typing.watsup:540.1-554.20
+  rule _ {C : context, data^n : data^n, elem* : elem*, export* : export*, ft* : functype*, func* : func*, global* : global*, gt* : globaltype*, import* : import*, mem* : mem*, mt* : memtype*, n : n, rt* : reftype*, start? : start?, table* : table*, tt* : tabletype*}:
+    `|-%:OK`(`MODULE%*%*%*%*%*%*%*%?%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data^n{data}, start?{start}, export*{export}))
     -- if (C = {FUNC ft*{ft}, GLOBAL gt*{gt}, TABLE tt*{tt}, MEM mt*{mt}, ELEM rt*{rt}, DATA OK^n{}, LOCAL [], LABEL [], RETURN ?()})
     -- (Func_ok: `%|-%:%`(C, func, ft))*{ft func}
     -- (Global_ok: `%|-%:%`(C, global, gt))*{global gt}
@@ -945,116 +1019,117 @@ relation Module_ok: `|-%:OK`(module)
     -- (Mem_ok: `%|-%:%`(C, mem, mt))*{mem mt}
     -- (Elem_ok: `%|-%:%`(C, elem, rt))*{elem rt}
     -- (Data_ok: `%|-%:OK`(C, data))^n{data}
-    -- (Start_ok: `%|-%:OK`(C, start))*{start}
+    -- (Start_ok: `%|-%:OK`(C, start))?{start}
     -- if (|mem*{mem}| <= 1)
-    -- if (|start*{start}| <= 1)
 
-;; 4-runtime.watsup:3.1-3.39
+;; 4-runtime.watsup:5.1-5.39
 syntax addr = nat
 
-;; 4-runtime.watsup:4.1-4.53
+;; 4-runtime.watsup:6.1-6.53
 syntax funcaddr = addr
 
-;; 4-runtime.watsup:5.1-5.53
+;; 4-runtime.watsup:7.1-7.53
 syntax globaladdr = addr
 
-;; 4-runtime.watsup:6.1-6.51
+;; 4-runtime.watsup:8.1-8.51
 syntax tableaddr = addr
 
-;; 4-runtime.watsup:7.1-7.50
+;; 4-runtime.watsup:9.1-9.50
 syntax memaddr = addr
 
-;; 4-runtime.watsup:8.1-8.49
+;; 4-runtime.watsup:10.1-10.49
 syntax elemaddr = addr
 
-;; 4-runtime.watsup:9.1-9.49
+;; 4-runtime.watsup:11.1-11.49
 syntax dataaddr = addr
 
-;; 4-runtime.watsup:10.1-10.51
+;; 4-runtime.watsup:12.1-12.51
 syntax labeladdr = addr
 
-;; 4-runtime.watsup:11.1-11.49
+;; 4-runtime.watsup:13.1-13.49
 syntax hostaddr = addr
 
-;; 4-runtime.watsup:24.1-25.24
+;; 4-runtime.watsup:30.1-31.28
 syntax num =
   | CONST(numtype, c_numtype)
 
-;; 4-runtime.watsup:26.1-27.67
+;; 4-runtime.watsup:32.1-33.71
 syntax ref =
   | REF.NULL(reftype)
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
 
-;; 4-runtime.watsup:28.1-29.10
+;; 4-runtime.watsup:34.1-35.14
 syntax val =
   | CONST(numtype, c_numtype)
   | REF.NULL(reftype)
   | REF.FUNC_ADDR(funcaddr)
   | REF.HOST_ADDR(hostaddr)
 
-;; 4-runtime.watsup:31.1-32.18
+;; 4-runtime.watsup:37.1-38.22
 syntax result =
   | _VALS(val*)
   | TRAP
 
-;; 4-runtime.watsup:38.1-39.66
+;; 4-runtime.watsup:47.1-48.70
 syntax externval =
   | FUNC(funcaddr)
   | GLOBAL(globaladdr)
   | TABLE(tableaddr)
   | MEM(memaddr)
 
-;; 4-runtime.watsup:44.1-44.44
+;; 4-runtime.watsup:55.1-55.44
 def default_ : valtype -> val
-  ;; 4-runtime.watsup:45.1-45.35
+  ;; 4-runtime.watsup:56.1-56.35
   def default_(I32_valtype) = CONST_val(I32_numtype, 0)
-  ;; 4-runtime.watsup:46.1-46.35
+  ;; 4-runtime.watsup:57.1-57.35
   def default_(I64_valtype) = CONST_val(I64_numtype, 0)
-  ;; 4-runtime.watsup:47.1-47.35
+  ;; 4-runtime.watsup:58.1-58.35
   def default_(F32_valtype) = CONST_val(F32_numtype, 0)
-  ;; 4-runtime.watsup:48.1-48.35
+  ;; 4-runtime.watsup:59.1-59.35
   def default_(F64_valtype) = CONST_val(F64_numtype, 0)
-  ;; 4-runtime.watsup:49.1-49.34
-  def {rt : reftype} default_(rt <: valtype) = REF.NULL_val(rt)
+  ;; 4-runtime.watsup:60.1-60.44
+  def default_(FUNCREF_valtype) = REF.NULL_val(FUNCREF_reftype)
+  ;; 4-runtime.watsup:61.1-61.48
+  def default_(EXTERNREF_valtype) = REF.NULL_val(EXTERNREF_reftype)
 
-;; 4-runtime.watsup:60.1-60.71
-syntax exportinst = EXPORT(name, externval)
+;; 4-runtime.watsup:87.1-89.22
+syntax exportinst = {NAME name, VALUE externval}
 
-;; 4-runtime.watsup:70.1-77.25
+;; 4-runtime.watsup:91.1-98.25
 syntax moduleinst = {FUNC funcaddr*, GLOBAL globaladdr*, TABLE tableaddr*, MEM memaddr*, ELEM elemaddr*, DATA dataaddr*, EXPORT exportinst*}
 
-;; 4-runtime.watsup:54.1-54.66
-syntax funcinst = `%;%`(moduleinst, func)
+;; 4-runtime.watsup:70.1-72.16
+syntax funcinst = {MODULE moduleinst, CODE func}
 
-;; 4-runtime.watsup:55.1-55.53
-syntax globalinst = val
+;; 4-runtime.watsup:73.1-75.16
+syntax globalinst = {TYPE globaltype, VALUE val}
 
-;; 4-runtime.watsup:56.1-56.52
-syntax tableinst = ref*
+;; 4-runtime.watsup:76.1-78.16
+syntax tableinst = {TYPE tabletype, ELEM ref*}
 
-;; 4-runtime.watsup:57.1-57.52
-syntax meminst = byte*
+;; 4-runtime.watsup:79.1-81.17
+syntax meminst = {TYPE memtype, DATA byte*}
 
-;; 4-runtime.watsup:58.1-58.53
-syntax eleminst = ref*
+;; 4-runtime.watsup:82.1-84.16
+syntax eleminst = {TYPE elemtype, ELEM ref*}
 
-;; 4-runtime.watsup:59.1-59.51
-syntax datainst = byte*
+;; 4-runtime.watsup:85.1-86.17
+syntax datainst = {DATA byte*}
 
-;; 4-runtime.watsup:62.1-68.21
+;; 4-runtime.watsup:112.1-118.21
 syntax store = {FUNC funcinst*, GLOBAL globalinst*, TABLE tableinst*, MEM meminst*, ELEM eleminst*, DATA datainst*}
 
-;; 4-runtime.watsup:79.1-81.24
+;; 4-runtime.watsup:120.1-122.24
 syntax frame = {LOCAL val*, MODULE moduleinst}
 
-;; 4-runtime.watsup:82.1-82.47
+;; 4-runtime.watsup:124.1-124.47
 syntax state = `%;%`(store, frame)
 
-;; 4-runtime.watsup:145.1-152.5
+;; 4-runtime.watsup:209.1-216.9
 rec {
 
-;; 4-runtime.watsup:145.1-152.5
+;; 4-runtime.watsup:209.1-216.9
 syntax admininstr =
   | UNREACHABLE
   | NOP
@@ -1108,98 +1183,141 @@ syntax admininstr =
   | TRAP
 }
 
-;; 4-runtime.watsup:83.1-83.62
+;; 4-runtime.watsup:125.1-125.62
 syntax config = `%;%*`(state, admininstr*)
 
-;; 4-runtime.watsup:101.1-101.59
+;; 4-runtime.watsup:134.1-134.59
 def funcaddr : state -> funcaddr*
-  ;; 4-runtime.watsup:102.1-102.38
+  ;; 4-runtime.watsup:135.1-135.38
   def {f : frame, s : store} funcaddr(`%;%`(s, f)) = f.MODULE_frame.FUNC_moduleinst
 
-;; 4-runtime.watsup:104.1-104.52
+;; 4-runtime.watsup:137.1-137.52
 def funcinst : state -> funcinst*
-  ;; 4-runtime.watsup:105.1-105.31
+  ;; 4-runtime.watsup:144.1-144.31
   def {f : frame, s : store} funcinst(`%;%`(s, f)) = s.FUNC_store
 
-;; 4-runtime.watsup:107.1-107.67
+;; 4-runtime.watsup:138.1-138.58
+def globalinst : state -> globalinst*
+  ;; 4-runtime.watsup:145.1-145.35
+  def {f : frame, s : store} globalinst(`%;%`(s, f)) = s.GLOBAL_store
+
+;; 4-runtime.watsup:139.1-139.55
+def tableinst : state -> tableinst*
+  ;; 4-runtime.watsup:146.1-146.33
+  def {f : frame, s : store} tableinst(`%;%`(s, f)) = s.TABLE_store
+
+;; 4-runtime.watsup:140.1-140.49
+def meminst : state -> meminst*
+  ;; 4-runtime.watsup:147.1-147.29
+  def {f : frame, s : store} meminst(`%;%`(s, f)) = s.MEM_store
+
+;; 4-runtime.watsup:141.1-141.52
+def eleminst : state -> eleminst*
+  ;; 4-runtime.watsup:148.1-148.31
+  def {f : frame, s : store} eleminst(`%;%`(s, f)) = s.ELEM_store
+
+;; 4-runtime.watsup:142.1-142.52
+def datainst : state -> datainst*
+  ;; 4-runtime.watsup:149.1-149.31
+  def {f : frame, s : store} datainst(`%;%`(s, f)) = s.DATA_store
+
+;; 4-runtime.watsup:151.1-151.67
 def func : (state, funcidx) -> funcinst
-  ;; 4-runtime.watsup:115.1-115.48
+  ;; 4-runtime.watsup:159.1-159.48
   def {f : frame, s : store, x : idx} func(`%;%`(s, f), x) = s.FUNC_store[f.MODULE_frame.FUNC_moduleinst[x]]
 
-;; 4-runtime.watsup:108.1-108.69
+;; 4-runtime.watsup:152.1-152.69
 def global : (state, globalidx) -> globalinst
-  ;; 4-runtime.watsup:116.1-116.54
+  ;; 4-runtime.watsup:160.1-160.54
   def {f : frame, s : store, x : idx} global(`%;%`(s, f), x) = s.GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]]
 
-;; 4-runtime.watsup:109.1-109.68
+;; 4-runtime.watsup:153.1-153.68
 def table : (state, tableidx) -> tableinst
-  ;; 4-runtime.watsup:117.1-117.51
+  ;; 4-runtime.watsup:161.1-161.51
   def {f : frame, s : store, x : idx} table(`%;%`(s, f), x) = s.TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]]
 
-;; 4-runtime.watsup:110.1-110.66
+;; 4-runtime.watsup:154.1-154.66
 def mem : (state, memidx) -> meminst
-  ;; 4-runtime.watsup:118.1-118.45
+  ;; 4-runtime.watsup:162.1-162.45
   def {f : frame, s : store, x : idx} mem(`%;%`(s, f), x) = s.MEM_store[f.MODULE_frame.MEM_moduleinst[x]]
 
-;; 4-runtime.watsup:111.1-111.67
+;; 4-runtime.watsup:155.1-155.67
 def elem : (state, tableidx) -> eleminst
-  ;; 4-runtime.watsup:119.1-119.48
+  ;; 4-runtime.watsup:163.1-163.48
   def {f : frame, s : store, x : idx} elem(`%;%`(s, f), x) = s.ELEM_store[f.MODULE_frame.ELEM_moduleinst[x]]
 
-;; 4-runtime.watsup:112.1-112.67
+;; 4-runtime.watsup:156.1-156.67
 def data : (state, dataidx) -> datainst
-  ;; 4-runtime.watsup:120.1-120.48
+  ;; 4-runtime.watsup:164.1-164.48
   def {f : frame, s : store, x : idx} data(`%;%`(s, f), x) = s.DATA_store[f.MODULE_frame.DATA_moduleinst[x]]
 
-;; 4-runtime.watsup:113.1-113.68
+;; 4-runtime.watsup:157.1-157.68
 def local : (state, localidx) -> val
-  ;; 4-runtime.watsup:121.1-121.35
+  ;; 4-runtime.watsup:165.1-165.35
   def {f : frame, s : store, x : idx} local(`%;%`(s, f), x) = f.LOCAL_frame[x]
 
-;; 4-runtime.watsup:124.1-124.78
+;; 4-runtime.watsup:168.1-168.78
 def with_local : (state, localidx, val) -> state
-  ;; 4-runtime.watsup:133.1-133.52
+  ;; 4-runtime.watsup:177.1-177.52
   def {f : frame, s : store, v : val, x : idx} with_local(`%;%`(s, f), x, v) = `%;%`(s, f[LOCAL_frame[x] = v])
 
-;; 4-runtime.watsup:125.1-125.79
+;; 4-runtime.watsup:169.1-169.85
 def with_global : (state, globalidx, val) -> state
-  ;; 4-runtime.watsup:134.1-134.71
-  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]] = v], f)
+  ;; 4-runtime.watsup:178.1-178.77
+  def {f : frame, s : store, v : val, x : idx} with_global(`%;%`(s, f), x, v) = `%;%`(s[GLOBAL_store[f.MODULE_frame.GLOBAL_moduleinst[x]].VALUE_globalinst = v], f)
 
-;; 4-runtime.watsup:126.1-126.83
+;; 4-runtime.watsup:170.1-170.88
 def with_table : (state, tableidx, nat, ref) -> state
-  ;; 4-runtime.watsup:135.1-135.74
-  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]][i] = r], f)
+  ;; 4-runtime.watsup:179.1-179.79
+  def {f : frame, i : nat, r : ref, s : store, x : idx} with_table(`%;%`(s, f), x, i, r) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]].ELEM_tableinst[i] = r], f)
 
-;; 4-runtime.watsup:127.1-127.80
-def with_tableext : (state, tableidx, ref*) -> state
-  ;; 4-runtime.watsup:136.1-136.75
-  def {f : frame, r* : ref*, s : store, x : idx} with_tableext(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] =.. r*{r}], f)
+;; 4-runtime.watsup:171.1-171.84
+def with_tableinst : (state, tableidx, tableinst) -> state
+  ;; 4-runtime.watsup:180.1-180.74
+  def {f : frame, s : store, ti : tableinst, x : idx} with_tableinst(`%;%`(s, f), x, ti) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = ti], f)
 
-;; 4-runtime.watsup:128.1-128.90
-def with_mem : (state, tableidx, nat, nat, byte*) -> state
-  ;; 4-runtime.watsup:137.1-137.77
-  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]][i : j] = b*{b}], f)
+;; 4-runtime.watsup:172.1-172.93
+def with_mem : (state, memidx, nat, nat, byte*) -> state
+  ;; 4-runtime.watsup:181.1-181.82
+  def {b* : byte*, f : frame, i : nat, j : nat, s : store, x : idx} with_mem(`%;%`(s, f), x, i, j, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]].DATA_meminst[i : j] = b*{b}], f)
 
-;; 4-runtime.watsup:129.1-129.78
-def with_memext : (state, tableidx, byte*) -> state
-  ;; 4-runtime.watsup:138.1-138.69
-  def {b* : byte*, f : frame, s : store, x : idx} with_memext(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] =.. b*{b}], f)
+;; 4-runtime.watsup:173.1-173.77
+def with_meminst : (state, memidx, meminst) -> state
+  ;; 4-runtime.watsup:182.1-182.68
+  def {f : frame, mi : meminst, s : store, x : idx} with_meminst(`%;%`(s, f), x, mi) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = mi], f)
 
-;; 4-runtime.watsup:130.1-130.77
+;; 4-runtime.watsup:174.1-174.82
 def with_elem : (state, elemidx, ref*) -> state
-  ;; 4-runtime.watsup:139.1-139.69
-  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[TABLE_store[f.MODULE_frame.TABLE_moduleinst[x]] = r*{r}], f)
+  ;; 4-runtime.watsup:183.1-183.72
+  def {f : frame, r* : ref*, s : store, x : idx} with_elem(`%;%`(s, f), x, r*{r}) = `%;%`(s[ELEM_store[f.MODULE_frame.ELEM_moduleinst[x]].ELEM_eleminst = r*{r}], f)
 
-;; 4-runtime.watsup:131.1-131.77
+;; 4-runtime.watsup:175.1-175.82
 def with_data : (state, dataidx, byte*) -> state
-  ;; 4-runtime.watsup:140.1-140.65
-  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[MEM_store[f.MODULE_frame.MEM_moduleinst[x]] = b*{b}], f)
+  ;; 4-runtime.watsup:184.1-184.72
+  def {b* : byte*, f : frame, s : store, x : idx} with_data(`%;%`(s, f), x, b*{b}) = `%;%`(s[DATA_store[f.MODULE_frame.DATA_moduleinst[x]].DATA_datainst = b*{b}], f)
 
-;; 4-runtime.watsup:154.1-157.21
+;; 4-runtime.watsup:189.1-189.63
+def grow_table : (tableinst, nat, ref) -> tableinst
+  ;; 4-runtime.watsup:192.1-196.36
+  def {i : nat, i' : nat, j : nat, n : n, r : ref, r'* : ref*, rt : reftype, ti : tableinst, ti' : tableinst} grow_table(ti, n, r) = ti'
+    -- if (ti = {TYPE `%%`(`[%..%]`(i, j), rt), ELEM r'*{r'}})
+    -- if (i' = (|r'*{r'}| + n))
+    -- if (ti' = {TYPE `%%`(`[%..%]`(i', j), rt), ELEM r'*{r'} :: r^n{}})
+    -- Tabletype_ok: `|-%:OK`(ti'.TYPE_tableinst)
+
+;; 4-runtime.watsup:190.1-190.55
+def grow_memory : (meminst, nat) -> meminst
+  ;; 4-runtime.watsup:198.1-202.34
+  def {b* : byte*, i : nat, i' : nat, j : nat, mi : meminst, mi' : meminst, n : n} grow_memory(mi, n) = mi'
+    -- if (mi = {TYPE `%I8`(`[%..%]`(i, j)), DATA b*{b}})
+    -- if (i' = ((|b*{b}| / (64 * $Ki)) + n))
+    -- if (mi' = {TYPE `%I8`(`[%..%]`(i', j)), DATA b*{b} :: 0^((n * 64) * $Ki){}})
+    -- Memtype_ok: `|-%:OK`(mi'.TYPE_meminst)
+
+;; 4-runtime.watsup:218.1-221.25
 rec {
 
-;; 4-runtime.watsup:154.1-157.21
+;; 4-runtime.watsup:218.1-221.25
 syntax E =
   | _HOLE
   | _SEQ(val*, E, instr*)
@@ -1230,580 +1348,894 @@ def wrap_ : ((nat, nat), c_numtype) -> nat
 ;; 5-numerics.watsup:13.1-13.28
 def bytes_ : (nat, c_numtype) -> byte*
 
-;; 6-reduction.watsup:4.1-4.63
+;; 6-reduction.watsup:6.1-6.63
 relation Step_pure: `%*~>%*`(admininstr*, admininstr*)
-  ;; 6-reduction.watsup:16.1-17.24
+  ;; 6-reduction.watsup:24.1-25.24
   rule unreachable:
     `%*~>%*`([UNREACHABLE_admininstr], [TRAP_admininstr])
 
-  ;; 6-reduction.watsup:19.1-20.19
+  ;; 6-reduction.watsup:27.1-28.19
   rule nop:
     `%*~>%*`([NOP_admininstr], [])
 
-  ;; 6-reduction.watsup:22.1-23.24
+  ;; 6-reduction.watsup:30.1-31.24
   rule drop {val : val}:
     `%*~>%*`([(val <: admininstr) DROP_admininstr], [])
 
-  ;; 6-reduction.watsup:26.1-28.16
+  ;; 6-reduction.watsup:34.1-36.16
   rule select-true {c : c_numtype, t? : valtype?, val_1 : val, val_2 : val}:
     `%*~>%*`([(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})], [(val_1 <: admininstr)])
     -- if (c =/= 0)
 
-  ;; 6-reduction.watsup:30.1-32.14
+  ;; 6-reduction.watsup:38.1-40.14
   rule select-false {c : c_numtype, t? : valtype?, val_1 : val, val_2 : val}:
     `%*~>%*`([(val_1 <: admininstr) (val_2 <: admininstr) CONST_admininstr(I32_numtype, c) SELECT_admininstr(t?{t})], [(val_2 <: admininstr)])
     -- if (c = 0)
 
-  ;; 6-reduction.watsup:35.1-37.28
+  ;; 6-reduction.watsup:45.1-47.28
   rule block {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
     `%*~>%*`((val <: admininstr)^k{val} :: [BLOCK_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
     -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
 
-  ;; 6-reduction.watsup:39.1-41.28
+  ;; 6-reduction.watsup:49.1-51.28
   rule loop {bt : blocktype, instr* : instr*, k : nat, n : n, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k}:
-    `%*~>%*`((val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})], [LABEL__admininstr(n, [LOOP_instr(bt, instr*{instr})], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
+    `%*~>%*`((val <: admininstr)^k{val} :: [LOOP_admininstr(bt, instr*{instr})], [LABEL__admininstr(k, [LOOP_instr(bt, instr*{instr})], (val <: admininstr)^k{val} :: (instr <: admininstr)*{instr})])
     -- if (bt = `%->%`(t_1^k{t_1}, t_2^n{t_2}))
 
-  ;; 6-reduction.watsup:43.1-45.16
+  ;; 6-reduction.watsup:53.1-55.16
   rule if-true {bt : blocktype, c : c_numtype, instr_1* : instr*, instr_2* : instr*}:
     `%*~>%*`([CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})], [BLOCK_admininstr(bt, instr_1*{instr_1})])
     -- if (c =/= 0)
 
-  ;; 6-reduction.watsup:47.1-49.14
+  ;; 6-reduction.watsup:57.1-59.14
   rule if-false {bt : blocktype, c : c_numtype, instr_1* : instr*, instr_2* : instr*}:
     `%*~>%*`([CONST_admininstr(I32_numtype, c) IF_admininstr(bt, instr_1*{instr_1}, instr_2*{instr_2})], [BLOCK_admininstr(bt, instr_2*{instr_2})])
     -- if (c = 0)
 
-  ;; 6-reduction.watsup:52.1-53.38
+  ;; 6-reduction.watsup:62.1-63.38
   rule label-vals {instr* : instr*, n : n, val* : val*}:
     `%*~>%*`([LABEL__admininstr(n, instr*{instr}, (val <: admininstr)*{val})], (val <: admininstr)*{val})
 
-  ;; 6-reduction.watsup:57.1-58.69
+  ;; 6-reduction.watsup:69.1-70.69
   rule br-zero {instr* : instr*, instr'* : instr*, n : n, val^n : val^n, val'* : val*}:
     `%*~>%*`([LABEL__admininstr(n, instr'*{instr'}, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [BR_admininstr(0)] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val} :: (instr' <: admininstr)*{instr'})
 
-  ;; 6-reduction.watsup:60.1-61.65
+  ;; 6-reduction.watsup:72.1-73.65
   rule br-succ {instr* : instr*, instr'* : instr*, l : labelidx, n : n, val* : val*}:
     `%*~>%*`([LABEL__admininstr(n, instr'*{instr'}, (val <: admininstr)*{val} :: [BR_admininstr(l + 1)] :: (instr <: admininstr)*{instr})], (val <: admininstr)*{val} :: [BR_admininstr(l)])
 
-  ;; 6-reduction.watsup:64.1-66.16
+  ;; 6-reduction.watsup:76.1-78.16
   rule br_if-true {c : c_numtype, l : labelidx}:
     `%*~>%*`([CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)], [BR_admininstr(l)])
     -- if (c =/= 0)
 
-  ;; 6-reduction.watsup:68.1-70.14
+  ;; 6-reduction.watsup:80.1-82.14
   rule br_if-false {c : c_numtype, l : labelidx}:
     `%*~>%*`([CONST_admininstr(I32_numtype, c) BR_IF_admininstr(l)], [])
     -- if (c = 0)
 
-  ;; 6-reduction.watsup:73.1-75.17
+  ;; 6-reduction.watsup:85.1-87.17
   rule br_table-lt {i : nat, l* : labelidx*, l' : labelidx}:
     `%*~>%*`([CONST_admininstr(I32_numtype, i) BR_TABLE_admininstr(l*{l}, l')], [BR_admininstr(l*{l}[i])])
     -- if (i < |l*{l}|)
 
-  ;; 6-reduction.watsup:77.1-79.18
+  ;; 6-reduction.watsup:89.1-91.18
   rule br_table-ge {i : nat, l* : labelidx*, l' : labelidx}:
     `%*~>%*`([CONST_admininstr(I32_numtype, i) BR_TABLE_admininstr(l*{l}, l')], [BR_admininstr(l')])
     -- if (i >= |l*{l}|)
 
-  ;; 6-reduction.watsup:100.1-101.35
+  ;; 6-reduction.watsup:116.1-117.35
   rule frame-vals {f : frame, n : n, val^n : val^n}:
     `%*~>%*`([FRAME__admininstr(n, f, (val <: admininstr)^n{val})], (val <: admininstr)^n{val})
 
-  ;; 6-reduction.watsup:103.1-104.55
+  ;; 6-reduction.watsup:119.1-120.55
   rule return-frame {f : frame, instr* : instr*, n : n, val^n : val^n, val'* : val*}:
     `%*~>%*`([FRAME__admininstr(n, f, (val' <: admininstr)*{val'} :: (val <: admininstr)^n{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})], (val <: admininstr)^n{val})
 
-  ;; 6-reduction.watsup:106.1-107.60
+  ;; 6-reduction.watsup:122.1-123.60
   rule return-label {instr* : instr*, instr'* : instr*, k : nat, val* : val*}:
     `%*~>%*`([LABEL__admininstr(k, instr'*{instr'}, (val <: admininstr)*{val} :: [RETURN_admininstr] :: (instr <: admininstr)*{instr})], (val <: admininstr)*{val} :: [RETURN_admininstr])
 
-  ;; 6-reduction.watsup:110.1-112.33
+  ;; 6-reduction.watsup:128.1-130.33
   rule unop-val {c : c_numtype, c_1 : c_numtype, nt : numtype, unop : unop_numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)], [CONST_admininstr(nt, c)])
     -- if ($unop(unop, nt, c_1) = [c])
 
-  ;; 6-reduction.watsup:114.1-116.39
+  ;; 6-reduction.watsup:132.1-134.39
   rule unop-trap {c_1 : c_numtype, nt : numtype, unop : unop_numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) UNOP_admininstr(nt, unop)], [TRAP_admininstr])
     -- if ($unop(unop, nt, c_1) = [])
 
-  ;; 6-reduction.watsup:119.1-121.40
+  ;; 6-reduction.watsup:137.1-139.40
   rule binop-val {binop : binop_numtype, c : c_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)], [CONST_admininstr(nt, c)])
     -- if ($binop(binop, nt, c_1, c_2) = [c])
 
-  ;; 6-reduction.watsup:123.1-125.46
+  ;; 6-reduction.watsup:141.1-143.46
   rule binop-trap {binop : binop_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) BINOP_admininstr(nt, binop)], [TRAP_admininstr])
     -- if ($binop(binop, nt, c_1, c_2) = [])
 
-  ;; 6-reduction.watsup:128.1-130.37
+  ;; 6-reduction.watsup:146.1-148.37
   rule testop {c : c_numtype, c_1 : c_numtype, nt : numtype, testop : testop_numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) TESTOP_admininstr(nt, testop)], [CONST_admininstr(I32_numtype, c)])
     -- if (c = $testop(testop, nt, c_1))
 
-  ;; 6-reduction.watsup:132.1-134.40
+  ;; 6-reduction.watsup:150.1-152.40
   rule relop {c : c_numtype, c_1 : c_numtype, c_2 : c_numtype, nt : numtype, relop : relop_numtype}:
     `%*~>%*`([CONST_admininstr(nt, c_1) CONST_admininstr(nt, c_2) RELOP_admininstr(nt, relop)], [CONST_admininstr(I32_numtype, c)])
     -- if (c = $relop(relop, nt, c_1, c_2))
 
-  ;; 6-reduction.watsup:137.1-138.70
+  ;; 6-reduction.watsup:155.1-156.70
   rule extend {c : c_numtype, n : n, nt : numtype}:
     `%*~>%*`([CONST_admininstr(nt, c) EXTEND_admininstr(nt, n)], [CONST_admininstr(nt, $ext(n, $size(nt <: valtype), S_sx, c))])
 
-  ;; 6-reduction.watsup:141.1-143.48
-  rule cvtop-val {c : c_numtype, c_1 : c_numtype, cvtop : cvtop, nt : numtype, nt_1 : numtype, nt_2 : numtype, sx? : sx?}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) CVTOP_admininstr(nt_1, cvtop, nt_2, sx?{sx})], [CONST_admininstr(nt, c)])
+  ;; 6-reduction.watsup:159.1-161.48
+  rule cvtop-val {c : c_numtype, c_1 : c_numtype, cvtop : cvtop, nt_1 : numtype, nt_2 : numtype, sx? : sx?}:
+    `%*~>%*`([CONST_admininstr(nt_1, c_1) CVTOP_admininstr(nt_2, cvtop, nt_1, sx?{sx})], [CONST_admininstr(nt_2, c)])
     -- if ($cvtop(nt_1, cvtop, nt_2, sx?{sx}, c_1) = [c])
 
-  ;; 6-reduction.watsup:145.1-147.54
-  rule cvtop-trap {c_1 : c_numtype, cvtop : cvtop, nt : numtype, nt_1 : numtype, nt_2 : numtype, sx? : sx?}:
-    `%*~>%*`([CONST_admininstr(nt, c_1) CVTOP_admininstr(nt_1, cvtop, nt_2, sx?{sx})], [TRAP_admininstr])
+  ;; 6-reduction.watsup:163.1-165.54
+  rule cvtop-trap {c_1 : c_numtype, cvtop : cvtop, nt_1 : numtype, nt_2 : numtype, sx? : sx?}:
+    `%*~>%*`([CONST_admininstr(nt_1, c_1) CVTOP_admininstr(nt_2, cvtop, nt_1, sx?{sx})], [TRAP_admininstr])
     -- if ($cvtop(nt_1, cvtop, nt_2, sx?{sx}, c_1) = [])
 
-  ;; 6-reduction.watsup:154.1-156.28
+  ;; 6-reduction.watsup:174.1-176.28
   rule ref.is_null-true {rt : reftype, val : val}:
     `%*~>%*`([(val <: admininstr) REF.IS_NULL_admininstr], [CONST_admininstr(I32_numtype, 1)])
     -- if (val = REF.NULL_val(rt))
 
-  ;; 6-reduction.watsup:158.1-160.15
+  ;; 6-reduction.watsup:178.1-180.15
   rule ref.is_null-false {val : val}:
     `%*~>%*`([(val <: admininstr) REF.IS_NULL_admininstr], [CONST_admininstr(I32_numtype, 0)])
     -- otherwise
 
-  ;; 6-reduction.watsup:169.1-170.47
+  ;; 6-reduction.watsup:191.1-192.47
   rule local.tee {val : val, x : idx}:
     `%*~>%*`([(val <: admininstr) LOCAL.TEE_admininstr(x)], [(val <: admininstr) (val <: admininstr) LOCAL.SET_admininstr(x)])
 
-;; 6-reduction.watsup:5.1-5.63
+;; 6-reduction.watsup:7.1-7.63
 relation Step_read: `%~>%*`(config, admininstr*)
-  ;; 6-reduction.watsup:82.1-83.47
+  ;; 6-reduction.watsup:96.1-97.47
   rule call {x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CALL_admininstr(x)]), [CALL_ADDR_admininstr($funcaddr(z)[x])])
 
-  ;; 6-reduction.watsup:85.1-88.34
-  rule call_indirect-call {a : addr, ft : functype, func : func, i : nat, m : moduleinst, x : idx, z : state}:
+  ;; 6-reduction.watsup:99.1-103.17
+  rule call_indirect-call {a : addr, ft : functype, ft' : functype, i : nat, instr* : instr*, t* : valtype*, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CALL_INDIRECT_admininstr(x, ft)]), [CALL_ADDR_admininstr(a)])
-    -- if ($table(z, x)[i] = REF.FUNC_ADDR_ref(a))
-    -- if ($funcinst(z)[a] = `%;%`(m, func))
+    -- if ($table(z, x).ELEM_tableinst[i] = REF.FUNC_ADDR_ref(a))
+    -- if ($funcinst(z)[a].CODE_funcinst = `FUNC%%*%`(ft', LOCAL(t)*{t}, instr*{instr}))
+    -- if (ft = ft')
 
-  ;; 6-reduction.watsup:90.1-92.15
+  ;; 6-reduction.watsup:105.1-107.15
   rule call_indirect-trap {ft : functype, i : nat, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CALL_INDIRECT_admininstr(x, ft)]), [TRAP_admininstr])
     -- otherwise
 
-  ;; 6-reduction.watsup:94.1-97.52
-  rule call_addr {a : addr, f : frame, instr* : instr*, k : nat, m : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state}:
+  ;; 6-reduction.watsup:109.1-113.53
+  rule call_addr {a : addr, f : frame, func : func, instr* : instr*, k : nat, mm : moduleinst, n : n, t* : valtype*, t_1^k : valtype^k, t_2^n : valtype^n, val^k : val^k, z : state}:
     `%~>%*`(`%;%*`(z, (val <: admininstr)^k{val} :: [CALL_ADDR_admininstr(a)]), [FRAME__admininstr(n, f, [LABEL__admininstr(n, [], (instr <: admininstr)*{instr})])])
-    -- if ($funcinst(z)[a] = `%;%`(m, `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), t*{t}, instr*{instr})))
-    -- if (f = {LOCAL val^k{val} :: $default_(t)*{t}, MODULE m})
+    -- if ($funcinst(z)[a] = {MODULE mm, CODE func})
+    -- if (func = `FUNC%%*%`(`%->%`(t_1^k{t_1}, t_2^n{t_2}), LOCAL(t)*{t}, instr*{instr}))
+    -- if (f = {LOCAL val^k{val} :: $default_(t)*{t}, MODULE mm})
 
-  ;; 6-reduction.watsup:150.1-151.53
+  ;; 6-reduction.watsup:170.1-171.53
   rule ref.func {x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [REF.FUNC_admininstr(x)]), [REF.FUNC_ADDR_admininstr($funcaddr(z)[x])])
 
-  ;; 6-reduction.watsup:163.1-164.37
+  ;; 6-reduction.watsup:185.1-186.37
   rule local.get {x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [LOCAL.GET_admininstr(x)]), [($local(z, x) <: admininstr)])
 
-  ;; 6-reduction.watsup:173.1-174.39
+  ;; 6-reduction.watsup:197.1-198.45
   rule global.get {x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [GLOBAL.GET_admininstr(x)]), [($global(z, x) <: admininstr)])
+    `%~>%*`(`%;%*`(z, [GLOBAL.GET_admininstr(x)]), [($global(z, x).VALUE_globalinst <: admininstr)])
 
-  ;; 6-reduction.watsup:180.1-182.28
+  ;; 6-reduction.watsup:206.1-208.33
   rule table.get-trap {i : nat, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) TABLE.GET_admininstr(x)]), [TRAP_admininstr])
-    -- if (i >= |$table(z, x)|)
+    -- if (i >= |$table(z, x).ELEM_tableinst|)
 
-  ;; 6-reduction.watsup:184.1-186.27
+  ;; 6-reduction.watsup:210.1-212.32
   rule table.get-val {i : nat, x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) TABLE.GET_admininstr(x)]), [($table(z, x)[i] <: admininstr)])
-    -- if (i < |$table(z, x)|)
+    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) TABLE.GET_admininstr(x)]), [($table(z, x).ELEM_tableinst[i] <: admininstr)])
+    -- if (i < |$table(z, x).ELEM_tableinst|)
 
-  ;; 6-reduction.watsup:197.1-199.27
+  ;; 6-reduction.watsup:223.1-225.32
   rule table.size {n : n, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [TABLE.SIZE_admininstr(x)]), [CONST_admininstr(I32_numtype, n)])
-    -- if (|$table(z, x)| = n)
+    -- if (|$table(z, x).ELEM_tableinst| = n)
 
-  ;; 6-reduction.watsup:209.1-211.34
+  ;; 6-reduction.watsup:236.1-238.39
   rule table.fill-trap {i : nat, n : n, val : val, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.FILL_admininstr(x)]), [TRAP_admininstr])
-    -- if ((i + n) > |$table(z, x)|)
+    -- if ((i + n) > |$table(z, x).ELEM_tableinst|)
 
-  ;; 6-reduction.watsup:213.1-216.14
+  ;; 6-reduction.watsup:240.1-243.14
   rule table.fill-zero {i : nat, n : n, val : val, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.FILL_admininstr(x)]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:218.1-222.15
+  ;; 6-reduction.watsup:245.1-249.15
   rule table.fill-succ {i : nat, n : n, val : val, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.FILL_admininstr(x)]), [CONST_admininstr(I32_numtype, i) (val <: admininstr) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (i + 1)) (val <: admininstr) CONST_admininstr(I32_numtype, (n - 1)) TABLE.FILL_admininstr(x)])
     -- otherwise
 
-  ;; 6-reduction.watsup:225.1-227.63
+  ;; 6-reduction.watsup:252.1-254.73
   rule table.copy-trap {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.COPY_admininstr(x, y)]), [TRAP_admininstr])
-    -- if (((i + n) > |$table(z, y)|) \/ ((j + n) > |$table(z, x)|))
+    -- if (((i + n) > |$table(z, y).ELEM_tableinst|) \/ ((j + n) > |$table(z, x).ELEM_tableinst|))
 
-  ;; 6-reduction.watsup:229.1-232.14
+  ;; 6-reduction.watsup:256.1-259.14
   rule table.copy-zero {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.COPY_admininstr(x, y)]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:234.1-239.15
+  ;; 6-reduction.watsup:261.1-266.15
   rule table.copy-le {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.COPY_admininstr(x, y)]), [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) TABLE.GET_admininstr(y) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) TABLE.COPY_admininstr(x, y)])
     -- otherwise
     -- if (j <= i)
 
-  ;; 6-reduction.watsup:241.1-245.15
+  ;; 6-reduction.watsup:268.1-272.15
   rule table.copy-gt {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.COPY_admininstr(x, y)]), [CONST_admininstr(I32_numtype, ((j + n) - 1)) CONST_admininstr(I32_numtype, ((i + n) - 1)) TABLE.GET_admininstr(y) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) TABLE.COPY_admininstr(x, y)])
+    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.COPY_admininstr(x, y)]), [CONST_admininstr(I32_numtype, ((j + n) - 1)) CONST_admininstr(I32_numtype, ((i + n) - 1)) TABLE.GET_admininstr(y) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, (n - 1)) TABLE.COPY_admininstr(x, y)])
     -- otherwise
 
-  ;; 6-reduction.watsup:248.1-250.62
+  ;; 6-reduction.watsup:275.1-277.72
   rule table.init-trap {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.INIT_admininstr(x, y)]), [TRAP_admininstr])
-    -- if (((i + n) > |$elem(z, y)|) \/ ((j + n) > |$table(z, x)|))
+    -- if (((i + n) > |$elem(z, y).ELEM_eleminst|) \/ ((j + n) > |$table(z, x).ELEM_tableinst|))
 
-  ;; 6-reduction.watsup:252.1-255.14
+  ;; 6-reduction.watsup:279.1-282.14
   rule table.init-zero {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.INIT_admininstr(x, y)]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:257.1-261.15
+  ;; 6-reduction.watsup:284.1-288.15
   rule table.init-succ {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.INIT_admininstr(x, y)]), [CONST_admininstr(I32_numtype, j) ($elem(z, y)[i] <: admininstr) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) TABLE.INIT_admininstr(x, y)])
+    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) TABLE.INIT_admininstr(x, y)]), [CONST_admininstr(I32_numtype, j) ($elem(z, y).ELEM_eleminst[i] <: admininstr) TABLE.SET_admininstr(x) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) TABLE.INIT_admininstr(x, y)])
     -- otherwise
 
-  ;; 6-reduction.watsup:268.1-270.49
+  ;; 6-reduction.watsup:297.1-299.53
   rule load-num-trap {i : nat, n_A : n, n_O : n, nt : numtype, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?(), n_A, n_O)]), [TRAP_admininstr])
-    -- if (((i + n_O) + ($size(nt <: valtype) / 8)) >= |$mem(z, 0)|)
+    -- if (((i + n_O) + ($size(nt <: valtype) / 8)) > |$mem(z, 0).DATA_meminst|)
 
-  ;; 6-reduction.watsup:272.1-274.66
+  ;; 6-reduction.watsup:301.1-303.71
   rule load-num-val {c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?(), n_A, n_O)]), [CONST_admininstr(nt, c)])
-    -- if ($bytes_($size(nt <: valtype), c) = $mem(z, 0)[(i + n_O) : ($size(nt <: valtype) / 8)])
+    -- if ($bytes_($size(nt <: valtype), c) = $mem(z, 0).DATA_meminst[(i + n_O) : ($size(nt <: valtype) / 8)])
 
-  ;; 6-reduction.watsup:276.1-278.41
+  ;; 6-reduction.watsup:305.1-307.45
   rule load-pack-trap {i : nat, n : n, n_A : n, n_O : n, nt : numtype, sx : sx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?((n, sx)), n_A, n_O)]), [TRAP_admininstr])
-    -- if (((i + n_O) + (n / 8)) >= |$mem(z, 0)|)
+    -- if (((i + n_O) + (n / 8)) > |$mem(z, 0).DATA_meminst|)
 
-  ;; 6-reduction.watsup:280.1-282.50
+  ;; 6-reduction.watsup:309.1-311.55
   rule load-pack-val {c : c_numtype, i : nat, n : n, n_A : n, n_O : n, nt : numtype, sx : sx, z : state}:
-    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?((n, sx)), n_A, n_O)]), [CONST_admininstr(nt, c)])
-    -- if ($bytes_(n, c) = $mem(z, 0)[(i + n_O) : (n / 8)])
+    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) LOAD_admininstr(nt, ?((n, sx)), n_A, n_O)]), [CONST_admininstr(nt, $ext(n, $size(nt <: valtype), sx, c))])
+    -- if ($bytes_(n, c) = $mem(z, 0).DATA_meminst[(i + n_O) : (n / 8)])
 
-  ;; 6-reduction.watsup:309.1-311.32
+  ;; 6-reduction.watsup:331.1-333.44
+  rule memory.size {n : n, z : state}:
+    `%~>%*`(`%;%*`(z, [MEMORY.SIZE_admininstr]), [CONST_admininstr(I32_numtype, n)])
+    -- if (((n * 64) * $Ki) = |$mem(z, 0).DATA_meminst|)
+
+  ;; 6-reduction.watsup:344.1-346.37
   rule memory.fill-trap {i : nat, n : n, val : val, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) MEMORY.FILL_admininstr]), [TRAP_admininstr])
-    -- if ((i + n) > |$mem(z, 0)|)
+    -- if ((i + n) > |$mem(z, 0).DATA_meminst|)
 
-  ;; 6-reduction.watsup:313.1-316.14
+  ;; 6-reduction.watsup:348.1-351.14
   rule memory.fill-zero {i : nat, n : n, val : val, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) MEMORY.FILL_admininstr]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:318.1-322.15
+  ;; 6-reduction.watsup:353.1-357.15
   rule memory.fill-succ {i : nat, n : n, val : val, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (val <: admininstr) CONST_admininstr(I32_numtype, n) MEMORY.FILL_admininstr]), [CONST_admininstr(I32_numtype, i) (val <: admininstr) STORE_admininstr(I32_numtype, ?(8), 0, 0) CONST_admininstr(I32_numtype, (i + 1)) (val <: admininstr) CONST_admininstr(I32_numtype, (n - 1)) MEMORY.FILL_admininstr])
     -- otherwise
 
-  ;; 6-reduction.watsup:325.1-327.63
+  ;; 6-reduction.watsup:360.1-362.69
   rule memory.copy-trap {i : nat, j : nat, n : n, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.COPY_admininstr]), [TRAP_admininstr])
-    -- if (((i + n) > |$table(z, 0)|) \/ ((j + n) > |$table(z, 0)|))
+    -- if (((i + n) > |$mem(z, 0).DATA_meminst|) \/ ((j + n) > |$mem(z, 0).DATA_meminst|))
 
-  ;; 6-reduction.watsup:329.1-332.14
+  ;; 6-reduction.watsup:364.1-367.14
   rule memory.copy-zero {i : nat, j : nat, n : n, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.COPY_admininstr]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:334.1-339.15
+  ;; 6-reduction.watsup:369.1-374.15
   rule memory.copy-le {i : nat, j : nat, n : n, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.COPY_admininstr]), [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) LOAD_admininstr(I32_numtype, ?((8, U_sx)), 0, 0) STORE_admininstr(I32_numtype, ?(8), 0, 0) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) MEMORY.COPY_admininstr])
     -- otherwise
     -- if (j <= i)
 
-  ;; 6-reduction.watsup:341.1-345.15
+  ;; 6-reduction.watsup:376.1-380.15
   rule memory.copy-gt {i : nat, j : nat, n : n, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.COPY_admininstr]), [CONST_admininstr(I32_numtype, ((j + n) - 1)) CONST_admininstr(I32_numtype, ((i + n) - 1)) LOAD_admininstr(I32_numtype, ?((8, U_sx)), 0, 0) STORE_admininstr(I32_numtype, ?(8), 0, 0) CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, (n - 1)) MEMORY.COPY_admininstr])
     -- otherwise
 
-  ;; 6-reduction.watsup:348.1-350.60
-  rule memory.init-trap {i : nat, j : nat, n : n, x : idx, y : idx, z : state}:
+  ;; 6-reduction.watsup:383.1-385.70
+  rule memory.init-trap {i : nat, j : nat, n : n, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.INIT_admininstr(x)]), [TRAP_admininstr])
-    -- if (((i + n) > |$data(z, y)|) \/ ((j + n) > |$mem(z, 0)|))
+    -- if (((i + n) > |$data(z, x).DATA_datainst|) \/ ((j + n) > |$mem(z, 0).DATA_meminst|))
 
-  ;; 6-reduction.watsup:352.1-355.14
+  ;; 6-reduction.watsup:387.1-390.14
   rule memory.init-zero {i : nat, j : nat, n : n, x : idx, z : state}:
     `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.INIT_admininstr(x)]), [])
     -- otherwise
     -- if (n = 0)
 
-  ;; 6-reduction.watsup:357.1-361.15
+  ;; 6-reduction.watsup:392.1-396.15
   rule memory.init-succ {i : nat, j : nat, n : n, x : idx, z : state}:
-    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.INIT_admininstr(x)]), [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, $data(z, x)[i]) STORE_admininstr(I32_numtype, ?(8), 0, 0) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) MEMORY.INIT_admininstr(x)])
+    `%~>%*`(`%;%*`(z, [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, n) MEMORY.INIT_admininstr(x)]), [CONST_admininstr(I32_numtype, j) CONST_admininstr(I32_numtype, $data(z, x).DATA_datainst[i]) STORE_admininstr(I32_numtype, ?(8), 0, 0) CONST_admininstr(I32_numtype, (j + 1)) CONST_admininstr(I32_numtype, (i + 1)) CONST_admininstr(I32_numtype, (n - 1)) MEMORY.INIT_admininstr(x)])
     -- otherwise
 
-;; 6-reduction.watsup:3.1-3.63
+;; 6-reduction.watsup:5.1-5.63
 relation Step: `%~>%`(config, config)
-  ;; 6-reduction.watsup:7.1-9.34
+  ;; 6-reduction.watsup:9.1-11.34
   rule pure {instr* : instr*, instr'* : instr*, z : state}:
     `%~>%`(`%;%*`(z, (instr <: admininstr)*{instr}), `%;%*`(z, (instr' <: admininstr)*{instr'}))
     -- Step_pure: `%*~>%*`((instr <: admininstr)*{instr}, (instr' <: admininstr)*{instr'})
 
-  ;; 6-reduction.watsup:11.1-13.37
+  ;; 6-reduction.watsup:13.1-15.37
   rule read {instr* : instr*, instr'* : instr*, z : state}:
     `%~>%`(`%;%*`(z, (instr <: admininstr)*{instr}), `%;%*`(z, (instr' <: admininstr)*{instr'}))
     -- Step_read: `%~>%*`(`%;%*`(z, (instr <: admininstr)*{instr}), (instr' <: admininstr)*{instr'})
 
-  ;; 6-reduction.watsup:166.1-167.60
+  ;; 6-reduction.watsup:188.1-189.60
   rule local.set {val : val, x : idx, z : state}:
     `%~>%`(`%;%*`(z, [(val <: admininstr) LOCAL.SET_admininstr(x)]), `%;%*`($with_local(z, x, val), []))
 
-  ;; 6-reduction.watsup:176.1-177.62
+  ;; 6-reduction.watsup:200.1-201.62
   rule global.set {val : val, x : idx, z : state}:
     `%~>%`(`%;%*`(z, [(val <: admininstr) GLOBAL.SET_admininstr(x)]), `%;%*`($with_global(z, x, val), []))
 
-  ;; 6-reduction.watsup:188.1-190.28
+  ;; 6-reduction.watsup:214.1-216.33
   rule table.set-trap {i : nat, ref : ref, x : idx, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (ref <: admininstr) TABLE.GET_admininstr(x)]), `%;%*`(z, [TRAP_admininstr]))
-    -- if (i >= |$table(z, x)|)
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (ref <: admininstr) TABLE.SET_admininstr(x)]), `%;%*`(z, [TRAP_admininstr]))
+    -- if (i >= |$table(z, x).ELEM_tableinst|)
 
-  ;; 6-reduction.watsup:192.1-194.27
+  ;; 6-reduction.watsup:218.1-220.32
   rule table.set-val {i : nat, ref : ref, x : idx, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (ref <: admininstr) TABLE.GET_admininstr(x)]), `%;%*`($with_table(z, x, i, ref), []))
-    -- if (i < |$table(z, x)|)
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) (ref <: admininstr) TABLE.SET_admininstr(x)]), `%;%*`($with_table(z, x, i, ref), []))
+    -- if (i < |$table(z, x).ELEM_tableinst|)
 
-  ;; 6-reduction.watsup:202.1-203.102
-  rule table.grow-succeed {n : n, ref : ref, x : idx, z : state}:
-    `%~>%`(`%;%*`(z, [(ref <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.GROW_admininstr(x)]), `%;%*`($with_tableext(z, x, ref^n{}), [CONST_admininstr(I32_numtype, |$table(z, x)|)]))
+  ;; 6-reduction.watsup:228.1-230.47
+  rule table.grow-succeed {n : n, ref : ref, ti : tableinst, x : idx, z : state}:
+    `%~>%`(`%;%*`(z, [(ref <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.GROW_admininstr(x)]), `%;%*`($with_tableinst(z, x, ti), [CONST_admininstr(I32_numtype, |$table(z, x).ELEM_tableinst|)]))
+    -- if ($grow_table($table(z, x), n, ref) = ti)
 
-  ;; 6-reduction.watsup:205.1-206.64
+  ;; 6-reduction.watsup:232.1-233.64
   rule table.grow-fail {n : n, ref : ref, x : idx, z : state}:
     `%~>%`(`%;%*`(z, [(ref <: admininstr) CONST_admininstr(I32_numtype, n) TABLE.GROW_admininstr(x)]), `%;%*`(z, [CONST_admininstr(I32_numtype, - 1)]))
 
-  ;; 6-reduction.watsup:264.1-265.59
+  ;; 6-reduction.watsup:291.1-292.59
   rule elem.drop {x : idx, z : state}:
     `%~>%`(`%;%*`(z, [ELEM.DROP_admininstr(x)]), `%;%*`($with_elem(z, x, []), []))
 
-  ;; 6-reduction.watsup:285.1-287.49
+  ;; 6-reduction.watsup:314.1-316.53
   rule store-num-trap {c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`(z, [TRAP_admininstr]))
-    -- if (((i + n_O) + ($size(nt <: valtype) / 8)) >= |$mem(z, 0)|)
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(nt, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`(z, [TRAP_admininstr]))
+    -- if (((i + n_O) + ($size(nt <: valtype) / 8)) > |$mem(z, 0).DATA_meminst|)
 
-  ;; 6-reduction.watsup:289.1-291.35
+  ;; 6-reduction.watsup:318.1-320.35
   rule store-num-val {b* : byte*, c : c_numtype, i : nat, n_A : n, n_O : n, nt : numtype, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), ($size(nt <: valtype) / 8), b*{b}), []))
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(nt, c) STORE_admininstr(nt, ?(), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), ($size(nt <: valtype) / 8), b*{b}), []))
     -- if (b*{b} = $bytes_($size(nt <: valtype), c))
 
-  ;; 6-reduction.watsup:293.1-295.41
+  ;; 6-reduction.watsup:322.1-324.45
   rule store-pack-trap {c : c_numtype, i : nat, n : n, n_A : n, n_O : n, nt : numtype, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`(z, [TRAP_admininstr]))
-    -- if (((i + n_O) + (n / 8)) >= |$mem(z, 0)|)
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(nt, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`(z, [TRAP_admininstr]))
+    -- if (((i + n_O) + (n / 8)) > |$mem(z, 0).DATA_meminst|)
 
-  ;; 6-reduction.watsup:297.1-299.50
+  ;; 6-reduction.watsup:326.1-328.50
   rule store-pack-val {b* : byte*, c : c_numtype, i : nat, n : n, n_A : n, n_O : n, nt : numtype, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(I32_numtype, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), (n / 8), b*{b}), []))
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, i) CONST_admininstr(nt, c) STORE_admininstr(nt, ?(n), n_A, n_O)]), `%;%*`($with_mem(z, 0, (i + n_O), (n / 8), b*{b}), []))
     -- if (b*{b} = $bytes_(n, $wrap_(($size(nt <: valtype), n), c)))
 
-  ;; 6-reduction.watsup:302.1-303.104
-  rule memory.grow-succeed {n : n, z : state}:
-    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, n) MEMORY.GROW_admininstr]), `%;%*`($with_memext(z, 0, 0^((n * 64) * $Ki){}), [CONST_admininstr(I32_numtype, |$mem(z, 0)|)]))
+  ;; 6-reduction.watsup:336.1-338.41
+  rule memory.grow-succeed {mi : meminst, n : n, z : state}:
+    `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, n) MEMORY.GROW_admininstr]), `%;%*`($with_meminst(z, 0, mi), [CONST_admininstr(I32_numtype, (|$mem(z, 0).DATA_meminst| / (64 * $Ki)))]))
+    -- if ($grow_memory($mem(z, 0), n) = mi)
 
-  ;; 6-reduction.watsup:305.1-306.59
+  ;; 6-reduction.watsup:340.1-341.59
   rule memory.grow-fail {n : n, z : state}:
     `%~>%`(`%;%*`(z, [CONST_admininstr(I32_numtype, n) MEMORY.GROW_admininstr]), `%;%*`(z, [CONST_admininstr(I32_numtype, - 1)]))
 
-  ;; 6-reduction.watsup:364.1-365.59
+  ;; 6-reduction.watsup:399.1-400.59
   rule data.drop {x : idx, z : state}:
     `%~>%`(`%;%*`(z, [DATA.DROP_admininstr(x)]), `%;%*`($with_data(z, x, []), []))
+
+;; 7-module.watsup:5.1-5.35
+rec {
+
+;; 7-module.watsup:5.1-5.35
+def funcs : externval* -> funcaddr*
+  ;; 7-module.watsup:6.1-6.30
+  def funcs([]) = []
+  ;; 7-module.watsup:7.1-7.59
+  def {externval'* : externval*, fa : funcaddr} funcs([FUNC_externval(fa)] :: externval'*{externval'}) = [fa] :: $funcs(externval'*{externval'})
+  ;; 7-module.watsup:8.1-9.15
+  def {externval : externval, externval'* : externval*} funcs([externval] :: externval'*{externval'}) = $funcs(externval'*{externval'})
+    -- otherwise
+}
+
+;; 7-module.watsup:11.1-11.39
+rec {
+
+;; 7-module.watsup:11.1-11.39
+def globals : externval* -> globaladdr*
+  ;; 7-module.watsup:12.1-12.32
+  def globals([]) = []
+  ;; 7-module.watsup:13.1-13.65
+  def {externval'* : externval*, ga : globaladdr} globals([GLOBAL_externval(ga)] :: externval'*{externval'}) = [ga] :: $globals(externval'*{externval'})
+  ;; 7-module.watsup:14.1-15.15
+  def {externval : externval, externval'* : externval*} globals([externval] :: externval'*{externval'}) = $globals(externval'*{externval'})
+    -- otherwise
+}
+
+;; 7-module.watsup:17.1-17.37
+rec {
+
+;; 7-module.watsup:17.1-17.37
+def tables : externval* -> tableaddr*
+  ;; 7-module.watsup:18.1-18.31
+  def tables([]) = []
+  ;; 7-module.watsup:19.1-19.62
+  def {externval'* : externval*, ta : tableaddr} tables([TABLE_externval(ta)] :: externval'*{externval'}) = [ta] :: $tables(externval'*{externval'})
+  ;; 7-module.watsup:20.1-21.15
+  def {externval : externval, externval'* : externval*} tables([externval] :: externval'*{externval'}) = $tables(externval'*{externval'})
+    -- otherwise
+}
+
+;; 7-module.watsup:23.1-23.33
+rec {
+
+;; 7-module.watsup:23.1-23.33
+def mems : externval* -> memaddr*
+  ;; 7-module.watsup:24.1-24.29
+  def mems([]) = []
+  ;; 7-module.watsup:25.1-25.56
+  def {externval'* : externval*, ma : memaddr} mems([MEM_externval(ma)] :: externval'*{externval'}) = [ma] :: $mems(externval'*{externval'})
+  ;; 7-module.watsup:26.1-27.15
+  def {externval : externval, externval'* : externval*} mems([externval] :: externval'*{externval'}) = $mems(externval'*{externval'})
+    -- otherwise
+}
+
+;; 7-module.watsup:36.1-36.60
+def allocfunc : (store, moduleinst, func) -> (store, funcaddr)
+  ;; 7-module.watsup:37.1-38.38
+  def {fi : funcinst, func : func, mm : moduleinst, s : store} allocfunc(s, mm, func) = (s[FUNC_store =.. [fi]], |s.FUNC_store|)
+    -- if (fi = {MODULE mm, CODE func})
+
+;; 7-module.watsup:40.1-40.63
+rec {
+
+;; 7-module.watsup:40.1-40.63
+def allocfuncs : (store, moduleinst, func*) -> (store, funcaddr*)
+  ;; 7-module.watsup:41.1-41.47
+  def {mm : moduleinst, s : store} allocfuncs(s, mm, []) = (s, [])
+  ;; 7-module.watsup:42.1-44.51
+  def {fa : funcaddr, fa'* : funcaddr*, func : func, func'* : func*, mm : moduleinst, s : store, s_1 : store, s_2 : store} allocfuncs(s, mm, [func] :: func'*{func'}) = (s_2, [fa] :: fa'*{fa'})
+    -- if ((s_1, fa) = $allocfunc(s, mm, func))
+    -- if ((s_2, fa'*{fa'}) = $allocfuncs(s_1, mm, func'*{func'}))
+}
+
+;; 7-module.watsup:46.1-46.63
+def allocglobal : (store, globaltype, val) -> (store, globaladdr)
+  ;; 7-module.watsup:47.1-48.44
+  def {gi : globalinst, globaltype : globaltype, s : store, val : val} allocglobal(s, globaltype, val) = (s[GLOBAL_store =.. [gi]], |s.GLOBAL_store|)
+    -- if (gi = {TYPE globaltype, VALUE val})
+
+;; 7-module.watsup:50.1-50.67
+rec {
+
+;; 7-module.watsup:50.1-50.67
+def allocglobals : (store, globaltype*, val*) -> (store, globaladdr*)
+  ;; 7-module.watsup:51.1-51.54
+  def {s : store} allocglobals(s, [], []) = (s, [])
+  ;; 7-module.watsup:52.1-54.62
+  def {ga : globaladdr, ga'* : globaladdr*, globaltype : globaltype, globaltype'* : globaltype*, s : store, s_1 : store, s_2 : store, val : val, val'* : val*} allocglobals(s, [globaltype] :: globaltype'*{globaltype'}, [val] :: val'*{val'}) = (s_2, [ga] :: ga'*{ga'})
+    -- if ((s_1, ga) = $allocglobal(s, globaltype, val))
+    -- if ((s_2, ga'*{ga'}) = $allocglobals(s_1, globaltype'*{globaltype'}, val'*{val'}))
+}
+
+;; 7-module.watsup:56.1-56.55
+def alloctable : (store, tabletype) -> (store, tableaddr)
+  ;; 7-module.watsup:57.1-58.59
+  def {i : nat, j : nat, rt : reftype, s : store, ti : tableinst} alloctable(s, `%%`(`[%..%]`(i, j), rt)) = (s[TABLE_store =.. [ti]], |s.TABLE_store|)
+    -- if (ti = {TYPE `%%`(`[%..%]`(i, j), rt), ELEM REF.NULL_ref(rt)^i{}})
+
+;; 7-module.watsup:60.1-60.58
+rec {
+
+;; 7-module.watsup:60.1-60.58
+def alloctables : (store, tabletype*) -> (store, tableaddr*)
+  ;; 7-module.watsup:61.1-61.44
+  def {s : store} alloctables(s, []) = (s, [])
+  ;; 7-module.watsup:62.1-64.53
+  def {s : store, s_1 : store, s_2 : store, ta : tableaddr, ta'* : tableaddr*, tabletype : tabletype, tabletype'* : tabletype*} alloctables(s, [tabletype] :: tabletype'*{tabletype'}) = (s_2, [ta] :: ta'*{ta'})
+    -- if ((s_1, ta) = $alloctable(s, tabletype))
+    -- if ((s_2, ta'*{ta'}) = $alloctables(s_1, tabletype'*{tabletype'}))
+}
+
+;; 7-module.watsup:66.1-66.49
+def allocmem : (store, memtype) -> (store, memaddr)
+  ;; 7-module.watsup:67.1-68.62
+  def {i : nat, j : nat, mi : meminst, s : store} allocmem(s, `%I8`(`[%..%]`(i, j))) = (s[MEM_store =.. [mi]], |s.MEM_store|)
+    -- if (mi = {TYPE `%I8`(`[%..%]`(i, j)), DATA 0^((i * 64) * $Ki){}})
+
+;; 7-module.watsup:70.1-70.52
+rec {
+
+;; 7-module.watsup:70.1-70.52
+def allocmems : (store, memtype*) -> (store, memaddr*)
+  ;; 7-module.watsup:71.1-71.42
+  def {s : store} allocmems(s, []) = (s, [])
+  ;; 7-module.watsup:72.1-74.49
+  def {ma : memaddr, ma'* : memaddr*, memtype : memtype, memtype'* : memtype*, s : store, s_1 : store, s_2 : store} allocmems(s, [memtype] :: memtype'*{memtype'}) = (s_2, [ma] :: ma'*{ma'})
+    -- if ((s_1, ma) = $allocmem(s, memtype))
+    -- if ((s_2, ma'*{ma'}) = $allocmems(s_1, memtype'*{memtype'}))
+}
+
+;; 7-module.watsup:76.1-76.57
+def allocelem : (store, reftype, ref*) -> (store, elemaddr)
+  ;; 7-module.watsup:77.1-78.36
+  def {ei : eleminst, ref* : ref*, rt : reftype, s : store} allocelem(s, rt, ref*{ref}) = (s[ELEM_store =.. [ei]], |s.ELEM_store|)
+    -- if (ei = {TYPE rt, ELEM ref*{ref}})
+
+;; 7-module.watsup:80.1-80.63
+rec {
+
+;; 7-module.watsup:80.1-80.63
+def allocelems : (store, reftype*, ref**) -> (store, elemaddr*)
+  ;; 7-module.watsup:81.1-81.52
+  def {s : store} allocelems(s, [], []) = (s, [])
+  ;; 7-module.watsup:82.1-84.53
+  def {ea : elemaddr, ea'* : elemaddr*, ref* : ref*, ref'** : ref**, rt : reftype, rt'* : reftype*, s : store, s_1 : store, s_2 : store} allocelems(s, [rt] :: rt'*{rt'}, [ref]*{ref} :: ref'*{ref'}*{ref'}) = (s_2, [ea] :: ea'*{ea'})
+    -- if ((s_1, ea) = $allocelem(s, rt, ref*{ref}))
+    -- if ((s_2, ea'*{ea'}) = $allocelems(s_2, rt'*{rt'}, ref'*{ref'}*{ref'}))
+}
+
+;; 7-module.watsup:86.1-86.49
+def allocdata : (store, byte*) -> (store, dataaddr)
+  ;; 7-module.watsup:87.1-88.28
+  def {byte* : byte*, di : datainst, s : store} allocdata(s, byte*{byte}) = (s[DATA_store =.. [di]], |s.DATA_store|)
+    -- if (di = {DATA byte*{byte}})
+
+;; 7-module.watsup:90.1-90.52
+rec {
+
+;; 7-module.watsup:90.1-90.52
+def allocdatas : (store, byte**) -> (store, dataaddr*)
+  ;; 7-module.watsup:91.1-91.43
+  def {s : store} allocdatas(s, []) = (s, [])
+  ;; 7-module.watsup:92.1-94.48
+  def {byte* : byte*, byte'** : byte**, da : dataaddr, da'* : dataaddr*, s : store, s_1 : store, s_2 : store} allocdatas(s, [byte]*{byte} :: byte'*{byte'}*{byte'}) = (s_2, [da] :: da'*{da'})
+    -- if ((s_1, da) = $allocdata(s, byte*{byte}))
+    -- if ((s_2, da'*{da'}) = $allocdatas(s_1, byte'*{byte'}*{byte'}))
+}
+
+;; 7-module.watsup:99.1-99.83
+def instexport : (funcaddr*, globaladdr*, tableaddr*, memaddr*, export) -> exportinst
+  ;; 7-module.watsup:100.1-100.95
+  def {fa* : funcaddr*, ga* : globaladdr*, ma* : memaddr*, name : name, ta* : tableaddr*, x : idx} instexport(fa*{fa}, ga*{ga}, ta*{ta}, ma*{ma}, EXPORT(name, FUNC_externidx(x))) = {NAME name, VALUE FUNC_externval(fa*{fa}[x])}
+  ;; 7-module.watsup:101.1-101.99
+  def {fa* : funcaddr*, ga* : globaladdr*, ma* : memaddr*, name : name, ta* : tableaddr*, x : idx} instexport(fa*{fa}, ga*{ga}, ta*{ta}, ma*{ma}, EXPORT(name, GLOBAL_externidx(x))) = {NAME name, VALUE GLOBAL_externval(ga*{ga}[x])}
+  ;; 7-module.watsup:102.1-102.97
+  def {fa* : funcaddr*, ga* : globaladdr*, ma* : memaddr*, name : name, ta* : tableaddr*, x : idx} instexport(fa*{fa}, ga*{ga}, ta*{ta}, ma*{ma}, EXPORT(name, TABLE_externidx(x))) = {NAME name, VALUE TABLE_externval(ta*{ta}[x])}
+  ;; 7-module.watsup:103.1-103.93
+  def {fa* : funcaddr*, ga* : globaladdr*, ma* : memaddr*, name : name, ta* : tableaddr*, x : idx} instexport(fa*{fa}, ga*{ga}, ta*{ta}, ma*{ma}, EXPORT(name, MEM_externidx(x))) = {NAME name, VALUE MEM_externval(ma*{ma}[x])}
+
+;; 7-module.watsup:106.1-106.81
+def allocmodule : (store, module, externval*, val*, ref**) -> (store, moduleinst)
+  ;; 7-module.watsup:107.1-144.54
+  def {byte*^n_data : byte*^n_data, da* : dataaddr*, datamode^n_data : datamode^n_data, ea* : elemaddr*, elemmode^n_elem : elemmode^n_elem, export* : export*, expr_1^n_global : expr^n_global, expr_2*^n_elem : expr*^n_elem, externval* : externval*, fa* : funcaddr*, fa_ex* : funcaddr*, func^n_func : func^n_func, ga* : globaladdr*, ga_ex* : globaladdr*, globaltype^n_global : globaltype^n_global, i_data^n_data : nat^n_data, i_elem^n_elem : nat^n_elem, i_func^n_func : nat^n_func, i_global^n_global : nat^n_global, i_mem^n_mem : nat^n_mem, i_table^n_table : nat^n_table, import* : import*, ma* : memaddr*, ma_ex* : memaddr*, memtype^n_mem : memtype^n_mem, mm : moduleinst, module : module, n_data : n, n_elem : n, n_func : n, n_global : n, n_mem : n, n_table : n, ref** : ref**, rt^n_elem : reftype^n_elem, s : store, s_1 : store, s_2 : store, s_3 : store, s_4 : store, s_5 : store, s_6 : store, start? : start?, ta* : tableaddr*, ta_ex* : tableaddr*, tabletype^n_table : tabletype^n_table, val* : val*, xi* : exportinst*} allocmodule(s, module, externval*{externval}, val*{val}, ref*{ref}*{ref}) = (s_6, mm)
+    -- if (module = `MODULE%*%*%*%*%*%*%*%?%*`(import*{import}, func^n_func{func}, GLOBAL(globaltype, expr_1)^n_global{expr_1 globaltype}, TABLE(tabletype)^n_table{tabletype}, MEMORY(memtype)^n_mem{memtype}, `ELEM%%*%`(rt, expr_2*{expr_2}, elemmode)^n_elem{elemmode expr_2 rt}, `DATA%*%`(byte*{byte}, datamode)^n_data{byte datamode}, start?{start}, export*{export}))
+    -- if (fa_ex*{fa_ex} = $funcs(externval*{externval}))
+    -- if (ga_ex*{ga_ex} = $globals(externval*{externval}))
+    -- if (ta_ex*{ta_ex} = $tables(externval*{externval}))
+    -- if (ma_ex*{ma_ex} = $mems(externval*{externval}))
+    -- if (fa*{fa} = (|s.FUNC_store| + i_func)^(i_func<n_func){i_func})
+    -- if (ga*{ga} = (|s.GLOBAL_store| + i_global)^(i_global<n_global){i_global})
+    -- if (ta*{ta} = (|s.TABLE_store| + i_table)^(i_table<n_table){i_table})
+    -- if (ma*{ma} = (|s.MEM_store| + i_mem)^(i_mem<n_mem){i_mem})
+    -- if (ea*{ea} = (|s.ELEM_store| + i_elem)^(i_elem<n_elem){i_elem})
+    -- if (da*{da} = (|s.DATA_store| + i_data)^(i_data<n_data){i_data})
+    -- if (xi*{xi} = $instexport(fa_ex*{fa_ex} :: fa*{fa}, ga_ex*{ga_ex} :: ga*{ga}, ta_ex*{ta_ex} :: ta*{ta}, ma_ex*{ma_ex} :: ma*{ma}, export)*{export})
+    -- if (mm = {FUNC fa_ex*{fa_ex} :: fa*{fa}, GLOBAL ga_ex*{ga_ex} :: ga*{ga}, TABLE ta_ex*{ta_ex} :: ta*{ta}, MEM ma_ex*{ma_ex} :: ma*{ma}, ELEM ea*{ea}, DATA da*{da}, EXPORT xi*{xi}})
+    -- if ((s_1, fa*{fa}) = $allocfuncs(s, mm, func^n_func{func}))
+    -- if ((s_2, ga*{ga}) = $allocglobals(s_1, globaltype^n_global{globaltype}, val*{val}))
+    -- if ((s_3, ta*{ta}) = $alloctables(s_2, tabletype^n_table{tabletype}))
+    -- if ((s_4, ma*{ma}) = $allocmems(s_3, memtype^n_mem{memtype}))
+    -- if ((s_5, ea*{ea}) = $allocelems(s_4, rt^n_elem{rt}, ref*{ref}*{ref}))
+    -- if ((s_6, da*{da}) = $allocdatas(s_5, byte*{byte}^n_data{byte}))
+
+;; 7-module.watsup:151.1-151.36
+rec {
+
+;; 7-module.watsup:151.1-151.36
+def concat_instr : instr** -> instr*
+  ;; 7-module.watsup:152.1-152.37
+  def concat_instr([]) = []
+  ;; 7-module.watsup:153.1-153.68
+  def {instr* : instr*, instr'** : instr**} concat_instr([instr]*{instr} :: instr'*{instr'}*{instr'}) = instr*{instr} :: $concat_instr(instr'*{instr'}*{instr'})
+}
+
+;; 7-module.watsup:155.1-155.33
+def runelem : (elem, idx) -> instr*
+  ;; 7-module.watsup:156.1-156.56
+  def {expr* : expr*, i : nat, reftype : reftype} runelem(`ELEM%%*%`(reftype, expr*{expr}, PASSIVE_elemmode), i) = []
+  ;; 7-module.watsup:157.1-157.62
+  def {expr* : expr*, i : nat, reftype : reftype} runelem(`ELEM%%*%`(reftype, expr*{expr}, DECLARE_elemmode), i) = [ELEM.DROP_instr(i)]
+  ;; 7-module.watsup:158.1-160.20
+  def {expr* : expr*, i : nat, instr* : instr*, n : n, reftype : reftype, x : idx} runelem(`ELEM%%*%`(reftype, expr*{expr}, ACTIVE_elemmode(x, instr*{instr})), i) = instr*{instr} :: [CONST_instr(I32_numtype, 0) CONST_instr(I32_numtype, n) TABLE.INIT_instr(x, i) ELEM.DROP_instr(i)]
+    -- if (n = |expr*{expr}|)
+
+;; 7-module.watsup:162.1-162.33
+def rundata : (data, idx) -> instr*
+  ;; 7-module.watsup:163.1-163.48
+  def {byte* : byte*, i : nat} rundata(`DATA%*%`(byte*{byte}, PASSIVE_datamode), i) = []
+  ;; 7-module.watsup:164.1-166.20
+  def {byte* : byte*, i : nat, instr* : instr*, n : n} rundata(`DATA%*%`(byte*{byte}, ACTIVE_datamode(0, instr*{instr})), i) = instr*{instr} :: [CONST_instr(I32_numtype, 0) CONST_instr(I32_numtype, n) MEMORY.INIT_instr(i) DATA.DROP_instr(i)]
+    -- if (n = |byte*{byte}|)
+
+;; 7-module.watsup:168.1-168.53
+def instantiate : (store, module, externval*) -> config
+  ;; 7-module.watsup:169.1-191.28
+  def {data* : data*, elem* : elem*, elemmode* : elemmode*, export* : export*, externval* : externval*, f : frame, f_init : frame, func* : func*, global* : global*, globaltype* : globaltype*, i^n_elem : nat^n_elem, import* : import*, instr_1** : instr**, instr_2*** : instr***, instr_data* : instr*, instr_elem* : instr*, j^n_data : nat^n_data, mem* : mem*, mm : moduleinst, mm_init : moduleinst, module : module, n_data : n, n_elem : n, ref** : ref**, reftype* : reftype*, s : store, s' : store, start? : start?, table* : table*, val* : val*, x? : idx?} instantiate(s, module, externval*{externval}) = `%;%*`(`%;%`(s', f), (instr_elem <: admininstr)*{instr_elem} :: (instr_data <: admininstr)*{instr_data} :: CALL_admininstr(x)?{x})
+    -- if (module = `MODULE%*%*%*%*%*%*%*%?%*`(import*{import}, func*{func}, global*{global}, table*{table}, mem*{mem}, elem*{elem}, data*{data}, start?{start}, export*{export}))
+    -- if (mm_init = {FUNC $funcs(externval*{externval}), GLOBAL $globals(externval*{externval}), TABLE [], MEM [], ELEM [], DATA [], EXPORT []})
+    -- if (f_init = {LOCAL [], MODULE mm_init})
+    -- if (global*{global} = GLOBAL(globaltype, instr_1*{instr_1})*{globaltype instr_1})
+    -- (Step_read: `%~>%*`(`%;%*`(`%;%`(s, f_init), (instr_1 <: admininstr)*{instr_1}), [(val <: admininstr)]))*{instr_1 val}
+    -- if (elem*{elem} = `ELEM%%*%`(reftype, instr_2*{instr_2}*{instr_2}, elemmode)*{elemmode instr_2 reftype})
+    -- (Step_read: `%~>%*`(`%;%*`(`%;%`(s, f_init), (instr_2 <: admininstr)*{instr_2}), [(ref <: admininstr)]))*{instr_2 ref}*{instr_2 ref}
+    -- if ((s', mm) = $allocmodule(s, module, externval*{externval}, val*{val}, ref*{ref}*{ref}))
+    -- if (f = {LOCAL [], MODULE mm})
+    -- if (n_elem = |elem*{elem}|)
+    -- if (instr_elem*{instr_elem} = $concat_instr($runelem(elem*{elem}[i], i)^(i<n_elem){i}))
+    -- if (n_data = |data*{data}|)
+    -- if (instr_data*{instr_data} = $concat_instr($rundata(data*{data}[j], j)^(j<n_data){j}))
+    -- if (start?{start} = START(x)?{x})
+
+;; 7-module.watsup:198.1-198.44
+def invoke : (store, funcaddr, val*) -> config
+  ;; 7-module.watsup:199.1-211.34
+  def {e : expr, f : frame, fa : funcaddr, ft : functype, functype : functype, k : nat, local* : local*, mm : moduleinst, n : n, s : store, t_1^n : valtype^n, t_2^k : valtype^k, val^n : val^n} invoke(s, fa, val^n{val}) = `%;%*`(`%;%`(s, f), (val <: admininstr)^n{val} :: [CALL_ADDR_admininstr(fa)])
+    -- if (mm = {FUNC [], GLOBAL [], TABLE [], MEM [], ELEM [], DATA [], EXPORT []})
+    -- if (f = {LOCAL [], MODULE mm})
+    -- if ($funcinst(`%;%`(s, f))[fa].CODE_funcinst = `FUNC%%*%`(ft, local*{local}, e))
+    -- if (functype = `%->%`(t_1^n{t_1}, t_2^k{t_2}))
 
 == IL Validation...
 == Latex Generation...
 $$
-\begin{array}{@{}lrrl@{}}
-& \mathit{n} &::=& \mathit{nat} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}}
-\mbox{(name)} & \mathit{name} &::=& \mathit{text} \\
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{n}} &::=& {\mathit{nat}} \\
+& {\mathit{m}} &::=& {\mathit{nat}} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(byte)} & \mathit{byte} &::=& \mathit{nat} \\
-\mbox{(32-bit integer)} & \mathit{u{\scriptstyle32}} &::=& \mathit{nat} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(byte)} & {\mathit{byte}} &::=& \mathtt{0x00} ~|~ \dots ~|~ \mathtt{0xFF} \\
+\mbox{(unsigned integer)} & {\mathit{uN}} &::=& 0 ~|~ \dots ~|~ {2^{{\mathit{N}}}} - 1 \\
+\mbox{(signed integer)} & {\mathit{sN}} &::=& {-{2^{{\mathit{N}} - 1}}} ~|~ \dots ~|~ {-1} ~|~ 0 ~|~ 1 ~|~ \dots ~|~ {2^{{\mathit{N}} - 1}} - 1 \\
+\mbox{(integer)} & {\mathit{iN}} &::=& {\mathit{uN}} \\
+\mbox{(32-bit integer)} & {\mathit{u{\scriptstyle32}}} &::=& 0 ~|~ \dots ~|~ {2^{32}} - 1 \\
+\mbox{(64-bit integer)} & {\mathit{u{\scriptstyle64}}} &::=& 0 ~|~ \dots ~|~ {2^{64}} - 1 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{signif}}(32) &=& 23 &  \\
+{\mathrm{signif}}(64) &=& 52 &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{expon}}(32) &=& 8 &  \\
+{\mathrm{expon}}(64) &=& 11 &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{M}}}_{{\mathit{N}}} &=& {\mathrm{signif}}({\mathit{N}}) &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{E}}}_{{\mathit{N}}} &=& {\mathrm{expon}}({\mathit{N}}) &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(floating-point number)} & {\mathit{fN}} &::=& {+{\mathit{fNmag}}} ~|~ {-{\mathit{fNmag}}} \\
+\mbox{(floating-point magnitude)} & {\mathit{fNmag}} &::=& (1 + {\mathit{m}} \cdot {2^{{-{{\mathrm{M}}}_{{\mathit{N}}}}}}) \cdot {2^{{\mathit{n}}}} &\quad
+  \mbox{if}~{-{2^{{{\mathrm{E}}}_{{\mathit{N}}} - 1}}} + 2 \leq {\mathit{n}} \leq {2^{{{\mathrm{E}}}_{{\mathit{N}}} - 1}} - 1 \\ &&|&
+(0 + {\mathit{m}} \cdot {2^{{-{{\mathrm{M}}}_{{\mathit{N}}}}}}) \cdot {2^{{\mathit{n}}}} &\quad
+  \mbox{if}~{-{2^{{{\mathrm{E}}}_{{\mathit{N}}} - 1}}} + 2 = {\mathit{n}} \\ &&|&
+\infty \\ &&|&
+{\mathsf{nan}}{({\mathit{n}})} &\quad
+  \mbox{if}~1 \leq {\mathit{n}} < {{\mathrm{M}}}_{{\mathit{N}}} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(index)} & \mathit{idx} &::=& \mathit{nat} \\
-\mbox{(function index)} & \mathit{funcidx} &::=& \mathit{idx} \\
-\mbox{(global index)} & \mathit{globalidx} &::=& \mathit{idx} \\
-\mbox{(table index)} & \mathit{tableidx} &::=& \mathit{idx} \\
-\mbox{(memory index)} & \mathit{memidx} &::=& \mathit{idx} \\
-\mbox{(elem index)} & \mathit{elemidx} &::=& \mathit{idx} \\
-\mbox{(data index)} & \mathit{dataidx} &::=& \mathit{idx} \\
-\mbox{(label index)} & \mathit{labelidx} &::=& \mathit{idx} \\
-\mbox{(local index)} & \mathit{localidx} &::=& \mathit{idx} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(character)} & {\mathit{char}} &::=& \mathrm{U{+}00} ~|~ \dots ~|~ \mathrm{U{+}D7FF} ~|~ \mathrm{U{+}E000} ~|~ \dots ~|~ \mathrm{U{+}10FFFF} \\
+\mbox{(name)} & {\mathit{name}} &::=& {{\mathit{char}}^\ast} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(number type)} & \mathit{numtype} &::=& \mathsf{i{\scriptstyle32}} ~|~ \mathsf{i{\scriptstyle64}} ~|~ \mathsf{f{\scriptstyle32}} ~|~ \mathsf{f{\scriptstyle64}} \\
-\mbox{(vector type)} & \mathit{vectype} &::=& \mathsf{v{\scriptstyle128}} \\
-\mbox{(reference type)} & \mathit{reftype} &::=& \mathsf{funcref} ~|~ \mathsf{externref} \\
-\mbox{(value type)} & \mathit{valtype} &::=& \mathit{numtype} ~|~ \mathit{vectype} ~|~ \mathit{reftype} ~|~ \mathsf{bot} \\
-& {\mathsf{i}}{\mathit{n}} &::=& \mathsf{i{\scriptstyle32}} ~|~ \mathsf{i{\scriptstyle64}} \\
-& {\mathsf{f}}{\mathit{n}} &::=& \mathsf{f{\scriptstyle32}} ~|~ \mathsf{f{\scriptstyle64}} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}}
-\mbox{(result type)} & \mathit{resulttype} &::=& {\mathit{valtype}^\ast} \\
-\mbox{(limits)} & \mathit{limits} &::=& [\mathit{u{\scriptstyle32}} .. \mathit{u{\scriptstyle32}}] \\
-\mbox{(global type)} & \mathit{globaltype} &::=& {\mathsf{mut}^?}~\mathit{valtype} \\
-\mbox{(function type)} & \mathit{functype} &::=& \mathit{resulttype} \rightarrow \mathit{resulttype} \\
-\mbox{(table type)} & \mathit{tabletype} &::=& \mathit{limits}~\mathit{reftype} \\
-\mbox{(memory type)} & \mathit{memtype} &::=& \mathit{limits}~\mathsf{i{\scriptstyle8}} \\
-\mbox{(element type)} & \mathit{elemtype} &::=& \mathit{reftype} \\
-\mbox{(data type)} & \mathit{datatype} &::=& \mathsf{ok} \\
-\mbox{(external type)} & \mathit{externtype} &::=& \mathsf{global}~\mathit{globaltype} ~|~ \mathsf{func}~\mathit{functype} ~|~ \mathsf{table}~\mathit{tabletype} ~|~ \mathsf{memory}~\mathit{memtype} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(index)} & {\mathit{idx}} &::=& {\mathit{nat}} \\
+\mbox{(function index)} & {\mathit{funcidx}} &::=& {\mathit{idx}} \\
+\mbox{(global index)} & {\mathit{globalidx}} &::=& {\mathit{idx}} \\
+\mbox{(table index)} & {\mathit{tableidx}} &::=& {\mathit{idx}} \\
+\mbox{(memory index)} & {\mathit{memidx}} &::=& {\mathit{idx}} \\
+\mbox{(elem index)} & {\mathit{elemidx}} &::=& {\mathit{idx}} \\
+\mbox{(data index)} & {\mathit{dataidx}} &::=& {\mathit{idx}} \\
+\mbox{(label index)} & {\mathit{labelidx}} &::=& {\mathit{idx}} \\
+\mbox{(local index)} & {\mathit{localidx}} &::=& {\mathit{idx}} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(signedness)} & \mathit{sx} &::=& \mathsf{u} ~|~ \mathsf{s} \\
-& \mathit{unop}_{\mathsf{ixx}} &::=& \mathsf{clz} ~|~ \mathsf{ctz} ~|~ \mathsf{popcnt} \\
-& \mathit{unop}_{\mathsf{fxx}} &::=& \mathsf{abs} ~|~ \mathsf{neg} ~|~ \mathsf{sqrt} ~|~ \mathsf{ceil} ~|~ \mathsf{floor} ~|~ \mathsf{trunc} ~|~ \mathsf{nearest} \\
-& \mathit{binop}_{\mathsf{ixx}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ {\mathsf{div\_}}{\mathit{sx}} ~|~ {\mathsf{rem\_}}{\mathit{sx}} \\ &&|&
-\mathsf{and} ~|~ \mathsf{or} ~|~ \mathsf{xor} ~|~ \mathsf{shl} ~|~ {\mathsf{shr\_}}{\mathit{sx}} ~|~ \mathsf{rotl} ~|~ \mathsf{rotr} \\
-& \mathit{binop}_{\mathsf{fxx}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} ~|~ \mathsf{min} ~|~ \mathsf{max} ~|~ \mathsf{copysign} \\
-& \mathit{testop}_{\mathsf{ixx}} &::=& \mathsf{eqz} \\
-& \mathit{testop}_{\mathsf{fxx}} &::=&  \\
-& \mathit{relop}_{\mathsf{ixx}} &::=& \mathsf{eq} ~|~ \mathsf{ne} ~|~ {\mathsf{lt\_}}{\mathit{sx}} ~|~ {\mathsf{gt\_}}{\mathit{sx}} ~|~ {\mathsf{le\_}}{\mathit{sx}} ~|~ {\mathsf{ge\_}}{\mathit{sx}} \\
-& \mathit{relop}_{\mathsf{fxx}} &::=& \mathsf{eq} ~|~ \mathsf{ne} ~|~ \mathsf{lt} ~|~ \mathsf{gt} ~|~ \mathsf{le} ~|~ \mathsf{ge} \\
-& \mathit{unop}_{\mathit{numtype}} &::=& \mathit{unop}_{\mathsf{ixx}} ~|~ \mathit{unop}_{\mathsf{fxx}} \\
-& \mathit{binop}_{\mathit{numtype}} &::=& \mathit{binop}_{\mathsf{ixx}} ~|~ \mathit{binop}_{\mathsf{fxx}} \\
-& \mathit{testop}_{\mathit{numtype}} &::=& \mathit{testop}_{\mathsf{ixx}} ~|~ \mathit{testop}_{\mathsf{fxx}} \\
-& \mathit{relop}_{\mathit{numtype}} &::=& \mathit{relop}_{\mathsf{ixx}} ~|~ \mathit{relop}_{\mathsf{fxx}} \\
-& \mathit{cvtop} &::=& \mathsf{convert} ~|~ \mathsf{reinterpret} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(number type)} & {\mathit{numtype}} &::=& \mathsf{i{\scriptstyle32}} ~|~ \mathsf{i{\scriptstyle64}} ~|~ \mathsf{f{\scriptstyle32}} ~|~ \mathsf{f{\scriptstyle64}} \\
+\mbox{(vector type)} & {\mathit{vectype}} &::=& \mathsf{v{\scriptstyle128}} \\
+\mbox{(reference type)} & {\mathit{reftype}} &::=& \mathsf{funcref} ~|~ \mathsf{externref} \\
+\mbox{(value type)} & {\mathit{valtype}} &::=& {\mathit{numtype}} ~|~ {\mathit{vectype}} ~|~ {\mathit{reftype}} ~|~ \mathsf{bot} \\
+& {{\mathsf{i}}{{\mathit{n}}}} &::=& \mathsf{i{\scriptstyle32}} ~|~ \mathsf{i{\scriptstyle64}} \\
+& {{\mathsf{f}}{{\mathit{n}}}} &::=& \mathsf{f{\scriptstyle32}} ~|~ \mathsf{f{\scriptstyle64}} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(result type)} & {\mathit{resulttype}} &::=& {{\mathit{valtype}}^\ast} \\
+\mbox{(limits)} & {\mathit{limits}} &::=& [{\mathit{u{\scriptstyle32}}} .. {\mathit{u{\scriptstyle32}}}] \\
+\mbox{(global type)} & {\mathit{globaltype}} &::=& {\mathsf{mut}^?}~{\mathit{valtype}} \\
+\mbox{(function type)} & {\mathit{functype}} &::=& {\mathit{resulttype}} \rightarrow {\mathit{resulttype}} \\
+\mbox{(table type)} & {\mathit{tabletype}} &::=& {\mathit{limits}}~{\mathit{reftype}} \\
+\mbox{(memory type)} & {\mathit{memtype}} &::=& {\mathit{limits}}~\mathsf{i{\scriptstyle8}} \\
+\mbox{(element type)} & {\mathit{elemtype}} &::=& {\mathit{reftype}} \\
+\mbox{(data type)} & {\mathit{datatype}} &::=& \mathsf{ok} \\
+\mbox{(external type)} & {\mathit{externtype}} &::=& \mathsf{global}~{\mathit{globaltype}} ~|~ \mathsf{func}~{\mathit{functype}} ~|~ \mathsf{table}~{\mathit{tabletype}} ~|~ \mathsf{mem}~{\mathit{memtype}} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-& \mathit{c}_{\mathit{numtype}} &::=& \mathit{nat} \\
-& \mathit{c}_{\mathit{vectype}} &::=& \mathit{nat} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(signedness)} & {\mathit{sx}} &::=& \mathsf{u} ~|~ \mathsf{s} \\
+& {\mathit{unop}}_{{\mathsf{ixx}}} &::=& \mathsf{clz} ~|~ \mathsf{ctz} ~|~ \mathsf{popcnt} \\
+& {\mathit{unop}}_{{\mathsf{fxx}}} &::=& \mathsf{abs} ~|~ \mathsf{neg} ~|~ \mathsf{sqrt} ~|~ \mathsf{ceil} ~|~ \mathsf{floor} ~|~ \mathsf{trunc} ~|~ \mathsf{nearest} \\
+& {\mathit{binop}}_{{\mathsf{ixx}}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ {\mathsf{div\_}}{{\mathit{sx}}} ~|~ {\mathsf{rem\_}}{{\mathit{sx}}} \\ &&|&
+\mathsf{and} ~|~ \mathsf{or} ~|~ \mathsf{xor} ~|~ \mathsf{shl} ~|~ {\mathsf{shr\_}}{{\mathit{sx}}} ~|~ \mathsf{rotl} ~|~ \mathsf{rotr} \\
+& {\mathit{binop}}_{{\mathsf{fxx}}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} ~|~ \mathsf{min} ~|~ \mathsf{max} ~|~ \mathsf{copysign} \\
+& {\mathit{testop}}_{{\mathsf{ixx}}} &::=& \mathsf{eqz} \\
+& {\mathit{testop}}_{{\mathsf{fxx}}} &::=&  \\
+& {\mathit{relop}}_{{\mathsf{ixx}}} &::=& \mathsf{eq} ~|~ \mathsf{ne} ~|~ {\mathsf{lt\_}}{{\mathit{sx}}} ~|~ {\mathsf{gt\_}}{{\mathit{sx}}} ~|~ {\mathsf{le\_}}{{\mathit{sx}}} ~|~ {\mathsf{ge\_}}{{\mathit{sx}}} \\
+& {\mathit{relop}}_{{\mathsf{fxx}}} &::=& \mathsf{eq} ~|~ \mathsf{ne} ~|~ \mathsf{lt} ~|~ \mathsf{gt} ~|~ \mathsf{le} ~|~ \mathsf{ge} \\
+& {\mathit{unop}}_{{\mathit{numtype}}} &::=& {\mathit{unop}}_{{\mathsf{ixx}}} ~|~ {\mathit{unop}}_{{\mathsf{fxx}}} \\
+& {\mathit{binop}}_{{\mathit{numtype}}} &::=& {\mathit{binop}}_{{\mathsf{ixx}}} ~|~ {\mathit{binop}}_{{\mathsf{fxx}}} \\
+& {\mathit{testop}}_{{\mathit{numtype}}} &::=& {\mathit{testop}}_{{\mathsf{ixx}}} ~|~ {\mathit{testop}}_{{\mathsf{fxx}}} \\
+& {\mathit{relop}}_{{\mathit{numtype}}} &::=& {\mathit{relop}}_{{\mathsf{ixx}}} ~|~ {\mathit{relop}}_{{\mathsf{fxx}}} \\
+& {\mathit{cvtop}} &::=& \mathsf{convert} ~|~ \mathsf{reinterpret} ~|~ \mathsf{convert\_sat} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{c}}_{{\mathit{numtype}}} &::=& {\mathit{nat}} \\
+& {\mathit{c}}_{{\mathit{vectype}}} &::=& {\mathit{nat}} \\
 \end{array}
 $$
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(block type)} & \mathit{blocktype} &::=& \mathit{functype} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(block type)} & {\mathit{blocktype}} &::=& {\mathit{functype}} \\
 \end{array}
 $$
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(instruction)} & \mathit{instr} &::=& \mathsf{unreachable} \\ &&|&
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(instruction)} & {\mathit{instr}} &::=& \mathsf{unreachable} \\ &&|&
 \mathsf{nop} \\ &&|&
 \mathsf{drop} \\ &&|&
-\mathsf{select}~{\mathit{valtype}^?} \\ &&|&
-\mathsf{block}~\mathit{blocktype}~{\mathit{instr}^\ast} \\ &&|&
-\mathsf{loop}~\mathit{blocktype}~{\mathit{instr}^\ast} \\ &&|&
-\mathsf{if}~\mathit{blocktype}~{\mathit{instr}^\ast}~\mathsf{else}~{\mathit{instr}^\ast} \\ &&|&
-\mathsf{br}~\mathit{labelidx} \\ &&|&
-\mathsf{br\_if}~\mathit{labelidx} \\ &&|&
-\mathsf{br\_table}~{\mathit{labelidx}^\ast}~\mathit{labelidx} \\ &&|&
-\mathsf{call}~\mathit{funcidx} \\ &&|&
-\mathsf{call\_indirect}~\mathit{tableidx}~\mathit{functype} \\ &&|&
+\mathsf{select}~{{\mathit{valtype}}^?} \\ &&|&
+\mathsf{block}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast} \\ &&|&
+\mathsf{loop}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast} \\ &&|&
+\mathsf{if}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast}~\mathsf{else}~{{\mathit{instr}}^\ast} \\ &&|&
+\mathsf{br}~{\mathit{labelidx}} \\ &&|&
+\mathsf{br\_if}~{\mathit{labelidx}} \\ &&|&
+\mathsf{br\_table}~{{\mathit{labelidx}}^\ast}~{\mathit{labelidx}} \\ &&|&
+\mathsf{call}~{\mathit{funcidx}} \\ &&|&
+\mathsf{call\_indirect}~{\mathit{tableidx}}~{\mathit{functype}} \\ &&|&
 \mathsf{return} \\ &&|&
-\mathit{numtype}.\mathsf{const}~\mathit{c}_{\mathit{numtype}} \\ &&|&
-\mathit{numtype} . \mathit{unop}_{\mathit{numtype}} \\ &&|&
-\mathit{numtype} . \mathit{binop}_{\mathit{numtype}} \\ &&|&
-\mathit{numtype} . \mathit{testop}_{\mathit{numtype}} \\ &&|&
-\mathit{numtype} . \mathit{relop}_{\mathit{numtype}} \\ &&|&
-{\mathit{numtype}.\mathsf{extend}}{\mathit{n}} \\ &&|&
-\mathit{numtype} . {{{{\mathit{cvtop}}{\mathsf{\_}}}{\mathit{numtype}}}{\mathsf{\_}}}{{\mathit{sx}^?}} \\ &&|&
-\mathsf{ref.null}~\mathit{reftype} \\ &&|&
-\mathsf{ref.func}~\mathit{funcidx} \\ &&|&
+{\mathit{numtype}}.\mathsf{const}~{\mathit{c}}_{{\mathit{numtype}}} \\ &&|&
+{\mathit{numtype}} . {\mathit{unop}}_{{\mathit{numtype}}} \\ &&|&
+{\mathit{numtype}} . {\mathit{binop}}_{{\mathit{numtype}}} \\ &&|&
+{\mathit{numtype}} . {\mathit{testop}}_{{\mathit{numtype}}} \\ &&|&
+{\mathit{numtype}} . {\mathit{relop}}_{{\mathit{numtype}}} \\ &&|&
+{{\mathit{numtype}}.\mathsf{extend}}{{\mathit{n}}} \\ &&|&
+{\mathit{numtype}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}} \\ &&|&
+\mathsf{ref.null}~{\mathit{reftype}} \\ &&|&
+\mathsf{ref.func}~{\mathit{funcidx}} \\ &&|&
 \mathsf{ref.is\_null} \\ &&|&
-\mathsf{local.get}~\mathit{localidx} \\ &&|&
-\mathsf{local.set}~\mathit{localidx} \\ &&|&
-\mathsf{local.tee}~\mathit{localidx} \\ &&|&
-\mathsf{global.get}~\mathit{globalidx} \\ &&|&
-\mathsf{global.set}~\mathit{globalidx} \\ &&|&
-\mathsf{table.get}~\mathit{tableidx} \\ &&|&
-\mathsf{table.set}~\mathit{tableidx} \\ &&|&
-\mathsf{table.size}~\mathit{tableidx} \\ &&|&
-\mathsf{table.grow}~\mathit{tableidx} \\ &&|&
-\mathsf{table.fill}~\mathit{tableidx} \\ &&|&
-\mathsf{table.copy}~\mathit{tableidx}~\mathit{tableidx} \\ &&|&
-\mathsf{table.init}~\mathit{tableidx}~\mathit{elemidx} \\ &&|&
-\mathsf{elem.drop}~\mathit{elemidx} \\ &&|&
+\mathsf{local.get}~{\mathit{localidx}} \\ &&|&
+\mathsf{local.set}~{\mathit{localidx}} \\ &&|&
+\mathsf{local.tee}~{\mathit{localidx}} \\ &&|&
+\mathsf{global.get}~{\mathit{globalidx}} \\ &&|&
+\mathsf{global.set}~{\mathit{globalidx}} \\ &&|&
+\mathsf{table.get}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.set}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.size}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.grow}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.fill}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.copy}~{\mathit{tableidx}}~{\mathit{tableidx}} \\ &&|&
+\mathsf{table.init}~{\mathit{tableidx}}~{\mathit{elemidx}} \\ &&|&
+\mathsf{elem.drop}~{\mathit{elemidx}} \\ &&|&
 \mathsf{memory.size} \\ &&|&
 \mathsf{memory.grow} \\ &&|&
 \mathsf{memory.fill} \\ &&|&
 \mathsf{memory.copy} \\ &&|&
-\mathsf{memory.init}~\mathit{dataidx} \\ &&|&
-\mathsf{data.drop}~\mathit{dataidx} \\ &&|&
-{\mathit{numtype}.\mathsf{load}}{{({{\mathit{n}}{\mathsf{\_}}}{\mathit{sx}})^?}}~\mathit{u{\scriptstyle32}}~\mathit{u{\scriptstyle32}} \\ &&|&
-{\mathit{numtype}.\mathsf{store}}{{\mathit{n}^?}}~\mathit{u{\scriptstyle32}}~\mathit{u{\scriptstyle32}} \\
-\mbox{(expression)} & \mathit{expr} &::=& {\mathit{instr}^\ast} \\
+\mathsf{memory.init}~{\mathit{dataidx}} \\ &&|&
+\mathsf{data.drop}~{\mathit{dataidx}} \\ &&|&
+{{\mathit{numtype}}.\mathsf{load}}{{({{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{u{\scriptstyle32}}}~{\mathit{u{\scriptstyle32}}} \\ &&|&
+{{\mathit{numtype}}.\mathsf{store}}{{{\mathit{n}}^?}}~{\mathit{u{\scriptstyle32}}}~{\mathit{u{\scriptstyle32}}} \\
+\mbox{(expression)} & {\mathit{expr}} &::=& {{\mathit{instr}}^\ast} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-& \mathit{elemmode} &::=& \mathsf{table}~\mathit{tableidx}~\mathit{expr} ~|~ \mathsf{declare} \\
-& \mathit{datamode} &::=& \mathsf{memory}~\mathit{memidx}~\mathit{expr} \\
-\mbox{(function)} & \mathit{func} &::=& \mathsf{func}~\mathit{functype}~{\mathit{valtype}^\ast}~\mathit{expr} \\
-\mbox{(global)} & \mathit{global} &::=& \mathsf{global}~\mathit{globaltype}~\mathit{expr} \\
-\mbox{(table)} & \mathit{table} &::=& \mathsf{table}~\mathit{tabletype} \\
-\mbox{(memory)} & \mathit{mem} &::=& \mathsf{memory}~\mathit{memtype} \\
-\mbox{(table segment)} & \mathit{elem} &::=& \mathsf{elem}~\mathit{reftype}~{\mathit{expr}^\ast}~{\mathit{elemmode}^?} \\
-\mbox{(memory segment)} & \mathit{data} &::=& \mathsf{data}~{({\mathit{byte}^\ast})^\ast}~{\mathit{datamode}^?} \\
-\mbox{(start function)} & \mathit{start} &::=& \mathsf{start}~\mathit{funcidx} \\
-\mbox{(external use)} & \mathit{externuse} &::=& \mathsf{func}~\mathit{funcidx} ~|~ \mathsf{global}~\mathit{globalidx} ~|~ \mathsf{table}~\mathit{tableidx} ~|~ \mathsf{memory}~\mathit{memidx} \\
-\mbox{(export)} & \mathit{export} &::=& \mathsf{export}~\mathit{name}~\mathit{externuse} \\
-\mbox{(import)} & \mathit{import} &::=& \mathsf{import}~\mathit{name}~\mathit{name}~\mathit{externtype} \\
-\mbox{(module)} & \mathit{module} &::=& \mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^\ast}~{\mathit{start}^\ast}~{\mathit{export}^\ast} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-\mathrm{Ki} &=& 1024 &  \\
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{elemmode}} &::=& \mathsf{active}~{\mathit{tableidx}}~{\mathit{expr}} ~|~ \mathsf{passive} ~|~ \mathsf{declare} \\
+& {\mathit{datamode}} &::=& \mathsf{active}~{\mathit{memidx}}~{\mathit{expr}} ~|~ \mathsf{passive} \\
+\mbox{(type)} & {\mathit{type}} &::=& \mathsf{type}~{\mathit{functype}} \\
+\mbox{(local)} & {\mathit{local}} &::=& \mathsf{local}~{\mathit{valtype}} \\
+\mbox{(function)} & {\mathit{func}} &::=& \mathsf{func}~{\mathit{functype}}~{{\mathit{local}}^\ast}~{\mathit{expr}} \\
+\mbox{(global)} & {\mathit{global}} &::=& \mathsf{global}~{\mathit{globaltype}}~{\mathit{expr}} \\
+\mbox{(table)} & {\mathit{table}} &::=& \mathsf{table}~{\mathit{tabletype}} \\
+\mbox{(memory)} & {\mathit{mem}} &::=& \mathsf{memory}~{\mathit{memtype}} \\
+\mbox{(table segment)} & {\mathit{elem}} &::=& \mathsf{elem}~{\mathit{reftype}}~{{\mathit{expr}}^\ast}~{\mathit{elemmode}} \\
+\mbox{(memory segment)} & {\mathit{data}} &::=& \mathsf{data}~{{\mathit{byte}}^\ast}~{\mathit{datamode}} \\
+\mbox{(start function)} & {\mathit{start}} &::=& \mathsf{start}~{\mathit{funcidx}} \\
+\mbox{(external index)} & {\mathit{externidx}} &::=& \mathsf{func}~{\mathit{funcidx}} ~|~ \mathsf{global}~{\mathit{globalidx}} ~|~ \mathsf{table}~{\mathit{tableidx}} ~|~ \mathsf{mem}~{\mathit{memidx}} \\
+\mbox{(export)} & {\mathit{export}} &::=& \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} \\
+\mbox{(import)} & {\mathit{import}} &::=& \mathsf{import}~{\mathit{name}}~{\mathit{name}}~{\mathit{externtype}} \\
+\mbox{(module)} & {\mathit{module}} &::=& \mathsf{module}~{{\mathit{import}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{global}}^\ast}~{{\mathit{table}}^\ast}~{{\mathit{mem}}^\ast}~{{\mathit{elem}}^\ast}~{{\mathit{data}}^\ast}~{{\mathit{start}}^?}~{{\mathit{export}}^\ast} \\
 \end{array}
 $$
 
@@ -1811,11 +2243,21 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-\mathrm{min}(0,\, \mathit{j}) &=& 0 &  \\
-\mathrm{min}(\mathit{i},\, 0) &=& 0 &  \\
-\mathrm{min}(\mathit{i} + 1,\, \mathit{j} + 1) &=& \mathrm{min}(\mathit{i},\, \mathit{j}) &  \\
+{\mathrm{Ki}} &=& 1024 &  \\
 \end{array}
 $$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{min}}(0,\, {\mathit{j}}) &=& 0 &  \\
+{\mathrm{min}}({\mathit{i}},\, 0) &=& 0 &  \\
+{\mathrm{min}}({\mathit{i}} + 1,\, {\mathit{j}} + 1) &=& {\mathrm{min}}({\mathit{i}},\, {\mathit{j}}) &  \\
+\end{array}
+$$
+
+\vspace{1ex}
 
 \vspace{1ex}
 
@@ -1833,56 +2275,54 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-\mathrm{test}_{\mathit{sub}_{\mathsf{atom}_{22}}}(\mathit{n}_{3_{\mathsf{atom}_{\mathit{y}}}}) &=& 0 &  \\
+{\mathrm{test}}_{{\mathit{sub}}_{{\mathsf{atom}}_{{22}}}}({\mathit{n}}_{{3}_{{\mathsf{atom}}_{{\mathit{y}}}}}) &=& 0 &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-{\mathrm{curried}}_{\mathit{n}_{1}}(\mathit{n}_{2}) &=& \mathit{n}_{1} + \mathit{n}_{2} &  \\
+{{\mathrm{curried}}}_{{\mathit{n}}_{{1}}}({\mathit{n}}_{{2}}) &=& {\mathit{n}}_{{1}} + {\mathit{n}}_{{2}} &  \\
 \end{array}
 $$
 
 $$
-\begin{array}{@{}lrrl@{}}
-& \mathit{testfuse} &::=& {\mathsf{ab}}_{\mathit{nat}}\,\,\mathit{nat}~\mathit{nat} \\ &&|&
-{\mathsf{cd}}_{\mathit{nat}}\,\mathit{nat}~\mathit{nat} \\ &&|&
-{\mathsf{ef\_}}{\mathit{nat}}~\mathit{nat}~\mathit{nat} \\ &&|&
-{{\mathsf{gh}}_{\mathit{nat}}}{\mathit{nat}}~\mathit{nat} \\ &&|&
-{{\mathsf{ij}}_{\mathit{nat}}}{\mathit{nat}}~\mathit{nat} \\ &&|&
-{\mathsf{kl\_ab}}{\mathit{nat}}~\mathit{nat}~\mathit{nat} \\ &&|&
-{\mathsf{mn\_}}{\mathsf{ab}}~\mathit{nat}~\mathit{nat}~\mathit{nat} \\ &&|&
-{{\mathsf{op\_}}{\mathsf{ab}}}{\mathit{nat}}~\mathit{nat}~\mathit{nat} \\ &&|&
-{{\mathsf{qr}}_{\mathit{nat}}}{\mathsf{ab}}~\mathit{nat}~\mathit{nat} \\
-\mbox{(context)} & \mathit{context} &::=& \{\; \begin{array}[t]{@{}l@{}}
-\mathsf{func}~{\mathit{functype}^\ast},\; \mathsf{global}~{\mathit{globaltype}^\ast},\; \mathsf{table}~{\mathit{tabletype}^\ast},\; \mathsf{mem}~{\mathit{memtype}^\ast},\; \\
-  \mathsf{elem}~{\mathit{elemtype}^\ast},\; \mathsf{data}~{\mathit{datatype}^\ast},\; \\
-  \mathsf{local}~{\mathit{valtype}^\ast},\; \mathsf{label}~{\mathit{resulttype}^\ast},\; \mathsf{return}~{\mathit{resulttype}^?} \;\}\end{array} \\
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{testfuse}} &::=& {\mathsf{ab}}_{{\mathit{nat}}}\,\,{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{\mathsf{cd}}_{{\mathit{nat}}}\,{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{\mathsf{ef\_}}{{\mathit{nat}}}~{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{{\mathsf{gh}}_{{\mathit{nat}}}}{{\mathit{nat}}}~{\mathit{nat}} \\ &&|&
+{{\mathsf{ij}}_{{\mathit{nat}}}}{{\mathit{nat}}}~{\mathit{nat}} \\ &&|&
+{\mathsf{kl\_ab}}{{\mathit{nat}}}~{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{\mathsf{mn\_}}{\mathsf{ab}}~{\mathit{nat}}~{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{{\mathsf{op\_}}{\mathsf{ab}}}{{\mathit{nat}}}~{\mathit{nat}}~{\mathit{nat}} \\ &&|&
+{{\mathsf{qr}}_{{\mathit{nat}}}}{\mathsf{ab}}~{\mathit{nat}}~{\mathit{nat}} \\
+\mbox{(context)} & {\mathit{context}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{func}~{{\mathit{functype}}^\ast},\; \mathsf{global}~{{\mathit{globaltype}}^\ast},\; \mathsf{table}~{{\mathit{tabletype}}^\ast},\; \mathsf{mem}~{{\mathit{memtype}}^\ast},\; \\
+  \mathsf{elem}~{{\mathit{elemtype}}^\ast},\; \mathsf{data}~{{\mathit{datatype}}^\ast},\; \\
+  \mathsf{local}~{{\mathit{valtype}}^\ast},\; \mathsf{label}~{{\mathit{resulttype}}^\ast},\; \mathsf{return}~{{\mathit{resulttype}}^?} \;\}\end{array} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
-$\boxed{{ \vdash }\;\mathit{limits} : \mathit{nat}}$
+$\boxed{{ \vdash }\;{\mathit{limits}} : {\mathit{nat}}}$
 
-$\boxed{{ \vdash }\;\mathit{functype} : \mathsf{ok}}$
+$\boxed{{ \vdash }\;{\mathit{functype}} : \mathsf{ok}}$
 
-$\boxed{{ \vdash }\;\mathit{globaltype} : \mathsf{ok}}$
+$\boxed{{ \vdash }\;{\mathit{globaltype}} : \mathsf{ok}}$
 
-$\boxed{{ \vdash }\;\mathit{tabletype} : \mathsf{ok}}$
+$\boxed{{ \vdash }\;{\mathit{tabletype}} : \mathsf{ok}}$
 
-$\boxed{{ \vdash }\;\mathit{memtype} : \mathsf{ok}}$
+$\boxed{{ \vdash }\;{\mathit{memtype}} : \mathsf{ok}}$
 
-$\boxed{{ \vdash }\;\mathit{externtype} : \mathsf{ok}}$
-
-\vspace{1ex}
+$\boxed{{ \vdash }\;{\mathit{externtype}} : \mathsf{ok}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{n}_{1} \leq \mathit{n}_{2} \leq \mathit{k}
+{\mathit{n}}_{{1}} \leq {\mathit{n}}_{{2}} \leq {\mathit{k}}
 }{
-{ \vdash }\;[\mathit{n}_{1} .. \mathit{n}_{2}] : \mathit{k}
+{ \vdash }\;[{\mathit{n}}_{{1}} .. {\mathit{n}}_{{2}}] : {\mathit{k}}
 } \, {[\textsc{\scriptsize K{-}limits}]}
 \qquad
 \end{array}
@@ -1892,7 +2332,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathit{ft} : \mathsf{ok}
+{ \vdash }\;{\mathit{ft}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}func}]}
 \qquad
 \end{array}
@@ -1902,7 +2342,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathit{gt} : \mathsf{ok}
+{ \vdash }\;{\mathit{gt}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}global}]}
 \qquad
 \end{array}
@@ -1911,9 +2351,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{lim} : {2^{32}} - 1
+{ \vdash }\;{\mathit{lim}} : {2^{32}} - 1
 }{
-{ \vdash }\;\mathit{lim}~\mathit{rt} : \mathsf{ok}
+{ \vdash }\;{\mathit{lim}}~{\mathit{rt}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}table}]}
 \qquad
 \end{array}
@@ -1922,22 +2362,20 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{lim} : {2^{16}}
+{ \vdash }\;{\mathit{lim}} : {2^{16}}
 }{
-{ \vdash }\;\mathit{lim}~\mathsf{i{\scriptstyle8}} : \mathsf{ok}
+{ \vdash }\;{\mathit{lim}}~\mathsf{i{\scriptstyle8}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}mem}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{functype} : \mathsf{ok}
+{ \vdash }\;{\mathit{functype}} : \mathsf{ok}
 }{
-{ \vdash }\;\mathsf{func}~\mathit{functype} : \mathsf{ok}
+{ \vdash }\;\mathsf{func}~{\mathit{functype}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}extern{-}func}]}
 \qquad
 \end{array}
@@ -1946,9 +2384,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{globaltype} : \mathsf{ok}
+{ \vdash }\;{\mathit{globaltype}} : \mathsf{ok}
 }{
-{ \vdash }\;\mathsf{global}~\mathit{globaltype} : \mathsf{ok}
+{ \vdash }\;\mathsf{global}~{\mathit{globaltype}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}extern{-}global}]}
 \qquad
 \end{array}
@@ -1957,9 +2395,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{tabletype} : \mathsf{ok}
+{ \vdash }\;{\mathit{tabletype}} : \mathsf{ok}
 }{
-{ \vdash }\;\mathsf{table}~\mathit{tabletype} : \mathsf{ok}
+{ \vdash }\;\mathsf{table}~{\mathit{tabletype}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}extern{-}table}]}
 \qquad
 \end{array}
@@ -1968,9 +2406,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{memtype} : \mathsf{ok}
+{ \vdash }\;{\mathit{memtype}} : \mathsf{ok}
 }{
-{ \vdash }\;\mathsf{memory}~\mathit{memtype} : \mathsf{ok}
+{ \vdash }\;\mathsf{mem}~{\mathit{memtype}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize K{-}extern{-}mem}]}
 \qquad
 \end{array}
@@ -1978,15 +2416,17 @@ $$
 
 \vspace{1ex}
 
-$\boxed{{ \vdash }\;\mathit{valtype} \leq \mathit{valtype}}$
+\vspace{1ex}
 
-$\boxed{{ \vdash }\;{\mathit{valtype}^\ast} \leq {\mathit{valtype}^\ast}}$
+$\boxed{{ \vdash }\;{\mathit{valtype}} \leq {\mathit{valtype}}}$
+
+$\boxed{{ \vdash }\;{{\mathit{valtype}}^\ast} \leq {{\mathit{valtype}}^\ast}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathit{t} \leq \mathit{t}
+{ \vdash }\;{\mathit{t}} \leq {\mathit{t}}
 } \, {[\textsc{\scriptsize S{-}refl}]}
 \qquad
 \end{array}
@@ -1996,7 +2436,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathsf{bot} \leq \mathit{t}
+{ \vdash }\;\mathsf{bot} \leq {\mathit{t}}
 } \, {[\textsc{\scriptsize S{-}bot}]}
 \qquad
 \end{array}
@@ -2005,9 +2445,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-({ \vdash }\;\mathit{t}_{1} \leq \mathit{t}_{2})^\ast
+({ \vdash }\;{\mathit{t}}_{{1}} \leq {\mathit{t}}_{{2}})^\ast
 }{
-{ \vdash }\;{\mathit{t}_{1}^\ast} \leq {\mathit{t}_{2}^\ast}
+{ \vdash }\;{{\mathit{t}}_{{1}}^\ast} \leq {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize S{-}result}]}
 \qquad
 \end{array}
@@ -2015,28 +2455,26 @@ $$
 
 \vspace{1ex}
 
-$\boxed{{ \vdash }\;\mathit{limits} \leq \mathit{limits}}$
+$\boxed{{ \vdash }\;{\mathit{limits}} \leq {\mathit{limits}}}$
 
-$\boxed{{ \vdash }\;\mathit{functype} \leq \mathit{functype}}$
+$\boxed{{ \vdash }\;{\mathit{functype}} \leq {\mathit{functype}}}$
 
-$\boxed{{ \vdash }\;\mathit{globaltype} \leq \mathit{globaltype}}$
+$\boxed{{ \vdash }\;{\mathit{globaltype}} \leq {\mathit{globaltype}}}$
 
-$\boxed{{ \vdash }\;\mathit{tabletype} \leq \mathit{tabletype}}$
+$\boxed{{ \vdash }\;{\mathit{tabletype}} \leq {\mathit{tabletype}}}$
 
-$\boxed{{ \vdash }\;\mathit{memtype} \leq \mathit{memtype}}$
+$\boxed{{ \vdash }\;{\mathit{memtype}} \leq {\mathit{memtype}}}$
 
-$\boxed{{ \vdash }\;\mathit{externtype} \leq \mathit{externtype}}$
-
-\vspace{1ex}
+$\boxed{{ \vdash }\;{\mathit{externtype}} \leq {\mathit{externtype}}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{n}_{11} \geq \mathit{n}_{21}
+{\mathit{n}}_{{11}} \geq {\mathit{n}}_{{21}}
  \qquad
-\mathit{n}_{12} \leq \mathit{n}_{22}
+{\mathit{n}}_{{12}} \leq {\mathit{n}}_{{22}}
 }{
-{ \vdash }\;[\mathit{n}_{11} .. \mathit{n}_{12}] \leq [\mathit{n}_{21} .. \mathit{n}_{22}]
+{ \vdash }\;[{\mathit{n}}_{{11}} .. {\mathit{n}}_{{12}}] \leq [{\mathit{n}}_{{21}} .. {\mathit{n}}_{{22}}]
 } \, {[\textsc{\scriptsize S{-}limits}]}
 \qquad
 \end{array}
@@ -2046,7 +2484,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathit{ft} \leq \mathit{ft}
+{ \vdash }\;{\mathit{ft}} \leq {\mathit{ft}}
 } \, {[\textsc{\scriptsize S{-}func}]}
 \qquad
 \end{array}
@@ -2056,7 +2494,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{ \vdash }\;\mathit{gt} \leq \mathit{gt}
+{ \vdash }\;{\mathit{gt}} \leq {\mathit{gt}}
 } \, {[\textsc{\scriptsize S{-}global}]}
 \qquad
 \end{array}
@@ -2065,9 +2503,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{lim}_{1} \leq \mathit{lim}_{2}
+{ \vdash }\;{\mathit{lim}}_{{1}} \leq {\mathit{lim}}_{{2}}
 }{
-{ \vdash }\;\mathit{lim}_{1}~\mathit{rt} \leq \mathit{lim}_{2}~\mathit{rt}
+{ \vdash }\;{\mathit{lim}}_{{1}}~{\mathit{rt}} \leq {\mathit{lim}}_{{2}}~{\mathit{rt}}
 } \, {[\textsc{\scriptsize S{-}table}]}
 \qquad
 \end{array}
@@ -2076,22 +2514,20 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{lim}_{1} \leq \mathit{lim}_{2}
+{ \vdash }\;{\mathit{lim}}_{{1}} \leq {\mathit{lim}}_{{2}}
 }{
-{ \vdash }\;\mathit{lim}_{1}~\mathsf{i{\scriptstyle8}} \leq \mathit{lim}_{2}~\mathsf{i{\scriptstyle8}}
+{ \vdash }\;{\mathit{lim}}_{{1}}~\mathsf{i{\scriptstyle8}} \leq {\mathit{lim}}_{{2}}~\mathsf{i{\scriptstyle8}}
 } \, {[\textsc{\scriptsize S{-}mem}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{ft}_{1} \leq \mathit{ft}_{2}
+{ \vdash }\;{\mathit{ft}}_{{1}} \leq {\mathit{ft}}_{{2}}
 }{
-{ \vdash }\;\mathsf{func}~\mathit{ft}_{1} \leq \mathsf{func}~\mathit{ft}_{2}
+{ \vdash }\;\mathsf{func}~{\mathit{ft}}_{{1}} \leq \mathsf{func}~{\mathit{ft}}_{{2}}
 } \, {[\textsc{\scriptsize S{-}extern{-}func}]}
 \qquad
 \end{array}
@@ -2100,9 +2536,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{gt}_{1} \leq \mathit{gt}_{2}
+{ \vdash }\;{\mathit{gt}}_{{1}} \leq {\mathit{gt}}_{{2}}
 }{
-{ \vdash }\;\mathsf{global}~\mathit{gt}_{1} \leq \mathsf{global}~\mathit{gt}_{2}
+{ \vdash }\;\mathsf{global}~{\mathit{gt}}_{{1}} \leq \mathsf{global}~{\mathit{gt}}_{{2}}
 } \, {[\textsc{\scriptsize S{-}extern{-}global}]}
 \qquad
 \end{array}
@@ -2111,9 +2547,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{tt}_{1} \leq \mathit{tt}_{2}
+{ \vdash }\;{\mathit{tt}}_{{1}} \leq {\mathit{tt}}_{{2}}
 }{
-{ \vdash }\;\mathsf{table}~\mathit{tt}_{1} \leq \mathsf{table}~\mathit{tt}_{2}
+{ \vdash }\;\mathsf{table}~{\mathit{tt}}_{{1}} \leq \mathsf{table}~{\mathit{tt}}_{{2}}
 } \, {[\textsc{\scriptsize S{-}extern{-}table}]}
 \qquad
 \end{array}
@@ -2122,9 +2558,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{mt}_{1} \leq \mathit{mt}_{2}
+{ \vdash }\;{\mathit{mt}}_{{1}} \leq {\mathit{mt}}_{{2}}
 }{
-{ \vdash }\;\mathsf{memory}~\mathit{mt}_{1} \leq \mathsf{memory}~\mathit{mt}_{2}
+{ \vdash }\;\mathsf{mem}~{\mathit{mt}}_{{1}} \leq \mathsf{mem}~{\mathit{mt}}_{{2}}
 } \, {[\textsc{\scriptsize S{-}extern{-}mem}]}
 \qquad
 \end{array}
@@ -2132,20 +2568,20 @@ $$
 
 \vspace{1ex}
 
-$\boxed{\mathit{context} \vdash \mathit{instr} : \mathit{functype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{instr}} : {\mathit{functype}}}$
 
-$\boxed{\mathit{context} \vdash {\mathit{instr}^\ast} : \mathit{functype}}$
+$\boxed{{\mathit{context}} \vdash {{\mathit{instr}}^\ast} : {\mathit{functype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{expr} : \mathit{resulttype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {\mathit{resulttype}}}$
 
 \vspace{1ex}
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash {\mathit{instr}^\ast} : \epsilon \rightarrow {\mathit{t}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow {{\mathit{t}}^\ast}
 }{
-\mathit{C} \vdash {\mathit{instr}^\ast} : {\mathit{t}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}^\ast}
 } \, {[\textsc{\scriptsize T{-}expr}]}
 \qquad
 \end{array}
@@ -2157,7 +2593,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \epsilon : \epsilon \rightarrow \epsilon
+{\mathit{C}} \vdash \epsilon : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T*{-}empty}]}
 \qquad
 \end{array}
@@ -2166,11 +2602,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{instr}_{1} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {\mathit{instr}}_{{1}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-\mathit{C} \vdash \mathit{instr}_{2} : {\mathit{t}_{2}^\ast} \rightarrow {\mathit{t}_{3}^\ast}
+{\mathit{C}} \vdash {\mathit{instr}}_{{2}} : {{\mathit{t}}_{{2}}^\ast} \rightarrow {{\mathit{t}}_{{3}}^\ast}
 }{
-\mathit{C} \vdash \mathit{instr}_{1}~{\mathit{instr}_{2}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{3}^\ast}
+{\mathit{C}} \vdash {\mathit{instr}}_{{1}}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{3}}^\ast}
 } \, {[\textsc{\scriptsize T*{-}seq}]}
 \qquad
 \end{array}
@@ -2180,14 +2616,14 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 \begin{array}{@{}c@{}}
-\mathit{C} \vdash {\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \\
-{ \vdash }\;{{\mathit{t}'}_{1}^\ast} \leq {\mathit{t}_{1}^\ast}
+{ \vdash }\;{{\mathit{t}'}_{{1}}^\ast} \leq {{\mathit{t}}_{{1}}^\ast}
  \qquad
-{ \vdash }\;{\mathit{t}_{2}^\ast} \leq {{\mathit{t}'}_{2}^\ast}
+{ \vdash }\;{{\mathit{t}}_{{2}}^\ast} \leq {{\mathit{t}'}_{{2}}^\ast}
 \end{array}
 }{
-\mathit{C} \vdash {\mathit{instr}^\ast} : {\mathit{t}'}_{1} \rightarrow {{\mathit{t}'}_{2}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}'}_{{1}}^\ast} \rightarrow {{\mathit{t}'}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T*{-}weak}]}
 \qquad
 \end{array}
@@ -2196,9 +2632,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash {\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash {\mathit{instr}^\ast} : {\mathit{t}^\ast}~{\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}^\ast}~{\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}^\ast}~{{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}^\ast}~{{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T*{-}frame}]}
 \qquad
 \end{array}
@@ -2210,7 +2646,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{unreachable} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{unreachable} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}unreachable}]}
 \qquad
 \end{array}
@@ -2220,7 +2656,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}nop}]}
 \qquad
 \end{array}
@@ -2230,19 +2666,17 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{drop} : \mathit{t} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{drop} : {\mathit{t}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}drop}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{select}~\mathit{t} : \mathit{t}~\mathit{t}~\mathsf{i{\scriptstyle32}} \rightarrow \mathit{t}
+{\mathit{C}} \vdash \mathsf{select}~{\mathit{t}} : {\mathit{t}}~{\mathit{t}}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}}
 } \, {[\textsc{\scriptsize T{-}select{-}expl}]}
 \qquad
 \end{array}
@@ -2251,11 +2685,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{t} \leq {\mathit{t}'}
+{ \vdash }\;{\mathit{t}} \leq {\mathit{t}'}
  \qquad
-{\mathit{t}'} = \mathit{numtype} \lor {\mathit{t}'} = \mathit{vectype}
+{\mathit{t}'} = {\mathit{numtype}} \lor {\mathit{t}'} = {\mathit{vectype}}
 }{
-\mathit{C} \vdash \mathsf{select} : \mathit{t}~\mathit{t}~\mathsf{i{\scriptstyle32}} \rightarrow \mathit{t}
+{\mathit{C}} \vdash \mathsf{select} : {\mathit{t}}~{\mathit{t}}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}}
 } \, {[\textsc{\scriptsize T{-}select{-}impl}]}
 \qquad
 \end{array}
@@ -2263,14 +2697,14 @@ $$
 
 \vspace{1ex}
 
-$\boxed{\mathit{context} \vdash \mathit{blocktype} : \mathit{functype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{blocktype}} : {\mathit{functype}}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{ft} : \mathsf{ok}
+{ \vdash }\;{\mathit{ft}} : \mathsf{ok}
 }{
-\mathit{C} \vdash \mathit{ft} : \mathit{ft}
+{\mathit{C}} \vdash {\mathit{ft}} : {\mathit{ft}}
 } \, {[\textsc{\scriptsize K{-}block}]}
 \qquad
 \end{array}
@@ -2279,11 +2713,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{bt} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-\mathit{C}, \mathsf{label}~{\mathit{t}_{2}^\ast} \vdash {\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}}, \mathsf{label}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{block}~\mathit{bt}~{\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}block}]}
 \qquad
 \end{array}
@@ -2292,11 +2726,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{bt} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-\mathit{C}, \mathsf{label}~{\mathit{t}_{1}^\ast} \vdash {\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}}, \mathsf{label}~({{\mathit{t}}_{{1}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{loop}~\mathit{bt}~{\mathit{instr}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}loop}]}
 \qquad
 \end{array}
@@ -2305,13 +2739,13 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{bt} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-\mathit{C}, \mathsf{label}~{\mathit{t}_{2}^\ast} \vdash {\mathit{instr}_{1}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}}, \mathsf{label}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{1}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-\mathit{C}, \mathsf{label}~{\mathit{t}_{2}^\ast} \vdash {\mathit{instr}_{2}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}}, \mathsf{label}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{if}~\mathit{bt}~{\mathit{instr}_{1}^\ast}~\mathsf{else}~{\mathit{instr}_{2}^\ast} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}if}]}
 \qquad
 \end{array}
@@ -2322,9 +2756,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{label}[\mathit{l}] = {\mathit{t}^\ast}
+{\mathit{C}}.\mathsf{label}[{\mathit{l}}] = {{\mathit{t}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{br}~\mathit{l} : {\mathit{t}_{1}^\ast}~{\mathit{t}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{br}~{\mathit{l}} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}br}]}
 \qquad
 \end{array}
@@ -2333,9 +2767,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{label}[\mathit{l}] = {\mathit{t}^\ast}
+{\mathit{C}}.\mathsf{label}[{\mathit{l}}] = {{\mathit{t}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{br\_if}~\mathit{l} : {\mathit{t}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}^\ast}
+{\mathit{C}} \vdash \mathsf{br\_if}~{\mathit{l}} : {{\mathit{t}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}^\ast}
 } \, {[\textsc{\scriptsize T{-}br\_if}]}
 \qquad
 \end{array}
@@ -2344,22 +2778,24 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-({ \vdash }\;{\mathit{t}^\ast} \leq \mathit{C}.\mathsf{label}[\mathit{l}])^\ast
+({ \vdash }\;{{\mathit{t}}^\ast} \leq {\mathit{C}}.\mathsf{label}[{\mathit{l}}])^\ast
  \qquad
-{ \vdash }\;{\mathit{t}^\ast} \leq \mathit{C}.\mathsf{label}[{\mathit{l}'}]
+{ \vdash }\;{{\mathit{t}}^\ast} \leq {\mathit{C}}.\mathsf{label}[{\mathit{l}'}]
 }{
-\mathit{C} \vdash \mathsf{br\_table}~{\mathit{l}^\ast}~{\mathit{l}'} : {\mathit{t}_{1}^\ast}~{\mathit{t}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{br\_table}~{{\mathit{l}}^\ast}~{\mathit{l}'} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}br\_table}]}
 \qquad
 \end{array}
 $$
 
+\vspace{1ex}
+
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{return} = ({\mathit{t}^\ast})
+{\mathit{C}}.\mathsf{return} = ({{\mathit{t}}^\ast})
 }{
-\mathit{C} \vdash \mathsf{return} : {\mathit{t}_{1}^\ast}~{\mathit{t}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{return} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}return}]}
 \qquad
 \end{array}
@@ -2368,9 +2804,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{func}[\mathit{x}] = {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}}.\mathsf{func}[{\mathit{x}}] = {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{call}~\mathit{x} : {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{call}~{\mathit{x}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}call}]}
 \qquad
 \end{array}
@@ -2379,11 +2815,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathsf{funcref}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~\mathsf{funcref}
  \qquad
-\mathit{ft} = {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{ft}} = {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{call\_indirect}~\mathit{x}~\mathit{ft} : {\mathit{t}_{1}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{C}} \vdash \mathsf{call\_indirect}~{\mathit{x}}~{\mathit{ft}} : {{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 } \, {[\textsc{\scriptsize T{-}call\_indirect}]}
 \qquad
 \end{array}
@@ -2395,7 +2831,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathit{nt}.\mathsf{const}~\mathit{c}_{\mathit{nt}} : \epsilon \rightarrow \mathit{nt}
+{\mathit{C}} \vdash {\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{\mathit{nt}}} : \epsilon \rightarrow {\mathit{nt}}
 } \, {[\textsc{\scriptsize T{-}const}]}
 \qquad
 \end{array}
@@ -2405,7 +2841,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathit{nt} . \mathit{unop} : \mathit{nt} \rightarrow \mathit{nt}
+{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{unop}} : {\mathit{nt}} \rightarrow {\mathit{nt}}
 } \, {[\textsc{\scriptsize T{-}unop}]}
 \qquad
 \end{array}
@@ -2415,7 +2851,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathit{nt} . \mathit{binop} : \mathit{nt}~\mathit{nt} \rightarrow \mathit{nt}
+{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{binop}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow {\mathit{nt}}
 } \, {[\textsc{\scriptsize T{-}binop}]}
 \qquad
 \end{array}
@@ -2425,7 +2861,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathit{nt} . \mathit{testop} : \mathit{nt} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{testop}} : {\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}testop}]}
 \qquad
 \end{array}
@@ -2435,20 +2871,18 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathit{nt} . \mathit{relop} : \mathit{nt}~\mathit{nt} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{relop}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}relop}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{n} \leq {|\mathit{nt}|}
+{\mathit{n}} \leq {|{\mathit{nt}}|}
 }{
-\mathit{C} \vdash {\mathit{nt}.\mathsf{extend}}{\mathit{n}} : \mathit{nt} \rightarrow \mathit{nt}
+{\mathit{C}} \vdash {{\mathit{nt}}.\mathsf{extend}}{{\mathit{n}}} : {\mathit{nt}} \rightarrow {\mathit{nt}}
 } \, {[\textsc{\scriptsize T{-}extend}]}
 \qquad
 \end{array}
@@ -2457,11 +2891,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{nt}_{1} \neq \mathit{nt}_{2}
+{\mathit{nt}}_{{1}} \neq {\mathit{nt}}_{{2}}
  \qquad
-{|\mathit{nt}_{1}|} = {|\mathit{nt}_{2}|}
+{|{\mathit{nt}}_{{1}}|} = {|{\mathit{nt}}_{{2}}|}
 }{
-\mathit{C} \vdash \mathsf{cvtop}~\mathit{nt}_{1}~\mathsf{reinterpret}~\mathit{nt}_{2} : \mathit{nt}_{2} \rightarrow \mathit{nt}_{1}
+{\mathit{C}} \vdash \mathsf{cvtop}~{\mathit{nt}}_{{1}}~\mathsf{reinterpret}~{\mathit{nt}}_{{2}} : {\mathit{nt}}_{{2}} \rightarrow {\mathit{nt}}_{{1}}
 } \, {[\textsc{\scriptsize T{-}reinterpret}]}
 \qquad
 \end{array}
@@ -2470,11 +2904,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathsf{i}}{\mathit{n}}_{1} \neq {\mathsf{i}}{\mathit{n}}_{2}
+{{\mathsf{i}}{{\mathit{n}}}}_{{1}} \neq {{\mathsf{i}}{{\mathit{n}}}}_{{2}}
  \qquad
-{\mathit{sx}^?} = \epsilon \Leftrightarrow {|{\mathsf{i}}{\mathit{n}}_{1}|} > {|{\mathsf{i}}{\mathit{n}}_{2}|}
+{{\mathit{sx}}^?} = \epsilon \Leftrightarrow {|{{\mathsf{i}}{{\mathit{n}}}}_{{1}}|} > {|{{\mathsf{i}}{{\mathit{n}}}}_{{2}}|}
 }{
-\mathit{C} \vdash {\mathsf{i}}{\mathit{n}}_{1} . {{{{\mathsf{convert}}{\mathsf{\_}}}{{\mathsf{i}}{\mathit{n}}_{2}}}{\mathsf{\_}}}{{\mathit{sx}^?}} : {\mathsf{i}}{\mathit{n}}_{2} \rightarrow {\mathsf{i}}{\mathit{n}}_{1}
+{\mathit{C}} \vdash {{\mathsf{i}}{{\mathit{n}}}}_{{1}} . {{{{\mathsf{convert}}{\mathsf{\_}}}{{{\mathsf{i}}{{\mathit{n}}}}_{{2}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}} : {{\mathsf{i}}{{\mathit{n}}}}_{{2}} \rightarrow {{\mathsf{i}}{{\mathit{n}}}}_{{1}}
 } \, {[\textsc{\scriptsize T{-}convert{-}i}]}
 \qquad
 \end{array}
@@ -2483,9 +2917,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathsf{f}}{\mathit{n}}_{1} \neq {\mathsf{f}}{\mathit{n}}_{2}
+{{\mathsf{f}}{{\mathit{n}}}}_{{1}} \neq {{\mathsf{f}}{{\mathit{n}}}}_{{2}}
 }{
-\mathit{C} \vdash \mathsf{cvtop}~{\mathsf{f}}{\mathit{n}}_{1}~\mathsf{convert}~{\mathsf{f}}{\mathit{n}}_{2} : {\mathsf{f}}{\mathit{n}}_{2} \rightarrow {\mathsf{f}}{\mathit{n}}_{1}
+{\mathit{C}} \vdash \mathsf{cvtop}~{{\mathsf{f}}{{\mathit{n}}}}_{{1}}~\mathsf{convert}~{{\mathsf{f}}{{\mathit{n}}}}_{{2}} : {{\mathsf{f}}{{\mathit{n}}}}_{{2}} \rightarrow {{\mathsf{f}}{{\mathit{n}}}}_{{1}}
 } \, {[\textsc{\scriptsize T{-}convert{-}f}]}
 \qquad
 \end{array}
@@ -2497,7 +2931,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{ref.null}~\mathit{rt} : \epsilon \rightarrow \mathit{rt}
+{\mathit{C}} \vdash \mathsf{ref.null}~{\mathit{rt}} : \epsilon \rightarrow {\mathit{rt}}
 } \, {[\textsc{\scriptsize T{-}ref.null}]}
 \qquad
 \end{array}
@@ -2506,9 +2940,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{func}[\mathit{x}] = \mathit{ft}
+{\mathit{C}}.\mathsf{func}[{\mathit{x}}] = {\mathit{ft}}
 }{
-\mathit{C} \vdash \mathsf{ref.func}~\mathit{x} : \epsilon \rightarrow \mathsf{funcref}
+{\mathit{C}} \vdash \mathsf{ref.func}~{\mathit{x}} : \epsilon \rightarrow \mathsf{funcref}
 } \, {[\textsc{\scriptsize T{-}ref.func}]}
 \qquad
 \end{array}
@@ -2518,7 +2952,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{ref.is\_null} : \mathit{rt} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{ref.is\_null} : {\mathit{rt}} \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}ref.is\_null}]}
 \qquad
 \end{array}
@@ -2529,9 +2963,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{local}[\mathit{x}] = \mathit{t}
+{\mathit{C}}.\mathsf{local}[{\mathit{x}}] = {\mathit{t}}
 }{
-\mathit{C} \vdash \mathsf{local.get}~\mathit{x} : \epsilon \rightarrow \mathit{t}
+{\mathit{C}} \vdash \mathsf{local.get}~{\mathit{x}} : \epsilon \rightarrow {\mathit{t}}
 } \, {[\textsc{\scriptsize T{-}local.get}]}
 \qquad
 \end{array}
@@ -2540,9 +2974,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{local}[\mathit{x}] = \mathit{t}
+{\mathit{C}}.\mathsf{local}[{\mathit{x}}] = {\mathit{t}}
 }{
-\mathit{C} \vdash \mathsf{local.set}~\mathit{x} : \mathit{t} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{local.set}~{\mathit{x}} : {\mathit{t}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}local.set}]}
 \qquad
 \end{array}
@@ -2551,9 +2985,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{local}[\mathit{x}] = \mathit{t}
+{\mathit{C}}.\mathsf{local}[{\mathit{x}}] = {\mathit{t}}
 }{
-\mathit{C} \vdash \mathsf{local.tee}~\mathit{x} : \mathit{t} \rightarrow \mathit{t}
+{\mathit{C}} \vdash \mathsf{local.tee}~{\mathit{x}} : {\mathit{t}} \rightarrow {\mathit{t}}
 } \, {[\textsc{\scriptsize T{-}local.tee}]}
 \qquad
 \end{array}
@@ -2564,9 +2998,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{global}[\mathit{x}] = {\mathsf{mut}^?}~\mathit{t}
+{\mathit{C}}.\mathsf{global}[{\mathit{x}}] = {\mathsf{mut}^?}~{\mathit{t}}
 }{
-\mathit{C} \vdash \mathsf{global.get}~\mathit{x} : \epsilon \rightarrow \mathit{t}
+{\mathit{C}} \vdash \mathsf{global.get}~{\mathit{x}} : \epsilon \rightarrow {\mathit{t}}
 } \, {[\textsc{\scriptsize T{-}global.get}]}
 \qquad
 \end{array}
@@ -2575,9 +3009,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{global}[\mathit{x}] = \mathsf{mut}~\mathit{t}
+{\mathit{C}}.\mathsf{global}[{\mathit{x}}] = \mathsf{mut}~{\mathit{t}}
 }{
-\mathit{C} \vdash \mathsf{global.set}~\mathit{x} : \mathit{t} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{global.set}~{\mathit{x}} : {\mathit{t}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}global.set}]}
 \qquad
 \end{array}
@@ -2588,9 +3022,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.get}~\mathit{x} : \mathsf{i{\scriptstyle32}} \rightarrow \mathit{rt}
+{\mathit{C}} \vdash \mathsf{table.get}~{\mathit{x}} : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{rt}}
 } \, {[\textsc{\scriptsize T{-}table.get}]}
 \qquad
 \end{array}
@@ -2599,9 +3033,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.set}~\mathit{x} : \mathsf{i{\scriptstyle32}}~\mathit{rt} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{table.set}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~{\mathit{rt}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}table.set}]}
 \qquad
 \end{array}
@@ -2610,9 +3044,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{tt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{tt}}
 }{
-\mathit{C} \vdash \mathsf{table.size}~\mathit{x} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{table.size}~{\mathit{x}} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}table.size}]}
 \qquad
 \end{array}
@@ -2621,9 +3055,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.grow}~\mathit{x} : \mathit{rt}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{table.grow}~{\mathit{x}} : {\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}table.grow}]}
 \qquad
 \end{array}
@@ -2632,9 +3066,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.fill}~\mathit{x} : \mathsf{i{\scriptstyle32}}~\mathit{rt}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{table.fill}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~{\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}table.fill}]}
 \qquad
 \end{array}
@@ -2643,11 +3077,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}_{1}] = \mathit{lim}_{1}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}_{{1}}] = {\mathit{lim}}_{{1}}~{\mathit{rt}}
  \qquad
-\mathit{C}.\mathsf{table}[\mathit{x}_{2}] = \mathit{lim}_{2}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}_{{2}}] = {\mathit{lim}}_{{2}}~{\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.copy}~\mathit{x}_{1}~\mathit{x}_{2} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{table.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}table.copy}]}
 \qquad
 \end{array}
@@ -2656,11 +3090,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}_{1}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}_{{1}}] = {\mathit{lim}}~{\mathit{rt}}
  \qquad
-\mathit{C}.\mathsf{elem}[\mathit{x}_{2}] = \mathit{rt}
+{\mathit{C}}.\mathsf{elem}[{\mathit{x}}_{{2}}] = {\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{table.init}~\mathit{x}_{1}~\mathit{x}_{2} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{table.init}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}table.init}]}
 \qquad
 \end{array}
@@ -2669,9 +3103,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{elem}[\mathit{x}] = \mathit{rt}
+{\mathit{C}}.\mathsf{elem}[{\mathit{x}}] = {\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{elem.drop}~\mathit{x} : \epsilon \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{elem.drop}~{\mathit{x}} : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}elem.drop}]}
 \qquad
 \end{array}
@@ -2682,9 +3116,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
 }{
-\mathit{C} \vdash \mathsf{memory.size} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{memory.size} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}memory.size}]}
 \qquad
 \end{array}
@@ -2693,9 +3127,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
 }{
-\mathit{C} \vdash \mathsf{memory.grow} : \mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{memory.grow} : \mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
 } \, {[\textsc{\scriptsize T{-}memory.grow}]}
 \qquad
 \end{array}
@@ -2704,9 +3138,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
 }{
-\mathit{C} \vdash \mathsf{memory.fill} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{memory.fill} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}memory.fill}]}
 \qquad
 \end{array}
@@ -2715,9 +3149,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
 }{
-\mathit{C} \vdash \mathsf{memory.copy} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{memory.copy} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}memory.copy}]}
 \qquad
 \end{array}
@@ -2726,11 +3160,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
  \qquad
-\mathit{C}.\mathsf{data}[\mathit{x}] = \mathsf{ok}
+{\mathit{C}}.\mathsf{data}[{\mathit{x}}] = \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{memory.init}~\mathit{x} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+{\mathit{C}} \vdash \mathsf{memory.init}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}memory.init}]}
 \qquad
 \end{array}
@@ -2739,9 +3173,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{data}[\mathit{x}] = \mathsf{ok}
+{\mathit{C}}.\mathsf{data}[{\mathit{x}}] = \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{data.drop}~\mathit{x} : \epsilon \rightarrow \epsilon
+{\mathit{C}} \vdash \mathsf{data.drop}~{\mathit{x}} : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}data.drop}]}
 \qquad
 \end{array}
@@ -2750,15 +3184,15 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
  \qquad
-{2^{\mathit{n}_{\mathsf{a}}}} \leq {|\mathit{nt}|} / 8
+{2^{{\mathit{n}}_{{\mathsf{a}}}}} \leq {|{\mathit{nt}}|} / 8
  \qquad
-({2^{\mathit{n}_{\mathsf{a}}}} \leq \mathit{n} / 8 < {|\mathit{nt}|} / 8)^?
+({2^{{\mathit{n}}_{{\mathsf{a}}}}} \leq {\mathit{n}} / 8 < {|{\mathit{nt}}|} / 8)^?
  \qquad
-{\mathit{n}^?} = \epsilon \lor \mathit{nt} = {\mathsf{i}}{\mathit{n}}
+{{\mathit{n}}^?} = \epsilon \lor {\mathit{nt}} = {{\mathsf{i}}{{\mathit{n}}}}
 }{
-\mathit{C} \vdash {\mathit{nt}.\mathsf{load}}{{({{\mathit{n}}{\mathsf{\_}}}{\mathit{sx}})^?}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}} : \mathsf{i{\scriptstyle32}} \rightarrow \mathit{nt}
+{\mathit{C}} \vdash {{\mathit{nt}}.\mathsf{load}}{{({{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}} : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{nt}}
 } \, {[\textsc{\scriptsize T{-}load}]}
 \qquad
 \end{array}
@@ -2767,15 +3201,15 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
  \qquad
-{2^{\mathit{n}_{\mathsf{a}}}} \leq {|\mathit{nt}|} / 8
+{2^{{\mathit{n}}_{{\mathsf{a}}}}} \leq {|{\mathit{nt}}|} / 8
  \qquad
-({2^{\mathit{n}_{\mathsf{a}}}} \leq \mathit{n} / 8 < {|\mathit{nt}|} / 8)^?
+({2^{{\mathit{n}}_{{\mathsf{a}}}}} \leq {\mathit{n}} / 8 < {|{\mathit{nt}}|} / 8)^?
  \qquad
-{\mathit{n}^?} = \epsilon \lor \mathit{nt} = {\mathsf{i}}{\mathit{n}}
+{{\mathit{n}}^?} = \epsilon \lor {\mathit{nt}} = {{\mathsf{i}}{{\mathit{n}}}}
 }{
-\mathit{C} \vdash {\mathit{nt}.\mathsf{store}}{{\mathit{n}^?}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}} : \mathsf{i{\scriptstyle32}}~\mathit{nt} \rightarrow \epsilon
+{\mathit{C}} \vdash {{\mathit{nt}}.\mathsf{store}}{{{\mathit{n}}^?}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}} : \mathsf{i{\scriptstyle32}}~{\mathit{nt}} \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}store}]}
 \qquad
 \end{array}
@@ -2783,17 +3217,17 @@ $$
 
 \vspace{1ex}
 
-$\boxed{\mathit{context} \vdash \mathit{instr}~\mathsf{const}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{instr}}~\mathsf{const}}$
 
-$\boxed{\mathit{context} \vdash \mathit{expr}~\mathsf{const}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{expr}}~\mathsf{const}}$
 
-$\boxed{\mathit{context} \vdash \mathit{expr} : \mathit{valtype}~\mathsf{const}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {\mathit{valtype}}~\mathsf{const}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash (\mathit{nt}.\mathsf{const}~\mathit{c})~\mathsf{const}
+{\mathit{C}} \vdash ({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~\mathsf{const}
 } \, {[\textsc{\scriptsize C{-}instr{-}const}]}
 \qquad
 \end{array}
@@ -2803,7 +3237,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash (\mathsf{ref.null}~\mathit{rt})~\mathsf{const}
+{\mathit{C}} \vdash (\mathsf{ref.null}~{\mathit{rt}})~\mathsf{const}
 } \, {[\textsc{\scriptsize C{-}instr{-}ref.null}]}
 \qquad
 \end{array}
@@ -2813,7 +3247,7 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash (\mathsf{ref.func}~\mathit{x})~\mathsf{const}
+{\mathit{C}} \vdash (\mathsf{ref.func}~{\mathit{x}})~\mathsf{const}
 } \, {[\textsc{\scriptsize C{-}instr{-}ref.func}]}
 \qquad
 \end{array}
@@ -2822,37 +3256,33 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{global}[\mathit{x}] = \epsilon~\mathit{t}
+{\mathit{C}}.\mathsf{global}[{\mathit{x}}] = \epsilon~{\mathit{t}}
 }{
-\mathit{C} \vdash (\mathsf{global.get}~\mathit{x})~\mathsf{const}
+{\mathit{C}} \vdash (\mathsf{global.get}~{\mathit{x}})~\mathsf{const}
 } \, {[\textsc{\scriptsize C{-}instr{-}global.get}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-(\mathit{C} \vdash \mathit{instr}~\mathsf{const})^\ast
+({\mathit{C}} \vdash {\mathit{instr}}~\mathsf{const})^\ast
 }{
-\mathit{C} \vdash {\mathit{instr}^\ast}~\mathsf{const}
+{\mathit{C}} \vdash {{\mathit{instr}}^\ast}~\mathsf{const}
 } \, {[\textsc{\scriptsize C{-}expr}]}
 \qquad
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{expr} : \mathit{t}
+{\mathit{C}} \vdash {\mathit{expr}} : {\mathit{t}}
  \qquad
-\mathit{C} \vdash \mathit{expr}~\mathsf{const}
+{\mathit{C}} \vdash {\mathit{expr}}~\mathsf{const}
 }{
-\mathit{C} \vdash \mathit{expr} : \mathit{t}~\mathsf{const}
+{\mathit{C}} \vdash {\mathit{expr}} : {\mathit{t}}~\mathsf{const}
 } \, {[\textsc{\scriptsize TC{-}expr}]}
 \qquad
 \end{array}
@@ -2860,36 +3290,36 @@ $$
 
 \vspace{1ex}
 
-$\boxed{\mathit{context} \vdash \mathit{func} : \mathit{functype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{func}} : {\mathit{functype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{global} : \mathit{globaltype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{global}} : {\mathit{globaltype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{table} : \mathit{tabletype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{table}} : {\mathit{tabletype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{mem} : \mathit{memtype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{mem}} : {\mathit{memtype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{elem} : \mathit{reftype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{elem}} : {\mathit{reftype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{data} : \mathsf{ok}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{data}} : \mathsf{ok}}$
 
-$\boxed{\mathit{context} \vdash \mathit{elemmode} : \mathit{reftype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{elemmode}} : {\mathit{reftype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{datamode} : \mathsf{ok}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{datamode}} : \mathsf{ok}}$
 
-$\boxed{\mathit{context} \vdash \mathit{start} : \mathsf{ok}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{start}} : \mathsf{ok}}$
 
 \vspace{1ex}
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{ft} = {\mathit{t}_{1}^\ast} \rightarrow {\mathit{t}_{2}^\ast}
+{\mathit{ft}} = {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
  \qquad
-{ \vdash }\;\mathit{ft} : \mathsf{ok}
+{ \vdash }\;{\mathit{ft}} : \mathsf{ok}
  \qquad
-\mathit{C}, \mathsf{local}~{\mathit{t}_{1}^\ast}~{\mathit{t}^\ast}, \mathsf{label}~({\mathit{t}_{2}^\ast}), \mathsf{return}~({\mathit{t}_{2}^\ast}) \vdash \mathit{expr} : {\mathit{t}_{2}^\ast}
+{\mathit{C}}, \mathsf{local}~{{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast}, \mathsf{label}~({{\mathit{t}}_{{2}}^\ast}), \mathsf{return}~({{\mathit{t}}_{{2}}^\ast}) \vdash {\mathit{expr}} : {{\mathit{t}}_{{2}}^\ast}
 }{
-\mathit{C} \vdash \mathsf{func}~\mathit{ft}~{\mathit{t}^\ast}~\mathit{expr} : \mathit{ft}
+{\mathit{C}} \vdash \mathsf{func}~{\mathit{ft}}~{(\mathsf{local}~{\mathit{t}})^\ast}~{\mathit{expr}} : {\mathit{ft}}
 } \, {[\textsc{\scriptsize T{-}func}]}
 \qquad
 \end{array}
@@ -2898,13 +3328,13 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{gt} : \mathsf{ok}
+{ \vdash }\;{\mathit{gt}} : \mathsf{ok}
  \qquad
-\mathit{gt} = {\mathsf{mut}^?}~\mathit{t}
+{\mathit{gt}} = {\mathsf{mut}^?}~{\mathit{t}}
  \qquad
-\mathit{C} \vdash \mathit{expr} : \mathit{t}~\mathsf{const}
+{\mathit{C}} \vdash {\mathit{expr}} : {\mathit{t}}~\mathsf{const}
 }{
-\mathit{C} \vdash \mathsf{global}~\mathit{gt}~\mathit{expr} : \mathit{gt}
+{\mathit{C}} \vdash \mathsf{global}~{\mathit{gt}}~{\mathit{expr}} : {\mathit{gt}}
 } \, {[\textsc{\scriptsize T{-}global}]}
 \qquad
 \end{array}
@@ -2913,9 +3343,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{tt} : \mathsf{ok}
+{ \vdash }\;{\mathit{tt}} : \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{table}~\mathit{tt} : \mathit{tt}
+{\mathit{C}} \vdash \mathsf{table}~{\mathit{tt}} : {\mathit{tt}}
 } \, {[\textsc{\scriptsize T{-}table}]}
 \qquad
 \end{array}
@@ -2924,9 +3354,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{mt} : \mathsf{ok}
+{ \vdash }\;{\mathit{mt}} : \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{memory}~\mathit{mt} : \mathit{mt}
+{\mathit{C}} \vdash \mathsf{memory}~{\mathit{mt}} : {\mathit{mt}}
 } \, {[\textsc{\scriptsize T{-}mem}]}
 \qquad
 \end{array}
@@ -2935,11 +3365,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-(\mathit{C} \vdash \mathit{expr} : \mathit{rt})^\ast
+({\mathit{C}} \vdash {\mathit{expr}} : {\mathit{rt}})^\ast
  \qquad
-(\mathit{C} \vdash \mathit{elemmode} : \mathit{rt})^?
+{\mathit{C}} \vdash {\mathit{elemmode}} : {\mathit{rt}}
 }{
-\mathit{C} \vdash \mathsf{elem}~\mathit{rt}~{\mathit{expr}^\ast}~{\mathit{elemmode}^?} : \mathit{rt}
+{\mathit{C}} \vdash \mathsf{elem}~{\mathit{rt}}~{{\mathit{expr}}^\ast}~{\mathit{elemmode}} : {\mathit{rt}}
 } \, {[\textsc{\scriptsize T{-}elem}]}
 \qquad
 \end{array}
@@ -2948,9 +3378,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-(\mathit{C} \vdash \mathit{datamode} : \mathsf{ok})^?
+{\mathit{C}} \vdash {\mathit{datamode}} : \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{data}~{({\mathit{b}^\ast})^\ast}~{\mathit{datamode}^?} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{data}~{{\mathit{b}}^\ast}~{\mathit{datamode}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize T{-}data}]}
 \qquad
 \end{array}
@@ -2959,11 +3389,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{lim}~\mathit{rt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
  \qquad
-(\mathit{C} \vdash \mathit{expr} : \mathsf{i{\scriptstyle32}}~\mathsf{const})^\ast
+({\mathit{C}} \vdash {\mathit{expr}} : \mathsf{i{\scriptstyle32}}~\mathsf{const})^\ast
 }{
-\mathit{C} \vdash \mathsf{table}~\mathit{x}~\mathit{expr} : \mathit{rt}
+{\mathit{C}} \vdash \mathsf{active}~{\mathit{x}}~{\mathit{expr}} : {\mathit{rt}}
 } \, {[\textsc{\scriptsize T{-}elemmode{-}active}]}
 \qquad
 \end{array}
@@ -2973,7 +3403,17 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-\mathit{C} \vdash \mathsf{declare} : \mathit{rt}
+{\mathit{C}} \vdash \mathsf{passive} : {\mathit{rt}}
+} \, {[\textsc{\scriptsize T{-}elemmode{-}passive}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+{\mathit{C}} \vdash \mathsf{declare} : {\mathit{rt}}
 } \, {[\textsc{\scriptsize T{-}elemmode{-}declare}]}
 \qquad
 \end{array}
@@ -2982,11 +3422,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[0] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[0] = {\mathit{mt}}
  \qquad
-(\mathit{C} \vdash \mathit{expr} : \mathsf{i{\scriptstyle32}}~\mathsf{const})^\ast
+({\mathit{C}} \vdash {\mathit{expr}} : \mathsf{i{\scriptstyle32}}~\mathsf{const})^\ast
 }{
-\mathit{C} \vdash \mathsf{memory}~0~\mathit{expr} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{active}~0~{\mathit{expr}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize T{-}datamode}]}
 \qquad
 \end{array}
@@ -2995,9 +3435,19 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{func}[\mathit{x}] = \epsilon \rightarrow \epsilon
 }{
-\mathit{C} \vdash \mathsf{start}~\mathit{x} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{passive} : \mathsf{ok}
+} \, {[\textsc{\scriptsize T{-}datamode{-}passive}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+{\mathit{C}}.\mathsf{func}[{\mathit{x}}] = \epsilon \rightarrow \epsilon
+}{
+{\mathit{C}} \vdash \mathsf{start}~{\mathit{x}} : \mathsf{ok}
 } \, {[\textsc{\scriptsize T{-}start}]}
 \qquad
 \end{array}
@@ -3005,18 +3455,18 @@ $$
 
 \vspace{1ex}
 
-$\boxed{\mathit{context} \vdash \mathit{import} : \mathit{externtype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{import}} : {\mathit{externtype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{export} : \mathit{externtype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{export}} : {\mathit{externtype}}}$
 
-$\boxed{\mathit{context} \vdash \mathit{externuse} : \mathit{externtype}}$
+$\boxed{{\mathit{context}} \vdash {\mathit{externidx}} : {\mathit{externtype}}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{ \vdash }\;\mathit{xt} : \mathsf{ok}
+{ \vdash }\;{\mathit{xt}} : \mathsf{ok}
 }{
-\mathit{C} \vdash \mathsf{import}~\mathit{name}_{1}~\mathit{name}_{2}~\mathit{xt} : \mathit{xt}
+{\mathit{C}} \vdash \mathsf{import}~{\mathit{name}}_{{1}}~{\mathit{name}}_{{2}}~{\mathit{xt}} : {\mathit{xt}}
 } \, {[\textsc{\scriptsize T{-}import}]}
 \qquad
 \end{array}
@@ -3025,9 +3475,9 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C} \vdash \mathit{externuse} : \mathit{xt}
+{\mathit{C}} \vdash {\mathit{externidx}} : {\mathit{xt}}
 }{
-\mathit{C} \vdash \mathsf{export}~\mathit{name}~\mathit{externuse} : \mathit{xt}
+{\mathit{C}} \vdash \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} : {\mathit{xt}}
 } \, {[\textsc{\scriptsize T{-}export}]}
 \qquad
 \end{array}
@@ -3036,10 +3486,10 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{func}[\mathit{x}] = \mathit{ft}
+{\mathit{C}}.\mathsf{func}[{\mathit{x}}] = {\mathit{ft}}
 }{
-\mathit{C} \vdash \mathsf{func}~\mathit{x} : \mathsf{func}~\mathit{ft}
-} \, {[\textsc{\scriptsize T{-}externuse{-}func}]}
+{\mathit{C}} \vdash \mathsf{func}~{\mathit{x}} : \mathsf{func}~{\mathit{ft}}
+} \, {[\textsc{\scriptsize T{-}externidx{-}func}]}
 \qquad
 \end{array}
 $$
@@ -3047,10 +3497,10 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{global}[\mathit{x}] = \mathit{gt}
+{\mathit{C}}.\mathsf{global}[{\mathit{x}}] = {\mathit{gt}}
 }{
-\mathit{C} \vdash \mathsf{global}~\mathit{x} : \mathsf{global}~\mathit{gt}
-} \, {[\textsc{\scriptsize T{-}externuse{-}global}]}
+{\mathit{C}} \vdash \mathsf{global}~{\mathit{x}} : \mathsf{global}~{\mathit{gt}}
+} \, {[\textsc{\scriptsize T{-}externidx{-}global}]}
 \qquad
 \end{array}
 $$
@@ -3058,10 +3508,10 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{table}[\mathit{x}] = \mathit{tt}
+{\mathit{C}}.\mathsf{table}[{\mathit{x}}] = {\mathit{tt}}
 }{
-\mathit{C} \vdash \mathsf{table}~\mathit{x} : \mathsf{table}~\mathit{tt}
-} \, {[\textsc{\scriptsize T{-}externuse{-}table}]}
+{\mathit{C}} \vdash \mathsf{table}~{\mathit{x}} : \mathsf{table}~{\mathit{tt}}
+} \, {[\textsc{\scriptsize T{-}externidx{-}table}]}
 \qquad
 \end{array}
 $$
@@ -3069,124 +3519,78 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-\mathit{C}.\mathsf{mem}[\mathit{x}] = \mathit{mt}
+{\mathit{C}}.\mathsf{mem}[{\mathit{x}}] = {\mathit{mt}}
 }{
-\mathit{C} \vdash \mathsf{memory}~\mathit{x} : \mathsf{memory}~\mathit{mt}
-} \, {[\textsc{\scriptsize T{-}externuse{-}mem}]}
+{\mathit{C}} \vdash \mathsf{mem}~{\mathit{x}} : \mathsf{mem}~{\mathit{mt}}
+} \, {[\textsc{\scriptsize T{-}externidx{-}mem}]}
 \qquad
 \end{array}
 $$
 
 \vspace{1ex}
 
-$\boxed{{ \vdash }\;\mathit{module} : \mathsf{ok}}$
+$\boxed{{ \vdash }\;{\mathit{module}} : \mathsf{ok}}$
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 \begin{array}{@{}c@{}}
-\mathit{C} = \{ \begin{array}[t]{@{}l@{}}
-\mathsf{func}~{\mathit{ft}^\ast},\; \mathsf{global}~{\mathit{gt}^\ast},\; \mathsf{table}~{\mathit{tt}^\ast},\; \mathsf{mem}~{\mathit{mt}^\ast},\; \mathsf{elem}~{\mathit{rt}^\ast},\; \mathsf{data}~{\mathsf{ok}^{\mathit{n}}} \}\end{array}
+{\mathit{C}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{func}~{{\mathit{ft}}^\ast},\; \mathsf{global}~{{\mathit{gt}}^\ast},\; \mathsf{table}~{{\mathit{tt}}^\ast},\; \mathsf{mem}~{{\mathit{mt}}^\ast},\; \mathsf{elem}~{{\mathit{rt}}^\ast},\; \mathsf{data}~{\mathsf{ok}^{{\mathit{n}}}} \}\end{array}
  \\
-(\mathit{C} \vdash \mathit{func} : \mathit{ft})^\ast
+({\mathit{C}} \vdash {\mathit{func}} : {\mathit{ft}})^\ast
  \qquad
-(\mathit{C} \vdash \mathit{global} : \mathit{gt})^\ast
+({\mathit{C}} \vdash {\mathit{global}} : {\mathit{gt}})^\ast
  \qquad
-(\mathit{C} \vdash \mathit{table} : \mathit{tt})^\ast
+({\mathit{C}} \vdash {\mathit{table}} : {\mathit{tt}})^\ast
  \qquad
-(\mathit{C} \vdash \mathit{mem} : \mathit{mt})^\ast
+({\mathit{C}} \vdash {\mathit{mem}} : {\mathit{mt}})^\ast
  \\
-(\mathit{C} \vdash \mathit{elem} : \mathit{rt})^\ast
+({\mathit{C}} \vdash {\mathit{elem}} : {\mathit{rt}})^\ast
  \qquad
-(\mathit{C} \vdash \mathit{data} : \mathsf{ok})^{\mathit{n}}
+({\mathit{C}} \vdash {\mathit{data}} : \mathsf{ok})^{{\mathit{n}}}
  \qquad
-(\mathit{C} \vdash \mathit{start} : \mathsf{ok})^\ast
+({\mathit{C}} \vdash {\mathit{start}} : \mathsf{ok})^?
  \\
-{|{\mathit{mem}^\ast}|} \leq 1
- \qquad
-{|{\mathit{start}^\ast}|} \leq 1
+{|{{\mathit{mem}}^\ast}|} \leq 1
 \end{array}
 }{
-{ \vdash }\;\mathsf{module}~{\mathit{import}^\ast}~{\mathit{func}^\ast}~{\mathit{global}^\ast}~{\mathit{table}^\ast}~{\mathit{mem}^\ast}~{\mathit{elem}^\ast}~{\mathit{data}^{\mathit{n}}}~{\mathit{start}^\ast}~{\mathit{export}^\ast} : \mathsf{ok}
+{ \vdash }\;\mathsf{module}~{{\mathit{import}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{global}}^\ast}~{{\mathit{table}}^\ast}~{{\mathit{mem}}^\ast}~{{\mathit{elem}}^\ast}~{{\mathit{data}}^{{\mathit{n}}}}~{{\mathit{start}}^?}~{{\mathit{export}}^\ast} : \mathsf{ok}
 } \, {[\textsc{\scriptsize T{-}module}]}
 \qquad
 \end{array}
 $$
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(address)} & \mathit{addr} &::=& \mathit{nat} \\
-\mbox{(function address)} & \mathit{funcaddr} &::=& \mathit{addr} \\
-\mbox{(global address)} & \mathit{globaladdr} &::=& \mathit{addr} \\
-\mbox{(table address)} & \mathit{tableaddr} &::=& \mathit{addr} \\
-\mbox{(memory address)} & \mathit{memaddr} &::=& \mathit{addr} \\
-\mbox{(elem address)} & \mathit{elemaddr} &::=& \mathit{addr} \\
-\mbox{(data address)} & \mathit{dataaddr} &::=& \mathit{addr} \\
-\mbox{(label address)} & \mathit{labeladdr} &::=& \mathit{addr} \\
-\mbox{(host address)} & \mathit{hostaddr} &::=& \mathit{addr} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(address)} & {\mathit{addr}} &::=& {\mathit{nat}} \\
+\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
+\mbox{(global address)} & {\mathit{globaladdr}} &::=& {\mathit{addr}} \\
+\mbox{(table address)} & {\mathit{tableaddr}} &::=& {\mathit{addr}} \\
+\mbox{(memory address)} & {\mathit{memaddr}} &::=& {\mathit{addr}} \\
+\mbox{(elem address)} & {\mathit{elemaddr}} &::=& {\mathit{addr}} \\
+\mbox{(data address)} & {\mathit{dataaddr}} &::=& {\mathit{addr}} \\
+\mbox{(label address)} & {\mathit{labeladdr}} &::=& {\mathit{addr}} \\
+\mbox{(host address)} & {\mathit{hostaddr}} &::=& {\mathit{addr}} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(number)} & \mathit{num} &::=& \mathit{numtype}.\mathsf{const}~\mathit{c}_{\mathit{numtype}} \\
-\mbox{(reference)} & \mathit{ref} &::=& \mathsf{ref.null}~\mathit{reftype} ~|~ \mathsf{ref.func}~\mathit{funcaddr} ~|~ \mathsf{ref.extern}~\mathit{hostaddr} \\
-\mbox{(value)} & \mathit{val} &::=& \mathit{num} ~|~ \mathit{ref} \\
-\mbox{(result)} & \mathit{result} &::=& {\mathit{val}^\ast} ~|~ \mathsf{trap} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}}
-\mbox{(external value)} & \mathit{externval} &::=& \mathsf{func}~\mathit{funcaddr} ~|~ \mathsf{global}~\mathit{globaladdr} ~|~ \mathsf{table}~\mathit{tableaddr} ~|~ \mathsf{mem}~\mathit{memaddr} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(number)} & {\mathit{num}} &::=& {\mathit{numtype}}.\mathsf{const}~{\mathit{c}}_{{\mathit{numtype}}} \\
+\mbox{(reference)} & {\mathit{ref}} &::=& \mathsf{ref.null}~{\mathit{reftype}} ~|~ \mathsf{ref.func}~{\mathit{funcaddr}} ~|~ \mathsf{ref.extern}~{\mathit{hostaddr}} \\
+\mbox{(value)} & {\mathit{val}} &::=& {\mathit{num}} ~|~ {\mathit{ref}} \\
+\mbox{(result)} & {\mathit{result}} &::=& {{\mathit{val}}^\ast} ~|~ \mathsf{trap} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lcl@{}l@{}}
-{\mathrm{default}}_{\mathsf{i{\scriptstyle32}}} &=& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~0) &  \\
-{\mathrm{default}}_{\mathsf{i{\scriptstyle64}}} &=& (\mathsf{i{\scriptstyle64}}.\mathsf{const}~0) &  \\
-{\mathrm{default}}_{\mathsf{f{\scriptstyle32}}} &=& (\mathsf{f{\scriptstyle32}}.\mathsf{const}~0) &  \\
-{\mathrm{default}}_{\mathsf{f{\scriptstyle64}}} &=& (\mathsf{f{\scriptstyle64}}.\mathsf{const}~0) &  \\
-{\mathrm{default}}_{\mathit{rt}} &=& (\mathsf{ref.null}~\mathit{rt}) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}}
-\mbox{(function instance)} & \mathit{funcinst} &::=& \mathit{moduleinst} ; \mathit{func} \\
-\mbox{(global instance)} & \mathit{globalinst} &::=& \mathit{val} \\
-\mbox{(table instance)} & \mathit{tableinst} &::=& {\mathit{ref}^\ast} \\
-\mbox{(memory instance)} & \mathit{meminst} &::=& {\mathit{byte}^\ast} \\
-\mbox{(element instance)} & \mathit{eleminst} &::=& {\mathit{ref}^\ast} \\
-\mbox{(data instance)} & \mathit{datainst} &::=& {\mathit{byte}^\ast} \\
-\mbox{(export instance)} & \mathit{exportinst} &::=& \mathsf{export}~\mathit{name}~\mathit{externval} \\
-\mbox{(store)} & \mathit{store} &::=& \{\; \begin{array}[t]{@{}l@{}}
-\mathsf{func}~{\mathit{funcinst}^\ast},\; \\
-  \mathsf{global}~{\mathit{globalinst}^\ast},\; \\
-  \mathsf{table}~{\mathit{tableinst}^\ast},\; \\
-  \mathsf{mem}~{\mathit{meminst}^\ast},\; \\
-  \mathsf{elem}~{\mathit{eleminst}^\ast},\; \\
-  \mathsf{data}~{\mathit{datainst}^\ast} \;\}\end{array} \\
-\mbox{(module instance)} & \mathit{moduleinst} &::=& \{\; \begin{array}[t]{@{}l@{}}
-\mathsf{func}~{\mathit{funcaddr}^\ast},\; \\
-  \mathsf{global}~{\mathit{globaladdr}^\ast},\; \\
-  \mathsf{table}~{\mathit{tableaddr}^\ast},\; \\
-  \mathsf{mem}~{\mathit{memaddr}^\ast},\; \\
-  \mathsf{elem}~{\mathit{elemaddr}^\ast},\; \\
-  \mathsf{data}~{\mathit{dataaddr}^\ast},\; \\
-  \mathsf{export}~{\mathit{exportinst}^\ast} \;\}\end{array} \\
-\mbox{(frame)} & \mathit{frame} &::=& \{\; \begin{array}[t]{@{}l@{}}
-\mathsf{local}~{\mathit{val}^\ast},\; \\
-  \mathsf{module}~\mathit{moduleinst} \;\}\end{array} \\
-\mbox{(state)} & \mathit{state} &::=& \mathit{store} ; \mathit{frame} \\
-\mbox{(configuration)} & \mathit{config} &::=& \mathit{state} ; {\mathit{instr}^\ast} \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} ~|~ \mathsf{global}~{\mathit{globaladdr}} ~|~ \mathsf{table}~{\mathit{tableaddr}} ~|~ \mathsf{mem}~{\mathit{memaddr}} \\
 \end{array}
 $$
 
@@ -3194,55 +3598,66 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f}).\mathsf{module}.\mathsf{func} &=& \mathit{f}.\mathsf{module}.\mathsf{func} &  \\
+{{\mathrm{default}}}_{\mathsf{i{\scriptstyle32}}} &=& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~0) &  \\
+{{\mathrm{default}}}_{\mathsf{i{\scriptstyle64}}} &=& (\mathsf{i{\scriptstyle64}}.\mathsf{const}~0) &  \\
+{{\mathrm{default}}}_{\mathsf{f{\scriptstyle32}}} &=& (\mathsf{f{\scriptstyle32}}.\mathsf{const}~0) &  \\
+{{\mathrm{default}}}_{\mathsf{f{\scriptstyle64}}} &=& (\mathsf{f{\scriptstyle64}}.\mathsf{const}~0) &  \\
+{{\mathrm{default}}}_{\mathsf{funcref}} &=& (\mathsf{ref.null}~\mathsf{funcref}) &  \\
+{{\mathrm{default}}}_{\mathsf{externref}} &=& (\mathsf{ref.null}~\mathsf{externref}) &  \\
 \end{array}
 $$
 
+\vspace{1ex}
+
 $$
-\begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f}).\mathsf{func} &=& \mathit{s}.\mathsf{func} &  \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{module}~{\mathit{moduleinst}},\; \\
+  \mathsf{code}~{\mathit{func}} \;\}\end{array} \\
+\mbox{(global instance)} & {\mathit{globalinst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{type}~{\mathit{globaltype}},\; \\
+  \mathsf{value}~{\mathit{val}} \;\}\end{array} \\
+\mbox{(table instance)} & {\mathit{tableinst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{type}~{\mathit{tabletype}},\; \\
+  \mathsf{elem}~{{\mathit{ref}}^\ast} \;\}\end{array} \\
+\mbox{(memory instance)} & {\mathit{meminst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{type}~{\mathit{memtype}},\; \\
+  \mathsf{data}~{{\mathit{byte}}^\ast} \;\}\end{array} \\
+\mbox{(element instance)} & {\mathit{eleminst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{type}~{\mathit{elemtype}},\; \\
+  \mathsf{elem}~{{\mathit{ref}}^\ast} \;\}\end{array} \\
+\mbox{(data instance)} & {\mathit{datainst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{data}~{{\mathit{byte}}^\ast} \;\}\end{array} \\
+\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{name}~{\mathit{name}},\; \\
+  \mathsf{value}~{\mathit{externval}} \;\}\end{array} \\
+\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{func}~{{\mathit{funcaddr}}^\ast},\; \\
+  \mathsf{global}~{{\mathit{globaladdr}}^\ast},\; \\
+  \mathsf{table}~{{\mathit{tableaddr}}^\ast},\; \\
+  \mathsf{mem}~{{\mathit{memaddr}}^\ast},\; \\
+  \mathsf{elem}~{{\mathit{elemaddr}}^\ast},\; \\
+  \mathsf{data}~{{\mathit{dataaddr}}^\ast},\; \\
+  \mathsf{export}~{{\mathit{exportinst}}^\ast} \;\}\end{array} \\
 \end{array}
 $$
 
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{func}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{func}[\mathit{f}.\mathsf{module}.\mathsf{func}[\mathit{x}]] &  \\
-\end{array}
-$$
+\vspace{1ex}
 
 $$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{global}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{global}[\mathit{f}.\mathsf{module}.\mathsf{global}[\mathit{x}]] &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{table}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{table}[\mathit{f}.\mathsf{module}.\mathsf{table}[\mathit{x}]] &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{mem}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{mem}[\mathit{f}.\mathsf{module}.\mathsf{mem}[\mathit{x}]] &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{elem}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{elem}[\mathit{f}.\mathsf{module}.\mathsf{elem}[\mathit{x}]] &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{data}}{[\mathit{x}]} &=& \mathit{s}.\mathsf{data}[\mathit{f}.\mathsf{module}.\mathsf{data}[\mathit{x}]] &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-{(\mathit{s} ; \mathit{f}).\mathsf{local}}{[\mathit{x}]} &=& \mathit{f}.\mathsf{local}[\mathit{x}] &  \\
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(store)} & {\mathit{store}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{func}~{{\mathit{funcinst}}^\ast},\; \\
+  \mathsf{global}~{{\mathit{globalinst}}^\ast},\; \\
+  \mathsf{table}~{{\mathit{tableinst}}^\ast},\; \\
+  \mathsf{mem}~{{\mathit{meminst}}^\ast},\; \\
+  \mathsf{elem}~{{\mathit{eleminst}}^\ast},\; \\
+  \mathsf{data}~{{\mathit{datainst}}^\ast} \;\}\end{array} \\
+\mbox{(frame)} & {\mathit{frame}} &::=& \{\; \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{local}~{{\mathit{val}}^\ast},\; \\
+  \mathsf{module}~{\mathit{moduleinst}} \;\}\end{array} \\
+\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
+\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{{\mathit{instr}}}^\ast} \\
 \end{array}
 $$
 
@@ -3250,81 +3665,191 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{local}[\mathit{x}] = \mathit{v}] &=& \mathit{s} ; \mathit{f}[\mathsf{local}[\mathit{x}] = \mathit{v}] &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{module}.\mathsf{func} &=& {\mathit{f}}.\mathsf{module}.\mathsf{func} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{global}[\mathit{x}] = \mathit{v}] &=& \mathit{s}[\mathsf{global}[\mathit{f}.\mathsf{module}.\mathsf{global}[\mathit{x}]] = \mathit{v}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{func} &=& {\mathit{s}}.\mathsf{func} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{table}[\mathit{x}][\mathit{i}] = \mathit{r}] &=& \mathit{s}[\mathsf{table}[\mathit{f}.\mathsf{module}.\mathsf{table}[\mathit{x}]][\mathit{i}] = \mathit{r}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{global} &=& {\mathit{s}}.\mathsf{global} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{table}[\mathit{x}] = ..{\mathit{r}^\ast}] &=& \mathit{s}[\mathsf{table}[\mathit{f}.\mathsf{module}.\mathsf{table}[\mathit{x}]] = ..{\mathit{r}^\ast}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{table} &=& {\mathit{s}}.\mathsf{table} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{mem}[\mathit{x}][\mathit{i} : \mathit{j}] = {\mathit{b}^\ast}] &=& \mathit{s}[\mathsf{mem}[\mathit{f}.\mathsf{module}.\mathsf{mem}[\mathit{x}]][\mathit{i} : \mathit{j}] = {\mathit{b}^\ast}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{mem} &=& {\mathit{s}}.\mathsf{mem} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{mem}[\mathit{x}] = ..{\mathit{b}^\ast}] &=& \mathit{s}[\mathsf{mem}[\mathit{f}.\mathsf{module}.\mathsf{mem}[\mathit{x}]] = ..{\mathit{b}^\ast}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{elem} &=& {\mathit{s}}.\mathsf{elem} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{elem}[\mathit{x}] = {\mathit{r}^\ast}] &=& \mathit{s}[\mathsf{table}[\mathit{f}.\mathsf{module}.\mathsf{table}[\mathit{x}]] = {\mathit{r}^\ast}] ; \mathit{f} &  \\
+({\mathit{s}} ; {\mathit{f}}).\mathsf{data} &=& {\mathit{s}}.\mathsf{data} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-(\mathit{s} ; \mathit{f})[\mathsf{data}[\mathit{x}] = {\mathit{b}^\ast}] &=& \mathit{s}[\mathsf{mem}[\mathit{f}.\mathsf{module}.\mathsf{mem}[\mathit{x}]] = {\mathit{b}^\ast}] ; \mathit{f} &  \\
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{func}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{func}[{\mathit{f}}.\mathsf{module}.\mathsf{func}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{global}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{global}[{\mathit{f}}.\mathsf{module}.\mathsf{global}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{table}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{table}[{\mathit{f}}.\mathsf{module}.\mathsf{table}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{mem}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{mem}[{\mathit{f}}.\mathsf{module}.\mathsf{mem}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{elem}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{elem}[{\mathit{f}}.\mathsf{module}.\mathsf{elem}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{data}}{[{\mathit{x}}]} &=& {\mathit{s}}.\mathsf{data}[{\mathit{f}}.\mathsf{module}.\mathsf{data}[{\mathit{x}}]] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{({\mathit{s}} ; {\mathit{f}}).\mathsf{local}}{[{\mathit{x}}]} &=& {\mathit{f}}.\mathsf{local}[{\mathit{x}}] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{local}[{\mathit{x}}] = {\mathit{v}}] &=& {\mathit{s}} ; {\mathit{f}}[\mathsf{local}[{\mathit{x}}] = {\mathit{v}}] &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{global}[{\mathit{x}}].\mathsf{value} = {\mathit{v}}] &=& {\mathit{s}}[\mathsf{global}[{\mathit{f}}.\mathsf{module}.\mathsf{global}[{\mathit{x}}]].\mathsf{value} = {\mathit{v}}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{table}[{\mathit{x}}].\mathsf{elem}[{\mathit{i}}] = {\mathit{r}}] &=& {\mathit{s}}[\mathsf{table}[{\mathit{f}}.\mathsf{module}.\mathsf{table}[{\mathit{x}}]].\mathsf{elem}[{\mathit{i}}] = {\mathit{r}}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{table}[{\mathit{x}}] = {\mathit{ti}}] &=& {\mathit{s}}[\mathsf{table}[{\mathit{f}}.\mathsf{module}.\mathsf{table}[{\mathit{x}}]] = {\mathit{ti}}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{mem}[{\mathit{x}}].\mathsf{data}[{\mathit{i}} : {\mathit{j}}] = {{\mathit{b}}^\ast}] &=& {\mathit{s}}[\mathsf{mem}[{\mathit{f}}.\mathsf{module}.\mathsf{mem}[{\mathit{x}}]].\mathsf{data}[{\mathit{i}} : {\mathit{j}}] = {{\mathit{b}}^\ast}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{mem}[{\mathit{x}}] = {\mathit{mi}}] &=& {\mathit{s}}[\mathsf{mem}[{\mathit{f}}.\mathsf{module}.\mathsf{mem}[{\mathit{x}}]] = {\mathit{mi}}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{elem}[{\mathit{x}}].\mathsf{elem} = {{\mathit{r}}^\ast}] &=& {\mathit{s}}[\mathsf{elem}[{\mathit{f}}.\mathsf{module}.\mathsf{elem}[{\mathit{x}}]].\mathsf{elem} = {{\mathit{r}}^\ast}] ; {\mathit{f}} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+({\mathit{s}} ; {\mathit{f}})[\mathsf{data}[{\mathit{x}}].\mathsf{data} = {{\mathit{b}}^\ast}] &=& {\mathit{s}}[\mathsf{data}[{\mathit{f}}.\mathsf{module}.\mathsf{data}[{\mathit{x}}]].\mathsf{data} = {{\mathit{b}}^\ast}] ; {\mathit{f}} &  \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}lrrl@{}}
-\mbox{(administrative instruction)} & \mathit{instr} &::=& \mathit{instr} \\ &&|&
-\mathsf{ref.func}~\mathit{funcaddr} \\ &&|&
-\mathsf{ref.extern}~\mathit{hostaddr} \\ &&|&
-\mathsf{call}~\mathit{funcaddr} \\ &&|&
-{{\mathsf{label}}_{\mathit{n}}}{\{{\mathit{instr}^\ast}\}}~{\mathit{instr}^\ast} \\ &&|&
-{{\mathsf{frame}}_{\mathit{n}}}{\{\mathit{frame}\}}~{\mathit{instr}^\ast} \\ &&|&
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{grow}}_{{\mathit{table}}}({\mathit{ti}},\, {\mathit{n}},\, {\mathit{r}}) &=& {\mathit{ti}'} &\quad
+  \mbox{if}~{\mathit{ti}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~[{\mathit{i}} .. {\mathit{j}}]~{\mathit{rt}},\; \mathsf{elem}~{{\mathit{r}'}^\ast} \}\end{array} \\
+ &&&\quad {\land}~{\mathit{i}'} = {|{{\mathit{r}'}^\ast}|} + {\mathit{n}} \\
+ &&&\quad {\land}~{\mathit{ti}'} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~[{\mathit{i}'} .. {\mathit{j}}]~{\mathit{rt}},\; \mathsf{elem}~{{\mathit{r}'}^\ast}~{{\mathit{r}}^{{\mathit{n}}}} \}\end{array} \\
+ &&&\quad {\land}~{ \vdash }\;{\mathit{ti}'}.\mathsf{type} : \mathsf{ok} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{grow}}_{{\mathit{memory}}}({\mathit{mi}},\, {\mathit{n}}) &=& {\mathit{mi}'} &\quad
+  \mbox{if}~{\mathit{mi}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~([{\mathit{i}} .. {\mathit{j}}]~\mathsf{i{\scriptstyle8}}),\; \mathsf{data}~{{\mathit{b}}^\ast} \}\end{array} \\
+ &&&\quad {\land}~{\mathit{i}'} = {|{{\mathit{b}}^\ast}|} / (64 \cdot {\mathrm{Ki}}) + {\mathit{n}} \\
+ &&&\quad {\land}~{\mathit{mi}'} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~([{\mathit{i}'} .. {\mathit{j}}]~\mathsf{i{\scriptstyle8}}),\; \mathsf{data}~{{\mathit{b}}^\ast}~{0^{{\mathit{n}} \cdot 64 \cdot {\mathrm{Ki}}}} \}\end{array} \\
+ &&&\quad {\land}~{ \vdash }\;{\mathit{mi}'}.\mathsf{type} : \mathsf{ok} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+\mbox{(administrative instruction)} & {{\mathit{instr}}} &::=& {\mathit{instr}} \\ &&|&
+\mathsf{ref.func}~{\mathit{funcaddr}} \\ &&|&
+\mathsf{ref.extern}~{\mathit{hostaddr}} \\ &&|&
+\mathsf{call}~{\mathit{funcaddr}} \\ &&|&
+{{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}}^\ast}\}}~{{{\mathit{instr}}}^\ast} \\ &&|&
+{{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{frame}}\}}~{{{\mathit{instr}}}^\ast} \\ &&|&
 \mathsf{trap} \\
-\mbox{(evaluation context)} & \mathit{E} &::=& [\mathsf{\_}] \\ &&|&
-{\mathit{val}^\ast}~\mathit{E}~{\mathit{instr}^\ast} \\ &&|&
-{{\mathsf{label}}_{\mathit{n}}}{\{{\mathit{instr}^\ast}\}}~\mathit{E} \\
+\mbox{(evaluation context)} & {\mathit{E}} &::=& [\mathsf{\_}] \\ &&|&
+{{\mathit{val}}^\ast}~{\mathit{E}}~{{\mathit{instr}}^\ast} \\ &&|&
+{{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}}^\ast}\}}~{\mathit{E}} \\
 \end{array}
 $$
 
-$\boxed{\mathit{config} \hookrightarrow \mathit{config}}$
+$\boxed{{\mathit{config}} \hookrightarrow {\mathit{config}}}$
 
-$\boxed{{\mathit{instr}^\ast} \hookrightarrow {\mathit{instr}^\ast}}$
+$\boxed{{{{\mathit{instr}}}^\ast} \hookrightarrow {{{\mathit{instr}}}^\ast}}$
 
-$\boxed{\mathit{config} \hookrightarrow {\mathit{instr}^\ast}}$
+$\boxed{{\mathit{config}} \hookrightarrow {{{\mathit{instr}}}^\ast}}$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}pure}]} \quad & \mathit{z} ; {\mathit{instr}^\ast} &\hookrightarrow& \mathit{z} ; {{\mathit{instr}'}^\ast} &\quad
-  \mbox{if}~{\mathit{instr}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
-{[\textsc{\scriptsize E{-}read}]} \quad & \mathit{z} ; {\mathit{instr}^\ast} &\hookrightarrow& \mathit{z} ; {{\mathit{instr}'}^\ast} &\quad
-  \mbox{if}~\mathit{z} ; {\mathit{instr}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
+{[\textsc{\scriptsize E{-}pure}]} \quad & {\mathit{z}} ; {{\mathit{instr}}^\ast} &\hookrightarrow& {\mathit{z}} ; {{\mathit{instr}'}^\ast} &\quad
+  \mbox{if}~{{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
+{[\textsc{\scriptsize E{-}read}]} \quad & {\mathit{z}} ; {{\mathit{instr}}^\ast} &\hookrightarrow& {\mathit{z}} ; {{\mathit{instr}'}^\ast} &\quad
+  \mbox{if}~{\mathit{z}} ; {{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
 \end{array}
 $$
 
@@ -3334,7 +3859,11 @@ $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
 {[\textsc{\scriptsize E{-}unreachable}]} \quad & \mathsf{unreachable} &\hookrightarrow& \mathsf{trap} &  \\
 {[\textsc{\scriptsize E{-}nop}]} \quad & \mathsf{nop} &\hookrightarrow& \epsilon &  \\
-{[\textsc{\scriptsize E{-}drop}]} \quad & \mathit{val}~\mathsf{drop} &\hookrightarrow& \epsilon &  \\
+{[\textsc{\scriptsize E{-}drop}]} \quad & {\mathit{val}}~\mathsf{drop} &\hookrightarrow& \epsilon &  \\
+{[\textsc{\scriptsize E{-}select{-}true}]} \quad & {\mathit{val}}_{{1}}~{\mathit{val}}_{{2}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{select}~{{\mathit{t}}^?}) &\hookrightarrow& {\mathit{val}}_{{1}} &\quad
+  \mbox{if}~{\mathit{c}} \neq 0 \\
+{[\textsc{\scriptsize E{-}select{-}false}]} \quad & {\mathit{val}}_{{1}}~{\mathit{val}}_{{2}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{select}~{{\mathit{t}}^?}) &\hookrightarrow& {\mathit{val}}_{{2}} &\quad
+  \mbox{if}~{\mathit{c}} = 0 \\
 \end{array}
 $$
 
@@ -3342,10 +3871,15 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}select{-}true}]} \quad & \mathit{val}_{1}~\mathit{val}_{2}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{select}~{\mathit{t}^?}) &\hookrightarrow& \mathit{val}_{1} &\quad
-  \mbox{if}~\mathit{c} \neq 0 \\
-{[\textsc{\scriptsize E{-}select{-}false}]} \quad & \mathit{val}_{1}~\mathit{val}_{2}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{select}~{\mathit{t}^?}) &\hookrightarrow& \mathit{val}_{2} &\quad
-  \mbox{if}~\mathit{c} = 0 \\
+{[\textsc{\scriptsize E{-}block}]} \quad & {{\mathit{val}}^{{\mathit{k}}}}~(\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{{\mathit{n}}}}{\{\epsilon\}}~{{\mathit{val}}^{{\mathit{k}}}}~{{\mathit{instr}}^\ast}) &\quad
+  \mbox{if}~{\mathit{bt}} = {{\mathit{t}}_{{1}}^{{\mathit{k}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
+{[\textsc{\scriptsize E{-}loop}]} \quad & {{\mathit{val}}^{{\mathit{k}}}}~(\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{{\mathit{k}}}}{\{\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}\}}~{{\mathit{val}}^{{\mathit{k}}}}~{{\mathit{instr}}^\ast}) &\quad
+  \mbox{if}~{\mathit{bt}} = {{\mathit{t}}_{{1}}^{{\mathit{k}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
+{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}) &\quad
+  \mbox{if}~{\mathit{c}} \neq 0 \\
+{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{2}}^\ast}) &\quad
+  \mbox{if}~{\mathit{c}} = 0 \\
+{[\textsc{\scriptsize E{-}label{-}vals}]} \quad & ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}}^\ast}\}}~{{\mathit{val}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast} &  \\
 \end{array}
 $$
 
@@ -3353,14 +3887,16 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}block}]} \quad & {\mathit{val}^{\mathit{k}}}~(\mathsf{block}~\mathit{bt}~{\mathit{instr}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{\mathit{n}}}{\{\epsilon\}}~{\mathit{val}^{\mathit{k}}}~{\mathit{instr}^\ast}) &\quad
-  \mbox{if}~\mathit{bt} = {\mathit{t}_{1}^{\mathit{k}}} \rightarrow {\mathit{t}_{2}^{\mathit{n}}} \\
-{[\textsc{\scriptsize E{-}loop}]} \quad & {\mathit{val}^{\mathit{k}}}~(\mathsf{loop}~\mathit{bt}~{\mathit{instr}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{\mathit{n}}}{\{\mathsf{loop}~\mathit{bt}~{\mathit{instr}^\ast}\}}~{\mathit{val}^{\mathit{k}}}~{\mathit{instr}^\ast}) &\quad
-  \mbox{if}~\mathit{bt} = {\mathit{t}_{1}^{\mathit{k}}} \rightarrow {\mathit{t}_{2}^{\mathit{n}}} \\
-{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{if}~\mathit{bt}~{\mathit{instr}_{1}^\ast}~\mathsf{else}~{\mathit{instr}_{2}^\ast}) &\hookrightarrow& (\mathsf{block}~\mathit{bt}~{\mathit{instr}_{1}^\ast}) &\quad
-  \mbox{if}~\mathit{c} \neq 0 \\
-{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{if}~\mathit{bt}~{\mathit{instr}_{1}^\ast}~\mathsf{else}~{\mathit{instr}_{2}^\ast}) &\hookrightarrow& (\mathsf{block}~\mathit{bt}~{\mathit{instr}_{2}^\ast}) &\quad
-  \mbox{if}~\mathit{c} = 0 \\
+{[\textsc{\scriptsize E{-}br{-}zero}]} \quad & ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{br}~0)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{{\mathit{n}}}}~{{\mathit{instr}'}^\ast} &  \\
+{[\textsc{\scriptsize E{-}br{-}succ}]} \quad & ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}}^\ast}~(\mathsf{br}~{\mathit{l}} + 1)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~(\mathsf{br}~{\mathit{l}}) &  \\
+{[\textsc{\scriptsize E{-}br\_if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{br\_if}~{\mathit{l}}) &\hookrightarrow& (\mathsf{br}~{\mathit{l}}) &\quad
+  \mbox{if}~{\mathit{c}} \neq 0 \\
+{[\textsc{\scriptsize E{-}br\_if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{br\_if}~{\mathit{l}}) &\hookrightarrow& \epsilon &\quad
+  \mbox{if}~{\mathit{c}} = 0 \\
+{[\textsc{\scriptsize E{-}br\_table{-}lt}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{br\_table}~{{\mathit{l}}^\ast}~{\mathit{l}'}) &\hookrightarrow& (\mathsf{br}~{{\mathit{l}}^\ast}[{\mathit{i}}]) &\quad
+  \mbox{if}~{\mathit{i}} < {|{{\mathit{l}}^\ast}|} \\
+{[\textsc{\scriptsize E{-}br\_table{-}ge}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{br\_table}~{{\mathit{l}}^\ast}~{\mathit{l}'}) &\hookrightarrow& (\mathsf{br}~{\mathit{l}'}) &\quad
+  \mbox{if}~{\mathit{i}} \geq {|{{\mathit{l}}^\ast}|} \\
 \end{array}
 $$
 
@@ -3368,55 +3904,27 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}label{-}vals}]} \quad & ({{\mathsf{label}}_{\mathit{n}}}{\{{\mathit{instr}^\ast}\}}~{\mathit{val}^\ast}) &\hookrightarrow& {\mathit{val}^\ast} &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}br{-}zero}]} \quad & ({{\mathsf{label}}_{\mathit{n}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}'}^\ast}~{\mathit{val}^{\mathit{n}}}~(\mathsf{br}~0)~{\mathit{instr}^\ast}) &\hookrightarrow& {\mathit{val}^{\mathit{n}}}~{{\mathit{instr}'}^\ast} &  \\
-{[\textsc{\scriptsize E{-}br{-}succ}]} \quad & ({{\mathsf{label}}_{\mathit{n}}}{\{{{\mathit{instr}'}^\ast}\}}~{\mathit{val}^\ast}~(\mathsf{br}~\mathit{l} + 1)~{\mathit{instr}^\ast}) &\hookrightarrow& {\mathit{val}^\ast}~(\mathsf{br}~\mathit{l}) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}br\_if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{br\_if}~\mathit{l}) &\hookrightarrow& (\mathsf{br}~\mathit{l}) &\quad
-  \mbox{if}~\mathit{c} \neq 0 \\
-{[\textsc{\scriptsize E{-}br\_if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathsf{br\_if}~\mathit{l}) &\hookrightarrow& \epsilon &\quad
-  \mbox{if}~\mathit{c} = 0 \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}br\_table{-}lt}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{br\_table}~{\mathit{l}^\ast}~{\mathit{l}'}) &\hookrightarrow& (\mathsf{br}~{\mathit{l}^\ast}[\mathit{i}]) &\quad
-  \mbox{if}~\mathit{i} < {|{\mathit{l}^\ast}|} \\
-{[\textsc{\scriptsize E{-}br\_table{-}ge}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{br\_table}~{\mathit{l}^\ast}~{\mathit{l}'}) &\hookrightarrow& (\mathsf{br}~{\mathit{l}'}) &\quad
-  \mbox{if}~\mathit{i} \geq {|{\mathit{l}^\ast}|} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}call}]} \quad & \mathit{z} ; (\mathsf{call}~\mathit{x}) &\hookrightarrow& (\mathsf{call}~\mathit{z}.\mathsf{module}.\mathsf{func}[\mathit{x}]) &  \\
-{[\textsc{\scriptsize E{-}call\_indirect{-}call}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{call\_indirect}~\mathit{x}~\mathit{ft}) &\hookrightarrow& (\mathsf{call}~\mathit{a}) &\quad
-  \mbox{if}~{\mathit{z}.\mathsf{table}}{[\mathit{x}]}[\mathit{i}] = (\mathsf{ref.func}~\mathit{a}) \\
- &&&&\quad {\land}~\mathit{z}.\mathsf{func}[\mathit{a}] = \mathit{m} ; \mathit{func} \\
-{[\textsc{\scriptsize E{-}call\_indirect{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{call\_indirect}~\mathit{x}~\mathit{ft}) &\hookrightarrow& \mathsf{trap} &\quad
+{[\textsc{\scriptsize E{-}call}]} \quad & {\mathit{z}} ; (\mathsf{call}~{\mathit{x}}) &\hookrightarrow& (\mathsf{call}~{\mathit{z}}.\mathsf{module}.\mathsf{func}[{\mathit{x}}]) &  \\
+{[\textsc{\scriptsize E{-}call\_indirect{-}call}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{call\_indirect}~{\mathit{x}}~{\mathit{ft}}) &\hookrightarrow& (\mathsf{call}~{\mathit{a}}) &\quad
+  \mbox{if}~{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}[{\mathit{i}}] = (\mathsf{ref.func}~{\mathit{a}}) \\
+ &&&&\quad {\land}~{\mathit{z}}.\mathsf{func}[{\mathit{a}}].\mathsf{code} = \mathsf{func}~{\mathit{ft}'}~{(\mathsf{local}~{\mathit{t}})^\ast}~{{\mathit{instr}}^\ast} \\
+ &&&&\quad {\land}~{\mathit{ft}} = {\mathit{ft}'} \\
+{[\textsc{\scriptsize E{-}call\_indirect{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{call\_indirect}~{\mathit{x}}~{\mathit{ft}}) &\hookrightarrow& \mathsf{trap} &\quad
   \mbox{otherwise} \\
-{[\textsc{\scriptsize E{-}call\_addr}]} \quad & \mathit{z} ; {\mathit{val}^{\mathit{k}}}~(\mathsf{call}~\mathit{a}) &\hookrightarrow& ({{\mathsf{frame}}_{\mathit{n}}}{\{\mathit{f}\}}~({{\mathsf{label}}_{\mathit{n}}}{\{\epsilon\}}~{\mathit{instr}^\ast})) &\quad
-  \mbox{if}~\mathit{z}.\mathsf{func}[\mathit{a}] = \mathit{m} ; \mathsf{func}~({\mathit{t}_{1}^{\mathit{k}}} \rightarrow {\mathit{t}_{2}^{\mathit{n}}})~{\mathit{t}^\ast}~{\mathit{instr}^\ast} \\
- &&&&\quad {\land}~\mathit{f} = \{ \begin{array}[t]{@{}l@{}}
-\mathsf{local}~{\mathit{val}^{\mathit{k}}}~{({\mathrm{default}}_{\mathit{t}})^\ast},\; \mathsf{module}~\mathit{m} \}\end{array} \\
+{[\textsc{\scriptsize E{-}call\_addr}]} \quad & {\mathit{z}} ; {{\mathit{val}}^{{\mathit{k}}}}~(\mathsf{call}~{\mathit{a}}) &\hookrightarrow& ({{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{f}}\}}~({{\mathsf{label}}_{{\mathit{n}}}}{\{\epsilon\}}~{{\mathit{instr}}^\ast})) &\quad
+  \mbox{if}~{\mathit{z}}.\mathsf{func}[{\mathit{a}}] = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{module}~{\mathit{mm}},\; \mathsf{code}~{\mathit{func}} \}\end{array} \\
+ &&&&\quad {\land}~{\mathit{func}} = \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{k}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}})~{(\mathsf{local}~{\mathit{t}})^\ast}~{{\mathit{instr}}^\ast} \\
+ &&&&\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{local}~{{\mathit{val}}^{{\mathit{k}}}}~{({{\mathrm{default}}}_{{\mathit{t}}})^\ast},\; \mathsf{module}~{\mathit{mm}} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}frame{-}vals}]} \quad & ({{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{f}}\}}~{{\mathit{val}}^{{\mathit{n}}}}) &\hookrightarrow& {{\mathit{val}}^{{\mathit{n}}}} &  \\
+{[\textsc{\scriptsize E{-}return{-}frame}]} \quad & ({{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{f}}\}}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{{\mathit{n}}}}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{{\mathit{n}}}} &  \\
+{[\textsc{\scriptsize E{-}return{-}label}]} \quad & ({{\mathsf{label}}_{{\mathit{k}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}}^\ast}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~\mathsf{return} &  \\
 \end{array}
 $$
 
@@ -3424,9 +3932,23 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}frame{-}vals}]} \quad & ({{\mathsf{frame}}_{\mathit{n}}}{\{\mathit{f}\}}~{\mathit{val}^{\mathit{n}}}) &\hookrightarrow& {\mathit{val}^{\mathit{n}}} &  \\
-{[\textsc{\scriptsize E{-}return{-}frame}]} \quad & ({{\mathsf{frame}}_{\mathit{n}}}{\{\mathit{f}\}}~{{\mathit{val}'}^\ast}~{\mathit{val}^{\mathit{n}}}~\mathsf{return}~{\mathit{instr}^\ast}) &\hookrightarrow& {\mathit{val}^{\mathit{n}}} &  \\
-{[\textsc{\scriptsize E{-}return{-}label}]} \quad & ({{\mathsf{label}}_{\mathit{k}}}{\{{{\mathit{instr}'}^\ast}\}}~{\mathit{val}^\ast}~\mathsf{return}~{\mathit{instr}^\ast}) &\hookrightarrow& {\mathit{val}^\ast}~\mathsf{return} &  \\
+{[\textsc{\scriptsize E{-}unop{-}val}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}} . {\mathit{unop}}) &\hookrightarrow& ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{{{{\mathit{unop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}})} = {\mathit{c}} \\
+{[\textsc{\scriptsize E{-}unop{-}trap}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}} . {\mathit{unop}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{{{{\mathit{unop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}})} = \epsilon \\
+{[\textsc{\scriptsize E{-}binop{-}val}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{2}})~({\mathit{nt}} . {\mathit{binop}}) &\hookrightarrow& ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{{{{\mathit{binop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}},\, {\mathit{c}}_{{2}})} = {\mathit{c}} \\
+{[\textsc{\scriptsize E{-}binop{-}trap}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{2}})~({\mathit{nt}} . {\mathit{binop}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{{{{\mathit{binop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}},\, {\mathit{c}}_{{2}})} = \epsilon \\
+{[\textsc{\scriptsize E{-}testop}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}} . {\mathit{testop}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{\mathit{c}} = {{{{\mathit{testop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}})} \\
+{[\textsc{\scriptsize E{-}relop}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{2}})~({\mathit{nt}} . {\mathit{relop}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{\mathit{c}} = {{{{\mathit{relop}}}{}}_{{\mathit{nt}}}}{({\mathit{c}}_{{1}},\, {\mathit{c}}_{{2}})} \\
+{[\textsc{\scriptsize E{-}extend}]} \quad & ({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{extend}}{{\mathit{n}}}) &\hookrightarrow& ({\mathit{nt}}.\mathsf{const}~{{{\mathrm{ext}}}_{{\mathit{n}}}({|{\mathit{nt}}|})^{\mathsf{s}}}~({\mathit{c}})) &  \\
+{[\textsc{\scriptsize E{-}cvtop{-}val}]} \quad & ({\mathit{nt}}_{{1}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}}_{{2}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{nt}}_{{1}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}) &\hookrightarrow& ({\mathit{nt}}_{{2}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{\mathrm{cvtop}}({\mathit{nt}}_{{1}},\, {\mathit{cvtop}},\, {\mathit{nt}}_{{2}},\, {{\mathit{sx}}^?},\, {\mathit{c}}_{{1}}) = {\mathit{c}} \\
+{[\textsc{\scriptsize E{-}cvtop{-}trap}]} \quad & ({\mathit{nt}}_{{1}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}}_{{2}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{nt}}_{{1}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathrm{cvtop}}({\mathit{nt}}_{{1}},\, {\mathit{cvtop}},\, {\mathit{nt}}_{{2}},\, {{\mathit{sx}}^?},\, {\mathit{c}}_{{1}}) = \epsilon \\
 \end{array}
 $$
 
@@ -3434,69 +3956,15 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}unop{-}val}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt} . \mathit{unop}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~{{{\mathit{unop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1})} = \mathit{c} \\
-{[\textsc{\scriptsize E{-}unop{-}trap}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt} . \mathit{unop}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~{{{\mathit{unop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1})} = \epsilon \\
+{[\textsc{\scriptsize E{-}ref.func}]} \quad & {\mathit{z}} ; (\mathsf{ref.func}~{\mathit{x}}) &\hookrightarrow& (\mathsf{ref.func}~{\mathit{z}}.\mathsf{module}.\mathsf{func}[{\mathit{x}}]) &  \\
 \end{array}
 $$
 
-\vspace{1ex}
-
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}binop{-}val}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt}.\mathsf{const}~\mathit{c}_{2})~(\mathit{nt} . \mathit{binop}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~{{{\mathit{binop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1},\, \mathit{c}_{2})} = \mathit{c} \\
-{[\textsc{\scriptsize E{-}binop{-}trap}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt}.\mathsf{const}~\mathit{c}_{2})~(\mathit{nt} . \mathit{binop}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~{{{\mathit{binop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1},\, \mathit{c}_{2})} = \epsilon \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}testop}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt} . \mathit{testop}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~\mathit{c} = {{{\mathit{testop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1})} \\
-{[\textsc{\scriptsize E{-}relop}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt}.\mathsf{const}~\mathit{c}_{2})~(\mathit{nt} . \mathit{relop}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~\mathit{c} = {{{\mathit{relop}}{}}_{\mathit{nt}}}{(\mathit{c}_{1},\, \mathit{c}_{2})} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}extend}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c})~({\mathit{nt}.\mathsf{extend}}{\mathit{n}}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~{{\mathrm{ext}}_{\mathit{n}}({|\mathit{nt}|})^{\mathsf{s}}}~(\mathit{c})) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}cvtop{-}val}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt}_{1} . {{{{\mathit{cvtop}}{\mathsf{\_}}}{\mathit{nt}_{2}}}{\mathsf{\_}}}{{\mathit{sx}^?}}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~\mathrm{cvtop}(\mathit{nt}_{1},\, \mathit{cvtop},\, \mathit{nt}_{2},\, {\mathit{sx}^?},\, \mathit{c}_{1}) = \mathit{c} \\
-{[\textsc{\scriptsize E{-}cvtop{-}trap}]} \quad & (\mathit{nt}.\mathsf{const}~\mathit{c}_{1})~(\mathit{nt}_{1} . {{{{\mathit{cvtop}}{\mathsf{\_}}}{\mathit{nt}_{2}}}{\mathsf{\_}}}{{\mathit{sx}^?}}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathrm{cvtop}(\mathit{nt}_{1},\, \mathit{cvtop},\, \mathit{nt}_{2},\, {\mathit{sx}^?},\, \mathit{c}_{1}) = \epsilon \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}ref.func}]} \quad & \mathit{z} ; (\mathsf{ref.func}~\mathit{x}) &\hookrightarrow& (\mathsf{ref.func}~\mathit{z}.\mathsf{module}.\mathsf{func}[\mathit{x}]) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}ref.is\_null{-}true}]} \quad & \mathit{val}~\mathsf{ref.is\_null} &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~1) &\quad
-  \mbox{if}~\mathit{val} = (\mathsf{ref.null}~\mathit{rt}) \\
-{[\textsc{\scriptsize E{-}ref.is\_null{-}false}]} \quad & \mathit{val}~\mathsf{ref.is\_null} &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~0) &\quad
+{[\textsc{\scriptsize E{-}ref.is\_null{-}true}]} \quad & {\mathit{val}}~\mathsf{ref.is\_null} &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~1) &\quad
+  \mbox{if}~{\mathit{val}} = (\mathsf{ref.null}~{\mathit{rt}}) \\
+{[\textsc{\scriptsize E{-}ref.is\_null{-}false}]} \quad & {\mathit{val}}~\mathsf{ref.is\_null} &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~0) &\quad
   \mbox{otherwise} \\
 \end{array}
 $$
@@ -3505,33 +3973,19 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}local.get}]} \quad & \mathit{z} ; (\mathsf{local.get}~\mathit{x}) &\hookrightarrow& {\mathit{z}.\mathsf{local}}{[\mathit{x}]} &  \\
+{[\textsc{\scriptsize E{-}local.get}]} \quad & {\mathit{z}} ; (\mathsf{local.get}~{\mathit{x}}) &\hookrightarrow& {{\mathit{z}}.\mathsf{local}}{[{\mathit{x}}]} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}local.set}]} \quad & \mathit{z} ; \mathit{val}~(\mathsf{local.set}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{local}[\mathit{x}] = \mathit{val}] ; \epsilon &  \\
+{[\textsc{\scriptsize E{-}local.set}]} \quad & {\mathit{z}} ; {\mathit{val}}~(\mathsf{local.set}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{local}[{\mathit{x}}] = {\mathit{val}}] ; \epsilon &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}local.tee}]} \quad & \mathit{val}~(\mathsf{local.tee}~\mathit{x}) &\hookrightarrow& \mathit{val}~\mathit{val}~(\mathsf{local.set}~\mathit{x}) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}global.get}]} \quad & \mathit{z} ; (\mathsf{global.get}~\mathit{x}) &\hookrightarrow& {\mathit{z}.\mathsf{global}}{[\mathit{x}]} &  \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}global.set}]} \quad & \mathit{z} ; \mathit{val}~(\mathsf{global.set}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{global}[\mathit{x}] = \mathit{val}] ; \epsilon &  \\
+{[\textsc{\scriptsize E{-}local.tee}]} \quad & {\mathit{val}}~(\mathsf{local.tee}~{\mathit{x}}) &\hookrightarrow& {\mathit{val}}~{\mathit{val}}~(\mathsf{local.set}~{\mathit{x}}) &  \\
 \end{array}
 $$
 
@@ -3539,19 +3993,13 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.get{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{table.get}~\mathit{x}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} \geq {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
-{[\textsc{\scriptsize E{-}table.get{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{table.get}~\mathit{x}) &\hookrightarrow& {\mathit{z}.\mathsf{table}}{[\mathit{x}]}[\mathit{i}] &\quad
-  \mbox{if}~\mathit{i} < {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
+{[\textsc{\scriptsize E{-}global.get}]} \quad & {\mathit{z}} ; (\mathsf{global.get}~{\mathit{x}}) &\hookrightarrow& {{\mathit{z}}.\mathsf{global}}{[{\mathit{x}}]}.\mathsf{value} &  \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.set{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{ref}~(\mathsf{table.get}~\mathit{x}) &\hookrightarrow& \mathit{z} ; \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} \geq {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
-{[\textsc{\scriptsize E{-}table.set{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{ref}~(\mathsf{table.get}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{table}[\mathit{x}][\mathit{i}] = \mathit{ref}] ; \epsilon &\quad
-  \mbox{if}~\mathit{i} < {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
+{[\textsc{\scriptsize E{-}global.set}]} \quad & {\mathit{z}} ; {\mathit{val}}~(\mathsf{global.set}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{global}[{\mathit{x}}].\mathsf{value} = {\mathit{val}}] ; \epsilon &  \\
 \end{array}
 $$
 
@@ -3559,8 +4007,65 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.size}]} \quad & \mathit{z} ; (\mathsf{table.size}~\mathit{x}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n}) &\quad
-  \mbox{if}~{|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} = \mathit{n} \\
+{[\textsc{\scriptsize E{-}table.get{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{x}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} \geq {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+{[\textsc{\scriptsize E{-}table.get{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{x}}) &\hookrightarrow& {{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}[{\mathit{i}}] &\quad
+  \mbox{if}~{\mathit{i}} < {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}table.set{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{table.set}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}} ; \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} \geq {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+{[\textsc{\scriptsize E{-}table.set{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{table.set}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{table}[{\mathit{x}}].\mathsf{elem}[{\mathit{i}}] = {\mathit{ref}}] ; \epsilon &\quad
+  \mbox{if}~{\mathit{i}} < {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}table.size}]} \quad & {\mathit{z}} ; (\mathsf{table.size}~{\mathit{x}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}}) &\quad
+  \mbox{if}~{|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} = {\mathit{n}} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}table.grow{-}succeed}]} \quad & {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.grow}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{table}[{\mathit{x}}] = {\mathit{ti}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|}) &\quad
+  \mbox{if}~{\mathrm{grow}}_{{\mathit{table}}}({{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]},\, {\mathit{n}},\, {\mathit{ref}}) = {\mathit{ti}} \\
+{[\textsc{\scriptsize E{-}table.grow{-}fail}]} \quad & {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.grow}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{-1}) &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}table.fill{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+{[\textsc{\scriptsize E{-}table.fill{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}table.fill{-}succ}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{table.set}~{\mathit{x}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.fill}~{\mathit{x}}) &\quad
+  \mbox{otherwise} \\
+{[\textsc{\scriptsize E{-}table.copy{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{y}}]}.\mathsf{elem}|} \lor {\mathit{j}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+{[\textsc{\scriptsize E{-}table.copy{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}table.copy{-}le}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{y}})~(\mathsf{table.set}~{\mathit{x}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\quad
+  \mbox{otherwise, if}~{\mathit{j}} \leq {\mathit{i}} \\
+{[\textsc{\scriptsize E{-}table.copy{-}gt}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + {\mathit{n}} - 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + {\mathit{n}} - 1)~(\mathsf{table.get}~{\mathit{y}})~(\mathsf{table.set}~{\mathit{x}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &\quad
+  \mbox{otherwise} \\
+{[\textsc{\scriptsize E{-}table.init{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{elem}}{[{\mathit{y}}]}.\mathsf{elem}|} \lor {\mathit{j}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{table}}{[{\mathit{x}}]}.\mathsf{elem}|} \\
+{[\textsc{\scriptsize E{-}table.init{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}table.init{-}succ}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~{{\mathit{z}}.\mathsf{elem}}{[{\mathit{y}}]}.\mathsf{elem}[{\mathit{i}}]~(\mathsf{table.set}~{\mathit{x}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &\quad
+  \mbox{otherwise} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}elem.drop}]} \quad & {\mathit{z}} ; (\mathsf{elem.drop}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{elem}[{\mathit{x}}].\mathsf{elem} = \epsilon] ; \epsilon &  \\
 \end{array}
 $$
 
@@ -3568,20 +4073,108 @@ $$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.grow{-}succeed}]} \quad & \mathit{z} ; \mathit{ref}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.grow}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{table}[\mathit{x}] = ..{\mathit{ref}^{\mathit{n}}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|}) &  \\
-{[\textsc{\scriptsize E{-}table.grow{-}fail}]} \quad & \mathit{z} ; \mathit{ref}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.grow}~\mathit{x}) &\hookrightarrow& \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~-1) &  \\
+{[\textsc{\scriptsize E{-}load{-}num{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{load}~{\mathit{nt}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} + {|{\mathit{nt}}|} / 8 > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}load{-}num{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{load}~{\mathit{nt}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}) &\quad
+  \mbox{if}~{{\mathrm{bytes}}}_{{|{\mathit{nt}}|}}({\mathit{c}}) = {{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}[{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} : {|{\mathit{nt}}|} / 8] \\
+{[\textsc{\scriptsize E{-}load{-}pack{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathit{nt}}.\mathsf{load}}{{{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} + {\mathit{n}} / 8 > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}load{-}pack{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathit{nt}}.\mathsf{load}}{{{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& ({\mathit{nt}}.\mathsf{const}~{{{\mathrm{ext}}}_{{\mathit{n}}}({|{\mathit{nt}}|})^{{\mathit{sx}}}}~({\mathit{c}})) &\quad
+  \mbox{if}~{{\mathrm{bytes}}}_{{\mathit{n}}}({\mathit{c}}) = {{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}[{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} : {\mathit{n}} / 8] \\
 \end{array}
 $$
 
-\vspace{1ex}
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}store{-}num{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~(\mathsf{store}~{\mathit{nt}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& {\mathit{z}} ; \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} + {|{\mathit{nt}}|} / 8 > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}store{-}num{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~(\mathsf{store}~{\mathit{nt}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& {\mathit{z}}[\mathsf{mem}[0].\mathsf{data}[{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} : {|{\mathit{nt}}|} / 8] = {{\mathit{b}}^\ast}] ; \epsilon &\quad
+  \mbox{if}~{{\mathit{b}}^\ast} = {{\mathrm{bytes}}}_{{|{\mathit{nt}}|}}({\mathit{c}}) \\
+{[\textsc{\scriptsize E{-}store{-}pack{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{store}}{{\mathit{n}}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& {\mathit{z}} ; \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} + {\mathit{n}} / 8 > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}store{-}pack{-}val}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{store}}{{\mathit{n}}}~{\mathit{n}}_{{\mathsf{a}}}~{\mathit{n}}_{{\mathsf{o}}}) &\hookrightarrow& {\mathit{z}}[\mathsf{mem}[0].\mathsf{data}[{\mathit{i}} + {\mathit{n}}_{{\mathsf{o}}} : {\mathit{n}} / 8] = {{\mathit{b}}^\ast}] ; \epsilon &\quad
+  \mbox{if}~{{\mathit{b}}^\ast} = {{\mathrm{bytes}}}_{{\mathit{n}}}({{\mathrm{wrap}}}_{{|{\mathit{nt}}|},{\mathit{n}}}({\mathit{c}})) \\
+\end{array}
+$$
 
 $$
 \begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.fill{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.fill}~\mathit{x}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
-{[\textsc{\scriptsize E{-}table.fill{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.fill}~\mathit{x}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}table.fill{-}succ}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.fill}~\mathit{x}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{table.set}~\mathit{x})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{table.fill}~\mathit{x}) &\quad
+{[\textsc{\scriptsize E{-}memory.size}]} \quad & {\mathit{z}} ; (\mathsf{memory.size}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}}) &\quad
+  \mbox{if}~{\mathit{n}} \cdot 64 \cdot {\mathrm{Ki}} = {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}memory.grow{-}succeed}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.grow}) &\hookrightarrow& {\mathit{z}}[\mathsf{mem}[0] = {\mathit{mi}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} / (64 \cdot {\mathrm{Ki}})) &\quad
+  \mbox{if}~{\mathrm{grow}}_{{\mathit{memory}}}({{\mathit{z}}.\mathsf{mem}}{[0]},\, {\mathit{n}}) = {\mathit{mi}} \\
+{[\textsc{\scriptsize E{-}memory.grow{-}fail}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.grow}) &\hookrightarrow& {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{-1}) &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}memory.fill{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}memory.fill{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}memory.fill{-}succ}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.fill}) &\quad
+  \mbox{otherwise} \\
+{[\textsc{\scriptsize E{-}memory.copy{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \lor {\mathit{j}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}memory.copy{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}memory.copy{-}le}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathsf{i{\scriptstyle32}}.\mathsf{load}}{{{8}{\mathsf{\_}}}{\mathsf{u}}}~0~0)~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.copy}) &\quad
+  \mbox{otherwise, if}~{\mathit{j}} \leq {\mathit{i}} \\
+{[\textsc{\scriptsize E{-}memory.copy{-}gt}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + {\mathit{n}} - 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + {\mathit{n}} - 1)~({\mathsf{i{\scriptstyle32}}.\mathsf{load}}{{{8}{\mathsf{\_}}}{\mathsf{u}}}~0~0)~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.copy}) &\quad
+  \mbox{otherwise} \\
+{[\textsc{\scriptsize E{-}memory.init{-}trap}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}) &\hookrightarrow& \mathsf{trap} &\quad
+  \mbox{if}~{\mathit{i}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{data}}{[{\mathit{x}}]}.\mathsf{data}|} \lor {\mathit{j}} + {\mathit{n}} > {|{{\mathit{z}}.\mathsf{mem}}{[0]}.\mathsf{data}|} \\
+{[\textsc{\scriptsize E{-}memory.init{-}zero}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}) &\hookrightarrow& \epsilon &\quad
+  \mbox{otherwise, if}~{\mathit{n}} = 0 \\
+{[\textsc{\scriptsize E{-}memory.init{-}succ}]} \quad & {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{{\mathit{z}}.\mathsf{data}}{[{\mathit{x}}]}.\mathsf{data}[{\mathit{i}}])~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.init}~{\mathit{x}}) &\quad
+  \mbox{otherwise} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}lcl@{}l@{}}
+{[\textsc{\scriptsize E{-}data.drop}]} \quad & {\mathit{z}} ; (\mathsf{data.drop}~{\mathit{x}}) &\hookrightarrow& {\mathit{z}}[\mathsf{data}[{\mathit{x}}].\mathsf{data} = \epsilon] ; \epsilon &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{funcs}}(\epsilon) &=& \epsilon &  \\
+{\mathrm{funcs}}((\mathsf{func}~{\mathit{fa}})~{{\mathit{externval}'}^\ast}) &=& {\mathit{fa}}~{\mathrm{funcs}}({{\mathit{externval}'}^\ast}) &  \\
+{\mathrm{funcs}}({\mathit{externval}}~{{\mathit{externval}'}^\ast}) &=& {\mathrm{funcs}}({{\mathit{externval}'}^\ast}) &\quad
+  \mbox{otherwise} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{globals}}(\epsilon) &=& \epsilon &  \\
+{\mathrm{globals}}((\mathsf{global}~{\mathit{ga}})~{{\mathit{externval}'}^\ast}) &=& {\mathit{ga}}~{\mathrm{globals}}({{\mathit{externval}'}^\ast}) &  \\
+{\mathrm{globals}}({\mathit{externval}}~{{\mathit{externval}'}^\ast}) &=& {\mathrm{globals}}({{\mathit{externval}'}^\ast}) &\quad
+  \mbox{otherwise} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{tables}}(\epsilon) &=& \epsilon &  \\
+{\mathrm{tables}}((\mathsf{table}~{\mathit{ta}})~{{\mathit{externval}'}^\ast}) &=& {\mathit{ta}}~{\mathrm{tables}}({{\mathit{externval}'}^\ast}) &  \\
+{\mathrm{tables}}({\mathit{externval}}~{{\mathit{externval}'}^\ast}) &=& {\mathrm{tables}}({{\mathit{externval}'}^\ast}) &\quad
+  \mbox{otherwise} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{mems}}(\epsilon) &=& \epsilon &  \\
+{\mathrm{mems}}((\mathsf{mem}~{\mathit{ma}})~{{\mathit{externval}'}^\ast}) &=& {\mathit{ma}}~{\mathrm{mems}}({{\mathit{externval}'}^\ast}) &  \\
+{\mathrm{mems}}({\mathit{externval}}~{{\mathit{externval}'}^\ast}) &=& {\mathrm{mems}}({{\mathit{externval}'}^\ast}) &\quad
   \mbox{otherwise} \\
 \end{array}
 $$
@@ -3589,124 +4182,226 @@ $$
 \vspace{1ex}
 
 $$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.copy{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[\mathit{y}]}|} \lor \mathit{j} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
-{[\textsc{\scriptsize E{-}table.copy{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}table.copy{-}le}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{table.get}~\mathit{y})~(\mathsf{table.set}~\mathit{x})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\quad
-  \mbox{otherwise, if}~\mathit{j} \leq \mathit{i} \\
-{[\textsc{\scriptsize E{-}table.copy{-}gt}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + \mathit{n} - 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + \mathit{n} - 1)~(\mathsf{table.get}~\mathit{y})~(\mathsf{table.set}~\mathit{x})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{table.copy}~\mathit{x}~\mathit{y}) &\quad
-  \mbox{otherwise} \\
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocfunc}}({\mathit{s}},\, {\mathit{mm}},\, {\mathit{func}}) &=& ({\mathit{s}}[\mathsf{func} = ..{\mathit{fi}}],\, {|{\mathit{s}}.\mathsf{func}|}) &\quad
+  \mbox{if}~{\mathit{fi}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{module}~{\mathit{mm}},\; \mathsf{code}~{\mathit{func}} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocfuncs}}({\mathit{s}},\, {\mathit{mm}},\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{allocfuncs}}({\mathit{s}},\, {\mathit{mm}},\, {\mathit{func}}~{{\mathit{func}'}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{fa}}~{{\mathit{fa}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{fa}}) = {\mathrm{allocfunc}}({\mathit{s}},\, {\mathit{mm}},\, {\mathit{func}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{fa}'}^\ast}) = {\mathrm{allocfuncs}}({\mathit{s}}_{{1}},\, {\mathit{mm}},\, {{\mathit{func}'}^\ast}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocglobal}}({\mathit{s}},\, {\mathit{globaltype}},\, {\mathit{val}}) &=& ({\mathit{s}}[\mathsf{global} = ..{\mathit{gi}}],\, {|{\mathit{s}}.\mathsf{global}|}) &\quad
+  \mbox{if}~{\mathit{gi}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~{\mathit{globaltype}},\; \mathsf{value}~{\mathit{val}} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocglobals}}({\mathit{s}},\, \epsilon,\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{allocglobals}}({\mathit{s}},\, {\mathit{globaltype}}~{{\mathit{globaltype}'}^\ast},\, {\mathit{val}}~{{\mathit{val}'}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{ga}}~{{\mathit{ga}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{ga}}) = {\mathrm{allocglobal}}({\mathit{s}},\, {\mathit{globaltype}},\, {\mathit{val}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{ga}'}^\ast}) = {\mathrm{allocglobals}}({\mathit{s}}_{{1}},\, {{\mathit{globaltype}'}^\ast},\, {{\mathit{val}'}^\ast}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{alloctable}}({\mathit{s}},\, [{\mathit{i}} .. {\mathit{j}}]~{\mathit{rt}}) &=& ({\mathit{s}}[\mathsf{table} = ..{\mathit{ti}}],\, {|{\mathit{s}}.\mathsf{table}|}) &\quad
+  \mbox{if}~{\mathit{ti}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~([{\mathit{i}} .. {\mathit{j}}]~{\mathit{rt}}),\; \mathsf{elem}~{(\mathsf{ref.null}~{\mathit{rt}})^{{\mathit{i}}}} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{alloctables}}({\mathit{s}},\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{alloctables}}({\mathit{s}},\, {\mathit{tabletype}}~{{\mathit{tabletype}'}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{ta}}~{{\mathit{ta}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{ta}}) = {\mathrm{alloctable}}({\mathit{s}},\, {\mathit{tabletype}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{ta}'}^\ast}) = {\mathrm{alloctables}}({\mathit{s}}_{{1}},\, {{\mathit{tabletype}'}^\ast}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocmem}}({\mathit{s}},\, [{\mathit{i}} .. {\mathit{j}}]~\mathsf{i{\scriptstyle8}}) &=& ({\mathit{s}}[\mathsf{mem} = ..{\mathit{mi}}],\, {|{\mathit{s}}.\mathsf{mem}|}) &\quad
+  \mbox{if}~{\mathit{mi}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~([{\mathit{i}} .. {\mathit{j}}]~\mathsf{i{\scriptstyle8}}),\; \mathsf{data}~{0^{{\mathit{i}} \cdot 64 \cdot {\mathrm{Ki}}}} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocmems}}({\mathit{s}},\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{allocmems}}({\mathit{s}},\, {\mathit{memtype}}~{{\mathit{memtype}'}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{ma}}~{{\mathit{ma}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{ma}}) = {\mathrm{allocmem}}({\mathit{s}},\, {\mathit{memtype}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{ma}'}^\ast}) = {\mathrm{allocmems}}({\mathit{s}}_{{1}},\, {{\mathit{memtype}'}^\ast}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocelem}}({\mathit{s}},\, {\mathit{rt}},\, {{\mathit{ref}}^\ast}) &=& ({\mathit{s}}[\mathsf{elem} = ..{\mathit{ei}}],\, {|{\mathit{s}}.\mathsf{elem}|}) &\quad
+  \mbox{if}~{\mathit{ei}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{type}~{\mathit{rt}},\; \mathsf{elem}~{{\mathit{ref}}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocelems}}({\mathit{s}},\, \epsilon,\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{allocelems}}({\mathit{s}},\, {\mathit{rt}}~{{\mathit{rt}'}^\ast},\, {{\mathit{ref}}^\ast}~{{{\mathit{ref}'}^\ast}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{ea}}~{{\mathit{ea}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{ea}}) = {\mathrm{allocelem}}({\mathit{s}},\, {\mathit{rt}},\, {{\mathit{ref}}^\ast}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{ea}'}^\ast}) = {\mathrm{allocelems}}({\mathit{s}}_{{2}},\, {{\mathit{rt}'}^\ast},\, {{{\mathit{ref}'}^\ast}^\ast}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocdata}}({\mathit{s}},\, {{\mathit{byte}}^\ast}) &=& ({\mathit{s}}[\mathsf{data} = ..{\mathit{di}}],\, {|{\mathit{s}}.\mathsf{data}|}) &\quad
+  \mbox{if}~{\mathit{di}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{data}~{{\mathit{byte}}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocdatas}}({\mathit{s}},\, \epsilon) &=& ({\mathit{s}},\, \epsilon) &  \\
+{\mathrm{allocdatas}}({\mathit{s}},\, {{\mathit{byte}}^\ast}~{{{\mathit{byte}'}^\ast}^\ast}) &=& ({\mathit{s}}_{{2}},\, {\mathit{da}}~{{\mathit{da}'}^\ast}) &\quad
+  \mbox{if}~({\mathit{s}}_{{1}},\, {\mathit{da}}) = {\mathrm{allocdata}}({\mathit{s}},\, {{\mathit{byte}}^\ast}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{da}'}^\ast}) = {\mathrm{allocdatas}}({\mathit{s}}_{{1}},\, {{{\mathit{byte}'}^\ast}^\ast}) \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}table.init{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.init}~\mathit{x}~\mathit{y}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{elem}}{[\mathit{y}]}|} \lor \mathit{j} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[\mathit{x}]}|} \\
-{[\textsc{\scriptsize E{-}table.init{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.init}~\mathit{x}~\mathit{y}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}table.init{-}succ}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{table.init}~\mathit{x}~\mathit{y}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~{\mathit{z}.\mathsf{elem}}{[\mathit{y}]}[\mathit{i}]~(\mathsf{table.set}~\mathit{x})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{table.init}~\mathit{x}~\mathit{y}) &\quad
-  \mbox{otherwise} \\
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{instexport}}({{\mathit{fa}}^\ast},\, {{\mathit{ga}}^\ast},\, {{\mathit{ta}}^\ast},\, {{\mathit{ma}}^\ast},\, \mathsf{export}~{\mathit{name}}~(\mathsf{func}~{\mathit{x}})) &=& \{ \begin{array}[t]{@{}l@{}}
+\mathsf{name}~{\mathit{name}},\; \mathsf{value}~(\mathsf{func}~{{\mathit{fa}}^\ast}[{\mathit{x}}]) \}\end{array} &  \\
+{\mathrm{instexport}}({{\mathit{fa}}^\ast},\, {{\mathit{ga}}^\ast},\, {{\mathit{ta}}^\ast},\, {{\mathit{ma}}^\ast},\, \mathsf{export}~{\mathit{name}}~(\mathsf{global}~{\mathit{x}})) &=& \{ \begin{array}[t]{@{}l@{}}
+\mathsf{name}~{\mathit{name}},\; \mathsf{value}~(\mathsf{global}~{{\mathit{ga}}^\ast}[{\mathit{x}}]) \}\end{array} &  \\
+{\mathrm{instexport}}({{\mathit{fa}}^\ast},\, {{\mathit{ga}}^\ast},\, {{\mathit{ta}}^\ast},\, {{\mathit{ma}}^\ast},\, \mathsf{export}~{\mathit{name}}~(\mathsf{table}~{\mathit{x}})) &=& \{ \begin{array}[t]{@{}l@{}}
+\mathsf{name}~{\mathit{name}},\; \mathsf{value}~(\mathsf{table}~{{\mathit{ta}}^\ast}[{\mathit{x}}]) \}\end{array} &  \\
+{\mathrm{instexport}}({{\mathit{fa}}^\ast},\, {{\mathit{ga}}^\ast},\, {{\mathit{ta}}^\ast},\, {{\mathit{ma}}^\ast},\, \mathsf{export}~{\mathit{name}}~(\mathsf{mem}~{\mathit{x}})) &=& \{ \begin{array}[t]{@{}l@{}}
+\mathsf{name}~{\mathit{name}},\; \mathsf{value}~(\mathsf{mem}~{{\mathit{ma}}^\ast}[{\mathit{x}}]) \}\end{array} &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{allocmodule}}({\mathit{s}},\, {\mathit{module}},\, {{\mathit{externval}}^\ast},\, {{\mathit{val}}^\ast},\, {({{\mathit{ref}}^\ast})^\ast}) &=& ({\mathit{s}}_{{6}},\, {\mathit{mm}}) &\quad
+  \mbox{if}~{\mathit{module}} = \mathsf{module}~{{\mathit{import}}^\ast}~{{\mathit{func}}^{{\mathit{n}}_{{\mathit{func}}}}}~{(\mathsf{global}~{\mathit{globaltype}}~{\mathit{expr}}_{{1}})^{{\mathit{n}}_{{\mathit{global}}}}}~{(\mathsf{table}~{\mathit{tabletype}})^{{\mathit{n}}_{{\mathit{table}}}}}~{(\mathsf{memory}~{\mathit{memtype}})^{{\mathit{n}}_{{\mathit{mem}}}}}~{(\mathsf{elem}~{\mathit{rt}}~{{\mathit{expr}}_{{2}}^\ast}~{\mathit{elemmode}})^{{\mathit{n}}_{{\mathit{elem}}}}}~{(\mathsf{data}~{{\mathit{byte}}^\ast}~{\mathit{datamode}})^{{\mathit{n}}_{{\mathit{data}}}}}~{{\mathit{start}}^?}~{{\mathit{export}}^\ast} \\
+ &&&\quad {\land}~{{\mathit{fa}}_{{\mathit{ex}}}^\ast} = {\mathrm{funcs}}({{\mathit{externval}}^\ast}) \\
+ &&&\quad {\land}~{{\mathit{ga}}_{{\mathit{ex}}}^\ast} = {\mathrm{globals}}({{\mathit{externval}}^\ast}) \\
+ &&&\quad {\land}~{{\mathit{ta}}_{{\mathit{ex}}}^\ast} = {\mathrm{tables}}({{\mathit{externval}}^\ast}) \\
+ &&&\quad {\land}~{{\mathit{ma}}_{{\mathit{ex}}}^\ast} = {\mathrm{mems}}({{\mathit{externval}}^\ast}) \\
+ &&&\quad {\land}~{{\mathit{fa}}^\ast} = {{|{\mathit{s}}.\mathsf{func}|} + {\mathit{i}}_{{\mathit{func}}}^{{\mathit{i}}_{{\mathit{func}}}<{\mathit{n}}_{{\mathit{func}}}}} \\
+ &&&\quad {\land}~{{\mathit{ga}}^\ast} = {{|{\mathit{s}}.\mathsf{global}|} + {\mathit{i}}_{{\mathit{global}}}^{{\mathit{i}}_{{\mathit{global}}}<{\mathit{n}}_{{\mathit{global}}}}} \\
+ &&&\quad {\land}~{{\mathit{ta}}^\ast} = {{|{\mathit{s}}.\mathsf{table}|} + {\mathit{i}}_{{\mathit{table}}}^{{\mathit{i}}_{{\mathit{table}}}<{\mathit{n}}_{{\mathit{table}}}}} \\
+ &&&\quad {\land}~{{\mathit{ma}}^\ast} = {{|{\mathit{s}}.\mathsf{mem}|} + {\mathit{i}}_{{\mathit{mem}}}^{{\mathit{i}}_{{\mathit{mem}}}<{\mathit{n}}_{{\mathit{mem}}}}} \\
+ &&&\quad {\land}~{{\mathit{ea}}^\ast} = {{|{\mathit{s}}.\mathsf{elem}|} + {\mathit{i}}_{{\mathit{elem}}}^{{\mathit{i}}_{{\mathit{elem}}}<{\mathit{n}}_{{\mathit{elem}}}}} \\
+ &&&\quad {\land}~{{\mathit{da}}^\ast} = {{|{\mathit{s}}.\mathsf{data}|} + {\mathit{i}}_{{\mathit{data}}}^{{\mathit{i}}_{{\mathit{data}}}<{\mathit{n}}_{{\mathit{data}}}}} \\
+ &&&\quad {\land}~{{\mathit{xi}}^\ast} = {{\mathrm{instexport}}({{\mathit{fa}}_{{\mathit{ex}}}^\ast}~{{\mathit{fa}}^\ast},\, {{\mathit{ga}}_{{\mathit{ex}}}^\ast}~{{\mathit{ga}}^\ast},\, {{\mathit{ta}}_{{\mathit{ex}}}^\ast}~{{\mathit{ta}}^\ast},\, {{\mathit{ma}}_{{\mathit{ex}}}^\ast}~{{\mathit{ma}}^\ast},\, {\mathit{export}})^\ast} \\
+ &&&\quad {\land}~{\mathit{mm}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{func}~{{\mathit{fa}}_{{\mathit{ex}}}^\ast}~{{\mathit{fa}}^\ast},\; \\
+  \mathsf{global}~{{\mathit{ga}}_{{\mathit{ex}}}^\ast}~{{\mathit{ga}}^\ast},\; \\
+  \mathsf{table}~{{\mathit{ta}}_{{\mathit{ex}}}^\ast}~{{\mathit{ta}}^\ast},\; \\
+  \mathsf{mem}~{{\mathit{ma}}_{{\mathit{ex}}}^\ast}~{{\mathit{ma}}^\ast},\; \\
+  \mathsf{elem}~{{\mathit{ea}}^\ast},\; \\
+  \mathsf{data}~{{\mathit{da}}^\ast},\; \\
+  \mathsf{export}~{{\mathit{xi}}^\ast} \}\end{array} \\
+ &&&\quad {\land}~({\mathit{s}}_{{1}},\, {{\mathit{fa}}^\ast}) = {\mathrm{allocfuncs}}({\mathit{s}},\, {\mathit{mm}},\, {{\mathit{func}}^{{\mathit{n}}_{{\mathit{func}}}}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{2}},\, {{\mathit{ga}}^\ast}) = {\mathrm{allocglobals}}({\mathit{s}}_{{1}},\, {{\mathit{globaltype}}^{{\mathit{n}}_{{\mathit{global}}}}},\, {{\mathit{val}}^\ast}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{3}},\, {{\mathit{ta}}^\ast}) = {\mathrm{alloctables}}({\mathit{s}}_{{2}},\, {{\mathit{tabletype}}^{{\mathit{n}}_{{\mathit{table}}}}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{4}},\, {{\mathit{ma}}^\ast}) = {\mathrm{allocmems}}({\mathit{s}}_{{3}},\, {{\mathit{memtype}}^{{\mathit{n}}_{{\mathit{mem}}}}}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{5}},\, {{\mathit{ea}}^\ast}) = {\mathrm{allocelems}}({\mathit{s}}_{{4}},\, {{\mathit{rt}}^{{\mathit{n}}_{{\mathit{elem}}}}},\, {({{\mathit{ref}}^\ast})^\ast}) \\
+ &&&\quad {\land}~({\mathit{s}}_{{6}},\, {{\mathit{da}}^\ast}) = {\mathrm{allocdatas}}({\mathit{s}}_{{5}},\, {({{\mathit{byte}}^\ast})^{{\mathit{n}}_{{\mathit{data}}}}}) \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}elem.drop}]} \quad & \mathit{z} ; (\mathsf{elem.drop}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{elem}[\mathit{x}] = \epsilon] ; \epsilon &  \\
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{concat}}_{{\mathit{instr}}}(\epsilon) &=& \epsilon &  \\
+{\mathrm{concat}}_{{\mathit{instr}}}({{\mathit{instr}}^\ast}~{{{\mathit{instr}'}^\ast}^\ast}) &=& {{\mathit{instr}}^\ast}~{\mathrm{concat}}_{{\mathit{instr}}}({{{\mathit{instr}'}^\ast}^\ast}) &  \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{runelem}}(\mathsf{elem}~{\mathit{reftype}}~{{\mathit{expr}}^\ast}~(\mathsf{passive}),\, {\mathit{i}}) &=& \epsilon &  \\
+{\mathrm{runelem}}(\mathsf{elem}~{\mathit{reftype}}~{{\mathit{expr}}^\ast}~(\mathsf{declare}),\, {\mathit{i}}) &=& (\mathsf{elem.drop}~{\mathit{i}}) &  \\
+{\mathrm{runelem}}(\mathsf{elem}~{\mathit{reftype}}~{{\mathit{expr}}^\ast}~(\mathsf{active}~{\mathit{x}}~{{\mathit{instr}}^\ast}),\, {\mathit{i}}) &=& {{\mathit{instr}}^\ast}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{i}})~(\mathsf{elem.drop}~{\mathit{i}}) &\quad
+  \mbox{if}~{\mathit{n}} = {|{{\mathit{expr}}^\ast}|} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{rundata}}(\mathsf{data}~{{\mathit{byte}}^\ast}~(\mathsf{passive}),\, {\mathit{i}}) &=& \epsilon &  \\
+{\mathrm{rundata}}(\mathsf{data}~{{\mathit{byte}}^\ast}~(\mathsf{active}~0~{{\mathit{instr}}^\ast}),\, {\mathit{i}}) &=& {{\mathit{instr}}^\ast}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{i}})~(\mathsf{data.drop}~{\mathit{i}}) &\quad
+  \mbox{if}~{\mathit{n}} = {|{{\mathit{byte}}^\ast}|} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{instantiate}}({\mathit{s}},\, {\mathit{module}},\, {{\mathit{externval}}^\ast}) &=& {\mathit{s}'} ; {\mathit{f}} ; {{\mathit{instr}}_{{\mathit{elem}}}^\ast}~{{\mathit{instr}}_{{\mathit{data}}}^\ast}~{(\mathsf{call}~{\mathit{x}})^?} &\quad
+  \mbox{if}~{\mathit{module}} = \mathsf{module}~{{\mathit{import}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{global}}^\ast}~{{\mathit{table}}^\ast}~{{\mathit{mem}}^\ast}~{{\mathit{elem}}^\ast}~{{\mathit{data}}^\ast}~{{\mathit{start}}^?}~{{\mathit{export}}^\ast} \\
+ &&&\quad {\land}~{\mathit{mm}}_{{\mathit{init}}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{func}~{\mathrm{funcs}}({{\mathit{externval}}^\ast}),\; \\
+  \mathsf{global}~{\mathrm{globals}}({{\mathit{externval}}^\ast}),\; \\
+  \mathsf{table}~\epsilon,\; \\
+  \mathsf{mem}~\epsilon,\; \\
+  \mathsf{elem}~\epsilon,\; \\
+  \mathsf{data}~\epsilon,\; \\
+  \mathsf{export}~\epsilon \}\end{array} \\
+ &&&\quad {\land}~{\mathit{f}}_{{\mathit{init}}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{local}~\epsilon,\; \mathsf{module}~{\mathit{mm}}_{{\mathit{init}}} \}\end{array} \\
+ &&&\quad {\land}~{{\mathit{global}}^\ast} = {(\mathsf{global}~{\mathit{globaltype}}~{{\mathit{instr}}_{{1}}^\ast})^\ast} \\
+ &&&\quad {\land}~({\mathit{s}} ; {\mathit{f}}_{{\mathit{init}}} ; {{\mathit{instr}}_{{1}}^\ast} \hookrightarrow {\mathit{val}})^\ast \\
+ &&&\quad {\land}~{{\mathit{elem}}^\ast} = {(\mathsf{elem}~{\mathit{reftype}}~{({{\mathit{instr}}_{{2}}^\ast})^\ast}~{\mathit{elemmode}})^\ast} \\
+ &&&\quad {\land}~{({\mathit{s}} ; {\mathit{f}}_{{\mathit{init}}} ; {{\mathit{instr}}_{{2}}^\ast} \hookrightarrow {\mathit{ref}})^\ast}^\ast \\
+ &&&\quad {\land}~({\mathit{s}'},\, {\mathit{mm}}) = {\mathrm{allocmodule}}({\mathit{s}},\, {\mathit{module}},\, {{\mathit{externval}}^\ast},\, {{\mathit{val}}^\ast},\, {({{\mathit{ref}}^\ast})^\ast}) \\
+ &&&\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{local}~\epsilon,\; \mathsf{module}~{\mathit{mm}} \}\end{array} \\
+ &&&\quad {\land}~{\mathit{n}}_{{\mathit{elem}}} = {|{{\mathit{elem}}^\ast}|} \\
+ &&&\quad {\land}~{{\mathit{instr}}_{{\mathit{elem}}}^\ast} = {\mathrm{concat}}_{{\mathit{instr}}}({{\mathrm{runelem}}({{\mathit{elem}}^\ast}[{\mathit{i}}],\, {\mathit{i}})^{{\mathit{i}}<{\mathit{n}}_{{\mathit{elem}}}}}) \\
+ &&&\quad {\land}~{\mathit{n}}_{{\mathit{data}}} = {|{{\mathit{data}}^\ast}|} \\
+ &&&\quad {\land}~{{\mathit{instr}}_{{\mathit{data}}}^\ast} = {\mathrm{concat}}_{{\mathit{instr}}}({{\mathrm{rundata}}({{\mathit{data}}^\ast}[{\mathit{j}}],\, {\mathit{j}})^{{\mathit{j}}<{\mathit{n}}_{{\mathit{data}}}}}) \\
+ &&&\quad {\land}~{{\mathit{start}}^?} = {(\mathsf{start}~{\mathit{x}})^?} \\
 \end{array}
 $$
 
 \vspace{1ex}
 
 $$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}load{-}num{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathit{nt}.\mathsf{load}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n}_{\mathsf{o}} + {|\mathit{nt}|} / 8 \geq {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}load{-}num{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathit{nt}.\mathsf{load}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~{\mathrm{bytes}}_{{|\mathit{nt}|}}(\mathit{c}) = {\mathit{z}.\mathsf{mem}}{[0]}[\mathit{i} + \mathit{n}_{\mathsf{o}} : {|\mathit{nt}|} / 8] \\
-{[\textsc{\scriptsize E{-}load{-}pack{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~({\mathit{nt}.\mathsf{load}}{{{\mathit{n}}{\mathsf{\_}}}{\mathit{sx}}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n}_{\mathsf{o}} + \mathit{n} / 8 \geq {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}load{-}pack{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~({\mathit{nt}.\mathsf{load}}{{{\mathit{n}}{\mathsf{\_}}}{\mathit{sx}}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& (\mathit{nt}.\mathsf{const}~\mathit{c}) &\quad
-  \mbox{if}~{\mathrm{bytes}}_{\mathit{n}}(\mathit{c}) = {\mathit{z}.\mathsf{mem}}{[0]}[\mathit{i} + \mathit{n}_{\mathsf{o}} : \mathit{n} / 8] \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}store{-}num{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathit{nt}.\mathsf{store}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathit{z} ; \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n}_{\mathsf{o}} + {|\mathit{nt}|} / 8 \geq {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}store{-}num{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~(\mathit{nt}.\mathsf{store}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathit{z}[\mathsf{mem}[0][\mathit{i} + \mathit{n}_{\mathsf{o}} : {|\mathit{nt}|} / 8] = {\mathit{b}^\ast}] ; \epsilon &\quad
-  \mbox{if}~{\mathit{b}^\ast} = {\mathrm{bytes}}_{{|\mathit{nt}|}}(\mathit{c}) \\
-{[\textsc{\scriptsize E{-}store{-}pack{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~({\mathit{nt}.\mathsf{store}}{\mathit{n}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathit{z} ; \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n}_{\mathsf{o}} + \mathit{n} / 8 \geq {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}store{-}pack{-}val}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{c})~({\mathit{nt}.\mathsf{store}}{\mathit{n}}~\mathit{n}_{\mathsf{a}}~\mathit{n}_{\mathsf{o}}) &\hookrightarrow& \mathit{z}[\mathsf{mem}[0][\mathit{i} + \mathit{n}_{\mathsf{o}} : \mathit{n} / 8] = {\mathit{b}^\ast}] ; \epsilon &\quad
-  \mbox{if}~{\mathit{b}^\ast} = {\mathrm{bytes}}_{\mathit{n}}({\mathrm{wrap}}_{{|\mathit{nt}|},\mathit{n}}(\mathit{c})) \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}memory.grow{-}succeed}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.grow}) &\hookrightarrow& \mathit{z}[\mathsf{mem}[0] = ..{0^{\mathit{n} \cdot 64 \cdot \mathrm{Ki}}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}.\mathsf{mem}}{[0]}|}) &  \\
-{[\textsc{\scriptsize E{-}memory.grow{-}fail}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.grow}) &\hookrightarrow& \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~-1) &  \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}memory.fill{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.fill}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}memory.fill{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.fill}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}memory.fill{-}succ}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.fill}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~\mathit{val}~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~\mathit{val}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{memory.fill}) &\quad
-  \mbox{otherwise} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}memory.copy{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.copy}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[0]}|} \lor \mathit{j} + \mathit{n} > {|{\mathit{z}.\mathsf{table}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}memory.copy{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.copy}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}memory.copy{-}le}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.copy}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~({\mathsf{i{\scriptstyle32}}.\mathsf{load}}{{{8}{\mathsf{\_}}}{\mathsf{u}}}~0~0)~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{memory.copy}) &\quad
-  \mbox{otherwise, if}~\mathit{j} \leq \mathit{i} \\
-{[\textsc{\scriptsize E{-}memory.copy{-}gt}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.copy}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + \mathit{n} - 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + \mathit{n} - 1)~({\mathsf{i{\scriptstyle32}}.\mathsf{load}}{{{8}{\mathsf{\_}}}{\mathsf{u}}}~0~0)~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{memory.copy}) &\quad
-  \mbox{otherwise} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}memory.init{-}trap}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.init}~\mathit{x}) &\hookrightarrow& \mathsf{trap} &\quad
-  \mbox{if}~\mathit{i} + \mathit{n} > {|{\mathit{z}.\mathsf{data}}{[\mathit{y}]}|} \lor \mathit{j} + \mathit{n} > {|{\mathit{z}.\mathsf{mem}}{[0]}|} \\
-{[\textsc{\scriptsize E{-}memory.init{-}zero}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.init}~\mathit{x}) &\hookrightarrow& \epsilon &\quad
-  \mbox{otherwise, if}~\mathit{n} = 0 \\
-{[\textsc{\scriptsize E{-}memory.init{-}succ}]} \quad & \mathit{z} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n})~(\mathsf{memory.init}~\mathit{x}) &\hookrightarrow& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{z}.\mathsf{data}}{[\mathit{x}]}[\mathit{i}])~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~0~0)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{j} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{i} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~\mathit{n} - 1)~(\mathsf{memory.init}~\mathit{x}) &\quad
-  \mbox{otherwise} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}lcl@{}l@{}}
-{[\textsc{\scriptsize E{-}data.drop}]} \quad & \mathit{z} ; (\mathsf{data.drop}~\mathit{x}) &\hookrightarrow& \mathit{z}[\mathsf{data}[\mathit{x}] = \epsilon] ; \epsilon &  \\
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{invoke}}({\mathit{s}},\, {\mathit{fa}},\, {{\mathit{val}}^{{\mathit{n}}}}) &=& {\mathit{s}} ; {\mathit{f}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{call}~{\mathit{fa}}) &\quad
+  \mbox{if}~{\mathit{mm}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{func}~\epsilon,\; \\
+  \mathsf{global}~\epsilon,\; \\
+  \mathsf{table}~\epsilon,\; \\
+  \mathsf{mem}~\epsilon,\; \\
+  \mathsf{elem}~\epsilon,\; \\
+  \mathsf{data}~\epsilon,\; \\
+  \mathsf{export}~\epsilon \}\end{array} \\
+ &&&\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{@{}l@{}}
+\mathsf{local}~\epsilon,\; \mathsf{module}~{\mathit{mm}} \}\end{array} \\
+ &&&\quad {\land}~({\mathit{s}} ; {\mathit{f}}).\mathsf{func}[{\mathit{fa}}].\mathsf{code} = \mathsf{func}~{\mathit{ft}}~{{\mathit{local}}^\ast}~{\mathit{e}} \\
+ &&&\quad {\land}~{\mathit{functype}} = {{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{k}}}} \\
 \end{array}
 $$
 

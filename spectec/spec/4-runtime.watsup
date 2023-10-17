@@ -1,4 +1,6 @@
+;;
 ;; Addresses
+;;
 
 syntax addr hint(desc "address") = nat
 syntax funcaddr hint(desc "function address") = addr
@@ -19,7 +21,11 @@ var ea : elemaddr
 var da : dataaddr
 
 
+;;
 ;; Values
+;;
+
+;; Basic values
 
 syntax num hint(desc "number") =
   | CONST numtype c_numtype
@@ -35,37 +41,52 @@ var r : ref
 var v : val
 var res : result
 
+
+;; External values
+
 syntax externval hint(desc "external value") =
   | FUNC funcaddr | GLOBAL globaladdr | TABLE tableaddr | MEM memaddr
 
 var xv : externval
 
 
+;; Auxiliary definition: default values
+
 def $default_(valtype) : val  hint(partial)
 def $default_(I32) = (CONST I32 0)
 def $default_(I64) = (CONST I64 0)
 def $default_(F32) = (CONST F32 0)
 def $default_(F64) = (CONST F64 0)
-def $default_(rt) = (REF.NULL rt)
+def $default_(FUNCREF) = (REF.NULL FUNCREF)
+def $default_(EXTERNREF) = (REF.NULL EXTERNREF) ;; TODO: All reference types should be caught by one pattern.
 
 
+;;
 ;; Configurations
+;;
 
-syntax funcinst hint(desc "function instance") = moduleinst; func
-syntax globalinst hint(desc "global instance") = val
-syntax tableinst hint(desc "table instance") = ref*
-syntax meminst hint(desc "memory instance") = byte*
-syntax eleminst hint(desc "element instance") = ref*
-syntax datainst hint(desc "data instance") = byte*
-syntax exportinst hint(desc "export instance") = EXPORT name externval
+;; Instances
 
-syntax store hint(desc "store") =
-  { FUNC funcinst*,
-    GLOBAL globalinst*,
-    TABLE tableinst*,
-    MEM meminst*,
-    ELEM eleminst*,
-    DATA datainst* }
+syntax funcinst hint(desc "function instance") =
+  { MODULE moduleinst,
+    CODE func }
+syntax globalinst hint(desc "global instance") =
+  { TYPE globaltype,
+    VALUE val }
+syntax tableinst hint(desc "table instance") =
+  { TYPE tabletype,
+    ELEM ref* }
+syntax meminst hint(desc "memory instance") =
+  { TYPE memtype,
+    DATA byte* }
+syntax eleminst hint(desc "element instance") =
+  { TYPE elemtype,
+    ELEM ref* }
+syntax datainst hint(desc "data instance") =
+  { DATA byte* }
+syntax exportinst hint(desc "export instance") =
+  { NAME name,
+    VALUE externval }
 
 syntax moduleinst hint(desc "module instance") =
   { FUNC funcaddr*,
@@ -76,17 +97,7 @@ syntax moduleinst hint(desc "module instance") =
     DATA dataaddr*,
     EXPORT exportinst* }
 
-syntax frame hint(desc "frame") =
-  { LOCAL val*,
-    MODULE moduleinst }
-syntax state hint(desc "state") = store; frame
-syntax config hint(desc "configuration") = state; admininstr*
-
-var s : store
-var f : frame
-var z : state
-
-var m : moduleinst
+var mm : moduleinst
 var fi : funcinst
 var gi : globalinst
 var ti : tableinst
@@ -96,13 +107,46 @@ var di : datainst
 var xi : exportinst
 
 
-;; Auxiliary notation
+;; Configurations proper
+
+syntax store hint(desc "store") =
+  { FUNC funcinst*,
+    GLOBAL globalinst*,
+    TABLE tableinst*,
+    MEM meminst*,
+    ELEM eleminst*,
+    DATA datainst* }
+
+syntax frame hint(desc "frame") =
+  { LOCAL val*,
+    MODULE moduleinst }
+
+syntax state hint(desc "state") = store; frame
+syntax config hint(desc "configuration") = state; admininstr*
+
+var s : store
+var f : frame
+var z : state
+
+
+;; Auxiliary notation: short-hands
 
 def $funcaddr(state) : funcaddr*  hint(show %.MODULE.FUNC)
 def $funcaddr((s; f)) = f.MODULE.FUNC
 
 def $funcinst(state) : funcinst*  hint(show %.FUNC)
+def $globalinst(state) : globalinst*  hint(show %.GLOBAL)
+def $tableinst(state) : tableinst*  hint(show %.TABLE)
+def $meminst(state) : meminst*  hint(show %.MEM)
+def $eleminst(state) : eleminst*  hint(show %.ELEM)
+def $datainst(state) : datainst*  hint(show %.DATA)
+
 def $funcinst((s; f)) = s.FUNC
+def $globalinst((s; f)) = s.GLOBAL
+def $tableinst((s; f)) = s.TABLE
+def $meminst((s; f)) = s.MEM
+def $eleminst((s; f)) = s.ELEM
+def $datainst((s; f)) = s.DATA
 
 def $func(state, funcidx) : funcinst        hint(show %.FUNC#`[%])
 def $global(state, globalidx) : globalinst  hint(show %.GLOBAL#`[%])
@@ -122,25 +166,45 @@ def $local((s; f), x) = f.LOCAL[x]
 
 
 def $with_local(state, localidx, val) : state     hint(show %[.LOCAL[%] = %])
-def $with_global(state, globalidx, val) : state   hint(show %[.GLOBAL[%] = %])
-def $with_table(state, tableidx, nat, ref) : state  hint(show %[.TABLE[%][%] = %])
-def $with_tableext(state, tableidx, ref*) : state hint(show %[.TABLE[%] =.. %])
-def $with_mem(state, tableidx, nat, nat, byte*) : state  hint(show %[.MEM[%][% : %] = %])
-def $with_memext(state, tableidx, byte*) : state  hint(show %[.MEM[%] =.. %])
-def $with_elem(state, elemidx, ref*) : state      hint(show %[.ELEM[%] = %])
-def $with_data(state, dataidx, byte*) : state     hint(show %[.DATA[%] = %])
+def $with_global(state, globalidx, val) : state   hint(show %[.GLOBAL[%].VALUE = %])
+def $with_table(state, tableidx, nat, ref) : state  hint(show %[.TABLE[%].ELEM[%] = %])
+def $with_tableinst(state, tableidx, tableinst) : state hint(show %[.TABLE[%] = %])
+def $with_mem(state, memidx, nat, nat, byte*) : state  hint(show %[.MEM[%].DATA[% : %] = %])
+def $with_meminst(state, memidx, meminst) : state  hint(show %[.MEM[%] = %])
+def $with_elem(state, elemidx, ref*) : state      hint(show %[.ELEM[%].ELEM = %])
+def $with_data(state, dataidx, byte*) : state     hint(show %[.DATA[%].DATA = %])
 
 def $with_local((s; f), x, v) = s; f[.LOCAL[x] = v]
-def $with_global((s; f), x, v) = s[.GLOBAL[f.MODULE.GLOBAL[x]] = v]; f
-def $with_table((s; f), x, i, r) = s[.TABLE[f.MODULE.TABLE[x]][i] = r]; f
-def $with_tableext((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] =.. r*]; f
-def $with_mem((s; f), x, i, j, b*) = s[.MEM[f.MODULE.MEM[x]][i : j] = b*]; f
-def $with_memext((s; f), x, b*) = s[.MEM[f.MODULE.MEM[x]] =.. b*]; f
-def $with_elem((s; f), x, r*) = s[.TABLE[f.MODULE.TABLE[x]] = r*]; f
-def $with_data((s; f), x, b*) = s[.MEM[f.MODULE.MEM[x]] = b*]; f
+def $with_global((s; f), x, v) = s[.GLOBAL[f.MODULE.GLOBAL[x]].VALUE = v]; f
+def $with_table((s; f), x, i, r) = s[.TABLE[f.MODULE.TABLE[x]].ELEM[i] = r]; f
+def $with_tableinst((s; f), x, ti) = s[.TABLE[f.MODULE.TABLE[x]] = ti]; f
+def $with_mem((s; f), x, i, j, b*) = s[.MEM[f.MODULE.MEM[x]].DATA[i : j] = b*]; f
+def $with_meminst((s; f), x, mi) = s[.MEM[f.MODULE.MEM[x]] = mi]; f
+def $with_elem((s; f), x, r*) = s[.ELEM[f.MODULE.ELEM[x]].ELEM = r*]; f
+def $with_data((s; f), x, b*) = s[.DATA[f.MODULE.DATA[x]].DATA = b*]; f
 
 
+;; Auxiliary definitions: Growing store objects
+
+def $grow_table(tableinst, nat, ref) : tableinst hint(partial)
+def $grow_memory(meminst, nat) : meminst hint(partial)
+
+def $grow_table(ti, n, r) = ti'
+  -- if ti = { TYPE `[i .. j] rt, ELEM r'* }
+  -- if i' = $(|r'*| + n)
+  -- if ti' = { TYPE `[i' .. j] rt, ELEM r'* r^n }
+  -- Tabletype_ok: |- ti'.TYPE : OK
+
+def $grow_memory(mi, n) = mi'
+  -- if mi = { TYPE (`[i .. j] I8), DATA b* }
+  -- if i' = $(|b*| / (64 * $Ki) + n)
+  -- if mi' = { TYPE (`[i' .. j] I8), DATA b* 0^(n * 64 * $Ki) }
+  -- Memtype_ok: |- mi'.TYPE : OK
+
+
+;;
 ;; Administrative Instructions
+;;
 
 syntax admininstr hint(show instr) hint(desc "administrative instruction") =
   | instr

@@ -12,15 +12,23 @@ type id = string phrase
 
 type atom =
   | Atom of string               (* atomid *)
+  | Infinity                     (* infinity *)
   | Bot                          (* `_|_` *)
   | Dot                          (* `.` *)
   | Dot2                         (* `..` *)
   | Dot3                         (* `...` *)
   | Semicolon                    (* `;` *)
+  | Backslash                    (* `\` *)
+  | In                           (* `in` *)
   | Arrow                        (* `->` *)
   | Colon                        (* `:` *)
   | Sub                          (* `<:` *)
+  | Assign                       (* `:=` *)
+  | Approx                       (* `~~` *)
   | SqArrow                      (* `~>` *)
+  | SqArrowStar                  (* `~>*` *)
+  | Prec                         (* << *)
+  | Succ                         (* >> *)
   | Turnstile                    (* `|-` *)
   | Tilesturn                    (* `-|` *)
   | LParen                       (* `(` *)
@@ -41,7 +49,7 @@ type iter =
   | Opt                          (* `?` *)
   | List                         (* `*` *)
   | List1                        (* `+` *)
-  | ListN of exp                 (* `^` exp *)
+  | ListN of exp * id option     (* `^` exp *)
 
 
 (* Types *)
@@ -62,8 +70,8 @@ and deftyp' =
   | StructT of typfield list            (* record type *)
   | VariantT of typcase list            (* variant type *)
 
-and typfield = atom * typ * hint list   (* record field *)
-and typcase = atom * typ * hint list    (* variant case *)
+and typfield = atom * (binds * typ * premise list) * hint list   (* record field *)
+and typcase = atom * (binds * typ * premise list) * hint list    (* variant case *)
 
 
 (* Expressions *)
@@ -156,6 +164,7 @@ and premise = premise' phrase
 and premise' =
   | RulePr of id * mixop * exp                        (* premise *)
   | IfPr of exp                                       (* side condition *)
+  | LetPr of exp * exp                                (* assignment *)
   | ElsePr                                            (* otherwise *)
   | IterPr of premise * iterexp                       (* iteration *)
   | NegPr of premise                                  (* negation of a premise *)

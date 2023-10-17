@@ -14,7 +14,7 @@ let error at msg = Source.error at "latex generation" msg
 module Set = Set.Make(String)
 module Map = Map.Make(String)
 
-type rel_sort = TypingRel | ReductionRel
+type rel_sort = TypingRel | ReductionRel | ExpansionRel
 
 type env =
   { config : config;
@@ -168,13 +168,13 @@ and exp_of_typ' = function
   | TupT ts -> TupE (List.map exp_of_typ ts)
   | IterT (t1, iter) -> IterE (exp_of_typ t1, iter)
   | StrT tfs -> StrE (map_nl_list expfield_of_typfield tfs)
-  | CaseT _ -> assert false
+  | CaseT _ | RangeT _ -> assert false
   | AtomT atom -> AtomE atom
   | SeqT ts -> SeqE (List.map exp_of_typ ts)
   | InfixT (t1, atom, t2) -> InfixE (exp_of_typ t1, atom, exp_of_typ t2)
   | BrackT (brack, t1) -> BrackE (brack, exp_of_typ t1)
 
-and expfield_of_typfield (atom, t, _) = (atom, exp_of_typ t)
+and expfield_of_typfield (atom, (t, _prems), _) = (atom, exp_of_typ t)
 
 
 (* Identifiers *)
@@ -187,6 +187,9 @@ let lower = String.lowercase_ascii
 
 let ends_sub id = id <> "" && id.[String.length id - 1] = '_'
 let chop_sub id = String.sub id 0 (String.length id - 1)
+let rec chop_tick id =
+  if id.[String.length id - 1] <> '\'' then id else
+  chop_tick (String.sub id 0 (String.length id - 1))
 
 let rec chop_sub_exp e =
   match e.it with
@@ -219,23 +222,23 @@ let render_id' env style id =
 let rec render_id_sub env style show at = function
   | [] -> ""
   | ""::ss -> render_id_sub env style show at ss
-  | s::ss when style = `Var && is_upper s.[0] && not (Set.mem s !(env.vars)) ->
-    render_id_sub env `Atom show at (lower s ::ss)  (* subscripts may be atoms *)
+  | s::ss when style = `Var && is_upper s.[0] && not (Set.mem (chop_tick s) !(env.vars)) ->
+    render_id_sub env `Atom show at (lower s :: ss)  (* subscripts may be atoms *)
   | s1::""::ss -> render_id_sub env style show at (s1::ss)
   | s1::s2::ss when style = `Atom && is_upper s2.[0] ->
     render_id_sub env `Atom show at ((s1 ^ "_" ^ lower s2)::ss)
   | s::ss ->
-    let rec find_primes i =
-      if i > 0 && s.[i - 1] = '\'' then find_primes (i - 1) else i
+    let rec find_ticks i =
+      if i > 0 && s.[i - 1] = '\'' then find_ticks (i - 1) else i
     in
     let n = String.length s in
-    let i = find_primes n in
+    let i = find_ticks n in
     let s' = String.sub s 0 i in
     let s'' =
       if String.for_all is_digit s' then s' else
       !render_expand_fwd env show (s' $ at) [] (fun () -> render_id' env style s')
     in
-    (if i = n then s'' else "{" ^ s'' ^ String.sub s i (n - i) ^ "}") ^
+    "{" ^ (if i = n then s'' else s'' ^ String.sub s i (n - i)) ^ "}" ^
     (if ss = [] then "" else "_{" ^ render_id_sub env `Var env.show_var at ss ^ "}")
 
 let render_id env style show id =
@@ -270,21 +273,31 @@ let render_rule_deco env pre id1 id2 post =
 let render_atom env = function
   | Atom id when id.[0] = '_' && id <> "_" -> ""
   | Atom id -> render_atomid env id
+  | Infinity -> "\\infty"
   | Bot -> "\\bot"
   | Dot -> "."
   | Dot2 -> ".."
   | Dot3 -> "\\dots"
   | Semicolon -> ";"
+  | Backslash -> "\\setminus"
+  | In -> "\\in"
   | Arrow -> "\\rightarrow"
   | Colon -> ":"
   | Sub -> "\\leq"
+  | Assign -> ":="
+  | Approx -> "\\approx"
   | SqArrow -> "\\hookrightarrow"
+  | SqArrowStar -> "\\hookrightarrow^\\ast"
+  | Prec -> "\\prec"
+  | Succ -> "\\succ"
   | Tilesturn -> "\\dashv"
   | Turnstile ->
     if env.config.macros_for_vdash then
       "\\vdash" ^ env.current_rel
     else
       "\\vdash"
+  | Quest -> "{}^?"
+  | Star -> "{}^\\ast"
 
 let render_brack = function
   | Paren -> "(", ")"
@@ -327,12 +340,12 @@ exception Arity_mismatch
 let rec expand_iter args iter =
   match iter with
   | Opt | List | List1 -> iter
-  | ListN e -> ListN (expand_exp args e)
+  | ListN (e, id_opt) -> ListN (expand_exp args e, id_opt)
 
 and expand_exp args e = expand_exp' args e.it $ e.at
 and expand_exp' args e' =
   match e' with
-  | VarE _ | AtomE _ | BoolE _ | NatE _ | TextE _ | EpsE -> e'
+  | VarE _ | AtomE _ | BoolE _ | NatE _ | HexE _ | CharE _ | TextE _ | EpsE -> e'
   | UnE (op, e) -> UnE (op, expand_exp args e)
   | BinE (e1, op, e2) ->
     let e1' = expand_exp args e1 in
@@ -441,7 +454,10 @@ and render_iter env = function
   | Opt -> "^?"
   | List -> "^\\ast"
   | List1 -> "^{+}"
-  | ListN {it = ParenE (e, _); _} | ListN e -> "^{" ^ render_exp env e ^ "}"
+  | ListN ({it = ParenE (e, _); _}, None) | ListN (e, None) ->
+    "^{" ^ render_exp env e ^ "}"
+  | ListN (e, Some id) ->
+    "^{" ^ render_varid env id ^ "<" ^ render_exp env e ^ "}"
 
 
 (* Types *)
@@ -457,16 +473,18 @@ and render_typ env t =
   | IterT (t1, iter) -> "{" ^ render_typ env t1 ^ render_iter env iter ^ "}"
   | StrT tfs ->
     "\\{\\; " ^
-    "\\begin{array}[t]{@{}l@{}}\n" ^
+    "\\begin{array}[t]{@{}l@{}l@{}}\n" ^
     concat_map_nl ",\\; " "\\\\\n  " (render_typfield env) tfs ^ " \\;\\}" ^
     "\\end{array}"
   | CaseT (dots1, ids, tcases, dots2) ->
     altern_map_nl " ~|~ " " \\\\ &&|&\n" Fun.id
       (render_dots dots1 @ map_nl_list (render_synid env) ids @
         map_nl_list (render_typcase env t.at) tcases @ render_dots dots2)
-  | AtomT atom -> render_typcase env t.at (atom, [], [])
+  | RangeT tes ->
+    altern_map_nl " ~|~ " "\\\\ &&|&\n" (render_typenum env) tes
+  | AtomT atom -> render_typcase env t.at (atom, ([], []), [])
   | SeqT [] -> "\\epsilon"
-  | SeqT ({it = AtomT atom; at; _}::ts) -> render_typcase env at (atom, ts, [])
+  | SeqT ({it = AtomT atom; at; _}::ts) -> render_typcase env at (atom, (ts, []), [])
   | SeqT ts -> render_typs "~" env ts
   | InfixT ({it = SeqT []; _}, atom, t2) ->
     "{" ^ space (render_atom env) atom ^ "}\\;" ^ render_typ env t2
@@ -479,10 +497,11 @@ and render_typs sep env ts =
   concat sep (List.filter ((<>) "") (List.map (render_typ env) ts))
 
 
-and render_typfield env (atom, t, _hints) =
-  render_fieldname env atom t.at ^ "~" ^ render_typ env t
+and render_typfield env (atom, (t, prems), _hints) =
+  render_fieldname env atom t.at ^ "~" ^ render_typ env t ^
+  if prems = [] then "" else render_conditions env "&&&&" prems
 
-and render_typcase env at (atom, ts, _hints) =
+and render_typcase env at (atom, (ts, prems), _hints) =
   let es = List.map exp_of_typ ts in
   render_expand env env.show_case (El.Print.string_of_atom atom $ at) es
     (fun () ->
@@ -497,7 +516,14 @@ and render_typcase env at (atom, ts, _hints) =
         let s2 = render_typs "~" env ts in
         assert (s1 <> "" || s2 <> "");
         if s1 <> "" && s2 <> "" then s1 ^ "~" ^ s2 else s1 ^ s2
-    )
+    ) ^
+    if prems = [] then "" else render_conditions env "&&&&" prems
+
+and render_typenum env (e, eo) =
+  render_exp env e ^
+  match eo with
+  | None -> ""
+  | Some e2 -> " ~|~ \\dots ~|~ " ^ render_exp env e2
 
 
 (* Expressions *)
@@ -518,8 +544,20 @@ and render_exp env e =
   | AtomE atom -> render_expcase env atom [] e.at
   | BoolE b -> render_atom env (Atom (string_of_bool b))
   | NatE n -> string_of_int n
+  | HexE n ->
+    let fmt : (_, _, _) format =
+      if n < 0x100 then "%02X" else
+      if n < 0x10000 then "%04X" else
+      "%X"
+    in "\\mathtt{0x" ^ Printf.sprintf fmt n ^ "}"
+  | CharE n ->
+    let fmt : (_, _, _) format =
+      if n < 0x100 then "%02X" else
+      if n < 0x10000 then "%04X" else
+      "%X"
+    in "\\mathrm{U{+}" ^ Printf.sprintf fmt n ^ "}"
   | TextE t -> "``" ^ t ^ "''"
-  | UnE (op, e2) -> render_unop op ^ render_exp env e2
+  | UnE (op, e2) -> "{" ^ render_unop op ^ render_exp env e2 ^ "}"
   | BinE (e1, ExpOp, ({it = ParenE (e2, _); _ } | e2)) ->
     "{" ^ render_exp env e1 ^ "^{" ^ render_exp env e2 ^ "}}"
   | BinE (e1, op, e2) ->
@@ -623,14 +661,9 @@ and render_expcase env atom es at =
     )
 
 
-let () = render_expand_fwd := render_expand
+(* Premises *)
 
-
-(* Definitions *)
-
-let word s = "\\mbox{" ^ s ^ "}"
-
-let rec render_prem env prem =
+and render_prem env prem =
   match prem.it with
   | RulePr (id, e) -> render_exp {env with current_rel = id.it} e
   | IfPr e -> render_exp env e
@@ -640,6 +673,22 @@ let rec render_prem env prem =
   | IterPr (prem', iter) ->
     "(" ^ render_prem env prem' ^ ")" ^ render_iter env iter
 
+and word s = "\\mbox{" ^ s ^ "}"
+
+and render_conditions env tabs = function
+  | [] -> " & "
+  | [Elem {it = ElsePr; _}] -> " &\\quad\n  " ^ word "otherwise"
+  | (Elem {it = ElsePr; _})::prems ->
+    " &\\quad\n  " ^ word "otherwise, if" ^ "~" ^
+    concat_map_nl (" \\\\\n " ^ tabs ^ "\\quad {\\land}~") "" (render_prem env) prems
+  | prems ->
+    " &\\quad\n  " ^ word "if" ^ "~" ^
+    concat_map_nl (" \\\\\n " ^ tabs ^ "\\quad {\\land}~") "" (render_prem env) prems
+
+
+(* Definitions *)
+
+let () = render_expand_fwd := render_expand
 
 let merge_typ t1 t2 =
   match t1.it, t2.it with
@@ -684,34 +733,25 @@ let render_ruledef env d =
     render_rule_deco env " \\, " id1 id2 ""
   | _ -> failwith "render_ruledef"
 
-let render_conditions env = function
-  | [] -> " & "
-  | [Elem {it = ElsePr; _}] -> " &\\quad\n  " ^ word "otherwise"
-  | (Elem {it = ElsePr; _})::prems ->
-    " &\\quad\n  " ^ word "otherwise, if" ^ "~" ^
-    concat_map_nl " \\\\\n &&&&\\quad {\\land}~" "" (render_prem env) prems
-  | prems ->
-    " &\\quad\n  " ^ word "if" ^ "~" ^
-    concat_map_nl " \\\\\n &&&&\\quad {\\land}~" "" (render_prem env) prems
 
 let render_reddef env d =
   match d.it with
   | RuleD (id1, id2, e, prems) ->
-    let e1, e2 =
+    let e1, op, e2 =
       match e.it with
-      | InfixE (e1, SqArrow, e2) -> e1, e2
+      | InfixE (e1, op, e2) -> e1, op, e2
       | _ -> error e.at "unrecognized format for reduction rule"
     in
     render_rule_deco env "" id1 id2 " \\quad " ^ "& " ^
-      render_exp env e1 ^ " &" ^ render_atom env SqArrow ^ "& " ^
-        render_exp env e2 ^ render_conditions env prems
+      render_exp env e1 ^ " &" ^ render_atom env op ^ "& " ^
+        render_exp env e2 ^ render_conditions env "&&&&" prems
   | _ -> failwith "render_reddef"
 
 let render_funcdef env d =
   match d.it with
   | DefD (id1, e1, e2, prems) ->
     render_exp env (CallE (id1, e1) $ d.at) ^ " &=& " ^
-      render_exp env e2 ^ render_conditions env prems
+      render_exp env e2 ^ render_conditions env "&&&" prems
   | _ -> failwith "render_funcdef"
 
 let rec render_sep_defs ?(sep = " \\\\\n") ?(br = " \\\\[0.8ex]\n") f = function
@@ -724,7 +764,8 @@ let rec render_sep_defs ?(sep = " \\\\\n") ?(br = " \\\\[0.8ex]\n") f = function
 let rec classify_rel e : rel_sort option =
   match e.it with
   | InfixE (_, Turnstile, _) -> Some TypingRel
-  | InfixE (_, SqArrow, _) -> Some ReductionRel
+  | InfixE (_, (SqArrow | SqArrowStar), _) -> Some ReductionRel
+  | InfixE (_, Approx, _) -> Some ExpansionRel
   | InfixE (e1, _, e2) ->
     (match classify_rel e1 with
     | None -> classify_rel e2
@@ -740,7 +781,7 @@ let rec render_defs env = function
     | SynD _ ->
       let ds' = merge_syndefs ds in
       let deco = if env.deco_syn then "l" else "l@{}" in
-      "\\begin{array}{@{}" ^ deco ^ "rrl@{}}\n" ^
+      "\\begin{array}{@{}" ^ deco ^ "rrl@{}l@{}}\n" ^
         render_sep_defs (render_syndef env) ds' ^
       "\\end{array}"
     | RelD (id, t, _hints) ->
@@ -756,6 +797,10 @@ let rec render_defs env = function
             (render_ruledef env) ds ^
         "\\end{array}"
       | Some ReductionRel ->
+        "\\begin{array}{@{}l@{}lcl@{}l@{}}\n" ^
+          render_sep_defs (render_reddef env) ds ^
+        "\\end{array}"
+      | Some ExpansionRel ->
         "\\begin{array}{@{}l@{}lcl@{}l@{}}\n" ^
           render_sep_defs (render_reddef env) ds ^
         "\\end{array}"
@@ -815,6 +860,10 @@ let rec render_script env = function
         "$$\n" ^ render_def env d ^ "\n$$\n\n" ^
         render_script env ds
       | Some ReductionRel ->
+        let reddefs, ds' = split_reddefs id1.it [d] ds in
+        "$$\n" ^ render_defs env reddefs ^ "\n$$\n\n" ^
+        render_script env ds'
+      | Some ExpansionRel ->
         let reddefs, ds' = split_reddefs id1.it [d] ds in
         "$$\n" ^ render_defs env reddefs ^ "\n$$\n\n" ^
         render_script env ds'

@@ -14,15 +14,23 @@ let space f x = " " ^ f x ^ " "
 
 let string_of_atom = function
   | Atom atomid -> atomid
+  | Infinity -> "infinity"
   | Bot -> "_|_"
   | Dot -> "."
   | Dot2 -> ".."
   | Dot3 -> "..."
   | Semicolon -> ";"
+  | Backslash -> "\\"
+  | In -> "in"
   | Arrow -> "->"
   | Colon -> ":"
   | Sub -> "<:"
+  | Assign -> ":="
+  | Approx -> "~~"
   | SqArrow -> "~>"
+  | SqArrowStar -> "~>*"
+  | Prec -> "<<"
+  | Succ -> ">>"
   | Tilesturn -> "-|"
   | Turnstile -> "|-"
   | LParen -> "("
@@ -76,7 +84,9 @@ let rec string_of_iter iter =
   | Opt -> "?"
   | List -> "*"
   | List1 -> "+"
-  | ListN e -> "^" ^ string_of_exp e
+  | ListN (e, None) -> "^" ^ string_of_exp e
+  | ListN (e, Some id) ->
+    "^(" ^ id.it ^ "<" ^ string_of_exp e ^ ")"
 
 and string_of_typ t =
   match t.it with
@@ -107,11 +117,15 @@ and string_of_typ_mix mixop t =
   if mixop = [[]; []] then string_of_typ t else
   string_of_mixop mixop ^ string_of_typ_args t
 
-and string_of_typfield (atom, t, _hints) =
-  string_of_atom atom ^ " " ^ string_of_typ t
+and string_of_typfield (atom, (binds, t, prems), _hints) =
+  string_of_binds binds ^
+  string_of_atom atom ^ " " ^ string_of_typ t ^
+    concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
-and string_of_typcase (atom, t, _hints) =
-  string_of_atom atom ^ string_of_typ_args t
+and string_of_typcase (atom, (binds, t, prems), _hints) =
+  string_of_binds binds ^
+  string_of_atom atom ^ string_of_typ_args t ^
+    concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
 
 (* Expressions *)
@@ -183,27 +197,30 @@ and string_of_iterexp (iter, ids) =
   string_of_iter iter ^ "{" ^ String.concat " " (List.map Source.it ids) ^ "}"
 
 
-(* Definitions *)
+(* Premises *)
 
-let string_of_bind (id, t, iters) =
-  let dim = String.concat "" (List.map string_of_iter iters) in
-  id.it ^ dim ^ " : " ^ string_of_typ t ^ dim
-
-let string_of_binds = function
-  | [] -> ""
-  | binds -> " {" ^ concat ", " (List.map string_of_bind binds) ^ "}"
-
-
-let rec string_of_prem prem =
+and string_of_prem prem =
   match prem.it with
   | RulePr (id, op, e) -> id.it ^ ": " ^ string_of_exp {e with it = MixE (op, e)}
   | IfPr e -> "if " ^ string_of_exp e
+  | LetPr (e1, e2) -> "where " ^ string_of_exp e1 ^ " = " ^ string_of_exp e2
   | ElsePr -> "otherwise"
   | IterPr ({it = IterPr _; _} as prem', iter) ->
     string_of_prem prem' ^ string_of_iterexp iter
   | IterPr (prem', iter) ->
     "(" ^ string_of_prem prem' ^ ")" ^ string_of_iterexp iter
   | NegPr prem' -> "unless " ^ string_of_prem prem'
+
+
+(* Definitions *)
+
+and string_of_bind (id, t, iters) =
+  let dim = String.concat "" (List.map string_of_iter iters) in
+  id.it ^ dim ^ " : " ^ string_of_typ t ^ dim
+
+and string_of_binds = function
+  | [] -> ""
+  | binds -> " {" ^ concat ", " (List.map string_of_bind binds) ^ "}"
 
 let region_comment indent at =
   if at = no_region then "" else
