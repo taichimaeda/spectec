@@ -39,8 +39,8 @@ type syntax = {sdef : El.Ast.def; sfragments : (string * El.Ast.def * use) list}
 type grammar = {gdef : El.Ast.def; gfragments : (string * El.Ast.def * use) list}
 type relation = {rdef : El.Ast.def; rules : (string * El.Ast.def * use) list}
 type definition = {fdef : El.Ast.def; clauses : El.Ast.def list; use : use}
-type relation_prose = {ralgos : (string * Backend_prose.Prose.def * use) list}
-type definition_prose = {falgo : Backend_prose.Prose.def; use : use}
+type relation_prose = {rprose : (string * Backend_prose.Prose.def * use) list}
+type definition_prose = {fprose : Backend_prose.Prose.def; use : use}
 
 type env =
   { elab : Frontend.Elab.env;
@@ -97,14 +97,14 @@ let env_prose env prose =
   match prose with
   | Pred ((id, _), _, _) ->
     let relation = Map.find valid_id env.rel_prose in
-    let ralgos = (normalize_id id, prose, ref 0) :: relation.ralgos in
-    env.rel_prose <- Map.add valid_id {ralgos} env.rel_prose
+    let rprose = (normalize_id id, prose, ref 0) :: relation.rprose in
+    env.rel_prose <- Map.add valid_id {rprose} env.rel_prose
   | Algo (Al.Ast.RuleA ((id, _), _, _)) ->
     let relation = Map.find exec_id env.rel_prose in
-    let ralgos = (normalize_id id, prose, ref 0) :: relation.ralgos in
-    env.rel_prose <- Map.add exec_id {ralgos} env.rel_prose
+    let rprose = (normalize_id id, prose, ref 0) :: relation.rprose in
+    env.rel_prose <- Map.add exec_id {rprose} env.rel_prose
   | Algo (Al.Ast.FuncA (id, _, _)) ->
-    env.def_prose <- Map.add id {falgo = prose; use = ref 0} env.def_prose
+    env.def_prose <- Map.add id {fprose = prose; use = ref 0} env.def_prose
 
 let env (config : config) pdsts odsts elab el pr : env =
   let latex = Backend_latex.Render.env config.latex el in
@@ -115,7 +115,7 @@ let env (config : config) pdsts odsts elab el pr : env =
       gram = Map.empty;
       rel = Map.empty;
       def = Map.empty;
-      rel_prose = Map.(add valid_id {ralgos = []} (add exec_id {ralgos = []} empty));
+      rel_prose = Map.(add valid_id {rprose = []} (add exec_id {rprose = []} empty));
       def_prose = Map.empty;
     }
   in
@@ -145,8 +145,8 @@ let warn_math env =
   ) env.def
 
 let warn_prose env =
-  Map.iter (fun id1 {ralgos} ->
-    List.iter (fun (id2, _, use) -> warn_use use "rule prose" id1 id2) ralgos
+  Map.iter (fun id1 {rprose} ->
+    List.iter (fun (id2, _, use) -> warn_use use "rule prose" id1 id2) rprose
   ) env.rel_prose;
   Map.iter (fun id1 ({use; _} : definition_prose) ->
     warn_use use "definition prose" id1 ""
@@ -210,13 +210,13 @@ let find_def env src id1 id2 =
 let find_rule_prose env src id1 id2 =
   match Map.find_opt id1 env.rel_prose with
   | None -> error src ("unknown prose relation identifier `" ^ id1 ^ "`")
-  | Some relation -> find_entry "prose rule" src id1 id2 relation.ralgos
+  | Some relation -> find_entry "prose rule" src id1 id2 relation.rprose
 
 let find_def_prose env src id1 id2 =
   find_nosub "definition" src id1 id2;
   match Map.find_opt id1 env.def_prose with
   | None -> error src ("unknown prose definition identifier `" ^ id1 ^ "`")
-  | Some definition -> incr definition.use; definition.falgo
+  | Some definition -> incr definition.use; definition.fprose
 
 
 (* Parsing *)
