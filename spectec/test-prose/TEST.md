@@ -93,15 +93,10 @@ validation_of_TESTOP t testop
 validation_of_RELOP t relop
 - The instruction is valid with type ([t, t] -> [I32]).
 
-validation_of_CVTOP t_1 REINTERPRET t_2 ?()
-- t_1 must be different with t_2.
-- $size(t_1) must be equal to $size(t_2).
-- The instruction is valid with type ([t_2] -> [t_1]).
-
-validation_of_CVTOP inn_1 CONVERT inn_2 sx?
-- inn_1 must be different with inn_2.
-- (($size(inn_1) > $size(inn_2))) and ((sx? is ?())) are equivalent.
-- The instruction is valid with type ([inn_2] -> [inn_1]).
+validation_of_CVTOP nt_1 REINTERPRET nt_2 ?()
+- nt_1 must be different with nt_2.
+- $size(nt_1) must be equal to $size(nt_2).
+- The instruction is valid with type ([nt_2] -> [nt_1]).
 
 validation_of_LOCAL.GET x
 - |C.LOCAL| must be greater than x.
@@ -1010,11 +1005,6 @@ validation_of_CVTOP nt_1 REINTERPRET nt_2 ?()
 - nt_1 must be different with nt_2.
 - $size(nt_1) must be equal to $size(nt_2).
 - The instruction is valid with type ([nt_2] -> [nt_1]).
-
-validation_of_CVTOP inn_1 CONVERT inn_2 sx?
-- inn_1 must be different with inn_2.
-- (($size(inn_1) > $size(inn_2))) and ((sx? is ?())) are equivalent.
-- The instruction is valid with type ([inn_2] -> [inn_1]).
 
 validation_of_REF.NULL rt
 - The instruction is valid with type ([] -> [rt]).
@@ -2818,11 +2808,6 @@ validation_of_CVTOP nt_1 REINTERPRET nt_2 ?()
 - nt_1 must be different with nt_2.
 - $size(nt_1) must be equal to $size(nt_2).
 - The instruction is valid with type ([nt_2] -> [nt_1]).
-
-validation_of_CVTOP inn_1 CONVERT inn_2 sx?
-- inn_1 must be different with inn_2.
-- (($size(inn_1) > $size(inn_2))) and ((sx? is ?())) are equivalent.
-- The instruction is valid with type ([inn_2] -> [inn_1]).
 
 validation_of_REF.NULL ht
 - Under the context C, ht must be valid.

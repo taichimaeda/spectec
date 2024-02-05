@@ -692,7 +692,6 @@ warning: rule `Instr_ok/binop` was never spliced
 warning: rule `Instr_ok/testop` was never spliced
 warning: rule `Instr_ok/relop` was never spliced
 warning: rule `Instr_ok/extend` was never spliced
-warning: rule `Instr_ok/reinterpret` was never spliced
 warning: rule `Instr_ok/ref.null` was never spliced
 warning: rule `Instr_ok/ref.func` was never spliced
 warning: rule `Instr_ok/ref.i31` was never spliced
@@ -1346,7 +1345,6 @@ warning: rule prose `valid/ref.is_null` was never spliced
 warning: rule prose `valid/ref.i31` was never spliced
 warning: rule prose `valid/ref.func` was never spliced
 warning: rule prose `valid/ref.null` was never spliced
-warning: rule prose `valid/cvtop` was never spliced
 warning: rule prose `valid/cvtop` was never spliced
 warning: rule prose `valid/extend` was never spliced
 warning: rule prose `valid/relop` was never spliced

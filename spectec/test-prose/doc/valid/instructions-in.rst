@@ -65,10 +65,7 @@ $${rule-prose: valid/cvtop}
 
 \
 
-$${rule+: 
-  Instr_ok/reinterpret
-  Instr_ok/convert-*
-}
+$${rule+: Instr_ok/cvtop-*}
 
 Reference Instructions
 ~~~~~~~~~~~~~~~~~~~~~~

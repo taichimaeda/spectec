@@ -2627,19 +2627,19 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= $size(nt <: valtype))
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([(nt_2 <: valtype)], [(nt_1 <: valtype)]))
     -- if (nt_1 =/= nt_2)
     -- if ($size(nt_1 <: valtype) = $size(nt_2 <: valtype))
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
     `%|-%:%`(C, CVTOP_instr((inn_1 <: numtype), CONVERT_cvtop, (inn_2 <: numtype), sx?{sx}), `%->%`([(inn_2 <: valtype)], [(inn_1 <: valtype)]))
     -- if (inn_1 =/= inn_2)
     -- if ((sx?{sx} = ?()) <=> ($size(inn_1 <: valtype) > $size(inn_2 <: valtype)))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr((fnn_1 <: numtype), CONVERT_cvtop, (fnn_2 <: numtype), ?()), `%->%`([(fnn_2 <: valtype)], [(fnn_1 <: valtype)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -7551,19 +7551,19 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= $size($valtype_numtype(nt)))
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if (nt_1 =/= nt_2)
     -- if ($size($valtype_numtype(nt_1)) = $size($valtype_numtype(nt_2)))
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if (inn_1 =/= inn_2)
     -- if ((sx?{sx} = ?()) <=> ($size($valtype_inn(inn_1)) > $size($valtype_inn(inn_2))))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -12478,19 +12478,19 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= !($size($valtype_numtype(nt))))
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if (nt_1 =/= nt_2)
     -- if (!($size($valtype_numtype(nt_1))) = !($size($valtype_numtype(nt_2))))
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if (inn_1 =/= inn_2)
     -- if ((sx?{sx} = ?()) <=> (!($size($valtype_inn(inn_1))) > !($size($valtype_inn(inn_2)))))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -17406,7 +17406,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= o0)
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if ($size($valtype_numtype(nt_1)) = ?(o0))
     -- if ($size($valtype_numtype(nt_2)) = ?(o1))
@@ -17414,7 +17414,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (o0 = o1)
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if ($size($valtype_inn(inn_1)) = ?(o0))
     -- if ($size($valtype_inn(inn_2)) = ?(o1))
@@ -17422,7 +17422,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ((sx?{sx} = ?()) <=> (o0 > o1))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -22358,7 +22358,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= o0)
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if ($size($valtype_numtype(nt_1)) = ?(o0))
     -- if ($size($valtype_numtype(nt_2)) = ?(o1))
@@ -22366,7 +22366,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (o0 = o1)
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if ($size($valtype_inn(inn_1)) = ?(o0))
     -- if ($size($valtype_inn(inn_2)) = ?(o1))
@@ -22374,7 +22374,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ((sx?{sx} = ?()) <=> (o0 > o1))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -27343,7 +27343,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= o0)
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if ($size($valtype_numtype(nt_1)) = ?(o0))
     -- if ($size($valtype_numtype(nt_2)) = ?(o1))
@@ -27351,7 +27351,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (o0 = o1)
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if ($size($valtype_inn(inn_1)) = ?(o0))
     -- if ($size($valtype_inn(inn_2)) = ?(o1))
@@ -27359,7 +27359,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ((sx?{sx} = ?()) <=> (o0 > o1))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
@@ -32457,7 +32457,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if (n <= o0)
 
   ;; 6-typing.watsup:700.1-703.34
-  rule reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
+  rule cvtop-reinterpret {C : context, nt_1 : numtype, nt_2 : numtype, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr(nt_1, REINTERPRET_cvtop, nt_2, ?()), `%->%`([$valtype_numtype(nt_2)], [$valtype_numtype(nt_1)]))
     -- if (nt_1 =/= nt_2)
     -- where ?(o1) = $size($valtype_numtype(nt_2))
@@ -32465,7 +32465,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ($size($valtype_numtype(nt_1)) = ?(o0))
 
   ;; 6-typing.watsup:705.1-708.50
-  rule convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
+  rule cvtop-convert-i {C : context, inn_1 : inn, inn_2 : inn, sx? : sx?, o0 : nat, o1 : nat}:
     `%|-%:%`(C, CVTOP_instr($numtype_inn(inn_1), CONVERT_cvtop, $numtype_inn(inn_2), sx?{sx}), `%->%`([$valtype_inn(inn_2)], [$valtype_inn(inn_1)]))
     -- if (inn_1 =/= inn_2)
     -- where ?(o0) = $size($valtype_inn(inn_1))
@@ -32473,7 +32473,7 @@ relation Instr_ok: `%|-%:%`(context, instr, functype)
     -- if ((sx?{sx} = ?()) <=> (o0 > o1))
 
   ;; 6-typing.watsup:710.1-712.24
-  rule convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
+  rule cvtop-convert-f {C : context, fnn_1 : fnn, fnn_2 : fnn}:
     `%|-%:%`(C, CVTOP_instr($numtype_fnn(fnn_1), CONVERT_cvtop, $numtype_fnn(fnn_2), ?()), `%->%`([$valtype_fnn(fnn_2)], [$valtype_fnn(fnn_1)]))
     -- if (fnn_1 =/= fnn_2)
 
