@@ -194,7 +194,20 @@ let () =
     let al =
       if !target = Check || not (PS.mem Animate !selected_passes) then [] else (
         log "Translating to AL...";
-        (Il2al.Translate.translate il @ Backend_interpreter.Manual.manual_algos)
+        let get_name = function
+          | Al.Ast.RuleA ((id, _), _, _) -> id
+          | Al.Ast.FuncA (id, _, _) -> id
+        in
+        let al_manual = Backend_interpreter.Manual.manual_algos in
+        let names_manual = List.map get_name al_manual in
+        let al_translated =
+          List.filter
+            (fun algo ->
+              let name_translated = get_name algo in
+              not (List.mem name_translated names_manual))
+            (Il2al.Translate.translate il)
+        in
+        al_translated @ al_manual
       )
     in
 

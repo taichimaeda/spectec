@@ -1211,7 +1211,6 @@ warning: rule prose `exec/array.copy` was never spliced
 warning: rule prose `exec/array.fill` was never spliced
 warning: rule prose `exec/array.len` was never spliced
 warning: rule prose `exec/array.get` was never spliced
-warning: rule prose `exec/array.new_data` was never spliced
 warning: rule prose `exec/array.new_elem` was never spliced
 warning: rule prose `exec/array.new_default` was never spliced
 warning: rule prose `exec/array.new` was never spliced
@@ -1222,7 +1221,6 @@ warning: rule prose `exec/ref.test` was never spliced
 warning: rule prose `exec/ref.func` was never spliced
 warning: rule prose `exec/return_call_ref` was never spliced
 warning: rule prose `exec/return_call` was never spliced
-warning: rule prose `exec/call_ref` was never spliced
 warning: rule prose `exec/call` was never spliced
 warning: rule prose `exec/br_on_cast_fail` was never spliced
 warning: rule prose `exec/br_on_cast` was never spliced

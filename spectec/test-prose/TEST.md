@@ -4597,9 +4597,6 @@ execution_of_CALL x
 2. Push (REF.FUNC_ADDR $funcaddr()[x]) to the stack.
 3. Execute (CALL_REF ?()).
 
-execution_of_CALL_REF
-1. YetI: TODO: It is likely that the value stack of two rules are different.
-
 execution_of_RETURN_CALL x
 1. Assert: Due to validation, (x < |$funcaddr()|).
 2. Push (REF.FUNC_ADDR $funcaddr()[x]) to the stack.
@@ -4707,21 +4704,6 @@ execution_of_ARRAY.NEW_ELEM x y
 6. Let ref^n be $elem(y).ELEM[i : n].
 7. Push ref^n to the stack.
 8. Execute (ARRAY.NEW_FIXED x n).
-
-execution_of_ARRAY.NEW_DATA x y
-1. Assert: Due to validation, a value of value type I32 is on the top of the stack.
-2. Pop (I32.CONST n) from the stack.
-3. Assert: Due to validation, a value of value type I32 is on the top of the stack.
-4. Pop (I32.CONST i) from the stack.
-5. Assert: Due to validation, $expanddt($type(x)) is of the case ARRAY.
-6. Let (ARRAY y_0) be $expanddt($type(x)).
-7. Let (mut, zt) be y_0.
-8. If ((i + ((n · $storagesize(zt)) / 8)) > |$data(y).DATA|), then:
-  a. Trap.
-9. Let $ztbytes(zt, c)^n be $inverse_of_concat_bytes($data(y).DATA[i : ((n · $storagesize(zt)) / 8)]).
-10. Let nt be $unpacknumtype(zt).
-11. Push (nt.CONST c)^n to the stack.
-12. Execute (ARRAY.NEW_FIXED x n).
 
 execution_of_ARRAY.GET sx? x
 1. Assert: Due to validation, a value of value type I32 is on the top of the stack.

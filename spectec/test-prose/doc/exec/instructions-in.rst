@@ -801,8 +801,7 @@ $${rule-prose: exec/call}
 
 $${rule: Step_read/call}
 
-CALL_REF
-^^^^^^^^
+.. _exec-call_ref:
 
 $${rule-prose: exec/call_ref}
 
