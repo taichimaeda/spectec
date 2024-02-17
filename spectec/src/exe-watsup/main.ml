@@ -15,6 +15,7 @@ type target =
  | Prose
  | Splice of Backend_splice.Config.t
  | Interpreter of string list
+ | Coq
 
 type pass =
   | Sub
@@ -130,6 +131,7 @@ let argspec = Arg.align
   "--prose", Arg.Unit (fun () -> target := Prose), " Generate prose";
   "--interpreter", Arg.Rest_all (fun args -> target := Interpreter args),
     " Generate interpreter";
+  "--coq", Arg.Unit (fun () -> target := Coq), " Generate Coq";
 
   "--print-el", Arg.Set print_el, " Print EL";
   "--print-il", Arg.Set print_elab_il, " Print IL (after elaboration)";
@@ -169,6 +171,8 @@ let () =
     (match !target with
     | Prose | Splice _ | Interpreter _ ->
       enable_pass Sideconditions; enable_pass Animate
+    | Coq ->
+      enable_pass Sub; enable_pass Totalize; enable_pass Unthe; enable_pass Wild; enable_pass Sideconditions
     | _ -> ()
     );
 
@@ -255,6 +259,15 @@ let () =
       Backend_interpreter.Ds.init al;
       log "Interpreting...";
       Backend_interpreter.Runner.run args
+    | Coq ->
+      log "Coq generation...";
+      (match !odsts with
+      | [] -> print_endline (Backend_coq.Gen.gen_string il)
+      | [odst] -> Backend_coq.Gen.gen_file odst il
+      | _ ->
+        prerr_endline "too many output file names";
+        exit 2
+      )
     );
     log "Complete."
   with
