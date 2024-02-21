@@ -166,12 +166,12 @@ The attribute of the complete production then is the abstract syntax for the lim
 <li><p><span class="math notranslate nohighlight">\(||B||\)</span> is the length of the byte sequence generated from the production <span class="math notranslate nohighlight">\(B\)</span> in a derivation.</p></li>
 </ul>
 </section>
-<section id="vectors">
-<span id="binary-vec"></span><span id="index-2"></span><h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this heading">¶</a></h2>
-<p><a class="reference internal" href="../syntax/conventions.html#syntax-vec"><span class="std std-ref">Vectors</span></a> are encoded with their <span class="math notranslate nohighlight">\(\href{../binary/values.html#binary-int}{\def\mathdef1428#1{{\mathtt{u}#1}}\mathdef1428{\mathtt{32}}}\)</span> length followed by the encoding of their element sequence.</p>
+<section id="lists">
+<span id="binary-list"></span><span id="index-2"></span><h2>Lists<a class="headerlink" href="#lists" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="../syntax/conventions.html#syntax-list"><span class="std std-ref">Lists</span></a> are encoded with their <span class="math notranslate nohighlight">\(\href{../binary/values.html#binary-int}{\def\mathdef1428#1{{\mathtt{u}#1}}\mathdef1428{\mathtt{32}}}\)</span> length followed by the encoding of their element sequence.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llclll&#64;{\qquad\qquad}l}
-\def\mathdef1423#1{{}}\mathdef1423{vector} &amp; \href{../binary/conventions.html#binary-vec}{\mathtt{vec}}(\mathtt{B}) &amp;::=&amp;
+\def\mathdef1423#1{{}}\mathdef1423{list} &amp; \href{../binary/conventions.html#binary-list}{\mathtt{list}}(\mathtt{B}) &amp;::=&amp;
   n{:}\href{../binary/values.html#binary-int}{\def\mathdef1428#1{{\mathtt{u}#1}}\mathdef1428{\mathtt{32}}}~~(x{:}\mathtt{B})^n &amp;\Rightarrow&amp; x^n \\
 \end{array}\end{split}\]</div>
 </section>

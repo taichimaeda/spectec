@@ -171,7 +171,7 @@
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llclll&#64;{\qquad\qquad}l}
 \def\mathdef4160#1{{}}\mathdef4160{function type} &amp; \href{../text/types.html#text-functype}{\mathtt{functype}}_I &amp;::=&amp;
-  \def\mathdef4281#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4281{(}~\def\mathdef4282#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4282{func}~~t_1^\ast{:\,}\href{../text/conventions.html#text-vec}{\mathtt{vec}}(\href{../text/types.html#text-functype}{\mathtt{param}}_I)~~t_2^\ast{:\,}\href{../text/conventions.html#text-vec}{\mathtt{vec}}(\href{../text/types.html#text-functype}{\mathtt{result}}_I)~\def\mathdef4283#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4283{)}
+  \def\mathdef4281#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4281{(}~\def\mathdef4282#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4282{func}~~t_1^\ast{:\,}\href{../text/conventions.html#text-list}{\mathtt{list}}(\href{../text/types.html#text-functype}{\mathtt{param}}_I)~~t_2^\ast{:\,}\href{../text/conventions.html#text-list}{\mathtt{list}}(\href{../text/types.html#text-functype}{\mathtt{result}}_I)~\def\mathdef4283#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4283{)}
     &amp;\Rightarrow&amp; [t_1^\ast] \mathrel{\href{../syntax/types.html#syntax-instrtype}{\rightarrow}} [t_2^\ast] \\
 \def\mathdef4160#1{{}}\mathdef4160{parameter} &amp; \href{../text/types.html#text-functype}{\mathtt{param}}_I &amp;::=&amp;
   \def\mathdef4284#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4284{(}~\def\mathdef4285#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4285{param}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~t{:}\href{../text/types.html#text-valtype}{\mathtt{valtype}}_I~\def\mathdef4286#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4286{)}
@@ -207,7 +207,7 @@ They cannot be referenced from anywhere.</p>
   \def\mathdef4302#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4302{(}~\def\mathdef4303#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4303{array}~~\mathit{ft}{:}\href{../text/types.html#text-fieldtype}{\mathtt{fieldtype}}_I~\def\mathdef4304#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4304{)}
     &amp;\Rightarrow&amp; \mathit{ft} \\
 \def\mathdef4160#1{{}}\mathdef4160{structure type} &amp; \href{../text/types.html#text-structtype}{\mathtt{structtype}}_I &amp;::=&amp;
-  \def\mathdef4305#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4305{(}~\def\mathdef4306#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4306{struct}~~\mathit{ft}^\ast{:\,}\href{../text/conventions.html#text-vec}{\mathtt{vec}}(\href{../text/types.html#text-structtype}{\mathtt{field}}_I)~\def\mathdef4307#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4307{)}
+  \def\mathdef4305#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4305{(}~\def\mathdef4306#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4306{struct}~~\mathit{ft}^\ast{:\,}\href{../text/conventions.html#text-list}{\mathtt{list}}(\href{../text/types.html#text-structtype}{\mathtt{field}}_I)~\def\mathdef4307#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4307{)}
     &amp;\Rightarrow&amp; \mathit{ft}^\ast \\
 \def\mathdef4160#1{{}}\mathdef4160{field} &amp; \href{../text/types.html#text-structtype}{\mathtt{field}}_I &amp;::=&amp;
   \def\mathdef4308#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4308{(}~\def\mathdef4309#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4309{field}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~\mathit{ft}{:}\href{../text/types.html#text-fieldtype}{\mathtt{fieldtype}}_I~\def\mathdef4310#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4310{)}
@@ -257,13 +257,13 @@ They cannot be referenced from anywhere.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llclll&#64;{\qquad\qquad}l}
 \def\mathdef4160#1{{}}\mathdef4160{recursive type} &amp; \href{../text/types.html#text-rectype}{\mathtt{rectype}}_I &amp;::=&amp;
-  \def\mathdef4322#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4322{(}~\def\mathdef4323#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4323{rec}~~\mathit{st}^\ast{:\,}\href{../text/conventions.html#text-vec}{\mathtt{vec}}(\href{../text/types.html#text-typedef}{\mathtt{typedef}}_I)~\def\mathdef4324#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4324{)}
+  \def\mathdef4322#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4322{(}~\def\mathdef4323#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4323{rec}~~\mathit{st}^\ast{:\,}\href{../text/conventions.html#text-list}{\mathtt{list}}(\href{../text/types.html#text-typedef}{\mathtt{typedef}}_I)~\def\mathdef4324#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4324{)}
     &amp;\Rightarrow&amp; \href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~\mathit{st}^\ast \\
 \def\mathdef4160#1{{}}\mathdef4160{defined type} &amp; \href{../text/types.html#text-typedef}{\mathtt{typedef}}_I &amp;::=&amp;
   \def\mathdef4325#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4325{(}~\def\mathdef4326#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4326{type}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~\mathit{st}{:}\href{../text/types.html#text-subtype}{\mathtt{subtype}}_I~\def\mathdef4327#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4327{)}
     &amp;\Rightarrow&amp; \mathit{st} \\
 \def\mathdef4160#1{{}}\mathdef4160{sub type} &amp; \href{../text/types.html#text-subtype}{\mathtt{subtype}}_I &amp;::=&amp;
-  \def\mathdef4328#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4328{(}~\def\mathdef4329#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4329{sub}~~\def\mathdef4330#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4330{final}^?~~x^\ast{:\,}\href{../text/conventions.html#text-vec}{\mathtt{vec}}(\href{../text/modules.html#text-typeidx}{\mathtt{typeidx}}_I)~~\mathit{ct}{:}\href{../text/types.html#text-comptype}{\mathtt{comptype}}_I~\def\mathdef4331#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4331{)}
+  \def\mathdef4328#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4328{(}~\def\mathdef4329#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4329{sub}~~\def\mathdef4330#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4330{final}^?~~x^\ast{:\,}\href{../text/conventions.html#text-list}{\mathtt{list}}(\href{../text/modules.html#text-typeidx}{\mathtt{typeidx}}_I)~~\mathit{ct}{:}\href{../text/types.html#text-comptype}{\mathtt{comptype}}_I~\def\mathdef4331#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef4331{)}
     &amp;\Rightarrow&amp; \href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~\href{../syntax/types.html#syntax-subtype}{\mathsf{final}}^?~x^\ast~\mathit{ct} \\
 \end{array}\end{split}\]</div>
 <section id="id3">
