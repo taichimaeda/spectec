@@ -182,14 +182,15 @@ No distinction is made between signalling and quiet NaNs.</p>
 <section id="vectors">
 <span id="syntax-vecnum"></span><span id="index-4"></span><h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this heading">¶</a></h2>
 <p><em>Numeric vectors</em> are 128-bit values that are processed by vector instructions (also known as <em>SIMD</em> instructions, single instruction multiple data).
-They are represented in the abstract syntax using <span class="math notranslate nohighlight">\(\href{../syntax/values.html#syntax-int}{\mathit{i128}}\)</span>. The interpretation of lane types (<a class="reference internal" href="#syntax-int"><span class="std std-ref">integer</span></a> or <a class="reference internal" href="#syntax-float"><span class="std std-ref">floating-point</span></a> numbers) and lane sizes are determined by the specific instruction operating on them.</p>
+They are represented in the abstract syntax using <span class="math notranslate nohighlight">\({\mathit{i{\scriptstyle128}}}\)</span>. The interpretation of lane types (<a class="reference internal" href="#syntax-int"><span class="std std-ref">integer</span></a> or <a class="reference internal" href="#syntax-float"><span class="std std-ref">floating-point</span></a> numbers) and lane sizes are determined by the specific instruction operating on them.</p>
 </section>
 <section id="names">
 <span id="syntax-name"></span><span id="syntax-char"></span><span id="index-5"></span><h2>Names<a class="headerlink" href="#names" title="Permalink to this heading">¶</a></h2>
 <p><em>Names</em> are sequences of <em>characters</em>, which are <em>scalar values</em> as defined by <a class="reference external" href="https://www.unicode.org/versions/latest/">Unicode</a> (Section 2.4).</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
-&amp; {\mathit{name}} &amp;::=&amp; {{\mathit{char}}^\ast} \\
+&amp; {\mathit{name}} &amp;::=&amp; {{\mathit{char}}^\ast} &amp;\quad
+  \mbox{if}~{|{\mathrm{utf{\scriptstyle8}}}({{\mathit{char}}^\ast})|} &lt; {2^{32}} \\
 &amp; {\mathit{char}} &amp;::=&amp; \mathrm{U{+}00} ~|~ \dots ~|~ \mathrm{U{+}D7FF} ~|~ \mathrm{U{+}E000} ~|~ \dots ~|~ \mathrm{U{+}10FFFF} \\
 \end{array}\end{split}\]</div>
 <p>Due to the limitations of the <a class="reference internal" href="../binary/values.html#binary-name"><span class="std std-ref">binary format</span></a>,

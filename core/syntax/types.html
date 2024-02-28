@@ -138,7 +138,7 @@ There are three disjoint hierarchies of heap types:</p>
 <li><p><em>aggregate types</em> classify dynamically allocated <em>managed</em> data, such as <em>structures</em>, <em>arrays</em>, or <em>unboxed scalars</em>,</p></li>
 <li><p><em>external types</em> classify <em>external</em> references possibly owned by the <a class="reference internal" href="../intro/overview.html#embedder"><span class="std std-ref">embedder</span></a>.</p></li>
 </ul>
-<p>The values from the latter two hierarchies are interconvertible by ways of the <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{extern.convert\_any}}\)</span> and <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{any.convert\_extern}}\)</span> instructions.
+<p>The values from the latter two hierarchies are interconvertible by ways of the <span class="math notranslate nohighlight">\(\mathsf{extern.convert\_any}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{any.convert\_extern}\)</span> instructions.
 That is, both type hierarchies are inhabited by an isomorphic set of values, but may have different, incompatible representations in practice.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}

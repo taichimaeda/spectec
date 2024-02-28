@@ -171,7 +171,8 @@ where the <span class="math notranslate nohighlight">\({\mathit{A}}\)</span> can
 A list can have at most <span class="math notranslate nohighlight">\({2^{32}} - 1\)</span> elements.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
-&amp; {\mathit{list}}({\mathit{X}}) &amp;::=&amp; {{\mathit{X}}^\ast} \\
+&amp; {\mathit{list}}({\mathit{X}}) &amp;::=&amp; {{\mathit{X}}^\ast} &amp;\quad
+  \mbox{if}~{|{{\mathit{X}}^\ast}|} &lt; {2^{32}} \\
 \end{array}\end{split}\]</div>
 </section>
 </section>
