@@ -345,7 +345,7 @@ In contrast,</p>
 <ul>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}_i\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t_i\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i)\)</span>.</p></li>
-<li><p>The type <span class="math notranslate nohighlight">\(t_i\)</span> must be <a class="reference internal" href="types.html#valid-defaultable"><span class="std std-ref">defaultable</span></a>.</p></li>
+<li><p>The type <span class="math notranslate nohighlight">\(t_i\)</span> must be <span class="xref std std-ref">defaultable</span>.</p></li>
 </ul>
 </li>
 <li><p>Let <span class="math notranslate nohighlight">\(t^\ast\)</span> be the concatenation of all <span class="math notranslate nohighlight">\(t_i\)</span>.</p></li>
@@ -423,7 +423,7 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
-<li><p>The type <span class="math notranslate nohighlight">\(t\)</span> must be <a class="reference internal" href="types.html#valid-defaultable"><span class="std std-ref">defaultable</span></a>.</p></li>
+<li><p>The type <span class="math notranslate nohighlight">\(t\)</span> must be <span class="xref std std-ref">defaultable</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../syntax/types.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">

@@ -100,7 +100,8 @@ which are part of the instruction itself.</p>
 <p>Instructions in this group can operate on operands of any <a class="reference internal" href="types.html#syntax-valtype"><span class="std std-ref">value type</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
-&amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
+&amp; {\mathit{instr}} &amp;::=&amp; \mathsf{unreachable} \\ &amp;&amp;|&amp;
+\mathsf{nop} \\ &amp;&amp;|&amp;
 \mathsf{drop} \\ &amp;&amp;|&amp;
 \mathsf{select}~\,{({{\mathit{valtype}}^\ast})^?} \\ &amp;&amp;|&amp;
 \dots \\
@@ -112,6 +113,8 @@ which are part of the instruction itself.</p>
   \href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{drop}} \\&amp;&amp;|&amp;
   \href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~(\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}^\ast)^? \\
 \end{array}\end{split}\]</div>
+<p>The <span class="math notranslate nohighlight">\(\mathsf{nop}\)</span> instruction does nothing.</p>
+<p>The <span class="math notranslate nohighlight">\(\mathsf{unreachable}\)</span> instruction causes an unconditional <a class="reference internal" href="../intro/overview.html#trap"><span class="std std-ref">trap</span></a>.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{drop}\)</span> instruction simply throws away a single operand.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{select}\)</span> instruction selects one of its first two operands based on whether its third operand is zero or not.
 It may include a <a class="reference internal" href="types.html#syntax-valtype"><span class="std std-ref">value type</span></a> determining the type of these operands. If missing, the operands must be of <a class="reference internal" href="types.html#syntax-numtype"><span class="std std-ref">numeric type</span></a>.</p>
@@ -655,8 +658,7 @@ This restriction may be lifted in future versions.</p>
 <p>Instructions in this group affect the flow of control.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
-&amp; {\mathit{instr}} &amp;::=&amp; \mathsf{nop} \\ &amp;&amp;|&amp;
-\mathsf{unreachable} \\ &amp;&amp;|&amp;
+&amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
 \mathsf{block}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
 \mathsf{loop}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
 \mathsf{if}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast}~\,\mathsf{else}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
@@ -702,8 +704,6 @@ This restriction may be lifted in future versions.</p>
   \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return\_call\_ref}}~\href{../syntax/modules.html#syntax-funcidx}{\mathit{funcidx}} \\&amp;&amp;|&amp;
   \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return\_call\_indirect}}~\href{../syntax/modules.html#syntax-tableidx}{\mathit{tableidx}}~\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}} \\
 \end{array}\end{split}\]</div>
-<p>The <span class="math notranslate nohighlight">\(\mathsf{nop}\)</span> instruction does nothing.</p>
-<p>The <span class="math notranslate nohighlight">\(\mathsf{unreachable}\)</span> instruction causes an unconditional <a class="reference internal" href="../intro/overview.html#trap"><span class="std std-ref">trap</span></a>.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{block}\)</span>, <span class="math notranslate nohighlight">\(\mathsf{loop}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{if}\)</span> instructions are <em>structured</em> instructions.
 They bracket nested sequences of instructions, called <em>blocks</em>, terminated with, or separated by, <span class="math notranslate nohighlight">\(\mathsf{end}\)</span> or <span class="math notranslate nohighlight">\(\mathsf{else}\)</span> pseudo-instructions.
 As the grammar prescribes, they must be well-nested.</p>
