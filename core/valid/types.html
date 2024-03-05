@@ -162,7 +162,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 \frac{
 {\mathit{C}} \vdash {\mathit{heaptype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{ref}~\,{\mathsf{null}^?}~\,{\mathit{heaptype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{ref}~{\mathsf{null}^?}~{\mathit{heaptype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -185,7 +185,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}.\mathsf{type}{}[{\mathit{typeidx}}] \approx \mathsf{func}~\,({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+{\mathit{C}}.\mathsf{type}{}[{\mathit{typeidx}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
 }{
 {\mathit{C}} \vdash {\mathit{typeidx}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }
@@ -247,7 +247,7 @@ However, restrictions apply to most other types, such as <a class="reference int
  \qquad
 ({\mathit{C}}.\mathsf{local}{}[{\mathit{x}}] = {{\mathit{lt}}})^\ast
 }{
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{x}}^\ast}~\,{{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{x}}^\ast}~{{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -288,7 +288,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 \frac{
 {\mathit{C}} \vdash {\mathit{functype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{func}~\,{\mathit{functype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{func}~{\mathit{functype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -308,7 +308,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 \frac{
 ({\mathit{C}} \vdash {\mathit{fieldtype}} : \mathsf{ok})^\ast
 }{
-{\mathit{C}} \vdash \mathsf{struct}~\,{{\mathit{fieldtype}}^\ast} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{struct}~{{\mathit{fieldtype}}^\ast} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -324,7 +324,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 \frac{
 {\mathit{C}} \vdash {\mathit{fieldtype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{array}~\,{\mathit{fieldtype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{array}~{\mathit{fieldtype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -343,7 +343,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 \frac{
 {\mathit{C}} \vdash {\mathit{storagetype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {\mathsf{mut}^?}~\,{\mathit{storagetype}} : \mathsf{ok}
+{\mathit{C}} \vdash {\mathsf{mut}^?}~{\mathit{storagetype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -382,15 +382,15 @@ However, restrictions apply to most other types, such as <a class="reference int
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{rec}~\,\epsilon : {\mathsf{ok}}{({\mathit{x}})}
+{\mathit{C}} \vdash \mathsf{rec}~\epsilon : {\mathsf{ok}}{({\mathit{x}})}
 }
 \qquad
 \frac{
 {\mathit{C}} \vdash {\mathit{subtype}}_{{1}} : {\mathsf{ok}}{({\mathit{x}})}
  \qquad
-{\mathit{C}} \vdash \mathsf{rec}~\,{{\mathit{subtype}}^\ast} : {\mathsf{ok}}{({\mathit{x}} + 1)}
+{\mathit{C}} \vdash \mathsf{rec}~{{\mathit{subtype}}^\ast} : {\mathsf{ok}}{({\mathit{x}} + 1)}
 }{
-{\mathit{C}} \vdash \mathsf{rec}~\,({\mathit{subtype}}_{{1}}~\,{{\mathit{subtype}}^\ast}) : {\mathsf{ok}}{({\mathit{x}})}
+{\mathit{C}} \vdash \mathsf{rec}~({\mathit{subtype}}_{{1}}~{{\mathit{subtype}}^\ast}) : {\mathsf{ok}}{({\mathit{x}})}
 }
 \qquad
 \end{array}\]</div>
@@ -420,14 +420,14 @@ However, restrictions apply to most other types, such as <a class="reference int
  \qquad
 ({\mathit{x}} &lt; {\mathit{x}}_{{0}})^\ast
  \qquad
-({\mathrm{unroll}}({\mathit{C}}.\mathsf{type}{}[{\mathit{x}}]) = \mathsf{sub}~\,{{\mathit{x}'}^\ast}~\,{\mathit{comptype}'})^\ast
+({\mathrm{unroll}}({\mathit{C}}.\mathsf{type}{}[{\mathit{x}}]) = \mathsf{sub}~{{\mathit{x}'}^\ast}~{\mathit{comptype}'})^\ast
  \\
 {\mathit{C}} \vdash {\mathit{comptype}} : \mathsf{ok}
  \qquad
 ({\mathit{C}} \vdash {\mathit{comptype}} \leq {\mathit{comptype}'})^\ast
 \end{array}
 }{
-{\mathit{C}} \vdash \mathsf{sub}~\,{\mathsf{final}^?}~\,{{\mathit{typeidx}}^\ast}~\,{\mathit{comptype}} : {\mathsf{ok}}{({\mathit{x}}_{{0}})}
+{\mathit{C}} \vdash \mathsf{sub}~{\mathsf{final}^?}~{{\mathit{typeidx}}^\ast}~{\mathit{comptype}} : {\mathsf{ok}}{({\mathit{x}}_{{0}})}
 }
 \qquad
 \end{array}\end{split}\]</div>
@@ -454,7 +454,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{rectype}} : {\mathsf{ok}}{({\mathit{x}})}
  \qquad
-{\mathit{rectype}} = \mathsf{rec}~\,{{\mathit{subtype}}^{{\mathit{n}}}}
+{\mathit{rectype}} = \mathsf{rec}~{{\mathit{subtype}}^{{\mathit{n}}}}
  \qquad
 {\mathit{i}} &lt; {\mathit{n}}
 }{
@@ -506,7 +506,7 @@ preventing cyclic subtype hierarchies.</p>
  \qquad
 {\mathit{C}} \vdash {\mathit{reftype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {\mathit{limits}}~\,{\mathit{reftype}} : \mathsf{ok}
+{\mathit{C}} \vdash {\mathit{limits}}~{\mathit{reftype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -525,7 +525,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{limits}} : {2^{16}}
 }{
-{\mathit{C}} \vdash {\mathit{limits}}~\,\mathsf{i{\scriptstyle8}} : \mathsf{ok}
+{\mathit{C}} \vdash {\mathit{limits}}~\mathsf{i{\scriptstyle8}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -544,7 +544,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{t}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {\mathsf{mut}^?}~\,{\mathit{t}} : \mathsf{ok}
+{\mathit{C}} \vdash {\mathsf{mut}^?}~{\mathit{t}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -564,9 +564,9 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{deftype}} : \mathsf{ok}
  \qquad
-{\mathit{deftype}} \approx \mathsf{func}~\,{\mathit{functype}}
+{\mathit{deftype}} \approx \mathsf{func}~{\mathit{functype}}
 }{
-{\mathit{C}} \vdash \mathsf{func}~\,{\mathit{deftype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{func}~{\mathit{deftype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -582,7 +582,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{tabletype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{table}~\,{\mathit{tabletype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{table}~{\mathit{tabletype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -598,7 +598,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{memtype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{mem}~\,{\mathit{memtype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{mem}~{\mathit{memtype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>
@@ -614,7 +614,7 @@ preventing cyclic subtype hierarchies.</p>
 \frac{
 {\mathit{C}} \vdash {\mathit{globaltype}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{global}~\,{\mathit{globaltype}} : \mathsf{ok}
+{\mathit{C}} \vdash \mathsf{global}~{\mathit{globaltype}} : \mathsf{ok}
 }
 \qquad
 \end{array}\]</div>

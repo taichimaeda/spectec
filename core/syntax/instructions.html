@@ -103,7 +103,7 @@ which are part of the instruction itself.</p>
 &amp; {\mathit{instr}} &amp;::=&amp; \mathsf{unreachable} \\ &amp;&amp;|&amp;
 \mathsf{nop} \\ &amp;&amp;|&amp;
 \mathsf{drop} \\ &amp;&amp;|&amp;
-\mathsf{select}~\,{({{\mathit{valtype}}^\ast})^?} \\ &amp;&amp;|&amp;
+\mathsf{select}~{({{\mathit{valtype}}^\ast})^?} \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
@@ -133,15 +133,16 @@ These operations closely match respective operations available in hardware.</p>
 &amp; {{\mathit{num}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; {{\mathit{i}}}{{\mathit{n}}} \\
 &amp; {{\mathit{num}}}_{{\mathsf{f}}{{\mathit{n}}}} &amp;::=&amp; {{\mathit{f}}}{{\mathit{n}}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{\mathit{numtype}}.\mathsf{const}~\,{{\mathit{num}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
+{\mathit{numtype}}.\mathsf{const}~{{\mathit{num}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{unop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{binop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{testop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{relop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
-{\mathit{numtype}}_{{1}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}} \\ &amp;&amp;|&amp;
+{\mathit{numtype}}_{{1}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}} &amp;\quad
+  \mbox{if}~{\mathit{numtype}}_{{1}} \neq {\mathit{numtype}}_{{2}} \\ &amp;&amp;|&amp;
 {{{{\mathit{numtype}}.\mathsf{extend}}{{\mathit{n}}}}{\mathsf{\_}}}{\mathsf{s}} \\ &amp;&amp;|&amp;
 \dots \\[0.8ex]
-&amp; {{\mathit{unop}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{clz} ~|~ \mathsf{ctz} ~|~ \mathsf{popcnt} ~|~ \mathsf{extend}~\,{\mathit{n}} \\
+&amp; {{\mathit{unop}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{clz} ~|~ \mathsf{ctz} ~|~ \mathsf{popcnt} ~|~ \mathsf{extend}~{\mathit{n}} \\
 &amp; {{\mathit{unop}}}_{{\mathsf{f}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{abs} ~|~ \mathsf{neg} ~|~ \mathsf{sqrt} ~|~ \mathsf{ceil} ~|~ \mathsf{floor} ~|~ \mathsf{trunc} ~|~ \mathsf{nearest} \\[0.8ex]
 &amp; {{\mathit{binop}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ {\mathsf{div\_}}{{\mathit{sx}}} ~|~ {\mathsf{rem\_}}{{\mathit{sx}}} \\ &amp;&amp;|&amp;
 \mathsf{and} ~|~ \mathsf{or} ~|~ \mathsf{xor} ~|~ \mathsf{shl} ~|~ {\mathsf{shr\_}}{{\mathit{sx}}} ~|~ \mathsf{rotl} ~|~ \mathsf{rotr} \\
@@ -178,19 +179,19 @@ For the other integer instructions, the use of two’s complement for the signed
 &amp; {\mathit{half}} &amp;::=&amp; \mathsf{low} ~|~ \mathsf{high} \\[0.8ex]
 &amp; {\mathit{laneidx}} &amp;::=&amp; {\mathit{u{\scriptstyle8}}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{\mathit{vectype}}.\mathsf{const}~\,{{\mathit{vec}}}_{{\mathit{vectype}}} \\ &amp;&amp;|&amp;
+{\mathit{vectype}}.\mathsf{const}~{{\mathit{vec}}}_{{\mathit{vectype}}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvunop}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvbinop}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvternop}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvtestop}} \\ &amp;&amp;|&amp;
 {\mathit{ishape}}.\mathsf{swizzle} &amp;\quad
   \mbox{if}~{\mathit{ishape}} = {{\mathsf{i{\scriptstyle8}}}{\mathsf{x}}}{\mathsf{{\scriptstyle16}}} \\ &amp;&amp;|&amp;
-{\mathit{ishape}}.\mathsf{shuffle}~\,{{\mathit{laneidx}}^\ast} &amp;\quad
+{\mathit{ishape}}.\mathsf{shuffle}~{{\mathit{laneidx}}^\ast} &amp;\quad
   \mbox{if}~{\mathit{ishape}} = {{\mathsf{i{\scriptstyle8}}}{\mathsf{x}}}{\mathsf{{\scriptstyle16}}} \land {|{{\mathit{laneidx}}^\ast}|} = 16 \\ &amp;&amp;|&amp;
 {\mathit{shape}}.\mathsf{splat} \\ &amp;&amp;|&amp;
-{{\mathit{shape}}.\mathsf{extract\_lane\_}}{{{\mathit{sx}}^?}}~\,{\mathit{laneidx}} &amp;\quad
+{{\mathit{shape}}.\mathsf{extract\_lane\_}}{{{\mathit{sx}}^?}}~{\mathit{laneidx}} &amp;\quad
   \mbox{if}~{\mathrm{lanetype}}({\mathit{shape}}) = {\mathit{numtype}} \Leftrightarrow {{\mathit{sx}}^?} = \epsilon \\ &amp;&amp;|&amp;
-{\mathit{shape}}.\mathsf{replace\_lane}~\,{\mathit{laneidx}} \\ &amp;&amp;|&amp;
+{\mathit{shape}}.\mathsf{replace\_lane}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
 {\mathit{shape}} . {{\mathit{vunop}}}_{{\mathit{shape}}} \\ &amp;&amp;|&amp;
 {\mathit{shape}} . {{\mathit{vbinop}}}_{{\mathit{shape}}} \\ &amp;&amp;|&amp;
 {\mathit{shape}} . {{\mathit{vtestop}}}_{{\mathit{shape}}} \\ &amp;&amp;|&amp;
@@ -446,13 +447,13 @@ For the other vector instructions, the use of two’s complement for the signed 
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-\mathsf{ref.func}~\,{\mathit{funcidx}} \\ &amp;&amp;|&amp;
-\mathsf{ref.null}~\,{\mathit{heaptype}} \\ &amp;&amp;|&amp;
+\mathsf{ref.func}~{\mathit{funcidx}} \\ &amp;&amp;|&amp;
+\mathsf{ref.null}~{\mathit{heaptype}} \\ &amp;&amp;|&amp;
 \mathsf{ref.is\_null} \\ &amp;&amp;|&amp;
 \mathsf{ref.as\_non\_null} \\ &amp;&amp;|&amp;
 \mathsf{ref.eq} \\ &amp;&amp;|&amp;
-\mathsf{ref.test}~\,{\mathit{reftype}} \\ &amp;&amp;|&amp;
-\mathsf{ref.cast}~\,{\mathit{reftype}} \\ &amp;&amp;|&amp;
+\mathsf{ref.test}~{\mathit{reftype}} \\ &amp;&amp;|&amp;
+\mathsf{ref.cast}~{\mathit{reftype}} \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
@@ -487,22 +488,22 @@ Similarly, the <span class="math notranslate nohighlight">\(\mathsf{br\_on\_cast
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-\mathsf{struct.new}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{struct.new\_default}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-{{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~\,{\mathit{typeidx}}~\,{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
-\mathsf{struct.set}~\,{\mathit{typeidx}}~\,{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
-\mathsf{array.new}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.new\_default}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.new\_fixed}~\,{\mathit{typeidx}}~\,{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
-\mathsf{array.new\_data}~\,{\mathit{typeidx}}~\,{\mathit{dataidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.new\_elem}~\,{\mathit{typeidx}}~\,{\mathit{elemidx}} \\ &amp;&amp;|&amp;
-{{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.set}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{struct.new}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{struct.new\_default}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+{{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{typeidx}}~{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
+\mathsf{struct.set}~{\mathit{typeidx}}~{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
+\mathsf{array.new}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.new\_default}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.new\_fixed}~{\mathit{typeidx}}~{\mathit{u{\scriptstyle32}}} \\ &amp;&amp;|&amp;
+\mathsf{array.new\_data}~{\mathit{typeidx}}~{\mathit{dataidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.new\_elem}~{\mathit{typeidx}}~{\mathit{elemidx}} \\ &amp;&amp;|&amp;
+{{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.set}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
 \mathsf{array.len} \\ &amp;&amp;|&amp;
-\mathsf{array.fill}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.copy}~\,{\mathit{typeidx}}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.init\_data}~\,{\mathit{typeidx}}~\,{\mathit{dataidx}} \\ &amp;&amp;|&amp;
-\mathsf{array.init\_elem}~\,{\mathit{typeidx}}~\,{\mathit{elemidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.fill}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.copy}~{\mathit{typeidx}}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.init\_data}~{\mathit{typeidx}}~{\mathit{dataidx}} \\ &amp;&amp;|&amp;
+\mathsf{array.init\_elem}~{\mathit{typeidx}}~{\mathit{elemidx}} \\ &amp;&amp;|&amp;
 \mathsf{ref.i{\scriptstyle31}} \\ &amp;&amp;|&amp;
 {{\mathsf{i{\scriptstyle31}.get}}{\mathsf{\_}}}{{\mathit{sx}}} \\ &amp;&amp;|&amp;
 \mathsf{extern.convert\_any} \\ &amp;&amp;|&amp;
@@ -520,7 +521,7 @@ again allowing for different sign extension modes in the case of a <a class="ref
 <span class="math notranslate nohighlight">\(\mathsf{array.len}\)</span> produces the length of an array;
 <span class="math notranslate nohighlight">\(\mathsf{array.fill}\)</span> fills a specified slice of an array with a given value and <span class="math notranslate nohighlight">\(\mathsf{array.copy}\)</span>, <span class="math notranslate nohighlight">\(\mathsf{array.init\_data}\)</span>, and <span class="math notranslate nohighlight">\(\mathsf{array.init\_elem}\)</span> copy elements to a specified slice of an array from a given array, data segment, or element segment, respectively.</p>
 <p>The instructions <span class="math notranslate nohighlight">\(\mathsf{ref.i{\scriptstyle31}}\)</span> and <span class="math notranslate nohighlight">\({{\mathsf{i{\scriptstyle31}.get}}{\mathsf{\_}}}{{\mathit{sx}}}\)</span> convert between type <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}}\)</span> and an unboxed <a class="reference internal" href="types.html#syntax-i31"><span class="std std-ref">scalar</span></a>.</p>
-<p>The instructions <span class="math notranslate nohighlight">\(\mathsf{any.convert\_extern}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{extern.convert\_any}\)</span> allow lossless conversion between references represented as type <span class="math notranslate nohighlight">\((\mathsf{ref}~\,\mathsf{null}~\,\mathsf{extern})\)</span> and as <span class="math notranslate nohighlight">\(:math:\)</span>.</p>
+<p>The instructions <span class="math notranslate nohighlight">\(\mathsf{any.convert\_extern}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{extern.convert\_any}\)</span> allow lossless conversion between references represented as type <span class="math notranslate nohighlight">\((\mathsf{ref}~\mathsf{null}~\mathsf{extern})\)</span> and as <span class="math notranslate nohighlight">\(:math:\)</span>.</p>
 </section>
 <section id="variable-instructions">
 <span id="syntax-instr-variable"></span><span id="index-6"></span><h2>Variable Instructions<a class="headerlink" href="#variable-instructions" title="Permalink to this heading">¶</a></h2>
@@ -528,11 +529,11 @@ again allowing for different sign extension modes in the case of a <a class="ref
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-\mathsf{local.get}~\,{\mathit{localidx}} \\ &amp;&amp;|&amp;
-\mathsf{local.set}~\,{\mathit{localidx}} \\ &amp;&amp;|&amp;
-\mathsf{local.tee}~\,{\mathit{localidx}} \\ &amp;&amp;|&amp;
-\mathsf{global.get}~\,{\mathit{globalidx}} \\ &amp;&amp;|&amp;
-\mathsf{global.set}~\,{\mathit{globalidx}} \\ &amp;&amp;|&amp;
+\mathsf{local.get}~{\mathit{localidx}} \\ &amp;&amp;|&amp;
+\mathsf{local.set}~{\mathit{localidx}} \\ &amp;&amp;|&amp;
+\mathsf{local.tee}~{\mathit{localidx}} \\ &amp;&amp;|&amp;
+\mathsf{global.get}~{\mathit{globalidx}} \\ &amp;&amp;|&amp;
+\mathsf{global.set}~{\mathit{globalidx}} \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <p>These instructions get or set the values of respective variables.
@@ -544,14 +545,14 @@ The <span class="math notranslate nohighlight">\(\mathsf{local.tee}\)</span> ins
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-\mathsf{table.get}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.set}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.size}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.grow}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.fill}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.copy}~\,{\mathit{tableidx}}~\,{\mathit{tableidx}} \\ &amp;&amp;|&amp;
-\mathsf{table.init}~\,{\mathit{tableidx}}~\,{\mathit{elemidx}} \\ &amp;&amp;|&amp;
-\mathsf{elem.drop}~\,{\mathit{elemidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.get}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.set}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.size}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.grow}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.fill}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.copy}~{\mathit{tableidx}}~{\mathit{tableidx}} \\ &amp;&amp;|&amp;
+\mathsf{table.init}~{\mathit{tableidx}}~{\mathit{elemidx}} \\ &amp;&amp;|&amp;
+\mathsf{elem.drop}~{\mathit{elemidx}} \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{table.get}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{table.set}\)</span> instructions load or store an element in a table, respectively.</p>
@@ -573,23 +574,23 @@ The <span class="math notranslate nohighlight">\(\mathsf{table.init}\)</span> in
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{memop}} &amp;::=&amp; \{\; \begin{array}[t]{&#64;{}l&#64;{}l&#64;{}}
-\mathsf{align}~\,{\mathit{u{\scriptstyle32}}},\; \mathsf{offset}~\,{\mathit{u{\scriptstyle32}}} \;\}\end{array} \\[0.8ex]
+\mathsf{align}~{\mathit{u{\scriptstyle32}}},\; \mathsf{offset}~{\mathit{u{\scriptstyle32}}} \;\}\end{array} \\[0.8ex]
 &amp; {\mathit{packsize}} &amp;::=&amp; \mathsf{{\scriptstyle8}} ~|~ \mathsf{{\scriptstyle16}} ~|~ \mathsf{{\scriptstyle32}} ~|~ \mathsf{{\scriptstyle64}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{{\mathit{numtype}}.\mathsf{load}}{{({\mathit{w}}~\,\mathsf{\_}~\,{\mathit{sx}})^?}}~\,{\mathit{memidx}}~\,{\mathit{memop}} &amp;\quad
+{{\mathit{numtype}}.\mathsf{load}}{{({\mathit{w}}~\mathsf{\_}~{\mathit{sx}})^?}}~{\mathit{memidx}}~{\mathit{memop}} &amp;\quad
   \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;
-{{\mathit{numtype}}.\mathsf{store}}{{{\mathit{w}}^?}}~\,{\mathit{memidx}}~\,{\mathit{memop}} &amp;\quad
+{{\mathit{numtype}}.\mathsf{store}}{{{\mathit{w}}^?}}~{\mathit{memidx}}~{\mathit{memop}} &amp;\quad
   \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;
-{\mathsf{v{\scriptstyle128}.load}}{{{\mathit{vloadop}}^?}}~\,{\mathit{memidx}}~\,{\mathit{memop}} \\ &amp;&amp;|&amp;
-{{{\mathsf{v{\scriptstyle128}.load}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~\,{\mathit{memidx}}~\,{\mathit{memop}}~\,{\mathit{laneidx}} \\ &amp;&amp;|&amp;
-\mathsf{v{\scriptstyle128}.store}~\,{\mathit{memidx}}~\,{\mathit{memop}} \\ &amp;&amp;|&amp;
-{{{\mathsf{v{\scriptstyle128}.store}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~\,{\mathit{memidx}}~\,{\mathit{memop}}~\,{\mathit{laneidx}} \\ &amp;&amp;|&amp;
-\mathsf{memory.size}~\,{\mathit{memidx}} \\ &amp;&amp;|&amp;
-\mathsf{memory.grow}~\,{\mathit{memidx}} \\ &amp;&amp;|&amp;
-\mathsf{memory.fill}~\,{\mathit{memidx}} \\ &amp;&amp;|&amp;
-\mathsf{memory.copy}~\,{\mathit{memidx}}~\,{\mathit{memidx}} \\ &amp;&amp;|&amp;
-\mathsf{memory.init}~\,{\mathit{memidx}}~\,{\mathit{dataidx}} \\ &amp;&amp;|&amp;
-\mathsf{data.drop}~\,{\mathit{dataidx}} \\
+{\mathsf{v{\scriptstyle128}.load}}{{{\mathit{vloadop}}^?}}~{\mathit{memidx}}~{\mathit{memop}} \\ &amp;&amp;|&amp;
+{{{\mathsf{v{\scriptstyle128}.load}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memop}}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
+\mathsf{v{\scriptstyle128}.store}~{\mathit{memidx}}~{\mathit{memop}} \\ &amp;&amp;|&amp;
+{{{\mathsf{v{\scriptstyle128}.store}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memop}}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
+\mathsf{memory.size}~{\mathit{memidx}} \\ &amp;&amp;|&amp;
+\mathsf{memory.grow}~{\mathit{memidx}} \\ &amp;&amp;|&amp;
+\mathsf{memory.fill}~{\mathit{memidx}} \\ &amp;&amp;|&amp;
+\mathsf{memory.copy}~{\mathit{memidx}}~{\mathit{memidx}} \\ &amp;&amp;|&amp;
+\mathsf{memory.init}~{\mathit{memidx}}~{\mathit{dataidx}} \\ &amp;&amp;|&amp;
+\mathsf{data.drop}~{\mathit{dataidx}} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llrl}
@@ -659,23 +660,23 @@ This restriction may be lifted in future versions.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-\mathsf{block}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
-\mathsf{loop}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
-\mathsf{if}~\,{\mathit{blocktype}}~\,{{\mathit{instr}}^\ast}~\,\mathsf{else}~\,{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
-\mathsf{br}~\,{\mathit{labelidx}} \\ &amp;&amp;|&amp;
-\mathsf{br\_if}~\,{\mathit{labelidx}} \\ &amp;&amp;|&amp;
-\mathsf{br\_table}~\,{{\mathit{labelidx}}^\ast}~\,{\mathit{labelidx}} \\ &amp;&amp;|&amp;
-\mathsf{br\_on\_null}~\,{\mathit{labelidx}} \\ &amp;&amp;|&amp;
-\mathsf{br\_on\_non\_null}~\,{\mathit{labelidx}} \\ &amp;&amp;|&amp;
-\mathsf{br\_on\_cast}~\,{\mathit{labelidx}}~\,{\mathit{reftype}}~\,{\mathit{reftype}} \\ &amp;&amp;|&amp;
-\mathsf{br\_on\_cast\_fail}~\,{\mathit{labelidx}}~\,{\mathit{reftype}}~\,{\mathit{reftype}} \\ &amp;&amp;|&amp;
-\mathsf{call}~\,{\mathit{funcidx}} \\ &amp;&amp;|&amp;
-\mathsf{call\_ref}~\,{{\mathit{typeidx}}^?} \\ &amp;&amp;|&amp;
-\mathsf{call\_indirect}~\,{\mathit{tableidx}}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{block}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
+\mathsf{loop}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
+\mathsf{if}~{\mathit{blocktype}}~{{\mathit{instr}}^\ast}~\mathsf{else}~{{\mathit{instr}}^\ast} \\ &amp;&amp;|&amp;
+\mathsf{br}~{\mathit{labelidx}} \\ &amp;&amp;|&amp;
+\mathsf{br\_if}~{\mathit{labelidx}} \\ &amp;&amp;|&amp;
+\mathsf{br\_table}~{{\mathit{labelidx}}^\ast}~{\mathit{labelidx}} \\ &amp;&amp;|&amp;
+\mathsf{br\_on\_null}~{\mathit{labelidx}} \\ &amp;&amp;|&amp;
+\mathsf{br\_on\_non\_null}~{\mathit{labelidx}} \\ &amp;&amp;|&amp;
+\mathsf{br\_on\_cast}~{\mathit{labelidx}}~{\mathit{reftype}}~{\mathit{reftype}} \\ &amp;&amp;|&amp;
+\mathsf{br\_on\_cast\_fail}~{\mathit{labelidx}}~{\mathit{reftype}}~{\mathit{reftype}} \\ &amp;&amp;|&amp;
+\mathsf{call}~{\mathit{funcidx}} \\ &amp;&amp;|&amp;
+\mathsf{call\_ref}~{{\mathit{typeidx}}^?} \\ &amp;&amp;|&amp;
+\mathsf{call\_indirect}~{\mathit{tableidx}}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
 \mathsf{return} \\ &amp;&amp;|&amp;
-\mathsf{return\_call}~\,{\mathit{funcidx}} \\ &amp;&amp;|&amp;
-\mathsf{return\_call\_ref}~\,{{\mathit{typeidx}}^?} \\ &amp;&amp;|&amp;
-\mathsf{return\_call\_indirect}~\,{\mathit{tableidx}}~\,{\mathit{typeidx}} \\ &amp;&amp;|&amp;
+\mathsf{return\_call}~{\mathit{funcidx}} \\ &amp;&amp;|&amp;
+\mathsf{return\_call\_ref}~{{\mathit{typeidx}}^?} \\ &amp;&amp;|&amp;
+\mathsf{return\_call\_indirect}~{\mathit{tableidx}}~{\mathit{typeidx}} \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
