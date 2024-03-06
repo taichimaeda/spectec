@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-03-05)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-03-06)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -573,11 +573,11 @@ The <span class="math notranslate nohighlight">\(\mathsf{table.init}\)</span> in
 <p>Instructions in this group are concerned with linear <a class="reference internal" href="modules.html#syntax-mem"><span class="std std-ref">memory</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
-&amp; {\mathit{memop}} &amp;::=&amp; \{\; \begin{array}[t]{&#64;{}l&#64;{}l&#64;{}}
-\mathsf{align}~{\mathit{u{\scriptstyle32}}},\; \mathsf{offset}~{\mathit{u{\scriptstyle32}}} \;\}\end{array} \\[0.8ex]
+&amp; {\mathit{memop}} &amp;::=&amp; \{ \begin{array}[t]{&#64;{}l&#64;{}l&#64;{}}
+\mathsf{align}~{\mathit{u{\scriptstyle32}}},\; \mathsf{offset}~{\mathit{u{\scriptstyle32}}} \}\end{array} \\[0.8ex]
 &amp; {\mathit{packsize}} &amp;::=&amp; \mathsf{{\scriptstyle8}} ~|~ \mathsf{{\scriptstyle16}} ~|~ \mathsf{{\scriptstyle32}} ~|~ \mathsf{{\scriptstyle64}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{{\mathit{numtype}}.\mathsf{load}}{{({\mathit{w}}~\mathsf{\_}~{\mathit{sx}})^?}}~{\mathit{memidx}}~{\mathit{memop}} &amp;\quad
+{{\mathit{numtype}}.\mathsf{load}}{{({{{\mathit{w}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{memidx}}~{\mathit{memop}} &amp;\quad
   \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;
 {{\mathit{numtype}}.\mathsf{store}}{{{\mathit{w}}^?}}~{\mathit{memidx}}~{\mathit{memop}} &amp;\quad
   \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;

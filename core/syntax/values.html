@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Values &#8212; WebAssembly 3.0 (Draft 2024-03-05)</title>
+    <title>Values &#8212; WebAssembly 3.0 (Draft 2024-03-06)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -149,7 +149,7 @@ No distinction is made between signalling and quiet NaNs.</p>
 (0 + {\mathit{m}} \cdot {2^{{-{\mathit{M}}}}}) \cdot {2^{{\mathit{n}}}} &amp;\quad
   \mbox{if}~{\mathit{m}} &lt; {2^{{\mathit{M}}}} \land 2 - {2^{{\mathit{E}} - 1}} = {\mathit{n}} \\ &amp;&amp;|&amp;
 \infty \\ &amp;&amp;|&amp;
-{\mathsf{nan}}{({\mathit{m}})} &amp;\quad
+{\mathsf{nan}}{{\mathit{m}}} &amp;\quad
   \mbox{if}~1 \leq {\mathit{m}} &lt; {2^{{\mathit{M}}}} \\
 \end{array}\end{split}\]</div>
 <p id="aux-exponent"><span id="aux-significand"></span>where <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{~}c&#64;{~}l&#64;{}l&#64;{}} {\mathit{M}} &amp;=&amp; {\mathrm{signif}}({\mathit{N}}) &amp;  \\ \end{array}\)</span> and <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{~}c&#64;{~}l&#64;{}l&#64;{}} {\mathit{E}} &amp;=&amp; {\mathrm{expon}}({\mathit{N}}) &amp;  \\ \end{array}\)</span> with</p>
@@ -160,12 +160,12 @@ No distinction is made between signalling and quiet NaNs.</p>
 {\mathrm{expon}}(32) &amp;=&amp; 8 &amp;  \\
 {\mathrm{expon}}(64) &amp;=&amp; 11 &amp;  \\
 \end{array}\end{split}\]</div>
-<p id="aux-canon"><span id="arithmetic-nan"></span><span id="canonical-nan"></span>A <em>canonical NaN</em> is a floating-point value <span class="math notranslate nohighlight">\({\pm{\mathsf{nan}}{({{\mathrm{canon}}}_{{\mathit{N}}})}}\)</span> where <span class="math notranslate nohighlight">\({{\mathrm{canon}}}_{{\mathit{N}}}\)</span> is a payload whose most significant bit is <span class="math notranslate nohighlight">\(1\)</span> while all others are <span class="math notranslate nohighlight">\(0\)</span>:</p>
+<p id="aux-canon"><span id="arithmetic-nan"></span><span id="canonical-nan"></span>A <em>canonical NaN</em> is a floating-point value <span class="math notranslate nohighlight">\({\pm{\mathsf{nan}}{{{\mathrm{canon}}}_{{\mathit{N}}}}}\)</span> where <span class="math notranslate nohighlight">\({{\mathrm{canon}}}_{{\mathit{N}}}\)</span> is a payload whose most significant bit is <span class="math notranslate nohighlight">\(1\)</span> while all others are <span class="math notranslate nohighlight">\(0\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
 {{\mathrm{canon}}}_{{\mathit{N}}} &amp;=&amp; {2^{{\mathrm{signif}}({\mathit{N}}) - 1}} &amp;  \\
 \end{array}\end{split}\]</div>
-<p>An <em>arithmetic NaN</em> is a floating-point value <span class="math notranslate nohighlight">\({\pm{\mathsf{nan}}{({\mathit{m}})}}\)</span> with <span class="math notranslate nohighlight">\({\mathit{m}} \geq {{\mathrm{canon}}}_{{\mathit{N}}}\)</span>, such that the most significant bit is <span class="math notranslate nohighlight">\(1\)</span> while all others are arbitrary.</p>
+<p>An <em>arithmetic NaN</em> is a floating-point value <span class="math notranslate nohighlight">\({\pm{\mathsf{nan}}{{\mathit{m}}}}\)</span> with <span class="math notranslate nohighlight">\({\mathit{m}} \geq {{\mathrm{canon}}}_{{\mathit{N}}}\)</span>, such that the most significant bit is <span class="math notranslate nohighlight">\(1\)</span> while all others are arbitrary.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>In the abstract syntax, subnormals are distinguished by the leading <span class="math notranslate nohighlight">\(0\)</span> of the significand. The exponent of subnormals has the same value as the smallest possible exponent of a normal number. Only in the <a class="reference internal" href="../binary/values.html#binary-float"><span class="std std-ref">binary representation</span></a> the exponent of a subnormal is encoded differently than the exponent of any normal number.</p>
