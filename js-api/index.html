@@ -6,7 +6,7 @@
   <meta content="ED" name="w3c-status">
   <meta content="Bikeshed version d5d58a306, updated Fri Jan 26 16:12:28 2024 -0800" name="generator">
   <link href="https://www.w3.org/TR/wasm-js-api-2/" rel="canonical">
-  <meta content="cddfdca2c41924a185de9b9d17bc02f30b5f92e0" name="revision">
+  <meta content="7e88fa5addd9d1a95b30dadef05e775919b8e915" name="revision">
 <style>
 emu-const {
     font-family: serif;
@@ -719,7 +719,7 @@ var[data-var-color="6"] { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBC
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebAssembly JavaScript Interface</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-03-06">6 March 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2024-03-07">7 March 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -729,9 +729,10 @@ var[data-var-color="6"] { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBC
       <dt>Latest published version:
       <dd><a href="https://www.w3.org/TR/wasm-js-api-2/">https://www.w3.org/TR/wasm-js-api-2/</a>
       <dt>Feedback:
+      <dd><a href="https://github.com/WebAssembly/spec/issues">GitHub</a>
       <dd><a href="#issues-index">Inline In Spec</a>
       <dt class="editor">Editor:
-      <dd class="editor p-author h-card vcard"><span class="p-name fn">Ms2ger</span> (<span class="p-org org">Igalia</span>)
+      <dd class="editor p-author h-card vcard" data-editor-id="46309"><span class="p-name fn">Ms2ger</span> (<span class="p-org org">Igalia</span>)
       <dt>Issue Tracking:
       <dd><a href="https://github.com/WebAssembly/spec/labels/wasm-js-api-2">GitHub Issues</a>
      </dl>
@@ -2593,7 +2594,7 @@ The particular exception here is implementation-defined in both cases.</p>
    <h2 class="heading settled" data-level="6" id="limits"><span class="secno">6. </span><span class="content">Implementation-defined Limits</span><a class="self-link" href="#limits"></a></h2>
    <p>The WebAssembly core specification allows an implementation to define limits on the syntactic structure of the module.
 While each embedding of WebAssembly may choose to define its own limits, for predictability the standard WebAssembly JavaScript Interface described in this document defines the following exact limits.
-An implementation must reject a module that exceeds one of the following limits with a <code class="idl"><a data-link-type="idl" href="#exceptiondef-compileerror" id="ref-for-exceptiondef-compileerror③">CompileError</a></code>:
+An implementation must reject a module that exceeds one of the following limits with a <code class="idl"><a data-link-type="idl" href="#exceptiondef-compileerror" id="ref-for-exceptiondef-compileerror③">CompileError</a></code>.
 In practice, an implementation may run out of resources for valid modules below these limits.</p>
    <ul>
     <li>The maximum size of a module is 1,073,741,824 bytes (1 GiB).
@@ -2609,7 +2610,7 @@ In practice, an implementation may run out of resources for valid modules below 
     <li>The maximum number of tables, including declared or imported tables, is 100,000.
     <li>The maximum size of a table is 10,000,000.
     <li>The maximum number of table entries in any table initialization is 10,000,000.
-    <li>The maximum number of memories, including declared or imported memories, is 1.
+    <li>The maximum number of memories, including defined and imported memories, is 100.
     <li>The maximum number of parameters to any function or block is 1,000.
     <li>The maximum number of return values for any function or block is 1,000.
     <li>The maximum size of a function body, including locals declarations, is 7,654,321 bytes.
