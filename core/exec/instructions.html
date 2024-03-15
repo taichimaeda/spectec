@@ -122,7 +122,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>No formal reduction rule is required for this instruction, since <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}\)</span> instructions already are <a class="reference internal" href="runtime.html#syntax-val"><span class="std std-ref">values</span></a>.</p>
+<p>No formal reduction rule is required for this instruction, since <span class="math notranslate nohighlight">\(\mathsf{const}\)</span> instructions already are <a class="reference internal" href="runtime.html#syntax-val"><span class="std std-ref">values</span></a>.</p>
 </div>
 </section>
 <section id="t-mathsf-xref-syntax-instructions-syntax-unop-mathit-unop">
@@ -142,6 +142,13 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 </ol>
 </li>
 </ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}lcl&#64;{}l&#64;{}}
+&amp; ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}} . {\mathit{unop}}) &amp;\hookrightarrow&amp; ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}) &amp;\quad
+  \mbox{if}~{{{\mathit{unop}}}{{}_{{\mathit{nt}}}}}{({\mathit{c}}_{{1}})} = {\mathit{c}} \\
+&amp; ({\mathit{nt}}.\mathsf{const}~{\mathit{c}}_{{1}})~({\mathit{nt}} . {\mathit{unop}}) &amp;\hookrightarrow&amp; \mathsf{trap} &amp;\quad
+  \mbox{if}~{{{\mathit{unop}}}{{}_{{\mathit{nt}}}}}{({\mathit{c}}_{{1}})} = \epsilon \\
+\end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lcl&#64;{\qquad}l}
 (t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~t\mathsf{.}\href{../syntax/instructions.html#syntax-unop}{\mathit{unop}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; (t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
