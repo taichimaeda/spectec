@@ -2742,15 +2742,8 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{k}}}}~(\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{\epsilon\}}~({{\mathit{val}}^{{\mathit{k}}}}, {{\mathit{instr}}^\ast}))
-  &amp;\quad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{k}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
-\end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{lcl}
-S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{block}}~\mathit{bt}~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp;
-  S; F; \href{../exec/runtime.html#syntax-label}{\mathsf{label}}_n\{\epsilon\}~\href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}
-  \\&amp;&amp;\quad (\mathrel{\mbox{if}} \href{../exec/runtime.html#aux-fblocktype}{\mathrm{instrtype}}_{S;F}(\mathit{bt}) = [t_1^m] \mathrel{\href{../syntax/types.html#syntax-instrtype}{\rightarrow}} [t_2^n])
+&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{m}}}}~(\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{\epsilon\}}~{{\mathit{val}}^{{\mathit{m}}}}~{{\mathit{instr}}^\ast})
+  &amp;\quad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{m}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-loop-xref-syntax-instructions-syntax-blocktype-mathit-blocktype-xref-syntax-instructions-syntax-instr-mathit-instr-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end">
@@ -2766,15 +2759,8 @@ S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/ins
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{k}}}}~(\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; ({{\mathsf{label}}_{{\mathit{k}}}}{\{\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}\}}~({{\mathit{val}}^{{\mathit{k}}}}, {{\mathit{instr}}^\ast}))
-  &amp;\quad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{k}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
-\end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{lcl}
-S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{loop}}~\mathit{bt}~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp;
-  S; F; \href{../exec/runtime.html#syntax-label}{\mathsf{label}}_m\{\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{loop}}~\mathit{bt}~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}\}~\href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}
-  \\&amp;&amp;\quad (\mathrel{\mbox{if}} \href{../exec/runtime.html#aux-fblocktype}{\mathrm{instrtype}}_{S;F}(\mathit{bt}) = [t_1^m] \mathrel{\href{../syntax/types.html#syntax-instrtype}{\rightarrow}} [t_2^n])
+&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{m}}}}~(\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; ({{\mathsf{label}}_{{\mathit{m}}}}{\{\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}\}}~{{\mathit{val}}^{{\mathit{m}}}}~{{\mathit{instr}}^\ast})
+  &amp;\quad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{m}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-if-xref-syntax-instructions-syntax-blocktype-mathit-blocktype-xref-syntax-instructions-syntax-instr-mathit-instr-1-ast-xref-syntax-instructions-syntax-instr-control-mathsf-else-xref-syntax-instructions-syntax-instr-mathit-instr-2-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end">
@@ -2825,15 +2811,10 @@ S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/ins
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~({{\mathit{val}'}^\ast}, {{\mathit{val}}^{{\mathit{n}}}}, (\mathsf{br}~{\mathit{l}}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~{{\mathit{instr}'}^\ast}
+&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{br}~{\mathit{l}})~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~{{\mathit{instr}'}^\ast}
   &amp;\quad \mbox{if}~{\mathit{l}} = 0 \\
-&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~({{\mathit{val}}^\ast}, (\mathsf{br}~{\mathit{l}}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{br}~{\mathit{l}} - 1)
+&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}}^\ast}~(\mathsf{br}~{\mathit{l}})~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{br}~{\mathit{l}} - 1)
   &amp;\quad \mbox{if}~{\mathit{l}} &gt; 0 \\
-\end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{lcl&#64;{\qquad}l}
-\href{../exec/runtime.html#syntax-label}{\mathsf{label}}_n\{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast\}~\href{../exec/runtime.html#syntax-ctxt-block}{B}^l[\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br}}~l)]~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-br-if-l">
@@ -3008,12 +2989,8 @@ S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/ins
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; ({{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{f}}\}}~({{\mathit{val}'}^\ast}, {{\mathit{val}}^{{\mathit{n}}}}, \mathsf{return}, {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}} \\
-\end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{lcl&#64;{\qquad}l}
-\href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}_n\{F\}~B^\ast[\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return}}]~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^n
+&amp; ({{\mathsf{frame}}_{{\mathit{n}}}}{\{{\mathit{f}}\}}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{{\mathit{n}}}}~\mathsf{return}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}} \\
+&amp; ({{\mathsf{label}}_{{\mathit{n}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}}^\ast}~\mathsf{return}~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~\mathsf{return} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-call-x">
@@ -3138,9 +3115,9 @@ F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\math
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; ({{\mathsf{label}}_{{\mathit{k}}}}{\{{{\mathit{instr}'}^\ast}\}}~({{\mathit{val}}^\ast}, (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?}) \\
-&amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~({{\mathit{val}}^\ast}, (\mathsf{ref.null}~{\mathit{ht}}), (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; \mathsf{trap} \\
-&amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~({{\mathit{val}'}^\ast}, {{\mathit{val}}^{{\mathit{n}}}}, (\mathsf{ref.func}~{\mathit{a}}), (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{x}}^?})
+&amp; {\mathit{z}} ; ({{\mathsf{label}}_{{\mathit{k}}}}{\{{{\mathit{instr}'}^\ast}\}}~{{\mathit{val}}^\ast}~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?})~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?}) \\
+&amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~{{\mathit{val}}^\ast}~(\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?})~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
+&amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?})~{{\mathit{instr}}^\ast}) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{x}}^?})
   &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{funcs}{}[{\mathit{a}}].\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}}) \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
