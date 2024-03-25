@@ -308,7 +308,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{x}}) &amp;\hookrightarrow&amp; (\mathsf{ref.null}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}]) \\
+&amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{x}}) &amp;\hookrightarrow&amp; (\mathsf{ref.null}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}]) \\
 \end{array}\end{split}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -520,11 +520,11 @@ since the instruction form is already a <a class="reference internal" href="runt
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{struct.new}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{struct} = ..{\mathit{si}}] ; (\mathsf{ref.struct}~{\mathit{a}})
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^{{\mathit{n}}}} \\
-  &amp;&amp;&amp;&amp;\quad {\land}~{\mathit{a}} = {|{\mathit{z}}.\mathsf{struct}|} \\
+&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{struct.new}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{structs} = ..{\mathit{si}}] ; (\mathsf{ref.struct}~{\mathit{a}})
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^{{\mathit{n}}}} \\
+  &amp;&amp;&amp;&amp;\quad {\land}~{\mathit{a}} = {|{\mathit{z}}.\mathsf{structs}|} \\
   &amp;&amp;&amp;&amp;\quad {\land}~{\mathit{si}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\mathsf{type}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}],\; \mathsf{field}~{({{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}}))^{{\mathit{n}}}} \}\end{array} \\
+\mathsf{type}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}],\; \mathsf{fields}~{({{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}}))^{{\mathit{n}}}} \}\end{array} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-struct-mathsf-struct-new-default-x">
@@ -548,7 +548,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{struct.new\_default}~{\mathit{x}}) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{struct.new}~{\mathit{x}})
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
   &amp;&amp;&amp;&amp;\quad {\land}~({{\mathrm{default}}}_{{\mathrm{unpack}}({\mathit{zt}})} = {\mathit{val}})^\ast \\
 \end{array}\end{split}\]</div>
 </section>
@@ -578,8 +578,8 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~({{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
-&amp; {\mathit{z}} ; (\mathsf{ref.struct}~{\mathit{a}})~({{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; {{{{\mathrm{unpack}}}_{{{\mathit{zt}}^\ast}{}[{\mathit{i}}]}^{{{\mathit{sx}}^?}}}}{({\mathit{z}}.\mathsf{struct}{}[{\mathit{a}}].\mathsf{field}{}[{\mathit{i}}])}
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
+&amp; {\mathit{z}} ; (\mathsf{ref.struct}~{\mathit{a}})~({{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; {{{{\mathrm{unpack}}}_{{{\mathit{zt}}^\ast}{}[{\mathit{i}}]}^{{{\mathit{sx}}^?}}}}{({\mathit{z}}.\mathsf{structs}{}[{\mathit{a}}].\mathsf{fields}{}[{\mathit{i}}])}
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-struct-mathsf-struct-set-x-y">
@@ -612,8 +612,8 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~{\mathit{val}}~(\mathsf{struct.set}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; \mathsf{trap} \\
-&amp; {\mathit{z}} ; (\mathsf{ref.struct}~{\mathit{a}})~{\mathit{val}}~(\mathsf{struct.set}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{struct}{}[{\mathit{a}}].\mathsf{field}{}[{\mathit{i}}] = {{\mathrm{pack}}}_{{{\mathit{zt}}^\ast}{}[{\mathit{i}}]}({\mathit{val}})] ; \epsilon
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
+&amp; {\mathit{z}} ; (\mathsf{ref.struct}~{\mathit{a}})~{\mathit{val}}~(\mathsf{struct.set}~{\mathit{x}}~{\mathit{i}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{structs}{}[{\mathit{a}}].\mathsf{fields}{}[{\mathit{i}}] = {{\mathrm{pack}}}_{{{\mathit{zt}}^\ast}{}[{\mathit{i}}]}({\mathit{val}})] ; \epsilon
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-new-x">
@@ -649,7 +649,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.new\_default}~{\mathit{x}}) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}})
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}) \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}) \\
   &amp;&amp;&amp;&amp;\quad {\land}~{{\mathrm{default}}}_{{\mathrm{unpack}}({\mathit{zt}})} = {\mathit{val}} \\
 \end{array}\end{split}\]</div>
 </section>
@@ -676,10 +676,10 @@ since the instruction form is already a <a class="reference internal" href="runt
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{array} = ..{\mathit{ai}}] ; (\mathsf{ref.array}~{\mathit{a}}) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{a}} = {|{\mathit{z}}.\mathsf{array}|} \land {\mathit{ai}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\mathsf{type}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}],\; \mathsf{field}~{({{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}}))^{{\mathit{n}}}} \}\end{array}} \\
+&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{arrays} = ..{\mathit{ai}}] ; (\mathsf{ref.array}~{\mathit{a}}) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{a}} = {|{\mathit{z}}.\mathsf{arrays}|} \land {\mathit{ai}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
+\mathsf{type}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}],\; \mathsf{fields}~{({{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}}))^{{\mathit{n}}}} \}\end{array}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-new-data-x-y">
@@ -718,11 +718,11 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.new\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \mathsf{trap} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{i}} + {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}|}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{i}} + {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}|}} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.new\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {({\mathrm{unpack}}({\mathit{zt}}).\mathsf{const}~{\mathrm{unpackconst}}({\mathit{zt}}, {\mathit{c}}))^{{\mathit{n}}}}~(\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}}) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathrm{concat}}({{{\mathrm{bytes}}}_{{\mathit{zt}}}({\mathit{c}})^{{\mathit{n}}}}) = {\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}{}[{\mathit{i}} : {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathrm{concat}}({{{\mathrm{bytes}}}_{{\mathit{zt}}}({\mathit{c}})^{{\mathit{n}}}}) = {\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}{}[{\mathit{i}} : {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8]} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-new-elem-x-y">
@@ -748,9 +748,9 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.new\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.new\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {{\mathit{ref}}^{{\mathit{n}}}}~(\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}}) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\mathit{ref}}^{{\mathit{n}}}} = {\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}{}[{\mathit{i}} : {\mathit{n}}]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\mathit{ref}}^{{\mathit{n}}}} = {\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}{}[{\mathit{i}} : {\mathit{n}}]} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-get-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-x">
@@ -789,9 +789,9 @@ since the instruction form is already a <a class="reference internal" href="runt
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|} \\
-&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {{{{\mathrm{unpack}}}_{{\mathit{zt}}}^{{{\mathit{sx}}^?}}}}{({\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}{}[{\mathit{i}}])} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|} \\
+&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {{{{\mathrm{unpack}}}_{{\mathit{zt}}}^{{{\mathit{sx}}^?}}}}{({\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}{}[{\mathit{i}}])} } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-set-x">
@@ -831,9 +831,9 @@ since the instruction form is already a <a class="reference internal" href="runt
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{array.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{array.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|} \\
-&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{array.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{array}{}[{\mathit{a}}].\mathsf{field}{}[{\mathit{i}}] = {{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}})] ; \epsilon } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|} \\
+&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{array.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}{}[{\mathit{i}}] = {{\mathrm{pack}}}_{{\mathit{zt}}}({\mathit{val}})] ; \epsilon } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-len">
@@ -855,7 +855,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~\mathsf{array.len} &amp;\hookrightarrow&amp; \mathsf{trap} \\
-&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~\mathsf{array.len} &amp;\hookrightarrow&amp; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|}) \\
+&amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~\mathsf{array.len} &amp;\hookrightarrow&amp; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|}) \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-aray-mathsf-array-fill-x">
@@ -902,7 +902,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{array.set}~{\mathit{x}}) \\ (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{array.fill}~{\mathit{x}}) \end{array} } \\
@@ -1004,17 +1004,17 @@ since the instruction form is already a <a class="reference internal" href="runt
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~{\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.null}~{\mathit{ht}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}}_{{1}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}_{{1}}].\mathsf{field}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}}_{{1}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}_{{1}}].\mathsf{fields}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}}_{{2}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}_{{2}}].\mathsf{field}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}}_{{2}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}_{{2}}].\mathsf{fields}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}}) \\ (\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}}) \\ ({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}_{{2}})~(\mathsf{array.set}~{\mathit{x}}_{{1}}) \\ (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}} + 1)~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) \end{array} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}_{{2}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}_{{2}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}_{{2}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}_{{2}})} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{i}}_{{1}} \leq {\mathit{i}}_{{2}}} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{{\mathit{sx}}^?} = {\mathrm{sx}}({\mathit{zt}}_{{2}})} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}} + {\mathit{n}} - 1) \\ (\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}} + {\mathit{n}} - 1) \\ ({{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}_{{2}})~(\mathsf{array.set}~{\mathit{x}}_{{1}}) \\ (\mathsf{ref.array}~{\mathit{a}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{ref.array}~{\mathit{a}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) \end{array} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}_{{2}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}_{{2}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}_{{2}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}_{{2}})} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{{\mathit{sx}}^?} = {\mathrm{sx}}({\mathit{zt}}_{{2}})} \\
 \end{array}\end{split}\]</div>
 <p>Where:</p>
@@ -1083,15 +1083,15 @@ since the instruction form is already a <a class="reference internal" href="runt
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}) \\
-  &amp;&amp;&amp;&amp;\quad {\land}~{\mathit{j}} + {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}) \\
+  &amp;&amp;&amp;&amp;\quad {\land}~{\mathit{j}} + {\mathit{n}} \cdot {|{\mathit{zt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathrm{unpack}}({\mathit{zt}}).\mathsf{const}~{\mathrm{unpackconst}}({\mathit{zt}}, {\mathit{c}}))~(\mathsf{array.set}~{\mathit{x}}) \\ (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + {|{\mathit{zt}}|} / 8)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{type}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{{\mathrm{bytes}}}_{{\mathit{zt}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}{}[{\mathit{j}} : {|{\mathit{zt}}|} / 8]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{z}}.\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{{\mathrm{bytes}}}_{{\mathit{zt}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}{}[{\mathit{j}} : {|{\mathit{zt}}|} / 8]} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-aray-mathsf-array-init-elem-x-y">
@@ -1148,13 +1148,13 @@ since the instruction form is already a <a class="reference internal" href="runt
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{array}{}[{\mathit{a}}].\mathsf{field}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{arrays}{}[{\mathit{a}}].\mathsf{fields}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}|} \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{array.set}~{\mathit{x}}) \\ (\mathsf{ref.array}~{\mathit{a}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{ref}} = {\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}{}[{\mathit{j}}]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise, if}~{\mathit{ref}} = {\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}{}[{\mathit{j}}]} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-extern-mathsf-any-convert-extern">
@@ -1762,7 +1762,7 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{local.get}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{val}}
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{local}{}[{\mathit{x}}] = {\mathit{val}} \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{locals}{}[{\mathit{x}}] = {\mathit{val}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-variable-mathsf-local-set-x">
@@ -1776,7 +1776,7 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {\mathit{val}}~(\mathsf{local.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{local}{}[{\mathit{x}}] = {\mathit{val}}] ; \epsilon \\
+&amp; {\mathit{z}} ; {\mathit{val}}~(\mathsf{local.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{locals}{}[{\mathit{x}}] = {\mathit{val}}] ; \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-variable-mathsf-local-tee-x">
@@ -1807,7 +1807,7 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{global.get}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{val}}
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{global}{}[{\mathit{x}}].\mathsf{value} = {\mathit{val}} \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{globals}{}[{\mathit{x}}].\mathsf{value} = {\mathit{val}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-variable-mathsf-global-set-x">
@@ -1824,7 +1824,7 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {\mathit{val}}~(\mathsf{global.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{global}{}[{\mathit{x}}].\mathsf{value} = {\mathit{val}}] ; \epsilon \\
+&amp; {\mathit{z}} ; {\mathit{val}}~(\mathsf{global.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{globals}{}[{\mathit{x}}].\mathsf{value} = {\mathit{val}}] ; \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
 </section>
@@ -1851,9 +1851,9 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}{}[{\mathit{i}}]
-  &amp;\quad \mbox{if}~{\mathit{i}} &lt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}{}[{\mathit{i}}]
+  &amp;\quad \mbox{if}~{\mathit{i}} &lt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-table-mathsf-table-set-x">
@@ -1878,9 +1878,9 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{table.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{table.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}{}[{\mathit{i}}] = {\mathit{ref}}] ; \epsilon
-  &amp;\quad \mbox{if}~{\mathit{i}} &lt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} \geq {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{ref}}~(\mathsf{table.set}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}{}[{\mathit{i}}] = {\mathit{ref}}] ; \epsilon
+  &amp;\quad \mbox{if}~{\mathit{i}} &lt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-table-mathsf-table-size-x">
@@ -1897,7 +1897,7 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{table.size}~{\mathit{x}}) &amp;\hookrightarrow&amp; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})
-  &amp;\quad \mbox{if}~{|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} = {\mathit{n}} \\
+  &amp;\quad \mbox{if}~{|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} = {\mathit{n}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-table-mathsf-table-grow-x">
@@ -1940,8 +1940,8 @@ respectively.</p>
 </div></blockquote>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{table}{}[{\mathit{x}}] = {\mathit{ti}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|}) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{ti}} = {\mathrm{growtable}}({\mathit{z}}.\mathsf{table}{}[{\mathit{x}}], {\mathit{n}}, {\mathit{ref}})} \\
+&amp; {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{tables}{}[{\mathit{x}}] = {\mathit{ti}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|}) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{ti}} = {\mathrm{growtable}}({\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}], {\mathit{n}}, {\mathit{ref}})} \\
 &amp; {\mathit{z}} ; {\mathit{ref}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{{{{\mathrm{signed}}}_{32}^{{-1}}}}{({-1})}) \\
 \end{array}\end{split}\]</div>
 <div class="admonition note">
@@ -1991,7 +1991,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{table.set}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.fill}~{\mathit{x}}) \end{array} } \\
@@ -2069,7 +2069,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{y}}].\mathsf{elem}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{y}}].\mathsf{refs}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{table.get}~{\mathit{y}})~(\mathsf{table.set}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.copy}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
@@ -2120,10 +2120,10 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{table}{}[{\mathit{x}}].\mathsf{elem}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{tables}{}[{\mathit{x}}].\mathsf{refs}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~{\mathit{z}}.\mathsf{elem}{}[{\mathit{y}}].\mathsf{elem}{}[{\mathit{i}}]~(\mathsf{table.set}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~{\mathit{z}}.\mathsf{elems}{}[{\mathit{y}}].\mathsf{refs}{}[{\mathit{i}}]~(\mathsf{table.set}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{table.init}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise}} \\
 \end{array}\end{split}\]</div>
 </section>
@@ -2138,7 +2138,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; (\mathsf{elem.drop}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{elem}{}[{\mathit{x}}].\mathsf{elem} = \epsilon] ; \epsilon \\
+&amp; {\mathit{z}} ; (\mathsf{elem.drop}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{elems}{}[{\mathit{x}}].\mathsf{refs} = \epsilon] ; \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
 </section>
@@ -2190,13 +2190,13 @@ However, it may be substantially slower on some hardware.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{load}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {|{\mathit{nt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {|{\mathit{nt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{load}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; ({\mathit{nt}}.\mathsf{const}~{\mathit{c}})
-  &amp;\quad \mbox{if}~{{\mathrm{bytes}}}_{{\mathit{nt}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {|{\mathit{nt}}|} / 8] \\
+  &amp;\quad \mbox{if}~{{\mathrm{bytes}}}_{{\mathit{nt}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {|{\mathit{nt}}|} / 8] \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{i}}{{\mathit{n}}}.\mathsf{load}}{{{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}}}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {\mathit{n}} / 8 &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {\mathit{n}} / 8 &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({{\mathsf{i}}{{\mathit{n}}}.\mathsf{load}}{{{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}}}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; ({\mathsf{i}}{{\mathit{n}}}.\mathsf{const}~{{{{\mathrm{ext}}}_{{\mathit{n}}, {|{\mathsf{i}}{{\mathit{n}}}|}}^{{\mathit{sx}}}}}{({\mathit{c}})})
-  &amp;\quad \mbox{if}~{{\mathrm{bytes}}}_{{\mathsf{i}}{{\mathit{n}}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {\mathit{n}} / 8] \\
+  &amp;\quad \mbox{if}~{{\mathrm{bytes}}}_{{\mathsf{i}}{{\mathit{n}}}}({\mathit{c}}) = {\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {\mathit{n}} / 8] \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-valtype-mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-m-mathsf-x-n-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
@@ -2422,12 +2422,12 @@ S; F; (\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}.\href{../syntax/
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({\mathit{nt}}.\mathsf{store}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}} ; \mathsf{trap} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {|{\mathit{nt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|}} \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({\mathit{nt}}.\mathsf{store}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {|{\mathit{nt}}|} / 8] = {{\mathit{b}}^\ast}] ; \epsilon } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {|{\mathit{nt}}|} / 8 &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|}} \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathit{nt}}.\mathsf{const}~{\mathit{c}})~({\mathit{nt}}.\mathsf{store}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {|{\mathit{nt}}|} / 8] = {{\mathit{b}}^\ast}] ; \epsilon } \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\mathit{b}}^\ast} = {{\mathrm{bytes}}}_{{\mathit{nt}}}({\mathit{c}})} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathsf{i}}{{\mathit{n}}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{store}}{{\mathit{n}}}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}} ; \mathsf{trap} } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {\mathit{n}} / 8 &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|}} \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathsf{i}}{{\mathit{n}}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{store}}{{\mathit{n}}}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {\mathit{n}} / 8] = {{\mathit{b}}^\ast}] ; \epsilon } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} + {\mathit{n}} / 8 &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|}} \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~({\mathsf{i}}{{\mathit{n}}}.\mathsf{const}~{\mathit{c}})~({{\mathit{nt}}.\mathsf{store}}{{\mathit{n}}}~{\mathit{x}}~{\mathit{mo}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}{}[{\mathit{i}} + {\mathit{mo}}.\mathsf{offset} : {\mathit{n}} / 8] = {{\mathit{b}}^\ast}] ; \epsilon } \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\mathit{b}}^\ast} = {{\mathrm{bytes}}}_{{\mathsf{i}}{{\mathit{n}}}}({{{\mathrm{wrap}}}_{{|{\mathsf{i}}{{\mathit{n}}}|}, {\mathit{n}}}}{({\mathit{c}})})} \\
 \end{array}\end{split}\]</div>
 </section>
@@ -2489,7 +2489,7 @@ S; F; (\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}.\href{../syntax/
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{memory.size}~{\mathit{x}}) &amp;\hookrightarrow&amp; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})
-  &amp;\quad \mbox{if}~{\mathit{n}} \cdot 64 \, {\mathrm{Ki}} = {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{n}} \cdot 64 \, {\mathrm{Ki}} = {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-memory-mathsf-memory-grow-x">
@@ -2530,8 +2530,8 @@ S; F; (\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}.\href{../syntax/
 </div></blockquote>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mem}{}[{\mathit{x}}] = {\mathit{mi}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} / 64 \, {\mathrm{Ki}}) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{mi}} = {\mathrm{growmemory}}({\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}], {\mathit{n}})} \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ {\mathit{z}}{}[\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mi}}] ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} / 64 \, {\mathrm{Ki}}) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{mi}} = {\mathrm{growmemory}}({\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}], {\mathit{n}})} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.grow}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{{{{\mathrm{signed}}}_{32}^{{-1}}}}{({-1})}) \\
 \end{array}\end{split}\]</div>
 <div class="admonition note">
@@ -2580,7 +2580,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.fill}~{\mathit{x}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~{\mathit{val}}~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~{\mathit{val}}~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.fill}~{\mathit{x}}) \end{array} } \\
@@ -2654,7 +2654,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}}_{{1}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}_{{1}}].\mathsf{data}|} \lor {\mathit{i}}_{{2}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}_{{2}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}}_{{1}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}_{{1}}].\mathsf{bytes}|} \lor {\mathit{i}}_{{2}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}_{{2}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}})~({\mathsf{i{\scriptstyle32}}.\mathsf{load}}{{{8}{\mathsf{\_}}}{\mathsf{u}}}~{\mathit{x}}_{{2}})~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~{\mathit{x}}_{{1}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{1}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}}_{{2}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}}) \end{array} } \\
@@ -2705,10 +2705,10 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \mathsf{trap}
-  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mem}{}[{\mathit{x}}].\mathsf{data}|} \\
+  &amp;\quad \mbox{if}~{\mathit{i}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}|} \lor {\mathit{j}} + {\mathit{n}} &gt; {|{\mathit{z}}.\mathsf{mems}{}[{\mathit{x}}].\mathsf{bytes}|} \\
 &amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \epsilon
   &amp;\quad \mbox{otherwise, if}~{\mathit{n}} = 0 \\
-&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{z}}.\mathsf{data}{}[{\mathit{y}}].\mathsf{data}{}[{\mathit{i}}])~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
+&amp; {\mathit{z}} ; (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}})~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ \begin{array}[t]{&#64;{}l&#64;{}} (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}})~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{z}}.\mathsf{datas}{}[{\mathit{y}}].\mathsf{bytes}{}[{\mathit{i}}])~({\mathsf{i{\scriptstyle32}}.\mathsf{store}}{8}~{\mathit{x}}) \\ (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{j}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{i}} + 1)~(\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{n}} - 1)~(\mathsf{memory.init}~{\mathit{x}}~{\mathit{y}}) \end{array} } \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{otherwise}} \\
 \end{array}\end{split}\]</div>
 </section>
@@ -2723,7 +2723,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; {\mathit{z}} ; (\mathsf{data.drop}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{data}{}[{\mathit{x}}].\mathsf{data} = \epsilon] ; \epsilon \\
+&amp; {\mathit{z}} ; (\mathsf{data.drop}~{\mathit{x}}) &amp;\hookrightarrow&amp; {\mathit{z}}{}[\mathsf{datas}{}[{\mathit{x}}].\mathsf{bytes} = \epsilon] ; \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
 </section>
@@ -3050,11 +3050,11 @@ S; F; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^m~\href{../syntax/ins
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{call\_ref}~{{\mathit{x}}^?}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{x}}^?}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ ({{\mathsf{frame}}_{{\mathit{m}}}}{\{{\mathit{f}}\}}~({{\mathsf{label}}_{{\mathit{m}}}}{\{\epsilon\}}~{{\mathit{instr}}^\ast})) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{func}{}[{\mathit{a}}] = {\mathit{fi}}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{funcs}{}[{\mathit{a}}] = {\mathit{fi}}} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}})} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{code} = \mathsf{func}~{\mathit{y}}~{(\mathsf{local}~{\mathit{t}})^\ast}~({{\mathit{instr}}^\ast})} \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\mathsf{local}~{{\mathit{val}}^{{\mathit{n}}}}~{({{\mathrm{default}}}_{{\mathit{t}}})^\ast},\; \mathsf{module}~{\mathit{fi}}.\mathsf{module} \}\end{array}} \\
+\mathsf{locals}~{{\mathit{val}}^{{\mathit{n}}}}~{({{\mathrm{default}}}_{{\mathit{t}}})^\ast},\; \mathsf{module}~{\mathit{fi}}.\mathsf{module} \}\end{array}} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lcl&#64;{\qquad}l}
@@ -3141,7 +3141,7 @@ F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\math
 &amp; {\mathit{z}} ; ({{\mathsf{label}}_{{\mathit{k}}}}{\{{{\mathit{instr}'}^\ast}\}}~({{\mathit{val}}^\ast}, (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^\ast}~(\mathsf{return\_call\_ref}~{{\mathit{x}}^?}) \\
 &amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~({{\mathit{val}}^\ast}, (\mathsf{ref.null}~{\mathit{ht}}), (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; \mathsf{trap} \\
 &amp; {\mathit{z}} ; ({{\mathsf{frame}}_{{\mathit{k}}}}{\{{\mathit{f}}\}}~({{\mathit{val}'}^\ast}, {{\mathit{val}}^{{\mathit{n}}}}, (\mathsf{ref.func}~{\mathit{a}}), (\mathsf{return\_call\_ref}~{{\mathit{x}}^?}), {{\mathit{instr}}^\ast})) &amp;\hookrightarrow&amp; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{x}}^?})
-  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{func}{}[{\mathit{a}}].\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}}) \\
+  &amp;\quad \mbox{if}~{\mathit{z}}.\mathsf{funcs}{}[{\mathit{a}}].\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}}) \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lcl&#64;{\qquad}l}

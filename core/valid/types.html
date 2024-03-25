@@ -140,7 +140,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}.\mathsf{type}{}[{\mathit{typeidx}}] = {\mathit{dt}}
+{\mathit{C}}.\mathsf{types}{}[{\mathit{typeidx}}] = {\mathit{dt}}
 }{
 {\mathit{C}} \vdash {\mathit{typeidx}} : \mathsf{ok}
 }
@@ -185,7 +185,7 @@ However, restrictions apply to most other types, such as <a class="reference int
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}.\mathsf{type}{}[{\mathit{typeidx}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+{\mathit{C}}.\mathsf{types}{}[{\mathit{typeidx}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
 }{
 {\mathit{C}} \vdash {\mathit{typeidx}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
 }
@@ -245,7 +245,7 @@ However, restrictions apply to most other types, such as <a class="reference int
  \qquad
 {\mathit{C}} \vdash {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
  \qquad
-({\mathit{C}}.\mathsf{local}{}[{\mathit{x}}] = {{\mathit{lt}}})^\ast
+({\mathit{C}}.\mathsf{locals}{}[{\mathit{x}}] = {{\mathit{lt}}})^\ast
 }{
 {\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
 }
@@ -420,7 +420,7 @@ However, restrictions apply to most other types, such as <a class="reference int
  \qquad
 ({\mathit{x}} &lt; {\mathit{x}}_{{0}})^\ast
  \qquad
-({\mathrm{unroll}}({\mathit{C}}.\mathsf{type}{}[{\mathit{x}}]) = \mathsf{sub}~{{\mathit{x}'}^\ast}~{\mathit{comptype}'})^\ast
+({\mathrm{unroll}}({\mathit{C}}.\mathsf{types}{}[{\mathit{x}}]) = \mathsf{sub}~{{\mathit{x}'}^\ast}~{\mathit{comptype}'})^\ast
  \\
 {\mathit{C}} \vdash {\mathit{comptype}} : \mathsf{ok}
  \qquad
