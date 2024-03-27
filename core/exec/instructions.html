@@ -3026,18 +3026,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; {\mathit{z}} ; (\mathsf{ref.null}~{\mathit{ht}})~(\mathsf{call\_ref}~{{\mathit{y}}}) &amp;\hookrightarrow&amp; \mathsf{trap} \\
-&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{y}}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ ({{\mathsf{frame}}_{{\mathit{m}}}}{\{{\mathit{f}}\}}~({{\mathsf{label}}_{{\mathit{m}}}}{\{\epsilon\}}~{{\mathit{instr}}^\ast})) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{funcs}{}[{\mathit{a}}] = {\mathit{fi}}} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{code} = \mathsf{func}~{\mathit{y}}~{(\mathsf{local}~{\mathit{t}})^\ast}~({{\mathit{instr}}^\ast})} \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\mathsf{locals}~{{\mathit{val}}^{{\mathit{n}}}}~{({{\mathrm{default}}}_{{\mathit{t}}})^\ast},\; \mathsf{module}~{\mathit{fi}}.\mathsf{module} \}\end{array}} \\
 \end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{array}{lcl&#64;{\qquad}l}
-F; (\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a)~(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~x) &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; F; (\href{../exec/runtime.html#syntax-invoke}{\mathsf{invoke}}~a) \\
-F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\mathit{ht})~(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~x) &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; F; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}} \\
-\end{array}\end{split}\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The formal rule for calling a non-null function reference is described <a class="reference internal" href="#exec-invoke"><span class="std std-ref">below</span></a>.</p>
+</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-call-indirect-x-y">
 <span id="exec-call-indirect"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_indirect}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-call-indirect-x-y" title="Permalink to this heading">¶</a></h3>
@@ -3085,7 +3078,7 @@ F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\math
 <li><p>Let <span class="math notranslate nohighlight">\(F\)</span> be the <a class="reference internal" href="conventions.html#exec-notation-textual"><span class="std std-ref">current</span></a> <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a>.</p></li>
 <li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-call"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\(F.\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}.\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{funcaddrs}}[x]\)</span> exists.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(a\)</span> be the <a class="reference internal" href="runtime.html#syntax-funcaddr"><span class="std std-ref">function address</span></a> <span class="math notranslate nohighlight">\(F.\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}.\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{funcaddrs}}[x]\)</span>.</p></li>
-<li><p><a class="reference internal" href="#exec-return-invoke"><span class="std std-ref">Tail-invoke</span></a> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
+<li><p><span class="xref std std-ref">Tail-invoke</span> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3107,7 +3100,7 @@ F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\math
 </li>
 <li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-call-ref"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\(r\)</span> is a <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">function reference</span></a>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a\)</span> be the reference <span class="math notranslate nohighlight">\(r\)</span>.</p></li>
-<li><p><a class="reference internal" href="#exec-return-invoke"><span class="std std-ref">Tail-invoke</span></a> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
+<li><p><span class="xref std std-ref">Tail-invoke</span> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3148,7 +3141,7 @@ F; (\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\math
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p><a class="reference internal" href="#exec-return-invoke"><span class="std std-ref">Tail-invoke</span></a> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
+<li><p><span class="xref std std-ref">Tail-invoke</span> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3198,8 +3191,8 @@ Therefore, execution of a loop falls off the end, unless a backwards branch is p
 <p>The following auxiliary rules define the semantics of invoking a <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a>
 through one of the <a class="reference internal" href="#exec-instr-control"><span class="std std-ref">call instructions</span></a>
 and returning from it.</p>
-<section id="invocation-of-function-address-a">
-<span id="exec-invoke"></span><h3>Invocation of <a class="reference internal" href="runtime.html#syntax-funcaddr"><span class="std std-ref">function address</span></a> <span class="math notranslate nohighlight">\(a\)</span><a class="headerlink" href="#invocation-of-function-address-a" title="Permalink to this heading">¶</a></h3>
+<section id="invocation-of-function-reference-xref-exec-runtime-syntax-ref-mathsf-ref-func-a">
+<span id="exec-invoke"></span><h3>Invocation of <a class="reference internal" href="../syntax/instructions.html#syntax-ref-func"><span class="std std-ref">function reference</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a)\)</span><a class="headerlink" href="#invocation-of-function-reference-xref-exec-runtime-syntax-ref-mathsf-ref-func-a" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-call"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a]\)</span> exists.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(f\)</span> be the <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a>, <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a]\)</span>.</p></li>
@@ -3214,49 +3207,18 @@ and returning from it.</p>
 <li><p><a class="reference internal" href="#exec-instr-seq-enter"><span class="std std-ref">Enter</span></a> the instruction sequence <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast\)</span> with label <span class="math notranslate nohighlight">\(L\)</span>.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{l}
-\begin{array}{lcl&#64;{\qquad}l}
-S; \href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~(\href{../exec/runtime.html#syntax-invoke}{\mathsf{invoke}}~a) &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp; S; \href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}_m\{F\}~\href{../exec/runtime.html#syntax-label}{\mathsf{label}}_m\{\}~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}
-\end{array}
-\\ \qquad
-  \begin{array}[t]{&#64;{}r&#64;{~}l&#64;{}}
-  (\mathrel{\mbox{if}} &amp; S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a] = f \\
-  \wedge &amp; \href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}(f.\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}}) = \href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~[t_1^n] \href{../syntax/types.html#syntax-functype}{\rightarrow} [t_2^m] \\
-  \wedge &amp; f.\href{../exec/runtime.html#syntax-funcinst}{\mathsf{code}} = \{ \href{../syntax/modules.html#syntax-func}{\mathsf{type}}~x, \href{../syntax/modules.html#syntax-func}{\mathsf{locals}}~\{\href{../syntax/modules.html#syntax-local}{\mathsf{type}}~t\}^k, \href{../syntax/modules.html#syntax-func}{\mathsf{body}}~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} \} \\
-  \wedge &amp; F = \{ \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~f.\href{../exec/runtime.html#syntax-funcinst}{\mathsf{module}}, ~\href{../exec/runtime.html#syntax-frame}{\mathsf{locals}}~\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~(\href{../exec/runtime.html#default-val}{\mathrm{default}}_t)^k \})
-  \end{array} \\
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; {\mathit{z}} ; {{\mathit{val}}^{{\mathit{n}}}}~(\mathsf{ref.func}~{\mathit{a}})~(\mathsf{call\_ref}~{{\mathit{y}}}) &amp;\hookrightarrow&amp; \multicolumn{2}{l&#64;{}}{ ({{\mathsf{frame}}_{{\mathit{m}}}}{\{{\mathit{f}}\}}~({{\mathsf{label}}_{{\mathit{m}}}}{\{\epsilon\}}~{{\mathit{instr}}^\ast})) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{\mathit{z}}.\mathsf{funcs}{}[{\mathit{a}}] = {\mathit{fi}}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{type} \approx \mathsf{func}~({{\mathit{t}}_{{1}}^{{\mathit{n}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{m}}}})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{fi}}.\mathsf{code} = \mathsf{func}~{\mathit{x}}~{(\mathsf{local}~{\mathit{t}})^\ast}~({{\mathit{instr}}^\ast})} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~{\mathit{f}} = \{ \begin{array}[t]{&#64;{}l&#64;{}}
+\mathsf{locals}~{{\mathit{val}}^{{\mathit{n}}}}~{({{\mathrm{default}}}_{{\mathit{t}}})^\ast},\; \mathsf{module}~{\mathit{fi}}.\mathsf{module} \}\end{array}} \\
 \end{array}\end{split}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For non-defaultable types, the respective local is left uninitialized by these rules.</p>
 </div>
-</section>
-<section id="tail-invocation-of-function-address-a">
-<span id="exec-return-invoke"></span><h3>Tail-invocation of <a class="reference internal" href="runtime.html#syntax-funcaddr"><span class="std std-ref">function address</span></a> <span class="math notranslate nohighlight">\(a\)</span><a class="headerlink" href="#tail-invocation-of-function-address-a" title="Permalink to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-call"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a]\)</span> exists.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~[t_1^n] \href{../syntax/types.html#syntax-functype}{\rightarrow} [t_2^m]\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-comptype"><span class="std std-ref">composite type</span></a> <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a].\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}})\)</span>.</p></li>
-<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-return-call"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
-<li><p>Pop the results <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n\)</span> from the stack.</p></li>
-<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-return-call"><span class="std std-ref">validation</span></a>, the stack contains at least one <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a>.</p></li>
-<li><p>While the top of the stack is not a frame, do:</p>
-<ol class="loweralpha simple">
-<li><p>Pop the top element from the stack.</p></li>
-</ol>
-</li>
-<li><p>Assert: the top of the stack is a frame.</p></li>
-<li><p>Pop the frame from the stack.</p></li>
-<li><p>Push <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n\)</span> to the stack.</p></li>
-<li><p><a class="reference internal" href="#exec-invoke"><span class="std std-ref">Invoke</span></a> the function instance at address <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
-</ol>
-<div class="math notranslate nohighlight">
-\[\begin{split}~\\[-1ex]
-\begin{array}{lcl&#64;{\qquad}l}
- S; \href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}_m\{F\}~B^\ast[\href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~(\href{../exec/runtime.html#syntax-return-invoke}{\mathsf{return\_invoke}}~a)]~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}} &amp;\href{../exec/conventions.html#formal-notation}{\hookrightarrow}&amp;
-   \href{../exec/runtime.html#syntax-val}{\mathit{val}}^n~(\href{../exec/runtime.html#syntax-invoke}{\mathsf{invoke}}~a)
-   &amp; (\mathrel{\mbox{if}} \href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a].\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}}) = \href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~[t_1^n] \href{../syntax/types.html#syntax-functype}{\rightarrow} [t_2^m])
-\end{array}\end{split}\]</div>
 </section>
 <section id="returning-from-a-function">
 <span id="exec-invoke-exit"></span><h3>Returning from a function<a class="headerlink" href="#returning-from-a-function" title="Permalink to this heading">¶</a></h3>
