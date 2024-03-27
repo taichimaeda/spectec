@@ -145,12 +145,12 @@ No distinction is made between signalling and quiet NaNs.</p>
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {{\mathit{f}}}{{\mathit{N}}} &amp;::=&amp; {+{{{\mathit{f}}}{{\mathit{N}}}}{{\mathit{mag}}}} ~|~ {-{{{\mathit{f}}}{{\mathit{N}}}}{{\mathit{mag}}}} \\
 &amp; {{{\mathit{f}}}{{\mathit{N}}}}{{\mathit{mag}}} &amp;::=&amp; (1 + {\mathit{m}} \cdot {2^{{-{\mathit{M}}}}}) \cdot {2^{{\mathit{n}}}}
-  &amp;\quad \mbox{if}~{\mathit{m}} &lt; {2^{{\mathit{M}}}} \land 2 - {2^{{\mathit{E}} - 1}} \leq {\mathit{n}} \leq {2^{{\mathit{E}} - 1}} - 1 \\ &amp;&amp;|&amp;
+  &amp;\qquad \mbox{if}~{\mathit{m}} &lt; {2^{{\mathit{M}}}} \land 2 - {2^{{\mathit{E}} - 1}} \leq {\mathit{n}} \leq {2^{{\mathit{E}} - 1}} - 1 \\ &amp;&amp;|&amp;
 (0 + {\mathit{m}} \cdot {2^{{-{\mathit{M}}}}}) \cdot {2^{{\mathit{n}}}}
-  &amp;\quad \mbox{if}~{\mathit{m}} &lt; {2^{{\mathit{M}}}} \land 2 - {2^{{\mathit{E}} - 1}} = {\mathit{n}} \\ &amp;&amp;|&amp;
+  &amp;\qquad \mbox{if}~{\mathit{m}} &lt; {2^{{\mathit{M}}}} \land 2 - {2^{{\mathit{E}} - 1}} = {\mathit{n}} \\ &amp;&amp;|&amp;
 \infty \\ &amp;&amp;|&amp;
 {\mathsf{nan}}{{\mathit{m}}}
-  &amp;\quad \mbox{if}~1 \leq {\mathit{m}} &lt; {2^{{\mathit{M}}}} \\
+  &amp;\qquad \mbox{if}~1 \leq {\mathit{m}} &lt; {2^{{\mathit{M}}}} \\
 \end{array}\end{split}\]</div>
 <p id="aux-exponent"><span id="aux-significand"></span>where <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{~}c&#64;{~}l&#64;{}l&#64;{}} {\mathit{M}} &amp;=&amp; {\mathrm{signif}}({\mathit{N}}) \\ \end{array}\)</span> and <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{~}c&#64;{~}l&#64;{}l&#64;{}} {\mathit{E}} &amp;=&amp; {\mathrm{expon}}({\mathit{N}}) \\ \end{array}\)</span> with</p>
 <div class="math notranslate nohighlight">
@@ -190,7 +190,7 @@ They are represented in the abstract syntax using <span class="math notranslate 
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\mathit{name}} &amp;::=&amp; {{\mathit{char}}^\ast}
-  &amp;\quad \mbox{if}~{|{\mathrm{utf{\scriptstyle8}}}({{\mathit{char}}^\ast})|} &lt; {2^{32}} \\
+  &amp;\qquad \mbox{if}~{|{\mathrm{utf{\scriptstyle8}}}({{\mathit{char}}^\ast})|} &lt; {2^{32}} \\
 &amp; {\mathit{char}} &amp;::=&amp; \mathrm{U{+}00} ~|~ \dots ~|~ \mathrm{U{+}D7FF} ~|~ \mathrm{U{+}E000} ~|~ \dots ~|~ \mathrm{U{+}10FFFF} \\
 \end{array}\end{split}\]</div>
 <p>Due to the limitations of the <a class="reference internal" href="../binary/values.html#binary-name"><span class="std std-ref">binary format</span></a>,
