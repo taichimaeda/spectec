@@ -89,20 +89,40 @@ and gen_iter (it : CoqAst.iter) =
     | List -> ""
     | List1 -> ""
     | ListN (exp, id) -> "" *)
-      
+let gen_premises (p : CoqAst.premise) =
+  match p.it with
+    | IfPr exp -> gen_exp exp
+    | _ -> ""
+
+let gen_variant_type (id : id) (t : CoqAst.typ) =
+  match t.it with
+    | TupT [] -> id.it
+    | _ -> gen_typ t ^ " -> " ^ id.it
+let gen_variant_premises (premises : CoqAst.premise list) =
+  let e = (match premises with
+    | [] -> ""
+    | _ -> " -> ") in
+  String.concat " /\\ " (List.map gen_premises premises) ^ e
+let gen_typcases id typcases = 
+  "Inductive " ^ id.it ^ ": Type :=\n" ^ 
+  String.concat "\n" (List.map (fun (a, (t, premises)) -> 
+    "\t| " ^ id.it ^ "__" ^ gen_atom a ^ ": " ^ gen_variant_premises premises 
+    ^ gen_variant_type id t) typcases)
+
 let gen_def (d : CoqAst.def) =
   match d.it with
     | SynD (id, deftyp) -> (match deftyp.it with
       | AliasT typ -> "Definition " ^ id.it ^ " := " ^ gen_typ typ
       | NotationT (_mixop, _typ) -> gen_exp (CoqAst.TextE "" $ no_region)
       | StructT _typfields -> ""
-      | VariantT _typcases -> gen_exp (CoqAst.TextE "" $ no_region)) 
+      | VariantT typcases -> gen_typcases id typcases
+    )
     | RelD (_id, _mixop, _typ, _rules) -> ""
     | DecD (_id, _typ1, _typ2, _clauses) -> ""
     | RecD _defs -> ""
 
 let gen_script (il : CoqAst.script) =
-  String.concat "\n" (List.map (fun d -> gen_def d ^ ".\n") il) 
+  String.concat "\n" (List.map (fun d -> gen_def d ^ "\n.") il) 
 let gen_string (il : script) =
   let translated_il = translate_il il in
   gen_script translated_il

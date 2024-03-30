@@ -1,14 +1,17 @@
 open Il.Ast
-open Util
-open Source
+open Util.Source
 
-
+let _error at msg = Util.Source.error at "Coq generation" msg
 module CoqAst = Ast
 
 module IdSet = Set.Make(String)
 let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"] |> IdSet.of_list
 
-let make_id s = match s with
+let rec make_id s = 
+  let s' = make_id' s.it in
+  s' $ s.at
+
+and make_id' s = match s with
  | s when IdSet.mem s reserved_ids -> "reserved__" ^ s
  | s -> String.map (function
     | '.' -> '_'
@@ -18,7 +21,7 @@ let make_id s = match s with
 
 let translate_atom (a : atom) =
   match a with
-    | Atom str -> CoqAst.Atom (make_id str)
+    | Atom str -> CoqAst.Atom (make_id' str)
     | _ -> CoqAst.Atom (Il.Print.string_of_atom a)
 
 let translate_binop (b : binop) =
@@ -53,7 +56,7 @@ let rec translate_typ (t : typ) =
   t' $ t.at
 and translate_typ' (t: typ) =
   match t.it with
-    | VarT id -> CoqAst.VarT (make_id id.it $ id.at)
+    | VarT id -> CoqAst.VarT (make_id id)
     | NumT _ -> CoqAst.NatT
     | TextT -> CoqAst.TextT
     | BoolT -> CoqAst.BoolT
@@ -66,7 +69,7 @@ and translate_exp (e : exp) =
 
 and translate_exp' (e : exp) =
   match e.it with
-    | VarE id -> CoqAst.VarE (make_id id.it $ id.at)
+    | VarE id -> CoqAst.VarE (make_id id)
     | BoolE bool -> CoqAst.BoolE bool
     | NatE nat -> CoqAst.NatE nat
     | TextE text -> CoqAst.TextE ("\"" ^ String.escaped text ^ "\"")
@@ -113,28 +116,35 @@ and translate_iter (it : iter) =
     | List1 -> CoqAst.List1
     | ListN (exp, id) -> CoqAst.ListN (translate_exp exp, id)
 
+let rec translate_premise (p : premise) =
+  let p' = translate_premise' p in
+  p' $ p.at
+and translate_premise' (p : premise) = 
+  match p.it with
+    | RulePr (id, mixop, exp) -> CoqAst.RulePr (id, translate_mixop mixop, translate_exp exp)
+    | IfPr exp -> CoqAst.IfPr (translate_exp exp)
+    | LetPr (exp1, exp2, ids) -> CoqAst.LetPr (translate_exp exp1, translate_exp exp2, ids)
+    | ElsePr -> CoqAst.ElsePr
+    | IterPr (premise, (iter, ids)) -> CoqAst.IterPr (translate_premise premise, (translate_iter iter, ids))
+
 let rec translate_def (d : def) : CoqAst.def =
   let d' = translate_def' d in
   d' $ d.at
-   
+
 and translate_def' (d : def) =
   match d.it with
-    | SynD (id, deftyp) -> CoqAst.SynD (make_id id.it $ id.at, match deftyp.it with 
-      | AliasT typ -> CoqAst.AliasT (translate_typ typ) $ deftyp.at
-      | NotationT (_mixop, _typ) -> CoqAst.StructT [] $ no_region
-      | StructT (_typfields) -> CoqAst.StructT [] $ no_region
-      | VariantT (_variants) -> CoqAst.StructT [] $ no_region)
+    | SynD (id, deftyp) -> CoqAst.SynD (make_id id, (match deftyp.it with 
+      | AliasT typ -> CoqAst.AliasT (translate_typ typ)
+      | NotationT (_mixop, _typ) -> CoqAst.StructT []
+      | StructT (_typfields) -> CoqAst.StructT []
+      | VariantT typcases -> CoqAst.VariantT (List.map (fun (a, (_, t, prems), _) -> 
+        (translate_atom a, (translate_typ t, List.map translate_premise prems))) typcases)) 
+        $ deftyp.at)
     | RelD (_id, _mixop, _typ, _rules) -> CoqAst.RecD []
     | DecD (_id, _typ1, _typ2, _clauses) -> CoqAst.RecD []
     | RecD _defs -> CoqAst.RecD []
     | HintD _ -> CoqAst.RecD []
   
-
-let is_not_syntax (d : def) =
-  match d.it with
-    | SynD _ -> true
-    | _ -> false 
-
-let translate_il (il: script) = 
-  List.map (fun d -> translate_def d) (List.filter is_not_syntax il)
+ let translate_il (il: script) = 
+  List.map (fun d -> translate_def d) il
 

@@ -68,8 +68,8 @@ and deftyp' =
   | StructT of typfield list            (* record type *)
   | VariantT of typcase list            (* variant type *)
 
-and typfield = atom * (binds * typ * premise list)   (* record field *)
-and typcase = atom * (binds * typ * premise list)    (* variant case *)
+and typfield = atom * (typ * premise list)   (* record field *)
+and typcase = atom * (typ * premise list)    (* variant case *)
 
 
 
