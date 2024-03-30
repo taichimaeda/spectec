@@ -1,7 +1,7 @@
 open Il.Ast
 open Util.Source
 
-let _error at msg = Util.Source.error at "Coq generation" msg
+let _error at msg = Util.Error.error at "Coq generation" msg
 module CoqAst = Ast
 
 module IdSet = Set.Make(String)
@@ -19,10 +19,7 @@ and make_id' s = match s with
     | c -> c
     ) s
 
-let translate_atom (a : atom) =
-  match a with
-    | Atom str -> CoqAst.Atom (make_id' str)
-    | _ -> CoqAst.Atom (Il.Print.string_of_atom a)
+let translate_atom (a : atom) = a
 
 let translate_binop (b : binop) =
   match b with
@@ -41,6 +38,8 @@ let translate_unop (u : unop) =
     | NotOp -> CoqAst.NotOp
     | PlusOp _ -> CoqAst.PlusOp
     | MinusOp _ -> CoqAst.MinusOp
+    | PlusMinusOp _ -> CoqAst.PlusMinusOp
+    | MinusPlusOp _ -> CoqAst.MinusPlusOp
 
 let translate_cmpop (c : cmpop) =
   match c with
@@ -56,11 +55,11 @@ let rec translate_typ (t : typ) =
   t' $ t.at
 and translate_typ' (t: typ) =
   match t.it with
-    | VarT id -> CoqAst.VarT (make_id id)
+    | VarT (id, _) -> CoqAst.VarT (make_id id)
     | NumT _ -> CoqAst.NatT
     | TextT -> CoqAst.TextT
     | BoolT -> CoqAst.BoolT
-    | TupT typs -> CoqAst.TupT (List.map (fun t -> translate_typ t) typs)
+    | TupT typs -> CoqAst.TupT (List.map (fun (_, t) -> translate_typ t) typs)
     | IterT (typ, iter) -> CoqAst.IterT (translate_typ typ, translate_iter iter)
 
 and translate_exp (e : exp) = 
@@ -76,28 +75,40 @@ and translate_exp' (e : exp) =
     | UnE (op, exp) ->  CoqAst.UnE (translate_unop op, translate_exp exp)
     | BinE (binop, exp1, exp2) -> CoqAst.BinE (translate_binop binop, translate_exp exp1, translate_exp exp2)
     | CmpE (cmpop, exp1, exp2) -> CoqAst.CmpE (translate_cmpop cmpop, translate_exp exp1, translate_exp exp2)
-    | IdxE (exp1, exp2) -> CoqAst.CallE ("lookup_total" $ no_region, (CoqAst.TupE [translate_exp exp1; translate_exp exp2]) $ e.at) 
+    | IdxE (exp1, exp2) -> CoqAst.CallE ("lookup_total" $ no_region, ([CoqAst.ExpA (translate_exp exp1) $ exp1.at ; CoqAst.ExpA (translate_exp exp2) $ exp2.at ])) 
     | SliceE (exp1, exp2, exp3) -> CoqAst.SliceE (translate_exp exp1, translate_exp exp2, translate_exp exp3)
     | UpdE (exp, path, exp2) -> CoqAst.UpdE (translate_exp exp, translate_path path, translate_exp exp2)
     | ExtE (exp1, path, exp2) -> CoqAst.ExtE (translate_exp exp1, translate_path path, translate_exp exp2)
     | StrE expfields -> CoqAst.StrE (List.map (fun (a, e) -> (translate_atom a, translate_exp e)) expfields)       
     | DotE (exp, atom) -> CoqAst.DotE (translate_exp exp, translate_atom atom)       
     | CompE (exp, exp2) -> CoqAst.CompE (translate_exp exp, translate_exp exp2)
-    | LenE exp -> CoqAst.CallE ("List.length" $ no_region, CoqAst.TupE [translate_exp exp] $ e.at)                 
+    | LenE exp -> CoqAst.CallE ("List.length" $ no_region, [CoqAst.ExpA (translate_exp exp) $ exp.at])                 
     | TupE exps -> CoqAst.TupE (List.map (fun e -> translate_exp e) exps)
-    | MixE (mixop, exp) -> CoqAst.MixE (translate_mixop mixop, translate_exp exp)
-    | CallE (id, exp) -> CoqAst.CallE (id, translate_exp exp)
-    | IterE (exp, (iter, ids)) -> CoqAst.IterE (translate_exp exp, (translate_iter iter, ids))
+    | CallE (id, args) -> CoqAst.CallE (id, List.map (fun a -> translate_arg a) args)
+    | IterE (exp, iexp) -> CoqAst.IterE (translate_exp exp, translate_iterexp iexp)
     | OptE None -> CoqAst.OptE (None)
     | OptE (Some exp) -> CoqAst.OptE (Some (translate_exp exp))
     | TheE exp -> CoqAst.TheE (translate_exp exp)   
     | ListE exps -> CoqAst.ListE (List.map (fun e -> translate_exp e) exps)
     | CatE (exp1, exp2) -> CoqAst.CatE (translate_exp exp1, translate_exp exp2)
-    | CaseE (atom, exp) -> CoqAst.CaseE (translate_atom atom, translate_exp exp)         
+    | CaseE (mixop, exp) -> CoqAst.CaseE (mixop, translate_exp exp)         
     | SubE (exp, typ1, typ2) -> CoqAst.SubE (translate_exp exp, translate_typ typ1, translate_typ typ2)
+    | ProjE (exp, n) -> CoqAst.ProjE (translate_exp exp, n)
+    | UncaseE (exp, mixop) -> CoqAst.UncaseE (translate_exp exp, mixop)
 
-and translate_mixop (m : mixop) =
-  List.map (fun l -> List.map (fun a -> translate_atom a) l) m
+and translate_arg (a : arg) = 
+  let a' = translate_arg' a in
+  a' $ a.at
+
+and translate_iterexp (iexp: iterexp) =
+  let (iter, ids) = iexp in
+  (translate_iter iter, List.map (fun (id, t) -> (id, translate_typ t)) ids)
+
+and translate_arg' (a : arg) =
+  match a.it with
+    | ExpA e -> CoqAst.ExpA (translate_exp e)
+    | TypA t -> CoqAst.TypA (translate_typ t)
+
 and translate_path (p : path) =
   let p' = translate_path' p in
   p' $ p.at
@@ -116,30 +127,48 @@ and translate_iter (it : iter) =
     | List1 -> CoqAst.List1
     | ListN (exp, id) -> CoqAst.ListN (translate_exp exp, id)
 
-let rec translate_premise (p : premise) =
+let rec translate_param (p : param) = 
+  let p' = translate_param' p in
+  p' $ p.at
+
+and translate_param' (p : param) = 
+  match p.it with
+    | ExpP (id, typ) -> CoqAst.ExpP (make_id id, translate_typ typ)
+    | TypP id -> CoqAst.TypP (make_id id)
+let rec translate_premise (p : prem) =
   let p' = translate_premise' p in
   p' $ p.at
-and translate_premise' (p : premise) = 
+and translate_premise' (p : prem) = 
   match p.it with
-    | RulePr (id, mixop, exp) -> CoqAst.RulePr (id, translate_mixop mixop, translate_exp exp)
+    | RulePr (id, mixop, exp) -> CoqAst.RulePr (id, mixop, translate_exp exp)
     | IfPr exp -> CoqAst.IfPr (translate_exp exp)
     | LetPr (exp1, exp2, ids) -> CoqAst.LetPr (translate_exp exp1, translate_exp exp2, ids)
     | ElsePr -> CoqAst.ElsePr
-    | IterPr (premise, (iter, ids)) -> CoqAst.IterPr (translate_premise premise, (translate_iter iter, ids))
+    | IterPr (premise, iexp) -> CoqAst.IterPr (translate_premise premise, translate_iterexp iexp)
 
+
+let rec translate_inst (i : inst) =
+  let i' = translate_inst' i in
+  i' $ i.at
+
+and translate_inst' (i : inst) =
+  match i.it with
+    | InstD (_, args, deftyp) -> CoqAst.InstD (List.map translate_arg args, 
+      let deftyp' = (match deftyp.it with
+        | AliasT typ -> CoqAst.AliasT (translate_typ typ)
+        | StructT typfields -> CoqAst.StructT (List.map (fun (a, (_, typ, premises), _) -> (translate_atom a, (translate_typ typ, 
+                                              List.map translate_premise premises))) typfields)
+        | VariantT typcases -> CoqAst.VariantT (List.map (fun (m, (_, typ, premises), _) -> (m, (translate_typ typ, 
+                                              List.map translate_premise premises))) typcases)
+      ) in deftyp' $ deftyp.at
+    )
 let rec translate_def (d : def) : CoqAst.def =
   let d' = translate_def' d in
   d' $ d.at
 
 and translate_def' (d : def) =
   match d.it with
-    | SynD (id, deftyp) -> CoqAst.SynD (make_id id, (match deftyp.it with 
-      | AliasT typ -> CoqAst.AliasT (translate_typ typ)
-      | NotationT (_mixop, _typ) -> CoqAst.StructT []
-      | StructT (_typfields) -> CoqAst.StructT []
-      | VariantT typcases -> CoqAst.VariantT (List.map (fun (a, (_, t, prems), _) -> 
-        (translate_atom a, (translate_typ t, List.map translate_premise prems))) typcases)) 
-        $ deftyp.at)
+    | TypD (id, params, insts) -> CoqAst.TypD (make_id id, List.map translate_param params, List.map translate_inst insts) 
     | RelD (_id, _mixop, _typ, _rules) -> CoqAst.RecD []
     | DecD (_id, _typ1, _typ2, _clauses) -> CoqAst.RecD []
     | RecD _defs -> CoqAst.RecD []
