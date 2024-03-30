@@ -13,7 +13,7 @@ The only exception are :ref:`structured control instructions <binary-instr-contr
    Gaps in the byte code ranges for encoding instructions are reserved for future extensions.
 
 
-.. index:: control instructions, structured control, label, block, branch, result type, value type, block type, label index, function index, type index, vector, polymorphism, LEB128
+.. index:: control instructions, structured control, label, block, branch, result type, value type, block type, label index, function index, type index, list, polymorphism, LEB128
    pair: binary format; instruction
    pair: binary format; block type
 .. _binary-instr-control:
@@ -67,7 +67,7 @@ Control Instructions
        &\Rightarrow& \IF~\X{bt}~\X{in}_1^\ast~\ELSE~\X{in}_2^\ast~\END \\ &&|&
      \hex{0C}~~l{:}\Blabelidx &\Rightarrow& \BR~l \\ &&|&
      \hex{0D}~~l{:}\Blabelidx &\Rightarrow& \BRIF~l \\ &&|&
-     \hex{0E}~~l^\ast{:}\Bvec(\Blabelidx)~~l_N{:}\Blabelidx
+     \hex{0E}~~l^\ast{:}\Blist(\Blabelidx)~~l_N{:}\Blabelidx
        &\Rightarrow& \BRTABLE~l^\ast~l_N \\ &&|&
      \hex{0F} &\Rightarrow& \RETURN \\ &&|&
      \hex{10}~~x{:}\Bfuncidx &\Rightarrow& \CALL~x \\ &&|&
@@ -193,7 +193,7 @@ Parametric Instructions
    \production{instruction} & \Binstr &::=& \dots \\ &&|&
      \hex{1A} &\Rightarrow& \DROP \\ &&|&
      \hex{1B} &\Rightarrow& \SELECT \\ &&|&
-     \hex{1C}~~t^\ast{:}\Bvec(\Bvaltype) &\Rightarrow& \SELECT~t^\ast \\
+     \hex{1C}~~t^\ast{:}\Blist(\Bvaltype) &\Rightarrow& \SELECT~t^\ast \\
    \end{array}
 
 
@@ -261,7 +261,7 @@ Table Instructions
 Memory Instructions
 ~~~~~~~~~~~~~~~~~~~
 
-Each variant of :ref:`memory instruction <syntax-instr-memory>` is encoded with a different byte code. Loads and stores are followed by the encoding of their |memarg| immediate.
+Each variant of :ref:`memory instruction <syntax-instr-memory>` is encoded with a different byte code. Loads and stores are followed by the encoding of their |memarg| immediate, which includes the :ref:`memory index <binary-memidx>` if bit 6 of the flags field containing alignment is set; the memory index defaults to 0 otherwise.
 
 .. _binary-memarg:
 .. _binary-load:
@@ -276,9 +276,12 @@ Each variant of :ref:`memory instruction <syntax-instr-memory>` is encoded with 
 .. _binary-data.drop:
 
 .. math::
-   \begin{array}{llclll}
+   \begin{array}{llcllll}
    \production{memory argument} & \Bmemarg &::=&
-     a{:}\Bu32~~o{:}\Bu32 &\Rightarrow& \{ \ALIGN~a,~\OFFSET~o \} \\
+     a{:}\Bu32~~o{:}\Bu32 &\Rightarrow& 0~\{ \ALIGN~a,~\OFFSET~o \}
+       & (\iff a < 2^6) \\ &&|&
+     a{:}\Bu32~~x{:}\memidx~~o{:}\Bu32 &\Rightarrow& x~\{ \ALIGN~(a - 2^6),~\OFFSET~o \}
+       & (\iff 2^6 \leq a < 2^7) \\
    \production{instruction} & \Binstr &::=& \dots \\ &&|&
      \hex{28}~~m{:}\Bmemarg &\Rightarrow& \I32.\LOAD~m \\ &&|&
      \hex{29}~~m{:}\Bmemarg &\Rightarrow& \I64.\LOAD~m \\ &&|&
@@ -303,17 +306,13 @@ Each variant of :ref:`memory instruction <syntax-instr-memory>` is encoded with 
      \hex{3C}~~m{:}\Bmemarg &\Rightarrow& \I64.\STORE\K{8}~m \\ &&|&
      \hex{3D}~~m{:}\Bmemarg &\Rightarrow& \I64.\STORE\K{16}~m \\ &&|&
      \hex{3E}~~m{:}\Bmemarg &\Rightarrow& \I64.\STORE\K{32}~m \\ &&|&
-     \hex{3F}~~\hex{00} &\Rightarrow& \MEMORYSIZE \\ &&|&
-     \hex{40}~~\hex{00} &\Rightarrow& \MEMORYGROW \\ &&|&
-     \hex{FC}~~8{:}\Bu32~~x{:}\Bdataidx~\hex{00} &\Rightarrow& \MEMORYINIT~x \\ &&|&
+     \hex{3F}~~x{:}\Bmemidx &\Rightarrow& \MEMORYSIZE~x \\ &&|&
+     \hex{40}~~x{:}\Bmemidx &\Rightarrow& \MEMORYGROW~x \\ &&|&
+     \hex{FC}~~8{:}\Bu32~~y{:}\Bdataidx~x{:}\Bmemidx &\Rightarrow& \MEMORYINIT~x~y \\ &&|&
      \hex{FC}~~9{:}\Bu32~~x{:}\Bdataidx &\Rightarrow& \DATADROP~x \\ &&|&
-     \hex{FC}~~10{:}\Bu32~~\hex{00}~~\hex{00} &\Rightarrow& \MEMORYCOPY \\ &&|&
-     \hex{FC}~~11{:}\Bu32~~\hex{00} &\Rightarrow& \MEMORYFILL \\
+     \hex{FC}~~10{:}\Bu32~~x{:}\Bmemidx~~y{:}\Bmemidx &\Rightarrow& \MEMORYCOPY~x~y \\ &&|&
+     \hex{FC}~~11{:}\Bu32~~x{:}\Bmemidx &\Rightarrow& \MEMORYFILL~x \\
    \end{array}
-
-.. note::
-   In future versions of WebAssembly, the additional zero bytes occurring in the encoding of the |MEMORYSIZE|, |MEMORYGROW|, |MEMORYCOPY|, and |MEMORYFILL| instructions may be used to index additional memories.
-
 
 .. index:: numeric instruction
    pair: binary format; instruction
