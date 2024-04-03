@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-04-02)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-04-03)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -131,7 +131,7 @@ These operations closely match respective operations available in hardware.</p>
 {\mathit{numtype}} . {{\mathit{binop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{testop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{relop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
-{\mathit{numtype}}_{{1}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}
+{\mathit{numtype}}_{{1}} . {{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}
   &amp;\qquad \mbox{if}~{\mathit{numtype}}_{{1}} \neq {\mathit{numtype}}_{{2}} \\ &amp;&amp;|&amp;
 {{{{\mathit{numtype}}.\mathsf{extend}}{{\mathit{n}}}}{\mathsf{\_}}}{\mathsf{s}} \\ &amp;&amp;|&amp;
 \dots \\[0.8ex]
@@ -198,7 +198,8 @@ For the other integer instructions, the use of two’s complement for the signed
   &amp;\qquad \mbox{if}~{|{\mathrm{lanetype}}({\mathit{ishape}}_{{1}})|} = 2 \cdot {|{\mathrm{lanetype}}({\mathit{ishape}}_{{2}})|} \\ &amp;&amp;|&amp;
 {{{{{\mathit{ishape}}_{{1}}.\mathsf{narrow}}{\mathsf{\_}}}{{\mathit{ishape}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}}
   &amp;\qquad \mbox{if}~{|{\mathrm{lanetype}}({\mathit{ishape}}_{{2}})|} = 2 \cdot {|{\mathrm{lanetype}}({\mathit{ishape}}_{{1}})|} \leq 32 \\ &amp;&amp;|&amp;
-{\mathit{shape}} . {{{{{{{{{\mathit{vcvtop}}}{\mathsf{\_}}}{{{\mathit{half}}^?}}}{\mathsf{\_}}}{{\mathit{shape}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}}{\mathsf{\_}}}{{{\mathit{zero}}^?}} \\ &amp;&amp;|&amp;
+{\mathit{shape}}_{{1}} . {{{{\mathit{vcvtop}}}_{{\mathit{shape}}_{{2}}}({\mathit{shape}}_{{1}})}{\mathsf{\_}}}{{\mathit{shape}}_{{2}}}
+  &amp;\qquad \mbox{if}~{\mathrm{lanetype}}({\mathit{shape}}_{{1}}) \neq {\mathrm{lanetype}}({\mathit{shape}}_{{2}}) \\ &amp;&amp;|&amp;
 \dots \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
