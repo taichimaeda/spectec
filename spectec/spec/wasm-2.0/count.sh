@@ -1,1 +1,1 @@
-grep -v "^$" *.watsup | wc -l
+grep -v "^ *$" *.watsup | wc -l
