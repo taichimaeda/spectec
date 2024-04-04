@@ -5,18 +5,25 @@ open Util.Source
 module CoqAst = Ast
 
 let parens s = "(" ^ s ^ ")"
+let curly_parens s = "{" ^ s ^ "}"
 
-let gen_atom (a : CoqAst.atom) = Il.Atom.string_of_atom a
-let gen_mixop (m : mixop) = Il.Atom.string_of_mixop m
+(* Hack for now for mixops, anonymous names with be a *)
+let reserved_mixop_name = "a"
 
-let rec gen_typ (t: CoqAst.typ) =
-  match t.it with
-    | VarT id -> id.it
-    | NatT -> "nat"
-    | TextT -> "string"
-    | BoolT -> "bool"
-    | TupT typs -> String.concat " * " (List.map (fun t -> gen_typ t) typs)
-    | IterT (_typ, _iter) -> ""
+let _gen_atom (a : CoqAst.atom) = Il.Atom.string_of_atom a
+let gen_mixop (m : mixop) =
+  match m with
+    | [{it = Atom a; _}]::tail when List.for_all ((=) []) tail -> a
+    | _ -> reserved_mixop_name
+    
+let gen_iter (it : CoqAst.iter) =
+  match it with
+    | Opt -> "option"
+    | List -> "list"
+    | List1 -> "list"
+    | ListN (_exp, _id) -> "list"
+
+
 
 let gen_binop (b : CoqAst.binop) =
   match b with
@@ -33,7 +40,7 @@ let gen_binop (b : CoqAst.binop) =
 let gen_unop (u : CoqAst.unop) =
   match u with
     | NotOp -> "~"
-    | PlusOp -> "+"
+    | PlusOp -> ""
     | MinusOp -> "0 - "
     | PlusMinusOp -> "0 - "
     | MinusPlusOp -> "0 - "
@@ -66,73 +73,114 @@ let rec gen_exp (e : CoqAst.exp) =
     | TupE _exps -> ""       
     | MixE (_mixop, _exp) -> ""        
     | CallE (id, args) -> parens (id.it ^ String.concat " " (List.map gen_arg args))
-    | IterE (_exp, (_iter, _ids)) -> ""  
+    | IterE (exp, (_iter, _ids)) -> gen_exp exp  
     | OptE None -> "None"
     | OptE (Some exp) -> "Some " ^ gen_exp exp  
     | TheE _exp -> ""              
     | ListE _exps -> ""           
     | CatE (exp1, exp2) -> parens (gen_exp exp1 ^ " ++ " ^ gen_exp exp2)      
     | CaseE (mixop, exp) -> parens (gen_mixop mixop ^ " ++ " ^ gen_exp exp)      
-    | SubE (_exp, _typ1, _typ2) -> ""
+    | SubE (exp, _typ1, _typ2) -> gen_exp exp
     | ProjE (_exp, _n) -> ""
     | UncaseE (_exp, _mixop) -> ""
 
+and gen_typ (t: CoqAst.typ) =
+  match t.it with
+    | VarT (id, args) -> id.it ^ gen_args args
+    | NatT -> "nat"
+    | TextT -> "string"
+    | BoolT -> "bool"
+    | TupT typs -> String.concat " * " (List.map (fun (e, t) -> parens (gen_exp e ^ " : " ^ gen_typ t)) typs)
+    | IterT (typ, iter) -> gen_iter iter ^ " " ^ gen_typ typ
 
+and gen_typ_args (t : CoqAst.typ) =
+  match t.it with
+    | TupT typs -> String.concat " " (List.map (fun (e, t) -> parens (gen_exp e ^ " : " ^ gen_typ t)) typs)
+    | _ -> parens (gen_typ t)
 and gen_arg (a: CoqAst.arg) =
   match a.it with
+    | ExpA exp -> parens (gen_exp exp)
+    | TypA typ -> curly_parens (gen_typ typ)
+
+and gen_args (args: CoqAst.arg list) =
+  match args with
+    | [] -> ""
+    | _ -> String.concat " " (List.map (fun x -> gen_arg x) args)
+
+let gen_arg_name (a : CoqAst.arg) = 
+  match a.it with
     | ExpA exp -> gen_exp exp
-    | TypA typ -> gen_typ typ
+    | _ -> ""
+
 (* and gen_path (p : CoqAst.path) =
   match p.it with   
     | RootP -> ""
     | IdxP (_path, _exp) -> ""
     | SliceP (path, exp1, exp2) -> ""
-    | DotP (path, atom) -> ""
+    | DotP (path, atom) -> ""*)
 
-and gen_iter (it : CoqAst.iter) =
-  match it with
-    | Opt -> ""
-    | List -> ""
-    | List1 -> ""
-    | ListN (exp, id) -> "" *)
+
+
+
 let gen_premises (p : CoqAst.premise) =
   match p.it with
     | IfPr exp -> gen_exp exp
     | _ -> ""
 
-let gen_variant_type (id : id) (t : CoqAst.typ) =
+let _gen_variant_type (id : CoqAst.id) (t : CoqAst.typ) =
   match t.it with
     | TupT [] -> id.it
     | _ -> gen_typ t ^ " -> " ^ id.it
-let gen_variant_premises (premises : CoqAst.premise list) =
+let gen_variant_premises (premises : CoqAst.premise list) (id : CoqAst.id) =
   let e = (match premises with
     | [] -> ""
     | _ -> " -> ") in
-  String.concat " /\\ " (List.map gen_premises premises) ^ e
-let _gen_typcases id typcases = 
-  "Inductive " ^ id.it ^ ": Type :=\n" ^ 
-  String.concat "\n" (List.map (fun (a, (t, premises)) -> 
-    "\t| " ^ id.it ^ "__" ^ gen_atom a ^ ": " ^ gen_variant_premises premises 
-    ^ gen_variant_type id t) typcases)
+  String.concat " /\\ " (List.map gen_premises premises) ^ e ^ id.it
 
-let _gen_param (p : CoqAst.param) = 
+let gen_param (p : CoqAst.param) = 
   match p.it with
     | ExpP (id, typ) -> parens (id.it ^ " : " ^ gen_typ typ)
-    | TypP id -> id.it
+    | TypP id -> curly_parens id.it
 
-let _gen_instances (_i : CoqAst.inst) =
-  ""
+let gen_deftyp (args : CoqAst.arg list) (id : CoqAst.id) (d : CoqAst.deftyp) =
+  match d.it with
+    | AliasT typ -> "Definition " ^ id.it ^ gen_args args ^  " := " ^ gen_typ typ
+    | StructT _typfields -> ""
+    | VariantT typcases -> 
+    let arg_names = match args with 
+      | [] -> "" 
+      | _ -> " " ^ String.concat " " (List.map gen_arg_name args)
+    in 
+    "Inductive " ^ id.it ^ " " ^ gen_args args ^  " : Type :=\n" ^ 
+    String.concat "\n" (List.map (fun (m, (t, premises)) -> 
+    "\t| " ^ id.it ^ "__" ^ gen_mixop m ^ gen_typ_args t ^ ": " ^ gen_variant_premises premises id
+    ^ arg_names) typcases)
+
+let gen_instances (_id : CoqAst.id) (i : CoqAst.inst) =
+  match i.it with
+    | InstD (_args, deftyp) -> (match deftyp.it with
+      | AliasT _typ -> ""
+      | StructT _typfields -> ""
+      | VariantT _typcases -> ""
+    )
 let gen_def (d : CoqAst.def) =
   match d.it with
-    | TypD (_id, _params, _insts) -> ""
+    | TypD (id, _params, [{it = InstD (args, deftyp); _}]) -> gen_deftyp args id deftyp
+    | TypD (id, params, insts) -> "Definition " ^ id.it ^ String.concat " " (List.map gen_param params) ^ " := \n" ^
+      String.concat "\n" (List.map (fun i -> (gen_instances id i) ^ ".\n") insts)
     | RelD (_id, _mixop, _typ, _rules) -> ""
-    | DecD (_id, _typ1, _typ2, _clauses) -> ""
+    | DecD (_id, _params, _typ, _clauses) -> ""
     | RecD _defs -> ""
 
 let gen_script (il : CoqAst.script) =
-  String.concat "\n" (List.map (fun d -> gen_def d ^ "\n.") il) 
+  String.concat "\n" (List.filter (fun s -> s <> ".\n") (List.map (fun d -> gen_def d ^ ".\n") il)) 
+
 let gen_string (il : script) =
   let translated_il = translate_il il in
+  "From Coq Require Import List.\n" ^
+  "From Coq Require Import Arith.\n" ^
+  "\n" ^
+  "(* Generated Code *)\n" ^
   gen_script translated_il
 
 let gen_file file il =

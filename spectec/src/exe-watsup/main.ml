@@ -268,13 +268,13 @@ let () =
       Backend_interpreter.Runner.run args
     | Coq ->
       log "Coq generation...";
-      (* (match !odsts with
+      (match !odsts with
       | [] -> print_endline (Backend_coq.Gen.gen_string il)
       | [odst] -> Backend_coq.Gen.gen_file odst il
       | _ ->
         prerr_endline "too many output file names";
         exit 2
-      ) *)
+      )
     );
     log "Complete."
   with

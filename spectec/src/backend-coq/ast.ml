@@ -8,12 +8,12 @@ type atom = Il.Atom.atom
 type mixop = Il.Atom.mixop
 
 type typ' = 
-  | VarT of id 
+  | VarT of id * arg list
   | NatT
   | BoolT
   | TextT
   | IterT of typ * iter
-  | TupT of typ list
+  | TupT of (exp * typ) list
 
 and typ = typ' phrase
 
@@ -122,11 +122,11 @@ and param' =
 
 and rule = rule' phrase
 and rule' =
-  | RuleD of id * bind list * mixop * exp * premise list  (* relation rule *)
+  | RuleD of id * mixop * exp * premise list  (* relation rule *)
 
 and clause = clause' phrase
 and clause' =
-  | DefD of bind list * exp * exp * premise list          (* definition clause *)
+  | DefD of arg list * exp * premise list          (* definition clause *)
 
 and premise = premise' phrase
 and premise' =
@@ -139,7 +139,7 @@ and premise' =
 and def' =
   | TypD of id * param list * inst list               (* syntax type *)
   | RelD of id * mixop * typ * rule list              (* relation *)
-  | DecD of id * typ * typ * clause list              (* definition *)
+  | DecD of id * param list * typ * clause list              (* definition *)
   | RecD of def list                                  (* recursive *)
 
 

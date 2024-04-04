@@ -1,11 +1,11 @@
 open Il.Ast
 open Util.Source
 
-let _error at msg = Util.Error.error at "Coq generation" msg
+let error at msg = Util.Error.error at "Coq generation" msg
 module CoqAst = Ast
 
 module IdSet = Set.Make(String)
-let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"] |> IdSet.of_list
+let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"] |> IdSet.of_list
 
 let rec make_id s = 
   let s' = make_id' s.it in
@@ -55,11 +55,11 @@ let rec translate_typ (t : typ) =
   t' $ t.at
 and translate_typ' (t: typ) =
   match t.it with
-    | VarT (id, _) -> CoqAst.VarT (make_id id)
+    | VarT (id, args) -> CoqAst.VarT (make_id id, List.map translate_arg args)
     | NumT _ -> CoqAst.NatT
     | TextT -> CoqAst.TextT
     | BoolT -> CoqAst.BoolT
-    | TupT typs -> CoqAst.TupT (List.map (fun (_, t) -> translate_typ t) typs)
+    | TupT typs -> CoqAst.TupT (List.map (fun (e, t) -> (translate_exp e, translate_typ t)) typs)
     | IterT (typ, iter) -> CoqAst.IterT (translate_typ typ, translate_iter iter)
 
 and translate_exp (e : exp) = 
@@ -162,6 +162,22 @@ and translate_inst' (i : inst) =
                                               List.map translate_premise premises))) typcases)
       ) in deftyp' $ deftyp.at
     )
+
+let rec translate_rule (r : rule) =
+  let r' = translate_rule' r in 
+  r' $ r.at
+
+and translate_rule' (r : rule) =
+  match r.it with
+    | RuleD (id, _binds, mixop, exp, premises) -> CoqAst.RuleD (make_id id, mixop, translate_exp exp, List.map translate_premise premises)
+
+
+let rec translate_clause (c : clause) =
+  let c' = translate_clause' c in
+  c' $ c.at
+and translate_clause' (c : clause) =
+  match c.it with
+    | DefD (_binds, args, exp2, premises) -> CoqAst.DefD (List.map translate_arg args, translate_exp exp2, List.map translate_premise premises)
 let rec translate_def (d : def) : CoqAst.def =
   let d' = translate_def' d in
   d' $ d.at
@@ -169,11 +185,17 @@ let rec translate_def (d : def) : CoqAst.def =
 and translate_def' (d : def) =
   match d.it with
     | TypD (id, params, insts) -> CoqAst.TypD (make_id id, List.map translate_param params, List.map translate_inst insts) 
-    | RelD (_id, _mixop, _typ, _rules) -> CoqAst.RecD []
-    | DecD (_id, _typ1, _typ2, _clauses) -> CoqAst.RecD []
-    | RecD _defs -> CoqAst.RecD []
-    | HintD _ -> CoqAst.RecD []
+    | RelD (id, mixop, typ, rules) -> CoqAst.RelD (make_id id, mixop, translate_typ typ, List.map translate_rule rules)
+    | DecD (id, params, typ, clauses) -> CoqAst.DecD (make_id id, List.map translate_param params, translate_typ typ, List.map translate_clause clauses)
+    | RecD defs -> CoqAst.RecD (List.map translate_def defs)
+    (* Should not happen *)
+    | HintD _ -> error d.at "Hints should not be in Coq Generation"
   
- let translate_il (il: script) = 
-  List.map (fun d -> translate_def d) il
+let is_not_hint_def (d : def) =
+  match d.it with
+    | HintD _ -> false
+    | _ -> true
+
+let translate_il (il: script) = 
+  List.map translate_def (List.filter is_not_hint_def il)
 
