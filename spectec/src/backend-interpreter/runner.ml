@@ -19,9 +19,15 @@ let pass = 0, 0
 
 let num_parse_fail = ref 0
 
+let assert_ = ref 0
+let assert_trap = ref 0
+let assert_module_trap = ref 0
+let inc counter = counter := !counter + 1
+
 (* Excluded test files *)
 
 let is_long_test path =
+  false &&
   List.mem (Filename.basename path)
     [ "memory_copy.wast";
       "memory_fill.wast";
@@ -154,11 +160,13 @@ let run_action action =
 let test_assertion assertion =
   match assertion.it with
   | AssertReturn (action, expected) ->
+    inc assert_;
     let result = run_action action |> al_to_list al_to_value in
     Run.assert_result no_region result expected;
     success
   | AssertTrap (action, re) -> (
     try
+      inc assert_trap;
       let result = run_action action in
       Run.assert_message assertion.at "runtime" (Al.Print.string_of_value result) re;
       fail
@@ -166,6 +174,7 @@ let test_assertion assertion =
   )
   | AssertUninstantiable (def, re) -> (
     try
+      inc assert_module_trap;
       def |> module_of_def |> try_instantiate |> ignore;
       Run.assert_message assertion.at "instantiation" "module instance" re;
       fail
@@ -177,6 +186,7 @@ let test_assertion assertion =
 let run_command' command =
   match command.it with
   | Module (var_opt, def) ->
+    inc assert_;
     def
     |> module_of_def
     |> try_instantiate
@@ -187,6 +197,7 @@ let run_command' command =
     Register.add (Utf8.encode modulename) moduleinst;
     pass
   | Action a ->
+    inc assert_;
     ignore (run_action a); success
   | Assertion a -> test_assertion a
   | Meta _ -> pass
@@ -312,5 +323,6 @@ let run = function
       if !num_parse_fail <> 0 then
         print_endline ((string_of_int !num_parse_fail) ^ " parsing fail");
       print_runner_result "Total" result;
+      print_endline (Printf.sprintf "assert:%d, assert_trap:%d, assert_module_trap:%d" !assert_ !assert_trap !assert_module_trap);
     )
   | _ -> failwith "Cannot find file to run"
