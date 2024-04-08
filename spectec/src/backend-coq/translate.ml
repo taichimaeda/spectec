@@ -75,14 +75,14 @@ and translate_exp' (e : exp) =
     | UnE (op, exp) ->  CoqAst.UnE (translate_unop op, translate_exp exp)
     | BinE (binop, exp1, exp2) -> CoqAst.BinE (translate_binop binop, translate_exp exp1, translate_exp exp2)
     | CmpE (cmpop, exp1, exp2) -> CoqAst.CmpE (translate_cmpop cmpop, translate_exp exp1, translate_exp exp2)
-    | IdxE (exp1, exp2) -> CoqAst.CallE ("lookup_total" $ no_region, ([CoqAst.ExpA (translate_exp exp1) $ exp1.at ; CoqAst.ExpA (translate_exp exp2) $ exp2.at ])) 
+    | IdxE (exp1, exp2) -> CoqAst.IdxE (translate_exp exp1, translate_exp exp2)
     | SliceE (exp1, exp2, exp3) -> CoqAst.SliceE (translate_exp exp1, translate_exp exp2, translate_exp exp3)
     | UpdE (exp, path, exp2) -> CoqAst.UpdE (translate_exp exp, translate_path path, translate_exp exp2)
     | ExtE (exp1, path, exp2) -> CoqAst.ExtE (translate_exp exp1, translate_path path, translate_exp exp2)
     | StrE expfields -> CoqAst.StrE (List.map (fun (a, e) -> (translate_atom a, translate_exp e)) expfields)       
     | DotE (exp, atom) -> CoqAst.DotE (translate_exp exp, translate_atom atom)       
     | CompE (exp, exp2) -> CoqAst.CompE (translate_exp exp, translate_exp exp2)
-    | LenE exp -> CoqAst.CallE ("List.length" $ no_region, [CoqAst.ExpA (translate_exp exp) $ exp.at])                 
+    | LenE exp -> CoqAst.LenE (translate_exp exp)               
     | TupE exps -> CoqAst.TupE (List.map (fun e -> translate_exp e) exps)
     | CallE (id, args) -> CoqAst.CallE (id, List.map (fun a -> translate_arg a) args)
     | IterE (exp, iexp) -> CoqAst.IterE (translate_exp exp, translate_iterexp iexp)
@@ -146,6 +146,14 @@ and translate_premise' (p : prem) =
     | ElsePr -> CoqAst.ElsePr
     | IterPr (premise, iexp) -> CoqAst.IterPr (translate_premise premise, translate_iterexp iexp)
 
+let rec translate_bind (b : bind) =
+  let b' = translate_bind' b in
+  b' $ b.at
+
+and translate_bind' (b : bind) =
+  match b.it with
+    | ExpB (id, typ, iters) -> CoqAst.ExpB (make_id id, translate_typ typ, List.map translate_iter iters)
+    | TypB id -> CoqAst.TypB (make_id id)
 
 let rec translate_inst (i : inst) =
   let i' = translate_inst' i in
@@ -177,7 +185,7 @@ let rec translate_clause (c : clause) =
   c' $ c.at
 and translate_clause' (c : clause) =
   match c.it with
-    | DefD (_binds, args, exp2, premises) -> CoqAst.DefD (List.map translate_arg args, translate_exp exp2, List.map translate_premise premises)
+    | DefD (binds, args, exp2, premises) -> CoqAst.DefD (List.map translate_bind binds, List.map translate_arg args, translate_exp exp2, List.map translate_premise premises)
 let rec translate_def (d : def) : CoqAst.def =
   let d' = translate_def' d in
   d' $ d.at

@@ -83,7 +83,9 @@ and exp' =
   | OptE of exp option           (* exp? *)
   | TheE of exp                  (* THE exp *)
   | ListE of exp list            (* [exp ... exp] *)
+  | LenE of exp
   | CatE of exp * exp            (* exp :: exp *)
+  | IdxE of exp * exp
   | CaseE of mixop * exp          (* atom exp *)
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
   | UncaseE of exp * mixop       (* exp!mixop *)
@@ -126,7 +128,7 @@ and rule' =
 
 and clause = clause' phrase
 and clause' =
-  | DefD of arg list * exp * premise list          (* definition clause *)
+  | DefD of bind list * arg list * exp * premise list          (* definition clause *)
 
 and premise = premise' phrase
 and premise' =
