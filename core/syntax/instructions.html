@@ -126,14 +126,14 @@ These operations closely match respective operations available in hardware.</p>
 &amp; {{\mathit{num}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; {{\mathit{i}}}{{\mathit{n}}} \\
 &amp; {{\mathit{num}}}_{{\mathsf{f}}{{\mathit{n}}}} &amp;::=&amp; {{\mathit{f}}}{{\mathit{n}}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{\mathit{numtype}}.\mathsf{const}~{{\mathit{num}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
+{\mathit{numtype}}{.}\mathsf{const}~{{\mathit{num}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{unop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{binop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{testop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}} . {{\mathit{relop}}}_{{\mathit{numtype}}} \\ &amp;&amp;|&amp;
 {\mathit{numtype}}_{{1}} . {{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}
   &amp;\qquad \mbox{if}~{\mathit{numtype}}_{{1}} \neq {\mathit{numtype}}_{{2}} \\ &amp;&amp;|&amp;
-{{{{\mathit{numtype}}.\mathsf{extend}}{{\mathit{n}}}}{\mathsf{\_}}}{\mathsf{s}} \\ &amp;&amp;|&amp;
+{{{{\mathit{numtype}}{.}\mathsf{extend}}{{\mathit{n}}}}{\mathsf{\_}}}{\mathsf{s}} \\ &amp;&amp;|&amp;
 \dots \\[0.8ex]
 &amp; {{\mathit{unop}}}_{{\mathsf{i}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{clz} ~|~ \mathsf{ctz} ~|~ \mathsf{popcnt} ~|~ \mathsf{extend}~{\mathit{n}} \\
 &amp; {{\mathit{unop}}}_{{\mathsf{f}}{{\mathit{n}}}} &amp;::=&amp; \mathsf{abs} ~|~ \mathsf{neg} ~|~ \mathsf{sqrt} ~|~ \mathsf{ceil} ~|~ \mathsf{floor} ~|~ \mathsf{trunc} ~|~ \mathsf{nearest} \\[0.8ex]
@@ -173,7 +173,7 @@ For the other integer instructions, the use of two’s complement for the signed
 &amp; {\mathit{half}} &amp;::=&amp; \mathsf{low} ~|~ \mathsf{high} \\[0.8ex]
 &amp; {\mathit{laneidx}} &amp;::=&amp; {\mathit{u{\scriptstyle8}}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{\mathit{vectype}}.\mathsf{const}~{{\mathit{vec}}}_{{\mathit{vectype}}} \\ &amp;&amp;|&amp;
+{\mathit{vectype}}{.}\mathsf{const}~{{\mathit{vec}}}_{{\mathit{vectype}}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvunop}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvbinop}} \\ &amp;&amp;|&amp;
 {\mathit{vectype}} . {\mathit{vvternop}} \\ &amp;&amp;|&amp;
@@ -183,20 +183,20 @@ For the other integer instructions, the use of two’s complement for the signed
 {\mathit{shape}} . {{\mathit{vtestop}}}_{{\mathit{shape}}} \\ &amp;&amp;|&amp;
 {\mathit{shape}} . {{\mathit{vrelop}}}_{{\mathit{shape}}} \\ &amp;&amp;|&amp;
 {\mathit{ishape}} . {{\mathit{vshiftop}}}_{{\mathit{ishape}}} \\ &amp;&amp;|&amp;
-{\mathit{ishape}}.\mathsf{bitmask} \\ &amp;&amp;|&amp;
-{\mathit{ishape}}.\mathsf{swizzle}
+{\mathit{ishape}}{.}\mathsf{bitmask} \\ &amp;&amp;|&amp;
+{\mathit{ishape}}{.}\mathsf{swizzle}
   &amp;\qquad \mbox{if}~{\mathit{ishape}} = {{\mathsf{i{\scriptstyle8}}}{\mathsf{x}}}{\mathsf{{\scriptstyle16}}} \\ &amp;&amp;|&amp;
-{\mathit{ishape}}.\mathsf{shuffle}~{{\mathit{laneidx}}^\ast}
+{\mathit{ishape}}{.}\mathsf{shuffle}~{{\mathit{laneidx}}^\ast}
   &amp;\qquad \mbox{if}~{\mathit{ishape}} = {{\mathsf{i{\scriptstyle8}}}{\mathsf{x}}}{\mathsf{{\scriptstyle16}}} \land {|{{\mathit{laneidx}}^\ast}|} = 16 \\ &amp;&amp;|&amp;
-{\mathit{shape}}.\mathsf{splat} \\ &amp;&amp;|&amp;
-{{\mathit{shape}}.\mathsf{extract\_lane\_}}{{{\mathit{sx}}^?}}~{\mathit{laneidx}}
+{\mathit{shape}}{.}\mathsf{splat} \\ &amp;&amp;|&amp;
+{{\mathit{shape}}{.}\mathsf{extract\_lane\_}}{{{\mathit{sx}}^?}}~{\mathit{laneidx}}
   &amp;\qquad \mbox{if}~{\mathrm{lanetype}}({\mathit{shape}}) = {\mathit{numtype}} \Leftrightarrow {{\mathit{sx}}^?} = \epsilon \\ &amp;&amp;|&amp;
-{\mathit{shape}}.\mathsf{replace\_lane}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
+{\mathit{shape}}{.}\mathsf{replace\_lane}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
 {\mathit{ishape}}_{{1}} . {{{{{{\mathit{vextunop}}}_{{\mathit{ishape}}_{{1}}}}{\mathsf{\_}}}{{\mathit{ishape}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}}
   &amp;\qquad \mbox{if}~{|{\mathrm{lanetype}}({\mathit{ishape}}_{{1}})|} = 2 \cdot {|{\mathrm{lanetype}}({\mathit{ishape}}_{{2}})|} \\ &amp;&amp;|&amp;
 {\mathit{ishape}}_{{1}} . {{{{{{\mathit{vextbinop}}}_{{\mathit{ishape}}_{{1}}}}{\mathsf{\_}}}{{\mathit{ishape}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}}
   &amp;\qquad \mbox{if}~{|{\mathrm{lanetype}}({\mathit{ishape}}_{{1}})|} = 2 \cdot {|{\mathrm{lanetype}}({\mathit{ishape}}_{{2}})|} \\ &amp;&amp;|&amp;
-{{{{{\mathit{ishape}}_{{1}}.\mathsf{narrow}}{\mathsf{\_}}}{{\mathit{ishape}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}}
+{{{{{\mathit{ishape}}_{{1}}{.}\mathsf{narrow}}{\mathsf{\_}}}{{\mathit{ishape}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}}
   &amp;\qquad \mbox{if}~{|{\mathrm{lanetype}}({\mathit{ishape}}_{{2}})|} = 2 \cdot {|{\mathrm{lanetype}}({\mathit{ishape}}_{{1}})|} \leq 32 \\ &amp;&amp;|&amp;
 {\mathit{shape}}_{{1}} . {{{{\mathit{vcvtop}}}_{{\mathit{shape}}_{{2}}}({\mathit{shape}}_{{1}})}{\mathsf{\_}}}{{\mathit{shape}}_{{2}}}
   &amp;\qquad \mbox{if}~{\mathrm{lanetype}}({\mathit{shape}}_{{1}}) \neq {\mathrm{lanetype}}({\mathit{shape}}_{{2}}) \\ &amp;&amp;|&amp;
@@ -545,9 +545,9 @@ The <span class="math notranslate nohighlight">\(\mathsf{table.init}\)</span> in
 \mathsf{align}~{\mathit{u{\scriptstyle32}}},\; \mathsf{offset}~{\mathit{u{\scriptstyle32}}} \}\end{array} \\[0.8ex]
 &amp; {\mathit{packsize}} &amp;::=&amp; \mathsf{{\scriptstyle8}} ~|~ \mathsf{{\scriptstyle16}} ~|~ \mathsf{{\scriptstyle32}} ~|~ \mathsf{{\scriptstyle64}} \\[0.8ex]
 &amp; {\mathit{instr}} &amp;::=&amp; \dots \\ &amp;&amp;|&amp;
-{{\mathit{numtype}}.\mathsf{load}}{{({{{\mathit{w}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{memidx}}~{\mathit{memop}}
+{{\mathit{numtype}}{.}\mathsf{load}}{{({{{\mathit{w}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{memidx}}~{\mathit{memop}}
   &amp;\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;
-{{\mathit{numtype}}.\mathsf{store}}{{{\mathit{w}}^?}}~{\mathit{memidx}}~{\mathit{memop}}
+{{\mathit{numtype}}{.}\mathsf{store}}{{{\mathit{w}}^?}}~{\mathit{memidx}}~{\mathit{memop}}
   &amp;\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} &lt; {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &amp;&amp;|&amp;
 {\mathsf{v{\scriptstyle128}.load}}{{{\mathit{vloadop}}^?}}~{\mathit{memidx}}~{\mathit{memop}} \\ &amp;&amp;|&amp;
 {{{\mathsf{v{\scriptstyle128}.load}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memop}}~{\mathit{laneidx}} \\ &amp;&amp;|&amp;
