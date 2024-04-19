@@ -90,7 +90,7 @@ and exp' =
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
   | UncaseE of exp * mixop       (* exp!mixop *)
 
-and exp = exp' phrase
+and exp = (exp', typ) note_phrase
 
 and arg = arg' phrase
 and arg' =
@@ -99,7 +99,7 @@ and arg' =
 
 and expfield = atom * exp        (* atom exp *)
 
-and path = path' phrase
+and path = (path', typ) note_phrase
 and path' =
   | RootP                        (*  *)
   | IdxP of path * exp           (* path `[` exp `]` *)
@@ -115,7 +115,7 @@ and bind' =
 
 and inst = inst' phrase
 and inst' =
-  | InstD of arg list * deftyp            (* family instance clause *)
+  | InstD of bind list * arg list * deftyp            (* family instance clause *)
 
 and param = param' phrase
 and param' =

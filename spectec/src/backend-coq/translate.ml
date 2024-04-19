@@ -5,7 +5,7 @@ let error at msg = Util.Error.error at "Coq generation" msg
 module CoqAst = Ast
 
 module IdSet = Set.Make(String)
-let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"] |> IdSet.of_list
+let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"; "nat"] |> IdSet.of_list
 
 let rec make_id s = 
   let s' = make_id' s.it in
@@ -19,8 +19,13 @@ and make_id' s = match s with
     | c -> c
     ) s
 
-let translate_atom (a : atom) = a
+let translate_atom (a : atom) =
+  match a.it with
+    | Atom id -> Il.Atom.Atom (make_id' id) $$ (a.at, a.note)
+    | _ -> a
 
+let translate_mixop (m : mixop) = 
+  List.map (fun m' -> List.map translate_atom m') m
 let translate_binop (b : binop) =
   match b with
     | AndOp -> CoqAst.AndOp
@@ -64,7 +69,7 @@ and translate_typ' (t: typ) =
 
 and translate_exp (e : exp) = 
   let e' = translate_exp' e in
-  e' $ e.at
+  e' $$ (e.at, translate_typ e.note)
 
 and translate_exp' (e : exp) =
   match e.it with
@@ -91,10 +96,10 @@ and translate_exp' (e : exp) =
     | TheE exp -> CoqAst.TheE (translate_exp exp)   
     | ListE exps -> CoqAst.ListE (List.map (fun e -> translate_exp e) exps)
     | CatE (exp1, exp2) -> CoqAst.CatE (translate_exp exp1, translate_exp exp2)
-    | CaseE (mixop, exp) -> CoqAst.CaseE (mixop, translate_exp exp)         
+    | CaseE (mixop, exp) -> CoqAst.CaseE (translate_mixop mixop, translate_exp exp)         
     | SubE (exp, typ1, typ2) -> CoqAst.SubE (translate_exp exp, translate_typ typ1, translate_typ typ2)
     | ProjE (exp, n) -> CoqAst.ProjE (translate_exp exp, n)
-    | UncaseE (exp, mixop) -> CoqAst.UncaseE (translate_exp exp, mixop)
+    | UncaseE (exp, mixop) -> CoqAst.UncaseE (translate_exp exp, translate_mixop mixop)
 
 and translate_arg (a : arg) = 
   let a' = translate_arg' a in
@@ -111,7 +116,7 @@ and translate_arg' (a : arg) =
 
 and translate_path (p : path) =
   let p' = translate_path' p in
-  p' $ p.at
+  p' $$ (p.at, translate_typ p.note)
 
 and translate_path' (p : path) =
   match p.it with   
@@ -140,7 +145,7 @@ let rec translate_premise (p : prem) =
   p' $ p.at
 and translate_premise' (p : prem) = 
   match p.it with
-    | RulePr (id, mixop, exp) -> CoqAst.RulePr (id, mixop, translate_exp exp)
+    | RulePr (id, mixop, exp) -> CoqAst.RulePr (make_id id, translate_mixop mixop, translate_exp exp)
     | IfPr exp -> CoqAst.IfPr (translate_exp exp)
     | LetPr (exp1, exp2, ids) -> CoqAst.LetPr (translate_exp exp1, translate_exp exp2, ids)
     | ElsePr -> CoqAst.ElsePr
@@ -161,12 +166,12 @@ let rec translate_inst (i : inst) =
 
 and translate_inst' (i : inst) =
   match i.it with
-    | InstD (_, args, deftyp) -> CoqAst.InstD (List.map translate_arg args, 
+    | InstD (binds, args, deftyp) -> CoqAst.InstD (List.map translate_bind binds, List.map translate_arg args, 
       let deftyp' = (match deftyp.it with
         | AliasT typ -> CoqAst.AliasT (translate_typ typ)
         | StructT typfields -> CoqAst.StructT (List.map (fun (a, (_, typ, premises), _) -> (translate_atom a, (translate_typ typ, 
                                               List.map translate_premise premises))) typfields)
-        | VariantT typcases -> CoqAst.VariantT (List.map (fun (m, (_, typ, premises), _) -> (m, (translate_typ typ, 
+        | VariantT typcases -> CoqAst.VariantT (List.map (fun (m, (_, typ, premises), _) -> (translate_mixop m, (translate_typ typ, 
                                               List.map translate_premise premises))) typcases)
       ) in deftyp' $ deftyp.at
     )
@@ -177,7 +182,7 @@ let rec translate_rule (r : rule) =
 
 and translate_rule' (r : rule) =
   match r.it with
-    | RuleD (id, _binds, mixop, exp, premises) -> CoqAst.RuleD (make_id id, mixop, translate_exp exp, List.map translate_premise premises)
+    | RuleD (id, _binds, mixop, exp, premises) -> CoqAst.RuleD (make_id id, translate_mixop mixop, translate_exp exp, List.map translate_premise premises)
 
 
 let rec translate_clause (c : clause) =
@@ -193,7 +198,7 @@ let rec translate_def (d : def) : CoqAst.def =
 and translate_def' (d : def) =
   match d.it with
     | TypD (id, params, insts) -> CoqAst.TypD (make_id id, List.map translate_param params, List.map translate_inst insts) 
-    | RelD (id, mixop, typ, rules) -> CoqAst.RelD (make_id id, mixop, translate_typ typ, List.map translate_rule rules)
+    | RelD (id, mixop, typ, rules) -> CoqAst.RelD (make_id id, translate_mixop mixop, translate_typ typ, List.map translate_rule rules)
     | DecD (id, params, typ, clauses) -> CoqAst.DecD (make_id id, List.map translate_param params, translate_typ typ, List.map translate_clause clauses)
     | RecD defs -> CoqAst.RecD (List.map translate_def defs)
     (* Should not happen *)
