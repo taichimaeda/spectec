@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-04-28)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-04-29)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -88,43 +88,43 @@
   <section id="instructions">
 <span id="valid-instr"></span><span id="index-0"></span><h1>Instructions<a class="headerlink" href="#instructions" title="Permalink to this heading">¶</a></h1>
 <p><a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">Instructions</span></a> are classified by <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction types</span></a> that describe how they manipulate the <a class="reference internal" href="../exec/runtime.html#stack"><span class="std std-ref">operand stack</span></a> and initialize <a class="reference internal" href="../syntax/modules.html#syntax-local"><span class="std std-ref">locals</span></a>:
-A type <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}\)</span> describes the required input stack with argument values of types <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast}\)</span> that an instruction pops off
-and the provided output stack with result values of types <span class="math notranslate nohighlight">\({{\mathit{t}}_{{2}}^\ast}\)</span> that it pushes back.
-Moreover, it enumerates the <a class="reference internal" href="../syntax/modules.html#syntax-localidx"><span class="std std-ref">indices</span></a> <span class="math notranslate nohighlight">\({{\mathit{x}}^\ast}\)</span> of locals that have been set by the instruction.
+A type <span class="math notranslate nohighlight">\({t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}\)</span> describes the required input stack with argument values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> that an instruction pops off
+and the provided output stack with result values of types <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> that it pushes back.
+Moreover, it enumerates the <a class="reference internal" href="../syntax/modules.html#syntax-localidx"><span class="std std-ref">indices</span></a> <span class="math notranslate nohighlight">\({x^\ast}\)</span> of locals that have been set by the instruction.
 In most cases, this is empty.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For example, the instruction <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}} . \mathsf{add}\)</span> has type <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}\)</span>,
 consuming two <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}}\)</span> values and producing one.
-The instruction <span class="math notranslate nohighlight">\(\mathsf{local.set}~{\mathit{x}}\)</span> has type <span class="math notranslate nohighlight">\({\mathit{t}}~{\rightarrow}_{{\mathit{x}}}\,\epsilon\)</span>, provided <span class="math notranslate nohighlight">\({\mathit{t}}\)</span> is the type declared for the local <span class="math notranslate nohighlight">\({\mathit{x}}\)</span>.</p>
+The instruction <span class="math notranslate nohighlight">\(\mathsf{local.set}~x\)</span> has type <span class="math notranslate nohighlight">\(t~{\rightarrow}_{x}\,\epsilon\)</span>, provided <span class="math notranslate nohighlight">\(t\)</span> is the type declared for the local <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </div>
-<p>Typing extends to <a class="reference internal" href="#valid-instr-seq"><span class="std std-ref">instruction sequences</span></a> <span class="math notranslate nohighlight">\({{\mathit{instr}}^\ast}\)</span>.
-Such a sequence has an instruction type <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}\)</span> if the accumulative effect of executing the instructions is consuming values of types <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast}\)</span> off the operand stack, pushing new values of types <span class="math notranslate nohighlight">\({{\mathit{t}}_{{2}}^\ast}\)</span>, and setting all locals <span class="math notranslate nohighlight">\({{\mathit{x}}^\ast}\)</span>.</p>
+<p>Typing extends to <a class="reference internal" href="#valid-instr-seq"><span class="std std-ref">instruction sequences</span></a> <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.
+Such a sequence has an instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}\)</span> if the accumulative effect of executing the instructions is consuming values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> off the operand stack, pushing new values of types <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>, and setting all locals <span class="math notranslate nohighlight">\({x^\ast}\)</span>.</p>
 <p id="polymorphism">For some instructions, the typing rules do not fully constrain the type,
 and therefore allow for multiple types.
 Such instructions are called <em>polymorphic</em>.
 Two degrees of polymorphism can be distinguished:</p>
 <ul class="simple">
 <li><p><em>value-polymorphic</em>:
-the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\mathit{t}}\)</span> of one or several individual operands is unconstrained.
+the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(t\)</span> of one or several individual operands is unconstrained.
 That is the case for all <a class="reference internal" href="#valid-instr-parametric"><span class="std std-ref">parametric instructions</span></a> like <span class="math notranslate nohighlight">\(\mathsf{drop}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{select}\)</span>.</p></li>
 <li><p><em>stack-polymorphic</em>:
-the entire (or most of the) <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction type</span></a> <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}\)</span> of the instruction is unconstrained.
+the entire (or most of the) <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction type</span></a> <span class="math notranslate nohighlight">\({t_1^\ast} \rightarrow {t_2^\ast}\)</span> of the instruction is unconstrained.
 That is the case for all <a class="reference internal" href="#valid-instr-control"><span class="std std-ref">control instructions</span></a> that perform an <em>unconditional control transfer</em>, such as <span class="math notranslate nohighlight">\(\mathsf{unreachable}\)</span>, <span class="math notranslate nohighlight">\(\mathsf{br}\)</span>, or <span class="math notranslate nohighlight">\(\mathsf{return}\)</span>.</p></li>
 </ul>
 <p>In both cases, the unconstrained types or type sequences can be chosen arbitrarily, as long as they meet the constraints imposed for the surrounding parts of the program.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For example, the <span class="math notranslate nohighlight">\(\mathsf{select}\)</span> instruction is valid with type <span class="math notranslate nohighlight">\({\mathit{t}}~{\mathit{t}}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}}\)</span>, for any possible <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\mathit{t}}\)</span>.
+<p>For example, the <span class="math notranslate nohighlight">\(\mathsf{select}\)</span> instruction is valid with type <span class="math notranslate nohighlight">\(t~t~\mathsf{i{\scriptstyle32}} \rightarrow t\)</span>, for any possible <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(t\)</span>.
 Consequently, both instruction sequences</p>
 <div class="math notranslate nohighlight">
 \[(\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~1)~(\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~2)~(\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~3)~\mathsf{select}\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight">
 \[(\mathsf{f{\scriptstyle64}}{.}\mathsf{const}~1 . 0)~(\mathsf{f{\scriptstyle64}}{.}\mathsf{const}~2 . 0)~(\mathsf{f{\scriptstyle64}}{.}\mathsf{const}~3 . 0)~\mathsf{select}\]</div>
-<p>are valid, with <span class="math notranslate nohighlight">\({\mathit{t}}\)</span> in the typing of <span class="math notranslate nohighlight">\(\mathsf{select}\)</span> being instantiated to <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}}\)</span> or <span class="math notranslate nohighlight">\(\mathsf{f{\scriptstyle64}}\)</span>, respectively.</p>
+<p>are valid, with <span class="math notranslate nohighlight">\(t\)</span> in the typing of <span class="math notranslate nohighlight">\(\mathsf{select}\)</span> being instantiated to <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}}\)</span> or <span class="math notranslate nohighlight">\(\mathsf{f{\scriptstyle64}}\)</span>, respectively.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{unreachable}\)</span> instruction is stack-polymorphic,
-and hence valid with type <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}\)</span> for any possible sequences of value types <span class="math notranslate nohighlight">\({{\mathit{t}}_{{1}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{t}}_{{2}}^\ast}\)</span>.
+and hence valid with type <span class="math notranslate nohighlight">\({t_1^\ast} \rightarrow {t_2^\ast}\)</span> for any possible sequences of value types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> and <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>.
 Consequently,</p>
 <div class="math notranslate nohighlight">
 \[\mathsf{unreachable}~\mathsf{i{\scriptstyle32}} . \mathsf{add}\]</div>
@@ -146,7 +146,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
+C \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -159,9 +159,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+C \vdash {t_1^\ast} \rightarrow {t_2^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{unreachable} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{unreachable} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -178,9 +178,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{t}} : \mathsf{ok}
+C \vdash t : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{drop} : {\mathit{t}} \rightarrow \epsilon
+C \vdash \mathsf{drop} : t \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -208,19 +208,19 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{t}} : \mathsf{ok}
+C \vdash t : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{select}~{\mathit{t}} : {\mathit{t}}~{\mathit{t}}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}}
+C \vdash \mathsf{select}~t : t~t~\mathsf{i{\scriptstyle32}} \rightarrow t
 }
 \qquad
 \frac{
-{\mathit{C}} \vdash {\mathit{t}} : \mathsf{ok}
+C \vdash t : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{t}} \leq {\mathit{t}'}
+C \vdash t \leq {t'}
  \qquad
-{\mathit{t}'} = {\mathit{numtype}} \lor {\mathit{t}'} = {\mathit{vectype}}
+{t'} = {\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}} \lor {t'} = {\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}
 }{
-{\mathit{C}} \vdash \mathsf{select} : {\mathit{t}}~{\mathit{t}}~\mathsf{i{\scriptstyle32}} \rightarrow {\mathit{t}}
+C \vdash \mathsf{select} : t~t~\mathsf{i{\scriptstyle32}} \rightarrow t
 }
 \qquad
 \end{array}\]</div>
@@ -241,7 +241,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{nt}}{.}\mathsf{const}~{\mathit{c}}_{{\mathit{nt}}} : \epsilon \rightarrow {\mathit{nt}}
+C \vdash {\mathit{nt}}{.}\mathsf{const}~c_{\mathit{nt}} : \epsilon \rightarrow {\mathit{nt}}
 }
 \qquad
 \end{array}\]</div>
@@ -255,7 +255,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{unop}}_{{\mathit{nt}}} : {\mathit{nt}} \rightarrow {\mathit{nt}}
+C \vdash {\mathit{nt}} . {\href{../syntax/instructions.html#syntax-unop}{\mathit{unop}}}_{\mathit{nt}} : {\mathit{nt}} \rightarrow {\mathit{nt}}
 }
 \qquad
 \end{array}\]</div>
@@ -269,7 +269,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{binop}}_{{\mathit{nt}}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow {\mathit{nt}}
+C \vdash {\mathit{nt}} . {\href{../syntax/instructions.html#syntax-binop}{\mathit{binop}}}_{\mathit{nt}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow {\mathit{nt}}
 }
 \qquad
 \end{array}\]</div>
@@ -283,7 +283,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{testop}}_{{\mathit{nt}}} : {\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash {\mathit{nt}} . {\href{../syntax/instructions.html#syntax-testop}{\mathit{testop}}}_{\mathit{nt}} : {\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -297,7 +297,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{nt}} . {\mathit{relop}}_{{\mathit{nt}}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash {\mathit{nt}} . {\href{../syntax/instructions.html#syntax-relop}{\mathit{relop}}}_{\mathit{nt}} : {\mathit{nt}}~{\mathit{nt}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -310,15 +310,15 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{|{\mathit{nt}}_{{1}}|} = {|{\mathit{nt}}_{{2}}|}
+{|{\mathit{nt}}_1|} = {|{\mathit{nt}}_2|}
 }{
-{\mathit{C}} \vdash {\mathit{nt}}_{{1}} . {{\mathsf{reinterpret}}{\mathsf{\_}}}{{\mathit{nt}}_{{2}}} : {\mathit{nt}}_{{2}} \rightarrow {\mathit{nt}}_{{1}}
+C \vdash {\mathit{nt}}_1 . {{\mathsf{reinterpret}}{\mathsf{\_}}}{{\mathit{nt}}_2} : {\mathit{nt}}_2 \rightarrow {\mathit{nt}}_1
 }
 \qquad
 \frac{
-{{\mathit{sx}}^?} = \epsilon \Leftrightarrow {\mathit{nt}}_{{1}} = {{\mathsf{i}}{{\mathit{n}}}}_{{1}} \land {\mathit{nt}}_{{2}} = {{\mathsf{i}}{{\mathit{n}}}}_{{2}} \land {|{\mathit{nt}}_{{1}}|} &gt; {|{\mathit{nt}}_{{2}}|} \lor {\mathit{nt}}_{{1}} = {{\mathsf{f}}{{\mathit{n}}}}_{{1}} \land {\mathit{nt}}_{{2}} = {{\mathsf{f}}{{\mathit{n}}}}_{{2}}
+{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?} = \epsilon \Leftrightarrow {\mathit{nt}}_1 = {{\mathsf{i}}{n}}_1 \land {\mathit{nt}}_2 = {{\mathsf{i}}{n}}_2 \land {|{\mathit{nt}}_1|} &gt; {|{\mathit{nt}}_2|} \lor {\mathit{nt}}_1 = {{\mathsf{f}}{n}}_1 \land {\mathit{nt}}_2 = {{\mathsf{f}}{n}}_2
 }{
-{\mathit{C}} \vdash {\mathit{nt}}_{{1}} . {{\mathsf{convert}}{\mathsf{\_}}}{{\mathit{nt}}_{{2}}} : {\mathit{nt}}_{{2}} \rightarrow {\mathit{nt}}_{{1}}
+C \vdash {\mathit{nt}}_1 . {{\mathsf{convert}}{\mathsf{\_}}}{{\mathit{nt}}_2} : {\mathit{nt}}_2 \rightarrow {\mathit{nt}}_1
 }
 \qquad
 \end{array}\]</div>
@@ -335,9 +335,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{ht}} : \mathsf{ok}
+C \vdash {\mathit{ht}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{ref.null}~{\mathit{ht}} : \epsilon \rightarrow (\mathsf{ref}~\mathsf{null}~{\mathit{ht}})
+C \vdash \mathsf{ref.null}~{\mathit{ht}} : \epsilon \rightarrow (\mathsf{ref}~\mathsf{null}~{\mathit{ht}})
 }
 \qquad
 \end{array}\]</div>
@@ -353,9 +353,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{funcs}{}[{\mathit{x}}] = {\mathit{dt}}
+C{.}\mathsf{funcs}{}[x] = {\mathit{dt}}
 }{
-{\mathit{C}} \vdash \mathsf{ref.func}~{\mathit{x}} : \epsilon \rightarrow (\mathsf{ref}~{\mathit{dt}})
+C \vdash \mathsf{ref.func}~x : \epsilon \rightarrow (\mathsf{ref}~{\mathit{dt}})
 }
 \qquad
 \end{array}\]</div>
@@ -368,9 +368,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{ht}} : \mathsf{ok}
+C \vdash {\mathit{ht}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{ref.is\_null} : (\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{ref.is\_null} : (\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -383,9 +383,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{ht}} : \mathsf{ok}
+C \vdash {\mathit{ht}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{ref.as\_non\_null} : (\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow (\mathsf{ref}~{\mathit{ht}})
+C \vdash \mathsf{ref.as\_non\_null} : (\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow (\mathsf{ref}~{\mathit{ht}})
 }
 \qquad
 \end{array}\]</div>
@@ -399,7 +399,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{ref.eq} : (\mathsf{ref}~\mathsf{null}~\mathsf{eq})~(\mathsf{ref}~\mathsf{null}~\mathsf{eq}) \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{ref.eq} : (\mathsf{ref}~\mathsf{null}~\mathsf{eq})~(\mathsf{ref}~\mathsf{null}~\mathsf{eq}) \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -413,13 +413,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{rt}} : \mathsf{ok}
+C \vdash {\mathit{rt}} : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}'} : \mathsf{ok}
+C \vdash {\mathit{rt}'} : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}} \leq {\mathit{rt}'}
+C \vdash {\mathit{rt}} \leq {\mathit{rt}'}
 }{
-{\mathit{C}} \vdash \mathsf{ref.test}~{\mathit{rt}} : {\mathit{rt}'} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{ref.test}~{\mathit{rt}} : {\mathit{rt}'} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -437,13 +437,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{rt}} : \mathsf{ok}
+C \vdash {\mathit{rt}} : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}'} : \mathsf{ok}
+C \vdash {\mathit{rt}'} : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}} \leq {\mathit{rt}'}
+C \vdash {\mathit{rt}} \leq {\mathit{rt}'}
 }{
-{\mathit{C}} \vdash \mathsf{ref.cast}~{\mathit{rt}} : {\mathit{rt}'} \rightarrow {\mathit{rt}}
+C \vdash \mathsf{ref.cast}~{\mathit{rt}} : {\mathit{rt}'} \rightarrow {\mathit{rt}}
 }
 \qquad
 \end{array}\]</div>
@@ -463,7 +463,7 @@ In contrast,</p>
 <li><p>For each <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}_i\)</span> in <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast\)</span>:</p>
 <ul>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}_i\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t_i\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i)\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t_i\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i)\)</span>.</p></li>
 </ul>
 </li>
 <li><p>Let <span class="math notranslate nohighlight">\(t^\ast\)</span> be the concatenation of all <span class="math notranslate nohighlight">\(t_i\)</span>.</p></li>
@@ -472,9 +472,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast}
+C{.}\mathsf{types}{}[x] \approx \mathsf{struct}~{({\mathsf{mut}^?}~{\mathit{zt}})^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{struct.new}~{\mathit{x}} : {{\mathrm{unpack}}({\mathit{zt}})^\ast} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{struct.new}~x : {{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})^\ast} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -487,7 +487,7 @@ In contrast,</p>
 <li><p>For each <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}_i\)</span> in <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast\)</span>:</p>
 <ul>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}_i\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t_i\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i)\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t_i\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}_i)\)</span>.</p></li>
 <li><p>The type <span class="math notranslate nohighlight">\(t_i\)</span> must be defaultable.</p></li>
 </ul>
 </li>
@@ -497,11 +497,11 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{({\mathit{mut}}~{\mathit{zt}})^\ast}
+C{.}\mathsf{types}{}[x] \approx \mathsf{struct}~{({\mathsf{mut}^?}~{\mathit{zt}})^\ast}
  \qquad
-({{\mathrm{default}}}_{{\mathrm{unpack}}({\mathit{zt}})} = {\mathit{val}})^\ast
+({{\href{../exec/runtime.html#default-val}{\mathrm{default}}}}_{{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})} = {\href{../exec/runtime.html#syntax-val}{\mathit{val}}})^\ast
 }{
-{\mathit{C}} \vdash \mathsf{struct.new\_default}~{\mathit{x}} : \epsilon \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{struct.new\_default}~x : \epsilon \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -512,20 +512,20 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-structtype"><span class="std std-ref">structure type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast[y]\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
-<li><p>The extension <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}\)</span> must be present if and only if <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> is a <a class="reference internal" href="../syntax/types.html#syntax-packedtype"><span class="std std-ref">packed type</span></a>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>The extension <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}\)</span> must be present if and only if <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> is a <a class="reference internal" href="../syntax/types.html#syntax-packtype"><span class="std std-ref">packed type</span></a>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{{\mathit{yt}}^\ast}
+C{.}\mathsf{types}{}[x] \approx \mathsf{struct}~{{\mathit{yt}}^\ast}
  \qquad
-{{\mathit{yt}}^\ast}{}[{\mathit{i}}] = {\mathit{mut}}~{\mathit{zt}}
+{{\mathit{yt}}^\ast}{}[i] = {\mathsf{mut}^?}~{\mathit{zt}}
  \qquad
-{{\mathit{sx}}^?} = \epsilon \Leftrightarrow {\mathit{zt}} = {\mathrm{unpack}}({\mathit{zt}})
+{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?} = \epsilon \Leftrightarrow {\mathit{zt}} = {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})
 }{
-{\mathit{C}} \vdash {{\mathsf{struct.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}}~{\mathit{i}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}}) \rightarrow {\mathrm{unpack}}({\mathit{zt}})
+C \vdash {{\mathsf{struct.get}}{\mathsf{\_}}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~x~i : (\mathsf{ref}~\mathsf{null}~x) \rightarrow {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})
 }
 \qquad
 \end{array}\]</div>
@@ -537,17 +537,17 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-structtype"><span class="std std-ref">structure type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast[y]\)</span>.</p></li>
 <li><p>The prefix <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}\)</span> must be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathsf{var}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{struct}~{{\mathit{yt}}^\ast}
+C{.}\mathsf{types}{}[x] \approx \mathsf{struct}~{{\mathit{yt}}^\ast}
  \qquad
-{{\mathit{yt}}^\ast}{}[{\mathit{i}}] = \mathsf{mut}~{\mathit{zt}}
+{{\mathit{yt}}^\ast}{}[i] = \mathsf{mut}~{\mathit{zt}}
 }{
-{\mathit{C}} \vdash \mathsf{struct.set}~{\mathit{x}}~{\mathit{i}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~{\mathrm{unpack}}({\mathit{zt}}) \rightarrow \epsilon
+C \vdash \mathsf{struct.set}~x~i : (\mathsf{ref}~\mathsf{null}~x)~{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -558,15 +558,15 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([t~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}})
 }{
-{\mathit{C}} \vdash \mathsf{array.new}~{\mathit{x}} : {\mathrm{unpack}}({\mathit{zt}})~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{array.new}~x : {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -577,18 +577,18 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>The type <span class="math notranslate nohighlight">\(t\)</span> must be defaultable.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}})
  \qquad
-{{\mathrm{default}}}_{{\mathrm{unpack}}({\mathit{zt}})} = {\mathit{val}}
+{{\href{../exec/runtime.html#default-val}{\mathrm{default}}}}_{{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})} = {\href{../exec/runtime.html#syntax-val}{\mathit{val}}}
 }{
-{\mathit{C}} \vdash \mathsf{array.new\_default}~{\mathit{x}} : \mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{array.new\_default}~x : \mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -599,15 +599,15 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([t^n] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}})
 }{
-{\mathit{C}} \vdash \mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}} : {{\mathrm{unpack}}({\mathit{zt}})^{{\mathit{n}}}} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{array.new\_fixed}~x~n : {{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})^{n}} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -627,11 +627,11 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{rt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{rt}})
  \qquad
-{\mathit{C}} \vdash {\mathit{C}}{.}\mathsf{elems}{}[{\mathit{y}}] \leq {\mathit{rt}}
+C \vdash C{.}\mathsf{elems}{}[y] \leq {\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{array.new\_elem}~{\mathit{x}}~{\mathit{y}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{array.new\_elem}~x~y : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -642,7 +642,7 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>The type <span class="math notranslate nohighlight">\(t\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">numeric type</span></a> or a <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/modules.html#syntax-data"><span class="std std-ref">data segment</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{datas}}[y]\)</span> must exist.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span>.</p></li>
@@ -650,13 +650,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}})
  \qquad
-{\mathrm{unpack}}({\mathit{zt}}) = {\mathit{numtype}} \lor {\mathrm{unpack}}({\mathit{zt}}) = {\mathit{vectype}}
+{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) = {\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}} \lor {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) = {\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}
  \qquad
-{\mathit{C}}{.}\mathsf{datas}{}[{\mathit{y}}] = \mathsf{ok}
+C{.}\mathsf{datas}{}[y] = \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{array.new\_data}~{\mathit{x}}~{\mathit{y}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~{\mathit{x}})
+C \vdash \mathsf{array.new\_data}~x~y : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~x)
 }
 \qquad
 \end{array}\]</div>
@@ -667,18 +667,18 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must exist.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
-<li><p>The extension <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}\)</span> must be present if and only if <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> is a <a class="reference internal" href="../syntax/types.html#syntax-packedtype"><span class="std std-ref">packed type</span></a>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>The extension <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}\)</span> must be present if and only if <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> is a <a class="reference internal" href="../syntax/types.html#syntax-packtype"><span class="std std-ref">packed type</span></a>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}})
  \qquad
-{{\mathit{sx}}^?} = \epsilon \Leftrightarrow {\mathit{zt}} = {\mathrm{unpack}}({\mathit{zt}})
+{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?} = \epsilon \Leftrightarrow {\mathit{zt}} = {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})
 }{
-{\mathit{C}} \vdash {{\mathsf{array.get}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}~{\mathit{x}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~\mathsf{i{\scriptstyle32}} \rightarrow {\mathrm{unpack}}({\mathit{zt}})
+C \vdash {{\mathsf{array.get}}{\mathsf{\_}}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~x : (\mathsf{ref}~\mathsf{null}~x)~\mathsf{i{\scriptstyle32}} \rightarrow {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})
 }
 \qquad
 \end{array}\]</div>
@@ -690,15 +690,15 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>The prefix <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}\)</span> must be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathsf{var}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
 }{
-{\mathit{C}} \vdash \mathsf{array.set}~{\mathit{x}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~\mathsf{i{\scriptstyle32}}~{\mathrm{unpack}}({\mathit{zt}}) \rightarrow \epsilon
+C \vdash \mathsf{array.set}~x : (\mathsf{ref}~\mathsf{null}~x)~\mathsf{i{\scriptstyle32}}~{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -711,9 +711,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
 }{
-{\mathit{C}} \vdash \mathsf{array.len} : (\mathsf{ref}~\mathsf{null}~\mathsf{array}) \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{array.len} : (\mathsf{ref}~\mathsf{null}~\mathsf{array}) \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -725,15 +725,15 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>The prefix <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}\)</span> must be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathsf{var}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}~t~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
 }{
-{\mathit{C}} \vdash \mathsf{array.fill}~{\mathit{x}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~\mathsf{i{\scriptstyle32}}~{\mathrm{unpack}}({\mathit{zt}})~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{array.fill}~x : (\mathsf{ref}~\mathsf{null}~x)~\mathsf{i{\scriptstyle32}}~{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -754,13 +754,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}_{{1}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}}_{{1}})
+C{.}\mathsf{types}{}[x_1] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}}_1)
  \qquad
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}_{{2}}] \approx \mathsf{array}~({\mathit{mut}}~{\mathit{zt}}_{{2}})
+C{.}\mathsf{types}{}[x_2] \approx \mathsf{array}~({\mathsf{mut}^?}~{\mathit{zt}}_2)
  \qquad
-{\mathit{C}} \vdash {\mathit{zt}}_{{2}} \leq {\mathit{zt}}_{{1}}
+C \vdash {\mathit{zt}}_2 \leq {\mathit{zt}}_1
 }{
-{\mathit{C}} \vdash \mathsf{array.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}}_{{1}})~\mathsf{i{\scriptstyle32}}~(\mathsf{ref}~\mathsf{null}~{\mathit{x}}_{{2}})~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{array.copy}~x_1~x_2 : (\mathsf{ref}~\mathsf{null}~x_1)~\mathsf{i{\scriptstyle32}}~(\mathsf{ref}~\mathsf{null}~x_2)~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -781,11 +781,11 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
  \qquad
-{\mathit{C}} \vdash {\mathit{C}}{.}\mathsf{elems}{}[{\mathit{y}}] \leq {\mathit{zt}}
+C \vdash C{.}\mathsf{elems}{}[y] \leq {\mathit{zt}}
 }{
-{\mathit{C}} \vdash \mathsf{array.init\_elem}~{\mathit{x}}~{\mathit{y}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{array.init\_elem}~x~y : (\mathsf{ref}~\mathsf{null}~x)~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -797,7 +797,7 @@ In contrast,</p>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[x]\)</span> must be an <a class="reference internal" href="../syntax/types.html#syntax-arraytype"><span class="std std-ref">array type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>Let the <a class="reference internal" href="../syntax/types.html#syntax-fieldtype"><span class="std std-ref">field type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span> be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}\)</span>.</p></li>
 <li><p>The prefix <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}\)</span> must be <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathsf{var}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpacktype}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}(\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}})\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(t\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">numeric type</span></a> or a <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/modules.html#syntax-data"><span class="std std-ref">data segment</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{datas}}[y]\)</span> must exist.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~x)~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
@@ -805,13 +805,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
+C{.}\mathsf{types}{}[x] \approx \mathsf{array}~(\mathsf{mut}~{\mathit{zt}})
  \qquad
-{\mathrm{unpack}}({\mathit{zt}}) = {\mathit{numtype}} \lor {\mathrm{unpack}}({\mathit{zt}}) = {\mathit{vectype}}
+{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) = {\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}} \lor {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}) = {\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}
  \qquad
-{\mathit{C}}{.}\mathsf{datas}{}[{\mathit{y}}] = \mathsf{ok}
+C{.}\mathsf{datas}{}[y] = \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{array.init\_data}~{\mathit{x}}~{\mathit{y}} : (\mathsf{ref}~\mathsf{null}~{\mathit{x}})~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{array.init\_data}~x~y : (\mathsf{ref}~\mathsf{null}~x)~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -828,7 +828,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{ref.i{\scriptstyle31}} : \mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~\mathsf{i{\scriptstyle31}})
+C \vdash \mathsf{ref.i{\scriptstyle31}} : \mathsf{i{\scriptstyle32}} \rightarrow (\mathsf{ref}~\mathsf{i{\scriptstyle31}})
 }
 \qquad
 \end{array}\]</div>
@@ -842,7 +842,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {{\mathsf{i{\scriptstyle31}.get}}{\mathsf{\_}}}{{\mathit{sx}}} : (\mathsf{ref}~\mathsf{null}~\mathsf{i{\scriptstyle31}}) \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash {{\mathsf{i{\scriptstyle31}.get}}{\mathsf{\_}}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}} : (\mathsf{ref}~\mathsf{null}~\mathsf{i{\scriptstyle31}}) \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -859,7 +859,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{any.convert\_extern} : (\mathsf{ref}~{\mathit{nul}}~\mathsf{extern}) \rightarrow (\mathsf{ref}~{\mathit{nul}}~\mathsf{any})
+C \vdash \mathsf{any.convert\_extern} : (\mathsf{ref}~{\mathsf{null}^?}~\mathsf{extern}) \rightarrow (\mathsf{ref}~{\mathsf{null}^?}~\mathsf{any})
 }
 \qquad
 \end{array}\]</div>
@@ -873,23 +873,18 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{extern.convert\_any} : (\mathsf{ref}~{\mathit{nul}}~\mathsf{any}) \rightarrow (\mathsf{ref}~{\mathit{nul}}~\mathsf{extern})
+C \vdash \mathsf{extern.convert\_any} : (\mathsf{ref}~{\mathsf{null}^?}~\mathsf{any}) \rightarrow (\mathsf{ref}~{\mathsf{null}^?}~\mathsf{extern})
 }
 \qquad
 \end{array}\]</div>
 </section>
 </section>
 <section id="vector-instructions">
-<span id="aux-dim"></span><span id="aux-unpackshape"></span><span id="valid-instr-vec"></span><span id="index-7"></span><h2>Vector Instructions<a class="headerlink" href="#vector-instructions" title="Permalink to this heading">¶</a></h2>
-<p>Vector instructions can have a prefix to describe the <a class="reference internal" href="../syntax/instructions.html#syntax-vec-shape"><span class="std std-ref">shape</span></a> of the operand. Packed numeric types, <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle8}}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle16}}\)</span>, are not <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value types</span></a>. An auxiliary function maps such packed type shapes to value types:</p>
+<span id="aux-unpackshape"></span><span id="valid-instr-vec"></span><span id="index-7"></span><h2>Vector Instructions<a class="headerlink" href="#vector-instructions" title="Permalink to this heading">¶</a></h2>
+<p>Vector instructions can have a prefix to describe the <a class="reference internal" href="../syntax/instructions.html#syntax-shape"><span class="std std-ref">shape</span></a> of the operand. Packed numeric types, <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle8}}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle16}}\)</span>, are not <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value types</span></a>. An auxiliary function maps such packed type shapes to value types:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
-{\mathrm{unpack}}({{{\mathsf{i}}{{\mathit{n}}}}{\mathsf{x}}}{{\mathit{N}}}) &amp;=&amp; {\mathrm{unpack}}({\mathsf{i}}{{\mathit{n}}}) \\
-\end{array}\end{split}\]</div>
-<p>The following auxiliary function denotes the number of lanes in a vector shape, i.e., its <em>dimension</em>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
-{\mathrm{dim}}({{{\mathsf{i}}{{\mathit{n}}}}{\mathsf{x}}}{{\mathit{N}}}) &amp;=&amp; {\mathit{N}} \\
+{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({{{\mathsf{i}}{n}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}}{N}) &amp;=&amp; {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathsf{i}}{n}) \\
 \end{array}\end{split}\]</div>
 <section id="xref-syntax-types-syntax-valtype-mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c">
 <span id="valid-vconst"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span><a class="headerlink" href="#xref-syntax-types-syntax-valtype-mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c" title="Permalink to this heading">¶</a></h3>
@@ -900,7 +895,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{v{\scriptstyle128}}{.}\mathsf{const}~{\mathit{c}} : \epsilon \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash \mathsf{v{\scriptstyle128}}{.}\mathsf{const}~c : \epsilon \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -914,7 +909,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{v{\scriptstyle128}} . {\mathit{vvunop}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash \mathsf{v{\scriptstyle128}} . {\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -934,7 +929,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{v{\scriptstyle128}} . {\mathit{vvternop}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash \mathsf{v{\scriptstyle128}} . {\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -948,7 +943,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{v{\scriptstyle128}} . {\mathit{vvtestop}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{v{\scriptstyle128}} . {\href{../syntax/instructions.html#syntax-vvtestop}{\mathit{vvtestop}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -962,7 +957,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}} . {\mathit{vunop}}_{{\mathit{sh}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}} . {\href{../syntax/instructions.html#syntax-vunop}{\mathit{vunop}}}_{\mathit{sh}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -976,7 +971,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}} . {\mathit{vbinop}}_{{\mathit{sh}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}} . {\href{../syntax/instructions.html#syntax-vbinop}{\mathit{vbinop}}}_{\mathit{sh}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -990,7 +985,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}} . {\mathit{vtestop}}_{{\mathit{sh}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash {\mathit{sh}} . {\href{../syntax/instructions.html#syntax-vrelop}{\mathit{vtestop}}}_{\mathit{sh}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1004,7 +999,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}} . {\mathit{vrelop}}_{{\mathit{sh}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}} . {\href{../syntax/instructions.html#syntax-vrelop}{\mathit{vrelop}}}_{\mathit{sh}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1018,7 +1013,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}} . {\mathit{vshiftop}}_{{\mathit{sh}}} : \mathsf{v{\scriptstyle128}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}} . {\href{../syntax/instructions.html#syntax-vshiftop}{\mathit{vshiftop}}}_{\mathit{sh}} : \mathsf{v{\scriptstyle128}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1032,7 +1027,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}}{.}\mathsf{bitmask} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash {\mathit{sh}}{.}\mathsf{bitmask} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1046,7 +1041,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}}{.}\mathsf{swizzle} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{swizzle} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1060,15 +1055,15 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-({\mathit{i}} &lt; 2 \cdot {\mathrm{dim}}({\mathit{sh}}))^\ast
+(i &lt; 2 \cdot {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}}))^\ast
 }{
-{\mathit{C}} \vdash {\mathit{sh}}{.}\mathsf{shuffle}~{{\mathit{i}}^\ast} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{shuffle}~{i^\ast} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-splat">
-<span id="valid-vec-splat"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{splat}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-splat" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vsplat"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{splat}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-splat" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be <span class="math notranslate nohighlight">\(\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
 <li><p>The instruction is valid with type <span class="math notranslate nohighlight">\([t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}]\)</span>.</p></li>
@@ -1077,40 +1072,41 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}}{.}\mathsf{splat} : {\mathrm{unpack}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{splat} : {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
-<span id="valid-vec-extract-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extract\_lane}}\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vextract-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extract\_lane}}\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>The lane index <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span> must be smaller than <span class="math notranslate nohighlight">\(\href{../valid/instructions.html#aux-dim}{\mathrm{dim}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
-<li><p>The instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})]\)</span>.</p></li>
+<li><p>The lane index <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span> must be smaller than <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be <span class="math notranslate nohighlight">\(\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
+<li><p>The instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{i}} &lt; {\mathrm{dim}}({\mathit{sh}})
+i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 }{
-{\mathit{C}} \vdash {{\mathit{sh}}{.}\mathsf{extract\_lane\_}}{{{\mathit{sx}}^?}}~{\mathit{i}} : \mathsf{v{\scriptstyle128}} \rightarrow {\mathrm{unpack}}({\mathit{sh}})
+C \vdash {{\mathit{sh}}{.}\mathsf{extract\_lane\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~i : \mathsf{v{\scriptstyle128}} \rightarrow {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}})
 }
 \qquad
 \end{array}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-replace-lane-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
-<span id="valid-vec-replace-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{replace\_lane}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-replace-lane-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vreplace-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{replace\_lane}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-shape-mathit-shape-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-replace-lane-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>The lane index <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span> must be smaller than <span class="math notranslate nohighlight">\(\href{../valid/instructions.html#aux-dim}{\mathrm{dim}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
+<li><p>The lane index <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span> must be smaller than <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be <span class="math notranslate nohighlight">\(\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}(\href{../syntax/instructions.html#syntax-shape}{\mathit{shape}})\)</span>.</p></li>
 <li><p>The instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-valtype}{\mathsf{v128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{i}} &lt; {\mathrm{dim}}({\mathit{sh}})
+i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 }{
-{\mathit{C}} \vdash {\mathit{sh}}{.}\mathsf{replace\_lane}~{\mathit{i}} : \mathsf{v{\scriptstyle128}}~{\mathrm{unpack}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{replace\_lane}~i : \mathsf{v{\scriptstyle128}}~{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1124,7 +1120,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}}_{{1}} . {{{{{\mathit{vextunop}}}{\mathsf{\_}}}{{\mathit{sh}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}_1 . {{{{{\href{../syntax/instructions.html#syntax-vextunop}{\mathit{vextunop}}}}{\mathsf{\_}}}{{\mathit{sh}}_2}}{\mathsf{\_}}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1138,7 +1134,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {\mathit{sh}}_{{1}} . {{{{{\mathit{vextbinop}}}{\mathsf{\_}}}{{\mathit{sh}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}_1 . {{{{{\href{../syntax/instructions.html#syntax-vextbinop}{\mathit{vextbinop}}}}{\mathsf{\_}}}{{\mathit{sh}}_2}}{\mathsf{\_}}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1152,7 +1148,7 @@ In contrast,</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash {{{{{\mathit{sh}}_{{1}}{.}\mathsf{narrow}}{\mathsf{\_}}}{{\mathit{sh}}_{{2}}}}{\mathsf{\_}}}{{\mathit{sx}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {{{{{\mathit{sh}}_1{.}\mathsf{narrow}}{\mathsf{\_}}}{{\mathit{sh}}_2}}{\mathsf{\_}}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}} : \mathsf{v{\scriptstyle128}}~\mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1165,9 +1161,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{{\mathit{sx}}^?} = \epsilon \Leftrightarrow {\mathrm{lanetype}}({\mathit{sh}}_{{1}}) = {{\mathsf{i}}{{\mathit{n}}}}_{{1}} \land {\mathrm{lanetype}}({\mathit{sh}}_{{2}}) = {{\mathsf{i}}{{\mathit{n}}}}_{{2}} \land {|{{\mathsf{i}}{{\mathit{n}}}}_{{1}}|} &gt; {|{{\mathsf{i}}{{\mathit{n}}}}_{{2}}|} \lor {\mathrm{lanetype}}({\mathit{sh}}_{{1}}) = {{\mathsf{f}}{{\mathit{n}}}}_{{1}} \land {\mathrm{lanetype}}({\mathit{sh}}_{{2}}) = {{\mathsf{f}}{{\mathit{n}}}}_{{2}}
+{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?} = \epsilon \Leftrightarrow {\href{../syntax/instructions.html#aux-lanetype}{\mathrm{lanetype}}}({\mathit{sh}}_1) = {\mathit{imm}}_1 \land {\href{../syntax/instructions.html#aux-lanetype}{\mathrm{lanetype}}}({\mathit{sh}}_2) = {\mathit{imm}}_2 \land {|{\mathit{imm}}_1|} &gt; {|{\mathit{imm}}_2|} \lor {\href{../syntax/instructions.html#aux-lanetype}{\mathrm{lanetype}}}({\mathit{sh}}_1) = {{\mathsf{f}}{n}}_1 \land {\href{../syntax/instructions.html#aux-lanetype}{\mathrm{lanetype}}}({\mathit{sh}}_2) = {{\mathsf{f}}{n}}_2
 }{
-{\mathit{C}} \vdash {\mathit{sh}}_{{1}} . {{{\mathit{vcvtop}}}{\mathsf{\_}}}{{\mathit{sh}}_{{2}}} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}_1 . {{{\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}}}{\mathsf{\_}}}{{\mathit{sh}}_2} : \mathsf{v{\scriptstyle128}} \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1186,9 +1182,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{locals}{}[{\mathit{x}}] = \mathsf{set}~{\mathit{t}}
+C{.}\mathsf{locals}{}[x] = \mathsf{set}~t
 }{
-{\mathit{C}} \vdash \mathsf{local.get}~{\mathit{x}} : \epsilon \rightarrow {\mathit{t}}
+C \vdash \mathsf{local.get}~x : \epsilon \rightarrow t
 }
 \qquad
 \end{array}\]</div>
@@ -1203,9 +1199,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{locals}{}[{\mathit{x}}] = {\mathit{init}}~{\mathit{t}}
+C{.}\mathsf{locals}{}[x] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t
 }{
-{\mathit{C}} \vdash \mathsf{local.set}~{\mathit{x}} : {\mathit{t}}~{\rightarrow}_{{\mathit{x}}}\,\epsilon
+C \vdash \mathsf{local.set}~x : t~{\rightarrow}_{x}\,\epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1220,9 +1216,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{locals}{}[{\mathit{x}}] = {\mathit{init}}~{\mathit{t}}
+C{.}\mathsf{locals}{}[x] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t
 }{
-{\mathit{C}} \vdash \mathsf{local.tee}~{\mathit{x}} : {\mathit{t}}~{\rightarrow}_{{\mathit{x}}}\,{\mathit{t}}
+C \vdash \mathsf{local.tee}~x : t~{\rightarrow}_{x}\,t
 }
 \qquad
 \end{array}\]</div>
@@ -1237,9 +1233,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{globals}{}[{\mathit{x}}] = {\mathit{mut}}~{\mathit{t}}
+C{.}\mathsf{globals}{}[x] = {\mathsf{mut}^?}~t
 }{
-{\mathit{C}} \vdash \mathsf{global.get}~{\mathit{x}} : \epsilon \rightarrow {\mathit{t}}
+C \vdash \mathsf{global.get}~x : \epsilon \rightarrow t
 }
 \qquad
 \end{array}\]</div>
@@ -1255,9 +1251,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{globals}{}[{\mathit{x}}] = \mathsf{mut}~{\mathit{t}}
+C{.}\mathsf{globals}{}[x] = \mathsf{mut}~t
 }{
-{\mathit{C}} \vdash \mathsf{global.set}~{\mathit{x}} : {\mathit{t}} \rightarrow \epsilon
+C \vdash \mathsf{global.set}~x : t \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1275,9 +1271,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{table.get}~{\mathit{x}} : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{rt}}
+C \vdash \mathsf{table.get}~x : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{rt}}
 }
 \qquad
 \end{array}\]</div>
@@ -1292,9 +1288,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{table.set}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~{\mathit{rt}} \rightarrow \epsilon
+C \vdash \mathsf{table.set}~x : \mathsf{i{\scriptstyle32}}~{\mathit{rt}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1308,9 +1304,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{table.size}~{\mathit{x}} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{table.size}~x : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1325,9 +1321,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{table.grow}~{\mathit{x}} : {\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{table.grow}~x : {\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1342,9 +1338,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{table.fill}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~{\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{table.fill}~x : \mathsf{i{\scriptstyle32}}~{\mathit{rt}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1362,13 +1358,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}_{{1}}] = {\mathit{lim}}_{{1}}~{\mathit{rt}}_{{1}}
+C{.}\mathsf{tables}{}[x_1] = {\mathit{lim}}_1~{\mathit{rt}}_1
  \qquad
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}_{{2}}] = {\mathit{lim}}_{{2}}~{\mathit{rt}}_{{2}}
+C{.}\mathsf{tables}{}[x_2] = {\mathit{lim}}_2~{\mathit{rt}}_2
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} \leq {\mathit{rt}}_{{1}}
+C \vdash {\mathit{rt}}_2 \leq {\mathit{rt}}_1
 }{
-{\mathit{C}} \vdash \mathsf{table.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{table.copy}~x_1~x_2 : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1386,13 +1382,13 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}_{{1}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}_1
  \qquad
-{\mathit{C}}{.}\mathsf{elems}{}[{\mathit{y}}] = {\mathit{rt}}_{{2}}
+C{.}\mathsf{elems}{}[y] = {\mathit{rt}}_2
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} \leq {\mathit{rt}}_{{1}}
+C \vdash {\mathit{rt}}_2 \leq {\mathit{rt}}_1
 }{
-{\mathit{C}} \vdash \mathsf{table.init}~{\mathit{x}}~{\mathit{y}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{table.init}~x~y : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1406,9 +1402,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{elems}{}[{\mathit{x}}] = {\mathit{rt}}
+C{.}\mathsf{elems}{}[x] = {\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{elem.drop}~{\mathit{x}} : \epsilon \rightarrow \epsilon
+C \vdash \mathsf{elem.drop}~x : \epsilon \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1426,15 +1422,15 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
  \qquad
-{2^{{\mathit{memop}}{.}\mathsf{align}}} \leq {|{\mathit{nt}}|} / 8
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\mathsf{align}}} \leq {|{\mathit{nt}}|} / 8
  \qquad
-({2^{{\mathit{memop}}{.}\mathsf{align}}} \leq {\mathit{n}} / 8 &lt; {|{\mathit{nt}}|} / 8)^?
+({2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\mathsf{align}}} \leq n / 8 &lt; {|{\mathit{nt}}|} / 8)^?
  \qquad
-{{\mathit{n}}^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{{\mathit{n}}}
+{n^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{n}
 }{
-{\mathit{C}} \vdash {{\mathit{nt}}{.}\mathsf{load}}{{({{{\mathit{n}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{x}}~{\mathit{memop}} : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{nt}}
+C \vdash {{\mathit{nt}}{.}\mathsf{load}}{{({{n}{\mathsf{\_}}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}})^?}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \mathsf{i{\scriptstyle32}} \rightarrow {\mathit{nt}}
 }
 \qquad
 \end{array}\]</div>
@@ -1473,15 +1469,15 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
  \qquad
-{2^{{\mathit{memop}}{.}\mathsf{align}}} \leq {|{\mathit{nt}}|} / 8
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\mathsf{align}}} \leq {|{\mathit{nt}}|} / 8
  \qquad
-({2^{{\mathit{memop}}{.}\mathsf{align}}} \leq {\mathit{n}} / 8 &lt; {|{\mathit{nt}}|} / 8)^?
+({2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\mathsf{align}}} \leq n / 8 &lt; {|{\mathit{nt}}|} / 8)^?
  \qquad
-{{\mathit{n}}^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{{\mathit{n}}}
+{n^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{n}
 }{
-{\mathit{C}} \vdash {{\mathit{nt}}{.}\mathsf{store}}{{{\mathit{n}}^?}}~{\mathit{x}}~{\mathit{memop}} : \mathsf{i{\scriptstyle32}}~{\mathit{nt}} \rightarrow \epsilon
+C \vdash {{\mathit{nt}}{.}\mathsf{store}}{{n^?}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \mathsf{i{\scriptstyle32}}~{\mathit{nt}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1511,7 +1507,7 @@ In contrast,</p>
 }\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-load-extend"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{x}M\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vload-ext"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{x}M\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8 \cdot M\)</span>.</p></li>
@@ -1527,7 +1523,7 @@ In contrast,</p>
 }\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-load-splat"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vload-splat"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
@@ -1543,7 +1539,7 @@ In contrast,</p>
 }\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-load-zero"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vload-zero"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
@@ -1559,7 +1555,7 @@ In contrast,</p>
 }\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
-<span id="valid-load-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vload-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
@@ -1578,7 +1574,7 @@ In contrast,</p>
 }\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
-<span id="valid-store-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vstore-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
@@ -1605,9 +1601,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
 }{
-{\mathit{C}} \vdash \mathsf{memory.size}~{\mathit{x}} : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{memory.size}~x : \epsilon \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1621,9 +1617,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
 }{
-{\mathit{C}} \vdash \mathsf{memory.grow}~{\mathit{x}} : \mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
+C \vdash \mathsf{memory.grow}~x : \mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}
 }
 \qquad
 \end{array}\]</div>
@@ -1637,9 +1633,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
 }{
-{\mathit{C}} \vdash \mathsf{memory.fill}~{\mathit{x}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{memory.fill}~x : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1654,11 +1650,11 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}_{{1}}] = {\mathit{mt}}_{{1}}
+C{.}\mathsf{mems}{}[x_1] = {\mathit{mt}}_1
  \qquad
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}_{{2}}] = {\mathit{mt}}_{{2}}
+C{.}\mathsf{mems}{}[x_2] = {\mathit{mt}}_2
 }{
-{\mathit{C}} \vdash \mathsf{memory.copy}~{\mathit{x}}_{{1}}~{\mathit{x}}_{{2}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{memory.copy}~x_1~x_2 : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1673,11 +1669,11 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{mems}{}[{\mathit{x}}] = {\mathit{mt}}
+C{.}\mathsf{mems}{}[x] = {\mathit{mt}}
  \qquad
-{\mathit{C}}{.}\mathsf{datas}{}[{\mathit{y}}] = \mathsf{ok}
+C{.}\mathsf{datas}{}[y] = \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{memory.init}~{\mathit{x}}~{\mathit{y}} : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
+C \vdash \mathsf{memory.init}~x~y : \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1691,9 +1687,9 @@ In contrast,</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{datas}{}[{\mathit{x}}] = \mathsf{ok}
+C{.}\mathsf{datas}{}[x] = \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{data.drop}~{\mathit{x}} : \epsilon \rightarrow \epsilon
+C \vdash \mathsf{data.drop}~x : \epsilon \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1713,17 +1709,17 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{block}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}, \mathsf{labels}~({{\mathit{t}}^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
+<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\(C, \mathsf{labels}~({t^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
 </div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-loop-xref-syntax-instructions-syntax-blocktype-mathit-blocktype-xref-syntax-instructions-syntax-instr-mathit-instr-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end">
@@ -1738,17 +1734,17 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{1}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_1^\ast}) \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{loop}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}, \mathsf{labels}~({{\mathit{t}}^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
+<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\(C, \mathsf{labels}~({t^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
 </div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-if-xref-syntax-instructions-syntax-blocktype-mathit-blocktype-xref-syntax-instructions-syntax-instr-mathit-instr-1-ast-xref-syntax-instructions-syntax-instr-control-mathsf-else-xref-syntax-instructions-syntax-instr-mathit-instr-2-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end">
@@ -1765,19 +1761,19 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{1}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast} : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{if}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast}~\mathsf{else}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}, \mathsf{labels}~({{\mathit{t}}^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
+<p>The <a class="reference internal" href="conventions.html#notation-extend"><span class="std std-ref">notation</span></a> <span class="math notranslate nohighlight">\(C, \mathsf{labels}~({t^\ast})\)</span> inserts the new label type at index <span class="math notranslate nohighlight">\(0\)</span>, shifting all others.</p>
 </div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-br-l">
@@ -1790,17 +1786,17 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}
+C{.}\mathsf{labels}{}[l] = {t^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+C \vdash {t_1^\ast} \rightarrow {t_2^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{br}~{\mathit{l}} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{br}~l : {t_1^\ast}~{t^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\({\mathit{C}}{.}\mathsf{label}{}[{\mathit{l}}]\)</span> performs a relative lookup as expected.</p>
+<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\(C\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\(C{.}\mathsf{label}{}[l]\)</span> performs a relative lookup as expected.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{br}\)</span> instruction is <a class="reference internal" href="#polymorphism"><span class="std std-ref">stack-polymorphic</span></a>.</p>
 </div>
 </section>
@@ -1814,15 +1810,15 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}
+C{.}\mathsf{labels}{}[l] = {t^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{br\_if}~{\mathit{l}} : {{\mathit{t}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}^\ast}
+C \vdash \mathsf{br\_if}~l : {t^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {t^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\({\mathit{C}}{.}\mathsf{label}{}[{\mathit{l}}]\)</span> performs a relative lookup as expected.</p>
+<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\(C\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\(C{.}\mathsf{label}{}[l]\)</span> performs a relative lookup as expected.</p>
 </div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-br-table-l-ast-l-n">
@@ -1843,22 +1839,22 @@ the result type <span class="math notranslate nohighlight">\([t^\ast]\)</span> <
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-({\mathit{C}} \vdash {{\mathit{t}}^\ast} \leq {\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}])^\ast
+(C \vdash {t^\ast} \leq C{.}\mathsf{labels}{}[l])^\ast
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}^\ast} \leq {\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}'}]
+C \vdash {t^\ast} \leq C{.}\mathsf{labels}{}[{l'}]
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+C \vdash {t_1^\ast} \rightarrow {t_2^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{br\_table}~{{\mathit{l}}^\ast}~{\mathit{l}'} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{br\_table}~{l^\ast}~{l'} : {t_1^\ast}~{t^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\({\mathit{C}}\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\({\mathit{C}}{.}\mathsf{label}{}[{\mathit{l}}]\)</span> performs a relative lookup as expected.</p>
+<p>The <a class="reference internal" href="../syntax/modules.html#syntax-labelidx"><span class="std std-ref">label index</span></a> space in the <a class="reference internal" href="conventions.html#context"><span class="std std-ref">context</span></a> <span class="math notranslate nohighlight">\(C\)</span> contains the most recent label first, so that <span class="math notranslate nohighlight">\(C{.}\mathsf{label}{}[l]\)</span> performs a relative lookup as expected.</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{br\_table}\)</span> instruction is <a class="reference internal" href="#polymorphism"><span class="std std-ref">stack-polymorphic</span></a>.</p>
-<p>Furthermore, the <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({{\mathit{t}}^\ast}\)</span> is also chosen non-deterministically in this rule.
-Although it may seem necessary to compute <span class="math notranslate nohighlight">\({{\mathit{t}}^\ast}\)</span> as the greatest lower bound of all label types in practice,
+<p>Furthermore, the <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({t^\ast}\)</span> is also chosen non-deterministically in this rule.
+Although it may seem necessary to compute <span class="math notranslate nohighlight">\({t^\ast}\)</span> as the greatest lower bound of all label types in practice,
 a simple <a class="reference internal" href="../appendix/algorithm.html#algo-valid"><span class="std std-ref">linear algorithm</span></a> does not require this.</p>
 </div>
 </section>
@@ -1872,11 +1868,11 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}
+C{.}\mathsf{labels}{}[l] = {t^\ast}
  \qquad
-{\mathit{C}} \vdash {\mathit{ht}} : \mathsf{ok}
+C \vdash {\mathit{ht}} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{br\_on\_null}~{\mathit{l}} : {{\mathit{t}}^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow {{\mathit{t}}^\ast}~(\mathsf{ref}~{\mathit{ht}})
+C \vdash \mathsf{br\_on\_null}~l : {t^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow {t^\ast}~(\mathsf{ref}~{\mathit{ht}})
 }
 \qquad
 \end{array}\]</div>
@@ -1894,9 +1890,9 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}~(\mathsf{ref}~{\mathit{ht}})
+C{.}\mathsf{labels}{}[l] = {t^\ast}~(\mathsf{ref}~{\mathit{ht}})
 }{
-{\mathit{C}} \vdash \mathsf{br\_on\_non\_null}~{\mathit{l}} : {{\mathit{t}}^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow {{\mathit{t}}^\ast}
+C \vdash \mathsf{br\_on\_non\_null}~l : {t^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{ht}}) \rightarrow {t^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -1917,17 +1913,17 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}~{\mathit{rt}}
+C{.}\mathsf{labels}{}[l] = {t^\ast}~{\mathit{rt}}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{1}} : \mathsf{ok}
+C \vdash {\mathit{rt}}_1 : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} : \mathsf{ok}
+C \vdash {\mathit{rt}}_2 : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} \leq {\mathit{rt}}_{{1}}
+C \vdash {\mathit{rt}}_2 \leq {\mathit{rt}}_1
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} \leq {\mathit{rt}}
+C \vdash {\mathit{rt}}_2 \leq {\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{br\_on\_cast}~{\mathit{l}}~{\mathit{rt}}_{{1}}~{\mathit{rt}}_{{2}} : {{\mathit{t}}^\ast}~{\mathit{rt}}_{{1}} \rightarrow {{\mathit{t}}^\ast}~({\mathit{rt}}_{{1}} \setminus {\mathit{rt}}_{{2}})
+C \vdash \mathsf{br\_on\_cast}~l~{\mathit{rt}}_1~{\mathit{rt}}_2 : {t^\ast}~{\mathit{rt}}_1 \rightarrow {t^\ast}~({\mathit{rt}}_1 \setminus {\mathit{rt}}_2)
 }
 \qquad
 \end{array}\]</div>
@@ -1948,17 +1944,17 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{labels}{}[{\mathit{l}}] = {{\mathit{t}}^\ast}~{\mathit{rt}}
+C{.}\mathsf{labels}{}[l] = {t^\ast}~{\mathit{rt}}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{1}} : \mathsf{ok}
+C \vdash {\mathit{rt}}_1 : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} : \mathsf{ok}
+C \vdash {\mathit{rt}}_2 : \mathsf{ok}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{2}} \leq {\mathit{rt}}_{{1}}
+C \vdash {\mathit{rt}}_2 \leq {\mathit{rt}}_1
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}}_{{1}} \setminus {\mathit{rt}}_{{2}} \leq {\mathit{rt}}
+C \vdash {\mathit{rt}}_1 \setminus {\mathit{rt}}_2 \leq {\mathit{rt}}
 }{
-{\mathit{C}} \vdash \mathsf{br\_on\_cast\_fail}~{\mathit{l}}~{\mathit{rt}}_{{1}}~{\mathit{rt}}_{{2}} : {{\mathit{t}}^\ast}~{\mathit{rt}}_{{1}} \rightarrow {{\mathit{t}}^\ast}~{\mathit{rt}}_{{2}}
+C \vdash \mathsf{br\_on\_cast\_fail}~l~{\mathit{rt}}_1~{\mathit{rt}}_2 : {t^\ast}~{\mathit{rt}}_1 \rightarrow {t^\ast}~{\mathit{rt}}_2
 }
 \qquad
 \end{array}\]</div>
@@ -1973,9 +1969,9 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{funcs}{}[{\mathit{x}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{funcs}{}[x] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
 }{
-{\mathit{C}} \vdash \mathsf{call}~{\mathit{x}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{call}~x : {t_1^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -1990,9 +1986,9 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{types}{}[x] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
 }{
-{\mathit{C}} \vdash \mathsf{call\_ref}~{\mathit{x}} : {{\mathit{t}}_{{1}}^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{x}}) \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{call\_ref}~x : {t_1^\ast}~(\mathsf{ref}~\mathsf{null}~x) \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2002,7 +1998,7 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <ul class="simple">
 <li><p>The table <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{tables}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-limits}{\mathit{limits}}~t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-tabletype"><span class="std std-ref">table type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{tables}}[x]\)</span>.</p></li>
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\(t\)</span> must <a class="reference internal" href="matching.html#match-reftype"><span class="std std-ref">match</span></a> type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\(t\)</span> must <a class="reference internal" href="matching.html#match-reftype"><span class="std std-ref">match</span></a> type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~\href{../syntax/modules.html#syntax-func}{\mathsf{func}}\)</span>.</p></li>
 <li><p>The type <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[y]\)</span> must be defined in the context.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[y]\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-functype"><span class="std std-ref">function type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~[t_1^\ast] \href{../syntax/types.html#syntax-functype}{\rightarrow} [t_2^\ast]\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([t_1^\ast~\href{../syntax/types.html#syntax-valtype}{\mathsf{i32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t_2^\ast]\)</span>.</p></li>
@@ -2010,13 +2006,13 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}} \leq (\mathsf{ref}~\mathsf{null}~\mathsf{func})
+C \vdash {\mathit{rt}} \leq (\mathsf{ref}~\mathsf{null}~\mathsf{func})
  \qquad
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{y}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{types}{}[y] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
 }{
-{\mathit{C}} \vdash \mathsf{call\_indirect}~{\mathit{x}}~{\mathit{y}} : {{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{call\_indirect}~x~y : {t_1^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2031,18 +2027,18 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{return} = ({{\mathit{t}}^\ast})
+C{.}\mathsf{return} = ({t^\ast})
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+C \vdash {t_1^\ast} \rightarrow {t_2^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{return} : {{\mathit{t}}_{{1}}^\ast}~{{\mathit{t}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{return} : {t_1^\ast}~{t^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \end{array}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{return}\)</span> instruction is <a class="reference internal" href="#polymorphism"><span class="std std-ref">stack-polymorphic</span></a>.</p>
-<p><span class="math notranslate nohighlight">\({\mathit{C}}{.}\mathsf{return}\)</span> is absent (set to <span class="math notranslate nohighlight">\(\epsilon\)</span>) when validating an <a class="reference internal" href="#valid-expr"><span class="std std-ref">expression</span></a> that is not a function body.
+<p><span class="math notranslate nohighlight">\(C{.}\mathsf{return}\)</span> is absent (set to <span class="math notranslate nohighlight">\(\epsilon\)</span>) when validating an <a class="reference internal" href="#valid-expr"><span class="std std-ref">expression</span></a> that is not a function body.
 This differs from it being set to the empty result type <span class="math notranslate nohighlight">\((\epsilon)\)</span>,
 which is the case for functions not returning anything.</p>
 </div>
@@ -2059,15 +2055,15 @@ which is the case for functions not returning anything.</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{funcs}{}[{\mathit{x}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{funcs}{}[x] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
  \qquad
-{\mathit{C}}{.}\mathsf{return} = ({{\mathit{t}'}_{{2}}^\ast})
+C{.}\mathsf{return} = ({{t'}_2^\ast})
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{2}}^\ast} \leq {{\mathit{t}'}_{{2}}^\ast}
+C \vdash {t_2^\ast} \leq {{t'}_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{3}}^\ast} \rightarrow {{\mathit{t}}_{{4}}^\ast} : \mathsf{ok}
+C \vdash {t_3^\ast} \rightarrow {t_4^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{return\_call}~{\mathit{x}} : {{\mathit{t}}_{{3}}^\ast}~{{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{4}}^\ast}
+C \vdash \mathsf{return\_call}~x : {t_3^\ast}~{t_1^\ast} \rightarrow {t_4^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2087,15 +2083,15 @@ which is the case for functions not returning anything.</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{x}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{types}{}[x] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
  \qquad
-{\mathit{C}}{.}\mathsf{return} = ({{\mathit{t}'}_{{2}}^\ast})
+C{.}\mathsf{return} = ({{t'}_2^\ast})
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{2}}^\ast} \leq {{\mathit{t}'}_{{2}}^\ast}
+C \vdash {t_2^\ast} \leq {{t'}_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{3}}^\ast} \rightarrow {{\mathit{t}}_{{4}}^\ast} : \mathsf{ok}
+C \vdash {t_3^\ast} \rightarrow {t_4^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{return\_call\_ref}~{\mathit{x}} : {{\mathit{t}}_{{3}}^\ast}~{{\mathit{t}}_{{1}}^\ast}~(\mathsf{ref}~\mathsf{null}~{\mathit{x}}) \rightarrow {{\mathit{t}}_{{4}}^\ast}
+C \vdash \mathsf{return\_call\_ref}~x : {t_3^\ast}~{t_1^\ast}~(\mathsf{ref}~\mathsf{null}~x) \rightarrow {t_4^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2110,7 +2106,7 @@ which is the case for functions not returning anything.</p>
 <li><p>The return type <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{return}}\)</span> must not be empty in the context.</p></li>
 <li><p>The table <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{tables}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-limits}{\mathit{limits}}~t\)</span> be the <a class="reference internal" href="../syntax/types.html#syntax-tabletype"><span class="std std-ref">table type</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{tables}}[x]\)</span>.</p></li>
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\(t\)</span> must <a class="reference internal" href="matching.html#match-reftype"><span class="std std-ref">match</span></a> type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\(t\)</span> must <a class="reference internal" href="matching.html#match-reftype"><span class="std std-ref">match</span></a> type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~\href{../syntax/modules.html#syntax-func}{\mathsf{func}}\)</span>.</p></li>
 <li><p>The type <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[y]\)</span> must be defined in the context.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{types}}[y]\)</span> must be a <a class="reference internal" href="../syntax/types.html#syntax-functype"><span class="std std-ref">function type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~[t_1^\ast] \href{../syntax/types.html#syntax-functype}{\rightarrow} [t_2^\ast]\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\([t_2^\ast]\)</span> must <a class="reference internal" href="matching.html#match-resulttype"><span class="std std-ref">match</span></a> <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{return}}\)</span>.</p></li>
@@ -2120,20 +2116,20 @@ which is the case for functions not returning anything.</p>
 \[\begin{split}\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 \begin{array}{&#64;{}c&#64;{}}
-{\mathit{C}}{.}\mathsf{tables}{}[{\mathit{x}}] = {\mathit{lim}}~{\mathit{rt}}
+C{.}\mathsf{tables}{}[x] = {\mathit{lim}}~{\mathit{rt}}
  \qquad
-{\mathit{C}} \vdash {\mathit{rt}} \leq (\mathsf{ref}~\mathsf{null}~\mathsf{func})
+C \vdash {\mathit{rt}} \leq (\mathsf{ref}~\mathsf{null}~\mathsf{func})
  \\
-{\mathit{C}}{.}\mathsf{types}{}[{\mathit{y}}] \approx \mathsf{func}~({{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast})
+C{.}\mathsf{types}{}[y] \approx \mathsf{func}~({t_1^\ast} \rightarrow {t_2^\ast})
  \qquad
-{\mathit{C}}{.}\mathsf{return} = ({{\mathit{t}'}_{{2}}^\ast})
+C{.}\mathsf{return} = ({{t'}_2^\ast})
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{2}}^\ast} \leq {{\mathit{t}'}_{{2}}^\ast}
+C \vdash {t_2^\ast} \leq {{t'}_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}_{{3}}^\ast} \rightarrow {{\mathit{t}}_{{4}}^\ast} : \mathsf{ok}
+C \vdash {t_3^\ast} \rightarrow {t_4^\ast} : \mathsf{ok}
 \end{array}
 }{
-{\mathit{C}} \vdash \mathsf{return\_call\_indirect}~{\mathit{x}}~{\mathit{y}} : {{\mathit{t}}_{{3}}^\ast}~{{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{4}}^\ast}
+C \vdash \mathsf{return\_call\_indirect}~x~y : {t_3^\ast}~{t_1^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {t_4^\ast}
 }
 \qquad
 \end{array}\end{split}\]</div>
@@ -2155,7 +2151,7 @@ which is the case for functions not returning anything.</p>
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \epsilon : \epsilon \rightarrow \epsilon
+C \vdash \epsilon : \epsilon \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -2176,13 +2172,13 @@ but with:</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{instr}}_{{1}} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1 : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}}\,{t_2^\ast}
  \qquad
-({\mathit{C}}{.}\mathsf{locals}{}[{\mathit{x}}_{{1}}] = {\mathit{init}}~{\mathit{t}})^\ast
+(C{.}\mathsf{locals}{}[x_1] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)^\ast
  \qquad
-{\mathit{C}}{}[\mathsf{local}{}[{{\mathit{x}}_{{1}}^\ast}] = {(\mathsf{set}~{\mathit{t}})^\ast}] \vdash {{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{2}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{3}}^\ast}
+C{}[\mathsf{local}{}[{x_1^\ast}] = {(\mathsf{set}~t)^\ast}] \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_2^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_3^\ast}
 }{
-{\mathit{C}} \vdash {\mathit{instr}}_{{1}}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}~{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{3}}^\ast}
+C \vdash {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}~{x_2^\ast}}\,{t_3^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2198,21 +2194,21 @@ but with:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {\mathit{it}}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {\mathit{it}}
  \qquad
-{\mathit{C}} \vdash {\mathit{it}} \leq {\mathit{it}'}
+C \vdash {\mathit{it}} \leq {\mathit{it}'}
  \qquad
-{\mathit{C}} \vdash {\mathit{it}'} : \mathsf{ok}
+C \vdash {\mathit{it}'} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {\mathit{it}'}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {\mathit{it}'}
 }
 \\[3ex]\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}^\ast} : \mathsf{ok}
+C \vdash {t^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : ({{\mathit{t}}^\ast}~{{\mathit{t}}_{{1}}^\ast})~{\rightarrow}_{{{\mathit{x}}^\ast}}\,({{\mathit{t}}^\ast}~{{\mathit{t}}_{{2}}^\ast})
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : ({t^\ast}~{t_1^\ast})~{\rightarrow}_{{x^\ast}}\,({t^\ast}~{t_2^\ast})
 }
 \qquad
 \end{array}\end{split}\]</div>
@@ -2228,13 +2224,13 @@ For example, consider the instruction sequence</p>
 <p>To type this sequence, its subsequence <span class="math notranslate nohighlight">\((\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~2)~\mathsf{i{\scriptstyle32}} . \mathsf{add}\)</span> needs to be valid with an intermediate type.
 But the direct type of <span class="math notranslate nohighlight">\((\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~2)\)</span> is <span class="math notranslate nohighlight">\(\epsilon \rightarrow \mathsf{i{\scriptstyle32}}\)</span>, not matching the two inputs expected by <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}} . \mathsf{add}\)</span>.
 The subsumption rule allows to weaken the type of <span class="math notranslate nohighlight">\((\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~2)\)</span> to the supertype <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}\)</span>, such that it can be composed with <span class="math notranslate nohighlight">\(\mathsf{add}~\mathsf{i{\scriptstyle32}}\)</span> and yields the intermediate type <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle32}} \rightarrow \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle32}}\)</span> for the subsequence. That can in turn be composed with the first constant.</p>
-<p>Furthermore, subsumption allows to drop init variables <span class="math notranslate nohighlight">\({{\mathit{x}}^\ast}\)</span> from the instruction type in a context where they are not needed, for example, at the end of the body of a <a class="reference internal" href="#valid-block"><span class="std std-ref">block</span></a>.</p>
+<p>Furthermore, subsumption allows to drop init variables <span class="math notranslate nohighlight">\({x^\ast}\)</span> from the instruction type in a context where they are not needed, for example, at the end of the body of a <a class="reference internal" href="#valid-block"><span class="std std-ref">block</span></a>.</p>
 </div>
 </section>
 </section>
 <section id="expressions">
 <span id="valid-expr"></span><span id="index-13"></span><h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this heading">¶</a></h2>
-<p>Expressions <span class="math notranslate nohighlight">\({\mathit{expr}}\)</span> are classified by <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result types</span></a> <span class="math notranslate nohighlight">\({{\mathit{t}}^\ast}\)</span>.</p>
+<p>Expressions <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> are classified by <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result types</span></a> <span class="math notranslate nohighlight">\({t^\ast}\)</span>.</p>
 <section id="xref-syntax-instructions-syntax-instr-mathit-instr-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end">
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-mathit-instr-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
@@ -2244,9 +2240,9 @@ The subsumption rule allows to weaken the type of <span class="math notranslate 
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : \epsilon~{\rightarrow}_{\epsilon}\,{{\mathit{t}}^\ast}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : \epsilon~{\rightarrow}_{\epsilon}\,{t^\ast}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}^\ast}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2276,9 +2272,9 @@ The subsumption rule allows to weaken the type of <span class="math notranslate 
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-({\mathit{C}} \vdash {\mathit{instr}}~\mathsf{const})^\ast
+(C \vdash {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}~\mathsf{const})^\ast
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast}~\mathsf{const}
+C \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}~\mathsf{const}
 }
 \qquad
 \end{array}\]</div>
@@ -2286,83 +2282,83 @@ The subsumption rule allows to weaken the type of <span class="math notranslate 
 \[\begin{split}\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash ({\mathit{nt}}{.}\mathsf{const}~{\mathit{c}}_{{\mathit{nt}}})~\mathsf{const}
+C \vdash ({\mathit{nt}}{.}\mathsf{const}~c_{\mathit{nt}})~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash ({\mathit{vt}}{.}\mathsf{const}~{\mathit{c}}_{{\mathit{vt}}})~\mathsf{const}
+C \vdash ({\mathit{vt}}{.}\mathsf{const}~c_{\mathit{vt}})~\mathsf{const}
 }
 \qquad
 \frac{
-{\mathsf{i}}{{\mathit{n}}} \in \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle64}}
+{\mathsf{i}}{n} \in \mathsf{i{\scriptstyle32}}~\mathsf{i{\scriptstyle64}}
  \qquad
-{\mathit{binop}} \in \mathsf{add}~\mathsf{sub}~\mathsf{mul}
+{\href{../syntax/instructions.html#syntax-binop}{\mathit{binop}}} \in \mathsf{add}~\mathsf{sub}~\mathsf{mul}
 }{
-{\mathit{C}} \vdash ({\mathsf{i}}{{\mathit{n}}} . {\mathit{binop}})~\mathsf{const}
+C \vdash ({\mathsf{i}}{n} . {\href{../syntax/instructions.html#syntax-binop}{\mathit{binop}}})~\mathsf{const}
 }
 \\[3ex]\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{ref.null}~{\mathit{ht}})~\mathsf{const}
+C \vdash (\mathsf{ref.null}~{\mathit{ht}})~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{ref.i{\scriptstyle31}})~\mathsf{const}
+C \vdash (\mathsf{ref.i{\scriptstyle31}})~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{ref.func}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{ref.func}~x)~\mathsf{const}
 }
 \\[3ex]\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{struct.new}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{struct.new}~x)~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{struct.new\_default}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{struct.new\_default}~x)~\mathsf{const}
 }
 \\[3ex]\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{array.new}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{array.new}~x)~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{array.new\_default}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{array.new\_default}~x)~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{array.new\_fixed}~{\mathit{x}}~{\mathit{n}})~\mathsf{const}
+C \vdash (\mathsf{array.new\_fixed}~x~n)~\mathsf{const}
 }
 \\[3ex]\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{any.convert\_extern})~\mathsf{const}
+C \vdash (\mathsf{any.convert\_extern})~\mathsf{const}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash (\mathsf{extern.convert\_any})~\mathsf{const}
+C \vdash (\mathsf{extern.convert\_any})~\mathsf{const}
 }
 \\[3ex]\displaystyle
 \frac{
-{\mathit{C}}{.}\mathsf{globals}{}[{\mathit{x}}] = {\mathit{t}}
+C{.}\mathsf{globals}{}[x] = t
 }{
-{\mathit{C}} \vdash (\mathsf{global.get}~{\mathit{x}})~\mathsf{const}
+C \vdash (\mathsf{global.get}~x)~\mathsf{const}
 }
 \qquad
 \end{array}\end{split}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Currently, constant expressions occurring in <a class="reference internal" href="../syntax/modules.html#syntax-global"><span class="std std-ref">globals</span></a> are further constrained in that contained <span class="math notranslate nohighlight">\(\mathsf{global.get}\)</span> instructions are only allowed to refer to <em>imported</em> or <em>previously defined</em> globals. Constant expressions occurring in <a class="reference internal" href="../syntax/modules.html#syntax-table"><span class="std std-ref">tables</span></a> may only have <span class="math notranslate nohighlight">\(\mathsf{global.get}\)</span> instructions that refer to <em>imported</em> globals.
-This is enforced in the <a class="reference internal" href="modules.html#valid-module"><span class="std std-ref">validation rule for modules</span></a> by constraining the context <span class="math notranslate nohighlight">\({\mathit{C}}\)</span> accordingly.</p>
+This is enforced in the <a class="reference internal" href="modules.html#valid-module"><span class="std std-ref">validation rule for modules</span></a> by constraining the context <span class="math notranslate nohighlight">\(C\)</span> accordingly.</p>
 <p>The definition of constant expression may be extended in future versions of WebAssembly.</p>
 </div>
 </section>
