@@ -22,14 +22,14 @@ $ (../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup -l --splice-latex -p spe
 ../spec/wasm-3.0/6-typing.watsup:675.6-675.40: prem_to_instrs: Yet `Resulttype_sub: `%|-%<:%`(C, t_2*{t_2 : valtype}, t'_2*{t'_2 : valtype})`
 ../spec/wasm-3.0/6-typing.watsup:682.6-682.45: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt, REF_reftype(`NULL%?`_nul(?(())), FUNC_heaptype))`
 ../spec/wasm-3.0/6-typing.watsup:686.6-686.40: prem_to_instrs: Yet `Resulttype_sub: `%|-%<:%`(C, t_2*{t_2 : valtype}, t'_2*{t'_2 : valtype})`
-../spec/wasm-3.0/6-typing.watsup:750.6-750.33: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt, rt')`
-../spec/wasm-3.0/6-typing.watsup:756.6-756.33: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt, rt')`
-../spec/wasm-3.0/6-typing.watsup:774.7-774.38: prem_to_instrs: Yet `where ?(val) = $default_($unpack(zt))`
-../spec/wasm-3.0/6-typing.watsup:806.6-806.40: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, C.ELEMS_context[y!`%`_idx.0], rt)`
-../spec/wasm-3.0/6-typing.watsup:835.6-835.40: prem_to_instrs: Yet `Storagetype_sub: `%|-%<:%`(C, zt_2, zt_1)`
-../spec/wasm-3.0/6-typing.watsup:840.6-840.44: prem_to_instrs: Yet `Storagetype_sub: `%|-%<:%`(C, (C.ELEMS_context[y!`%`_idx.0] : reftype <: storagetype), zt)`
-../spec/wasm-3.0/6-typing.watsup:978.6-978.36: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt_2, rt_1)`
-../spec/wasm-3.0/6-typing.watsup:984.6-984.36: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt_2, rt_1)`
+../spec/wasm-3.0/6-typing.watsup:747.6-747.33: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt, rt')`
+../spec/wasm-3.0/6-typing.watsup:753.6-753.33: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt, rt')`
+../spec/wasm-3.0/6-typing.watsup:771.7-771.38: prem_to_instrs: Yet `where ?(val) = $default_($unpack(zt))`
+../spec/wasm-3.0/6-typing.watsup:803.6-803.40: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, C.ELEMS_context[y!`%`_idx.0], rt)`
+../spec/wasm-3.0/6-typing.watsup:832.6-832.40: prem_to_instrs: Yet `Storagetype_sub: `%|-%<:%`(C, zt_2, zt_1)`
+../spec/wasm-3.0/6-typing.watsup:837.6-837.44: prem_to_instrs: Yet `Storagetype_sub: `%|-%<:%`(C, (C.ELEMS_context[y!`%`_idx.0] : reftype <: storagetype), zt)`
+../spec/wasm-3.0/6-typing.watsup:976.6-976.36: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt_2, rt_1)`
+../spec/wasm-3.0/6-typing.watsup:982.6-982.36: prem_to_instrs: Yet `Reftype_sub: `%|-%<:%`(C, rt_2, rt_1)`
 == Splicing...
 \documentclass[a4paper]{scrartcl}
 
@@ -64,7 +64,7 @@ $$
 $$
 \begin{array}{@{}lrrl@{}l@{}}
 \mbox{(limits)} & {\mathit{limits}} &::=& {}[{\mathit{u{\scriptstyle32}}} .. {\mathit{u{\scriptstyle32}}}] \\[0.8ex]
-\mbox{(global type)} & {\mathit{globaltype}} &::=& {\mathit{mut}}~{\mathit{valtype}} \\
+\mbox{(global type)} & {\mathit{globaltype}} &::=& {\mathsf{mut}^?}~{\mathit{valtype}} \\
 \mbox{(function type)} & {\mathit{functype}} &::=& {\mathit{resulttype}} \rightarrow {\mathit{resulttype}} \\
 \mbox{(table type)} & {\mathit{tabletype}} &::=& {\mathit{limits}}~{\mathit{reftype}} \\
 \mbox{(memory type)} & {\mathit{memtype}} &::=& {\mathit{limits}}~\mathsf{i{\scriptstyle8}} \\[0.8ex]
@@ -86,27 +86,27 @@ $$
 $$
 \begin{array}{@{}l@{}rrl@{}l@{}}
 & {\mathit{instr}} &::=& \dots \\ &&|&
-{\mathit{numtype}}.\mathsf{const}~{{\mathit{num}}}_{{\mathit{numtype}}} \\ &&|&
+{\mathit{numtype}}{.}\mathsf{const}~{{\mathit{num}}}_{{\mathit{numtype}}} \\ &&|&
 {\mathit{numtype}} . {{\mathit{unop}}}_{{\mathit{numtype}}} \\ &&|&
 {\mathit{numtype}} . {{\mathit{binop}}}_{{\mathit{numtype}}} \\ &&|&
 {\mathit{numtype}} . {{\mathit{testop}}}_{{\mathit{numtype}}} \\ &&|&
 {\mathit{numtype}} . {{\mathit{relop}}}_{{\mathit{numtype}}} \\ &&|&
-{\mathit{numtype}}_{{1}} . {{{{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_{{2}}}}{\mathsf{\_}}}{{{\mathit{sx}}^?}}
-  &\qquad \mbox{if}~{\mathit{numtype}}_{{1}} \neq {\mathit{numtype}}_{{2}} \\ &&|&
-{{{{\mathit{numtype}}.\mathsf{extend}}{{\mathit{n}}}}{\mathsf{\_}}}{\mathsf{s}} \\ &&|&
+{\mathit{numtype}}_1 . {{{\mathit{cvtop}}}{\mathsf{\_}}}{{\mathit{numtype}}_2}
+  &\qquad \mbox{if}~{\mathit{numtype}}_1 \neq {\mathit{numtype}}_2 \\ &&|&
+{{{{\mathit{numtype}}{.}\mathsf{extend}}{n}}{\mathsf{\_}}}{\mathsf{s}} \\ &&|&
 \mathsf{local.get}~{\mathit{localidx}} \\ &&|&
 \mathsf{local.set}~{\mathit{localidx}} \\ &&|&
 \mathsf{local.tee}~{\mathit{localidx}} \\ &&|&
 \mathsf{global.get}~{\mathit{globalidx}} \\ &&|&
 \mathsf{global.set}~{\mathit{globalidx}} \\ &&|&
-{{\mathit{numtype}}.\mathsf{load}}{{({{{\mathit{w}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{memidx}}~{\mathit{memop}}
-  &\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} < {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &&|&
-{{\mathit{numtype}}.\mathsf{store}}{{{\mathit{w}}^?}}~{\mathit{memidx}}~{\mathit{memop}}
-  &\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{{\mathit{n}}} \land {\mathit{w}} < {|{\mathsf{i}}{{\mathit{n}}}|})^? \\ &&|&
-{\mathsf{v{\scriptstyle128}.load}}{{{\mathit{vloadop}}^?}}~{\mathit{memidx}}~{\mathit{memop}} \\ &&|&
-{{{\mathsf{v{\scriptstyle128}.load}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memop}}~{\mathit{laneidx}} \\ &&|&
-\mathsf{v{\scriptstyle128}.store}~{\mathit{memidx}}~{\mathit{memop}} \\ &&|&
-{{{\mathsf{v{\scriptstyle128}.store}}{{\mathit{w}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memop}}~{\mathit{laneidx}} \\ &&|&
+{{\mathit{numtype}}{.}\mathsf{load}}{{({{{\mathit{sz}}}{\mathsf{\_}}}{{\mathit{sx}}})^?}}~{\mathit{memidx}}~{\mathit{memarg}}
+  &\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{n} \land {\mathit{sz}} < {|{\mathsf{i}}{n}|})^? \\ &&|&
+{{\mathit{numtype}}{.}\mathsf{store}}{{{\mathit{sz}}^?}}~{\mathit{memidx}}~{\mathit{memarg}}
+  &\qquad \mbox{if}~({\mathit{numtype}} = {\mathsf{i}}{n} \land {\mathit{sz}} < {|{\mathsf{i}}{n}|})^? \\ &&|&
+{\mathsf{v{\scriptstyle128}.load}}{{{\mathit{vloadop}}^?}}~{\mathit{memidx}}~{\mathit{memarg}} \\ &&|&
+{{{\mathsf{v{\scriptstyle128}.load}}{{\mathit{sz}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memarg}}~{\mathit{laneidx}} \\ &&|&
+\mathsf{v{\scriptstyle128}.store}~{\mathit{memidx}}~{\mathit{memarg}} \\ &&|&
+{{{\mathsf{v{\scriptstyle128}.store}}{{\mathit{sz}}}}{\mathsf{\_}}}{\mathsf{lane}}~{\mathit{memidx}}~{\mathit{memarg}}~{\mathit{laneidx}} \\ &&|&
 \mathsf{memory.size}~{\mathit{memidx}} \\ &&|&
 \mathsf{memory.grow}~{\mathit{memidx}} \\ &&|&
 \mathsf{memory.fill}~{\mathit{memidx}} \\ &&|&
@@ -120,31 +120,31 @@ $$
 
 \subsection*{Typing $\boxed{{\mathit{context}} \vdash {\mathit{instr}} : {\mathit{instrtype}}}$}
 
-An instruction sequence ${{\mathit{instr}}^\ast}$ is well-typed with an instruction type ${{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}$, written ${{\mathit{instr}}^\ast}$ $:$ ${{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}$, according to the following rules:
+An instruction sequence ${{\mathit{instr}}^\ast}$ is well-typed with an instruction type ${t_1^\ast} \rightarrow {t_2^\ast}$, written ${{\mathit{instr}}^\ast}$ $:$ ${t_1^\ast} \rightarrow {t_2^\ast}$, according to the following rules:
 
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \epsilon : \epsilon \rightarrow \epsilon
+C \vdash \epsilon : \epsilon \rightarrow \epsilon
 }
 \qquad
 \frac{
-{\mathit{C}} \vdash {\mathit{instr}}_{{1}} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{instr}}_1 : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}}\,{t_2^\ast}
  \qquad
-({\mathit{C}}.\mathsf{locals}{}[{\mathit{x}}_{{1}}] = {\mathit{init}}~{\mathit{t}})^\ast
+(C{.}\mathsf{locals}{}[x_1] = {\mathit{init}}~t)^\ast
  \qquad
-{\mathit{C}}{}[\mathsf{local}{}[{{\mathit{x}}_{{1}}^\ast}] = {(\mathsf{set}~{\mathit{t}})^\ast}] \vdash {{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{2}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{3}}^\ast}
+C{}[\mathsf{local}{}[{x_1^\ast}] = {(\mathsf{set}~t)^\ast}] \vdash {{\mathit{instr}}_2^\ast} : {t_2^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_3^\ast}
 }{
-{\mathit{C}} \vdash {\mathit{instr}}_{{1}}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}~{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{3}}^\ast}
+C \vdash {\mathit{instr}}_1~{{\mathit{instr}}_2^\ast} : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}~{x_2^\ast}}\,{t_3^\ast}
 }
 \\[3ex]\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {{\mathit{instr}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}^\ast} : \mathsf{ok}
+C \vdash {t^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : ({{\mathit{t}}^\ast}~{{\mathit{t}}_{{1}}^\ast})~{\rightarrow}_{{{\mathit{x}}^\ast}}\,({{\mathit{t}}^\ast}~{{\mathit{t}}_{{2}}^\ast})
+C \vdash {{\mathit{instr}}^\ast} : ({t^\ast}~{t_1^\ast})~{\rightarrow}_{{x^\ast}}\,({t^\ast}~{t_2^\ast})
 }
 \qquad
 \end{array}
@@ -154,28 +154,28 @@ $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \epsilon : \epsilon \rightarrow \epsilon
+C \vdash \epsilon : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}instr*{-}empty}]}
 \qquad
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {{\mathit{instr}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}^\ast} : \mathsf{ok}
+C \vdash {t^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : ({{\mathit{t}}^\ast}~{{\mathit{t}}_{{1}}^\ast})~{\rightarrow}_{{{\mathit{x}}^\ast}}\,({{\mathit{t}}^\ast}~{{\mathit{t}}_{{2}}^\ast})
+C \vdash {{\mathit{instr}}^\ast} : ({t^\ast}~{t_1^\ast})~{\rightarrow}_{{x^\ast}}\,({t^\ast}~{t_2^\ast})
 } \, {[\textsc{\scriptsize T{-}instr*{-}frame}]}
 \\[3ex]\displaystyle
 \frac{
 }{
-{\mathit{C}} \vdash \epsilon : \epsilon \rightarrow \epsilon
+C \vdash \epsilon : \epsilon \rightarrow \epsilon
 } \, {[\textsc{\scriptsize T{-}instr*{-}empty}]}
 \qquad
 \frac{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C \vdash {{\mathit{instr}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}} \vdash {{\mathit{t}}^\ast} : \mathsf{ok}
+C \vdash {t^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash {{\mathit{instr}}^\ast} : ({{\mathit{t}}^\ast}~{{\mathit{t}}_{{1}}^\ast})~{\rightarrow}_{{{\mathit{x}}^\ast}}\,({{\mathit{t}}^\ast}~{{\mathit{t}}_{{2}}^\ast})
+C \vdash {{\mathit{instr}}^\ast} : ({t^\ast}~{t_1^\ast})~{\rightarrow}_{{x^\ast}}\,({t^\ast}~{t_2^\ast})
 } \, {[\textsc{\scriptsize T{-}instr*{-}frame}]}
 \qquad
 \end{array}
@@ -184,20 +184,20 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast} : \mathsf{ok}
+C \vdash {t_1^\ast} \rightarrow {t_2^\ast} : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{unreachable} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{unreachable} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
 \qquad
 \frac{
 }{
-{\mathit{C}} \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
+C \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
 }
 \qquad
 \frac{
-{\mathit{C}} \vdash {\mathit{t}} : \mathsf{ok}
+C \vdash t : \mathsf{ok}
 }{
-{\mathit{C}} \vdash \mathsf{drop} : {\mathit{t}} \rightarrow \epsilon
+C \vdash \mathsf{drop} : t \rightarrow \epsilon
 }
 \qquad
 \end{array}
@@ -206,11 +206,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\mathit{instr}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 } \, {[\textsc{\scriptsize T{-}block}]}
 \qquad
 \end{array}
@@ -219,11 +219,11 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{1}}^\ast}) \vdash {{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_1^\ast}) \vdash {{\mathit{instr}}^\ast} : {t_1^\ast}~{\rightarrow}_{{x^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 } \, {[\textsc{\scriptsize T{-}loop}]}
 \qquad
 \end{array}
@@ -232,13 +232,13 @@ $$
 $$
 \begin{array}{@{}c@{}}\displaystyle
 \frac{
-{\mathit{C}} \vdash {\mathit{bt}} : {{\mathit{t}}_{{1}}^\ast} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{1}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{1}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\mathit{instr}}_1^\ast} : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}}\,{t_2^\ast}
  \qquad
-{\mathit{C}}, \mathsf{labels}~({{\mathit{t}}_{{2}}^\ast}) \vdash {{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~{\rightarrow}_{{{\mathit{x}}_{{2}}^\ast}}\,{{\mathit{t}}_{{2}}^\ast}
+C, \mathsf{labels}~({t_2^\ast}) \vdash {{\mathit{instr}}_2^\ast} : {t_1^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_2^\ast}
 }{
-{\mathit{C}} \vdash \mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast} : {{\mathit{t}}_{{1}}^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {{\mathit{t}}_{{2}}^\ast}
+C \vdash \mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast} : {t_1^\ast}~\mathsf{i{\scriptstyle32}} \rightarrow {t_2^\ast}
 } \, {[\textsc{\scriptsize T{-}if}]}
 \qquad
 \end{array}
@@ -252,11 +252,11 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-{{\mathrm{default}}}_{\mathsf{i{\scriptstyle32}}} &=& (\mathsf{i{\scriptstyle32}}.\mathsf{const}~0) \\
-{{\mathrm{default}}}_{\mathsf{i{\scriptstyle64}}} &=& (\mathsf{i{\scriptstyle64}}.\mathsf{const}~0) \\
-{{\mathrm{default}}}_{\mathsf{f{\scriptstyle32}}} &=& (\mathsf{f{\scriptstyle32}}.\mathsf{const}~{+0}) \\
-{{\mathrm{default}}}_{\mathsf{f{\scriptstyle64}}} &=& (\mathsf{f{\scriptstyle64}}.\mathsf{const}~{+0}) \\
-{{\mathrm{default}}}_{\mathsf{v{\scriptstyle128}}} &=& (\mathsf{v{\scriptstyle128}}.\mathsf{const}~0) \\
+{{\mathrm{default}}}_{\mathsf{i{\scriptstyle32}}} &=& (\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~0) \\
+{{\mathrm{default}}}_{\mathsf{i{\scriptstyle64}}} &=& (\mathsf{i{\scriptstyle64}}{.}\mathsf{const}~0) \\
+{{\mathrm{default}}}_{\mathsf{f{\scriptstyle32}}} &=& (\mathsf{f{\scriptstyle32}}{.}\mathsf{const}~{+0}) \\
+{{\mathrm{default}}}_{\mathsf{f{\scriptstyle64}}} &=& (\mathsf{f{\scriptstyle64}}{.}\mathsf{const}~{+0}) \\
+{{\mathrm{default}}}_{\mathsf{v{\scriptstyle128}}} &=& (\mathsf{v{\scriptstyle128}}{.}\mathsf{const}~0) \\
 {{\mathrm{default}}}_{\mathsf{ref}~\mathsf{null}~{\mathit{ht}}} &=& (\mathsf{ref.null}~{\mathit{ht}}) \\
 {{\mathrm{default}}}_{\mathsf{ref}~\epsilon~{\mathit{ht}}} &=& \epsilon \\
 \end{array}
@@ -264,10 +264,10 @@ $$
 
 $$
 \begin{array}{@{}lcl@{}l@{}}
-({\mathit{s}} ; {\mathit{f}}).\mathsf{module}.\mathsf{funcs} &=& {\mathit{f}}.\mathsf{module}.\mathsf{funcs} \\
-({\mathit{s}} ; {\mathit{f}}).\mathsf{funcs} &=& {\mathit{s}}.\mathsf{funcs} \\[0.8ex]
-({\mathit{s}} ; {\mathit{f}}).\mathsf{funcs}{}[{\mathit{x}}] &=& {\mathit{s}}.\mathsf{funcs}{}[{\mathit{f}}.\mathsf{module}.\mathsf{funcs}{}[{\mathit{x}}]] \\
-({\mathit{s}} ; {\mathit{f}}).\mathsf{tables}{}[{\mathit{x}}] &=& {\mathit{s}}.\mathsf{tables}{}[{\mathit{f}}.\mathsf{module}.\mathsf{tables}{}[{\mathit{x}}]] \\
+(s ; f){.}\mathsf{module}{.}\mathsf{funcs} &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
+(s ; f){.}\mathsf{funcs} &=& s{.}\mathsf{funcs} \\[0.8ex]
+(s ; f){.}\mathsf{funcs}{}[x] &=& s{.}\mathsf{funcs}{}[f{.}\mathsf{module}{.}\mathsf{funcs}{}[x]] \\
+(s ; f){.}\mathsf{tables}{}[x] &=& s{.}\mathsf{tables}{}[f{.}\mathsf{module}{.}\mathsf{tables}{}[x]] \\
 \end{array}
 $$
 
@@ -278,32 +278,32 @@ The relation ${\mathit{config}} \hookrightarrow {\mathit{config}}$ checks that a
 
 $$
 \begin{array}{@{}l@{}rcl@{}l@{}}
-& {\mathit{z}} ; {{\mathit{instr}}^\ast} &\hookrightarrow& {\mathit{z}} ; {{\mathit{instr}'}^\ast}
+& z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
   &\qquad \mbox{if}~{{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\[0.8ex]
-& {\mathit{z}} ; {{\mathit{instr}}^\ast} &\hookrightarrow& {\mathit{z}} ; {{\mathit{instr}'}^\ast}
-  &\qquad \mbox{if}~{\mathit{z}} ; {{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
+& z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
+  &\qquad \mbox{if}~z ; {{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}l@{}rcl@{}l@{}}
-{[\textsc{\scriptsize E{-}block}]} \quad & {\mathit{z}} ; {{\mathit{val}}^{{\mathit{m}}}}~(\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{{\mathit{n}}}}{\{\epsilon\}}~{{\mathit{val}}^{{\mathit{m}}}}~{{\mathit{instr}}^\ast})
-  &\qquad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{m}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\
-{[\textsc{\scriptsize E{-}loop}]} \quad & {\mathit{z}} ; {{\mathit{val}}^{{\mathit{m}}}}~(\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{{\mathit{m}}}}{\{\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}\}}~{{\mathit{val}}^{{\mathit{m}}}}~{{\mathit{instr}}^\ast})
-  &\qquad \mbox{if}~{{\mathrm{blocktype}}}_{{\mathit{z}}}({\mathit{bt}}) = {{\mathit{t}}_{{1}}^{{\mathit{m}}}} \rightarrow {{\mathit{t}}_{{2}}^{{\mathit{n}}}} \\[0.8ex]
-{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast})
-  &\qquad \mbox{if}~{\mathit{c}} \neq 0 \\
-{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{2}}^\ast})
-  &\qquad \mbox{if}~{\mathit{c}} = 0 \\
+{[\textsc{\scriptsize E{-}block}]} \quad & z ; {{\mathit{val}}^{m}}~(\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{n}}{\{\epsilon\}}~{{\mathit{val}}^{m}}~{{\mathit{instr}}^\ast})
+  &\qquad \mbox{if}~{{\mathrm{blocktype}}}_{z}({\mathit{bt}}) = {t_1^{m}} \rightarrow {t_2^{n}} \\
+{[\textsc{\scriptsize E{-}loop}]} \quad & z ; {{\mathit{val}}^{m}}~(\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({{\mathsf{label}}_{m}}{\{\mathsf{loop}~{\mathit{bt}}~{{\mathit{instr}}^\ast}\}}~{{\mathit{val}}^{m}}~{{\mathit{instr}}^\ast})
+  &\qquad \mbox{if}~{{\mathrm{blocktype}}}_{z}({\mathit{bt}}) = {t_1^{m}} \rightarrow {t_2^{n}} \\[0.8ex]
+{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~c)~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast})
+  &\qquad \mbox{if}~c \neq 0 \\
+{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~c)~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_2^\ast})
+  &\qquad \mbox{if}~c = 0 \\
 \end{array}
 $$
 
 $$
 \begin{array}{@{}l@{}rcl@{}l@{}}
-{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast})
-  &\qquad \mbox{if}~{\mathit{c}} \neq 0 \\
-{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}.\mathsf{const}~{\mathit{c}})~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_{{1}}^\ast}~\mathsf{else}~{{\mathit{instr}}_{{2}}^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_{{2}}^\ast})
-  &\qquad \mbox{if}~{\mathit{c}} = 0 \\
+{[\textsc{\scriptsize E{-}if{-}true}]} \quad & (\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~c)~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast})
+  &\qquad \mbox{if}~c \neq 0 \\
+{[\textsc{\scriptsize E{-}if{-}false}]} \quad & (\mathsf{i{\scriptstyle32}}{.}\mathsf{const}~c)~(\mathsf{if}~{\mathit{bt}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{bt}}~{{\mathit{instr}}_2^\ast})
+  &\qquad \mbox{if}~c = 0 \\
 \end{array}
 $$
 
@@ -313,9 +313,15 @@ $$
 
 warning: syntax `A` was never spliced
 warning: syntax `B` was never spliced
-warning: syntax `E` was never spliced
+warning: syntax `Cnn` was never spliced
+warning: syntax `Fnn` was never spliced
+warning: syntax `Inn` was never spliced
+warning: syntax `Jnn` was never spliced
+warning: syntax `Lnn` was never spliced
 warning: syntax `M` was never spliced
 warning: syntax `N` was never spliced
+warning: syntax `Pnn` was never spliced
+warning: syntax `Vnn` was never spliced
 warning: syntax `absheaptype/syn` was never spliced
 warning: syntax `absheaptype/sem` was never spliced
 warning: syntax `addr` was never spliced
@@ -331,7 +337,6 @@ warning: syntax `blocktype` was never spliced
 warning: syntax `byte` was never spliced
 warning: syntax `castop` was never spliced
 warning: syntax `char` was never spliced
-warning: syntax `cnn` was never spliced
 warning: syntax `code` was never spliced
 warning: syntax `comptype` was never spliced
 warning: syntax `config` was never spliced
@@ -363,7 +368,6 @@ warning: syntax `fNmag` was never spliced
 warning: syntax `fieldtype` was never spliced
 warning: syntax `fieldval` was never spliced
 warning: syntax `fin` was never spliced
-warning: syntax `fnn` was never spliced
 warning: syntax `frame` was never spliced
 warning: syntax `fshape` was never spliced
 warning: syntax `func` was never spliced
@@ -375,14 +379,13 @@ warning: syntax `globaladdr` was never spliced
 warning: syntax `globalidx` was never spliced
 warning: syntax `globalinst` was never spliced
 warning: syntax `half` was never spliced
+warning: syntax `half_` was never spliced
 warning: syntax `heaptype` was never spliced
 warning: syntax `hostaddr` was never spliced
 warning: syntax `iN` was never spliced
 warning: syntax `idx` was never spliced
-warning: syntax `imm` was never spliced
 warning: syntax `import` was never spliced
 warning: syntax `init` was never spliced
-warning: syntax `inn` was never spliced
 warning: syntax `instr/parametric` was never spliced
 warning: syntax `instr/br` was never spliced
 warning: syntax `instr/call` was never spliced
@@ -405,17 +408,19 @@ warning: syntax `lane_` was never spliced
 warning: syntax `laneidx` was never spliced
 warning: syntax `lanetype` was never spliced
 warning: syntax `list` was never spliced
-warning: syntax `lnn` was never spliced
+warning: syntax `lit_` was never spliced
+warning: syntax `lit_` was never spliced
+warning: syntax `lit_` was never spliced
 warning: syntax `local` was never spliced
 warning: syntax `localidx` was never spliced
 warning: syntax `localtype` was never spliced
 warning: syntax `m` was never spliced
 warning: syntax `mem` was never spliced
 warning: syntax `memaddr` was never spliced
+warning: syntax `memarg` was never spliced
 warning: syntax `memidx` was never spliced
 warning: syntax `memidxop` was never spliced
 warning: syntax `meminst` was never spliced
-warning: syntax `memop` was never spliced
 warning: syntax `module` was never spliced
 warning: syntax `moduleinst` was never spliced
 warning: syntax `mut` was never spliced
@@ -429,17 +434,13 @@ warning: syntax `numtype` was never spliced
 warning: syntax `oktypeidx` was never spliced
 warning: syntax `oktypeidxnat` was never spliced
 warning: syntax `pack_` was never spliced
-warning: syntax `packsize` was never spliced
 warning: syntax `packtype` was never spliced
 warning: syntax `packval` was never spliced
-warning: syntax `pnn` was never spliced
 warning: syntax `pshape` was never spliced
 warning: syntax `pth` was never spliced
 warning: syntax `pthaux` was never spliced
 warning: syntax `record` was never spliced
 warning: syntax `recorddots` was never spliced
-warning: syntax `recordeq` was never spliced
-warning: syntax `recordstar` was never spliced
 warning: syntax `rectype` was never spliced
 warning: syntax `ref` was never spliced
 warning: syntax `reftype` was never spliced
@@ -462,6 +463,7 @@ warning: syntax `sx` was never spliced
 warning: syntax `sym` was never spliced
 warning: syntax `symsplit/1` was never spliced
 warning: syntax `symsplit/2` was never spliced
+warning: syntax `sz` was never spliced
 warning: syntax `table` was never spliced
 warning: syntax `tableaddr` was never spliced
 warning: syntax `tableidx` was never spliced
@@ -487,14 +489,16 @@ warning: syntax `valtype/syn` was never spliced
 warning: syntax `valtype/sem` was never spliced
 warning: syntax `vbinop_` was never spliced
 warning: syntax `vbinop_` was never spliced
-warning: syntax `vcvtop` was never spliced
+warning: syntax `vcvtop_` was never spliced
+warning: syntax `vcvtop_` was never spliced
+warning: syntax `vcvtop_` was never spliced
+warning: syntax `vcvtop_` was never spliced
 warning: syntax `vec` was never spliced
 warning: syntax `vec_` was never spliced
 warning: syntax `vectype` was never spliced
 warning: syntax `vextbinop_` was never spliced
 warning: syntax `vextunop_` was never spliced
 warning: syntax `vloadop` was never spliced
-warning: syntax `vnn` was never spliced
 warning: syntax `vrelop_` was never spliced
 warning: syntax `vrelop_` was never spliced
 warning: syntax `vshiftop_` was never spliced
@@ -505,11 +509,7 @@ warning: syntax `vvbinop` was never spliced
 warning: syntax `vvternop` was never spliced
 warning: syntax `vvtestop` was never spliced
 warning: syntax `vvunop` was never spliced
-warning: syntax `ww` was never spliced
-warning: syntax `zero` was never spliced
-warning: syntax `zval_` was never spliced
-warning: syntax `zval_` was never spliced
-warning: syntax `zval_` was never spliced
+warning: syntax `zero_` was never spliced
 warning: grammar `Babsheaptype` was never spliced
 warning: grammar `Bblocktype` was never spliced
 warning: grammar `Bbyte` was never spliced
@@ -598,8 +598,8 @@ warning: grammar `Blimits` was never spliced
 warning: grammar `Blocalidx` was never spliced
 warning: grammar `Blocals` was never spliced
 warning: grammar `Bmem` was never spliced
+warning: grammar `Bmemarg` was never spliced
 warning: grammar `Bmemidx` was never spliced
-warning: grammar `Bmemop` was never spliced
 warning: grammar `Bmemsec` was never spliced
 warning: grammar `Bmemtype` was never spliced
 warning: grammar `Bmodule` was never spliced
@@ -766,21 +766,21 @@ warning: rule `Instr_ok/vvunop` was never spliced
 warning: rule `Instr_ok/vvbinop` was never spliced
 warning: rule `Instr_ok/vvternop` was never spliced
 warning: rule `Instr_ok/vvtestop` was never spliced
+warning: rule `Instr_ok/vunop` was never spliced
+warning: rule `Instr_ok/vbinop` was never spliced
+warning: rule `Instr_ok/vtestop` was never spliced
+warning: rule `Instr_ok/vrelop` was never spliced
+warning: rule `Instr_ok/vshiftop` was never spliced
 warning: rule `Instr_ok/vbitmask` was never spliced
 warning: rule `Instr_ok/vswizzle` was never spliced
 warning: rule `Instr_ok/vshuffle` was never spliced
 warning: rule `Instr_ok/vsplat` was never spliced
 warning: rule `Instr_ok/vextract_lane` was never spliced
 warning: rule `Instr_ok/vreplace_lane` was never spliced
-warning: rule `Instr_ok/vunop` was never spliced
-warning: rule `Instr_ok/vbinop` was never spliced
-warning: rule `Instr_ok/vtestop` was never spliced
-warning: rule `Instr_ok/vrelop` was never spliced
-warning: rule `Instr_ok/vshiftop` was never spliced
-warning: rule `Instr_ok/vcvtop` was never spliced
-warning: rule `Instr_ok/vnarrow` was never spliced
 warning: rule `Instr_ok/vextunop` was never spliced
 warning: rule `Instr_ok/vextbinop` was never spliced
+warning: rule `Instr_ok/vnarrow` was never spliced
+warning: rule `Instr_ok/vcvtop` was never spliced
 warning: rule `Instr_ok/local.get` was never spliced
 warning: rule `Instr_ok/local.set` was never spliced
 warning: rule `Instr_ok/local.tee` was never spliced
@@ -918,26 +918,26 @@ warning: rule `Step_pure/vvunop` was never spliced
 warning: rule `Step_pure/vvbinop` was never spliced
 warning: rule `Step_pure/vvternop` was never spliced
 warning: rule `Step_pure/vvtestop` was never spliced
+warning: rule `Step_pure/vunop` was never spliced
+warning: rule `Step_pure/vbinop-val` was never spliced
+warning: rule `Step_pure/vbinop-trap` was never spliced
+warning: rule `Step_pure/vtestop-true` was never spliced
+warning: rule `Step_pure/vtestop-false` was never spliced
+warning: rule `Step_pure/vrelop` was never spliced
+warning: rule `Step_pure/vshiftop` was never spliced
+warning: rule `Step_pure/vbitmask` was never spliced
 warning: rule `Step_pure/vswizzle` was never spliced
 warning: rule `Step_pure/vshuffle` was never spliced
 warning: rule `Step_pure/vsplat` was never spliced
 warning: rule `Step_pure/vextract_lane-num` was never spliced
 warning: rule `Step_pure/vextract_lane-pack` was never spliced
 warning: rule `Step_pure/vreplace_lane` was never spliced
-warning: rule `Step_pure/vunop` was never spliced
-warning: rule `Step_pure/vbinop-val` was never spliced
-warning: rule `Step_pure/vbinop-trap` was never spliced
-warning: rule `Step_pure/vrelop` was never spliced
-warning: rule `Step_pure/vshiftop` was never spliced
-warning: rule `Step_pure/vtestop-true` was never spliced
-warning: rule `Step_pure/vtestop-false` was never spliced
-warning: rule `Step_pure/vbitmask` was never spliced
-warning: rule `Step_pure/vnarrow` was never spliced
-warning: rule `Step_pure/vcvtop-normal` was never spliced
-warning: rule `Step_pure/vcvtop-half` was never spliced
-warning: rule `Step_pure/vcvtop-zero` was never spliced
 warning: rule `Step_pure/vextunop` was never spliced
 warning: rule `Step_pure/vextbinop` was never spliced
+warning: rule `Step_pure/vnarrow` was never spliced
+warning: rule `Step_pure/vcvtop-full` was never spliced
+warning: rule `Step_pure/vcvtop-half` was never spliced
+warning: rule `Step_pure/vcvtop-zero` was never spliced
 warning: rule `Step_pure/local.tee` was never spliced
 warning: rule `Step_read/br_on_cast-succeed` was never spliced
 warning: rule `Step_read/br_on_cast-fail` was never spliced
@@ -1082,7 +1082,9 @@ warning: definition `clostypes` was never spliced
 warning: definition `concat_` was never spliced
 warning: definition `const` was never spliced
 warning: definition `convert` was never spliced
+warning: definition `cpacknum` was never spliced
 warning: definition `cunpack` was never spliced
+warning: definition `cunpacknum` was never spliced
 warning: definition `cvtop` was never spliced
 warning: definition `data` was never spliced
 warning: definition `datainst` was never spliced
@@ -1134,9 +1136,9 @@ warning: definition `global` was never spliced
 warning: definition `globalinst` was never spliced
 warning: definition `globalsxt` was never spliced
 warning: definition `globalsxv` was never spliced
-warning: definition `growmemory` was never spliced
+warning: definition `growmem` was never spliced
 warning: definition `growtable` was never spliced
-warning: definition `halfop` was never spliced
+warning: definition `half` was never spliced
 warning: definition `iabs` was never spliced
 warning: definition `iadd` was never spliced
 warning: definition `iaddsat` was never spliced
@@ -1187,11 +1189,13 @@ warning: definition `ixor` was never spliced
 warning: definition `lanes_` was never spliced
 warning: definition `lanetype` was never spliced
 warning: definition `local` was never spliced
+warning: definition `lpacknum` was never spliced
 warning: definition `lsize` was never spliced
 warning: definition `lunpack` was never spliced
+warning: definition `lunpacknum` was never spliced
 warning: definition `mem` was never spliced
+warning: definition `memarg0` was never spliced
 warning: definition `meminst` was never spliced
-warning: definition `memop0` was never spliced
 warning: definition `memsxt` was never spliced
 warning: definition `memsxv` was never spliced
 warning: definition `min` was never spliced
@@ -1199,9 +1203,7 @@ warning: definition `moduleinst` was never spliced
 warning: definition `narrow` was never spliced
 warning: definition `nbytes` was never spliced
 warning: definition `nunpack` was never spliced
-warning: definition `packconst` was never spliced
 warning: definition `packfield` was never spliced
-warning: definition `packnum` was never spliced
 warning: definition `promote` was never spliced
 warning: definition `psize` was never spliced
 warning: definition `reinterpret` was never spliced
@@ -1216,7 +1218,12 @@ warning: definition `setminus1` was never spliced
 warning: definition `shsize` was never spliced
 warning: definition `signed` was never spliced
 warning: definition `signif` was never spliced
+warning: definition `sizemm` was never spliced
+warning: definition `sizemm1` was never spliced
+warning: definition `sizemm2` was never spliced
 warning: definition `sizenn` was never spliced
+warning: definition `sizenn1` was never spliced
+warning: definition `sizenn2` was never spliced
 warning: definition `store` was never spliced
 warning: definition `structinst` was never spliced
 warning: definition `subst_all_deftype` was never spliced
@@ -1252,9 +1259,8 @@ warning: definition `trunc_sat` was never spliced
 warning: definition `type` was never spliced
 warning: definition `unop` was never spliced
 warning: definition `unpack` was never spliced
-warning: definition `unpackconst` was never spliced
 warning: definition `unpackfield` was never spliced
-warning: definition `unpacknum` was never spliced
+warning: definition `unpackshape` was never spliced
 warning: definition `unrolldt` was never spliced
 warning: definition `unrollht` was never spliced
 warning: definition `unrollrt` was never spliced
@@ -1264,8 +1270,8 @@ warning: definition `vbytes` was never spliced
 warning: definition `vcvtop` was never spliced
 warning: definition `vextbinop` was never spliced
 warning: definition `vextunop` was never spliced
-warning: definition `vishiftop` was never spliced
 warning: definition `vrelop` was never spliced
+warning: definition `vshiftop` was never spliced
 warning: definition `vsize` was never spliced
 warning: definition `vunop` was never spliced
 warning: definition `vunpack` was never spliced
@@ -1288,7 +1294,6 @@ warning: definition `zbytes` was never spliced
 warning: definition `zero` was never spliced
 warning: definition `zsize` was never spliced
 warning: rule prose `exec/array.new_data` was never spliced
-warning: rule prose `exec/call_ref` was never spliced
 warning: rule prose `exec/data.drop` was never spliced
 warning: rule prose `exec/memory.grow` was never spliced
 warning: rule prose `exec/vstore_lane` was never spliced
@@ -1341,21 +1346,21 @@ warning: rule prose `exec/br_on_cast` was never spliced
 warning: rule prose `exec/loop` was never spliced
 warning: rule prose `exec/block` was never spliced
 warning: rule prose `exec/local.tee` was never spliced
-warning: rule prose `exec/vextbinop` was never spliced
-warning: rule prose `exec/vextunop` was never spliced
 warning: rule prose `exec/vcvtop` was never spliced
 warning: rule prose `exec/vnarrow` was never spliced
-warning: rule prose `exec/vbitmask` was never spliced
-warning: rule prose `exec/vtestop` was never spliced
-warning: rule prose `exec/vshiftop` was never spliced
-warning: rule prose `exec/vrelop` was never spliced
-warning: rule prose `exec/vbinop` was never spliced
-warning: rule prose `exec/vunop` was never spliced
+warning: rule prose `exec/vextbinop` was never spliced
+warning: rule prose `exec/vextunop` was never spliced
 warning: rule prose `exec/vreplace_lane` was never spliced
 warning: rule prose `exec/vextract_lane` was never spliced
 warning: rule prose `exec/vsplat` was never spliced
 warning: rule prose `exec/vshuffle` was never spliced
 warning: rule prose `exec/vswizzle` was never spliced
+warning: rule prose `exec/vbitmask` was never spliced
+warning: rule prose `exec/vshiftop` was never spliced
+warning: rule prose `exec/vrelop` was never spliced
+warning: rule prose `exec/vtestop` was never spliced
+warning: rule prose `exec/vbinop` was never spliced
+warning: rule prose `exec/vunop` was never spliced
 warning: rule prose `exec/vvtestop` was never spliced
 warning: rule prose `exec/vvternop` was never spliced
 warning: rule prose `exec/vvbinop` was never spliced
@@ -1413,21 +1418,21 @@ warning: rule prose `valid/global.get` was never spliced
 warning: rule prose `valid/local.tee` was never spliced
 warning: rule prose `valid/local.set` was never spliced
 warning: rule prose `valid/local.get` was never spliced
+warning: rule prose `valid/vcvtop` was never spliced
+warning: rule prose `valid/vnarrow` was never spliced
 warning: rule prose `valid/vextbinop` was never spliced
 warning: rule prose `valid/vextunop` was never spliced
-warning: rule prose `valid/vnarrow` was never spliced
-warning: rule prose `valid/vcvtop` was never spliced
-warning: rule prose `valid/vshiftop` was never spliced
-warning: rule prose `valid/vrelop` was never spliced
-warning: rule prose `valid/vtestop` was never spliced
-warning: rule prose `valid/vbinop` was never spliced
-warning: rule prose `valid/vunop` was never spliced
 warning: rule prose `valid/vreplace_lane` was never spliced
 warning: rule prose `valid/vextract_lane` was never spliced
 warning: rule prose `valid/vsplat` was never spliced
 warning: rule prose `valid/vshuffle` was never spliced
 warning: rule prose `valid/vswizzle` was never spliced
 warning: rule prose `valid/vbitmask` was never spliced
+warning: rule prose `valid/vshiftop` was never spliced
+warning: rule prose `valid/vrelop` was never spliced
+warning: rule prose `valid/vtestop` was never spliced
+warning: rule prose `valid/vbinop` was never spliced
+warning: rule prose `valid/vunop` was never spliced
 warning: rule prose `valid/vvtestop` was never spliced
 warning: rule prose `valid/vvternop` was never spliced
 warning: rule prose `valid/vvbinop` was never spliced
@@ -1513,7 +1518,9 @@ warning: definition prose `clostype` was never spliced
 warning: definition prose `clostypes` was never spliced
 warning: definition prose `concat_` was never spliced
 warning: definition prose `const` was never spliced
+warning: definition prose `cpacknum` was never spliced
 warning: definition prose `cunpack` was never spliced
+warning: definition prose `cunpacknum` was never spliced
 warning: definition prose `cvtop` was never spliced
 warning: definition prose `data` was never spliced
 warning: definition prose `datainst` was never spliced
@@ -1545,9 +1552,9 @@ warning: definition prose `globalinst` was never spliced
 warning: definition prose `globalsxt` was never spliced
 warning: definition prose `globalsxv` was never spliced
 warning: definition prose `group_bytes_by` was never spliced
-warning: definition prose `growmemory` was never spliced
+warning: definition prose `growmem` was never spliced
 warning: definition prose `growtable` was never spliced
-warning: definition prose `halfop` was never spliced
+warning: definition prose `half` was never spliced
 warning: definition prose `idx` was never spliced
 warning: definition prose `in_binop` was never spliced
 warning: definition prose `in_numtype` was never spliced
@@ -1562,19 +1569,19 @@ warning: definition prose `invsigned` was never spliced
 warning: definition prose `isize` was never spliced
 warning: definition prose `lanetype` was never spliced
 warning: definition prose `local` was never spliced
+warning: definition prose `lpacknum` was never spliced
 warning: definition prose `lsize` was never spliced
 warning: definition prose `lunpack` was never spliced
+warning: definition prose `lunpacknum` was never spliced
 warning: definition prose `mem` was never spliced
+warning: definition prose `memarg0` was never spliced
 warning: definition prose `meminst` was never spliced
-warning: definition prose `memop0` was never spliced
 warning: definition prose `memsxt` was never spliced
 warning: definition prose `memsxv` was never spliced
 warning: definition prose `min` was never spliced
 warning: definition prose `moduleinst` was never spliced
 warning: definition prose `nunpack` was never spliced
-warning: definition prose `packconst` was never spliced
 warning: definition prose `packfield` was never spliced
-warning: definition prose `packnum` was never spliced
 warning: definition prose `psize` was never spliced
 warning: definition prose `relop` was never spliced
 warning: definition prose `rolldt` was never spliced
@@ -1587,7 +1594,12 @@ warning: definition prose `shsize` was never spliced
 warning: definition prose `signed` was never spliced
 warning: definition prose `signif` was never spliced
 warning: definition prose `size` was never spliced
+warning: definition prose `sizemm` was never spliced
+warning: definition prose `sizemm1` was never spliced
+warning: definition prose `sizemm2` was never spliced
 warning: definition prose `sizenn` was never spliced
+warning: definition prose `sizenn1` was never spliced
+warning: definition prose `sizenn2` was never spliced
 warning: definition prose `store` was never spliced
 warning: definition prose `structinst` was never spliced
 warning: definition prose `subst_all_deftype` was never spliced
@@ -1622,9 +1634,8 @@ warning: definition prose `testop` was never spliced
 warning: definition prose `type` was never spliced
 warning: definition prose `unop` was never spliced
 warning: definition prose `unpack` was never spliced
-warning: definition prose `unpackconst` was never spliced
 warning: definition prose `unpackfield` was never spliced
-warning: definition prose `unpacknum` was never spliced
+warning: definition prose `unpackshape` was never spliced
 warning: definition prose `unrolldt` was never spliced
 warning: definition prose `unrollht` was never spliced
 warning: definition prose `unrollrt` was never spliced
@@ -1633,8 +1644,8 @@ warning: definition prose `vbinop` was never spliced
 warning: definition prose `vcvtop` was never spliced
 warning: definition prose `vextbinop` was never spliced
 warning: definition prose `vextunop` was never spliced
-warning: definition prose `vishiftop` was never spliced
 warning: definition prose `vrelop` was never spliced
+warning: definition prose `vshiftop` was never spliced
 warning: definition prose `vsize` was never spliced
 warning: definition prose `vunop` was never spliced
 warning: definition prose `vunpack` was never spliced

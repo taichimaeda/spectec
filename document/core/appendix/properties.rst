@@ -21,7 +21,7 @@ In order to state and prove soundness precisely, the typing rules must be extend
 
 
 .. index:: context, recursive type, recursive type index
-.. context-rec:
+.. _context-ext:
 
 Contexts
 ~~~~~~~~
@@ -639,7 +639,7 @@ where :math:`\val_1 \gg^+_S \val_2` denotes the transitive closure of the follow
 
 .. index:: field value, field type, validation, store, packed value, packed type
 .. _valid-fieldval:
-.. _valid-packedval:
+.. _valid-packval:
 
 :ref:`Field Values <syntax-fieldval>` :math:`\fieldval`
 .......................................................
@@ -650,16 +650,16 @@ where :math:`\val_1 \gg^+_S \val_2` denotes the transitive closure of the follow
 
   - Then the field value is valid with :ref:`value type <syntax-valtype>` :math:`t`.
 
-* Else, :math:`\fieldval` is a :ref:`packed value <syntax-packedval>` :math:`\packedval`:
+* Else, :math:`\fieldval` is a :ref:`packed value <syntax-packval>` :math:`\packval`:
 
-  - Let :math:`\packedtype.\PACK~i` be the field value :math:`\fieldval`.
+  - Let :math:`\packtype.\PACK~i` be the field value :math:`\fieldval`.
 
-  - Then the field value is valid with :ref:`packed type <syntax-packedtype>` :math:`\packedtype`.
+  - Then the field value is valid with :ref:`packed type <syntax-packtype>` :math:`\packtype`.
 
 .. math::
    \frac{
    }{
-     S \vdashpackedval \X{pt}.\PACK~i : \X{pt}
+     S \vdashpackval \X{pt}.\PACK~i : \X{pt}
    }
 
 
@@ -717,10 +717,14 @@ where :math:`\val_1 \gg^+_S \val_2` denotes the transitive closure of the follow
 
 * Let :math:`\reftype^\ast` be the concatenation of all :math:`\reftype_i` in order.
 
+* Let :math:`m` be the length of :math:`\moduleinst.\MIFUNCS`.
+
 * Let :math:`n` be the length of :math:`\moduleinst.\MIDATAS`.
 
+* Let :math:`x^\ast` be the sequence of :ref:`function indices <syntax-funcidx>` from :math:`0` to :math:`m-1`.
+
 * Then the module instance is valid with :ref:`context <context>`
-  :math:`\{\CTYPES~\deftype^\ast,` :math:`\CFUNCS~\functype^\ast,` :math:`\CTABLES~\tabletype^\ast,` :math:`\CMEMS~\memtype^\ast,` :math:`\CGLOBALS~\globaltype^\ast,` :math:`\CELEMS~\reftype^\ast,` :math:`\CDATAS~{\ok}^n\}`.
+  :math:`\{\CTYPES~\deftype^\ast,` :math:`\CFUNCS~\functype^\ast,` :math:`\CTABLES~\tabletype^\ast,` :math:`\CMEMS~\memtype^\ast,` :math:`\CGLOBALS~\globaltype^\ast,` :math:`\CELEMS~\reftype^\ast,` :math:`\CDATAS~{\ok}^n,` :math:`\CREFS~x^\ast\}`.
 
 .. math::
    ~\\[-1ex]
@@ -762,7 +766,8 @@ where :math:`\val_1 \gg^+_S \val_2` denotes the transitive closure of the follow
          \CMEMS & \memtype^\ast, \\
          \CGLOBALS & \globaltype^\ast, \\
          \CELEMS & \reftype^\ast, \\
-         \CDATAS & {\ok}^n ~\}
+         \CDATAS & {\ok}^n, \\
+         \CREFS & 0 \dots (|\funcaddr^\ast|-1) ~\}
          \end{array}
        \end{array}
    }

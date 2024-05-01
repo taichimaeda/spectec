@@ -45,12 +45,13 @@ It may include a :ref:`value type <syntax-valtype>` determining the type of thes
 .. index:: ! numeric instruction, value, value type, integer, floating-point, two's complement
    pair: abstract syntax; instruction
 .. _syntax-sx:
-.. _syntax-num:
+.. _syntax-num_:
 .. _syntax-const:
 .. _syntax-unop:
 .. _syntax-binop:
 .. _syntax-testop:
 .. _syntax-relop:
+.. _syntax-cvtop:
 .. _syntax-instr-numeric:
 
 Numeric Instructions
@@ -85,6 +86,8 @@ For the other integer instructions, the use of two's complement for the signed i
 .. index:: ! vector instruction, numeric vector, number, value, value type, SIMD
    pair: abstract syntax; instruction
 .. _syntax-laneidx:
+.. _syntax-lanetype:
+.. _syntax-dim:
 .. _syntax-shape:
 .. _syntax-half:
 .. _syntax-vvunop:
@@ -96,9 +99,9 @@ For the other integer instructions, the use of two's complement for the signed i
 .. _syntax-vshiftop:
 .. _syntax-vunop:
 .. _syntax-vbinop:
-.. _syntax-visatbinop:
-.. _syntax-vfunop:
-.. _syntax-vfbinop:
+.. _syntax-vextunop:
+.. _syntax-vextbinop:
+.. _syntax-vcvtop:
 .. _syntax-instr-vec:
 
 Vector Instructions
@@ -106,25 +109,12 @@ Vector Instructions
 
 Vector instructions (also known as *SIMD* instructions, *single instruction multiple data*) provide basic operations over :ref:`values <syntax-value>` of :ref:`vector type <syntax-vectype>`.
 
-$${syntax: {packtype lanetype dim shape} half laneidx instr/vec}
+$${syntax: {lanetype dim shape ishape} half laneidx instr/vec}
 
 $${syntax:
   vvunop vvbinop vvternop vvtestop
   vunop_ vbinop_ vtestop_ vrelop_ vshiftop_ vextunop_ vextbinop_
 }
-
-.. math::
-   \begin{array}{llrl}
-   \production{ishape} & \ishape &::=&
-     \K{i8x16} ~|~ \K{i16x8} ~|~ \K{i32x4} ~|~ \K{i64x2} \\
-   \production{fshape} & \fshape &::=&
-     \K{f32x4} ~|~ \K{f64x2} \\
-   \production{shape} & \shape &::=&
-     \ishape ~|~ \fshape \\
-   \production{half} & \half &::=&
-     \K{low} ~|~ \K{high} \\
-   \production{lane index} & \laneidx &::=& \u8 \\
-   \end{array}
 
 .. math::
    \begin{array}{llrl}
@@ -295,11 +285,8 @@ Some vector instructions have a signedness annotation ${:sx} which distinguishes
 For the other vector instructions, the use of two's complement for the signed interpretation means that they behave the same regardless of signedness.
 
 
-.. _syntax-vunop:
-.. _syntax-vbinop:
-.. _syntax-vrelop:
-.. _syntax-vtestop:
-.. _syntax-vcvtop:
+.. _aux-lanetype:
+.. _aux-dim:
 
 Conventions
 ...........
@@ -307,32 +294,6 @@ Conventions
 * The function ${:$lanetype(shape)} extracts the lane type of a shape.  ${definition-ignore: lanetype}
 
 * The function ${:$dim(shape)} extracts the dimension of a shape.  ${definition-ignore: dim}
-
-* Occasionally, it is convenient to group vector operators together according to the following grammar shorthands:
-
-  .. math::
-     \begin{array}{llrl}
-     \production{unary operator} & \vunop &::=&
-       \viunop ~|~
-       \vfunop ~|~
-       \VPOPCNT \\
-     \production{binary operator} & \vbinop &::=&
-       \vibinop ~|~ \vfbinop \\&&|&
-       \viminmaxop ~|~ \visatbinop \\&&|&
-       \VMUL ~|~
-       \AVGR\K{\_u} ~|~
-       \Q15MULRSAT\K{\_s} \\
-     \production{test operator} & \vtestop &::=&
-       \vitestop \\
-     \production{relational operator} & \vrelop &::=&
-       \virelop ~|~ \vfrelop \\
-     \production{conversion operator} & \vcvtop &::=&
-       \VEXTEND ~|~
-       \VTRUNC\K{\_sat} ~|~
-       \VCONVERT ~|~
-       \VDEMOTE ~|~
-       \VPROMOTE \\
-     \end{array}
 
 
 .. index:: ! reference instruction, reference, null, cast, heap type, reference type
@@ -426,13 +387,13 @@ $${syntax: {instr/struct instr/array instr/i31 instr/extern}}
 
 The instructions ${:STRUCT.NEW} and ${:STRUCT.NEW_DEFAULT} allocate a new :ref:`structure <syntax-structtype>`, initializing them either with operands or with default values.
 The remaining instructions on structs access individual fields,
-allowing for different sign extension modes in the case of :ref:`packed <syntax-packedtype>` storage types.
+allowing for different sign extension modes in the case of :ref:`packed <syntax-packtype>` storage types.
 
 Similarly, :ref:`arrays <syntax-arraytype>` can be allocated either with an explicit initialization operand or a default value.
 Furthermore, ${:ARRAY.NEW_FIXED} allocates an array with statically fixed size,
 and ${:ARRAY.NEW_DATA} and ${:ARRAY.NEW_ELEM} allocate an array and initialize it from a :ref:`data <syntax-data>` or :ref:`element <syntax-elem>` segment, respectively.
 The instructions ${:ARRAY.GET}, ${:ARRAY.GET sx !%}, and ${:ARRAY.SET} access individual slots,
-again allowing for different sign extension modes in the case of a :ref:`packed <syntax-packedtype>` storage type;
+again allowing for different sign extension modes in the case of a :ref:`packed <syntax-packtype>` storage type;
 ${:ARRAY.LEN} produces the length of an array;
 ${:ARRAY.FILL} fills a specified slice of an array with a given value and ${:ARRAY.COPY}, ${:ARRAY.INIT_DATA}, and ${:ARRAY.INIT_ELEM} copy elements to a specified slice of an array from a given array, data segment, or element segment, respectively.
 
@@ -490,9 +451,11 @@ The ${:ELEM.DROP} instruction prevents further use of a passive element segment.
 
 .. index:: ! memory instruction, memory, memory index, page size, little endian, trap
    pair: abstract syntax; instruction
+.. _syntax-sz:
 .. _syntax-loadn:
 .. _syntax-storen:
 .. _syntax-memarg:
+.. _syntax-vloadop:
 .. _syntax-lanewidth:
 .. _syntax-instr-memory:
 
@@ -501,7 +464,7 @@ Memory Instructions
 
 Instructions in this group are concerned with linear :ref:`memory <syntax-mem>`.
 
-$${syntax: memop packsize {instr/memory instr/data}}
+$${syntax: memarg vloadop sz {instr/memory instr/data}}
 
 .. math::
    \begin{array}{llrl}
@@ -540,7 +503,7 @@ $${syntax: memop packsize {instr/memory instr/data}}
    \end{array}
 
 Memory is accessed with ${:LOAD} and ${:STORE} instructions for the different :ref:`number types <syntax-numtype>` and `vector types <syntax-vectype>`.
-They all take a :ref:`memory index <syntax-memidx>` and a *memory immediate* ${:memop} that contains an address *offset* and the expected *alignment* (expressed as the exponent of a power of 2).
+They all take a :ref:`memory index <syntax-memidx>` and a *memory argument* ${:memarg} that contains an address *offset* and the expected *alignment* (expressed as the exponent of a power of 2).
 
 Integer loads and stores can optionally specify a *storage size* that is smaller than the :ref:`bit width <syntax-numtype>` of the respective value type.
 In the case of loads, a sign extension mode ${:sx} is then required to select appropriate behavior.

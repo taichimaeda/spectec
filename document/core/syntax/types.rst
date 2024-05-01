@@ -78,6 +78,7 @@ $${definition-ignore: vsize}
 .. _syntax-i31:
 .. _syntax-typeuse:
 .. _syntax-heaptype:
+.. _syntax-absheaptype:
 
 Heap Types
 ~~~~~~~~~~
@@ -181,6 +182,7 @@ Conventions
    pair: abstract syntax; value type
    pair: value; type
 .. _syntax-valtype:
+.. _syntax-consttype:
 
 Value Types
 ~~~~~~~~~~~
@@ -188,7 +190,7 @@ Value Types
 *Value types* classify the individual values that WebAssembly code can compute with and the values that a variable accepts.
 They are either :ref:`number types <syntax-numtype>`, :ref:`vector types <syntax-vectype>`, or :ref:`reference types <syntax-reftype>`.
 
-$${syntax: valtype/syn}
+$${syntax: {consttype valtype/syn}}
 
 The syntax of value types is :ref:`extended <syntax-valtype-ext>` with additional forms for the purpose of specifying :ref:`validation <valid>`.
 
@@ -238,7 +240,7 @@ $${syntax: functype}
 .. _syntax-arraytype:
 .. _syntax-fieldtype:
 .. _syntax-storagetype:
-.. _syntax-packedtype:
+.. _syntax-packtype:
 
 Aggregate Types
 ~~~~~~~~~~~~~~~
@@ -251,6 +253,7 @@ Structures are heterogeneous, but require static indexing, while arrays need to 
 $${syntax: {structtype arraytype fieldtype storagetype packtype}}
 
 .. _bitwidth-fieldtype:
+.. _aux-unpack:
 
 Conventions
 ...........
@@ -258,6 +261,14 @@ Conventions
 * The notation ${:$psize(t)} for :ref:`bit width <bitwidth-valtype>` extends to packed types as well, that is, ${:$psize(I8) = 8} and ${:$psize(I16) = 16}.
 
 $${definition-ignore: psize}
+
+* The auxiliary function :math:`\unpack` maps a storage type to the :ref:`value type <syntax-valtype>` obtained when accessing a field:
+
+  .. math::
+     \begin{array}{lll}
+     \unpack(\valtype) &=& \valtype \\
+     \unpack(\packtype) &=& \I32 \\
+     \end{array}
 
 
 .. index:: ! composite type, function type, aggreagate type, structure type, array type

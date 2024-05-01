@@ -17,64 +17,35 @@ Parametric Instructions
 
 .. _exec-nop:
 
-:math:`\NOP`
-............
-
-1. Do nothing.
+$${rule-prose: exec/nop}
 
 $${rule: {Step_pure/nop}}
 
 
 .. _exec-unreachable:
 
-:math:`\UNREACHABLE`
-....................
-
-1. Trap.
+$${rule-prose: exec/unreachable}
 
 $${rule: {Step_pure/unreachable}}
 
 
 .. _exec-drop:
 
-:math:`\DROP`
-.............
+$${rule-prose: exec/drop}
 
-1. Assert: due to :ref:`validation <valid-drop>`, a value is on the top of the stack.
-
-2. Pop the value :math:`\val` from the stack.
+.. todo:: (1) Remove trailing "Do nothing."
 
 $${rule: Step_pure/drop}
 
 
 .. _exec-select:
 
-:math:`\SELECT~(t^\ast)^?`
-..........................
-
-1. Assert: due to :ref:`validation <valid-select>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~c` from the stack.
-
-3. Assert: due to :ref:`validation <valid-select>`, two more values (of the same :ref:`value type <syntax-valtype>`) are on the top of the stack.
-
-4. Pop the value :math:`\val_2` from the stack.
-
-5. Pop the value :math:`\val_1` from the stack.
-
-6. If :math:`c` is not :math:`0`, then:
-
-   a. Push the value :math:`\val_1` back to the stack.
-
-7. Else:
-
-   a. Push the value :math:`\val_2` back to the stack.
+$${rule-prose: exec/select}
 
 $${rule: {Step_pure/select-*}}
 
 .. note::
    In future versions of WebAssembly, |SELECT| may allow more than one value per choice.
-
 
 
 .. index:: numeric instruction, determinism, trap, NaN, value, value type
@@ -121,107 +92,50 @@ Where the underlying operators are non-deterministic, because they may return on
 1. Push the value :math:`t.\CONST~c` to the stack.
 
 .. note::
-   No formal reduction rule is required for this instruction, since ${:CONST} instructions already are :ref:`values <syntax-val>`.
+   No formal reduction rule is required for this instruction, since :math:`\CONST` instructions already are :ref:`values <syntax-val>`.
 
 
 .. _exec-unop:
 
-:math:`t\K{.}\unop`
-...................
+$${rule-prose: exec/unop}
 
-1. Assert: due to :ref:`validation <valid-unop>`, a value of :ref:`value type <syntax-valtype>` :math:`t` is on the top of the stack.
-
-2. Pop the value :math:`t.\CONST~c_1` from the stack.
-
-3. If :math:`\unopF_t(c_1)` is defined, then:
-
-   a. Let :math:`c` be a possible result of computing :math:`\unopF_t(c_1)`.
-
-   b. Push the value :math:`t.\CONST~c` to the stack.
-
-4. Else:
-
-   a. Trap.
+.. todo:: (2) SpecTec currently defines the image of unop as a sequence, not a set.
 
 $${rule: {Step_pure/unop-*}}
 
 
 .. _exec-binop:
 
-:math:`t\K{.}\binop`
-....................
+$${rule-prose: exec/binop}
 
-1. Assert: due to :ref:`validation <valid-binop>`, two values of :ref:`value type <syntax-valtype>` :math:`t` are on the top of the stack.
-
-2. Pop the value :math:`t.\CONST~c_2` from the stack.
-
-3. Pop the value :math:`t.\CONST~c_1` from the stack.
-
-4. If :math:`\binopF_t(c_1, c_2)` is defined, then:
-
-   a. Let :math:`c` be a possible result of computing :math:`\binopF_t(c_1, c_2)`.
-
-   b. Push the value :math:`t.\CONST~c` to the stack.
-
-5. Else:
-
-   a. Trap.
+.. todo:: (2) SpecTec currently defines the image of binop as a sequence, not a set.
 
 $${rule: {Step_pure/binop-*}}
 
 
 .. _exec-testop:
 
-:math:`t\K{.}\testop`
-.....................
+$${rule-prose: exec/testop}
 
-1. Assert: due to :ref:`validation <valid-testop>`, a value of :ref:`value type <syntax-valtype>` :math:`t` is on the top of the stack.
-
-2. Pop the value :math:`t.\CONST~c_1` from the stack.
-
-3. Let :math:`c` be the result of computing :math:`\testopF_t(c_1)`.
-
-4. Push the value :math:`\I32.\CONST~c` to the stack.
+.. todo:: (2) SpecTec currently defines the image of testop as a sequence, not a set.
 
 $${rule: Step_pure/testop}
 
 
 .. _exec-relop:
 
-:math:`t\K{.}\relop`
-....................
+$${rule-prose: exec/relop}
 
-1. Assert: due to :ref:`validation <valid-relop>`, two values of :ref:`value type <syntax-valtype>` :math:`t` are on the top of the stack.
-
-2. Pop the value :math:`t.\CONST~c_2` from the stack.
-
-3. Pop the value :math:`t.\CONST~c_1` from the stack.
-
-4. Let :math:`c` be the result of computing :math:`\relopF_t(c_1, c_2)`.
-
-5. Push the value :math:`\I32.\CONST~c` to the stack.
+.. todo:: (2) SpecTec currently defines the image of testop as a sequence, not a set.
 
 $${rule: Step_pure/relop}
 
 
 .. _exec-cvtop:
 
-:math:`t_2\K{.}\cvtop\K{\_}t_1\K{\_}\sx^?`
-..........................................
+$${rule-prose: exec/cvtop}
 
-1. Assert: due to :ref:`validation <valid-cvtop>`, a value of :ref:`value type <syntax-valtype>` :math:`t_1` is on the top of the stack.
-
-2. Pop the value :math:`t_1.\CONST~c_1` from the stack.
-
-3. If :math:`\cvtop^{\sx^?}_{t_1,t_2}(c_1)` is defined:
-
-   a. Let :math:`c_2` be a possible result of computing :math:`\cvtop^{\sx^?}_{t_1,t_2}(c_1)`.
-
-   b. Push the value :math:`t_2.\CONST~c_2` to the stack.
-
-4. Else:
-
-   a. Trap.
+.. todo:: (2) SpecTec currently defines the image of testop as a sequence, not a set.
 
 $${rule: {Step_pure/cvtop-*}}
 
@@ -256,84 +170,45 @@ $${rule: {Step_read/ref.null-*}}
 
 .. _exec-ref.func:
 
-:math:`\REFFUNC~x`
-..................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-ref.func>`, :math:`F.\AMODULE.\MIFUNCS[x]` exists.
-
-3. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`F.\AMODULE.\MIFUNCS[x]`.
-
-4. Push the value :math:`\REFFUNCADDR~a` to the stack.
+$${rule-prose: exec/ref.func}
 
 $${rule: Step_read/ref.func}
 
 
 .. _exec-ref.is_null:
 
-:math:`\REFISNULL`
-..................
+$${rule-prose: exec/ref.is_null}
 
-1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. Push the value :math:`\I32.\CONST~1` to the stack.
-
-4. Else:
-
-   a. Push the value :math:`\I32.\CONST~0` to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/ref.is_null-*}}
 
 
 .. _exec-ref.as_non_null:
 
-:math:`\REFASNONNULL`
-.....................
+$${rule-prose: exec/ref.as_non_null}
 
-1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. Trap.
-
-4. Push the value :math:`\reff` back to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/ref.as_non_null-*}}
 
 
 .. _exec-ref.eq:
 
-:math:`\REFEQ`
-..............
+$${rule-prose: exec/ref.eq}
 
-1. Assert: due to :ref:`validation <valid-ref.eq>`, two :ref:`reference values <syntax-ref>` are on the top of the stack.
-
-2. Pop the value :math:`\reff_2` from the stack.
-
-3. Pop the value :math:`\reff_1` from the stack.
-
-4. If :math:`\reff_1` is the same as :math:`\reff_2`, then:
-
-   a. Push the value :math:`\I32.\CONST~1` to the stack.
-
-5. Else:
-
-   a. Push the value :math:`\I32.\CONST~0` to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/ref.eq-*}}
 
 
 .. _exec-ref.test:
 
-:math:`\REFTEST~\X{rt}`
-.......................
+$${rule-prose: exec/ref.test}
+
+.. todo::
+   Below is the actual prose. 
+   (9) Need to handle RulePr s \|- ref : rt properly in prose instead of $ref_type_of
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -362,8 +237,11 @@ $${rule: {Step_read/ref.test-*}}
 
 .. _exec-ref.cast:
 
-:math:`\REFCAST~\X{rt}`
-.......................
+$${rule-prose: exec/ref.cast}
+
+.. todo::
+   Below is the actual prose. 
+   (9) Need to handle RulePr s \|- ref : rt properly in prose instead of $ref_type_of
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -390,27 +268,21 @@ $${rule: {Step_read/ref.test-*}}
 $${rule: {Step_read/ref.cast-*}}
 
 
-
 .. _exec-ref.i31:
 
-:math:`\REFI31`
-...............
-
-1. Assert: due to :ref:`validation <valid-ref.i31>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-3. Let :math:`j` be the result of computing :math:`\wrap_{32,31}(i)`.
-
-4. Push the reference value :math:`(\REFI31NUM~j)` to the stack.
+$${rule-prose: exec/ref.i31}
 
 $${rule: {Step_pure/ref.i31}}
 
 
 .. _exec-i31.get_sx:
 
-:math:`\I31GET\K{\_}\sx`
-........................
+$${rule-prose: exec/i31.get}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (4) Guarantees from validation can help simplify the prose.
 
 1. Assert: due to :ref:`validation <valid-i31.get_sx>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`(\REF~\NULL~\I31)` is on the top of the stack.
 
@@ -424,7 +296,7 @@ $${rule: {Step_pure/ref.i31}}
 
 5. Let :math:`\REFI31NUM~i` be the reference value :math:`\reff`.
 
-6. Let :math:`j` be the result of computing :math:`\extend^{\sx}_{31,32}(i)`.
+6. Let :math:`j` be the result of computing :math:`\ext^{\sx}_{31,32}(i)`.
 
 7. Push the value :math:`\I32.\CONST~j` to the stack.
 
@@ -433,8 +305,12 @@ $${rule: {Step_pure/i31.get-*}}
 
 .. _exec-struct.new:
 
-:math:`\STRUCTNEW~x`
-....................
+$${rule-prose: exec/struct.new}
+
+.. todo::
+   Below is the actual prose.
+   (3') Introduce let binding instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -454,7 +330,7 @@ $${rule: {Step_pure/i31.get-*}}
 
 9. For every value :math:`\val_i` in :math:`\val^\ast` and corresponding :ref:`field type <syntax-fieldtype>` :math:`\X{ft}_i` in :math:`\X{ft}^\ast`:
 
-   a. Let :math:`\fieldval_i` be the result of computing :math:`\packval_{\X{ft}_i}(\val_i))`.
+   a. Let :math:`\fieldval_i` be the result of computing :math:`\packfield_{\X{ft}_i}(\val_i))`.
 
 10. Let :math:`\fieldval^\ast` the concatenation of all field values :math:`\fieldval_i`.
 
@@ -471,8 +347,12 @@ $${rule: {Step/struct.new}}
 
 .. _exec-struct.new_default:
 
-:math:`\STRUCTNEWDEFAULT~x`
-...........................
+$${rule-prose: exec/struct.new_default}
+
+.. todo::
+   Below is the actual prose.
+   (3') Introduce let binding instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -488,7 +368,7 @@ $${rule: {Step/struct.new}}
 
 7. For every :ref:`field type <syntax-fieldtype>` :math:`\X{ft}_i` in :math:`\X{ft}^\ast`:
 
-   a. Let :math:`t_i` be the :ref:`value type <syntax-valtype>` :math:`\unpacktype(\X{ft}_i)`.
+   a. Let :math:`t_i` be the :ref:`value type <syntax-valtype>` :math:`\unpack(\X{ft}_i)`.
 
    b. Assert: due to :ref:`validation <valid-struct.new_default>`, :math:`\default_{t_i}` is defined.
 
@@ -502,8 +382,12 @@ $${rule: {Step_read/struct.new_default}}
 .. _exec-struct.get:
 .. _exec-struct.get_sx:
 
-:math:`\STRUCTGET\K{\_}\sx^?~x~y`
-.................................
+$${rule-prose: exec/struct.get}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -533,7 +417,7 @@ $${rule: {Step_read/struct.new_default}}
 
 13. Let :math:`\fieldval` be the :ref:`field value <syntax-fieldval>` :math:`S.\SSTRUCTS[a].\SIFIELDS[y]`.
 
-14. Let :math:`\val` be the result of computing :math:`\unpackval^{\sx^?}_{\X{ft}_y}(\fieldval))`.
+14. Let :math:`\val` be the result of computing :math:`\unpackfield^{\sx^?}_{\X{ft}_y}(\fieldval))`.
 
 15. Push the value :math:`\val` to the stack.
 
@@ -542,8 +426,12 @@ $${rule: {Step_read/struct.get-*}}
 
 .. _exec-struct.set:
 
-:math:`\STRUCTSET~x~y`
-......................
+$${rule-prose: exec/struct.set}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -575,37 +463,28 @@ $${rule: {Step_read/struct.get-*}}
 
 14. Assert: due to :ref:`validation <valid-struct.set>`, the :ref:`structure instance <syntax-structinst>` :math:`S.\SSTRUCTS[a]` exists and has at least :math:`y + 1` fields.
 
-15. Let :math:`\fieldval` be the result of computing :math:`\packval_{\X{ft}_y}(\val))`.
+15. Let :math:`\fieldval` be the result of computing :math:`\packfield_{\X{ft}_y}(\val))`.
 
 16. Replace the :ref:`field value <syntax-fieldval>` :math:`S.\SSTRUCTS[a].\SIFIELDS[y]` with :math:`\fieldval`.
 
 $${rule: {Step/struct.set-*}}
-
+   
 
 .. _exec-array.new:
 
-:math:`\ARRAYNEW~x`
-...................
-
-1. Assert: due to :ref:`validation <valid-array.new>`, a :ref:`value <syntax-val>` of type :math:`\I32` is on the top of the stack.
-
-2. Pop the value :math:`(\I32.\CONST~n)` from the stack.
-
-3. Assert: due to :ref:`validation <valid-array.new>`, a :ref:`value <syntax-val>` is on the top of the stack.
-
-4. Pop the value :math:`\val` from the stack.
-
-5. Push the value :math:`\val` to the stack :math:`n` times.
-
-6. Execute the instruction :math:`(\ARRAYNEWFIXED~x~n)`.
+$${rule-prose: exec/array.new}
 
 $${rule: {Step_pure/array.new}}
 
 
 .. _exec-array.new_default:
 
-:math:`\ARRAYNEWDEFAULT~x`
-..........................
+$${rule-prose: exec/array.new_default}
+
+.. todo::
+   Below is the actual prose.
+   (3') Introduce let binding instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -621,7 +500,7 @@ $${rule: {Step_pure/array.new}}
 
 7. Pop the value :math:`\I32.\CONST~n` from the stack.
 
-8. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpacktype(\X{ft})`.
+8. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpack(\X{ft})`.
 
 9. Assert: due to :ref:`validation <valid-array.new_default>`, :math:`\default_t` is defined.
 
@@ -634,8 +513,12 @@ $${rule: {Step_read/array.new_default}}
 
 .. _exec-array.new_fixed:
 
-:math:`\ARRAYNEWFIXED~x~n`
-..........................
+$${rule-prose: exec/array.new_fixed}
+
+.. todo::
+   Below is the actual prose.
+   (3') Introduce let binding instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -653,7 +536,7 @@ $${rule: {Step_read/array.new_default}}
 
 8. For every value :math:`\val_i` in :math:`\val^\ast`:
 
-   a. Let :math:`\fieldval_i` be the result of computing :math:`\packval_{\X{ft}}(\val_i))`.
+   a. Let :math:`\fieldval_i` be the result of computing :math:`\packfield_{\X{ft}}(\val_i))`.
 
 9. Let :math:`\fieldval^\ast` be the concatenation of all field values :math:`\fieldval_i`.
 
@@ -670,8 +553,11 @@ $${rule: {Step/array.new_fixed}}
 
 .. _exec-array.new_data:
 
-:math:`\ARRAYNEWDATA~x~y`
-.........................
+$${rule-prose: exec/array.new_data}
+
+.. todo::
+   Below is the actual prose.
+   (7) Render $inverse_ with display hint.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -707,7 +593,7 @@ $${rule: {Step/array.new_fixed}}
 
 16. Let :math:`b^\ast` be the :ref:`byte <syntax-byte>` sequence :math:`\datainst.\DIDATA[s \slice n \cdot z]`.
 
-17. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpacktype(\X{ft})`.
+17. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpack(\X{ft})`.
 
 18. For each consecutive subsequence :math:`{b'}^n` of :math:`b^\ast`:
 
@@ -724,34 +610,7 @@ $${rule: {Step_read/array.new_data-*}}
 
 .. _exec-array.new_elem:
 
-:math:`\ARRAYNEWELEM~x~y`
-.........................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-array.new_elem>`, the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[y]` exists.
-
-3. Let :math:`\X{ea}` be the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[y]`.
-
-4. Assert: due to :ref:`validation <valid-array.new_elem>`, the :ref:`element instance <syntax-eleminst>` :math:`S.\SELEMS[\X{ea}]` exists.
-
-5. Let :math:`\eleminst` be the :ref:`element instance <syntax-eleminst>` :math:`S.\SELEMS[\X{ea}]`.
-
-6. Assert: due to :ref:`validation <valid-array.new_elem>`, two :ref:`values <syntax-val>` of type :math:`\I32` are on the top of the stack.
-
-7. Pop the value :math:`(\I32.\CONST~n)` from the stack.
-
-8. Pop the value :math:`(\I32.\CONST~s)` from the stack.
-
-9. If the sum of :math:`s` and :math:`n` is larger than the length of :math:`\eleminst.\EIELEM`, then:
-
-   a. Trap.
-
-10. Let :math:`\reff^\ast` be the :ref:`reference <syntax-ref>` sequence :math:`\eleminst.\EIELEM[s \slice n]`.
-
-11. Push the references :math:`\reff^\ast` to the stack.
-
-12. Execute the instruction :math:`(\ARRAYNEWFIXED~x~n)`.
+$${rule-prose: exec/array.new_elem}
 
 $${rule: {Step_read/array.new_elem-*}}
 
@@ -759,8 +618,12 @@ $${rule: {Step_read/array.new_elem-*}}
 .. _exec-array.get:
 .. _exec-array.get_sx:
 
-:math:`\ARRAYGET\K{\_}\sx^?~x`
-..............................
+$${rule-prose: exec/array.get}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -796,7 +659,7 @@ $${rule: {Step_read/array.new_elem-*}}
 
 15. Let :math:`\fieldval` be the :ref:`field value <syntax-fieldval>` :math:`S.\SARRAYS[a].\AIFIELDS[i]`.
 
-16. Let :math:`\val` be the result of computing :math:`\unpackval^{\sx^?}_{\X{ft}}(\fieldval))`.
+16. Let :math:`\val` be the result of computing :math:`\unpackfield^{\sx^?}_{\X{ft}}(\fieldval))`.
 
 17. Push the value :math:`\val` to the stack.
 
@@ -805,8 +668,12 @@ $${rule: {Step_read/array.get-*}}
 
 .. _exec-array.set:
 
-:math:`\ARRAYSET~x`
-...................
+$${rule-prose: exec/array.set}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -844,7 +711,7 @@ $${rule: {Step_read/array.get-*}}
 
     a. Trap.
 
-17. Let :math:`\fieldval` be the result of computing :math:`\packval_{\X{ft}}(\val))`.
+17. Let :math:`\fieldval` be the result of computing :math:`\packfield_{\X{ft}}(\val))`.
 
 18. Replace the :ref:`field value <syntax-fieldval>` :math:`S.\SARRAYS[a].\AIFIELDS[i]` with :math:`\fieldval`.
 
@@ -853,96 +720,30 @@ $${rule: {Step/array.set-*}}
 
 .. _exec-array.len:
 
-:math:`\ARRAYLEN`
-.................
+$${rule-prose: exec/array.len}
 
-1. Assert: due to :ref:`validation <valid-array.len>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`(\REF~\NULL~\ARRAY)` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~t`, then:
-
-   a. Trap.
-
-4. Assert: due to :ref:`validation <valid-array.len>`, :math:`\reff` is an :ref:`array reference <syntax-ref.array>`.
-
-5. Let :math:`\REFARRAYADDR~a` be the reference value :math:`\reff`.
-
-6. Assert: due to :ref:`validation <valid-array.len>`, the :ref:`array instance <syntax-arrayinst>` :math:`S.\SARRAYS[a]` exists.
-
-7. Let :math:`n` be the length of :math:`S.\SARRAYS[a].\AIFIELDS`.
-
-8. Push the :ref:`value <syntax-val>` :math:`(\I32.\CONST~n)` to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_read/array.len-*}}
 
 
 .. _exec-array.fill:
 
-:math:`\ARRAYFILL~x`
-....................
+$${rule-prose: exec/array.fill}
 
-1. Assert: due to :ref:`validation <valid-array.fill>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`\I32` is on the top of the stack.
-
-2. Pop the value :math:`n` from the stack.
-
-3. Assert: due to :ref:`validation <valid-array.fill>`, a :ref:`value <syntax-val>` is on the top of the stack.
-
-4. Pop the value :math:`\val` from the stack.
-
-5. Assert: due to :ref:`validation <valid-array.fill>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`\I32` is on the top of the stack.
-
-6. Pop the value :math:`d` from the stack.
-
-7. Assert: due to :ref:`validation <valid-array.fill>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`(\REF~\NULL~x)` is on the top of the stack.
-
-8. Pop the value :math:`\reff` from the stack.
-
-9. If :math:`\reff` is :math:`\REFNULL~t`, then:
-
-   a. Trap.
-
-10. Assert: due to :ref:`validation <valid-array.fill>`, :math:`\reff` is an :ref:`array reference <syntax-ref.array>`.
-
-11. Let :math:`\REFARRAYADDR~a` be the reference value :math:`\reff`.
-
-12. Assert: due to :ref:`validation <valid-array.fill>`, the :ref:`array instance <syntax-arrayinst>` :math:`S.\SARRAYS[a]` exists.
-
-13. If :math:`d + n` is larger than or equal to the length of :math:`S.\SARRAYS[a].\AIFIELDS`, then:
-
-    a. Trap.
-
-14. If :math:`n = 0`, then:
-
-    a. Return.
-
-15. Push the value :math:`\REFARRAYADDR~a` to the stack.
-
-16. Push the value :math:`\I32.\CONST~d` to the stack.
-
-17. Push the value :math:`\val` to the stack.
-
-18. Execute the instruction :math:`\ARRAYSET~x`.
-
-19. Push the value :math:`\REFARRAYADDR~a` to the stack.
-
-20. Assert: due to the earlier check against the array size, :math:`d+1 < 2^{32}`.
-
-21. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-22. Push the value :math:`\val` to the stack.
-
-23. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-24. Execute the instruction :math:`\ARRAYFILL~x`.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_read/array.fill-*}}
 
 
 .. _exec-array.copy:
 
-:math:`\ARRAYCOPY~x~y`
-......................
+$${rule-prose: exec/array.copy}
+
+.. todo::
+   Below is the actual prose.
+   (3) Introduce if-let instruction instead of "is of the case".
+   (5) Use "the expansion of" instead of $expand function application.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -994,11 +795,11 @@ $${rule: {Step_read/array.fill-*}}
 
 23. Assert: due to :ref:`validation <valid-array.copy>`, the :ref:`array instance <syntax-arrayinst>` :math:`S.\SARRAYS[a_2]` exists.
 
-24. If :math:`d + n` is larger than or equal to the length of :math:`S.\SARRAYS[a_1].\AIFIELDS`, then:
+24. If :math:`d + n` is larger than the length of :math:`S.\SARRAYS[a_1].\AIFIELDS`, then:
 
     a. Trap.
 
-25. If :math:`s + n` is larger than or equal to the length of :math:`S.\SARRAYS[a_2].\AIFIELDS`, then:
+25. If :math:`s + n` is larger than the length of :math:`S.\SARRAYS[a_2].\AIFIELDS`, then:
 
     a. Trap.
 
@@ -1016,7 +817,7 @@ $${rule: {Step_read/array.fill-*}}
 
     d. Push the value :math:`\I32.\CONST~s` to the stack.
 
-    e. Execute :math:`\getfield(\X{st})`.
+    e. Execute :math:`\F{getfield}(\X{st})`.
 
     f. Execute the instruction :math:`\ARRAYSET~x`.
 
@@ -1046,7 +847,7 @@ $${rule: {Step_read/array.fill-*}}
 
     f. Push the value :math:`\I32.\CONST~(s+n-1)` to the stack.
 
-    g. Execute :math:`\getfield(\X{st})`.
+    g. Execute :math:`\F{getfield}(\X{st})`.
 
     h. Execute the instruction :math:`\ARRAYSET~x`.
 
@@ -1070,11 +871,13 @@ Where:
 
 $${definition: sx}
 
-
 .. _exec-array.init_data:
 
-:math:`\ARRAYINITDATA~x~y`
-..........................
+$${rule-prose: exec/array.init_data}
+
+.. todo::
+   Below is the actual prose.
+   (7) Render $inverse_ with display hint.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -1130,7 +933,7 @@ $${definition: sx}
 
 24. Let :math:`b^\ast` be the :ref:`byte <syntax-byte>` sequence :math:`\datainst.\DIDATA[s \slice z]`.
 
-25. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpacktype(\X{ft})`.
+25. Let :math:`t` be the :ref:`value type <syntax-valtype>` :math:`\unpack(\X{ft})`.
 
 26. Assert: due to :ref:`validation <valid-array.init_data>`, :math:`\bytes_{\X{ft}}` is defined.
 
@@ -1159,125 +962,29 @@ $${rule: {Step_read/array.init_data-*}}
 
 .. _exec-array.init_elem:
 
-:math:`\ARRAYINITELEM~x~y`
-..........................
+$${rule-prose: exec/array.init_elem}
 
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-array.init_elem>`, the :ref:`defined type <syntax-deftype>` :math:`F.\AMODULE.\MITYPES[x]` exists.
-
-3. Let :math:`\deftype` be the :ref:`defined type <syntax-deftype>` :math:`F.\AMODULE.\MITYPES[x]`.
-
-4. Assert: due to :ref:`validation <valid-array.init_elem>`, the :ref:`expansion <aux-expand-deftype>` of :math:`\deftype` is an :ref:`array type <syntax-arraytype>`.
-
-5. Let :math:`\TARRAY~\X{ft}` be the :ref:`expanded <aux-expand-deftype>` :ref:`array type <syntax-arraytype>` :math:`\deftype`.
-
-6. Assert: due to :ref:`validation <valid-array.init_elem>`, the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[y]` exists.
-
-7. Let :math:`\X{ea}` be the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[y]`.
-
-8. Assert: due to :ref:`validation <valid-array.init_elem>`, the :ref:`element instance <syntax-eleminst>` :math:`S.\SELEMS[\X{ea}]` exists.
-
-9. Let :math:`\eleminst` be the :ref:`element instance <syntax-eleminst>` :math:`S.\SELEMS[\X{ea}]`.
-
-10. Assert: due to :ref:`validation <valid-array.init_elem>`, three values of type :math:`\I32` are on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-12. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-13. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-14. Assert: due to :ref:`validation <valid-array.init_elem>`, a :ref:`value <syntax-val>` of :ref:`type <syntax-valtype>` :math:`(\REF~\NULL~x)` is on the top of the stack.
-
-15. Pop the value :math:`\reff` from the stack.
-
-16. If :math:`\reff` is :math:`\REFNULL~t`, then:
-
-   a. Trap.
-
-17. Assert: due to :ref:`validation <valid-array.init_elem>`, :math:`\reff` is an :ref:`array reference <syntax-ref.array>`.
-
-18. Let :math:`\REFARRAYADDR~a` be the reference value :math:`\reff`.
-
-19. Assert: due to :ref:`validation <valid-array.init_elem>`, the :ref:`array instance <syntax-arrayinst>` :math:`S.\SARRAYS[a]` exists.
-
-20. If :math:`d + n` is larger than the length of :math:`S.\SARRAYS[a].\AIFIELDS`, or :math:`s + n` is larger than the length of :math:`\eleminst.\EIELEM`, then:
-
-    a. Trap.
-
-21. If :math:`n = 0`, then:
-
-    a. Return.
-
-22. Let :math:`\reff'` be the :ref:`reference value <syntax-ref>` :math:`\eleminst.\EIELEM[s]`.
-
-23. Push the value :math:`\REFARRAYADDR~a` to the stack.
-
-24. Push the value :math:`\I32.\CONST~d` to the stack.
-
-25. Push the value :math:`\reff'` to the stack.
-
-26. Execute the instruction :math:`\ARRAYSET~x`.
-
-27. Push the value :math:`\REFARRAYADDR~a` to the stack.
-
-28. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-29. Push the value :math:`\I32.\CONST~(s+1)` to the stack.
-
-30. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-31. Execute the instruction :math:`\ARRAYINITELEM~x~y`.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_read/array.init_elem-*}}
 
 
 .. _exec-any.convert_extern:
 
-:math:`\ANYCONVERTEXTERN`
-.........................
+$${rule-prose: exec/any.convert_extern}
 
-1. Assert: due to :ref:`validation <valid-any.convert_extern>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. Push the reference value :math:`(\REFNULL~\ANY)` to the stack.
-
-4. Else:
-
-   a. Assert: due to :ref:`validation <valid-any.convert_extern>`, a :math:`\reff` is an :ref:`external reference <syntax-ref.extern>`.
-
-   b. Let :math:`\REFEXTERN~\reff'` be the reference value :math:`\reff`.
-
-   c. Push the reference value :math:`\reff'` to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/any.convert_extern-*}}
 
 
 .. _exec-extern.convert_any:
 
-:math:`\EXTERNCONVERTANY`
-.........................
+$${rule-prose: exec/extern.convert_any}
 
-1. Assert: due to :ref:`validation <valid-extern.convert_any>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. Push the reference value :math:`(\REFNULL~\EXTERN)` to the stack.
-
-4. Else:
-
-   a. Let :math:`\reff'` be the reference value :math:`(\REFEXTERN~\reff)`.
-
-   b. Push the reference value :math:`\reff'` to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/extern.convert_any-*}}
-
 
 
 .. index:: vector instruction
@@ -1295,7 +1002,7 @@ Vector instructions that operate bitwise are handled as integer operations of re
    \X{op}_{\VN}(i_1,\dots,i_k) &=& \xref{exec/numerics}{int-ops}{\F{i}\X{op}}_N(i_1,\dots,i_k) \\
    \end{array}
 
-Most other vector instructions are defined in terms of numeric operators that are applied lane-wise according to the given :ref:`shape <syntax-vec-shape>`.
+Most other vector instructions are defined in terms of numeric operators that are applied lane-wise according to the given :ref:`shape <syntax-shape>`.
 
 .. math::
    \begin{array}{llll}
@@ -1325,95 +1032,170 @@ Most other vector instructions are defined in terms of numeric operators that ar
 
 .. _exec-vvunop:
 
-:math:`\V128\K{.}\vvunop`
-.........................
+$${rule-prose: exec/vvunop}
 
-1. Assert: due to :ref:`validation <valid-vvunop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
-
-2. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-3. Let :math:`c` be the result of computing :math:`\vvunop_{\V128}(c_1)`.
-
-4. Push the value :math:`\V128.\VCONST~c` to the stack.
-
-.. math::
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~\V128\K{.}\vvunop &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff c = \vvunop_{\V128}(c_1)) \\
-   \end{array}
+$${rule: {Step_pure/vvunop}}
 
 
 .. _exec-vvbinop:
 
-:math:`\V128\K{.}\vvbinop`
-..........................
+$${rule-prose: exec/vvbinop}
 
-1. Assert: due to :ref:`validation <valid-vvbinop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+$${rule: {Step_pure/vvbinop}}
+
+
+.. _exec-vvternop:
+
+$${rule-prose: exec/vvternop}
+
+$${rule: {Step_pure/vvternop}}
+
+
+.. _exec-vvtestop:
+
+$${rule-prose: exec/vvtestop}
+
+$${rule: {Step_pure/vvtestop}}
+
+
+.. _exec-vunop:
+
+$${rule-prose: exec/vunop}
+
+$${rule: {Step_pure/vunop}}
+
+
+.. _exec-vbinop:
+
+$${rule-prose: exec/vbinop}
+
+.. todo:: (2) SpecTec currently defines the image of vbinop as a sequence, not a set.
+
+$${rule: {Step_pure/vbinop-*}}
+
+
+.. _exec-vtestop:
+
+$${rule-prose: exec/vtestop}
+
+$${rule: {Step_pure/vtestop-*}}
+
+
+.. _exec-vrelop:
+
+$${rule-prose: exec/vrelop}
+
+.. todo::
+   Below is the actual prose.
+
+1. Assert: due to :ref:`validation <valid-vrelop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
 
 2. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
 
 3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
-4. Let :math:`c` be the result of computing :math:`\vvbinop_{\V128}(c_1, c_2)`.
+4. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_1)`.
 
-5. Push the value :math:`\V128.\VCONST~c` to the stack.
+5. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_2)`.
+
+6. Let :math:`i^\ast` be the result of computing :math:`\vrelop_t(i_1^\ast, i_2^\ast)`.
+
+7. Let :math:`j^\ast` be the result of computing :math:`\exts_{1,|t|}(i^\ast)`.
+
+8. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t\K{x}N}(j^\ast)`.
+
+9. Push the value :math:`\V128.\VCONST~c` to the stack.
+
+$${rule: {Step_pure/vrelop}}
 
 .. math::
+   \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~\V128\K{.}\vvbinop &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff c = \vvbinop_{\V128}(c_1, c_2)) \\
+   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~t\K{x}N\K{.}\vrelop &\stepto& (\V128\K{.}\VCONST~c)
+   \end{array}
+   \\ \qquad
+     \begin{array}[t]{@{}r@{~}l@{}}
+     (\iff c = \lanes^{-1}_{t\K{x}N}(\exts_{1,|t|}(\vrelop_t(\lanes_{t\K{x}N}(c_1), \lanes_{t\K{x}N}(c_2)))))
+     \end{array}
    \end{array}
 
+.. _exec-vshiftop:
 
-.. _exec-vvternop:
+$${rule-prose: exec/vshiftop}
 
-:math:`\V128\K{.}\vvternop`
-...........................
+.. todo::
+   Below is the actual prose.
 
-1. Assert: due to :ref:`validation <valid-vvternop>`, three values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+1. Assert: due to :ref:`validation <valid-vshiftop>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
-2. Pop the value :math:`\V128.\VCONST~c_3` from the stack.
+2. Pop the value :math:`\I32.\CONST~s` from the stack.
 
-3. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
+3. Assert: due to :ref:`validation <valid-vshiftop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
 4. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
-5. Let :math:`c` be the result of computing :math:`\vvternop_{\V128}(c_1, c_2, c_3)`.
+5. Let :math:`i^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_1)`.
 
-6. Push the value :math:`\V128.\VCONST~c` to the stack.
+6. Let :math:`j^\ast` be the result of computing :math:`\vishiftop_{t}(i^\ast, s^N)`.
+
+7. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t\K{x}N}(j^\ast)`.
+
+8. Push the value :math:`\V128.\VCONST~c` to the stack.
+
+$${rule: {Step_pure/vshiftop}}
 
 .. math::
+   \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~(\V128\K{.}\VCONST~c_3)~\V128\K{.}\vvternop &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff c = \vvternop_{\V128}(c_1, c_2, c_3)) \\
+   (\V128\K{.}\VCONST~c_1)~(\I32\K{.}\CONST~s)~t\K{x}N\K{.}\vishiftop &\stepto& (\V128\K{.}\VCONST~c)
+   \end{array}
+   \\ \qquad
+     \begin{array}[t]{@{}r@{~}l@{}}
+     (\iff & i^\ast = \lanes_{t\K{x}N}(c_1) \\
+     \wedge & c = \lanes^{-1}_{t\K{x}N}(\vishiftop_{t}(i^\ast, s^N)))
+     \end{array}
    \end{array}
 
 
-.. _exec-vvtestop:
-.. _exec-vec-any_true:
+.. _exec-vbitmask:
 
-:math:`\V128\K{.}\ANYTRUE`
-..........................
+$${rule-prose: exec/vbitmask}
 
-1. Assert: due to :ref:`validation <valid-vvtestop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+.. todo::
+   Below is the actual prose.
 
-2. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
+1. Assert: due to :ref:`validation <valid-vbitmask>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
-3. Let :math:`i` be the result of computing :math:`\ine_{128}(c_1, 0)`.
+2. Pop the value :math:`\V128.\VCONST~c` from the stack.
 
-4. Push the value :math:`\I32.\CONST~i` onto the stack.
+3. Let :math:`i_1^N` be the result of computing :math:`\lanes_{t\K{x}N}(c)`.
+
+4. Let :math:`B` be the :ref:`bit width <syntax-valtype>` :math:`|t|` of :ref:`value type <syntax-valtype>` :math:`t`.
+
+5. Let :math:`i_2^N` be the result of computing :math:`\ilts_{B}(i_1^N, 0^N)`.
+
+6. Let :math:`j^\ast` be the concatenation of the two sequences :math:`i_2^N` and :math:`0^{32-N}`.
+
+7. Let :math:`i` be the result of computing :math:`\ibits_{32}^{-1}(j^\ast)`.
+
+8. Push the value :math:`\I32.\CONST~i` onto the stack.
+
+$${rule: {Step_pure/vbitmask}}
 
 .. math::
    \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~\V128\K{.}\ANYTRUE &\stepto& (\I32\K{.}\CONST~i)
-     & (\iff i = \ine_{128}(c_1, 0)) \\
+   (\V128\K{.}\VCONST~c)~t\K{x}N\K{.}\BITMASK &\stepto& (\I32\K{.}\CONST~i)
+     & (\iff i = \ibits_{32}^{-1}(\ilts_{|t|}(\lanes_{t\K{x}N}(c), 0^N)))
+     \\
    \end{array}
 
 
-.. _exec-vec-swizzle:
+.. _exec-vswizzle:
 
-:math:`\K{i8x16.}\SWIZZLE`
-..........................
+$${rule-prose: exec/vswizzle}
+
+.. todo::
+   Below is the actual prose.
 
 1. Assert: due to :ref:`validation <valid-vbinop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
 
@@ -1431,6 +1213,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 
 8. Push the value :math:`\V128.\VCONST~c'` onto the stack.
 
+$${rule: {Step_pure/vswizzle}}
+
 .. math::
    \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
@@ -1445,14 +1229,16 @@ Most other vector instructions are defined in terms of numeric operators that ar
    \end{array}
 
 
-.. _exec-vec-shuffle:
+.. _exec-vshuffle:
 
-:math:`\K{i8x16.}\SHUFFLE~x^\ast`
-.................................
+$${rule-prose: exec/vshuffle}
 
-1. Assert: due to :ref:`validation <valid-vec-shuffle>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+.. todo::
+   Below is the actual prose.
 
-2. Assert: due to :ref:`validation <valid-vec-shuffle>`, for all :math:`x_i` in :math:`x^\ast` it holds that :math:`x_i < 32`.
+1. Assert: due to :ref:`validation <valid-vshuffle>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+
+2. Assert: due to :ref:`validation <valid-vshuffle>`, for all :math:`x_i` in :math:`x^\ast` it holds that :math:`x_i < 32`.
 
 3. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
 
@@ -1468,6 +1254,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 
 9. Push the value :math:`\V128.\VCONST~c` onto the stack.
 
+$${rule: {Step_pure/vshuffle}}
+
 .. math::
    \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
@@ -1481,50 +1269,58 @@ Most other vector instructions are defined in terms of numeric operators that ar
    \end{array}
 
 
-.. _exec-vec-splat:
+.. _exec-vsplat:
 
-:math:`\shape\K{.}\SPLAT`
-.........................
+$${rule-prose: exec/vsplat}
 
-1. Let :math:`t` be the type :math:`\unpacked(\shape)`.
+.. todo::
+   Below is the actual prose.
 
-2. Assert: due to :ref:`validation <valid-vec-splat>`, a value of :ref:`value type <syntax-valtype>` :math:`t` is on the top of the stack.
+1. Let :math:`t` be the type :math:`\unpackshape(\shape)`.
+
+2. Assert: due to :ref:`validation <valid-vsplat>`, a value of :ref:`value type <syntax-valtype>` :math:`t` is on the top of the stack.
 
 3. Pop the value :math:`t.\CONST~c_1` from the stack.
 
-4. Let :math:`N` be the integer :math:`\dim(\shape)`.
+4. Let :math:`N` be the integer :math:`\shdim(\shape)`.
 
 5. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{\shape}(c_1^N)`.
 
 6. Push the value :math:`\V128.\VCONST~c` to the stack.
 
+$${rule: {Step_pure/vsplat}}
+
 .. math::
    \begin{array}{lcl@{\qquad}l}
    (t\K{.}\CONST~c_1)~\shape\K{.}\SPLAT &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff t = \unpacked(\shape)
-       \wedge c = \lanes^{-1}_{\shape}(c_1^{\dim(\shape)}))
+     & (\iff t = \unpackshape(\shape)
+       \wedge c = \lanes^{-1}_{\shape}(c_1^{\shdim(\shape)}))
      \\
    \end{array}
 
 
-.. _exec-vec-extract_lane:
+.. _exec-vextract_lane:
 
-:math:`t_1\K{x}N\K{.}\EXTRACTLANE\K{\_}\sx^?~x`
-...............................................
+$${rule-prose: exec/vextract_lane}
 
-1. Assert: due to :ref:`validation <valid-vec-extract_lane>`, :math:`x < N`.
+.. todo::
+   Below is the actual prose.
 
-2. Assert: due to :ref:`validation <valid-vec-extract_lane>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+1. Assert: due to :ref:`validation <valid-vextract_lane>`, :math:`x < N`.
+
+2. Assert: due to :ref:`validation <valid-vextract_lane>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
 3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
 4. Let :math:`i^\ast` be the result of computing :math:`\lanes_{t_1\K{x}N}(c_1)`.
 
-5. Let :math:`t_2` be the type :math:`\unpacked(t_1\K{x}N)`.
+5. Let :math:`t_2` be the type :math:`\unpackshape(t_1\K{x}N)`.
 
-6. Let :math:`c_2` be the result of computing :math:`\extend^{sx^?}_{t_1,t_2}(i^\ast[x])`.
+6. Let :math:`c_2` be the result of computing :math:`\ext^{sx^?}_{t_1,t_2}(i^\ast[x])`.
 
 7. Push the value :math:`t_2.\CONST~c_2` to the stack.
+
+$${rule: {Step_pure/vextract_lane-*}}
 
 .. math::
    \begin{array}{l}
@@ -1533,26 +1329,28 @@ Most other vector instructions are defined in terms of numeric operators that ar
    \end{array}
    \\ \qquad
      \begin{array}[t]{@{}r@{~}l@{}}
-      (\iff & t_2 = \unpacked(t_1\K{x}N) \\
-       \wedge & c_2 = \extend^{sx^?}_{t_1,t_2}(\lanes_{t_1\K{x}N}(c_1)[x]))
+      (\iff & t_2 = \unpackshape(t_1\K{x}N) \\
+       \wedge & c_2 = \ext^{sx^?}_{t_1,t_2}(\lanes_{t_1\K{x}N}(c_1)[x]))
      \end{array}
    \end{array}
 
 
-.. _exec-vec-replace_lane:
+.. _exec-vreplace_lane:
 
-:math:`\shape\K{.}\REPLACELANE~x`
-.................................
+$${rule-prose: exec/vreplace_lane}
 
-1. Assert: due to :ref:`validation <valid-vec-replace_lane>`, :math:`x < \dim(\shape)`.
+.. todo::
+   Below is the actual prose.
 
-2. Let :math:`t_2` be the type :math:`\unpacked(\shape)`.
+1. Assert: due to :ref:`validation <valid-vreplace_lane>`, :math:`x < \shdim(\shape)`.
 
-3. Assert: due to :ref:`validation <valid-vec-replace_lane>`, a value of :ref:`value type <syntax-valtype>` :math:`t_1` is on the top of the stack.
+2. Let :math:`t_2` be the type :math:`\unpackshape(\shape)`.
+
+3. Assert: due to :ref:`validation <valid-vreplace_lane>`, a value of :ref:`value type <syntax-valtype>` :math:`t_1` is on the top of the stack.
 
 4. Pop the value :math:`t_2.\CONST~c_2` from the stack.
 
-5. Assert: due to :ref:`validation <valid-vec-replace_lane>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+5. Assert: due to :ref:`validation <valid-vreplace_lane>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
 6. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
@@ -1561,6 +1359,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 8. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{\shape}(i^\ast \with [x] = c_2)`.
 
 9. Push :math:`\V128.\VCONST~c` on the stack.
+
+$${rule: {Step_pure/vreplace_lane}}
 
 .. math::
    \begin{array}{l}
@@ -1575,192 +1375,161 @@ Most other vector instructions are defined in terms of numeric operators that ar
    \end{array}
 
 
-.. _exec-vunop:
+.. _exec-vextadd_pairwise:
 
-:math:`\shape\K{.}\vunop`
-.........................
+$${rule-prose: exec/vextunop}
 
-1. Assert: due to :ref:`validation <valid-vunop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+.. todo::
+   Below is the actual prose.
 
-2. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
+1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M / 2`.
 
-3. Let :math:`c` be the result of computing :math:`\vunop_{\shape}(c_1)`.
-
-4. Push the value :math:`\V128.\VCONST~c` to the stack.
-
-.. math::
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~\V128\K{.}\vunop &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff c = \vunop_{\shape}(c_1))
-   \end{array}
-
-
-.. _exec-vbinop:
-
-:math:`\shape\K{.}\vbinop`
-..........................
-
-1. Assert: due to :ref:`validation <valid-vbinop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
-
-2. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
+2. Assert: due to :ref:`validation <valid-vextunop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
 3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
-4. If :math:`\vbinop_{\shape}(c_1, c_2)` is defined:
+4. Let :math:`i^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_1)`.
 
-   a. Let :math:`c` be a possible result of computing :math:`\vbinop_{\shape}(c_1, c_2)`.
+5. Let :math:`(j_1~j_2)^\ast` be the result of computing :math:`\ext^{\sx}_{|t_1|,|t_2|}(i^\ast)`.
 
-   b. Push the value :math:`\V128.\VCONST~c` to the stack.
+6. Let :math:`k^\ast` be the result of computing :math:`\iadd_{|t_2|}(j_1, j_2)^\ast`.
 
-5. Else:
-
-   a. Trap.
-
-.. math::
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~\shape\K{.}\vbinop &\stepto& (\V128\K{.}\VCONST~c)
-     & (\iff c \in \vbinop_{\shape}(c_1, c_2)) \\
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~\shape\K{.}\vbinop &\stepto& \TRAP
-     & (\iff \vbinop_{\shape}(c_1, c_2) = \{\})
-   \end{array}
-
-
-.. _exec-vrelop:
-
-:math:`t\K{x}N\K{.}\vrelop`
-...........................
-
-1. Assert: due to :ref:`validation <valid-vrelop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
-
-2. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
-
-3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-4. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_1)`.
-
-5. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_2)`.
-
-6. Let :math:`i^\ast` be the result of computing :math:`\vrelop_t(i_1^\ast, i_2^\ast)`.
-
-7. Let :math:`j^\ast` be the result of computing :math:`\extends_{1,|t|}(i^\ast)`.
-
-8. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t\K{x}N}(j^\ast)`.
-
-9. Push the value :math:`\V128.\VCONST~c` to the stack.
-
-.. math::
-   \begin{array}{l}
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~t\K{x}N\K{.}\vrelop &\stepto& (\V128\K{.}\VCONST~c)
-   \end{array}
-   \\ \qquad
-     \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff c = \lanes^{-1}_{t\K{x}N}(\extends_{1,|t|}(\vrelop_t(\lanes_{t\K{x}N}(c_1), \lanes_{t\K{x}N}(c_2)))))
-     \end{array}
-   \end{array}
-
-
-.. _exec-vishiftop:
-
-:math:`t\K{x}N\K{.}\vishiftop`
-..............................
-
-1. Assert: due to :ref:`validation <valid-vishiftop>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-3. Assert: due to :ref:`validation <valid-vishiftop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
-
-4. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-5. Let :math:`i^\ast` be the result of computing :math:`\lanes_{t\K{x}N}(c_1)`.
-
-6. Let :math:`j^\ast` be the result of computing :math:`\vishiftop_{t}(i^\ast, s^N)`.
-
-7. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t\K{x}N}(j^\ast)`.
+7. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(k^\ast)`.
 
 8. Push the value :math:`\V128.\VCONST~c` to the stack.
 
-.. math::
-   \begin{array}{l}
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\I32\K{.}\CONST~s)~t\K{x}N\K{.}\vishiftop &\stepto& (\V128\K{.}\VCONST~c)
-   \end{array}
-   \\ \qquad
-     \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff & i^\ast = \lanes_{t\K{x}N}(c_1) \\
-     \wedge & c = \lanes^{-1}_{t\K{x}N}(\vishiftop_{t}(i^\ast, s^N)))
-     \end{array}
-   \end{array}
-
-
-.. _exec-vtestop:
-.. _exec-vec-all_true:
-
-:math:`\shape\K{.}\ALLTRUE`
-...........................
-
-1. Assert: due to :ref:`validation <valid-vtestop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
-
-2. Pop the value :math:`\V128.\VCONST~c` from the stack.
-
-3. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{\shape}(c)`.
-
-4. Let :math:`i` be the result of computing :math:`\tobool(\bigwedge(i_1 \neq 0)^\ast)`.
-
-5. Push the value :math:`\I32.\CONST~i` onto the stack.
-
+$${rule: {Step_pure/vextunop}}
 
 .. math::
    \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c)~\shape\K{.}\ALLTRUE &\stepto& (\I32\K{.}\CONST~i)
+   (\V128\K{.}\VCONST~c_1)~t_2\K{x}N\K{.}\EXTADDPAIRWISE\_t_1\K{x}M\_\sx &\stepto& (\V128\K{.}\VCONST~c) \\
    \end{array}
    \\ \qquad
      \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff & i_1^\ast = \lanes_{\shape}(c) \\
-     \wedge & i = \tobool(\bigwedge(i_1 \neq 0)^\ast))
+     (\iff & (i_1~i_2)^\ast = \ext^{\sx}_{|t_1|,|t_2|}(\lanes_{t_1\K{x}M}(c_1)) \\
+     \wedge & j^\ast = \iadd_{|t_2|}(i_1, i_2)^\ast \\
+     \wedge & c = \lanes^{-1}_{t_2\K{x}N}(j^\ast))
      \end{array}
    \end{array}
 
 
-.. _exec-vec-bitmask:
+.. _exec-vextmul:
 
-:math:`t\K{x}N\K{.}\BITMASK`
-............................
+$${rule-prose: exec/vextbinop}
 
-1. Assert: due to :ref:`validation <valid-vec-bitmask>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+.. todo::
+   Below is the actual prose.
 
-2. Pop the value :math:`\V128.\VCONST~c` from the stack.
+1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M / 2`.
 
-3. Let :math:`i_1^N` be the result of computing :math:`\lanes_{t\K{x}N}(c)`.
+2. Assert: due to :ref:`validation <valid-vbinop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
 
-4. Let :math:`B` be the :ref:`bit width <syntax-valtype>` :math:`|t|` of :ref:`value type <syntax-valtype>` :math:`t`.
+3. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
 
-5. Let :math:`i_2^N` be the result of computing :math:`\ilts_{B}(i_1^N, 0^N)`.
+4. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
 
-6. Let :math:`j^\ast` be the concatenation of the two sequences :math:`i_2^N` and :math:`0^{32-N}`.
+5. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_1)`.
 
-7. Let :math:`i` be the result of computing :math:`\ibits_{32}^{-1}(j^\ast)`.
+6. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_2)`.
 
-8. Push the value :math:`\I32.\CONST~i` onto the stack.
+7. If :math:`\half` is :math:`\K{low}`, then:
+
+   a. Let :math:`j_1^\ast` be the sequence :math:`i_1^\ast[0 \slice N]`.
+
+   b. Let :math:`j_2^\ast` be the sequence :math:`i_2^\ast[0 \slice N]`.
+
+8. Else:
+
+   a. Let :math:`j_1^\ast` be the sequence :math:`i_1^\ast[N \slice N]`.
+
+   b. Let :math:`j_2^\ast` be the sequence :math:`i_2^\ast[N \slice N]`.
+
+9. Let :math:`k_1^\ast` be the result of computing :math:`\ext^{\sx}_{|t_1|,|t_2|}(j_1^\ast)`.
+
+10. Let :math:`k_2^\ast` be the result of computing :math:`\ext^{\sx}_{|t_1|,|t_2|}(j_2^\ast)`.
+
+11. Let :math:`k^\ast` be the result of computing :math:`\imul_{|t_2|}(k_1^\ast, k_2^\ast)`.
+
+12. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(k^\ast)`.
+
+13. Push the value :math:`\V128.\VCONST~c` onto the stack.
+
+$${rule: {Step_pure/vextbinop}}
 
 .. math::
    \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c)~t\K{x}N\K{.}\BITMASK &\stepto& (\I32\K{.}\CONST~i)
-     & (\iff i = \ibits_{32}^{-1}(\ilts_{|t|}(\lanes_{t\K{x}N}(c), 0^N)))
-     \\
+   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~t_2\K{x}N\K{.}\EXTMUL\K{\_}\half\K{\_}t_1\K{x}M\_\sx &\stepto& (\V128\K{.}\VCONST~c) \\
+   \end{array}
+   \\ \qquad
+     \begin{array}[t]{@{}r@{~}l@{}}
+     (\iff & i^\ast = \lanes_{t_1\K{x}M}(c_1)[\half(0, N) \slice N] \\
+     \wedge & j^\ast = \lanes_{t_1\K{x}M}(c_2)[\half(0, N) \slice N] \\
+     \wedge & c = \lanes^{-1}_{t_2\K{x}N}(\imul_{|t_2|}(\ext^{\sx}_{|t_1|,|t_2|}(i^\ast), \ext^{\sx}_{|t_1|,|t_2|}(j^\ast))))
+     \end{array}
+
+where:
+
+.. math::
+   \begin{array}{lcl}
+   \K{low}(x, y) &=& x \\
+   \K{high}(x, y) &=& y \\
    \end{array}
 
 
-.. _exec-vec-narrow:
+.. _exec-vdot:
 
-:math:`t_2\K{x}N\K{.}\NARROW\K{\_}t_1\K{x}M\K{\_}\sx`
-.....................................................
+:math:`\K{i32x4.}\DOT\K{\_i16x8\_s}`
+....................................
+
+.. todo:: (*) Prose not spliced, for this seems to be WIP on @Andreas.
+
+1. Assert: due to :ref:`validation <valid-vextbinop>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+
+2. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
+
+3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
+
+4. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{\I16X8}(c_1)`.
+
+5. Let :math:`j_1^\ast` be the result of computing :math:`\exts_{16,32}(i_1^\ast)`.
+
+6. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{\I16X8}(c_2)`.
+
+7. Let :math:`j_2^\ast` be the result of computing :math:`\exts_{16,32}(i_2^\ast)`.
+
+8. Let :math:`(k_1~k_2)^\ast` be the result of computing :math:`\imul_{32}(j_1^\ast, j_2^\ast)`.
+
+9. Let :math:`k^\ast` be the result of computing :math:`\iadd_{32}(k_1, k_2)^\ast`.
+
+10. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{\I32X4}(k^\ast)`.
+
+11. Push the value :math:`\V128.\VCONST~c` onto the stack.
+
+.. math::
+   \begin{array}{l}
+   \begin{array}{lcl@{\qquad}l}
+   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~\K{i32x4.}\DOT\K{\_i16x8\_s} &\stepto& (\V128\K{.}\VCONST~c) \\
+   \end{array}
+   \\ \qquad
+     \begin{array}[t]{@{}r@{~}l@{}}
+     (\iff & (i_1~i_2)^\ast = \imul_{32}(\exts_{16,32}(\lanes_{\I16X8}(c_1)), \exts_{16,32}(\lanes_{\I16X8}(c_2))) \\
+     \wedge & j^\ast = \iadd_{32}(i_1, i_2)^\ast \\
+     \wedge & c = \lanes^{-1}_{\I32X4}(j^\ast))
+     \end{array}
+   \end{array}
+
+
+.. _exec-vnarrow:
+
+$${rule-prose: exec/vnarrow}
+
+.. todo::
+   Below is the actual prose.
 
 1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = 2\cdot M`.
 
-2. Assert: due to :ref:`validation <valid-vec-narrow>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
+2. Assert: due to :ref:`validation <valid-vnarrow>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
 
 3. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
 
@@ -1779,6 +1548,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 10. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(j^N)`.
 
 11. Push the value :math:`\V128.\VCONST~c` onto the stack.
+
+$${rule: {Step_pure/vnarrow}}
 
 .. math::
    \begin{array}{l}
@@ -1799,6 +1570,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 :math:`t_2\K{x}N\K{.}\vcvtop\K{\_}t_1\K{x}M\K{\_}\sx`
 .....................................................
 
+.. todo:: (*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.
+
 1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M`.
 
 2. Assert: due to :ref:`validation <valid-vcvtop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
@@ -1812,6 +1585,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 6. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(j^\ast)`.
 
 7. Push the value :math:`\V128.\VCONST~c` onto the stack.
+
+$${rule: {Step_pure/vcvtop-full}}
 
 .. math::
    \begin{array}{l}
@@ -1827,6 +1602,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 
 :math:`t_2\K{x}N\K{.}\vcvtop\K{\_}\half\K{\_}t_1\K{x}M\K{\_}\sx^?`
 ..................................................................
+
+.. todo:: (*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.
 
 1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M / 2`.
 
@@ -1849,6 +1626,8 @@ Most other vector instructions are defined in terms of numeric operators that ar
 8. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(k^\ast)`.
 
 9. Push the value :math:`\V128.\VCONST~c` onto the stack.
+
+$${rule: {Step_pure/vcvtop-half}}
 
 .. math::
    \begin{array}{l}
@@ -1873,6 +1652,8 @@ where:
 :math:`t_2\K{x}N\K{.}\vcvtop\K{\_}t_1\K{x}M\K{\_}\sx^?\K{\_zero}`
 .................................................................
 
+.. todo:: (*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.
+
 1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = 2 \cdot M`.
 
 2. Assert: due to :ref:`validation <valid-vcvtop>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
@@ -1889,6 +1670,8 @@ where:
 
 8. Push the value :math:`\V128.\VCONST~c` onto the stack.
 
+$${rule: {Step_pure/vcvtop-zero}}
+
 .. math::
    \begin{array}{l}
    \begin{array}{lcl@{\qquad}l}
@@ -1897,141 +1680,6 @@ where:
    \\ \qquad
      \begin{array}[t]{@{}r@{~}l@{}}
      (\iff & c = \lanes^{-1}_{t_2\K{x}N}(\vcvtop^{\sx^?}_{|t_1|,|t_2|}(\lanes_{t_1\K{x}M}(c_1))~0^M))
-     \end{array}
-   \end{array}
-
-
-.. _exec-vec-dot:
-
-:math:`\K{i32x4.}\DOT\K{\_i16x8\_s}`
-....................................
-
-1. Assert: due to :ref:`validation <valid-vec-dot>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
-
-2. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
-
-3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-4. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{\I16X8}(c_1)`.
-
-5. Let :math:`j_1^\ast` be the result of computing :math:`\extends_{16,32}(i_1^\ast)`.
-
-6. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{\I16X8}(c_2)`.
-
-7. Let :math:`j_2^\ast` be the result of computing :math:`\extends_{16,32}(i_2^\ast)`.
-
-8. Let :math:`(k_1~k_2)^\ast` be the result of computing :math:`\imul_{32}(j_1^\ast, j_2^\ast)`.
-
-9. Let :math:`k^\ast` be the result of computing :math:`\iadd_{32}(k_1, k_2)^\ast`.
-
-10. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{\I32X4}(k^\ast)`.
-
-11. Push the value :math:`\V128.\VCONST~c` onto the stack.
-
-.. math::
-   \begin{array}{l}
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~\K{i32x4.}\DOT\K{\_i16x8\_s} &\stepto& (\V128\K{.}\VCONST~c) \\
-   \end{array}
-   \\ \qquad
-     \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff & (i_1~i_2)^\ast = \imul_{32}(\extends_{16,32}(\lanes_{\I16X8}(c_1)), \extends_{16,32}(\lanes_{\I16X8}(c_2))) \\
-     \wedge & j^\ast = \iadd_{32}(i_1, i_2)^\ast \\
-     \wedge & c = \lanes^{-1}_{\I32X4}(j^\ast))
-     \end{array}
-   \end{array}
-
-
-.. _exec-vec-extmul:
-
-:math:`t_2\K{x}N\K{.}\EXTMUL\K{\_}\half\K{\_}t_1\K{x}M\K{\_}\sx`
-................................................................
-
-1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M / 2`.
-
-2. Assert: due to :ref:`validation <valid-vec-extmul>`, two values of :ref:`value type <syntax-valtype>` |V128| are on the top of the stack.
-
-3. Pop the value :math:`\V128.\VCONST~c_2` from the stack.
-
-4. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-5. Let :math:`i_1^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_1)`.
-
-6. Let :math:`i_2^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_2)`.
-
-7. If :math:`\half` is :math:`\K{low}`, then:
-
-   a. Let :math:`j_1^\ast` be the sequence :math:`i_1^\ast[0 \slice N]`.
-
-   b. Let :math:`j_2^\ast` be the sequence :math:`i_2^\ast[0 \slice N]`.
-
-8. Else:
-
-   a. Let :math:`j_1^\ast` be the sequence :math:`i_1^\ast[N \slice N]`.
-
-   b. Let :math:`j_2^\ast` be the sequence :math:`i_2^\ast[N \slice N]`.
-
-9. Let :math:`k_1^\ast` be the result of computing :math:`\extend^{\sx}_{|t_1|,|t_2|}(j_1^\ast)`.
-
-10. Let :math:`k_2^\ast` be the result of computing :math:`\extend^{\sx}_{|t_1|,|t_2|}(j_2^\ast)`.
-
-11. Let :math:`k^\ast` be the result of computing :math:`\imul_{|t_2|}(k_1^\ast, k_2^\ast)`.
-
-12. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(k^\ast)`.
-
-13. Push the value :math:`\V128.\VCONST~c` onto the stack.
-
-.. math::
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~(\V128\K{.}\VCONST~c_2)~t_2\K{x}N\K{.}\EXTMUL\K{\_}\half\K{\_}t_1\K{x}M\_\sx &\stepto& (\V128\K{.}\VCONST~c) \\
-   \end{array}
-   \\ \qquad
-     \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff & i^\ast = \lanes_{t_1\K{x}M}(c_1)[\half(0, N) \slice N] \\
-     \wedge & j^\ast = \lanes_{t_1\K{x}M}(c_2)[\half(0, N) \slice N] \\
-     \wedge & c = \lanes^{-1}_{t_2\K{x}N}(\imul_{|t_2|}(\extend^{\sx}_{|t_1|,|t_2|}(i^\ast), \extend^{\sx}_{|t_1|,|t_2|}(j^\ast))))
-     \end{array}
-
-where:
-
-.. math::
-   \begin{array}{lcl}
-   \K{low}(x, y) &=& x \\
-   \K{high}(x, y) &=& y \\
-   \end{array}
-
-
-.. _exec-vec-extadd_pairwise:
-
-:math:`t_2\K{x}N\K{.}\EXTADDPAIRWISE\_t_1\K{x}M\_\sx`
-.....................................................
-
-1. Assert: due to :ref:`syntax <syntax-instr-vec>`, :math:`N = M / 2`.
-
-2. Assert: due to :ref:`validation <valid-vec-extadd_pairwise>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
-
-3. Pop the value :math:`\V128.\VCONST~c_1` from the stack.
-
-4. Let :math:`i^\ast` be the result of computing :math:`\lanes_{t_1\K{x}M}(c_1)`.
-
-5. Let :math:`(j_1~j_2)^\ast` be the result of computing :math:`\extend^{\sx}_{|t_1|,|t_2|}(i^\ast)`.
-
-6. Let :math:`k^\ast` be the result of computing :math:`\iadd_{|t_2|}(j_1, j_2)^\ast`.
-
-7. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{t_2\K{x}N}(k^\ast)`.
-
-8. Push the value :math:`\V128.\VCONST~c` to the stack.
-
-.. math::
-   \begin{array}{l}
-   \begin{array}{lcl@{\qquad}l}
-   (\V128\K{.}\VCONST~c_1)~t_2\K{x}N\K{.}\EXTADDPAIRWISE\_t_1\K{x}M\_\sx &\stepto& (\V128\K{.}\VCONST~c) \\
-   \end{array}
-   \\ \qquad
-     \begin{array}[t]{@{}r@{~}l@{}}
-     (\iff & (i_1~i_2)^\ast = \extend^{\sx}_{|t_1|,|t_2|}(\lanes_{t_1\K{x}M}(c_1)) \\
-     \wedge & j^\ast = \iadd_{|t_2|}(i_1, i_2)^\ast \\
-     \wedge & c = \lanes^{-1}_{t_2\K{x}N}(j^\ast))
      \end{array}
    \end{array}
 
@@ -2046,98 +1694,35 @@ Variable Instructions
 
 .. _exec-local.get:
 
-:math:`\LOCALGET~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-local.get>`, :math:`F.\ALOCALS[x]` exists and is non-empty.
-
-3. Let :math:`\val` be the value :math:`F.\ALOCALS[x]`.
-
-4. Push the value :math:`\val` to the stack.
+$${rule-prose: exec/local.get}
 
 $${rule: Step_read/local.get}
 
 
 .. _exec-local.set:
 
-:math:`\LOCALSET~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-local.set>`, :math:`F.\ALOCALS[x]` exists.
-
-3. Assert: due to :ref:`validation <valid-local.set>`, a value is on the top of the stack.
-
-4. Pop the value :math:`\val` from the stack.
-
-5. Replace :math:`F.\ALOCALS[x]` with the value :math:`\val`.
+$${rule-prose: exec/local.set}
 
 $${rule: Step/local.set}
 
 
 .. _exec-local.tee:
 
-:math:`\LOCALTEE~x`
-...................
-
-1. Assert: due to :ref:`validation <valid-local.tee>`, a value is on the top of the stack.
-
-2. Pop the value :math:`\val` from the stack.
-
-3. Push the value :math:`\val` to the stack.
-
-4. Push the value :math:`\val` to the stack.
-
-5. :ref:`Execute <exec-local.set>` the instruction :math:`\LOCALSET~x`.
+$${rule-prose: exec/local.tee}
 
 $${rule: Step_pure/local.tee}
 
 
 .. _exec-global.get:
 
-:math:`\GLOBALGET~x`
-....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-global.get>`, :math:`F.\AMODULE.\MIGLOBALS[x]` exists.
-
-3. Let :math:`a` be the :ref:`global address <syntax-globaladdr>` :math:`F.\AMODULE.\MIGLOBALS[x]`.
-
-4. Assert: due to :ref:`validation <valid-global.get>`, :math:`S.\SGLOBALS[a]` exists.
-
-5. Let :math:`\X{glob}` be the :ref:`global instance <syntax-globalinst>` :math:`S.\SGLOBALS[a]`.
-
-6. Let :math:`\val` be the value :math:`\X{glob}.\GIVALUE`.
-
-7. Push the value :math:`\val` to the stack.
+$${rule-prose: exec/global.get}
 
 $${rule: Step_read/global.get}
 
 
 .. _exec-global.set:
 
-:math:`\GLOBALSET~x`
-....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-global.set>`, :math:`F.\AMODULE.\MIGLOBALS[x]` exists.
-
-3. Let :math:`a` be the :ref:`global address <syntax-globaladdr>` :math:`F.\AMODULE.\MIGLOBALS[x]`.
-
-4. Assert: due to :ref:`validation <valid-global.set>`, :math:`S.\SGLOBALS[a]` exists.
-
-5. Let :math:`\X{glob}` be the :ref:`global instance <syntax-globalinst>` :math:`S.\SGLOBALS[a]`.
-
-6. Assert: due to :ref:`validation <valid-global.set>`, a value is on the top of the stack.
-
-7. Pop the value :math:`\val` from the stack.
-
-8. Replace :math:`\X{glob}.\GIVALUE` with the value :math:`\val`.
+$${rule-prose: exec/global.set}
 
 $${rule: Step/global.set}
 
@@ -2152,128 +1737,30 @@ Table Instructions
 
 .. _exec-table.get:
 
-:math:`\TABLEGET~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.get>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`a` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.get>`, :math:`S.\STABLES[a]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[a]`.
-
-6. Assert: due to :ref:`validation <valid-table.get>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-7. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-8. If :math:`i` is not smaller than the length of :math:`\X{tab}.\TIELEM`, then:
-
-   a. Trap.
-
-9. Let :math:`\val` be the value :math:`\X{tab}.\TIELEM[i]`.
-
-10. Push the value :math:`\val` to the stack.
+$${rule-prose: exec/table.get}
 
 $${rule: {Step_read/table.get-*}}
 
 
 .. _exec-table.set:
 
-:math:`\TABLESET~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.set>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`a` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.set>`, :math:`S.\STABLES[a]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[a]`.
-
-6. Assert: due to :ref:`validation <valid-table.set>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-7. Pop the value :math:`\val` from the stack.
-
-8. Assert: due to :ref:`validation <valid-table.set>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-9. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-10. If :math:`i` is not smaller than the length of :math:`\X{tab}.\TIELEM`, then:
-
-    a. Trap.
-
-11. Replace the element :math:`\X{tab}.\TIELEM[i]` with :math:`\val`.
+$${rule-prose: exec/table.set}
 
 $${rule: {Step/table.set-*}}
 
 
 .. _exec-table.size:
 
-:math:`\TABLESIZE~x`
-....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.size>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`a` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.size>`, :math:`S.\STABLES[a]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[a]`.
-
-6. Let :math:`\X{sz}` be the length of :math:`\X{tab}.\TIELEM`.
-
-7. Push the value :math:`\I32.\CONST~\X{sz}` to the stack.
+$${rule-prose: exec/table.size}
 
 $${rule: Step_read/table.size}
 
 
 .. _exec-table.grow:
 
-:math:`\TABLEGROW~x`
-....................
+$${rule-prose: exec/table.grow}
 
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.grow>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`a` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.grow>`, :math:`S.\STABLES[a]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[a]`.
-
-6. Let :math:`\X{sz}` be the length of :math:`S.\STABLES[a]`.
-
-7. Assert: due to :ref:`validation <valid-table.grow>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-8. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-9. Assert: due to :ref:`validation <valid-table.fill>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-10. Pop the value :math:`\val` from the stack.
-
-11. Let :math:`\X{err}` be the |i32| value :math:`2^{32}-1`, for which :math:`\signed_{32}(\X{err})` is :math:`-1`.
-
-12. Either:
-
-   a. If :ref:`growing <grow-table>` :math:`\X{tab}` by :math:`n` entries with initialization value :math:`\val` succeeds, then:
-
-      i. Push the value :math:`\I32.\CONST~\X{sz}` to the stack.
-
-   b. Else:
-
-      i. Push the value :math:`\I32.\CONST~\X{err}` to the stack.
-
-13. Or:
-
-   a. push the value :math:`\I32.\CONST~\X{err}` to the stack.
+.. todo:: (6) Maybe we want to be more precise than just saying "Either" in the prose, elaborating that it may succeed or fail non-deterministically.
 
 $${rule: {Step/table.grow-*}}
 
@@ -2285,225 +1772,30 @@ $${rule: {Step/table.grow-*}}
    However, failure *can* occur in other cases as well.
    In practice, the choice depends on the :ref:`resources <impl-exec>` available to the :ref:`embedder <embedder>`.
 
-
 .. _exec-table.fill:
 
-:math:`\TABLEFILL~x`
-....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.fill>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`\X{ta}` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.fill>`, :math:`S.\STABLES[\X{ta}]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}]`.
-
-6. Assert: due to :ref:`validation <valid-table.fill>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-7. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-8. Assert: due to :ref:`validation <valid-table.fill>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-9. Pop the value :math:`\val` from the stack.
-
-10. Assert: due to :ref:`validation <valid-table.fill>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-12. If :math:`i + n` is larger than the length of :math:`\X{tab}.\TIELEM`, then:
-
-    a. Trap.
-
-12. If :math:`n` is :math:`0`, then:
-
-    a. Return.
-
-13. Push the value :math:`\I32.\CONST~i` to the stack.
-
-14. Push the value :math:`\val` to the stack.
-
-15. Execute the instruction :math:`\TABLESET~x`.
-
-16. Push the value :math:`\I32.\CONST~(i+1)` to the stack.
-
-17. Push the value :math:`\val` to the stack.
-
-18. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-19. Execute the instruction :math:`\TABLEFILL~x`.
+$${rule-prose: exec/table.fill}
 
 $${rule: {Step_read/table.fill-*}}
 
 
 .. _exec-table.copy:
 
-:math:`\TABLECOPY~x~y`
-......................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.copy>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`\X{ta}_x` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.copy>`, :math:`S.\STABLES[\X{ta}_x]` exists.
-
-5. Let :math:`\X{tab}_x` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}_x]`.
-
-6. Assert: due to :ref:`validation <valid-table.copy>`, :math:`F.\AMODULE.\MITABLES[y]` exists.
-
-7. Let :math:`\X{ta}_y` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[y]`.
-
-8. Assert: due to :ref:`validation <valid-table.copy>`, :math:`S.\STABLES[\X{ta}_y]` exists.
-
-9. Let :math:`\X{tab}_y` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}_y]`.
-
-10. Assert: due to :ref:`validation <valid-table.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-12. Assert: due to :ref:`validation <valid-table.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-13. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-14. Assert: due to :ref:`validation <valid-table.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-15. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-16. If :math:`s + n` is larger than the length of :math:`\X{tab}_y.\TIELEM` or :math:`d + n` is larger than the length of :math:`\X{tab}_x.\TIELEM`, then:
-
-    a. Trap.
-
-17. If :math:`n = 0`, then:
-
-   a. Return.
-
-18. If :math:`d \leq s`, then:
-
-   a. Push the value :math:`\I32.\CONST~d` to the stack.
-
-   b. Push the value :math:`\I32.\CONST~s` to the stack.
-
-   c. Execute the instruction :math:`\TABLEGET~y`.
-
-   d. Execute the instruction :math:`\TABLESET~x`.
-
-   e. Assert: due to the earlier check against the table size, :math:`d+1 < 2^{32}`.
-
-   f. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-   g. Assert: due to the earlier check against the table size, :math:`s+1 < 2^{32}`.
-
-   h. Push the value :math:`\I32.\CONST~(s+1)` to the stack.
-
-19. Else:
-
-   a. Assert: due to the earlier check against the table size, :math:`d+n-1 < 2^{32}`.
-
-   b. Push the value :math:`\I32.\CONST~(d+n-1)` to the stack.
-
-   c. Assert: due to the earlier check against the table size, :math:`s+n-1 < 2^{32}`.
-
-   d. Push the value :math:`\I32.\CONST~(s+n-1)` to the stack.
-
-   c. Execute the instruction :math:`\TABLEGET~y`.
-
-   f. Execute the instruction :math:`\TABLESET~x`.
-
-   g. Push the value :math:`\I32.\CONST~d` to the stack.
-
-   h. Push the value :math:`\I32.\CONST~s` to the stack.
-
-20. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-21. Execute the instruction :math:`\TABLECOPY~x~y`.
+$${rule-prose: exec/table.copy}
 
 $${rule: {Step_read/table.copy-*}}
 
 
 .. _exec-table.init:
 
-:math:`\TABLEINIT~x~y`
-......................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-table.init>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
-
-3. Let :math:`\X{ta}` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
-
-4. Assert: due to :ref:`validation <valid-table.init>`, :math:`S.\STABLES[\X{ta}]` exists.
-
-5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}]`.
-
-6. Assert: due to :ref:`validation <valid-table.init>`, :math:`F.\AMODULE.\MIELEMS[y]` exists.
-
-7. Let :math:`\X{ea}` be the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[y]`.
-
-8. Assert: due to :ref:`validation <valid-table.init>`, :math:`S.\SELEMS[\X{ea}]` exists.
-
-9. Let :math:`\X{elem}` be the :ref:`element instance <syntax-eleminst>` :math:`S.\SELEMS[\X{ea}]`.
-
-10. Assert: due to :ref:`validation <valid-table.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-12. Assert: due to :ref:`validation <valid-table.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-13. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-14. Assert: due to :ref:`validation <valid-table.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-15. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-16. If :math:`s + n` is larger than the length of :math:`\X{elem}.\EIELEM` or :math:`d + n` is larger than the length of :math:`\X{tab}.\TIELEM`, then:
-
-    a. Trap.
-
-17. If :math:`n = 0`, then:
-
-    a. Return.
-
-18. Let :math:`\val` be the :ref:`reference value <syntax-ref>` :math:`\X{elem}.\EIELEM[s]`.
-
-19. Push the value :math:`\I32.\CONST~d` to the stack.
-
-20. Push the value :math:`\val` to the stack.
-
-21. Execute the instruction :math:`\TABLESET~x`.
-
-22. Assert: due to the earlier check against the table size, :math:`d+1 < 2^{32}`.
-
-23. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-24. Assert: due to the earlier check against the segment size, :math:`s+1 < 2^{32}`.
-
-25. Push the value :math:`\I32.\CONST~(s+1)` to the stack.
-
-26. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-27. Execute the instruction :math:`\TABLEINIT~x~y`.
+$${rule-prose: exec/table.init}
 
 $${rule: {Step_read/table.init-*}}
 
 
 .. _exec-elem.drop:
 
-:math:`\ELEMDROP~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-elem.drop>`, :math:`F.\AMODULE.\MIELEMS[x]` exists.
-
-3. Let :math:`a` be the :ref:`element address <syntax-elemaddr>` :math:`F.\AMODULE.\MIELEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-elem.drop>`, :math:`S.\SELEMS[a]` exists.
-
-5. Replace :math:`S.\SELEMS[a].\EIELEM` with :math:`\epsilon`.
+$${rule-prose: exec/elem.drop}
 
 $${rule: Step/elem.drop}
 
@@ -2528,8 +1820,11 @@ Memory Instructions
 .. _exec-load:
 .. _exec-loadn:
 
-:math:`t\K{.}\LOAD~x~\memarg` and :math:`t\K{.}\LOAD{N}\K{\_}\sx~x~\memarg`
-...........................................................................
+$${rule-prose: exec/load}
+
+.. todo::
+   Below is the actual prose.
+   (7) Render $inverse_of_nbytes with display hint.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -2561,7 +1856,7 @@ Memory Instructions
 
     a. Let :math:`n` be the integer for which :math:`\bytes_{\iN}(n) = b^\ast`.
 
-    b. Let :math:`c` be the result of computing :math:`\extend^{\sx}_{N,|t|}(n)`.
+    b. Let :math:`c` be the result of computing :math:`\ext^{\sx}_{N,|t|}(n)`.
 
 13. Else:
 
@@ -2572,22 +1867,24 @@ Memory Instructions
 $${rule: {Step_read/load-*}}
 
 
-.. _exec-load-extend:
+.. _exec-vload-ext:
 
 :math:`\V128\K{.}\LOAD{M}\K{x}N\_\sx~x~\memarg`
 ...............................................
 
+.. todo:: (*) Rule and prose both not spliced.
+
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
-2. Assert: due to :ref:`validation <valid-load-extend>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
+2. Assert: due to :ref:`validation <valid-vload-ext>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
 
 3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
 
-4. Assert: due to :ref:`validation <valid-load-extend>`, :math:`S.\SMEMS[a]` exists.
+4. Assert: due to :ref:`validation <valid-vload-ext>`, :math:`S.\SMEMS[a]` exists.
 
 5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
 
-6. Assert: due to :ref:`validation <valid-load-extend>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+6. Assert: due to :ref:`validation <valid-vload-ext>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
 7. Pop the value :math:`\I32.\CONST~i` from the stack.
 
@@ -2603,7 +1900,7 @@ $${rule: {Step_read/load-*}}
 
 12. Let :math:`W` be the integer :math:`M \cdot 2`.
 
-13. Let :math:`n_k` be the result of computing :math:`\extend^{\sx}_{M,W}(m_k)`.
+13. Let :math:`n_k` be the result of computing :math:`\ext^{\sx}_{M,W}(m_k)`.
 
 14. Let :math:`c` be the result of computing :math:`\lanes^{-1}_{\K{i}W\K{x}N}(n_0 \dots n_{N-1})`.
 
@@ -2622,7 +1919,7 @@ $${rule: {Step_read/load-*}}
      \wedge & \X{ea} + M \cdot N / 8 \leq |S.\SMEMS[F.\AMODULE.\MIMEMS[x]].\MIDATA| \\
      \wedge & \bytes_{\iM}(m_k) = S.\SMEMS[F.\AMODULE.\MIMEMS[x]].\MIDATA[\X{ea} + k \cdot M/8 \slice M/8]) \\
      \wedge & W = M \cdot 2 \\
-     \wedge & c = \lanes^{-1}_{\K{i}W\K{x}N}(\extend^{\sx}_{M,W}(m_0) \dots \extend^{\sx}_{M,W}(m_{N-1})))
+     \wedge & c = \lanes^{-1}_{\K{i}W\K{x}N}(\ext^{\sx}_{M,W}(m_0) \dots \ext^{\sx}_{M,W}(m_{N-1})))
      \end{array}
    \\[1ex]
    \begin{array}{lcl@{\qquad}l}
@@ -2633,22 +1930,24 @@ $${rule: {Step_read/load-*}}
    \end{array}
 
 
-.. _exec-load-splat:
+.. _exec-vload-splat:
 
 :math:`\V128\K{.}\LOAD{N}\K{\_splat}~x~\memarg`
 ...............................................
 
+.. todo:: (*) Rule and prose both not spliced.
+
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
-2. Assert: due to :ref:`validation <valid-load-extend>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
+2. Assert: due to :ref:`validation <valid-vload-splat>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
 
 3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
 
-4. Assert: due to :ref:`validation <valid-load-extend>`, :math:`S.\SMEMS[a]` exists.
+4. Assert: due to :ref:`validation <valid-vload-splat>`, :math:`S.\SMEMS[a]` exists.
 
 5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
 
-6. Assert: due to :ref:`validation <valid-load-extend>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+6. Assert: due to :ref:`validation <valid-vload-splat>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
 7. Pop the value :math:`\I32.\CONST~i` from the stack.
 
@@ -2690,22 +1989,24 @@ $${rule: {Step_read/load-*}}
    \end{array}
 
 
-.. _exec-load-zero:
+.. _exec-vload-zero:
 
 :math:`\V128\K{.}\LOAD{N}\K{\_zero}~x~\memarg`
 ..............................................
 
+.. todo:: (*) Rule and prose both not spliced.
+
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
-2. Assert: due to :ref:`validation <valid-load-extend>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
+2. Assert: due to :ref:`validation <valid-vload-zero>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
 
 3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
 
-4. Assert: due to :ref:`validation <valid-load-extend>`, :math:`S.\SMEMS[a]` exists.
+4. Assert: due to :ref:`validation <valid-vload-zero>`, :math:`S.\SMEMS[a]` exists.
 
 5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
 
-6. Assert: due to :ref:`validation <valid-load-extend>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+6. Assert: due to :ref:`validation <valid-vload-zero>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
 7. Pop the value :math:`\I32.\CONST~i` from the stack.
 
@@ -2719,7 +2020,7 @@ $${rule: {Step_read/load-*}}
 
 11. Let :math:`n` be the integer for which :math:`\bytes_{\iN}(n) = b^\ast`.
 
-12. Let :math:`c` be the result of computing :math:`\extendu_{N,128}(n)`.
+12. Let :math:`c` be the result of computing :math:`\extu_{N,128}(n)`.
 
 13. Push the value :math:`\V128.\CONST~c` to the stack.
 
@@ -2734,7 +2035,7 @@ $${rule: {Step_read/load-*}}
      (\iff & \X{ea} = i + \memarg.\OFFSET \\
      \wedge & \X{ea} + N/8 \leq |S.\SMEMS[F.\AMODULE.\MIMEMS[x]].\MIDATA| \\
      \wedge & \bytes_{\iN}(n) = S.\SMEMS[F.\AMODULE.\MIMEMS[x]].\MIDATA[\X{ea} \slice N/8]) \\
-     \wedge & c = \extendu_{N,128}(n)
+     \wedge & c = \extu_{N,128}(n)
      \end{array}
    \\[1ex]
    \begin{array}{lcl@{\qquad}l}
@@ -2745,26 +2046,28 @@ $${rule: {Step_read/load-*}}
    \end{array}
 
 
-.. _exec-load-lane:
+.. _exec-vload-lane:
 
 :math:`\V128\K{.}\LOAD{N}\K{\_lane}~x~\memarg~y`
 ................................................
 
+.. todo:: (*) Rule and prose both not spliced.
+
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
-2. Assert: due to :ref:`validation <valid-load-extend>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
+2. Assert: due to :ref:`validation <valid-vload-lane>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
 
 3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
 
-4. Assert: due to :ref:`validation <valid-load-extend>`, :math:`S.\SMEMS[a]` exists.
+4. Assert: due to :ref:`validation <valid-vload-lane>`, :math:`S.\SMEMS[a]` exists.
 
 5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
 
-6. Assert: due to :ref:`validation <valid-load-extend>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
+6. Assert: due to :ref:`validation <valid-vload-lane>`, a value of :ref:`value type <syntax-valtype>` |V128| is on the top of the stack.
 
 7. Pop the value :math:`\V128.\CONST~v` from the stack.
 
-8. Assert: due to :ref:`validation <valid-load-extend>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+8. Assert: due to :ref:`validation <valid-vload-lane>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
 9. Pop the value :math:`\I32.\CONST~i` from the stack.
 
@@ -2812,60 +2115,21 @@ $${rule: {Step_read/load-*}}
 .. _exec-store:
 .. _exec-storen:
 
-:math:`t\K{.}\STORE~x~\memarg` and :math:`t\K{.}\STORE{N}~x~\memarg`
-....................................................................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-storen>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-storen>`, :math:`S.\SMEMS[a]` exists.
-
-5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
-
-6. Assert: due to :ref:`validation <valid-storen>`, a value of :ref:`value type <syntax-valtype>` :math:`t` is on the top of the stack.
-
-7. Pop the value :math:`t.\CONST~c` from the stack.
-
-8. Assert: due to :ref:`validation <valid-storen>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-9. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-10. Let :math:`\X{ea}` be the integer :math:`i + \memarg.\OFFSET`.
-
-11. If :math:`N` is not part of the instruction, then:
-
-    a. Let :math:`N` be the :ref:`bit width <syntax-numtype>` :math:`|t|` of :ref:`number type <syntax-numtype>` :math:`t`.
-
-12. If :math:`\X{ea} + N/8` is larger than the length of :math:`\X{mem}.\MIDATA`, then:
-
-    a. Trap.
-
-13. If :math:`N` is part of the instruction, then:
-
-    a. Let :math:`n` be the result of computing :math:`\wrap_{|t|,N}(c)`.
-
-    b. Let :math:`b^\ast` be the byte sequence :math:`\bytes_{\iN}(n)`.
-
-14. Else:
-
-    a. Let :math:`b^\ast` be the byte sequence :math:`\bytes_t(c)`.
-
-15. Replace the bytes :math:`\X{mem}.\MIDATA[\X{ea} \slice N/8]` with :math:`b^\ast`.
+$${rule-prose: exec/store}
 
 $${rule: {Step/store-*}}
 
 
-.. _exec-store-lane:
+.. _exec-vstore-lane:
 
 :math:`\V128\K{.}\STORE{N}\K{\_lane}~x~\memarg~y`
 .................................................
 
+.. todo:: (*) Rule and prose both not spliced.
+
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
-2. Assert: due to :ref:`validation <valid-storen>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
+2. Assert: due to :ref:`validation <valid-vstore-lane>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
 
 3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
 
@@ -2873,11 +2137,11 @@ $${rule: {Step/store-*}}
 
 5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
 
-6. Assert: due to :ref:`validation <valid-storen>`, a value of :ref:`value type <syntax-valtype>` :math:`\V128` is on the top of the stack.
+6. Assert: due to :ref:`validation <valid-vstore-lane>`, a value of :ref:`value type <syntax-valtype>` :math:`\V128` is on the top of the stack.
 
 7. Pop the value :math:`\V128.\CONST~c` from the stack.
 
-8. Assert: due to :ref:`validation <valid-storen>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+8. Assert: due to :ref:`validation <valid-vstore-lane>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
 
 9. Pop the value :math:`\I32.\CONST~i` from the stack.
 
@@ -2919,62 +2183,16 @@ $${rule: {Step/store-*}}
 
 .. _exec-memory.size:
 
-:math:`\MEMORYSIZE~x`
-.....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-memory.size>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-memory.size>`, :math:`S.\SMEMS[a]` exists.
-
-5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
-
-6. Let :math:`\X{sz}` be the length of :math:`\X{mem}.\MIDATA` divided by the :ref:`page size <page-size>`.
-
-7. Push the value :math:`\I32.\CONST~\X{sz}` to the stack.
+$${rule-prose: exec/memory.size}
 
 $${rule: {Step_read/memory.size}}
 
 
 .. _exec-memory.grow:
 
-:math:`\MEMORYGROW~x`
-.....................
+$${rule-prose: exec/memory.grow}
 
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-memory.grow>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Let :math:`a` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-memory.grow>`, :math:`S.\SMEMS[a]` exists.
-
-5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[a]`.
-
-6. Let :math:`\X{sz}` be the length of :math:`S.\SMEMS[a]` divided by the :ref:`page size <page-size>`.
-
-7. Assert: due to :ref:`validation <valid-memory.grow>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-8. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-9. Let :math:`\X{err}` be the |i32| value :math:`2^{32}-1`, for which :math:`\signed_{32}(\X{err})` is :math:`-1`.
-
-10. Either:
-
-   a. If :ref:`growing <grow-mem>` :math:`\X{mem}` by :math:`n` :ref:`pages <page-size>` succeeds, then:
-
-      i. Push the value :math:`\I32.\CONST~\X{sz}` to the stack.
-
-   b. Else:
-
-      i. Push the value :math:`\I32.\CONST~\X{err}` to the stack.
-
-11. Or:
-
-   a. Push the value :math:`\I32.\CONST~\X{err}` to the stack.
+.. todo:: (6) Maybe we want to be more precise than just saying "Either" in the prose, elaborating that it may succeed or fail non-deterministically.
 
 $${rule: {Step/memory.grow-*}}
 
@@ -2989,224 +2207,28 @@ $${rule: {Step/memory.grow-*}}
 
 .. _exec-memory.fill:
 
-:math:`\MEMORYFILL~x`
-.....................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-memory.fill>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Let :math:`\X{ma}` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-memory.fill>`, :math:`S.\SMEMS[\X{ma}]` exists.
-
-5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[\X{ma}]`.
-
-6. Assert: due to :ref:`validation <valid-memory.fill>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-7. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-8. Assert: due to :ref:`validation <valid-memory.fill>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-9. Pop the value :math:`\val` from the stack.
-
-10. Assert: due to :ref:`validation <valid-memory.fill>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-12. If :math:`d + n` is larger than the length of :math:`\X{mem}.\MIDATA`, then:
-
-    a. Trap.
-
-13. If :math:`n = 0`, then:
-
-    a. Return.
-
-14. Push the value :math:`\I32.\CONST~d` to the stack.
-
-15. Push the value :math:`\val` to the stack.
-
-16. Execute the instruction :math:`\I32\K{.}\STORE\K{8}~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-17. Assert: due to the earlier check against the memory size, :math:`d+1 < 2^{32}`.
-
-18. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-19. Push the value :math:`\val` to the stack.
-
-20. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-21. Execute the instruction :math:`\MEMORYFILL~x`.
+$${rule-prose: exec/memory.fill}
 
 $${rule: {Step_read/memory.fill-*}}
 
 
 .. _exec-memory.copy:
 
-:math:`\MEMORYCOPY~x~y`
-.......................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-memory.copy>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Assert: due to :ref:`validation <valid-memory.copy>`, :math:`F.\AMODULE.\MIMEMS[y]` exists.
-
-4. Let :math:`\X{da}` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-5. Let :math:`\X{sa}` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[y]`.
-
-6. Assert: due to :ref:`validation <valid-memory.copy>`, :math:`S.\SMEMS[\X{da}]` exists.
-
-7. Assert: due to :ref:`validation <valid-memory.copy>`, :math:`S.\SMEMS[\X{sa}]` exists.
-
-8. Let :math:`\X{mem}_d` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[\X{da}]`.
-
-9. Let :math:`\X{mem}_s` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[\X{sa}]`.
-
-10. Assert: due to :ref:`validation <valid-memory.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-12. Assert: due to :ref:`validation <valid-memory.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-13. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-14. Assert: due to :ref:`validation <valid-memory.copy>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-15. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-16. If :math:`s + n` is larger than the length of :math:`\X{mem}_s.\MIDATA` or :math:`d + n` is larger than the length of :math:`\X{mem}_d.\MIDATA`, then:
-
-    a. Trap.
-
-17. If :math:`n = 0`, then:
-
-   a. Return.
-
-18. If :math:`d \leq s`, then:
-
-   a. Push the value :math:`\I32.\CONST~d` to the stack.
-
-   b. Push the value :math:`\I32.\CONST~s` to the stack.
-
-   c. Execute the instruction :math:`\I32\K{.}\LOAD\K{8\_u}~y~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-   d. Execute the instruction :math:`\I32\K{.}\STORE\K{8}~x~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-   e. Assert: due to the earlier check against the memory size, :math:`d+1 < 2^{32}`.
-
-   f. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-   g. Assert: due to the earlier check against the memory size, :math:`s+1 < 2^{32}`.
-
-   h. Push the value :math:`\I32.\CONST~(s+1)` to the stack.
-
-19. Else:
-
-   a. Assert: due to the earlier check against the memory size, :math:`d+n-1 < 2^{32}`.
-
-   b. Push the value :math:`\I32.\CONST~(d+n-1)` to the stack.
-
-   c. Assert: due to the earlier check against the memory size, :math:`s+n-1 < 2^{32}`.
-
-   d. Push the value :math:`\I32.\CONST~(s+n-1)` to the stack.
-
-   e. Execute the instruction :math:`\I32\K{.}\LOAD\K{8\_u}~y~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-   f. Execute the instruction :math:`\I32\K{.}\STORE\K{8}~x~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-   g. Push the value :math:`\I32.\CONST~d` to the stack.
-
-   h. Push the value :math:`\I32.\CONST~s` to the stack.
-
-20. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-21. Execute the instruction :math:`\MEMORYCOPY~x~y`.
+$${rule-prose: exec/memory.copy}
 
 $${rule: {Step_read/memory.copy-*}}
 
 
 .. _exec-memory.init:
 
-:math:`\MEMORYINIT~x~y`
-.......................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-memory.init>`, :math:`F.\AMODULE.\MIMEMS[x]` exists.
-
-3. Let :math:`\X{ma}` be the :ref:`memory address <syntax-memaddr>` :math:`F.\AMODULE.\MIMEMS[x]`.
-
-4. Assert: due to :ref:`validation <valid-memory.init>`, :math:`S.\SMEMS[\X{ma}]` exists.
-
-5. Let :math:`\X{mem}` be the :ref:`memory instance <syntax-meminst>` :math:`S.\SMEMS[\X{ma}]`.
-
-6. Assert: due to :ref:`validation <valid-memory.init>`, :math:`F.\AMODULE.\MIDATAS[y]` exists.
-
-7. Let :math:`\X{da}` be the :ref:`data address <syntax-dataaddr>` :math:`F.\AMODULE.\MIDATAS[y]`.
-
-8. Assert: due to :ref:`validation <valid-memory.init>`, :math:`S.\SDATAS[\X{da}]` exists.
-
-9. Let :math:`\X{data}` be the  :ref:`data instance <syntax-datainst>` :math:`S.\SDATAS[\X{da}]`.
-
-10. Assert: due to :ref:`validation <valid-memory.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-11. Pop the value :math:`\I32.\CONST~n` from the stack.
-
-12. Assert: due to :ref:`validation <valid-memory.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-13. Pop the value :math:`\I32.\CONST~s` from the stack.
-
-14. Assert: due to :ref:`validation <valid-memory.init>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-15. Pop the value :math:`\I32.\CONST~d` from the stack.
-
-16. If :math:`s + n` is larger than the length of :math:`\X{data}.\DIDATA` or :math:`d + n` is larger than the length of :math:`\X{mem}.\MIDATA`, then:
-
-    a. Trap.
-
-17. If :math:`n = 0`, then:
-
-    a. Return.
-
-18. Let :math:`b` be the byte :math:`\X{data}.\DIDATA[s]`.
-
-19. Push the value :math:`\I32.\CONST~d` to the stack.
-
-20. Push the value :math:`\I32.\CONST~b` to the stack.
-
-21. Execute the instruction :math:`\I32\K{.}\STORE\K{8}~\{ \OFFSET~0, \ALIGN~0 \}`.
-
-22. Assert: due to the earlier check against the memory size, :math:`d+1 < 2^{32}`.
-
-23. Push the value :math:`\I32.\CONST~(d+1)` to the stack.
-
-24. Assert: due to the earlier check against the memory size, :math:`s+1 < 2^{32}`.
-
-25. Push the value :math:`\I32.\CONST~(s+1)` to the stack.
-
-26. Push the value :math:`\I32.\CONST~(n-1)` to the stack.
-
-27. Execute the instruction :math:`\MEMORYINIT~x~y`.
+$${rule-prose: exec/memory.init}
 
 $${rule: {Step_read/memory.init-*}}
 
 
 .. _exec-data.drop:
 
-:math:`\DATADROP~x`
-...................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-data.drop>`, :math:`F.\AMODULE.\MIDATAS[x]` exists.
-
-3. Let :math:`a` be the :ref:`data address <syntax-dataaddr>` :math:`F.\AMODULE.\MIDATAS[x]`.
-
-4. Assert: due to :ref:`validation <valid-data.drop>`, :math:`S.\SDATAS[a]` exists.
-
-5. Replace :math:`S.\SDATAS[a]` with the :ref:`data instance <syntax-datainst>` :math:`\{\DIDATA~\epsilon\}`.
+$${rule-prose: exec/data.drop}
 
 $${rule: {Step/data.drop}}
 
@@ -3222,188 +2244,71 @@ Control Instructions
 
 .. _exec-block:
 
-:math:`\BLOCK~\blocktype~\instr^\ast~\END`
-..........................................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-blocktype>`, :math:`\fblocktype_{S;F}(\blocktype)` is defined.
-
-3. Let :math:`[t_1^m] \to [t_2^n]` be the :ref:`instruction type <syntax-instrtype>` :math:`\fblocktype_{S;F}(\blocktype)`.
-
-4. Let :math:`L` be the label whose arity is :math:`n` and whose continuation is the end of the block.
-
-5. Assert: due to :ref:`validation <valid-block>`, there are at least :math:`m` values on the top of the stack.
-
-6. Pop the values :math:`\val^m` from the stack.
-
-7. :ref:`Enter <exec-instr-seq-enter>` the block :math:`\val^m~\instr^\ast` with label :math:`L`.
+$${rule-prose: exec/block}
 
 $${rule: {Step_read/block}}
 
 
 .. _exec-loop:
 
-:math:`\LOOP~\blocktype~\instr^\ast~\END`
-.........................................
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-blocktype>`, :math:`\fblocktype_{S;F}(\blocktype)` is defined.
-
-3. Let :math:`[t_1^m] \to [t_2^n]` be the :ref:`instruction type <syntax-instrtype>` :math:`\fblocktype_{S;F}(\blocktype)`.
-
-4. Let :math:`L` be the label whose arity is :math:`m` and whose continuation is the start of the loop.
-
-5. Assert: due to :ref:`validation <valid-loop>`, there are at least :math:`m` values on the top of the stack.
-
-6. Pop the values :math:`\val^m` from the stack.
-
-7. :ref:`Enter <exec-instr-seq-enter>` the block :math:`\val^m~\instr^\ast` with label :math:`L`.
+$${rule-prose: exec/loop}
 
 $${rule: {Step_read/loop}}
 
 
 .. _exec-if:
 
-:math:`\IF~\blocktype~\instr_1^\ast~\ELSE~\instr_2^\ast~\END`
-.............................................................
-
-1. Assert: due to :ref:`validation <valid-if>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~c` from the stack.
-
-3. If :math:`c` is non-zero, then:
-
-   a. Execute the block instruction :math:`\BLOCK~\blocktype~\instr_1^\ast~\END`.
-
-4. Else:
-
-   a. Execute the block instruction :math:`\BLOCK~\blocktype~\instr_2^\ast~\END`.
+$${rule-prose: exec/if}
 
 $${rule: {Step_pure/if-*}}
 
 
 .. _exec-br:
 
-:math:`\BR~l`
-.............
-
-1. Assert: due to :ref:`validation <valid-br>`, the stack contains at least :math:`l+1` labels.
-
-2. Let :math:`L` be the :math:`l`-th label appearing on the stack, starting from the top and counting from zero.
-
-3. Let :math:`n` be the arity of :math:`L`.
-
-4. Assert: due to :ref:`validation <valid-br>`, there are at least :math:`n` values on the top of the stack.
-
-5. Pop the values :math:`\val^n` from the stack.
-
-6. Repeat :math:`l+1` times:
-
-   a. While the top of the stack is a value, do:
-
-      i. Pop the value from the stack.
-
-   b. Assert: due to :ref:`validation <valid-br>`, the top of the stack now is a label.
-
-   c. Pop the label from the stack.
-
-7. Push the values :math:`\val^n` to the stack.
-
-8. Jump to the continuation of :math:`L`.
+$${rule-prose: exec/br}
 
 $${rule: {Step_pure/br-*}}
 
 
 .. _exec-br_if:
 
-:math:`\BRIF~l`
-...............
-
-1. Assert: due to :ref:`validation <valid-br_if>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~c` from the stack.
-
-3. If :math:`c` is non-zero, then:
-
-   a. :ref:`Execute <exec-br>` the instruction :math:`\BR~l`.
-
-4. Else:
-
-   a. Do nothing.
+$${rule-prose: exec/br_if}
 
 $${rule: {Step_pure/br_if-*}}
 
 
 .. _exec-br_table:
 
-:math:`\BRTABLE~l^\ast~l_N`
-...........................
-
-1. Assert: due to :ref:`validation <valid-br_table>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
-
-2. Pop the value :math:`\I32.\CONST~i` from the stack.
-
-3. If :math:`i` is smaller than the length of :math:`l^\ast`, then:
-
-   a. Let :math:`l_i` be the label :math:`l^\ast[i]`.
-
-   b. :ref:`Execute <exec-br>` the instruction :math:`\BR~l_i`.
-
-4. Else:
-
-   a. :ref:`Execute <exec-br>` the instruction :math:`\BR~l_N`.
+$${rule-prose: exec/br_table}
 
 $${rule: {Step_pure/br_table-*}}
 
 
 .. _exec-br_on_null:
 
-:math:`\BRONNULL~l`
-...................
+$${rule-prose: exec/br_on_null}
 
-1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
-
-4. Else:
-
-   a. Push the value :math:`\reff` back to the stack.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/br_on_null-*}}
 
 
 .. _exec-br_on_non_null:
 
-:math:`\BRONNONNULL~l`
-......................
+$${rule-prose: exec/br_on_non_null}
 
-1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
-
-2. Pop the value :math:`\reff` from the stack.
-
-3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
-
-   a. Do nothing.
-
-4. Else:
-
-   a. Push the value :math:`\reff` back to the stack.
-
-   b. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
+.. todo:: (3) Introduce if-let instruction instead of "is of the case".
 
 $${rule: {Step_pure/br_on_non_null-*}}
 
 
 .. _exec-br_on_cast:
 
-:math:`\BRONCAST~l~\X{rt}_1~\X{rt}_2`
-.....................................
+$${rule-prose: exec/br_on_cast}
+
+.. todo::
+   Below is the acutal prose.
+   (9) Need to handle RulePr s \|- ref : rt properly in prose instead of $ref_type_of
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -3430,8 +2335,11 @@ $${rule: {Step_read/br_on_cast-*}}
 
 .. _exec-br_on_cast_fail:
 
-:math:`\BRONCASTFAIL~l~\X{rt}_1~\X{rt}_2`
-.........................................
+$${rule-prose: exec/br_on_cast_fail}
+
+.. todo::
+   Below is the actual prose.
+   (9) Need to handle RulePr s \|- ref : rt properly in prose instead of $ref_type_of
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -3458,46 +2366,14 @@ $${rule: {Step_read/br_on_cast_fail-*}}
 
 .. _exec-return:
 
-:math:`\RETURN`
-...............
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Let :math:`n` be the arity of :math:`F`.
-
-3. Assert: due to :ref:`validation <valid-return>`, there are at least :math:`n` values on the top of the stack.
-
-4. Pop the results :math:`\val^n` from the stack.
-
-5. Assert: due to :ref:`validation <valid-return>`, the stack contains at least one :ref:`frame <syntax-frame>`.
-
-6. While the top of the stack is not a frame, do:
-
-   a. Pop the top element from the stack.
-
-7. Assert: the top of the stack is the frame :math:`F`.
-
-8. Pop the frame from the stack.
-
-9. Push :math:`\val^n` to the stack.
-
-10. Jump to the instruction after the original call that pushed the frame.
+$${rule-prose: exec/return}
 
 $${rule: {Step_pure/return-*}}
 
 
 .. _exec-call:
 
-:math:`\CALL~x`
-...............
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-call>`, :math:`F.\AMODULE.\MIFUNCS[x]` exists.
-
-3. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`F.\AMODULE.\MIFUNCS[x]`.
-
-4. :ref:`Invoke <exec-invoke>` the function instance at address :math:`a`.
+$${rule-prose: exec/call}
 
 $${rule: {Step_read/call}}
 
@@ -3506,6 +2382,8 @@ $${rule: {Step_read/call}}
 
 :math:`\CALLREF~x`
 ..................
+
+.. todo:: (*) Prose not spliced, for the prose merges the two cases of null and non-null references.
 
 1. Assert: due to :ref:`validation <valid-call_ref>`, a null or :ref:`function reference <syntax-ref>` is on the top of the stack.
 
@@ -3529,8 +2407,11 @@ $${rule: {Step_read/call_ref-null}}
 
 .. _exec-call_indirect:
 
-:math:`\CALLINDIRECT~x~y`
-.........................
+$${rule-prose: exec/call_indirect}
+
+.. todo::
+   Below is the actual prose.
+   (11) ref.cast (ref (null ()) y) is rendered differently. Need to handle TERMINAL? case in AL-to-EL-expr phase.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -3581,18 +2462,7 @@ $${rule: {Step_pure/call_indirect}}
 
 .. _exec-return_call:
 
-:math:`\RETURNCALL~x`
-.....................
-
-.. todo: find a way to reuse call/call_indirect prose for tail call versions
-
-1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
-
-2. Assert: due to :ref:`validation <valid-call>`, :math:`F.\AMODULE.\MIFUNCS[x]` exists.
-
-3. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`F.\AMODULE.\MIFUNCS[x]`.
-
-4. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+$${rule-prose: exec/return_call}
 
 $${rule: {Step_read/return_call}}
 
@@ -3601,6 +2471,9 @@ $${rule: {Step_read/return_call}}
 
 :math:`\RETURNCALLREF~x`
 ........................
+
+.. todo::
+   (*) Prose not spliced, Sphinx cannot build the document with deeply nested ordered list. (mainly caused by spurious conditions that should be assertions)
 
 1. Assert: due to :ref:`validation <valid-return_call_ref>`, a :ref:`function reference <syntax-ref>` is on the top of the stack.
 
@@ -3614,15 +2487,18 @@ $${rule: {Step_read/return_call}}
 
 5. Let :math:`\REFFUNCADDR~a` be the reference :math:`r`.
 
-6. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+6. :ref:`Tail-invoke <exec-invoke>` the function instance at address :math:`a`.
 
 $${rule: {Step_read/return_call_ref-*}}
 
 
 .. _exec-return_call_indirect:
 
-:math:`\RETURNCALLINDIRECT~x~y`
-...............................
+$${rule-prose: exec/return_call_indirect}
+
+.. todo::
+   Below is the actual prose.
+   (11) ref.cast (ref (null ()) y) is rendered differently. Need to handle TERMINAL? case in AL-to-EL-expr phase.
 
 1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
 
@@ -3662,7 +2538,7 @@ $${rule: {Step_read/return_call_ref-*}}
 
     a. Trap.
 
-17. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+17. :ref:`Tail-invoke <exec-invoke>` the function instance at address :math:`a`.
 
 $${rule: {Step_pure/return_call_indirect}}
 

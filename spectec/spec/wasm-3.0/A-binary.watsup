@@ -303,36 +303,36 @@ grammar Binstr/table : instr = ...
 
 ;; Memory instructions
 
-syntax memidxop = (memidx, memop)
+syntax memidxop = (memidx, memarg)
 
-grammar Bmemop : memidxop =
+grammar Bmemarg : memidxop =
   | n:Bu32 m:Bu32 => (0, {ALIGN n, OFFSET m})            -- if $(n < 2^6)
   | n:Bu32 x:Bmemidx m:Bu32 => (x, {ALIGN n, OFFSET m})  -- if $(2^6 <= n < 2^7)
 
 grammar Binstr/memory : instr = ...
-  | 0x28 (x,mo):Bmemop => LOAD I32 x mo
-  | 0x29 (x,mo):Bmemop => LOAD I64 x mo
-  | 0x2A (x,mo):Bmemop => LOAD F32 x mo
-  | 0x2B (x,mo):Bmemop => LOAD F64 x mo
-  | 0x2C (x,mo):Bmemop => LOAD I32 (8 _ S) x mo
-  | 0x2D (x,mo):Bmemop => LOAD I32 (8 _ U) x mo
-  | 0x2E (x,mo):Bmemop => LOAD I32 (16 _ S) x mo
-  | 0x2F (x,mo):Bmemop => LOAD I32 (16 _ U) x mo
-  | 0x30 (x,mo):Bmemop => LOAD I64 (8 _ S) x mo
-  | 0x31 (x,mo):Bmemop => LOAD I64 (8 _ U) x mo
-  | 0x32 (x,mo):Bmemop => LOAD I64 (16 _ S) x mo
-  | 0x33 (x,mo):Bmemop => LOAD I64 (16 _ U) x mo
-  | 0x34 (x,mo):Bmemop => LOAD I64 (32 _ S) x mo
-  | 0x35 (x,mo):Bmemop => LOAD I64 (32 _ U) x mo
-  | 0x36 (x,mo):Bmemop => STORE I32 x mo
-  | 0x37 (x,mo):Bmemop => STORE I64 x mo
-  | 0x38 (x,mo):Bmemop => STORE F32 x mo
-  | 0x39 (x,mo):Bmemop => STORE F64 x mo
-  | 0x3A (x,mo):Bmemop => STORE I32 8 x mo
-  | 0x3B (x,mo):Bmemop => STORE I32 16 x mo
-  | 0x3C (x,mo):Bmemop => STORE I64 8 x mo
-  | 0x3D (x,mo):Bmemop => STORE I64 16 x mo
-  | 0x3E (x,mo):Bmemop => STORE I64 32 x mo
+  | 0x28 (x,ao):Bmemarg => LOAD I32 x ao
+  | 0x29 (x,ao):Bmemarg => LOAD I64 x ao
+  | 0x2A (x,ao):Bmemarg => LOAD F32 x ao
+  | 0x2B (x,ao):Bmemarg => LOAD F64 x ao
+  | 0x2C (x,ao):Bmemarg => LOAD I32 (8 _ S) x ao
+  | 0x2D (x,ao):Bmemarg => LOAD I32 (8 _ U) x ao
+  | 0x2E (x,ao):Bmemarg => LOAD I32 (16 _ S) x ao
+  | 0x2F (x,ao):Bmemarg => LOAD I32 (16 _ U) x ao
+  | 0x30 (x,ao):Bmemarg => LOAD I64 (8 _ S) x ao
+  | 0x31 (x,ao):Bmemarg => LOAD I64 (8 _ U) x ao
+  | 0x32 (x,ao):Bmemarg => LOAD I64 (16 _ S) x ao
+  | 0x33 (x,ao):Bmemarg => LOAD I64 (16 _ U) x ao
+  | 0x34 (x,ao):Bmemarg => LOAD I64 (32 _ S) x ao
+  | 0x35 (x,ao):Bmemarg => LOAD I64 (32 _ U) x ao
+  | 0x36 (x,ao):Bmemarg => STORE I32 x ao
+  | 0x37 (x,ao):Bmemarg => STORE I64 x ao
+  | 0x38 (x,ao):Bmemarg => STORE F32 x ao
+  | 0x39 (x,ao):Bmemarg => STORE F64 x ao
+  | 0x3A (x,ao):Bmemarg => STORE I32 8 x ao
+  | 0x3B (x,ao):Bmemarg => STORE I32 16 x ao
+  | 0x3C (x,ao):Bmemarg => STORE I64 8 x ao
+  | 0x3D (x,ao):Bmemarg => STORE I64 16 x ao
+  | 0x3E (x,ao):Bmemarg => STORE I64 32 x ao
   | 0x3F x:Bmemidx => MEMORY.SIZE x
   | 0x40 x:Bmemidx => MEMORY.GROW x
   | 0xFC 8:Bu32 y:Bdataidx x:Bmemidx => MEMORY.INIT x y
@@ -494,31 +494,31 @@ grammar Binstr/numeric-bin-f64 : instr = ...
 
 
 grammar Binstr/numeric-cvt : instr = ...
-  | 0xA7 => CVTOP I32 CONVERT I64
-  | 0xA8 => CVTOP I32 CONVERT F32 S
-  | 0xA9 => CVTOP I32 CONVERT F32 U
-  | 0xAA => CVTOP I32 CONVERT F64 S
-  | 0xAB => CVTOP I32 CONVERT F64 U
-  | 0xAC => CVTOP I64 CONVERT I32 S
-  | 0xAD => CVTOP I64 CONVERT I32 U
-  | 0xAE => CVTOP I64 CONVERT F32 S
-  | 0xAF => CVTOP I64 CONVERT F32 U
-  | 0xB0 => CVTOP I64 CONVERT F64 S
-  | 0xB1 => CVTOP I64 CONVERT F64 U
-  | 0xB2 => CVTOP F32 CONVERT I32 S
-  | 0xB3 => CVTOP F32 CONVERT I32 U
-  | 0xB4 => CVTOP F32 CONVERT I64 S
-  | 0xB5 => CVTOP F32 CONVERT I64 U
-  | 0xB6 => CVTOP F32 CONVERT F64
-  | 0xB7 => CVTOP F64 CONVERT I32 S
-  | 0xB8 => CVTOP F64 CONVERT I32 U
-  | 0xB9 => CVTOP F64 CONVERT I64 S
-  | 0xBA => CVTOP F64 CONVERT I64 U
-  | 0xBB => CVTOP F64 CONVERT F32
-  | 0xBC => CVTOP I32 REINTERPRET F32
-  | 0xBD => CVTOP I64 REINTERPRET F64
-  | 0xBE => CVTOP F32 REINTERPRET I32
-  | 0xBF => CVTOP F64 REINTERPRET I64
+  | 0xA7 => CVTOP I32 I64 CONVERT
+  | 0xA8 => CVTOP I32 F32 CONVERT S
+  | 0xA9 => CVTOP I32 F32 CONVERT U
+  | 0xAA => CVTOP I32 F64 CONVERT S
+  | 0xAB => CVTOP I32 F64 CONVERT U
+  | 0xAC => CVTOP I64 I32 CONVERT S
+  | 0xAD => CVTOP I64 I32 CONVERT U
+  | 0xAE => CVTOP I64 F32 CONVERT S
+  | 0xAF => CVTOP I64 F32 CONVERT U
+  | 0xB0 => CVTOP I64 F64 CONVERT S
+  | 0xB1 => CVTOP I64 F64 CONVERT U
+  | 0xB2 => CVTOP F32 I32 CONVERT S
+  | 0xB3 => CVTOP F32 I32 CONVERT U
+  | 0xB4 => CVTOP F32 I64 CONVERT S
+  | 0xB5 => CVTOP F32 I64 CONVERT U
+  | 0xB6 => CVTOP F32 F64 CONVERT
+  | 0xB7 => CVTOP F64 I32 CONVERT S
+  | 0xB8 => CVTOP F64 I32 CONVERT U
+  | 0xB9 => CVTOP F64 I64 CONVERT S
+  | 0xBA => CVTOP F64 I64 CONVERT U
+  | 0xBB => CVTOP F64 F32 CONVERT
+  | 0xBC => CVTOP I32 F32 REINTERPRET
+  | 0xBD => CVTOP I64 F64 REINTERPRET
+  | 0xBE => CVTOP F32 I32 REINTERPRET
+  | 0xBF => CVTOP F64 I64 REINTERPRET
   | ...
 
 grammar Binstr/numeric-extend : instr = ...
@@ -536,28 +536,28 @@ grammar Blaneidx : laneidx =
   | l:Bbyte => l
 
 grammar Binstr/vector-memory : instr = ...
-  | 0xFD 0:Bu32 (x,mo):Bmemop => VLOAD x mo
-  | 0xFD 1:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 8 X 8 S) x mo
-  | 0xFD 2:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 8 X 8 U) x mo
-  | 0xFD 3:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 16 X 4 S) x mo
-  | 0xFD 4:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 16 X 4 U) x mo
-  | 0xFD 5:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 32 X 2 S) x mo
-  | 0xFD 6:Bu32 (x,mo):Bmemop => VLOAD (SHAPE 32 X 2 U) x mo
-  | 0xFD 7:Bu32 (x,mo):Bmemop => VLOAD (SPLAT 8) x mo
-  | 0xFD 8:Bu32 (x,mo):Bmemop => VLOAD (SPLAT 16) x mo
-  | 0xFD 9:Bu32 (x,mo):Bmemop => VLOAD (SPLAT 32) x mo
-  | 0xFD 10:Bu32 (x,mo):Bmemop => VLOAD (SPLAT 64) x mo
-  | 0xFD 92:Bu32 (x,mo):Bmemop => VLOAD (ZERO 32) x mo
-  | 0xFD 92:Bu32 (x,mo):Bmemop => VLOAD (ZERO 64) x mo
-  | 0xFD 11:Bu32 (x,mo):Bmemop => VSTORE x mo
-  | 0xFD 84:Bu32 (x,mo):Bmemop l:Blaneidx => VLOAD_LANE 8 x mo l
-  | 0xFD 85:Bu32 (x,mo):Bmemop l:Blaneidx => VLOAD_LANE 16 x mo l
-  | 0xFD 86:Bu32 (x,mo):Bmemop l:Blaneidx => VLOAD_LANE 32 x mo l
-  | 0xFD 87:Bu32 (x,mo):Bmemop l:Blaneidx => VLOAD_LANE 64 x mo l
-  | 0xFD 88:Bu32 (x,mo):Bmemop l:Blaneidx => VSTORE_LANE 8 x mo l
-  | 0xFD 89:Bu32 (x,mo):Bmemop l:Blaneidx => VSTORE_LANE 16 x mo l
-  | 0xFD 90:Bu32 (x,mo):Bmemop l:Blaneidx => VSTORE_LANE 32 x mo l
-  | 0xFD 91:Bu32 (x,mo):Bmemop l:Blaneidx => VSTORE_LANE 64 x mo l
+  | 0xFD 0:Bu32 (x,ao):Bmemarg => VLOAD x ao
+  | 0xFD 1:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 8 X 8 S) x ao
+  | 0xFD 2:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 8 X 8 U) x ao
+  | 0xFD 3:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 16 X 4 S) x ao
+  | 0xFD 4:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 16 X 4 U) x ao
+  | 0xFD 5:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 32 X 2 S) x ao
+  | 0xFD 6:Bu32 (x,ao):Bmemarg => VLOAD (SHAPE 32 X 2 U) x ao
+  | 0xFD 7:Bu32 (x,ao):Bmemarg => VLOAD (SPLAT 8) x ao
+  | 0xFD 8:Bu32 (x,ao):Bmemarg => VLOAD (SPLAT 16) x ao
+  | 0xFD 9:Bu32 (x,ao):Bmemarg => VLOAD (SPLAT 32) x ao
+  | 0xFD 10:Bu32 (x,ao):Bmemarg => VLOAD (SPLAT 64) x ao
+  | 0xFD 92:Bu32 (x,ao):Bmemarg => VLOAD (ZERO 32) x ao
+  | 0xFD 92:Bu32 (x,ao):Bmemarg => VLOAD (ZERO 64) x ao
+  | 0xFD 11:Bu32 (x,ao):Bmemarg => VSTORE x ao
+  | 0xFD 84:Bu32 (x,ao):Bmemarg l:Blaneidx => VLOAD_LANE 8 x ao l
+  | 0xFD 85:Bu32 (x,ao):Bmemarg l:Blaneidx => VLOAD_LANE 16 x ao l
+  | 0xFD 86:Bu32 (x,ao):Bmemarg l:Blaneidx => VLOAD_LANE 32 x ao l
+  | 0xFD 87:Bu32 (x,ao):Bmemarg l:Blaneidx => VLOAD_LANE 64 x ao l
+  | 0xFD 88:Bu32 (x,ao):Bmemarg l:Blaneidx => VSTORE_LANE 8 x ao l
+  | 0xFD 89:Bu32 (x,ao):Bmemarg l:Blaneidx => VSTORE_LANE 16 x ao l
+  | 0xFD 90:Bu32 (x,ao):Bmemarg l:Blaneidx => VSTORE_LANE 32 x ao l
+  | 0xFD 91:Bu32 (x,ao):Bmemarg l:Blaneidx => VSTORE_LANE 64 x ao l
   | ...
 
 grammar Binstr/vector-const : instr = ...
@@ -708,10 +708,10 @@ grammar Binstr/vector-v-i16x8 : instr = ...
   | 0xFD 132:Bu32 => VBITMASK (I16 X 8)
   | 0xFD 133:Bu32 => VNARROW (I16 X 8) (I32 X 4) S
   | 0xFD 134:Bu32 => VNARROW (I16 X 8) (I32 X 4) U
-  | 0xFD 135:Bu32 => VCVTOP (I16 X 8) EXTEND LOW (I8 X 16) S
-  | 0xFD 136:Bu32 => VCVTOP (I16 X 8) EXTEND HIGH (I8 X 16) S
-  | 0xFD 137:Bu32 => VCVTOP (I16 X 8) EXTEND LOW (I8 X 16) U
-  | 0xFD 138:Bu32 => VCVTOP (I16 X 8) EXTEND HIGH (I8 X 16) U
+  | 0xFD 135:Bu32 => VCVTOP (I16 X 8) (I8 X 16) EXTEND LOW S
+  | 0xFD 136:Bu32 => VCVTOP (I16 X 8) (I8 X 16) EXTEND HIGH S
+  | 0xFD 137:Bu32 => VCVTOP (I16 X 8) (I8 X 16) EXTEND LOW U
+  | 0xFD 138:Bu32 => VCVTOP (I16 X 8) (I8 X 16) EXTEND HIGH U
   | 0xFD 139:Bu32 => VSHIFTOP (I16 X 8) SHL
   | 0xFD 140:Bu32 => VSHIFTOP (I16 X 8) (SHR S)
   | 0xFD 141:Bu32 => VSHIFTOP (I16 X 8) (SHR U)
@@ -740,10 +740,10 @@ grammar Binstr/vector-v-i32x4 : instr = ...
   | 0xFD 161:Bu32 => VUNOP (I32 X 4) NEG
   | 0xFD 163:Bu32 => VTESTOP (I32 X 4) ALL_TRUE
   | 0xFD 164:Bu32 => VBITMASK (I32 X 4)
-  | 0xFD 167:Bu32 => VCVTOP (I32 X 4) EXTEND LOW (I16 X 8) S
-  | 0xFD 168:Bu32 => VCVTOP (I32 X 4) EXTEND HIGH (I16 X 8) S
-  | 0xFD 169:Bu32 => VCVTOP (I32 X 4) EXTEND LOW (I16 X 8) U
-  | 0xFD 170:Bu32 => VCVTOP (I32 X 4) EXTEND HIGH (I16 X 8) U
+  | 0xFD 167:Bu32 => VCVTOP (I32 X 4) (I16 X 8) EXTEND LOW S
+  | 0xFD 168:Bu32 => VCVTOP (I32 X 4) (I16 X 8) EXTEND HIGH S
+  | 0xFD 169:Bu32 => VCVTOP (I32 X 4) (I16 X 8) EXTEND LOW U
+  | 0xFD 170:Bu32 => VCVTOP (I32 X 4) (I16 X 8) EXTEND HIGH U
   | 0xFD 171:Bu32 => VSHIFTOP (I32 X 4) SHL
   | 0xFD 172:Bu32 => VSHIFTOP (I32 X 4) (SHR S)
   | 0xFD 173:Bu32 => VSHIFTOP (I32 X 4) (SHR U)
@@ -766,10 +766,10 @@ grammar Binstr/vector-v-i64x2 : instr = ...
   | 0xFD 193:Bu32 => VUNOP (I64 X 2) NEG
   | 0xFD 195:Bu32 => VTESTOP (I64 X 2) ALL_TRUE
   | 0xFD 196:Bu32 => VBITMASK (I64 X 2)
-  | 0xFD 199:Bu32 => VCVTOP (I64 X 2) EXTEND LOW (I32 X 4) S
-  | 0xFD 200:Bu32 => VCVTOP (I64 X 2) EXTEND HIGH (I32 X 4) S
-  | 0xFD 201:Bu32 => VCVTOP (I64 X 2) EXTEND LOW (I32 X 4) U
-  | 0xFD 202:Bu32 => VCVTOP (I64 X 2) EXTEND HIGH (I32 X 4) U
+  | 0xFD 199:Bu32 => VCVTOP (I64 X 2) (I32 X 4) EXTEND LOW S
+  | 0xFD 200:Bu32 => VCVTOP (I64 X 2) (I32 X 4) EXTEND HIGH S
+  | 0xFD 201:Bu32 => VCVTOP (I64 X 2) (I32 X 4) EXTEND LOW U
+  | 0xFD 202:Bu32 => VCVTOP (I64 X 2) (I32 X 4) EXTEND HIGH U
   | 0xFD 203:Bu32 => VSHIFTOP (I64 X 2) SHL
   | 0xFD 204:Bu32 => VSHIFTOP (I64 X 2) (SHR S)
   | 0xFD 205:Bu32 => VSHIFTOP (I64 X 2) (SHR U)
@@ -819,16 +819,16 @@ grammar Binstr/vector-v-f64x2 : instr = ...
   | ...
 
 grammar Binstr/vector-cvt : instr = ...
-  | 0xFD 248:Bu32 => VCVTOP (I32 X 4) TRUNC_SAT (F32 X 4) S
-  | 0xFD 249:Bu32 => VCVTOP (I32 X 4) TRUNC_SAT (F32 X 4) U
-  | 0xFD 250:Bu32 => VCVTOP (F32 X 4) CONVERT (I32 X 4) S
-  | 0xFD 251:Bu32 => VCVTOP (F32 X 4) CONVERT (I32 X 4) U
-  | 0xFD 252:Bu32 => VCVTOP (I32 X 4) TRUNC_SAT (F64 X 2) S ZERO
-  | 0xFD 253:Bu32 => VCVTOP (I32 X 4) TRUNC_SAT (F64 X 2) U ZERO
-  | 0xFD 254:Bu32 => VCVTOP (F64 X 2) CONVERT LOW (I32 X 4) S
-  | 0xFD 255:Bu32 => VCVTOP (F64 X 2) CONVERT LOW (I32 X 4) U
-  | 0xFD 94:Bu32 => VCVTOP (F32 X 4) DEMOTE (F64 X 2) ZERO
-  | 0xFD 95:Bu32 => VCVTOP (F64 X 2) PROMOTE LOW (F32 X 4)
+  | 0xFD 248:Bu32 => VCVTOP (I32 X 4) (F32 X 4) TRUNC_SAT S
+  | 0xFD 249:Bu32 => VCVTOP (I32 X 4) (F32 X 4) TRUNC_SAT U
+  | 0xFD 250:Bu32 => VCVTOP (F32 X 4) (I32 X 4) CONVERT S
+  | 0xFD 251:Bu32 => VCVTOP (F32 X 4) (I32 X 4) CONVERT U
+  | 0xFD 252:Bu32 => VCVTOP (I32 X 4) (F64 X 2) TRUNC_SAT S ZERO
+  | 0xFD 253:Bu32 => VCVTOP (I32 X 4) (F64 X 2) TRUNC_SAT U ZERO
+  | 0xFD 254:Bu32 => VCVTOP (F64 X 2) (I32 X 4) CONVERT LOW S
+  | 0xFD 255:Bu32 => VCVTOP (F64 X 2) (I32 X 4) CONVERT LOW U
+  | 0xFD 94:Bu32 => VCVTOP (F32 X 4) (F64 X 2) DEMOTE ZERO
+  | 0xFD 95:Bu32 => VCVTOP (F64 X 2) (F32 X 4) PROMOTE LOW
 
 
 ;; Expressions
@@ -844,10 +844,10 @@ grammar Bexpr : expr =
 
 ;; Sections
 
-var sz : nat
+var len : nat
 
 grammar Bsection_(N, grammar BX : en*) : en*  hint(desc "section") =
-  | N:Bbyte sz:Bu32 en*:BX => en*  -- if sz = ||BX||
+  | N:Bbyte len:Bu32 en*:BX => en*  -- if len = ||BX||
   | eps => eps
 
 
@@ -967,7 +967,7 @@ grammar Bfunc : code =
   | local**:Bvec(Blocals) expr:Bexpr => ($concat_(local, local**), expr)
 
 grammar Bcode : code =
-  | sz:Bu32 code:Bfunc => code  -- if sz = ||Bfunc||
+  | len:Bu32 code:Bfunc => code  -- if len = ||Bfunc||
 
 grammar Bcodesec : code* hint(desc "code section") =
   | code*:Bsection_(10, Bvec(Bcode)) => code*

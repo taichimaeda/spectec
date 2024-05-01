@@ -5,6 +5,7 @@ open Ast
 open Convert
 open Print
 
+module Atom = Il.Atom
 module Il = struct include Il include Ast end
 
 module Set = Free.Set
@@ -116,7 +117,10 @@ let new_env () =
     defs = Map.empty;
   }
 
-let local_env env = {env with gvars = env.gvars; vars = env.vars; typs = env.typs}
+let local_env env =
+  {env with gvars = env.gvars; vars = env.vars; typs = env.typs}
+let promote_env env' env =
+  env.gvars <- env'.gvars; env.vars <- env'.vars; env.typs <- env'.typs
 
 let bound env' id = Map.mem id.it env'
 
@@ -440,9 +444,16 @@ let sub_typ env t1 t2 =
 
 (* Hints *)
 
-let elab_hint tid {hintid; hintexp} : Il.hint =
+let elab_hint tid mixop {hintid; hintexp} : Il.hint =
   let module IterAtoms =
-    Iter.Make(struct include Iter.Skip let visit_atom atom = atom.note := tid.it end)
+    Iter.Make(
+      struct
+        include Iter.Skip
+        let visit_atom atom =
+          atom.note.Atom.def <- tid.it;
+          atom.note.Atom.case <- Atom.string_name_of_mixop mixop
+      end
+    )
   in
   IterAtoms.exp hintexp;
   let ss =
@@ -452,13 +463,13 @@ let elab_hint tid {hintid; hintexp} : Il.hint =
   in
   {Il.hintid; Il.hintexp = ss}
 
-let elab_hints tid = List.map (elab_hint tid)
+let elab_hints tid mixop = List.map (elab_hint tid mixop)
 
 
 (* Atoms and Operators *)
 
 let elab_atom atom tid =
-  atom.note := tid.it;
+  atom.note.Atom.def <- tid.it;
   atom
 
 let numtyps = [NatT; IntT; RatT; RealT]
@@ -681,7 +692,7 @@ and elab_typfield env tid at ((atom, (t, prems), hints) as tf) : Il.typfield =
   Acc.prems prems;
   ( elab_atom atom tid,
     (!acc_bs', (if prems = [] then tup_typ' else tup_typ_bind' es') ts' t.at, prems'),
-    elab_hints tid hints
+    elab_hints tid [] hints
   )
 
 and elab_typcase env tid at ((_atom, (t, prems), hints) as tc) : Il.typcase =
@@ -705,7 +716,7 @@ and elab_typcase env tid at ((_atom, (t, prems), hints) as tc) : Il.typcase =
   Acc.prems prems;
   ( mixop,
     (!acc_bs', tup_typ_bind' es' ts' at, prems'),
-    elab_hints tid hints
+    elab_hints tid [] hints
   )
 
 and elab_typcon env tid at (((t, prems), hints) as tc) : Il.typcase =
@@ -729,7 +740,7 @@ and elab_typcon env tid at (((t, prems), hints) as tc) : Il.typcase =
   Acc.prems prems;
   ( mixop,
     (!acc_bs', tup_typ_bind' es' ts' at, prems'),
-    elab_hints tid hints
+    elab_hints tid [Atom.Atom tid.it $$ tid.at % Atom.info ""] hints
   )
 
 and elab_typenum env tid (e1, e2o) : typ * (Il.exp -> numtyp -> Il.exp) =
@@ -790,8 +801,8 @@ and elab_typ_notation env tid t : Il.mixop * Il.typ list * typ list =
       ts1', ts1
   | ParenT t1 ->
     let mixop1, ts1', ts1 = elab_typ_notation env tid t1 in
-    let l = Il.Atom.LParen $$ t.at % ref tid.it in
-    let r = Il.Atom.RParen $$ t.at % ref tid.it in
+    let l = Il.Atom.LParen $$ t.at % Atom.info tid.it in
+    let r = Il.Atom.RParen $$ t.at % Atom.info tid.it in
     merge_mixop (merge_mixop [[l]] mixop1) [[r]], ts1', ts1
   | IterT (t1, iter) ->
     (match iter with
@@ -802,7 +813,7 @@ and elab_typ_notation env tid t : Il.mixop * Il.typ list * typ list =
       let tit = IterT (tup_typ ts1 t1.at, iter) $ t.at in
       let t' = Il.IterT (tup_typ' ts1' t1.at, iter') $ t.at in
       let op =
-        Il.Atom.(match iter with Opt -> Quest | _ -> Star) $$ t.at % ref tid.it in
+        Il.Atom.(match iter with Opt -> Quest | _ -> Star) $$ t.at % Atom.info tid.it in
       (if mixop1 = [[]; []] then mixop1 else [List.flatten mixop1] @ [[op]]),
       [t'], [tit]
     )
@@ -983,7 +994,9 @@ and infer_exp' env e : Il.exp' * typ =
 
 and elab_exp env e t : Il.exp =
   try
-    let e' = elab_exp' env e t in
+    let env' = local_env env in
+    let e' = elab_exp' env' e t in
+    promote_env env' env;
     e' $$ e.at % elab_typ env t
   with Error _ when is_notation_typ env t ->
     Debug.(log_in_at "el.elab_exp" e.at
@@ -1230,8 +1243,10 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
   (* Optional iterations may always be inlined, use backtracking *)
   | SeqE (e1::es2), SeqT (t1::ts2) when is_opt_notation_typ env t1 ->
     (try
-      let es1' = [cast_empty "omitted sequence tail" env t1 e.at (!!!env tid t1)] in
-      let es2', s2 = elab_exp_notation' env tid e (SeqT ts2 $ t.at) in
+      let env' = local_env env in
+      let es1' = [cast_empty "omitted sequence tail" env' t1 e.at (!!!env' tid t1)] in
+      let es2', s2 = elab_exp_notation' env' tid e (SeqT ts2 $ t.at) in
+      promote_env env' env;
       es1' @ es2', s2
     with Error _ ->
       Debug.(log_in_at "el.elab_exp_notation" e.at
@@ -1433,12 +1448,17 @@ and cast_exp' phrase env e' t1 t2 : Il.exp' =
     Il.CaseE (mixop2, tup_exp_bind' es'' e'.at)
   | ConT ((t11, _), _), t2' ->
     (try
-      match t2' with
-      | IterT (t21, Opt) ->
-        Il.OptE (Some (cast_exp phrase env e' t1 t21))
-      | IterT (t21, (List | List1)) ->
-        Il.ListE [cast_exp phrase env e' t1 t21]
-      | _ -> raise (Error (e'.at, ""))
+      let env' = local_env env in
+      let e' =
+        match t2' with
+        | IterT (t21, Opt) ->
+          Il.OptE (Some (cast_exp phrase env' e' t1 t21))
+        | IterT (t21, (List | List1)) ->
+          Il.ListE [cast_exp phrase env' e' t1 t21]
+        | _ -> raise (Error (e'.at, ""))
+      in
+      promote_env env' env;
+      e'
     with Error _ ->  (* backtrack *)
       Debug.(log_in_at "el.cast_exp" e'.at
         (fun _ -> fmt "%s <: %s  >>  (%s) <: (%s) = (%s) # backtrack 1" (el_typ t1) (el_typ t2)
@@ -1459,12 +1479,17 @@ and cast_exp' phrase env e' t1 t2 : Il.exp' =
     Il.CaseE (mixop, tup_exp_bind' [cast_exp phrase env e' t1 t211] e'.at)
   | RangeT _, t2' ->
     (try
-      match t2' with
-      | IterT (t21, Opt) ->
-        Il.OptE (Some (cast_exp phrase env e' t1 t21))
-      | IterT (t21, (List | List1)) ->
-        Il.ListE [cast_exp phrase env e' t1 t21]
-      | _ -> raise (Error (e'.at, ""))
+      let env' = local_env env in
+      let e' =
+        match t2' with
+        | IterT (t21, Opt) ->
+          Il.OptE (Some (cast_exp phrase env e' t1 t21))
+        | IterT (t21, (List | List1)) ->
+          Il.ListE [cast_exp phrase env e' t1 t21]
+        | _ -> raise (Error (e'.at, ""))
+      in
+      promote_env env' env;
+      e'
     with Error _ ->  (* backtrack *)
       Debug.(log_in_at "el.cast_exp" e'.at
         (fun _ -> fmt "%s <: %s  >>  (%s) <: (%s) = (%s) # backtrack 2" (el_typ t1) (el_typ t2)
@@ -1816,13 +1841,13 @@ let elab_hintdef _env hd : Il.def list =
   match hd.it with
   | TypH (id1, _id2, hints) ->
     if hints = [] then [] else
-    [Il.HintD (Il.TypH (id1, elab_hints id1 hints) $ hd.at) $ hd.at]
+    [Il.HintD (Il.TypH (id1, elab_hints id1 [] hints) $ hd.at) $ hd.at]
   | RelH (id, hints) ->
     if hints = [] then [] else
-    [Il.HintD (Il.RelH (id, elab_hints id hints) $ hd.at) $ hd.at]
+    [Il.HintD (Il.RelH (id, elab_hints id [] hints) $ hd.at) $ hd.at]
   | DecH (id, hints) ->
     if hints = [] then [] else
-    [Il.HintD (Il.DecH (id, elab_hints id hints) $ hd.at) $ hd.at]
+    [Il.HintD (Il.DecH (id, elab_hints id [] hints) $ hd.at) $ hd.at]
   | GramH _ | AtomH _ | VarH _ ->
     []
 

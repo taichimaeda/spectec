@@ -1,6 +1,5 @@
 open Prose
 open Printf
-open Config
 open Util.Source
 
 
@@ -16,21 +15,16 @@ module Map = Map.Make(String)
 
 type env =
   {
-    config: config;
     prose: prose;
     render_latex: Backend_latex.Render.env;
     symbol: Symbol.env;
     macro: Macro.env;
   }
 
-let gen_macro env =
-  if env.config.macros then
-    Macro.gen_macro env.macro env.symbol
-
-let env config inputs outputs render_latex el prose : env =
+let env inputs outputs render_latex el prose : env =
   let symbol = Symbol.env el in
   let macro = Macro.env inputs outputs in
-  let env = { config; prose; render_latex; symbol; macro; } in
+  let env = { prose; render_latex; symbol; macro; } in
   env
 
 (* Translation from Al exp to El exp *)
@@ -39,7 +33,7 @@ let (let*) = Option.bind
 
 let al_to_el_atom atom =
   let atom', typ = atom in
-  atom' $$ (no_region, ref typ)
+  atom' $$ (no_region, Il.Atom.info typ)
 
 let al_to_el_unop = function
   | Al.Ast.MinusOp -> Some El.Ast.MinusOp
@@ -153,6 +147,12 @@ and al_to_el_expr expr =
     | Al.Ast.IterE (e, _, iter) ->
       let* ele = al_to_el_expr e in
       let* eliter = al_to_el_iter iter in
+      let ele =
+        match ele.it with
+        | El.Ast.IterE (_, eliter2) when eliter2 <> eliter ->
+          El.Ast.ParenE (ele, false) $ ele.at
+        | _ -> ele
+      in
       Some (El.Ast.IterE (ele, eliter))
     | Al.Ast.InfixE (e1, op, e2) ->
       let* ele1 = al_to_el_expr e1 in
@@ -452,9 +452,13 @@ and render_prose_instrs env depth instrs =
 (* Prefix for stack push/pop operations *)
 let render_stack_prefix expr =
   match expr.it with
+  | Al.Ast.GetCurContextE
+  | Al.Ast.GetCurFrameE
+  | Al.Ast.GetCurLabelE
   | Al.Ast.ContE _
   | Al.Ast.FrameE _
-  | Al.Ast.LabelE _ -> ""
+  | Al.Ast.LabelE _
+  | Al.Ast.VarE ("F" | "L") -> ""
   | Al.Ast.IterE _ -> "the values "
   | _ -> "the value "
 
@@ -522,7 +526,7 @@ let rec render_al_instr env algoname index depth instr =
     sprintf "%s Pop %s%s from the stack." (render_order index depth)
       (render_stack_prefix e) (render_expr env e)
   | Al.Ast.PopAllI e ->
-    sprintf "%s Pop all values %s from the stack." (render_order index depth)
+    sprintf "%s Pop all values %s from the top of the stack." (render_order index depth)
       (render_expr env e)
   | Al.Ast.LetI (n, e) ->
     sprintf "%s Let %s be %s." (render_order index depth) (render_expr env n)
@@ -533,7 +537,7 @@ let rec render_al_instr env algoname index depth instr =
     sprintf "%s Return%s." (render_order index depth)
       (render_opt " " (render_expr env) "" e_opt)
   | Al.Ast.EnterI (e1, e2, il) ->
-    sprintf "%s Enter %s with label %s:%s" (render_order index depth)
+    sprintf "%s Enter %s with label %s.%s" (render_order index depth)
       (render_expr env e1) (render_expr env e2)
       (render_al_instrs env algoname (depth + 1) il)
   | Al.Ast.ExecuteI e ->
@@ -542,7 +546,8 @@ let rec render_al_instr env algoname index depth instr =
     sprintf "%s Execute the sequence %s." (render_order index depth) (render_expr env e)
   | Al.Ast.PerformI (n, es) ->
     sprintf "%s Perform %s." (render_order index depth) (render_expr env (Al.Ast.CallE (n, es) $ no_region))
-  | Al.Ast.ExitI -> render_order index depth ^ " Exit current context."
+  | Al.Ast.ExitI a ->
+    sprintf "%s Exit from %s." (render_order index depth) (render_atom env a)
   | Al.Ast.ReplaceI (e1, p, e2) ->
     sprintf "%s Replace %s with %s." (render_order index depth)
       (render_expr env (Al.Ast.AccE (e1, p) $ no_region)) (render_expr env e2)

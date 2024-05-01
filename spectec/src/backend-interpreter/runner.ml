@@ -11,6 +11,12 @@ open Ds
 
 let error_interpret at msg = Error.error at "interpreter" msg
 
+(* Logging *)
+
+let logging = ref false
+
+let log fmt = Printf.(if !logging then fprintf stderr fmt else ifprintf stderr fmt)
+
 (* Result *)
 
 let success = 1, 1
@@ -50,7 +56,11 @@ let try_run runner target =
   let result =
     try
       runner target
-    with e ->
+    with
+    | Exception.Error (at, msg, step) ->
+      let msg' = msg ^ " (interpreting " ^ step ^ ")" in
+      error_interpret at msg'
+    | e ->
       prerr_endline (Printexc.to_string e); fail
   in
   result, Sys.time () -. start_time
@@ -66,7 +76,7 @@ let print_runner_result name result =
     Printf.printf "Total [%d/%d] (%.2f%%)\n\n" num_success total percentage
   else
     Printf.printf "- %d/%d (%.2f%%)\n\n" num_success total percentage;
-  Printf.eprintf "%s took %f ms.\n" name (execution_time *. 1000.)
+  log "%s took %f ms.\n" name (execution_time *. 1000.)
 
 let get_export name modulename =
   modulename
@@ -99,19 +109,14 @@ let get_export_addr name modulename =
 (** Main functions **)
 
 let invoke module_name funcname args =
-  Printf.eprintf "[Invoking %s %s...]\n" funcname (Value.string_of_values args);
+  log "[Invoking %s %s...]\n" funcname (Value.string_of_values args);
 
   let funcaddr = get_export_addr funcname module_name in
   Interpreter.invoke [funcaddr; al_of_list al_of_value args]
 
-let try_invoke module_name funcname args =
-  try invoke module_name funcname args
-  with Exception.Error (at, msg, step) ->
-    let msg' = msg ^ " (interpreting " ^ step ^ ")" in
-    error_interpret at msg'
 
 let get_global_value module_name globalname =
-  Printf.eprintf "[Getting %s...]\n" globalname;
+  log "[Getting %s...]\n" globalname;
 
   let index = get_export_addr globalname module_name in
   index
@@ -122,18 +127,12 @@ let get_global_value module_name globalname =
   |> listV
 
 let instantiate module_ =
-  Printf.eprintf "[Instantiating module...]\n";
+  log "[Instantiating module...]\n";
 
   let al_module = al_of_module module_ in
   let externvals = List.map get_externval module_.it.imports in
 
   Interpreter.instantiate [ al_module; listV_of_list externvals ]
-
-let try_instantiate module_ =
-  try instantiate module_
-  with Exception.Error (at, msg, step) ->
-    let msg' = msg ^ " (interpreting " ^ step ^ ")" in
-    error_interpret at msg'
 
 
 (** Wast runner **)
@@ -147,7 +146,7 @@ let module_of_def def =
 let run_action action =
   match action.it with
   | Invoke (var_opt, funcname, args) ->
-    try_invoke (Register.get_module_name var_opt) (Utf8.encode funcname) (List.map it args)
+    invoke (Register.get_module_name var_opt) (Utf8.encode funcname) (List.map it args)
   | Get (var_opt, globalname) ->
     get_global_value (Register.get_module_name var_opt) (Utf8.encode globalname)
 
@@ -166,7 +165,7 @@ let test_assertion assertion =
   )
   | AssertUninstantiable (def, re) -> (
     try
-      def |> module_of_def |> try_instantiate |> ignore;
+      def |> module_of_def |> instantiate |> ignore;
       Run.assert_message assertion.at "instantiation" "module instance" re;
       fail
     with Exception.Trap -> success
@@ -179,7 +178,7 @@ let run_command' command =
   | Module (var_opt, def) ->
     def
     |> module_of_def
-    |> try_instantiate
+    |> instantiate
     |> Register.add_with_var var_opt;
     success
   | Register (modulename, var_opt) ->
@@ -196,7 +195,11 @@ let run_command command =
   let result =
     try
       run_command' command
-    with e ->
+    with
+    | Exception.Error (at, msg, step) ->
+      let msg' = msg ^ " (interpreting " ^ step ^ ")" in
+      error_interpret at msg'
+    | e ->
       print_endline ("- Test failed at " ^ string_of_region command.at ^
         " (" ^ Printexc.to_string e ^ ")");
       fail
@@ -229,7 +232,7 @@ let run_wasm' args module_ =
 
   (* Instantiate *)
   module_
-  |> try_instantiate
+  |> instantiate
   |> Register.add_with_var None;
 
   (* TODO: Only Int32 arguments/results are acceptable *)
@@ -238,7 +241,7 @@ let run_wasm' args module_ =
     let make_value s = Value.Num (I32 (Int32.of_string s)) in
 
     (* Invoke *)
-    try_invoke (Register.get_module_name None) funcname (List.map make_value args')
+    invoke (Register.get_module_name None) funcname (List.map make_value args')
     (* Print invocation result *)
     |> al_to_list al_to_value
     |> Value.string_of_values
@@ -257,15 +260,16 @@ let run_wat = run_wasm
 
 let parse_file name parser_ file =
   Printf.printf "===== %s =====\n%!" name;
-  Printf.eprintf "===========================\n\n%s\n\n" name;
+  log "===========================\n\n%s\n\n" name;
 
   try
     parser_ file
   with e ->
+    let bt = Printexc.get_raw_backtrace () in
     print_endline ("- Failed to parse " ^ name ^ "\n");
-    prerr_endline ("- Failed to parse " ^ name ^ "\n");
+    log ("- Failed to parse %s\n") name;
     num_parse_fail := !num_parse_fail + 1;
-    raise e
+    Printexc.raise_with_backtrace e bt
 
 
 (** Runner **)

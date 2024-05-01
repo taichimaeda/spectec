@@ -223,16 +223,14 @@ rule Instr_ok/relop:
   C |- RELOP t relop_t : t t -> I32
 
 
+;; TODO: move side conditions to syntax
 rule Instr_ok/cvtop-reinterpret:
-  C |- CVTOP t_1 REINTERPRET t_2 : t_2 -> t_1
-  -- if $size(t_1) = $size(t_2)
+  C |- CVTOP nt_1 nt_2 REINTERPRET : nt_2 -> nt_1
+  -- if $size(nt_1) = $size(nt_2)
 
-rule Instr_ok/cvtop-convert-i:
-  C |- CVTOP inn_1 CONVERT inn_2 sx? : inn_2 -> inn_1
-  -- if sx? = eps <=> $size(inn_1) > $size(inn_2)
-
-rule Instr_ok/cvtop-convert-f:
-  C |- CVTOP fnn_1 CONVERT fnn_2 : fnn_2 -> fnn_1
+rule Instr_ok/cvtop-convert:
+  C |- CVTOP nt_1 nt_2 CONVERT sx? : nt_2 -> nt_1
+  -- if sx? = eps <=> nt_1 = Inn_1 /\ nt_2 = Inn_2 /\ $size(nt_1) > $size(nt_2) \/ nt_1 = Fnn_1 /\ nt_2 = Fnn_2
 
 
 ;; Local instructions
@@ -272,18 +270,18 @@ rule Instr_ok/memory.grow:
   -- if C.MEMS[0] = mt
 
 rule Instr_ok/load:
-  C |- LOAD nt (n _ sx)? memop : I32 -> nt
+  C |- LOAD nt (n _ sx)? memarg : I32 -> nt
   -- if C.MEMS[0] = mt
-  -- if $(2^(memop.ALIGN) <= $size(nt)/8)
-  -- if $(2^(memop.ALIGN) <= n/8 < $size(nt)/8)?
-  -- if n? = eps \/ nt = inn
+  -- if $(2^(memarg.ALIGN) <= $size(nt)/8)
+  -- if $(2^(memarg.ALIGN) <= n/8 < $size(nt)/8)?
+  -- if n? = eps \/ nt = Inn
 
 rule Instr_ok/store:
-  C |- STORE nt n? memop : I32 nt -> eps
+  C |- STORE nt n? memarg : I32 nt -> eps
   -- if C.MEMS[0] = mt
-  -- if $(2^(memop.ALIGN) <= $size(nt)/8)
-  -- if $(2^(memop.ALIGN) <= n/8 < $size(nt)/8)?
-  -- if n? = eps \/ nt = inn
+  -- if $(2^(memarg.ALIGN) <= $size(nt)/8)
+  -- if $(2^(memarg.ALIGN) <= n/8 < $size(nt)/8)?
+  -- if n? = eps \/ nt = Inn
 
 
 ;;

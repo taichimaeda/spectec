@@ -1,6 +1,5 @@
-open Util
-
 (* Configuration *)
+
 let name = "watsup"
 let version = "0.4"
 
@@ -38,7 +37,7 @@ type file_kind =
   | Output
 
 let target = ref Check
-let log = ref false        (* log execution steps *)
+let logging = ref false    (* log execution steps *)
 let in_place = ref false   (* splice patch files in place *)
 let dry = ref false        (* dry run for patching *)
 let warn_math = ref false  (* warn about unused or reused math splices *)
@@ -48,6 +47,8 @@ let file_kind = ref Spec
 let srcs = ref []    (* spec src file arguments *)
 let pdsts = ref []   (* patch file arguments *)
 let odsts = ref []   (* output file arguments *)
+
+let latex_macros = ref false
 
 let print_el = ref false
 let print_elab_il = ref false
@@ -117,7 +118,8 @@ let argspec = Arg.align
   "-i", Arg.Set in_place, " Splice patch files in-place";
   "-d", Arg.Set dry, " Dry run (when -p) ";
   "-o", Arg.Unit (fun () -> file_kind := Output), " Output files";
-  "-l", Arg.Set log, " Log execution steps";
+  "-l", Arg.Set logging, " Log execution steps";
+  "-ll", Arg.Set Backend_interpreter.Runner.logging, " Log interpreter execution";
   "-w", Arg.Unit (fun () -> warn_math := true; warn_prose := true),
     " Warn about unused or multiply used splices";
   "--warn-math", Arg.Set warn_math,
@@ -135,6 +137,8 @@ let argspec = Arg.align
   "--interpreter", Arg.Rest_all (fun args -> target := Interpreter args),
     " Generate interpreter";
   "--coq", Arg.Unit (fun () -> target := Coq), " Generate Coq";
+
+  "--latex-macros", Arg.Set latex_macros, " Splice Latex with macro invocations";
 
   "--print-el", Arg.Set print_el, " Print EL";
   "--print-il", Arg.Set print_elab_il, " Print IL (after elaboration)";
@@ -154,7 +158,7 @@ let argspec = Arg.align
 
 (* Main *)
 
-let log s = if !log then Printf.printf "== %s\n%!" s
+let log s = if !logging then Printf.printf "== %s\n%!" s
 
 let () =
   Printexc.record_backtrace true;
@@ -256,7 +260,13 @@ let () =
       log "Prose Generation...";
       let prose = Backend_prose.Gen.gen_prose il al in
       log "Splicing...";
-      let env = Backend_splice.Splice.(env config !pdsts !odsts elab_env el prose) in
+      let config' =
+        Backend_splice.Config.{config with latex = Backend_latex.Config.{config.latex with
+          macros_for_ids = !latex_macros;
+          macros_for_atoms = !latex_macros
+        }}
+      in
+      let env = Backend_splice.Splice.(env config' !pdsts !odsts elab_env el prose) in
       List.iter2 (Backend_splice.Splice.splice_file ~dry:!dry env) !pdsts !odsts;
       if !warn_math then Backend_splice.Splice.warn_math env;
       if !warn_prose then Backend_splice.Splice.warn_prose env;
@@ -278,15 +288,15 @@ let () =
     );
     log "Complete."
   with
-  | Error.Error (at, msg) as exn ->
+  | Util.Error.Error (at, msg) as exn ->
     let msg' =
       if !last_pass <> "" && String.starts_with ~prefix:"validation" msg then
         "(after pass " ^ !last_pass ^ ") " ^ msg
       else
         msg
     in
-    Error.print_error at msg';
-    Debug_log.log_exn exn;
+    Util.Error.print_error at msg';
+    Util.Debug_log.log_exn exn;
     exit 1
   | exn ->
     flush_all ();
