@@ -32,22 +32,33 @@ let case_mixop (m : mixop) =
     | _ -> ""
 
 
-let _find space env' id =
+let find space env' id =
   match Env.find_opt id.it env' with
   | None -> error id.at ("undeclared " ^ space ^ " `" ^ id.it ^ "`")
   | Some t -> t
 
+let string_of_option_typ (typ : typ option) =
+  match typ with
+    | Some a -> Il.Print.string_of_typ a
+    | None -> "None"
+
 let print_env (env: env) = 
-  Env.iter (fun id (n_id , _num_args, _is_inductive, _typ, _inst_env) -> print_endline (id ^ " " ^ n_id.it)) env.vars
+  Env.iter (fun id (n_id , num_args, is_inductive, typ, _inst_env) -> print_endline (
+    "Type Alias(Key): " ^ id ^ "\n" ^
+    "Actual Type: " ^ n_id.it ^ "\n" ^
+    "Num Args: " ^ string_of_int num_args ^ "\n" ^
+    "Type: " ^ string_of_option_typ typ ^ "\n" ^
+    "Is Inductive Type?: " ^ string_of_bool is_inductive ^ "\n")) env.vars
 
 let bind env' id t =
   if id = "_" then env' else
     Env.add id t env'
 
-let case_typ (t : typ) = 
+let rec case_typ (t : typ) = 
   match t.it with
     | VarT (id, args) -> (id, List.length args)
-    | _ -> ("" $ t.at, 0)
+    | IterT (typ, _) -> case_typ typ
+    | _ -> ("Terminal Type" $ t.at, 0)
 
 let case_exp (e : exp) = 
   match e.it with
@@ -76,8 +87,6 @@ let case_instance (e : env) (inst_env : inst_env) (id : id) (params : param list
           let n_id, _ = case_arg arg in
           (inst_env.cases <- bind inst_env.cases (case_mixop m) n_id)) args) typcases;
           e.vars <- bind e.vars id.it (id, List.length params, true, None, Some inst_env)
-        
-        
       | _ -> ()
     )
 let rec case_def (e : env) (d : def) = 
