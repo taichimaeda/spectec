@@ -1,0 +1,79 @@
+;;
+;; Projections
+;;
+
+def $funcs(externval*) : funcaddr*
+def $funcs(eps) = eps
+def $funcs((FUNC fa) externval'*) = fa $funcs(externval'*)
+def $funcs(externval externval'*) = $funcs(externval'*)
+  -- otherwise
+
+;;
+;; Allocation
+;;
+
+;; Definitions
+
+def $allocfunc(store, moduleinst, func) : (store, funcaddr)
+def $allocfunc(s, mm, func) = (s[.FUNCS =.. fi], |s.FUNCS|)
+  -- if fi = { TYPE mm.TYPES[x], MODULE mm, CODE func }
+  -- if func = FUNC x local* expr
+
+def $allocfuncs(store, moduleinst, func*) : (store, funcaddr*)
+def $allocfuncs(s, mm, eps) = (s, eps)
+def $allocfuncs(s, mm, func func'*) = (s_2, fa fa'*)
+  -- if (s_1, fa) = $allocfunc(s, mm, func)
+  -- if (s_2, fa'*) = $allocfuncs(s_1, mm, func'*)
+
+
+;; Modules
+
+def $instexport(funcaddr*, export) : exportinst
+def $instexport(fa*, EXPORT name (FUNC x)) = { NAME name, VALUE (FUNC fa*[x]) }
+
+def $allocmodule(store, module, externval*) : (store, moduleinst)
+def $allocmodule(s, module, externval*) = (s_1, mm)
+  -- if module =
+    MODULE
+      (TYPE ft)*
+      func^n_func
+      start?
+      export*
+  -- if fa_ex* = $funcs(externval*)
+  -- if fa* = $(|s.FUNCS|+i_func)^(i_func<n_func)
+  -- if xi* = $instexport(fa_ex* fa*, export)*
+  -- if mm = {
+      TYPES ft*,
+      FUNCS fa_ex* fa*,
+      EXPORTS xi*
+    }
+  -- if (s_1, fa*) = $allocfuncs(s, mm, func^n_func)
+
+
+;;
+;; Instantiation
+;;
+
+def $instantiate(store, module, externval*) : config
+def $instantiate(s, module, externval*) = s_1; f; (CALL x')?
+  -- if module = MODULE type* func* start? export*
+  -- if type* = (TYPE functype)*
+  -- if start? = (START x')?
+  -- if n_F = |func*|
+  -- if mm_init = {
+      TYPES functype*,
+      FUNCS $funcs(externval*) $(|s.FUNCS|+i_F)^(i_F<n_F)
+    }
+  -- if f_init = { MODULE mm_init }
+  -- if z = s; f_init
+  -- if (s_1, mm) = $allocmodule(s, module, externval*)
+  -- if f = { MODULE mm }
+
+;;
+;; Invocation
+;;
+
+def $invoke(store, funcaddr, val*) : config
+def $invoke(s, fa, val^n) = s; f; val^n (CALL_ADDR fa)
+  -- if f = { MODULE {} }
+  -- if $funcinst((s; f))[fa].TYPE = t_1^n -> t_2*

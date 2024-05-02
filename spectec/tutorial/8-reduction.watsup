@@ -1,0 +1,101 @@
+;;
+;; Configurations
+;;
+
+relation Step: config ~> config                 hint(show "E")
+
+;;
+;; Instructions
+;;
+
+;; Polymorphic instructions
+
+rule Step/nop:
+  z; NOP  ~>  z; eps
+
+rule Step/drop:
+  z; val DROP  ~>  z; eps
+
+
+rule Step/select-true:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_1
+  -- if c =/= 0
+
+rule Step/select-false:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_2
+  -- if c = 0
+
+
+;; Block instructions
+
+rule Step/block:
+  z; (BLOCK t? instr*)  ~>  z; (LABEL_ n `{eps} instr*)
+  -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
+
+rule Step/loop:
+  z; (LOOP t? instr*)  ~>  z; (LABEL_ 0 `{LOOP t? instr*} instr*)
+
+rule Step/if-true:
+  z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_1*)
+  -- if c =/= 0
+
+rule Step/if-false:
+  z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_2*)
+  -- if c = 0
+
+
+;; Branch instructions
+
+;; TODO: may want a label context instead of bubbling up
+rule Step/br-zero:
+  z; (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  z; val^n instr'*
+
+rule Step/br-succ:
+  z; (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  z; val* (BR l)
+
+
+rule Step/br_if-true:
+  z; (CONST I32 c) (BR_IF l)  ~>  z; (BR l)
+  -- if c =/= 0
+
+rule Step/br_if-false:
+  z; (CONST I32 c) (BR_IF l)  ~>  z; eps
+  -- if c = 0
+
+
+;; Function instructions
+
+rule Step/call:
+  z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])  ;; TODO
+
+rule Step/frame-vals:
+  z; (FRAME_ n `{f} val^n)  ~>  z; val^n
+
+rule Step/return-frame:
+  z; (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  z; val^n
+
+rule Step/return-label:
+  z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
+
+
+;; Numeric instructions
+
+rule Step/binop-val:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
+  -- if $binop(t, binop, c_1, c_2) = c  ;; TODO
+
+rule Step/binop-trap:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; TRAP
+  -- if $binop(t, binop, c_1, c_2) = eps  ;; TODO
+
+
+;; Local instructions
+
+rule Step/local.get:
+  z; (LOCAL.GET x)  ~>  z; $local(z, x)
+
+rule Step/local.set:
+  z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps
+
+rule Step/local.tee:
+  z; val (LOCAL.TEE x)  ~>  z; val val (LOCAL.SET x)

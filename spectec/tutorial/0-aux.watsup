@@ -1,0 +1,6 @@
+;; General variables
+
+var i : nat
+
+syntax N hint(macro) = nat  ;; hack
+syntax n hint(macro) = nat  ;; hack
