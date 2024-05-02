@@ -884,7 +884,7 @@ C \vdash \mathsf{extern.convert\_any} : (\mathsf{ref}~{\mathsf{null}^?}~\mathsf{
 <p>Vector instructions can have a prefix to describe the <a class="reference internal" href="../syntax/instructions.html#syntax-shape"><span class="std std-ref">shape</span></a> of the operand. Packed numeric types, <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle8}}\)</span> and <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle16}}\)</span>, are not <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value types</span></a>. An auxiliary function maps such packed type shapes to value types:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
-{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({{{\mathsf{i}}{n}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}}{N}) &amp;=&amp; {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathsf{i}}{n}) \\
+{\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}}({{{\mathsf{i}}{n}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}}{N}) &amp;=&amp; {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathsf{i}}{n}) \\
 \end{array}\end{split}\]</div>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c">
 <span id="valid-vconst"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c" title="Permalink to this heading">¶</a></h3>
@@ -1072,7 +1072,7 @@ C \vdash {\mathit{sh}}{.}\mathsf{shuffle}~{i^\ast} : \mathsf{v{\scriptstyle128}}
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
 }{
-C \vdash {\mathit{sh}}{.}\mathsf{splat} : {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{splat} : {\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1089,7 +1089,7 @@ C \vdash {\mathit{sh}}{.}\mathsf{splat} : {\href{../syntax/types.html#aux-unpack
 \frac{
 i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 }{
-C \vdash {{\mathit{sh}}{.}\mathsf{extract\_lane\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~i : \mathsf{v{\scriptstyle128}} \rightarrow {\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}})
+C \vdash {{\mathit{sh}}{.}\mathsf{extract\_lane\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~i : \mathsf{v{\scriptstyle128}} \rightarrow {\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}}({\mathit{sh}})
 }
 \qquad
 \end{array}\]</div>
@@ -1106,7 +1106,7 @@ C \vdash {{\mathit{sh}}{.}\mathsf{extract\_lane\_}}{{{\href{../syntax/instructio
 \frac{
 i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 }{
-C \vdash {\mathit{sh}}{.}\mathsf{replace\_lane}~i : \mathsf{v{\scriptstyle128}}~{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
+C \vdash {\mathit{sh}}{.}\mathsf{replace\_lane}~i : \mathsf{v{\scriptstyle128}}~{\href{../valid/instructions.html#aux-unpackshape}{\mathrm{unpack}}}({\mathit{sh}}) \rightarrow \mathsf{v{\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -2176,7 +2176,7 @@ C \vdash {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1 : {
  \qquad
 (C{.}\mathsf{locals}{}[x_1] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)^\ast
  \qquad
-C{}[\mathsf{local}{}[{x_1^\ast}] = {(\mathsf{set}~t)^\ast}] \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_2^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_3^\ast}
+C{}[\mathsf{withlocals}{}[{x_1^\ast}] = {(\mathsf{set}~t)^\ast}] \vdash {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_2^\ast}~{\rightarrow}_{{x_2^\ast}}\,{t_3^\ast}
 }{
 C \vdash {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~{\rightarrow}_{{x_1^\ast}~{x_2^\ast}}\,{t_3^\ast}
 }
