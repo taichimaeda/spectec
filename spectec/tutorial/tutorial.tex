@@ -1,0 +1,172 @@
+\documentclass{article}
+\usepackage{fullpage,fancyvrb,newverbs,xcolor}
+
+\definecolor{cverbbg}{gray}{0.93}
+
+\newenvironment{cverbatim}
+ {\SaveVerbatim{cverb}}
+ {\endSaveVerbatim
+  \flushleft\fboxrule=0pt\fboxsep=.5em
+  \colorbox{cverbbg}{\BUseVerbatim{cverb}}%
+  \endflushleft
+}
+\newenvironment{lcverbatim}
+ {\SaveVerbatim{cverb}}
+ {\endSaveVerbatim
+  \flushleft\fboxrule=0pt\fboxsep=.5em
+  \colorbox{cverbbg}{%
+    \makebox[\dimexpr\linewidth-2\fboxsep][l]{\BUseVerbatim{cverb}}%
+  }
+  \endflushleft
+}
+
+\newcommand{\ctexttt}[1]{\colorbox{cverbbg}{\texttt{#1}}}
+\newverbcommand{\cverb}
+  {\setbox\verbbox\hbox\bgroup}
+  {\egroup\colorbox{cverbbg}{\box\verbbox}}
+
+
+\newcommand\X[1]{\mathit{#1}}
+\newcommand\K[1]{\texttt{#1}}
+
+\date{}
+
+\begin{document}
+\title{Minimini-Wasm Tutorial}
+\maketitle
+
+\section{Introduction}
+In this tutorial, we will practice how to write a spec.
+Here, instead of a full Wasm, a very simplified version of Wasm (which we call Minimini-Wasm) is used as our goal.
+Abstract syntax of Minimini-Wasm is as follows:
+\[
+\begin{array}{rrl}
+\X{module} & ::= & \X{function}^*\ \X{start}^?\\
+\X{function} & ::= & \X{type}_{\X{func}}\ \X{code}\ \X{export}^*\\
+\X{start} & ::= & \X{idx}_{\X{func}}\\
+\X{export} & ::= & \mbox{``}\K{name}\mbox{''}\\
+\X{code} & ::= & (\K{local}\ \X{type}_{\X{val}})^*\ \X{instr}^*\\
+\X{init} & ::= & \X{instr}^*\\
+\X{instr} & ::= & \K{nop}~\mid~\K{drop}~\mid~\K{select}~\mid~
+\X{type}_{\X{val}}\K{.const}\ \X{value}\K{\_}(\X{type}_{\X{val}})~\mid~
+\X{binary}\\
+&\mid&(\K{set}\mid\K{get}\mid\K{tee})\K{\_}\K{local}\ \X{idx}_{\X{label}}~\mid~
+\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}~\mid~\K{block}~\mid~\K{loop}~\mid~\K{if}\\
+&\mid&\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
+\X{binary} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
+\K{i64.add}~\mid~\K{i64.sub}~\mid~\K{i64.mul}\\
+\X{type}_{\X{val}} & ::= & \K{i32}~\mid~\K{i64}\\
+\X{type}_{\X{func}} & ::= & \X{type}_{\X{val}}^*\rightarrow \X{type}_{\X{val}}^*\\
+\X{idx}_{\X{func}|\X{local}|\X{label}} & \in & [0,\ 2^{32} - 1]\\
+\X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
+\X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
+\end{array}
+\]
+
+\subsection{Directory of specs}
+Each folder in the directory \K{spectec/spec} indicates different versions of Wasm spec.
+Among them, directory \K{wasm-0.0} is where we will work on.
+
+\section{Syntax}
+Now, we will start from writing the syntax of Minimini-Wasm.
+Make a new file \K{1-syntax.wastup} in directory \K{wasm-0.0 }.
+
+Declaring syntax in Wasm-DSL is basically done like this:
+\begin{lcverbatim}
+syntax <name_of_syntax> = | <case> | <case> | <case> |
+\end{lcverbatim}
+Use keyword \K{syntax}, and simply list the possible cases with the separator \K{|}.
+We'll declare each of the syntax one by one.
+
+\subsection{\K{valtype}}
+\[
+\X{type}_{\X{val}} ::= \K{i32}~\mid~\K{i64}
+\]
+This syntax is simply written in Wasm-DSL like this:
+\begin{lcverbatim}
+syntax valtype = | I32 | I64 |
+\end{lcverbatim}
+This means the syntax \K{valtype} is either \K{I32} or \K{I64}.
+Similarly, let's declare each of the syntax one by one.
+
+\subsection{\K{idx}}
+\[
+\X{idx}_{\X{func}|\X{local}|\X{label}} \in [0,\ 2^{32} - 1]
+\]
+You can use \K{...} to describe a range.
+The Wasm-DSL version of upper syntax will be:
+\begin{lcverbatim}
+syntax idx = 0 | ... | 2^32-1
+\end{lcverbatim}
+Since we have three types of index (which are semantically same, but syntactically different), write like this:
+\begin{lcverbatim}
+syntax funcidx = idx
+syntax labelidx = idx
+syntax localidx = idx
+\end{lcverbatim}
+
+\subsection{\K{value}}
+\[
+\begin{array}{rrl}
+\X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
+\X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
+\end{array}
+\]
+Here, the syntax \K{value} is declared in regard with parameter \K{valtype}.
+This can be done like this:
+\begin{lcverbatim}
+syntax val(valtype)
+syntax val(I32) = 0 | ... | 2^32-1
+syntax val(I64) = 0 | ... | 2^64-1
+\end{lcverbatim}
+Here we can declare a general range, by using parameter again.
+\begin{lcverbatim}
+syntax iN(N) = 0 | ... | 2^N-1
+\end{lcverbatim}
+Here, \K{N} is a pre-defined syntax, which indicates any natural number.
+Now, we can write \K{iN(32)} and \K{iN(64)} instead of \verb!0 | ... | 2^32-1! and \verb!0 | ... | 2^64-1!.
+New declaration of \K{idx} and \K{val} is as follows:
+\begin{lcverbatim}
+syntax idx = iN(32)
+syntax val(valtype)
+syntax val(I32) = iN(32)
+syntax val(I64) = iN(64)
+\end{lcverbatim}
+
+\subsection{\K{char}}
+\begin{lcverbatim}
+syntax char = U+0000 | ... | U+D7FF | U+E000 | ... | U+10FFFF
+\end{lcverbatim}
+From the syntax \K{char}, we can declare \K{name}, which is an iteration of \K{char} s.
+Use \K{*} to represent a sequence:
+\begin{lcverbatim}
+syntax name = char*
+\end{lcverbatim}
+
+\subsection{\K{binop}}
+\begin{lcverbatim}
+syntax binop_(valtype) = | ADD | SUB | MUL
+\end{lcverbatim}
+
+\subsection{\K{instr}}
+\begin{lcverbatim}
+syntax instr =
+  | NOP
+  | DROP
+  | SELECT
+  | CONST valtype val_(valtype)
+  | BINOP valtype binop_(valtype)
+  | LOCAL.GET idx
+  | LOCAL.SET idx
+  | LOCAL.TEE idx
+  | CALL idx
+  | RETURN
+  | BLOCK blocktype instr*
+  | LOOP blocktype instr*
+  | IF blocktype instr* ELSE instr*
+  | BR labelidx
+  | BR_IF labelidx
+\end{lcverbatim}
+
+
+\end{document}
