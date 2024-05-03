@@ -5,6 +5,7 @@ open Case
 let parens s = "(" ^ s ^ ")"
 let curly_parens s = "{" ^ s ^ "}"
 let square_parens s = "[" ^ s ^ "]"
+let error at msg = Error.error at "Coq Generation" msg
 
 (* Function prefix (To avoid same name clash on types) *)
 let func_prefix = "fun_"
@@ -47,7 +48,7 @@ let gen_mixop (m : mixop) =
 
 let gen_iter_typ (it : iter) =
   match it with
-    | Opt -> "option" 
+    | Opt -> "list" 
     | (List | List1 | ListN _) -> "list"
 
 
@@ -61,12 +62,12 @@ let rec get_actual_case_name (env : env) (id : id) =
 let gen_case_name (env : env) (t : typ) =
   match t.it with
     | VarT (id, _) -> get_actual_case_name env id
-    | _ -> assert false
+    | _ -> error t.at "Should not happen"
 
 let gen_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> gen_id id
-    | _ -> assert false
+    | _ -> error t.at "Should not happen"
 
 let gen_binop (b : binop) =
   match b with
@@ -119,37 +120,41 @@ let rec gen_exp (env : env) (is_match : bool) (e : exp) =
       else parens (gen_exp env is_match exp1 ^ gen_binop binop ^ gen_exp env is_match exp2)
     | CmpE (cmpop, exp1, exp2) -> parens (gen_exp env is_match exp1 ^ gen_cmpop cmpop ^ gen_exp env is_match exp2)
     | SliceE (_exp1, _exp2, _exp3) -> "8" (* TODO *)
-    | UpdE (exp1, path, exp2) -> parens ("list_update " ^ parens (gen_exp env is_match exp1) ^ " " ^ parens (gen_path env path is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2))
+    | UpdE (exp1, path, exp2) -> 
+      parens ("list_update " ^ parens (gen_exp env is_match exp1) ^ " " ^ parens (gen_path env path is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2))
     | ExtE (exp1, path, exp2) -> parens ("list_extend " ^ parens (gen_path env path is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2))
     | StrE expfields -> "{| " ^ String.concat "; " (List.map (fun (a, exp) -> 
       gen_typ_name e.note ^ "__" ^ gen_atom a ^ " := " ^ gen_exp env false exp) expfields) 
       ^ " |}"
     | DotE (exp, atom) -> parens (gen_typ_name exp.note ^ "__" ^ gen_atom atom ^  " " ^ gen_exp env is_match exp)
-    | CompE (exp, exp2) -> parens (gen_exp env false exp ^ " ++ " ^ gen_exp env false exp2)
+    | CompE (exp, exp2) -> parens ("_append " ^ gen_exp env false exp ^ " " ^ gen_exp env false exp2)
     | TupE [] -> "tt"
     | TupE exps -> String.concat " " (List.map (gen_exp env is_match) exps)
     | CallE (id, args) -> parens (func_prefix ^ gen_id id ^ " " ^ gen_call_args env args)
-    | IterE (exp, (_iter, _ids)) -> gen_exp env is_match exp
-    | OptE None -> "None"
-    | OptE (Some exp) -> "Some " ^ gen_exp env is_match exp  
-    | TheE exp -> "the" ^ parens (gen_exp env is_match exp)             
+    | IterE (exp, (iter, ids)) -> 
+      let exp1 = gen_exp env is_match exp in
+      (match iter, ids, exp.it with
+      | (List | List1 | ListN _), [], _ -> square_parens exp1 
+      | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
+      | (List | List1 | ListN _ | Opt), [(v, _)], _ when not is_match -> parens ("List.map " ^ parens ("fun " ^ var_prefix ^ gen_id v ^ " => " ^ exp1) ^ " " ^ parens (var_prefix ^ gen_id v))
+      | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ when not is_match -> parens ("list_zipWith " ^
+        parens ("fun " ^ var_prefix ^ gen_id v ^ " " ^ var_prefix ^ gen_id s ^ " => " ^ gen_tup_exp env exp) ^ " " ^ 
+        parens (var_prefix ^ gen_id v) ^ " " ^ 
+        parens (var_prefix ^ gen_id s))
+      | _ -> exp1
+    ) 
+    | OptE None -> "[]"
+    | OptE (Some exp) -> square_parens (gen_exp env is_match exp)
+    | TheE exp -> parens ("the" ^ parens (gen_exp env is_match exp))
     | ListE exps -> (match exps with
       | [] -> "[]"
       | [e] -> if is_match then gen_exp env is_match e else square_parens (gen_exp env is_match e)
       | _ -> square_parens (String.concat ";" (List.map (gen_exp env false) exps)))
     | LenE exp -> "List.length(" ^ gen_exp env is_match exp ^ ")"
-    | CatE (exp1, exp2) -> let op = if is_match then " :: " else " ++ " in
-      let exp1_option = (match exp1.it with
-        | IterE (_, (Opt, _)) -> "option_to_list "
-        | _ -> ""
-      ) ^ gen_exp env is_match exp1 
-      in
-      let exp2_option = (match exp2.it with
-        | IterE (_, (Opt, _)) -> "option_to_list "
-        | _ -> ""
-      ) ^ gen_exp env is_match exp2
-      in      
-      parens (exp1_option ^ op ^ exp2_option)   
+    | CatE (exp1, exp2) -> 
+      let exp1_option = gen_exp env is_match exp1 in
+      let exp2_option = gen_exp env is_match exp2 in      
+      if is_match then parens (exp1_option ^ " :: " ^ exp2_option)  else parens ("_append " ^ exp1_option ^ " " ^ exp2_option) 
     | IdxE (exp1, exp2) -> parens ("lookup_total " ^ parens (gen_exp env is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2))
     | CaseE (mixop, exp1) -> let actual_id, num_args = gen_case_name env e.note in 
       let gen_exp1 = (match exp1.it with 
@@ -168,9 +173,9 @@ and gen_tup_exp (env : env) (exp : exp) =
 and gen_numtyp (nt : numtyp) =
   match nt with
     | NatT -> "nat"
-    | IntT -> "Z"
-    | RatT -> "float"
-    | RealT -> "float"
+    | IntT -> "nat"
+    | RatT -> "nat"
+    | RealT -> "nat"
 
 and gen_typ (env : env) (t: typ) =
   match t.it with
@@ -182,10 +187,27 @@ and gen_typ (env : env) (t: typ) =
     | TupT typs -> String.concat " * " (List.map (fun (_, t) -> gen_typ env t) typs)
     | IterT (typ, iter) -> gen_iter_typ iter ^ " " ^ parens (gen_typ env typ)
 
+and gen_exp_args (env : env) (is_match : bool) (e : exp) =
+  match e.it with
+    | TupE [] -> "_"
+    | IterE (e, _binds) -> gen_exp_args env is_match e 
+    | TupE exps -> let first_e = List.hd exps in gen_exp env is_match first_e
+    | _ -> gen_exp env is_match e
+
 and gen_typ_args (env : env) (t : typ) =
   match t.it with
-    | TupT typs -> String.concat " " (List.map (fun (e, t) -> parens (gen_exp env true e ^ " : " ^ gen_typ env t)) typs)
+    | TupT typs -> String.concat " " (List.map (fun (e, t) -> parens (gen_exp_args env true e ^ " : " ^ gen_typ env t)) typs)
     | _ -> parens (gen_typ env t)
+
+and gen_typealias_args (env : env) (t : typ) =
+  match t.it with
+    | VarT (id, args) -> let genargs = (match args with
+      | [] -> ""
+      | args' -> String.concat " " (List.map (fun a -> match a.it with 
+        | ExpA exp -> gen_exp env false exp
+        | TypA typ -> gen_typ env typ) args')) in
+      gen_id id ^ " " ^ genargs
+    | _ -> gen_typ env t
 
 and gen_relation_param_types (env : env) (t : typ) =
   match t.it with
@@ -203,16 +225,15 @@ and gen_bind (env : env) (b : bind) =
       parens (var_prefix ^ gen_id id ^ " : " ^ iter_typs ^ gen_typ env typ)
     | TypB id -> gen_id id
 
-and gen_arg (env : env) (a : arg * bind) =
-  match a with
-    | ({it = ExpA exp; _},{it = ExpB (_, typ, _); _}) -> Some (parens (gen_exp env false exp ^ " : " ^ gen_typ env typ))
-    | ({it = TypA typ; _},{it = TypB _; _}) -> Some (curly_parens (gen_typ env typ))
-    | _ -> None
+and gen_bind_arg (env : env) (b : bind) =
+  match b.it with
+    | ExpB (id, typ, _) -> parens (var_prefix ^ gen_id id ^ " : " ^ gen_typ env typ)
+    | TypB id -> curly_parens (gen_id id)
 
-and gen_inductive_args (env : env) (binds : bind list) (args : arg list) =
-  match args with
+and gen_inductive_args (env : env) (binds : bind list) =
+  match binds with
     | [] -> ""
-    | _ -> String.concat " " (List.filter_map (gen_arg env) (List.combine args binds))
+    | _ -> String.concat " " (List.map (gen_bind_arg env) binds)
 
 and gen_arg_name (env : env) (is_match : bool) (a : arg) = 
   match a.it with
@@ -248,8 +269,10 @@ let rec gen_premises (env : env) (p : prem) =
     | ElsePr -> ""
     | LetPr (_exp1, _exp2, _ids) -> "1"
     | IterPr (p, (iter, ids)) -> (match iter, ids with
-      | Opt, [(i, _typ)] -> "Option.map " ^ parens ( "fun " ^ var_prefix ^ gen_id i ^ " => " ^ gen_premises env p) ^ " " ^ parens (var_prefix ^ gen_id i) 
+      | Opt, [(i, _typ)] -> "List.Forall " ^ parens ( "fun " ^ var_prefix ^ gen_id i ^ " => " ^ gen_premises env p) ^ " " ^ parens (var_prefix ^ gen_id i) 
       | (List | List1 | ListN _), [(i, _typ)] -> "List.Forall " ^ parens ( "fun " ^ var_prefix ^ gen_id i ^ " => " ^ gen_premises env p) ^ " " ^ parens (var_prefix ^ gen_id i) 
+      | (List | List1 | ListN _), [(i, _); (i2, _)] -> "List.Forall " ^ parens ("fun '(" ^ var_prefix ^ gen_id i ^ ", " ^ var_prefix ^ gen_id i2 ^ ") => " ^ gen_premises env p) ^ " " ^ 
+        parens ("combine " ^ var_prefix ^ gen_id i ^ " " ^ var_prefix ^ gen_id i2)
       | _, _ -> gen_premises env p
     )
 
@@ -282,18 +305,26 @@ let gen_record_inhabitance_proof (id : id) (typfields : typfield list) : string 
 
 let gen_deftyp (env : env) (binds : bind list) (args : arg list) (id : id) (d : deftyp) =
   match d.it with
-    | AliasT typ -> "Definition " ^ gen_id id ^ gen_inductive_args env binds args ^  " := " ^ gen_typ env typ
-    | StructT typfields -> "Record " ^ gen_id id ^ " := \n{" ^ "\t" ^
+    | AliasT typ -> "Definition " ^ gen_id id ^ gen_inductive_args env binds ^  " := " ^ gen_typealias_args env typ
+    | StructT typfields -> 
+      let type_ident = gen_id id in 
+      "Record " ^ type_ident ^ " := \n{" ^ "\t" ^
       String.concat "\n;\t" (List.map (fun (a, (_, t, _premises), _) -> 
-        gen_id id ^ "__" ^ gen_atom a ^ " : " ^ gen_typ env t
+        type_ident ^ "__" ^ gen_atom a ^ " : " ^ gen_typ env t
       ) typfields) ^ "\n}" ^ ".\n\n" ^
       gen_record_inhabitance_proof id typfields
+      ^ ".\n\n" ^
+      "Definition _append_" ^ type_ident ^ " (arg1 arg2 : " ^ type_ident ^ ") :=\n" ^ 
+      "{|\n" ^ "\t" ^ String.concat "\t" (List.map (fun (a, (_, _, _premises), _) -> 
+        type_ident ^ "__" ^ gen_atom a ^ " := " ^ "_append arg1.(" ^ type_ident ^ "__" ^ gen_atom a ^ ") arg2.(" ^ type_ident ^ "__" ^ gen_atom a ^ ");\n" 
+      ) typfields) ^ "|}.\n\n" ^ 
+      "Global Instance Append_" ^ type_ident ^ " : Append " ^ type_ident ^ " := { _append arg1 arg2 := _append_" ^ type_ident ^ " arg1 arg2 }"
     | VariantT typcases -> 
       let arg_names = match args with 
         | [] -> "" 
         | _ -> " " ^ String.concat " " (List.filter_map (gen_arg_name env false) args)
       in 
-      "Inductive " ^ gen_id id ^ " " ^ gen_inductive_args env binds args ^  " : Type :=\n" ^ 
+      "Inductive " ^ gen_id id ^ " " ^ gen_inductive_args env binds ^  " : Type :=\n" ^ 
       String.concat "\n" (List.map (fun (m, (_, t, _premises), _) -> 
       "\t| " ^ gen_id id ^ "__" ^ gen_mixop m ^ gen_typ_args env t ^ ": " ^
       gen_id id ^ arg_names) typcases) ^ ".\n\n" ^ gen_inductive_inhabitance_proof id typcases
@@ -324,7 +355,7 @@ let gen_match_clause (params : param list) =
 let gen_instance (env : env) (id : id) (params : param list) (i : inst) =
   match i.it with
     | InstD (binds, args, deftyp) -> (match deftyp.it with
-      | AliasT typ -> "\t\t| " ^ gen_match_args env args ^ " => " ^ gen_typ env typ
+      | AliasT typ -> "\t\t| " ^ gen_match_args env args ^ " => " ^ gen_typealias_args env typ
       | VariantT typcases -> 
       let inductive_name = gen_id id ^ "__" ^ String.concat "__" (List.map (gen_bind_typ env) binds) 
       in 
@@ -390,7 +421,8 @@ let rec gen_def (env : env) (is_recursive : bool) (d : def)=
   match d.it with
     | TypD (id, _params, [{it = InstD (binds, args, deftyp); _}]) -> gen_deftyp env binds args id deftyp
     | TypD (id, params, insts) -> gen_instances env params id insts
-    | RelD (id, _mixop, typ, rules) -> "Inductive " ^ gen_id id ^ ": " ^ gen_relation_param_types env typ ^ " -> Prop := \n" ^ gen_rules env id rules
+    | RelD (id, _mixop, typ, rules) -> let prefix = if is_recursive then "" else "Inductive " in 
+      prefix ^ gen_id id ^ ": " ^ gen_relation_param_types env typ ^ " -> Prop := \n" ^ gen_rules env id rules
     | DecD (id, params, typ, clauses) -> let prefix = if is_recursive then "Fixpoint " else "Definition " in 
       if clauses == [] then
         (gen_axiom env id params typ)
@@ -401,9 +433,9 @@ let rec gen_def (env : env) (is_recursive : bool) (d : def)=
         ^ gen_clauses env params clauses)
     | RecD defs -> (match defs with
         | [] -> ""
-        | [d] -> gen_def env true d
+        | [d] -> gen_def env (not (is_inductive d)) d
         | d :: ds -> let inductive_word = if is_inductive d then "with\n\n" else "" in
-          gen_def env true d ^ "\n\n" ^ inductive_word ^ String.concat "\n\n" (List.map (gen_def env true) ds))  
+          gen_def env false d ^ "\n\n" ^ inductive_word ^ String.concat "\n\n" (List.map (gen_def env true) ds))  
     | _ -> ""
 
 let gen_script (env : env) (il : script) =
@@ -411,8 +443,9 @@ let gen_script (env : env) (il : script) =
 
 let gen_string (il : script) =
   let env = Case.get_case_env il in 
+  "(* Exported Code *)" ^
   "From Coq Require Import String List Unicode.Utf8.\n" ^
-  "Import ListNotations.\n" ^
+  (* "From RecordUpdate Require Import RecordSet.\n" ^ *)
   "Require Import NArith.\n" ^
   "Require Import Arith.\n" ^
   "Require Import BinNat.\n" ^
@@ -422,14 +455,17 @@ let gen_string (il : script) =
   "Require Import FloatOps.\n" ^
   "Require Import FloatAxioms.\n" ^
   "Require Import FloatLemmas.\n" ^
+  "Declare Scope wasm_scope.\n\n" ^
   "Class Inhabited (T: Type) := { default_val : T }.\n\n" ^
   "Definition lookup_total {T: Type} {_: Inhabited T} (l: list T) (n: nat) : T :=\n" ^
   "\tList.nth n l default_val.\n\n" ^
-  "Definition the {T : Type} {_ : Inhabited T} (arg : option T) : T :=\n" ^
+  "Definition the {T : Type} {_ : Inhabited T} (arg : list T) : T :=\n" ^
 	"\tmatch arg with\n" ^
-	"\t\t| Some a => a\n" ^
-	"\t\t| None => default_val\n" ^
+	"\t\t| nil => default_val\n" ^
+	"\t\t| v :: vs => v\n" ^
 	"\tend.\n\n" ^
+  "Definition list_zipWith {X Y Z : Type} (f : X -> Y -> Z) (xs : list X) (ys : list Y) : list Z :=\n" ^
+  "\tmap (fun '(x, y) => f x y) (combine xs ys).\n\n" ^
   "Fixpoint list_update {α: Type} (l: list α) (n: nat) (y: α): list α :=\n" ^
   "\tmatch l, n with\n" ^
   "\t\t| nil, _ => nil\n" ^
@@ -438,17 +474,19 @@ let gen_string (il : script) =
   "\tend.\n\n" ^
   "Definition list_extend {α: Type} (l: list α) (y: α): list α :=\n" ^
   "\ty :: l.\n\n" ^
-  "Definition option_to_list {α : Type} (o : option α): list α :=\n" ^
-  "\tmatch o with\n" ^
-  "\t\t| None => nil\n" ^
-  "\t\t| Some a => cons a nil\n" ^
-  "\tend.\n\n" ^
+  "Class Append (α: Type) := _append : α -> α -> α.\n\n" ^
+  "Infix \"++\" := _append (right associativity, at level 60) : wasm_scope.\n\n" ^
+  "Global Instance Append_List_ {α: Type}: Append (list α) := { _append l1 l2 := List.app l1 l2 }.\n\n" ^
+  "Global Instance Append_nat : Append (nat) := { _append n1 n2 := n1 + n2}.\n\n" ^
   "Global Instance Inh_unit : Inhabited unit := { default_val := tt }.\n\n" ^
   "Global Instance Inh_nat : Inhabited nat := { default_val := O }.\n\n" ^
   "Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }.\n\n" ^
   "Global Instance Inh_option {T: Type} : Inhabited (option T) := { default_val := None }.\n\n" ^
+  "Global Instance Inh_Z : Inhabited Z := { default_val := Z0 }.\n\n" ^
   "Global Instance Inh_prod {T1 T2: Type} {_: Inhabited T1} {_: Inhabited T2} : Inhabited (prod T1 T2) := { default_val := (default_val, default_val) }.\n\n" ^
   "\n" ^
+  "Open Scope wasm_scope.\n" ^
+  "Import ListNotations.\n" ^
   "(* Generated Code *)\n" ^
   gen_script env il
 

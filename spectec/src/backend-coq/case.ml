@@ -56,14 +56,14 @@ let bind env' id t =
 
 let rec case_typ (t : typ) = 
   match t.it with
-    | VarT (id, args) -> (id, List.length args)
+    | VarT (id, _) -> id
     | IterT (typ, _) -> case_typ typ
-    | _ -> ("Terminal Type" $ t.at, 0)
+    | _ -> "Terminal Type" $ t.at
 
 let case_exp (e : exp) = 
   match e.it with
-    | VarE id -> (id, 0)
-    | _ -> ("" $ e.at, 0)
+    | VarE id -> id
+    | _ -> "" $ e.at
 let case_arg (a : arg) = 
   match a.it with
     | ExpA e -> case_exp e
@@ -72,8 +72,8 @@ let case_arg (a : arg) =
 let case_deftyp (id : id) (args : arg list) (e : env) (dtyp : deftyp) =
   match dtyp.it with
   | AliasT typ -> 
-    let next_id, num_args = case_typ typ in 
-    e.vars <- bind e.vars id.it (next_id, num_args, false, Some typ, None)
+    let next_id = case_typ typ in 
+    e.vars <- bind e.vars id.it (next_id, List.length args, false, Some typ, None)
   | StructT _ -> ()
   | VariantT _ -> 
     e.vars <- bind e.vars id.it (id, List.length args, true, None, None)
@@ -82,9 +82,12 @@ let case_instance (e : env) (inst_env : inst_env) (id : id) (params : param list
   match i.it with
     | InstD (_, args, deftyp) -> 
         (match deftyp.it with
+      | AliasT typ -> 
+        let n_id = case_typ typ in
+        e.vars <- bind e.vars id.it (n_id, List.length params, true, Some typ, None)
       | VariantT typcases -> List.iter (fun (m, _, _) -> 
         List.iter (fun arg -> 
-          let n_id, _ = case_arg arg in
+          let n_id = case_arg arg in
           (inst_env.cases <- bind inst_env.cases (case_mixop m) n_id)) args) typcases;
           e.vars <- bind e.vars id.it (id, List.length params, true, None, Some inst_env)
       | _ -> ()
