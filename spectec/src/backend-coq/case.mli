@@ -2,11 +2,13 @@ open Il.Ast
 
 module Env : Map.S
 
-type inst_env = 
-{ mutable cases : id Env.t
-}
+type struct_type =
+    | Record
+    | Inductive
+    | TypeAlias
+    | Terminal (* nat, bool, list, etc.*)
 
-type var_typ = id * int * bool * typ option * inst_env option 
+type var_typ = id * int * struct_type
 
 type env =
 { mutable vars : var_typ Env.t
@@ -15,3 +17,4 @@ type env =
 val get_case_env : Il.Ast.script -> env
 val print_env : env -> unit
 val find : text -> 'a Env.t -> id -> 'a
+val string_of_struct_type : struct_type -> text

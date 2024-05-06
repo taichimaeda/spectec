@@ -67,10 +67,22 @@ let rec _print_paths (paths : path list) = match paths with
   | {it = IdxP _; _} :: ps -> print_endline ("IdxP"); _print_paths ps
 
 let rec get_actual_case_name (env : env) (id : id) =
-  let (n_id, num_args, is_inductive, _, _) = find "Case" env.vars id in
-  if is_inductive then (n_id, num_args) else 
-  let actual_id, final_args = get_actual_case_name env n_id in
-  (actual_id, num_args + final_args)
+  let (n_id, num_args, struct_type) = find "Case" env.vars id in
+  (match struct_type with 
+    | TypeAlias -> let actual_id, final_args = get_actual_case_name env n_id in
+    (actual_id, num_args + final_args)
+    | Inductive -> (n_id, num_args)
+    | _ -> error id.at "Should be a Variant type or type alias"
+  )
+
+let rec get_struct_type (env : env) (id : id) =
+  let (n_id, _, struct_type) = find "Case" env.vars id in
+  (match struct_type with 
+    | TypeAlias -> get_struct_type env n_id
+    | Inductive -> Inductive
+    | Record -> Record
+    | Terminal -> Terminal
+  )
 
 let gen_case_name (env : env) (t : typ) =
   match t.it with
@@ -81,6 +93,11 @@ let gen_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> gen_id id
     | _ -> error t.at "Should not happen"
+
+let get_typ_name (t : typ) = 
+  match t.it with
+    | VarT (id, _) -> Some id
+    | _ -> None
 
 let gen_binop (b : binop) =
   match b with
@@ -135,7 +152,7 @@ let rec gen_exp (env : env) (is_match : bool) (e : exp) =
     | SliceE (exp1, exp2, exp3) -> parens ("list_slice " ^ parens (gen_exp env is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2) ^ " " ^ parens (gen_exp env is_match exp3)) (* TODO *)
     | UpdE (exp1, path, exp2) -> 
       gen_path_start env path is_match exp1 exp2
-    | ExtE (exp1, path, exp2) -> parens ("list_extend " ^ parens (gen_path_start env path is_match exp1 exp2) ^ " " ^ parens (gen_exp env is_match exp2))
+    | ExtE (_exp1, _path, _exp2) -> "" (* TODO *)
     | StrE expfields -> "{| " ^ String.concat "; " (List.map (fun (a, exp) -> 
       gen_typ_name e.note ^ "__" ^ gen_atom a ^ " := " ^ gen_exp env false exp) expfields) 
       ^ " |}"
@@ -293,7 +310,6 @@ and _gen_path_name (env : env) (p : path) (is_match : bool) (e : exp) =
 
 and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) (is_match : bool) (update_exp : exp) = 
   match paths with
-    | [] -> ""
     | {it = DotP _; _} as p :: ps -> let (dot_paths, rest) = list_split is_dot (p :: ps) in 
       let (prefix, name) = (match start_exp with  
         | Some e -> let name = gen_exp env is_match e in (name, name)
@@ -327,7 +343,6 @@ and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) 
         (gen_exp env is_match e1) 
         (gen_exp env is_match e2) 
         (gen_exp env is_match update_exp)
-    
     | _ -> ""
 
 and gen_path_start (env : env) (p : path) (is_match : bool) (e : exp) (update_exp : exp) =
@@ -375,11 +390,15 @@ let gen_record_inhabitance_proof (id : id) (typfields : typfield list) : string 
         "  " ^ gen_id id ^ "__" ^ gen_atom a ^ " := default_val ;\n"
         ) typfields) ^ "|} }"
 
-let gen_record_append_proof (ident: text) (typfields : typfield list) =
+let gen_record_append_proof (env : env) (ident: text) (typfields : typfield list) =
   "Definition _append_" ^ ident ^ " (arg1 arg2 : " ^ ident ^ ") :=\n" ^ 
-  "{|\n" ^ "\t" ^ String.concat "\t" (List.map (fun (a, _, _) -> 
-    ident ^ "__" ^ gen_atom a ^ " := " ^ "_append arg1.(" ^ ident ^ "__" ^ gen_atom a ^ ") arg2.(" ^ ident ^ "__" ^ gen_atom a ^ ");\n" 
-  ) typfields) ^ "|}.\n\n" ^ 
+  "{|\n" ^ "\t" ^ String.concat "\t" (List.map (fun (a, (_, t, _), _) -> 
+    let typ_name = get_typ_name t in
+    let struct_type = Option.map (get_struct_type env) typ_name in 
+    (match struct_type with 
+      | Some Inductive -> ident ^ "__" ^ gen_atom a ^ " := " ^ "arg1.(" ^ ident ^ "__" ^ gen_atom a ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
+      | _ -> ident ^ "__" ^ gen_atom a ^ " := " ^ "arg1.(" ^ ident ^ "__" ^ gen_atom a ^ ") ++ arg2.(" ^ ident ^ "__" ^ gen_atom a ^ ");\n" 
+  )) typfields) ^ "|}.\n\n" ^ 
   "Global Instance Append_" ^ ident ^ " : Append " ^ ident ^ " := { _append arg1 arg2 := _append_" ^ ident ^ " arg1 arg2 }"
 
 let gen_record_setter_instances (ident : text) (constructor_name : text) (typfields : typfield list) = 
@@ -397,7 +416,7 @@ let gen_deftyp (env : env) (binds : bind list) (args : arg list) (id : id) (d : 
         type_ident ^ "__" ^ gen_atom a ^ " : " ^ gen_typ env t
       ) typfields) ^ "\n}" ^ ".\n\n" ^
       gen_record_inhabitance_proof id typfields ^ ".\n\n" ^
-      gen_record_append_proof type_ident typfields ^ ".\n\n" ^ 
+      gen_record_append_proof env type_ident typfields ^ ".\n\n" ^ 
       gen_record_setter_instances type_ident constructor_name typfields
     | VariantT typcases -> 
       let arg_names = match args with 
