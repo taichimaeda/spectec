@@ -21,7 +21,7 @@ let rec list_split (f : 'a -> bool) (l : 'a list) = match l with
   | [] -> ([], [])
   | x :: xs when f x -> let x_true, x_false = list_split f xs in
     (x :: x_true, x_false)
-  | x :: xs -> ([], x :: xs)
+  | xs -> ([], xs)
 
 let gen_id' (s : text) = match s with
  | s when IdSet.mem s reserved_ids -> "reserved__" ^ s
@@ -99,6 +99,13 @@ let get_typ_name (t : typ) =
     | VarT (id, _) -> Some id
     | _ -> None
 
+let gen_list_update_func (func_name: text) (list : text) (idx : text) (func : text) = 
+  parens (func_name ^ " " ^ parens list ^ " " ^ parens idx ^ " " ^ parens func)
+
+let gen_list_slice_update (list : text) (idx : text) (idx2 : text) (update_list : text) = 
+  parens ("list_slice_update " ^ parens list ^ " " ^ parens idx ^ " " ^ parens idx2 ^ " " ^ parens update_list)
+
+
 let gen_binop (b : binop) =
   match b with
     | AndOp -> " /\\ "
@@ -150,9 +157,8 @@ let rec gen_exp (env : env) (is_match : bool) (e : exp) =
       else parens (gen_exp env is_match exp1 ^ gen_binop binop ^ gen_exp env is_match exp2)
     | CmpE (cmpop, exp1, exp2) -> parens (gen_exp env is_match exp1 ^ gen_cmpop cmpop ^ gen_exp env is_match exp2)
     | SliceE (exp1, exp2, exp3) -> parens ("list_slice " ^ parens (gen_exp env is_match exp1) ^ " " ^ parens (gen_exp env is_match exp2) ^ " " ^ parens (gen_exp env is_match exp3)) (* TODO *)
-    | UpdE (exp1, path, exp2) -> 
-      gen_path_start env path is_match exp1 exp2
-    | ExtE (_exp1, _path, _exp2) -> "" (* TODO *)
+    | UpdE (exp1, path, exp2) -> gen_path_start env path is_match exp1 exp2 "list_update"
+    | ExtE (exp1, path, exp2) -> gen_path_start env path is_match exp1 exp2 "list_extend"
     | StrE expfields -> "{| " ^ String.concat "; " (List.map (fun (a, exp) -> 
       gen_typ_name e.note ^ "__" ^ gen_atom a ^ " := " ^ gen_exp env false exp) expfields) 
       ^ " |}"
@@ -207,14 +213,6 @@ and gen_numtyp (nt : numtyp) =
     | RatT -> "nat"
     | RealT -> "nat"
 
-and gen_list_update (list : text) (idx : text) (update_text : text) = 
-  parens ("list_update " ^ parens list ^ " " ^ parens idx ^ " " ^ parens update_text)
-
-and gen_list_update_func (list : text) (idx : text) (func : text) = 
-  parens ("list_update_func " ^ parens list ^ " " ^ parens idx ^ " " ^ parens func)
-
-and gen_list_slice_update (list : text) (idx : text) (idx2 : text) (update_list : text) = 
-  parens ("list_slice_update " ^ parens list ^ " " ^ parens idx ^ " " ^ parens idx2 ^ " " ^ parens update_list)
 
 and gen_typ (env : env) (t: typ) =
   match t.it with
@@ -267,7 +265,7 @@ and gen_bind (env : env) (b : bind) =
 and gen_bind_arg (env : env) (b : bind) =
   match b.it with
     | ExpB (id, typ, _) -> parens (var_prefix ^ gen_id id ^ " : " ^ gen_typ env typ)
-    | TypB id -> curly_parens (gen_id id)
+    | TypB id -> parens (gen_id id ^ " : Type")
 
 and gen_inductive_args (env : env) (binds : bind list) =
   match binds with
@@ -278,6 +276,11 @@ and gen_arg_name (env : env) (is_match : bool) (a : arg) =
   match a.it with
     | ExpA exp -> Some (gen_exp env is_match exp)
     | _ -> None
+
+and gen_inductive_args_name (env : env) (is_match : bool) (a : arg) =
+  match a.it with
+    | ExpA exp -> gen_exp env is_match exp
+    | TypA typ -> gen_typ env typ
 
 and gen_call_args (env : env) (args : arg list) =
   match args with
@@ -308,34 +311,34 @@ and _gen_path_name (env : env) (p : path) (is_match : bool) (e : exp) =
     | SliceP (_path, _exp1, _exp2) -> "default_val" (* TODO *)
     | DotP (path, atom) -> gen_typ_name path.note ^ "__" ^ gen_atom atom ^ " " ^ parens (_gen_path_name env path is_match e)
 
-and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) (is_match : bool) (update_exp : exp) = 
+and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) (is_match : bool) (update_exp : exp) (exp_name: text) = 
   match paths with
     | {it = DotP _; _} as p :: ps -> let (dot_paths, rest) = list_split is_dot (p :: ps) in 
       let (prefix, name) = (match start_exp with  
         | Some e -> let name = gen_exp env is_match e in (name, name)
         | None -> let name = var_prefix ^ string_of_int n in ("fun " ^ name ^ " => " ^ name, name)
       ) in
-      let projection_map delim = String.concat delim (List.map (fun p'' -> match p''.it with 
+      let projection_map delim list_to_map = String.concat delim (List.map (fun p'' -> match p''.it with 
       | DotP (p, a') -> gen_typ_name p.note ^ "__" ^ gen_atom a'
       | _ -> ""
-      ) dot_paths) in
-      let projection_name = projection_map " " ^ " " ^ name in
+      ) list_to_map) in
+      let projection_name = projection_map " " (List.rev dot_paths) ^ " " ^ name in
       let rest_gen = (match rest with
         | [] -> gen_exp env is_match update_exp 
-        | {it = IdxP (_, idx_exp); _} :: [] -> gen_list_update projection_name 
+        | {it = IdxP (_, idx_exp); _} :: [] -> gen_list_update_func exp_name projection_name 
         (gen_exp env is_match idx_exp) (gen_exp env is_match update_exp)
-        | {it = IdxP (_, idx_exp); _} :: rest_tail -> gen_list_update_func projection_name
-        (gen_exp env is_match idx_exp) (gen_path None (n + 1) env rest_tail is_match update_exp)
+        | {it = IdxP (_, idx_exp); _} :: rest_tail -> gen_list_update_func "list_update_func" projection_name
+        (gen_exp env is_match idx_exp) (gen_path None (n + 1) env rest_tail is_match update_exp exp_name)
         | [{it = SliceP (_, idx_exp1, idx_exp2); _}] -> gen_list_slice_update projection_name
           (gen_exp env is_match idx_exp1) 
           (gen_exp env is_match idx_exp2) 
           (gen_exp env is_match update_exp)
-        | _ -> gen_path None (n + 1) env rest is_match update_exp
+        | _ -> gen_path None (n + 1) env rest is_match update_exp exp_name
       ) in 
-      prefix ^ " <|" ^ projection_map ";" ^ " := " ^ rest_gen ^ "|>" 
+      prefix ^ " <|" ^ projection_map ";" dot_paths ^ " := " ^ rest_gen ^ "|>" 
     | {it = IdxP (_p', idx_exp); _} :: ps -> let list_name = var_prefix ^ string_of_int (n - 1) in ( match ps with 
-      | [] -> gen_list_update list_name (gen_exp env is_match idx_exp) (gen_exp env is_match update_exp)
-      | _ -> gen_list_update_func list_name (gen_exp env is_match idx_exp) (gen_path None n env ps is_match update_exp)
+      | [] -> gen_list_update_func exp_name list_name (gen_exp env is_match idx_exp) (gen_exp env is_match update_exp)
+      | _ -> gen_list_update_func "list_update_func" list_name (gen_exp env is_match idx_exp) (gen_path None n env ps is_match update_exp exp_name)
       )
     | {it = SliceP (_p', e1, e2); _} :: _ps -> 
       (* Slice should always be at the end *) 
@@ -345,9 +348,9 @@ and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) 
         (gen_exp env is_match update_exp)
     | _ -> ""
 
-and gen_path_start (env : env) (p : path) (is_match : bool) (e : exp) (update_exp : exp) =
+and gen_path_start (env : env) (p : path) (is_match : bool) (e : exp) (update_exp : exp) (exp_name : text) =
   let path_list = List.rev (transform_path env p is_match e) in
-  parens (gen_path (Some e) 0 env path_list is_match update_exp)
+  parens (gen_path (Some e) 0 env path_list is_match update_exp exp_name)
 
 let rec gen_premises (env : env) (p : prem) =
   match p.it with
@@ -375,8 +378,14 @@ let gen_param (env : env) (p : param) =
     | ExpP (id, typ) -> parens (var_prefix ^ gen_id id ^ " : " ^ gen_typ env typ)
     | TypP id -> curly_parens (gen_id id)
 
-let gen_inductive_inhabitance_proof (id : id) (typcases : typcase list) : string =
-  "Global Instance Inhabited__" ^ gen_id id ^ " : Inhabited " ^ gen_id id ^ 
+let gen_inductive_inhabitance_proof (env : env) (id : id) (typcases : typcase list) (binds : bind list) (arg_names: text) =
+  let binders = (match binds with 
+    | [] -> ""
+    | _ -> " " ^ String.concat " " (List.map (fun b -> (match b.it with
+      | ExpB (id, typ, _) -> parens (gen_id id ^ " : " ^ gen_typ env typ)
+      | TypB id -> curly_parens (gen_id id ^ " : Type")
+    )) binds))  in
+  "Global Instance Inhabited__" ^ gen_id id ^ binders ^ " : Inhabited " ^ parens (gen_id id ^ arg_names) ^
   let simple_constructors = List.filter (fun (_, (_, typ, _), _) -> typ.it = TupT []) typcases in
   match simple_constructors with
   | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
@@ -421,12 +430,12 @@ let gen_deftyp (env : env) (binds : bind list) (args : arg list) (id : id) (d : 
     | VariantT typcases -> 
       let arg_names = match args with 
         | [] -> "" 
-        | _ -> " " ^ String.concat " " (List.filter_map (gen_arg_name env false) args)
+        | _ -> " " ^ String.concat " " (List.map (gen_inductive_args_name env false) args)
       in 
       "Inductive " ^ gen_id id ^ " " ^ gen_inductive_args env binds ^  " : Type :=\n" ^ 
       String.concat "\n" (List.map (fun (m, (_, t, _premises), _) -> 
       "\t| " ^ gen_id id ^ "__" ^ gen_mixop m ^ gen_typ_args env t ^ ": " ^
-      gen_id id ^ arg_names) typcases) ^ ".\n\n" ^ gen_inductive_inhabitance_proof id typcases
+      gen_id id ^ arg_names) typcases) ^ ".\n\n" ^ gen_inductive_inhabitance_proof env id typcases binds arg_names
 
 let gen_param_id_used (param : param) =
   match param.it with
