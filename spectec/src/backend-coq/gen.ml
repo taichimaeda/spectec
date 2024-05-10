@@ -2,6 +2,7 @@ open Il.Ast
 open Util
 open Source
 open Case
+
 let parens s = "(" ^ s ^ ")"
 let curly_parens s = "{" ^ s ^ "}"
 let square_parens s = "[" ^ s ^ "]"
@@ -396,12 +397,12 @@ let gen_record_inhabitance_proof (id : id) (typfields : typfield list) : string 
   "Global Instance Inhabited_" ^ gen_id id ^ " : Inhabited " ^ gen_id id ^ " := \n" ^
   "{default_val := {|\n" ^
       String.concat "" (List.map (fun (a, _, _) -> 
-        "  " ^ gen_id id ^ "__" ^ gen_atom a ^ " := default_val ;\n"
+        "\t" ^ gen_id id ^ "__" ^ gen_atom a ^ " := default_val ;\n"
         ) typfields) ^ "|} }"
 
 let gen_record_append_proof (env : env) (ident: text) (typfields : typfield list) =
   "Definition _append_" ^ ident ^ " (arg1 arg2 : " ^ ident ^ ") :=\n" ^ 
-  "{|\n" ^ "\t" ^ String.concat "\t" (List.map (fun (a, (_, t, _), _) -> 
+  "{|\n\t" ^ String.concat "\t" (List.map (fun (a, (_, t, _), _) -> 
     let typ_name = get_typ_name t in
     let struct_type = Option.map (get_struct_type env) typ_name in 
     (match struct_type with 
@@ -420,10 +421,10 @@ let gen_deftyp (env : env) (binds : bind list) (args : arg list) (id : id) (d : 
     | StructT typfields -> 
       let type_ident = gen_id id in 
       let constructor_name = "mk" ^ type_ident in
-      "Record " ^ type_ident ^ " := " ^ constructor_name ^ "\n{" ^ "\t" ^
+      "Record " ^ type_ident ^ " := " ^ constructor_name ^ "\n{\t" ^
       String.concat "\n;\t" (List.map (fun (a, (_, t, _premises), _) -> 
         type_ident ^ "__" ^ gen_atom a ^ " : " ^ gen_typ env t
-      ) typfields) ^ "\n}" ^ ".\n\n" ^
+      ) typfields) ^ "\n}.\n\n" ^
       gen_record_inhabitance_proof id typfields ^ ".\n\n" ^
       gen_record_append_proof env type_ident typfields ^ ".\n\n" ^ 
       gen_record_setter_instances type_ident constructor_name typfields
