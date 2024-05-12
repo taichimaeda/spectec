@@ -117,7 +117,9 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
     | (case_id, _) :: _ -> " := { default_val := " ^ case_id ^ " }"
 
 let string_of_definition (prefix : string) (id : ident) (i_types : inferred_types) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
-  prefix ^ id ^ " " ^ string_of_inferred_types i_types ^ " " ^ string_of_binders binders ^ " : " ^ string_of_terms return_type ^ " :=\n" ^
+  match clauses with
+    | [(_, exp)] when binders == [] && i_types == [] -> prefix ^ id ^ " : " ^ string_of_terms return_type ^ " := " ^ string_of_terms exp
+    | _ -> prefix ^ id ^ " " ^ string_of_inferred_types i_types ^ " " ^ string_of_binders binders ^ " : " ^ string_of_terms return_type ^ " :=\n" ^
   "\tmatch " ^ string_of_match_binders binders ^ " with\n\t\t" ^
   String.concat "\n\t\t" (List.map (fun (match_term, exp) -> 
     "| " ^ string_of_terms match_term ^ " => " ^ string_of_terms exp) clauses) ^

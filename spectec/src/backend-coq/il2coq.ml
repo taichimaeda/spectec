@@ -3,6 +3,7 @@ open Il.Print
 open Coqast
 open Util
 open Source
+open Either
 
 module IdSet = Set.Make(String)
 let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"; "nat"] |> IdSet.of_list
@@ -26,8 +27,18 @@ let transform_numtyp (typ : numtyp) =
 
 let transform_atom (a : atom) = 
   match a.it with
-    | Atom s -> s
+    | Atom s -> transform_id' s
     | _ -> ""
+let is_atomid (a : atom) =
+  match a.it with
+    | Atom _ -> true
+    | _ -> false
+
+let transform_mixop (m : mixop) = match m with
+  | [{it = Atom a; _}]::tail when List.for_all ((=) []) tail -> transform_id' a
+  | mixop -> String.concat "" (List.map (
+      fun atoms -> String.concat "" (List.map transform_atom (List.filter is_atomid atoms))) mixop
+    )
 
 let gen_typ_name (t : typ) =
   match t.it with
@@ -40,7 +51,7 @@ let transform_itertyp (it : iter) =
     | Opt -> T_type_basic T_opt
     | List -> T_type_basic T_list
     | List1 | ListN _ -> T_unsupported ("(* Unsupported iter: " ^ string_of_iter it ^ "*)")
-    
+
 let rec transform_type (typ : typ) =
   match typ.it with
     | VarT (id, args) -> T_app (T_ident [transform_id id], List.map transform_arg args)
@@ -116,14 +127,64 @@ and transform_arg (arg : arg) =
     | ExpA exp -> transform_exp exp
     | TypA typ -> transform_type typ
 
-(* 
-let transform_def (d : def) : coq_def =
+and transform_bind (bind : bind) =
+  match bind.it with
+    | ExpB (id, typ, _) -> (transform_id id, transform_type typ) 
+    | TypB id -> (transform_id id, T_ident ["Type"])
+
+let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
+  match deftyp.it with
+    | AliasT typ -> TypeAliasD (transform_id id, List.map transform_bind binds, transform_type typ)
+    | StructT typfields -> RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> (transform_id id ^ "__" ^ transform_atom a, transform_type t)) typfields)
+    | VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (case_binds, _, _), _) ->
+        (transform_id id ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases)
+
+let transform_tuple_to_relation_args (t : typ) =
+  match t.it with
+    | TupT typs -> List.map (fun (_, t) -> transform_type t) typs
+    | _ -> [transform_type t]
+
+let transform_premise (p : prem) =
+  match p with
+    | _ -> ""
+
+let transform_rule (id : id) (r : rule) = 
+  match r.it with
+    | RuleD (rule_id, binds, mixop, exp, premises) -> 
+      ((transform_id id ^ "__" ^ transform_id rule_id ^ transform_mixop mixop, List.map transform_bind binds), 
+      List.map transform_premise premises, transform_exp exp)
+
+let transform_clause (c : clause) =
+  match c.it with
+    | DefD (_binds, args, exp, _prems) -> (T_match (List.map transform_arg args), transform_exp exp)
+
+let transform_param (p : param) =
+  match p.it with
+    | ExpP (id, typ) -> Right (transform_id id, transform_type typ)
+    | TypP id -> Left (T_ident [transform_id id]) 
+
+let transform_param_to_binders (p : param) =
+  match p.it with
+    | ExpP (id, typ) -> transform_id id, transform_type typ
+    | TypP id -> transform_id id, T_ident ["Type"]
+    
+
+let rec transform_def (d : def) : coq_def =
   match d.it with
-    | TypD (id, params, [{it = InstD (_binds, _args, deftyp);_}]) -> UnsupportedD ""
-    | TypD (id, params, insts) -> UnsupportedD "" (* TODO FAMILY *)
-    | RelD (id, mixop, typ, rules) -> UnsupportedD ""
-    | DecD (id, params, typ, clauses) -> UnsupportedD ""
-    | RecD defs -> UnsupportedD ""
-    | _ -> UnsupportedD ""
+    | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
+    | TypD (_id, _params, _insts) -> UnsupportedD "" (* TODO FAMILY *)
+    | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
+    | DecD (id, params, typ, clauses) -> let (i_types, binds) = List.partition_map transform_param params in 
+      if (clauses == []) 
+        then AxiomD (transform_id id, List.map transform_param_to_binders params, transform_type typ)
+        else DefinitionD (transform_id id, i_types, binds, transform_type typ, List.map transform_clause clauses)
+    | RecD defs -> MutualRecD (List.map transform_def defs)
+    | HintD _ -> UnsupportedD ""
+
+let is_not_hintdef (d : def) : bool =
+  match d.it with
+    | HintD _ -> true
+    | _ -> false 
+
 let transform (il : script) : coq_script =
-  List.map transform_def il *)
+  List.map transform_def (List.filter is_not_hintdef il)
