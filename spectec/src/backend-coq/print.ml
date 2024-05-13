@@ -118,8 +118,8 @@ let string_of_record (id: ident) (entries : record_entry list) =
   "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
   "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
     match s_typ with 
-      | Some Inductive -> id ^ " := " ^ "arg1.(" ^ record_id ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
-      | _ -> id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
+      | Some Inductive -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
+      | _ -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
     )
   )) entries) ^ "|}.\n\n" ^ 
   "Global Instance Append_" ^ id ^ " : Append " ^ id ^ " := { _append arg1 arg2 := _append_" ^ id ^ " arg1 arg2 }.\n\n" ^
@@ -162,7 +162,7 @@ let rec string_of_premise (prem : coq_premise) =
     | P_listforall (p, ids) -> (match ids with
       | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ v
       | [v; s] -> "List.Forall " ^ parens ("fun '(" ^ v ^ ", " ^ s ^ ") => " ^ string_of_premise p) ^ " " ^ parens ("combine " ^ v ^ " " ^ s)
-      | _ -> assert false
+      | _ -> assert false (* Should not happen *)
     )
     | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
   
@@ -170,7 +170,7 @@ let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) =
   "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ
 
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
-  prefix ^ id ^ " " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
+  prefix ^ id ^ ": " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
   String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_term) ->
     let string_prems = String.concat " /\\ " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
     "| " ^ case_id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_prems ^ id ^ " " ^ string_of_terms end_term
@@ -179,6 +179,9 @@ let string_of_inductive_relation (prefix : string) (id : ident) (args : relation
 let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =
   "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms r_type
 
+let string_of_family_types (id : ident) (entries : family_entry list) = 
+  String.concat ".\n\n" (List.map (fun (entry_id, i_entry) -> string_of_inductive_def entry_id [] i_entry) entries) ^ ".\n\n" ^
+  string_of_inductive_def id [] (List.map (fun (entry_id, _) -> (id ^ "__" ^ entry_id, [("arg" , T_ident [entry_id])])) entries)
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
   match def with
@@ -187,7 +190,7 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
     | InductiveD (id, args, entries) -> string_of_inductive_def id args entries
     | MutualRecD defs -> (match defs with
       | [] -> ""
-      | [d] -> string_of_def true d
+      | [d] -> string_of_def (not (is_inductive d)) d
       | d :: defs -> let prefix = if is_inductive d then "with\n\n" else "" in
         string_of_def false d ^ "\n\n" ^ prefix ^ String.concat "\n\n" (List.map (string_of_def true) defs)
       )
@@ -195,7 +198,8 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
       string_of_definition prefix id binds typ clauses
     | InductiveRelationD (id, args, relations) -> let prefix = if recursive then "" else "Inductive " in
       string_of_inductive_relation prefix id args relations
-    | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type 
+    | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type
+    | InductiveFamilyD (id, entries) -> string_of_family_types id entries 
     | UnsupportedD str -> "(* Unsupported Definition: " ^ str ^ "*)"
 
 let exported_string = 
@@ -266,9 +270,10 @@ let exported_string =
   "\n" ^
   "Open Scope wasm_scope.\n" ^
   "Import ListNotations.\n" ^
-  "Import RecordSetNotations.\n" ^
-  "(* Generated Code *)\n"
+  "Import RecordSetNotations.\n"
+  
 
 let string_of_script (coq_il : coq_script) =
   exported_string ^ 
+  "(* Generated Code *)\n" ^
   String.concat ".\n\n" (List.map (string_of_def false) coq_il) 

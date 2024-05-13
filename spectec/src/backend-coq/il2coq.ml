@@ -213,6 +213,12 @@ and transform_bind (bind : bind) =
     | ExpB (id, typ, _) -> (transform_var_id id, transform_type typ) 
     | TypB id -> (transform_id id, T_ident ["Type"])
 
+and gen_bind_name (bind : bind) =
+  match bind.it with
+    | ExpB (id, _, _) -> transform_id id
+    | TypB id -> transform_id id
+
+
 and transform_relation_bind (bind : bind) =
   match bind.it with
     | ExpB (id, typ, its) -> 
@@ -254,7 +260,9 @@ and transform_path (paths : path list) (n : int) (name : string option) =
 
 and transform_path_start (p : path) (start_name : exp) = 
   let paths = List.rev (transform_list_path p) in
-  transform_path paths 0 (Some (gen_var_id start_name))
+  match paths with
+    | [] -> error p.at "Path should not be empty"
+    | _ -> transform_path paths 0 (Some (gen_var_id start_name))
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
@@ -293,11 +301,19 @@ let transform_param (p : param) =
     | ExpP (id, typ) -> transform_var_id id, transform_type typ
     | TypP id -> transform_id id, T_ident ["Type"]
     
-
+let transform_inst (id : id) (i : inst) =
+  match i.it with
+    | InstD (binds, _, deftyp) -> 
+      let name = transform_id id ^ "__" ^ String.concat "__" (List.map gen_bind_name binds) in 
+      (match deftyp.it with
+      | AliasT typ -> (name, [(name ^ "__", [("arg", transform_type typ)])])
+      | StructT _ -> assert false
+      | VariantT typcases -> (name, List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases)
+    )
 let rec transform_def (d : def) : coq_def =
   match d.it with
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
-    | TypD (_id, _params, _insts) -> UnsupportedD "" (* TODO FAMILY *)
+    | TypD (id, _, insts) -> InductiveFamilyD (transform_id id, List.map (transform_inst id) insts)
     | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> let binds = List.map transform_param params in 
       if (clauses == []) 
