@@ -1,4 +1,5 @@
 open Coqast
+open Case
 
 let square_parens s = "[" ^ s ^ "]"
 let parens s = "(" ^ s ^ ")"
@@ -38,9 +39,10 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_basic T_concat -> " ++ "
     | T_exp_basic T_listmatch -> " :: "
     | T_exp_basic T_listlength -> "List.length"
-    | T_exp_basic T_listlookup -> "lookup_total"
     | T_exp_basic T_slicelookup -> "list_slice"
+    | T_exp_basic T_listlookup -> "lookup_total"
     | T_exp_basic T_the -> "the"
+    | T_exp_basic T_succ -> "S"
     | T_type_basic T_unit -> "unit"
     | T_type_basic T_bool -> "bool"
     | T_type_basic T_nat -> "nat"
@@ -49,15 +51,37 @@ let rec string_of_terms (term : coq_term) =
     | T_type_basic T_list -> "list"
     | T_type_basic T_opt -> "option"
     | T_ident ids -> String.concat "__" ids
-    | T_update _ -> "" (* TODO *)
-    | T_extend _ -> "" (* TODO *)
+    | T_update (paths, term1, term2) -> string_of_paths_start paths term1 "list_update" term2
+    | T_extend (paths, term1, term2) -> string_of_paths_start paths term1 "list_extend" term2
     | T_list [] -> "[]"
+    | T_listmap (id, exp) -> parens ("List.map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
+    | T_listzipwith (id1, id2, exp) -> parens ("list_zipWith " ^ parens ("fun " ^ id1 ^ " " ^ id2 ^ " => " ^ string_of_terms exp) ^ " " ^ id1 ^ " " ^ id2)
+    | T_exp_tuple terms -> String.concat " " (List.map string_of_terms terms)
+    | T_record_fields fields -> "{| " ^ (String.concat "; " (List.map (fun (id, term) -> id ^ " := " ^ string_of_terms term) fields)) ^ " |}"
     | T_list entries -> square_parens (String.concat ";" (List.map string_of_terms entries))
     | T_match patterns -> parens (String.concat ", " (List.map string_of_terms patterns))
     | T_app (base_term, args) -> parens (string_of_terms base_term ^ " " ^ String.concat " " (List.map string_of_terms args))
     | T_app_infix (infix_op, term1, term2) -> parens (string_of_terms term1 ^ string_of_terms infix_op ^ string_of_terms term2)
     | T_tuple types -> String.concat "*" (List.map string_of_terms types)
     | T_unsupported str -> "(* Unsupported Term: " ^ str ^ " *)"
+
+
+and string_of_paths (paths : coq_path_term list) (list_func_name : string) (update_term : coq_term) =
+  match paths with
+    | [P_sliceupdate (id, term1, term2)] -> parens ("list_slice_update " ^ parens (id) ^ " " ^ 
+      parens (string_of_terms term1) ^ " " ^ 
+      parens (string_of_terms term2) ^ " " ^ 
+      parens (string_of_terms update_term))
+    | P_recordlookup (ids, name) :: ps -> parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_paths ps list_func_name update_term ^ "|>")
+    | [P_listlookup (id, term)] -> parens (list_func_name ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_terms update_term))
+    | P_listlookup (id, term) :: ps -> parens ("list_update_func " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_paths ps list_func_name update_term))
+    | _ -> ""
+
+and string_of_paths_start (paths : coq_path_term list) (start_term : coq_term) (list_func_name : string) (update_term : coq_term) = 
+  let start_ids = (match (List.hd paths) with
+    | P_recordlookup (ids, _n) -> String.concat ";" ids
+    | _ -> "" (* Should not happen *)
+  ) in parens (string_of_terms start_term ^ " <|" ^ start_ids ^ " := " ^ string_of_paths (List.tl paths) list_func_name update_term ^ "|>")
 
 let string_of_binders (binds : binders) = 
   String.concat " " (List.map (fun (id, typ) -> 
@@ -68,7 +92,7 @@ let string_of_binders_ids (binds : binders) =
   String.concat " " (List.map (fun (id, _) -> id) binds)
 
 let string_of_match_binders (binds : binders) =
-  parens (String.concat "," (List.map (fun (id, _) -> id) binds))
+  parens (String.concat ", " (List.map (fun (id, _) -> id) binds))
 
 let string_of_inferred_types (types : inferred_types) =
   String.concat " " (List.map (fun typ -> curly_parens (string_of_terms typ)) types)
@@ -81,52 +105,66 @@ let string_of_record (id: ident) (entries : record_entry list) =
 
   (* Standard Record definition *)
   "Record " ^ id ^ " := " ^ constructor_name ^ "\n{\t" ^ 
-  String.concat "\n;\t" (List.map (fun (record_id, typ) -> 
+  String.concat "\n;\t" (List.map (fun (record_id, typ, _) -> 
     record_id ^ " : " ^ string_of_terms typ) entries) ^ "\n}.\n\n" ^
 
   (* Inhabitance proof for default values *)
   "Global Instance Inhabited_" ^ id ^ " : Inhabited " ^ id ^ " := \n" ^
   "{default_val := {|\n\t" ^
-      String.concat ";\n\t" (List.map (fun (record_id, _) -> 
+      String.concat ";\n\t" (List.map (fun (record_id, _, _) -> 
         record_id ^ " := default_val") entries) ^ "|} }.\n\n" ^
   
   (* Record Append proof (TODO might need information on type to improve this) *)
   "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
-  "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _) -> 
-    id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
+  "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
+    match s_typ with 
+      | Some Inductive -> id ^ " := " ^ "arg1.(" ^ record_id ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
+      | _ -> id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
+    )
   )) entries) ^ "|}.\n\n" ^ 
   "Global Instance Append_" ^ id ^ " : Append " ^ id ^ " := { _append arg1 arg2 := _append_" ^ id ^ " arg1 arg2 }.\n\n" ^
 
   (* Setter proof *)
   "#[export] Instance eta__" ^ id ^ " : Settable _ := settable! " ^ constructor_name ^ " <" ^ 
-  String.concat ";" (List.map (fun (record_id, _) -> record_id) entries) ^ ">"  
+  String.concat ";" (List.map (fun (record_id, _, _) -> record_id) entries) ^ ">"  
 
 let string_of_inductive_def (id : ident) (args : inductive_args) (entries : inductive_type_entry list) = 
   "Inductive " ^ id ^ " " ^ string_of_binders args ^ " : Type :=\n\t" ^
   String.concat "\n\t" (List.map (fun (case_id, binds) ->
-    "| " ^ case_id ^ " " ^ string_of_binders binds ^ " : " ^ id ^ string_of_binders_ids args   
+    "| " ^ case_id ^ " " ^ string_of_binders binds ^ " : " ^ id ^ " " ^ string_of_binders_ids args   
   )  entries) ^ ".\n\n" ^
 
   (* Inhabitance proof for default values *)
   let inhabitance_binders = string_of_binders args in 
-  "Global Instance Inhabited__" ^ id ^ inhabitance_binders ^ " : Inhabited " ^ parens (id ^ string_of_binders_ids args) ^
+  let binders = if args <> [] then " " ^ string_of_binders_ids args else "" in 
+  "Global Instance Inhabited__" ^ id ^ inhabitance_binders ^ " : Inhabited " ^ parens (id ^ binders) ^
   let simple_constructors = List.filter (fun (_, binders) -> binders = []) entries in
   match simple_constructors with
     | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
             "  Admitted"
     | (case_id, _) :: _ -> " := { default_val := " ^ case_id ^ " }"
 
-let string_of_definition (prefix : string) (id : ident) (i_types : inferred_types) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
+let string_of_definition (prefix : string) (id : ident) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
   match clauses with
-    | [(_, exp)] when binders == [] && i_types == [] -> prefix ^ id ^ " : " ^ string_of_terms return_type ^ " := " ^ string_of_terms exp
-    | _ -> prefix ^ id ^ " " ^ string_of_inferred_types i_types ^ " " ^ string_of_binders binders ^ " : " ^ string_of_terms return_type ^ " :=\n" ^
+    | [(_, exp)] when binders == [] -> prefix ^ id ^ " : " ^ string_of_terms return_type ^ " := " ^ string_of_terms exp
+    | _ -> prefix ^ id ^ " " ^ string_of_binders binders ^ " : " ^ string_of_terms return_type ^ " :=\n" ^
   "\tmatch " ^ string_of_match_binders binders ^ " with\n\t\t" ^
   String.concat "\n\t\t" (List.map (fun (match_term, exp) -> 
     "| " ^ string_of_terms match_term ^ " => " ^ string_of_terms exp) clauses) ^
   "\n\tend"
 
-let string_of_premises (_prems : coq_premises list) =
-  ""
+let rec string_of_premise (prem : coq_premise) =
+  match prem with
+    | P_if term -> string_of_terms term
+    | P_rule (id, term) -> id ^ " " ^ string_of_terms term
+    | P_neg p -> parens ("~" ^ string_of_premise p)
+    | P_else -> "otherwise" (* Will be removed by an else pass *)
+    | P_listforall (p, ids) -> (match ids with
+      | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ v
+      | [v; s] -> "List.Forall " ^ parens ("fun '(" ^ v ^ ", " ^ s ^ ") => " ^ string_of_premise p) ^ " " ^ parens ("combine " ^ v ^ " " ^ s)
+      | _ -> assert false
+    )
+    | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
   "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ
@@ -134,11 +172,12 @@ let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) =
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
   prefix ^ id ^ " " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
   String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_term) ->
-    "| " ^ case_id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_premises premises ^ " -> " ^ string_of_terms end_term
+    let string_prems = String.concat " /\\ " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
+    "| " ^ case_id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_prems ^ id ^ " " ^ string_of_terms end_term
   ) relations)
 
 let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =
-  "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ " , " ^ string_of_terms r_type
+  "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms r_type
 
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
@@ -152,12 +191,84 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
       | d :: defs -> let prefix = if is_inductive d then "with\n\n" else "" in
         string_of_def false d ^ "\n\n" ^ prefix ^ String.concat "\n\n" (List.map (string_of_def true) defs)
       )
-    | DefinitionD (id, inferred_types, binds, typ, clauses) -> let prefix = if recursive then "Fixpoint " else "Definition " in
-      string_of_definition prefix id inferred_types binds typ clauses
+    | DefinitionD (id, binds, typ, clauses) -> let prefix = if recursive then "Fixpoint " else "Definition " in
+      string_of_definition prefix id binds typ clauses
     | InductiveRelationD (id, args, relations) -> let prefix = if recursive then "" else "Inductive " in
       string_of_inductive_relation prefix id args relations
     | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type 
     | UnsupportedD str -> "(* Unsupported Definition: " ^ str ^ "*)"
 
+let exported_string = 
+  "(* Exported Code *)\n" ^
+  "From Coq Require Import String List Unicode.Utf8.\n" ^
+  "From RecordUpdate Require Import RecordSet.\n" ^
+  "Require Import NArith.\n" ^
+  "Require Import Arith.\n" ^
+  "Require Import BinNat.\n" ^
+  "Require Import FloatClass.\n" ^
+  "Require Import PrimFloat.\n" ^
+  "Require Import SpecFloat.\n" ^
+  "Require Import FloatOps.\n" ^
+  "Require Import FloatAxioms.\n" ^
+  "Require Import FloatLemmas.\n" ^
+  "Declare Scope wasm_scope.\n\n" ^
+  "Class Inhabited (T: Type) := { default_val : T }.\n\n" ^
+  "Definition lookup_total {T: Type} {_: Inhabited T} (l: list T) (n: nat) : T :=\n" ^
+  "\tList.nth n l default_val.\n\n" ^
+  "Definition the {T : Type} {_ : Inhabited T} (arg : list T) : T :=\n" ^
+	"\tmatch arg with\n" ^
+	"\t\t| nil => default_val\n" ^
+	"\t\t| v :: vs => v\n" ^
+	"\tend.\n\n" ^
+  "Definition list_zipWith {X Y Z : Type} (f : X -> Y -> Z) (xs : list X) (ys : list Y) : list Z :=\n" ^
+  "\tmap (fun '(x, y) => f x y) (combine xs ys).\n\n" ^
+  "Fixpoint list_update {α: Type} (l: list α) (n: nat) (y: α): list α :=\n" ^
+  "\tmatch l, n with\n" ^
+  "\t\t| nil, _ => nil\n" ^
+  "\t\t| x :: l', 0 => y :: l'\n" ^
+  "\t\t| x :: l', S n => x :: list_update l' n y\n" ^
+  "\tend.\n\n" ^
+  "Fixpoint list_update_func {α: Type} (l: list α) (n: nat) (y: α -> α): list α :=\n" ^
+	"\tmatch l, n with\n" ^
+	"\t\t| nil, _ => nil\n" ^
+	"\t\t| x :: l', 0 => (y x) :: l'\n" ^
+	"\t\t| x :: l', S n => x :: list_update_func l' n y\n" ^
+	"\tend.\n\n" ^
+  "Fixpoint list_slice {α: Type} (l: list α) (i: nat) (j: nat): list α :=\n" ^
+	"\tmatch l, i, j with\n" ^
+	"\t\t| nil, _, _ => nil\n" ^
+	"\t\t| x :: l', 0, 0 => nil\n" ^
+	"\t\t| x :: l', S n, 0 => nil\n" ^
+	"\t\t| x :: l', 0, S m => x :: list_slice l' 0 m\n" ^
+	"\t\t| x :: l', S n, S m => list_slice l' n m\n" ^
+	"\tend.\n\n" ^
+  "Fixpoint list_slice_update {α: Type} (l: list α) (i: nat) (j: nat) (update_l: list α): list α :=\n" ^
+	"\tmatch l, i, j, update_l with\n" ^
+	"\t\t| nil, _, _, _ => nil\n" ^
+	"\t\t| l', _, _, nil => l'\n" ^
+	"\t\t| x :: l', 0, 0, _ => nil\n" ^
+	"\t\t| x :: l', S n, 0, _ => nil\n" ^
+	"\t\t| x :: l', 0, S m, y :: u_l' => y :: list_slice_update l' 0 m u_l'\n" ^
+	"\t\t| x :: l', S n, S m, _ => x :: list_slice_update l' n m update_l\n" ^
+	"\tend.\n\n" ^
+  "Definition list_extend {α: Type} (l: list α) (y: α): list α :=\n" ^
+  "\ty :: l.\n\n" ^
+  "Class Append (α: Type) := _append : α -> α -> α.\n\n" ^
+  "Infix \"++\" := _append (right associativity, at level 60) : wasm_scope.\n\n" ^
+  "Global Instance Append_List_ {α: Type}: Append (list α) := { _append l1 l2 := List.app l1 l2 }.\n\n" ^
+  "Global Instance Append_nat : Append (nat) := { _append n1 n2 := n1 + n2}.\n\n" ^
+  "Global Instance Inh_unit : Inhabited unit := { default_val := tt }.\n\n" ^
+  "Global Instance Inh_nat : Inhabited nat := { default_val := O }.\n\n" ^
+  "Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }.\n\n" ^
+  "Global Instance Inh_option {T: Type} : Inhabited (option T) := { default_val := None }.\n\n" ^
+  "Global Instance Inh_Z : Inhabited Z := { default_val := Z0 }.\n\n" ^
+  "Global Instance Inh_prod {T1 T2: Type} {_: Inhabited T1} {_: Inhabited T2} : Inhabited (prod T1 T2) := { default_val := (default_val, default_val) }.\n\n" ^
+  "\n" ^
+  "Open Scope wasm_scope.\n" ^
+  "Import ListNotations.\n" ^
+  "Import RecordSetNotations.\n" ^
+  "(* Generated Code *)\n"
+
 let string_of_script (coq_il : coq_script) =
-  String.concat "\n\n" (List.map (string_of_def false) coq_il) 
+  exported_string ^ 
+  String.concat ".\n\n" (List.map (string_of_def false) coq_il) 

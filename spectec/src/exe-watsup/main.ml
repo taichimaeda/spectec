@@ -278,9 +278,14 @@ let () =
       Backend_interpreter.Runner.run args
     | Coq ->
       log "Coq generation...";
+      let coq_il = Backend_coq.Il2coq.transform il in 
       (match !odsts with
-      | [] -> print_endline (Backend_coq.Gen.gen_string il)
-      | [odst] -> Backend_coq.Gen.gen_file odst il
+      | [] -> print_endline (Backend_coq.Print.string_of_script coq_il)
+      | [odst] -> 
+        let coq_code = Backend_coq.Print.string_of_script coq_il in
+        let oc = Out_channel.open_text odst in
+        Fun.protect (fun () -> Out_channel.output_string oc coq_code)
+          ~finally:(fun () -> Out_channel.close oc)
       | _ ->
         prerr_endline "too many output file names";
         exit 2

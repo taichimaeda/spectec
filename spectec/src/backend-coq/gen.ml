@@ -339,7 +339,7 @@ and gen_path (start_exp : exp option) (n : int) (env : env) (paths : path list) 
       prefix ^ " <|" ^ projection_map ";" dot_paths ^ " := " ^ rest_gen ^ "|>" 
     | {it = IdxP (_p', idx_exp); _} :: ps -> let list_name = var_prefix ^ string_of_int (n - 1) in ( match ps with 
       | [] -> gen_list_update_func exp_name list_name (gen_exp env is_match idx_exp) (gen_exp env is_match update_exp)
-      | _ -> gen_list_update_func "list_update_func" list_name (gen_exp env is_match idx_exp) (gen_path None n env ps is_match update_exp exp_name)
+      | _ -> gen_list_update_func "list_update_func" list_name (gen_exp env is_match idx_exp) (gen_path None (n + 1) env ps is_match update_exp exp_name)
       )
     | {it = SliceP (_p', e1, e2); _} :: _ps -> 
       (* Slice should always be at the end *) 

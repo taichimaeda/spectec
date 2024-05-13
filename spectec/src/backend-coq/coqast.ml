@@ -1,3 +1,4 @@
+open Case
 type nat = Z.t
 
 type ident = string
@@ -44,10 +45,11 @@ type coq_basic_term =
   | T_listlength
   | T_slicelookup
   | T_listlookup
+  | T_succ 
   | T_the
 
 and coq_path_term =
-  | P_recordlookup of (ident list)
+  | P_recordlookup of (ident list * ident)
   | P_listlookup of (ident * coq_term)
   | P_sliceupdate of (ident * coq_term * coq_term)
 
@@ -58,21 +60,31 @@ and coq_term =
   | T_update of (coq_path_term list * coq_term * coq_term)
   | T_extend of (coq_path_term list * coq_term * coq_term)
   | T_list of (coq_term list)
+  | T_listmap of (ident * coq_term)
+  | T_listzipwith of (ident * ident * coq_term)
+  | T_exp_tuple of coq_term list
+  | T_record_fields of (ident * coq_term) list
   | T_match of (coq_term list)
   | T_app of (coq_term * (coq_term list))
   | T_app_infix of (coq_term * coq_term * coq_term) (* Same as above but first coq_term is placed in the middle *)
   | T_tuple of (coq_term list) 
   | T_unsupported of string
 
-and coq_premises = string
+and coq_premise =
+  | P_if of coq_term
+  | P_neg of coq_premise
+  | P_rule of ident * coq_term
+  | P_else
+  | P_listforall of coq_premise * ident list
+  | P_unsupported of string
 
 and binders = (ident * coq_term) list
 
-and record_entry = (ident * coq_term)
+and record_entry = (ident * coq_term * struct_type option)
 
 and inductive_type_entry = (ident * binders)
 
-and relation_type_entry = inductive_type_entry * coq_premises list * coq_term
+and relation_type_entry = inductive_type_entry * coq_premise list * coq_term
 
 and inductive_args = binders
 
@@ -89,7 +101,7 @@ and coq_def =
   | RecordD of (ident * record_entry list)
   | InductiveD of (ident * inductive_args * inductive_type_entry list)
   | MutualRecD of coq_def list
-  | DefinitionD of (ident * inferred_types * binders * return_type * clause_entry list)
+  | DefinitionD of (ident * binders * return_type * clause_entry list)
   | InductiveRelationD of (ident * relation_args * relation_type_entry list)
   | AxiomD of (ident * binders * return_type)
   (* TODO Family types *)
