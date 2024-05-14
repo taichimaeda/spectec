@@ -96,7 +96,11 @@ and return_type = coq_term
 
 and clause_entry = coq_term * coq_term 
 
-and family_entry = ident * inductive_type_entry list
+and family_deftype = 
+  | TypeAliasT of coq_term
+  | InductiveT of inductive_type_entry list
+
+and family_entry = ident * family_deftype
 
 and coq_def =
   | TypeAliasD of (ident * binders * coq_term)
@@ -106,7 +110,6 @@ and coq_def =
   | DefinitionD of (ident * binders * return_type * clause_entry list)
   | InductiveRelationD of (ident * relation_args * relation_type_entry list)
   | AxiomD of (ident * binders * return_type)
-  (* TODO Family types *)
   | InductiveFamilyD of (ident * family_entry list)
   | UnsupportedD of string
     

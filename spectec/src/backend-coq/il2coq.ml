@@ -6,16 +6,19 @@ open Source
 open Case
 
 (* Util functions for transform *)
-
 module IdSet = Set.Make(String)
 let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"; "nat"] |> IdSet.of_list
 let error at msg = Error.error at "Coq Generation" msg
+let family_type_suffix = "entry"
 
 let rec list_split (f : 'a -> bool) (l : 'a list) = match l with
   | [] -> ([], [])
   | x :: xs when f x -> let x_true, x_false = list_split f xs in
     (x :: x_true, x_false)
   | xs -> ([], xs)
+
+(* Temporary workaround for fixing family matching (Only works for family types of one dependent type param) *)
+let family_helper = Hashtbl.create 30
 
 (* Case functions that handles case expressions and record appending*)
 let env_ref = ref (Case.new_env())
@@ -43,18 +46,6 @@ let rec get_struct_type (env : env) (id : id) =
     | Terminal -> Terminal
   )
 
-let gen_typ_name (t : typ) =
-  match t.it with
-    | VarT (id, _) -> id.it
-    | _ -> error t.at "Should not happen"
-  
-let get_typ_name (t : typ) = 
-  match t.it with
-    | VarT (id, _) -> Some id
-    | _ -> None
-
-
-
 let var_prefix = "v_"
 let func_prefix = "fun_"
 
@@ -79,6 +70,34 @@ let transform_numtyp (typ : numtyp) =
     | RatT -> T_type_basic T_nat (*T_unsupported "rat"*)
     | RealT -> T_type_basic T_nat (*T_unsupported "real"*)
 
+let gen_typ_name (t : typ) =
+  match t.it with
+    | VarT (id, _) -> id.it
+    | _ -> error t.at "Should not happen"
+
+let gen_exp_name (e : exp) =
+  match e.it with
+    | VarE id -> id.it
+    | _ -> "_" 
+
+let get_typ_name (t : typ) = 
+  match t.it with
+    | VarT (id, _) -> Some id
+    | _ -> None
+
+let gen_bind_name (bind : bind) =
+  match bind.it with
+    | ExpB (id, _, _) -> transform_id id
+    | TypB id -> transform_id id
+    
+let rec infer_match_name (binds: bind list) (type_name : text) =
+  match binds with
+    | [] -> None
+    | b :: bs -> (match (Hashtbl.find_opt family_helper (type_name ^ "__" ^ gen_bind_name b)) with
+      | Some a -> Some a
+      | None -> infer_match_name bs type_name
+    )
+
 let transform_atom (a : atom) = 
   match a.it with
     | Atom s -> transform_id' s
@@ -89,7 +108,7 @@ let is_atomid (a : atom) =
     | _ -> false
 
 let transform_mixop (m : mixop) = match m with
-  | [{it = Atom a; _}]::tail when List.for_all ((=) []) tail -> transform_id' a
+  | [{it = Atom a; _}] :: tail when List.for_all ((=) []) tail -> transform_id' a
   | mixop -> String.concat "" (List.map (
       fun atoms -> String.concat "" (List.map transform_atom (List.filter is_atomid atoms))) mixop
     )
@@ -110,6 +129,25 @@ let rec transform_type (typ : typ) =
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> transform_type t) typs)
     | IterT (typ, iter) -> T_app (transform_itertyp iter, [transform_type typ])
+
+(* Erases the dependent type for inductive families *)
+and erase_dependent_type (typ : typ) = 
+  match typ.it with
+    | IterT (t, iter) -> T_app (transform_itertyp iter, [erase_dependent_type t])
+    | TupT [] -> T_type_basic T_unit
+    | TupT typs -> T_tuple (List.map (fun (_, t) -> erase_dependent_type t) typs)
+    | _ -> let inferred_opt = Option.bind (get_typ_name typ) (fun family_id -> Hashtbl.find_opt family_helper (transform_id family_id)) in      
+      (match inferred_opt with 
+        | Some family_id' -> T_ident [family_id']
+        | _ -> transform_type typ
+      )
+
+and transform_typ_args (typ : typ) =
+  match typ.it with
+    | TupT [] -> []
+    | TupT typs -> List.map (fun (e, t) -> (var_prefix ^ gen_exp_name e, erase_dependent_type t)) typs
+    | _ -> [("_", erase_dependent_type typ)]
+
 
 and gen_var_id (exp : exp) = 
   match exp.it with
@@ -150,24 +188,33 @@ and transform_exp (exp : exp) =
         | (List | List1 | ListN _), [], _ -> T_list [exp1] 
         | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
         | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_listmap (transform_var_id v, exp1)
-        | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_listzipwith (transform_var_id v, transform_var_id s, exp1)
+        | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_listzipwith (transform_var_id v, transform_var_id s, transform_tuple_exp exp)
         | _ -> exp1
       ) 
     | SubE (e, _typ1, _typ2) -> transform_exp e
 
-and transform_match_exp (exp : exp) =
+and transform_match_exp (binds : bind list) (exp : exp) =
   match exp.it with
-  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp exp1, transform_match_exp exp2)
-  | IterE (exp, _) -> transform_match_exp exp
+  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp binds exp1, transform_match_exp binds exp2)
+  | IterE (exp, _) -> transform_match_exp binds exp
   | ListE exps -> (match exps with
-    | [e] -> transform_match_exp e
+    | [e] -> transform_match_exp binds e
+    | _ -> transform_exp exp
+  )
+  | CaseE (m, e) -> (match (infer_match_name binds (gen_typ_name exp.note)) with 
+    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], [transform_match_exp binds e])])
     | _ -> transform_exp exp
   )
   | BinE (AddOp _, exp1, {it = NatE n ;_}) -> let rec get_succ n = (match n with
-    | 0 -> transform_match_exp exp1
+    | 0 -> transform_match_exp binds exp1
     | m -> T_app (T_exp_basic T_succ, [get_succ (m - 1)])
   ) in get_succ (Z.to_int n)
   | _ -> transform_exp exp
+
+and transform_tuple_exp (exp : exp) = 
+  match exp.it with
+    | TupE exps -> T_match (List.map transform_tuple_exp exps)
+    | _ -> transform_exp exp 
 
 and transform_unop (u : unop) (exp : exp) = 
   match u with
@@ -197,27 +244,21 @@ and transform_cmpop (c : cmpop) =
     | GtOp _ -> T_exp_basic T_gt
     | LeOp _ -> T_exp_basic T_le
     | GeOp _ -> T_exp_basic T_ge
-
+      
 and transform_arg (arg : arg) =
   match arg.it with
     | ExpA exp -> transform_exp exp
-    | TypA typ -> transform_type typ
+    | TypA typ -> erase_dependent_type typ
 
-and transform_match_arg (arg : arg) =
+and transform_match_arg (binds : bind list) (arg : arg) =
   match arg.it with
-    | ExpA exp -> transform_match_exp exp
+    | ExpA exp -> transform_match_exp binds exp
     | TypA _ -> T_ident ["_"]
 
 and transform_bind (bind : bind) =
   match bind.it with
-    | ExpB (id, typ, _) -> (transform_var_id id, transform_type typ) 
+    | ExpB (id, typ, _) -> (transform_var_id id, erase_dependent_type typ)
     | TypB id -> (transform_id id, T_ident ["Type"])
-
-and gen_bind_name (bind : bind) =
-  match bind.it with
-    | ExpB (id, _, _) -> transform_id id
-    | TypB id -> transform_id id
-
 
 and transform_relation_bind (bind : bind) =
   match bind.it with
@@ -226,7 +267,7 @@ and transform_relation_bind (bind : bind) =
       | [] -> typ
       | it :: its -> IterT (transform_iter_bind its, it) $ typ.at
     ) in
-      (transform_var_id id, transform_type (transform_iter_bind its)) 
+      (transform_var_id id, erase_dependent_type (transform_iter_bind its))
     | TypB id -> (transform_var_id id, T_ident ["Type"])
 
 and transform_list_path (p : path) = 
@@ -266,17 +307,17 @@ and transform_path_start (p : path) (start_name : exp) =
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
-    | AliasT typ -> TypeAliasD (transform_id id, List.map transform_bind binds, transform_type typ)
+    | AliasT typ -> TypeAliasD (transform_id id, List.map transform_bind binds, erase_dependent_type typ)
     | StructT typfields -> RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> 
-      (transform_id id ^ "__" ^ transform_atom a, transform_type t, Option.map (get_struct_type !env_ref) (get_typ_name t))
+      (transform_id id ^ "__" ^ transform_atom a, erase_dependent_type t, Option.map (get_struct_type !env_ref) (get_typ_name t))
       ) typfields)
-    | VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (case_binds, _, _), _) ->
-        (transform_id id ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases)
+    | VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (_, t, _), _) ->
+        (transform_id id ^ "__" ^ transform_mixop m, transform_typ_args t)) typcases)
 
 let transform_tuple_to_relation_args (t : typ) =
   match t.it with
-    | TupT typs -> List.map (fun (_, t) -> transform_type t) typs
-    | _ -> [transform_type t]
+    | TupT typs -> List.map (fun (_, t) -> erase_dependent_type t) typs
+    | _ -> [erase_dependent_type t]
 
 let rec transform_premise (p : prem) =
   match p.it with
@@ -294,22 +335,28 @@ let transform_rule (id : id) (r : rule) =
 
 let transform_clause (c : clause) =
   match c.it with
-    | DefD (_binds, args, exp, _prems) -> (T_match (List.map transform_match_arg args), transform_exp exp)
+    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg binds) args), transform_tuple_exp exp)
 
 let transform_param (p : param) =
   match p.it with
-    | ExpP (id, typ) -> transform_var_id id, transform_type typ
+    | ExpP (id, typ) -> (transform_var_id id, erase_dependent_type typ)
     | TypP id -> transform_id id, T_ident ["Type"]
     
 let transform_inst (id : id) (i : inst) =
   match i.it with
     | InstD (binds, _, deftyp) -> 
-      let name = transform_id id ^ "__" ^ String.concat "__" (List.map gen_bind_name binds) in 
-      (match deftyp.it with
-      | AliasT typ -> (name, [(name ^ "__", [("arg", transform_type typ)])])
+      let id_transformed = transform_id id in 
+      let name = id_transformed ^ "__" ^ String.concat "__" (List.map gen_bind_name binds) in    
+      Hashtbl.add family_helper id_transformed id_transformed;
+      (name, (match deftyp.it with
+      | AliasT typ -> 
+        TypeAliasT (erase_dependent_type typ)
       | StructT _ -> assert false
-      | VariantT typcases -> (name, List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases)
+      | VariantT typcases -> 
+        Hashtbl.add family_helper name name;
+        InductiveT (List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases))
     )
+
 let rec transform_def (d : def) : coq_def =
   match d.it with
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
@@ -317,8 +364,8 @@ let rec transform_def (d : def) : coq_def =
     | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> let binds = List.map transform_param params in 
       if (clauses == []) 
-        then AxiomD (transform_fun_id id, binds, transform_type typ)
-        else DefinitionD (transform_fun_id id, binds, transform_type typ, List.map transform_clause clauses)
+        then AxiomD (transform_fun_id id, binds, erase_dependent_type typ)
+        else DefinitionD (transform_fun_id id, binds, erase_dependent_type typ, List.map transform_clause clauses)
     | RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD ""
 

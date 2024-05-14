@@ -5,6 +5,7 @@ let square_parens s = "[" ^ s ^ "]"
 let parens s = "(" ^ s ^ ")"
 let curly_parens s = "{" ^ s ^ "}"
 
+let family_type_suffix = "entry"
 let is_inductive (d : coq_def) = 
   match d with
     | (InductiveRelationD _ | InductiveD _) -> true
@@ -62,7 +63,7 @@ let rec string_of_terms (term : coq_term) =
     | T_match patterns -> parens (String.concat ", " (List.map string_of_terms patterns))
     | T_app (base_term, args) -> parens (string_of_terms base_term ^ " " ^ String.concat " " (List.map string_of_terms args))
     | T_app_infix (infix_op, term1, term2) -> parens (string_of_terms term1 ^ string_of_terms infix_op ^ string_of_terms term2)
-    | T_tuple types -> String.concat "*" (List.map string_of_terms types)
+    | T_tuple types -> parens (String.concat " * " (List.map string_of_terms types))
     | T_unsupported str -> "(* Unsupported Term: " ^ str ^ " *)"
 
 
@@ -72,6 +73,7 @@ and string_of_paths (paths : coq_path_term list) (list_func_name : string) (upda
       parens (string_of_terms term1) ^ " " ^ 
       parens (string_of_terms term2) ^ " " ^ 
       parens (string_of_terms update_term))
+      | [P_recordlookup (ids, name)] ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_terms update_term ^ "|>")
     | P_recordlookup (ids, name) :: ps -> parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_paths ps list_func_name update_term ^ "|>")
     | [P_listlookup (id, term)] -> parens (list_func_name ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_terms update_term))
     | P_listlookup (id, term) :: ps -> parens ("list_update_func " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_paths ps list_func_name update_term))
@@ -173,15 +175,32 @@ let string_of_inductive_relation (prefix : string) (id : ident) (args : relation
   prefix ^ id ^ ": " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
   String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_term) ->
     let string_prems = String.concat " /\\ " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
-    "| " ^ case_id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_prems ^ id ^ " " ^ string_of_terms end_term
+    let forall_quantifiers = if binds <> [] then "forall " ^ string_of_binders binds ^ ", " else ""in
+    "| " ^ case_id ^ " : " ^ forall_quantifiers ^ string_prems ^ id ^ " " ^ string_of_terms end_term
   ) relations)
 
 let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =
   "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms r_type
 
+let is_typealias_familytype ((_, f_type) : family_entry) = 
+  match f_type with
+    | TypeAliasT _ -> true
+    | _ -> false
+
+(* TODO refactor this function so it is not necessary to look at the head of the list *)
 let string_of_family_types (id : ident) (entries : family_entry list) = 
-  String.concat ".\n\n" (List.map (fun (entry_id, i_entry) -> string_of_inductive_def entry_id [] i_entry) entries) ^ ".\n\n" ^
-  string_of_inductive_def id [] (List.map (fun (entry_id, _) -> (id ^ "__" ^ entry_id, [("arg" , T_ident [entry_id])])) entries)
+  if is_typealias_familytype (List.hd entries) then 
+  "Inductive " ^ id ^ ": Type :=\n\t" ^  
+  String.concat "\n\t" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
+    | TypeAliasT term -> "| " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " -> " ^ id   
+    | _ -> ""
+  ) entries)
+  else
+  String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
+    | InductiveT i_entry -> string_of_inductive_def entry_id [] i_entry
+    | _ -> ""
+  ) entries) ^ ".\n\n" ^
+  string_of_inductive_def id [] (List.map (fun (entry_id, _) -> (entry_id ^ "__" ^ family_type_suffix, [("arg" , T_ident [entry_id])])) entries)
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
   match def with
@@ -276,4 +295,4 @@ let exported_string =
 let string_of_script (coq_il : coq_script) =
   exported_string ^ 
   "(* Generated Code *)\n" ^
-  String.concat ".\n\n" (List.map (string_of_def false) coq_il) 
+  String.concat ".\n\n" (List.map (string_of_def false) coq_il) ^ "."
