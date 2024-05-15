@@ -73,7 +73,7 @@ let transform_numtyp (typ : numtyp) =
 let gen_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> id.it
-    | _ -> error t.at "Should not happen"
+    | _ -> "" (*error t.at "Should not happen"*)
 
 let gen_exp_name (e : exp) =
   match e.it with
@@ -116,8 +116,7 @@ let transform_mixop (m : mixop) = match m with
 let transform_itertyp (it : iter) =
   match it with
     | Opt -> T_type_basic T_list (*T_opt*)
-    | List -> T_type_basic T_list
-    | List1 | ListN _ -> T_unsupported ("(* Unsupported iter: " ^ string_of_iter it ^ "*)")
+    | List | List1 | ListN _ -> T_type_basic T_list
 
 let rec transform_type (typ : typ) =
   match typ.it with
@@ -136,11 +135,30 @@ and erase_dependent_type (typ : typ) =
     | IterT (t, iter) -> T_app (transform_itertyp iter, [erase_dependent_type t])
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> erase_dependent_type t) typs)
-    | _ -> let inferred_opt = Option.bind (get_typ_name typ) (fun family_id -> Hashtbl.find_opt family_helper (transform_id family_id)) in      
+    | VarT (id, _) -> let inferred_opt = Hashtbl.find_opt family_helper (transform_id id) in      
       (match inferred_opt with 
         | Some family_id' -> T_ident [family_id']
         | _ -> transform_type typ
       )
+    | _ -> transform_type typ
+
+and check_family_dependent_type (typ : typ) = 
+  match typ.it with
+    | IterT (t, _iter) -> check_family_dependent_type t
+    | TupT typs -> List.fold_left (fun acc (_, t) -> acc || check_family_dependent_type t) false typs
+    | VarT (id, _) -> Hashtbl.mem family_helper (transform_id id)
+    | _ -> false
+
+and transform_return_type (typ : typ) =
+  match typ.it with
+    (* Only works for 1-dimensional lists. (Which is fine since type coercing for higher dimensional lists is too much anyways)*)
+    | IterT ({it = VarT (id, args); _}, _) -> 
+      let inferred_opt = Hashtbl.find_opt family_helper (transform_id id) in      
+      (match inferred_opt with 
+        | Some family_id' -> T_ident ["list"; family_id'] 
+        | _ -> T_app (T_ident ["list"; transform_id id], List.map transform_arg args)
+      )
+    | _ -> erase_dependent_type typ
 
 and transform_typ_args (typ : typ) =
   match typ.it with
@@ -195,6 +213,11 @@ and transform_exp (exp : exp) =
 
 and transform_match_exp (binds : bind list) (exp : exp) =
   match exp.it with
+  | VarE id -> 
+    (match (infer_match_name binds (gen_typ_name exp.note)) with
+    | Some new_id -> T_app (T_ident [new_id; family_type_suffix], [T_ident [transform_var_id id]])
+    | _ -> transform_exp exp
+  )
   | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp binds exp1, transform_match_exp binds exp2)
   | IterE (exp, _) -> transform_match_exp binds exp
   | ListE exps -> (match exps with
@@ -280,8 +303,8 @@ and transform_list_path (p : path) =
 (* TODO: Improve this handling for the case of two listlookups in a row *)
 and transform_path (paths : path list) (n : int) (name : string option) = 
   let list_name num = (match name with
-        | Some id -> id
-        | None -> var_prefix ^ string_of_int num
+    | Some id -> id
+    | None -> var_prefix ^ string_of_int num
   ) in
   match paths with
     | {it = DotP _; _} :: _ -> 
@@ -341,21 +364,23 @@ let transform_param (p : param) =
   match p.it with
     | ExpP (id, typ) -> (transform_var_id id, erase_dependent_type typ)
     | TypP id -> transform_id id, T_ident ["Type"]
-    
+  
 let transform_inst (id : id) (i : inst) =
   match i.it with
     | InstD (binds, _, deftyp) -> 
       let id_transformed = transform_id id in 
       let name = id_transformed ^ "__" ^ String.concat "__" (List.map gen_bind_name binds) in    
       Hashtbl.add family_helper id_transformed id_transformed;
+      Hashtbl.add family_helper name name;
       (name, (match deftyp.it with
       | AliasT typ -> 
         TypeAliasT (erase_dependent_type typ)
       | StructT _ -> assert false
       | VariantT typcases -> 
-        Hashtbl.add family_helper name name;
         InductiveT (List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases))
     )
+
+
 
 let rec transform_def (d : def) : coq_def =
   match d.it with
@@ -364,8 +389,16 @@ let rec transform_def (d : def) : coq_def =
     | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> let binds = List.map transform_param params in 
       if (clauses == []) 
-        then AxiomD (transform_fun_id id, binds, erase_dependent_type typ)
-        else DefinitionD (transform_fun_id id, binds, erase_dependent_type typ, List.map transform_clause clauses)
+        then AxiomD (transform_fun_id id, binds, transform_return_type typ)
+        else (
+          let family_type_exists = List.fold_left (fun acc param -> acc || (match param.it with
+            | ExpP (_, typ) -> check_family_dependent_type typ
+            | TypP _ -> false 
+          )) false params in
+          let new_clause = if family_type_exists then [(T_ident ["_"], T_ident ["default_val"])] else [] in
+          let return_type = if family_type_exists then transform_return_type typ else erase_dependent_type typ in 
+          DefinitionD (transform_fun_id id, binds, return_type, List.append (List.map transform_clause clauses) new_clause)
+      )
     | RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD ""
 

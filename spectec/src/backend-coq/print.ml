@@ -11,6 +11,7 @@ let is_inductive (d : coq_def) =
     | (InductiveRelationD _ | InductiveD _) -> true
     | _ -> false
 
+
 let rec string_of_terms (term : coq_term) =
   match term with
     | T_exp_basic (T_bool b) -> string_of_bool b
@@ -90,6 +91,10 @@ let string_of_binders (binds : binders) =
     parens (id ^ " : " ^ string_of_terms typ)
   ) binds)
 
+let string_of_list_type (id : ident) (args : binders) =
+  "Definition list__" ^ id ^ " " ^ string_of_binders args ^  " := list " ^ parens (id ^ " " ^ string_of_binders args)
+  
+
 let string_of_binders_ids (binds : binders) = 
   String.concat " " (List.map (fun (id, _) -> id) binds)
 
@@ -115,7 +120,8 @@ let string_of_record (id: ident) (entries : record_entry list) =
   "{default_val := {|\n\t" ^
       String.concat ";\n\t" (List.map (fun (record_id, _, _) -> 
         record_id ^ " := default_val") entries) ^ "|} }.\n\n" ^
-  
+
+  string_of_list_type id [] ^ ".\n\n" ^
   (* Record Append proof (TODO might need information on type to improve this) *)
   "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
   "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
@@ -136,6 +142,7 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
     "| " ^ case_id ^ " " ^ string_of_binders binds ^ " : " ^ id ^ " " ^ string_of_binders_ids args   
   )  entries) ^ ".\n\n" ^
 
+  string_of_list_type id args ^ ".\n\n" ^
   (* Inhabitance proof for default values *)
   let inhabitance_binders = string_of_binders args in 
   let binders = if args <> [] then " " ^ string_of_binders_ids args else "" in 
@@ -143,7 +150,7 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
   let simple_constructors = List.filter (fun (_, binders) -> binders = []) entries in
   match simple_constructors with
     | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
-            "  Admitted"
+            "\tAdmitted"
     | (case_id, _) :: _ -> " := { default_val := " ^ case_id ^ " }"
 
 let string_of_definition (prefix : string) (id : ident) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
@@ -169,7 +176,9 @@ let rec string_of_premise (prem : coq_premise) =
     | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
-  "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ
+  "Notation " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
+  string_of_list_type id binds
+
 
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
   prefix ^ id ^ ": " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
@@ -194,7 +203,27 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
   String.concat "\n\t" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
     | TypeAliasT term -> "| " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " -> " ^ id   
     | _ -> ""
-  ) entries)
+  ) entries) ^ ".\n\n" ^
+
+  (* Inhabitance proof*)
+  "Global Instance Inhabited__" ^ id ^ " : Inhabited " ^ id ^
+  (match entries with
+    | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
+            "\tAdmitted"
+    | (case_id, (TypeAliasT _)) :: _ -> " := { default_val := " ^ case_id ^ "__" ^ family_type_suffix ^ " default_val" ^ " }"
+    | _ -> "(* FIXME: no inhabitant found! *) .\n" ^
+           "\tAdmitted"
+  ) ^ ".\n\n" ^
+  
+  (* Coercions (TODO make this work better (only really works for T_ident terms)) *)
+  string_of_list_type id [] ^ ".\n\n" ^
+  String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
+  | TypeAliasT term -> 
+    "Coercion " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " >-> " ^ id ^ ".\n\n" ^
+    "Definition list_" ^ string_of_terms term ^ "_" ^ id ^ " : " ^ "list__" ^ string_of_terms term ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
+    "Coercion list_" ^ string_of_terms term ^ "_" ^ id ^ " : list__" ^ string_of_terms term ^ " >-> " ^ "list__" ^ id 
+  | _ -> ""
+) entries)
   else
   String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
     | InductiveT i_entry -> string_of_inductive_def entry_id [] i_entry
