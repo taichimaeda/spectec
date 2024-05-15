@@ -98,6 +98,12 @@ let rec infer_match_name (binds: bind list) (type_name : text) =
       | None -> infer_match_name bs type_name
     )
 
+let is_terminal_type (typ : typ) =
+  match typ.it with
+    | VarT (_, args) -> args = [] 
+    | (BoolT | NumT _ | TextT) -> true
+    | _ -> false
+
 let transform_atom (a : atom) = 
   match a.it with
     | Atom s -> transform_id' s
@@ -330,7 +336,8 @@ and transform_path_start (p : path) (start_name : exp) =
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
-    | AliasT typ -> TypeAliasD (transform_id id, List.map transform_bind binds, erase_dependent_type typ)
+    | AliasT typ -> if is_terminal_type typ then NotationD (transform_id id, transform_type typ) 
+    else TypeAliasD (transform_id id, List.map transform_bind binds, erase_dependent_type typ)
     | StructT typfields -> RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> 
       (transform_id id ^ "__" ^ transform_atom a, erase_dependent_type t, Option.map (get_struct_type !env_ref) (get_typ_name t))
       ) typfields)

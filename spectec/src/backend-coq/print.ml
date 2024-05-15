@@ -91,13 +91,13 @@ let string_of_binders (binds : binders) =
     parens (id ^ " : " ^ string_of_terms typ)
   ) binds)
 
-let string_of_list_type (id : ident) (args : binders) =
-  "Definition list__" ^ id ^ " " ^ string_of_binders args ^  " := list " ^ parens (id ^ " " ^ string_of_binders args)
-  
-
 let string_of_binders_ids (binds : binders) = 
   String.concat " " (List.map (fun (id, _) -> id) binds)
 
+let string_of_list_type (id : ident) (args : binders) =
+
+  "Definition " ^ "list__" ^ id ^ " " ^ string_of_binders args ^  " := " ^ parens ("list " ^ parens (id ^ " " ^ string_of_binders_ids args))
+  
 let string_of_match_binders (binds : binders) =
   parens (String.concat ", " (List.map (fun (id, _) -> id) binds))
 
@@ -176,7 +176,7 @@ let rec string_of_premise (prem : coq_premise) =
     | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
-  "Notation " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
+  "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
   string_of_list_type id binds
 
 
@@ -231,11 +231,16 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
   ) entries) ^ ".\n\n" ^
   string_of_inductive_def id [] (List.map (fun (entry_id, _) -> (entry_id ^ "__" ^ family_type_suffix, [("arg" , T_ident [entry_id])])) entries)
 
+let string_of_notation (id : ident) (term : coq_term) = 
+  "Notation " ^ id ^ " := " ^ string_of_terms term ^ ".\n\n" ^
+  string_of_list_type id []
+
 let rec string_of_def (recursive : bool) (def : coq_def) = 
   match def with
     | TypeAliasD (id, binds, typ) -> string_of_typealias id binds typ
     | RecordD (id, entries) -> string_of_record id entries
     | InductiveD (id, args, entries) -> string_of_inductive_def id args entries
+    | NotationD (id, coq_term) -> string_of_notation id coq_term
     | MutualRecD defs -> (match defs with
       | [] -> ""
       | [d] -> string_of_def (not (is_inductive d)) d

@@ -104,6 +104,7 @@ and family_entry = ident * family_deftype
 
 and coq_def =
   | TypeAliasD of (ident * binders * coq_term)
+  | NotationD of (ident * coq_term)
   | RecordD of (ident * record_entry list)
   | InductiveD of (ident * inductive_args * inductive_type_entry list)
   | MutualRecD of coq_def list
@@ -112,5 +113,5 @@ and coq_def =
   | AxiomD of (ident * binders * return_type)
   | InductiveFamilyD of (ident * family_entry list)
   | UnsupportedD of string
-    
+  
 type coq_script = coq_def list
