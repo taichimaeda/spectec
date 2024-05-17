@@ -73,7 +73,7 @@ let transform_numtyp (typ : numtyp) =
 let gen_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> id.it
-    | _ -> "" (*error t.at "Should not happen"*)
+    | _ -> "" (* This should never happen (FIXME raise an actual error) *)
 
 let gen_exp_name (e : exp) =
   match e.it with
@@ -90,13 +90,41 @@ let gen_bind_name (bind : bind) =
     | ExpB (id, _, _) -> transform_id id
     | TypB id -> transform_id id
     
-let rec infer_match_name (binds: bind list) (type_name : text) =
-  match binds with
-    | [] -> None
-    | b :: bs -> (match (Hashtbl.find_opt family_helper (type_name ^ "__" ^ gen_bind_name b)) with
+let gen_arg_names (arg : arg) = 
+  match arg.it with
+    | ExpA e -> let rec gen_argexp_name exp = 
+      (match exp.it with
+        | CaseE (_, exp') -> gen_typ_name exp.note :: gen_argexp_name exp'
+        | TupE tups -> List.concat_map gen_argexp_name tups
+        | _ -> []
+      ) in 
+      gen_argexp_name e
+    | TypA _ -> []
+      
+let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
+  let rec infer_function lst =
+    match lst with
+      | [] -> None
+      | l :: lst' -> (match (Hashtbl.find_opt family_helper (type_name ^ "__" ^ l)) with
       | Some a -> Some a
-      | None -> infer_match_name bs type_name
-    )
+      | None -> infer_function lst'
+    ) in
+
+  let infer_match_name_from_binds bs = infer_function (List.map gen_bind_name bs) in
+  let rec infer_match_name_from_args ags = 
+    match ags with
+      | [] -> None
+      | a :: ags' -> let name_list = gen_arg_names a in 
+        let inferred_name = infer_function name_list in
+        if Option.is_none inferred_name 
+          then infer_match_name_from_args ags' 
+          else inferred_name
+  in
+  let result = infer_match_name_from_binds binds in
+  if Option.is_none result 
+    then infer_match_name_from_args args 
+    else result
+
 
 let is_terminal_type (typ : typ) =
   match typ.it with
@@ -217,25 +245,25 @@ and transform_exp (exp : exp) =
       ) 
     | SubE (e, _typ1, _typ2) -> transform_exp e
 
-and transform_match_exp (binds : bind list) (exp : exp) =
+and transform_match_exp (args : arg list) (binds : bind list) (exp : exp) =
   match exp.it with
   | VarE id -> 
-    (match (infer_match_name binds (gen_typ_name exp.note)) with
+    (match (infer_match_name args binds (gen_typ_name exp.note)) with
     | Some new_id -> T_app (T_ident [new_id; family_type_suffix], [T_ident [transform_var_id id]])
     | _ -> transform_exp exp
   )
-  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp binds exp1, transform_match_exp binds exp2)
-  | IterE (exp, _) -> transform_match_exp binds exp
+  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp args binds exp1, transform_match_exp args binds exp2)
+  | IterE (exp, _) -> transform_match_exp args binds exp
   | ListE exps -> (match exps with
-    | [e] -> transform_match_exp binds e
+    | [e] -> transform_match_exp args binds e
     | _ -> transform_exp exp
   )
-  | CaseE (m, e) -> (match (infer_match_name binds (gen_typ_name exp.note)) with 
-    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], [transform_match_exp binds e])])
+  | CaseE (m, e) -> (match (infer_match_name args binds (gen_typ_name exp.note)) with 
+    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], [transform_match_exp args binds e])])
     | _ -> transform_exp exp
   )
   | BinE (AddOp _, exp1, {it = NatE n ;_}) -> let rec get_succ n = (match n with
-    | 0 -> transform_match_exp binds exp1
+    | 0 -> transform_match_exp args binds exp1
     | m -> T_app (T_exp_basic T_succ, [get_succ (m - 1)])
   ) in get_succ (Z.to_int n)
   | _ -> transform_exp exp
@@ -279,9 +307,9 @@ and transform_arg (arg : arg) =
     | ExpA exp -> transform_exp exp
     | TypA typ -> erase_dependent_type typ
 
-and transform_match_arg (binds : bind list) (arg : arg) =
+and transform_match_arg (args : arg list) (binds : bind list) (arg : arg) =
   match arg.it with
-    | ExpA exp -> transform_match_exp binds exp
+    | ExpA exp -> transform_match_exp args binds exp
     | TypA _ -> T_ident ["_"]
 
 and transform_bind (bind : bind) =
@@ -365,7 +393,7 @@ let transform_rule (id : id) (r : rule) =
 
 let transform_clause (c : clause) =
   match c.it with
-    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg binds) args), transform_tuple_exp exp)
+    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg args binds) args), transform_tuple_exp exp)
 
 let transform_param (p : param) =
   match p.it with
@@ -387,8 +415,6 @@ let transform_inst (id : id) (i : inst) =
         InductiveT (List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases))
     )
 
-
-
 let rec transform_def (d : def) : coq_def =
   match d.it with
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
@@ -397,14 +423,14 @@ let rec transform_def (d : def) : coq_def =
     | DecD (id, params, typ, clauses) -> let binds = List.map transform_param params in 
       if (clauses == []) 
         then AxiomD (transform_fun_id id, binds, transform_return_type typ)
-        else (
-          let family_type_exists = List.fold_left (fun acc param -> acc || (match param.it with
-            | ExpP (_, typ) -> check_family_dependent_type typ
-            | TypP _ -> false 
-          )) false params in
-          let new_clause = if family_type_exists then [(T_ident ["_"], T_ident ["default_val"])] else [] in
-          let return_type = if family_type_exists then transform_return_type typ else erase_dependent_type typ in 
-          DefinitionD (transform_fun_id id, binds, return_type, List.append (List.map transform_clause clauses) new_clause)
+      else (
+        let family_type_exists = List.fold_left (fun acc param -> acc || (match param.it with
+          | ExpP (_, typ) -> check_family_dependent_type typ
+          | TypP _ -> false 
+        )) false params in
+        let new_clause = if family_type_exists then [(T_ident ["_"], T_ident ["default_val"])] else [] in
+        let return_type = if family_type_exists then transform_return_type typ else erase_dependent_type typ in 
+        DefinitionD (transform_fun_id id, binds, return_type, List.append (List.map transform_clause clauses) new_clause)
       )
     | RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD ""

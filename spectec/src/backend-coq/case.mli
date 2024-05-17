@@ -9,9 +9,11 @@ type struct_type =
     | Terminal (* nat, bool, list, etc.*)
 
 type var_typ = id * int * struct_type
+type sub_typ = (id * mixop * typ) list
 
 type env =
-{ mutable vars : var_typ Env.t
+{ mutable vars : var_typ Env.t;
+    mutable subs : sub_typ Env.t
 }
 
 val get_case_env : Il.Ast.script -> env
