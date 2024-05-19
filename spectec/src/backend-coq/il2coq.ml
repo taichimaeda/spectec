@@ -98,6 +98,7 @@ let gen_arg_names (arg : arg) =
   match arg.it with
     | ExpA e -> let rec gen_argexp_name exp = 
       (match exp.it with
+        | VarE id -> [transform_id id]
         | CaseE (_, exp') -> gen_typ_name exp.note :: gen_argexp_name exp'
         | TupE tups -> List.concat_map gen_argexp_name tups
         | _ -> []
@@ -111,10 +112,9 @@ let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
   let rec infer_function lst =
     match lst with
       | [] -> None
-      | l :: lst' -> (match (Hashtbl.find_opt family_helper (type_name ^ "__" ^ l)) with
-      | Some a -> Some a
-      | None -> infer_function lst'
-    ) in
+      | l :: lst' -> let name = (type_name ^ "__" ^ l) in 
+      if (Hashtbl.mem family_helper name) then Some name else infer_function lst'
+    in
 
   let infer_match_name_from_binds bs = infer_function (List.map gen_bind_name bs) in
   let rec infer_match_name_from_args ags = 
@@ -131,11 +131,31 @@ let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
     then infer_match_name_from_args args 
     else result
 
+let find_typ (args : arg list) (type_name : text) =
+  let rec infer_function lst =
+    match lst with
+      | [] -> None
+      | l :: lst' -> let name = (type_name ^ "__" ^ l) in 
+      match (Hashtbl.find_opt family_helper name) with 
+        | Some typ -> Some typ 
+        | _ -> infer_function lst'
+    in
+  let rec infer_match_name_from_args ags = 
+    match ags with
+      | [] -> None
+      | a :: ags' -> let name_list = gen_arg_names a in 
+        let inferred_name = infer_function name_list in
+        if Option.is_none inferred_name 
+          then infer_match_name_from_args ags' 
+          else inferred_name in
+  infer_match_name_from_args args 
+
 (* Atom functions *)
 let transform_atom (a : atom) = 
   match a.it with
     | Atom s -> transform_id' s
     | _ -> ""
+
 let is_atomid (a : atom) =
   match a.it with
     | Atom _ -> true
@@ -184,11 +204,8 @@ and erase_dependent_type (typ : typ) =
     | IterT (t, iter) -> T_app (transform_itertyp iter, [erase_dependent_type t])
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> erase_dependent_type t) typs)
-    | VarT (id, _) -> let inferred_opt = Hashtbl.find_opt family_helper (transform_id id) in      
-      (match inferred_opt with 
-        | Some family_id' -> T_ident [family_id']
-        | _ -> transform_type typ
-      )
+    | VarT (id, _) -> let inferred_opt = Hashtbl.mem family_helper (transform_id id) in      
+      if inferred_opt then T_ident [transform_id id] else transform_type typ
     | _ -> transform_type typ
 
 and check_family_dependent_type (typ : typ) = 
@@ -200,13 +217,14 @@ and check_family_dependent_type (typ : typ) =
 
 and transform_return_type (typ : typ) =
   match typ.it with
-    (* Only works for 1-dimensional lists. (Which is fine since type coercing for higher dimensional lists is too much anyways)*)
+    (* Only works for 1-dimensional lists. 
+    (Which is fine since type coercing for higher dimensional lists is too much anyways)*)
     | IterT ({it = VarT (id, args); _}, _) -> 
-      let inferred_opt = Hashtbl.find_opt family_helper (transform_id id) in      
-      (match inferred_opt with 
-        | Some family_id' -> T_ident ["list"; family_id'] 
-        | _ -> T_app (T_ident ["list"; transform_id id], List.map transform_arg args)
-      )
+      let inferred_opt = Hashtbl.mem family_helper (transform_id id) in      
+      if inferred_opt 
+      then T_ident ["list"; transform_id id] 
+      else T_app (T_ident ["list"; transform_id id], List.map transform_arg args)
+    | IterT (typ, iter) -> T_app (transform_itertyp iter, [transform_return_type typ])
     | _ -> erase_dependent_type typ
 
 and transform_typ_args (typ : typ) =
@@ -214,6 +232,11 @@ and transform_typ_args (typ : typ) =
     | TupT [] -> []
     | TupT typs -> List.map (fun (e, t) -> (var_prefix ^ gen_exp_name e, erase_dependent_type t)) typs
     | _ -> [("_", erase_dependent_type typ)]
+
+and remove_iter_typ (typ : typ) = 
+  match typ.it with
+    | IterT (typ, _) -> typ
+    | _ -> typ
 
 and transform_tuple_to_relation_args (t : typ) =
   match t.it with
@@ -290,6 +313,17 @@ and transform_tuple_exp (exp : exp) =
     | TupE exps -> List.map transform_exp exps
     | _ -> [transform_exp exp]
 
+
+(* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
+(* This could be extended for other list expressions (and option), but for 1.0 this is fine *)
+and transform_return_exp (r_typ : typ option) (exp : exp) = 
+  match r_typ with
+    | None -> transform_exp exp
+    | Some typ -> (match exp.it with
+      | ListE exps -> T_list (List.map (fun e -> T_cast ((transform_exp e), erase_dependent_type (remove_iter_typ typ))) exps)
+      | _ -> transform_exp exp
+    )
+
 and transform_unop (u : unop) (exp : exp) = 
   match u with
     | NotOp ->  T_app (T_exp_basic T_sub, [transform_exp exp])
@@ -336,13 +370,20 @@ and transform_bind (bind : bind) =
     | TypB id -> (transform_id id, T_ident ["Type"])
 
 and transform_relation_bind (bind : bind) =
+  let rec transform_iter_bind iters typ = (match iters with
+    | [] -> typ
+    | it :: its -> IterT (transform_iter_bind its typ, it) $ typ.at
+  ) in
   match bind.it with
+    | ExpB (id, ({it = VarT (t_id, args); _} as t), its) -> 
+      let id_transformed = transform_id t_id in 
+      let a = find_typ args id_transformed in
+        (transform_var_id id, (match a with
+          | Some typ -> transform_type (transform_iter_bind its typ)
+          | None -> erase_dependent_type (transform_iter_bind its t)
+        ))
     | ExpB (id, typ, its) -> 
-      let rec transform_iter_bind iters = (match iters with
-      | [] -> typ
-      | it :: its -> IterT (transform_iter_bind its, it) $ typ.at
-    ) in
-      (transform_var_id id, erase_dependent_type (transform_iter_bind its))
+      (transform_var_id id, erase_dependent_type (transform_iter_bind its typ))
     | TypB id -> (transform_var_id id, T_ident ["Type"])
 
 and transform_param (p : param) =
@@ -400,7 +441,6 @@ let rec transform_premise (p : prem) =
     | IterPr (p, (_iter, id_types)) -> P_listforall (transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
     | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp exp)
 
-(* Deftyp function *)
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
     | AliasT typ -> if is_terminal_type typ then NotationD (transform_id id, transform_type typ) 
@@ -411,29 +451,29 @@ let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
     | VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (_, t, _), _) ->
         (transform_id id ^ "__" ^ transform_mixop m, transform_typ_args t)) typcases)
 
-
 let transform_rule (id : id) (r : rule) = 
   match r.it with
     | RuleD (rule_id, binds, mixop, exp, premises) -> 
       ((transform_id id ^ "__" ^ transform_id rule_id ^ transform_mixop mixop, List.map transform_relation_bind binds), 
       List.map transform_premise premises, transform_tuple_exp exp)
 
-let transform_clause (_return_type : typ option) (c : clause) =
+let transform_clause (return_type : typ option) (c : clause) =
   match c.it with
-    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg args binds) args), transform_exp exp)
+    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg args binds) args), transform_return_exp return_type exp)
 
 let transform_inst (id : id) (i : inst) =
   match i.it with
     | InstD (binds, _, deftyp) -> 
       let id_transformed = transform_id id in 
       let name = id_transformed ^ "__" ^ String.concat "__" (List.map gen_bind_name binds) in    
-      Hashtbl.add family_helper id_transformed id_transformed;
-      Hashtbl.add family_helper name name;
+      Hashtbl.add family_helper id_transformed (VarT (id, []) $ i.at); (* Putting a dummy value as memcheck is only needed*)
       (name, (match deftyp.it with
       | AliasT typ -> 
+        Hashtbl.add family_helper name typ;
         TypeAliasT (erase_dependent_type typ)
-      | StructT _ -> assert false
+      | StructT _ -> error i.at "Family of records should not exist" (* This should never occur *)
       | VariantT typcases -> 
+        Hashtbl.add family_helper name (VarT (id, []) $ i.at); (* Putting a dummy value as memcheck is only needed*)
         InductiveT (List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases))
     )
 
@@ -454,7 +494,7 @@ let rec transform_def (d : def) : coq_def =
         let is_family_return_type = check_family_dependent_type typ in 
         let return_type = if is_family_return_type then transform_return_type typ else erase_dependent_type typ in 
         let base_return_type = if is_family_return_type then Some typ else None in 
-        DefinitionD (transform_fun_id id, binds, return_type, List.append (List.map (transform_clause base_return_type) clauses) new_clause)
+        DefinitionD (transform_fun_id id, binds, return_type, (List.map (transform_clause base_return_type) clauses) @ new_clause)
       )
     | RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD ""
@@ -465,7 +505,6 @@ let is_not_hintdef (d : def) : bool =
     | _ -> true 
 
 (* -------------- Sub pass ----------------- *)
-
 
 let sub_hastable = Hashtbl.create 16
 

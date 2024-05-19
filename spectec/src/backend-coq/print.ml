@@ -148,11 +148,11 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
   let inhabitance_binders = string_of_binders args in 
   let binders = if args <> [] then " " ^ string_of_binders_ids args else "" in 
   "Global Instance Inhabited__" ^ id ^ inhabitance_binders ^ " : Inhabited " ^ parens (id ^ binders) ^
-  let simple_constructors = List.filter (fun (_, binders) -> binders = []) entries in
-  match simple_constructors with
+  match entries with
     | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
             "\tAdmitted"
-    | (case_id, _) :: _ -> " := { default_val := " ^ case_id ^ " }"
+    | (case_id, binds) :: _ -> " := { default_val := " ^ case_id ^ binders ^ 
+      " " ^ (String.concat " " (List.map (fun _ -> "default_val" ) binds)) ^ " }"
 
 let string_of_definition (prefix : string) (id : ident) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
   match clauses with
