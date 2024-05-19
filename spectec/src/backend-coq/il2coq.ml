@@ -98,7 +98,7 @@ let gen_arg_names (arg : arg) =
   match arg.it with
     | ExpA e -> let rec gen_argexp_name exp = 
       (match exp.it with
-        | VarE id -> [transform_id id]
+        | VarE _ -> [gen_typ_name exp.note]
         | CaseE (_, exp') -> gen_typ_name exp.note :: gen_argexp_name exp'
         | TupE tups -> List.concat_map gen_argexp_name tups
         | _ -> []
@@ -246,7 +246,7 @@ and transform_tuple_to_relation_args (t : typ) =
 (* Expression functions *)
 and transform_exp (exp : exp) =
   match exp.it with 
-    | VarE id -> T_ident [transform_var_id id]
+    | VarE id -> if (Hashtbl.mem family_helper (gen_typ_name exp.note)) then T_cast (T_ident [transform_var_id id], erase_dependent_type exp.note) else T_ident [transform_var_id id]
     | BoolE b -> T_exp_basic (T_bool b)
     | NatE n -> T_exp_basic (T_nat n)
     | TextE txt -> T_exp_basic (T_string txt)
