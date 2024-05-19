@@ -8,6 +8,8 @@ open Source
 
 module Env = Map.Make(String)
 
+
+
 type struct_type =
     | Record
     | Inductive
@@ -20,12 +22,12 @@ type sub_typ = (id * mixop * typ) list
 
 type env =
 { mutable vars : var_typ Env.t;
-  mutable subs : sub_typ Env.t
+  mutable subs : sub_typ Env.t;
 }
 
 let new_env () =
 { vars = Env.empty;
-  subs = Env.empty
+  subs = Env.empty;
 }
 
 let error at msg = Error.error at "Coq Generation" msg
@@ -97,3 +99,4 @@ let get_case_env (il : script) =
   let env = new_env () in 
   List.iter (case_def env) il;
   env
+

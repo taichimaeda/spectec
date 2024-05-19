@@ -5,6 +5,7 @@ type ident = string
 
 (* binder names *)
 type name = string
+type func_name = string
 
 type coq_basic_types = 
   | T_unit
@@ -68,6 +69,7 @@ and coq_term =
   | T_app of (coq_term * (coq_term list))
   | T_app_infix of (coq_term * coq_term * coq_term) (* Same as above but first coq_term is placed in the middle *)
   | T_tuple of (coq_term list) 
+  | T_cast of (coq_term * coq_term)
   | T_unsupported of string
 
 and coq_premise =
@@ -112,6 +114,7 @@ and coq_def =
   | InductiveRelationD of (ident * relation_args * relation_type_entry list)
   | AxiomD of (ident * binders * return_type)
   | InductiveFamilyD of (ident * family_entry list)
+  | CoercionD of (func_name * ident * ident)
   | UnsupportedD of string
   
 type coq_script = coq_def list

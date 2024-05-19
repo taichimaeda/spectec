@@ -61,10 +61,12 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_tuple terms -> String.concat " " (List.map string_of_terms terms)
     | T_record_fields fields -> "{| " ^ (String.concat "; " (List.map (fun (id, term) -> id ^ " := " ^ string_of_terms term) fields)) ^ " |}"
     | T_list entries -> square_parens (String.concat ";" (List.map string_of_terms entries))
+    | T_match [] -> ""
     | T_match patterns -> parens (String.concat ", " (List.map string_of_terms patterns))
     | T_app (base_term, args) -> parens (string_of_terms base_term ^ " " ^ String.concat " " (List.map string_of_terms args))
     | T_app_infix (infix_op, term1, term2) -> parens (string_of_terms term1 ^ string_of_terms infix_op ^ string_of_terms term2)
     | T_tuple types -> parens (String.concat " * " (List.map string_of_terms types))
+    | T_cast (term, typ) -> parens (string_of_terms term ^ " : " ^ string_of_terms typ)
     | T_unsupported str -> "(* Unsupported Term: " ^ str ^ " *)"
 
 
@@ -165,7 +167,7 @@ let string_of_definition (prefix : string) (id : ident) (binders : binders) (ret
 let rec string_of_premise (prem : coq_premise) =
   match prem with
     | P_if term -> string_of_terms term
-    | P_rule (id, term) -> id ^ " " ^ string_of_terms term
+    | P_rule (id, term) -> parens (id ^ " " ^ string_of_terms term)
     | P_neg p -> parens ("~" ^ string_of_premise p)
     | P_else -> "otherwise" (* Will be removed by an else pass *)
     | P_listforall (p, ids) -> (match ids with
@@ -220,8 +222,8 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
   String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
   | TypeAliasT term -> 
     "Coercion " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " >-> " ^ id ^ ".\n\n" ^
-    "Definition list_" ^ string_of_terms term ^ "_" ^ id ^ " : " ^ "list__" ^ string_of_terms term ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
-    "Coercion list_" ^ string_of_terms term ^ "_" ^ id ^ " : list__" ^ string_of_terms term ^ " >-> " ^ "list__" ^ id 
+    "Definition list__" ^ string_of_terms term ^ "_" ^ id ^ " : " ^ "list__" ^ string_of_terms term ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
+    "Coercion list__" ^ string_of_terms term ^ "_" ^ id ^ " : list__" ^ string_of_terms term ^ " >-> " ^ "list__" ^ id 
   | _ -> ""
 ) entries)
   else
@@ -234,6 +236,12 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
 let string_of_notation (id : ident) (term : coq_term) = 
   "Notation " ^ id ^ " := " ^ string_of_terms term ^ ".\n\n" ^
   string_of_list_type id []
+
+let string_of_coercion (func_name : func_name) (typ1 : ident) (typ2 : ident) =
+  let list_func = "list__" ^ typ1 ^ "__" ^ typ2 in
+  "Coercion " ^ func_name ^ " : " ^ typ1 ^ " >-> " ^ typ2 ^ ".\n\n" ^
+  "Definition " ^ list_func ^ " : list__" ^ typ1 ^ " -> " ^ "list__" ^ typ2 ^ " := map " ^ func_name ^ ".\n\n" ^
+  "Coercion " ^ list_func ^ " : list__" ^ typ1 ^ " >-> " ^ "list__" ^ typ2
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
   match def with
@@ -253,6 +261,7 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
       string_of_inductive_relation prefix id args relations
     | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type
     | InductiveFamilyD (id, entries) -> string_of_family_types id entries 
+    | CoercionD (func_name, typ1, typ2) -> string_of_coercion func_name typ1 typ2
     | UnsupportedD str -> "(* Unsupported Definition: " ^ str ^ "*)"
 
 let exported_string = 

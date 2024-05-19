@@ -4,18 +4,30 @@ open Coqast
 open Util
 open Source
 open Case
+open Either
 
 (* Util functions for transform *)
 module IdSet = Set.Make(String)
 let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"; "nat"] |> IdSet.of_list
 let error at msg = Error.error at "Coq Generation" msg
 let family_type_suffix = "entry"
+let coerce_prefix = "coec_"
+let var_prefix = "v_"
+let func_prefix = "fun_"
 
 let rec list_split (f : 'a -> bool) (l : 'a list) = match l with
   | [] -> ([], [])
   | x :: xs when f x -> let x_true, x_false = list_split f xs in
     (x :: x_true, x_false)
   | xs -> ([], xs)
+
+let rec partition_eitherlist (xs : ('a, 'b) Either.t list) = 
+  match xs with
+    | [] -> ([], [])
+    | (Left x) :: xs' -> let (lefts, rights) = partition_eitherlist xs' in
+      (x :: lefts, rights)
+    | Right x :: xs' -> let (lefts, rights) = partition_eitherlist xs' in
+      (lefts, x :: rights)
 
 (* Temporary workaround for fixing family matching (Only works for family types of one dependent type param) *)
 let family_helper = Hashtbl.create 30
@@ -45,9 +57,6 @@ let rec get_struct_type (env : env) (id : id) =
     | Record -> Record
     | Terminal -> Terminal
   )
-
-let var_prefix = "v_"
-let func_prefix = "fun_"
 
 let transform_id' (s : text) = match s with
   | s when IdSet.mem s reserved_ids -> "reserved__" ^ s
@@ -101,6 +110,8 @@ let gen_arg_names (arg : arg) =
       gen_argexp_name e
     | TypA _ -> []
       
+
+(* TODO improve this function to instead only look at the actual dependent type only *)
 let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
   let rec infer_function lst =
     match lst with
@@ -220,7 +231,7 @@ and transform_exp (exp : exp) =
     | CaseE (mixop, e) -> let actual_id, num_args = gen_case_name !env_ref exp.note in 
       T_app (T_ident [transform_id actual_id; transform_mixop mixop], List.append (List.init num_args (fun _ -> T_ident ["_ "])) [transform_exp e])
     | UncaseE (_e, _mixop) -> T_unsupported ("Uncase: " ^ string_of_exp exp)
-    | OptE (Some e) -> T_list [transform_exp e] (*T_app (T_exp_basic T_some, [transform_exp e])*)
+    | OptE (Some e) -> T_list [transform_tuple_exp e] (*T_app (T_exp_basic T_some, [transform_exp e])*)
     | OptE None -> T_list [] (*T_exp_basic T_none*)
     | TheE e -> T_app (T_exp_basic T_the, [transform_exp e])
     | StrE expfields -> T_record_fields (List.map (fun (a, e) -> (gen_typ_name exp.note ^ "__" ^ transform_atom a, transform_exp e)) expfields)
@@ -239,11 +250,12 @@ and transform_exp (exp : exp) =
         (match iter, ids, exp.it with
         | (List | List1 | ListN _), [], _ -> T_list [exp1] 
         | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
+        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_listmap (transform_var_id v, transform_exp e)])
         | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_listmap (transform_var_id v, exp1)
         | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_listzipwith (transform_var_id v, transform_var_id s, transform_tuple_exp exp)
         | _ -> exp1
       ) 
-    | SubE (e, _typ1, _typ2) -> transform_exp e
+    | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
 
 and transform_match_exp (args : arg list) (binds : bind list) (exp : exp) =
   match exp.it with
@@ -440,6 +452,127 @@ let is_not_hintdef (d : def) : bool =
     | HintD _ -> false
     | _ -> true 
 
+(* -------------- Sub pass ----------------- *)
+
+
+let sub_hastable = Hashtbl.create 16
+
+let rec get_sube_exp (exp : exp) =
+  match exp.it with
+    | UnE (_, e) -> get_sube_exp e
+    | BinE (_, e1, e2) | CmpE (_, e1, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | TupE exps -> List.concat_map get_sube_exp exps
+    | ProjE (e, _) -> get_sube_exp e
+    | CaseE (_, e) -> get_sube_exp e
+    | UncaseE (e, _) -> get_sube_exp e
+    | OptE (Some e) -> get_sube_exp e
+    | TheE e -> get_sube_exp e
+    | StrE expfields -> List.concat_map (fun (_, e) -> get_sube_exp e) expfields
+    | DotE (e, _) -> get_sube_exp e
+    | CompE (e1, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | ListE exps -> List.concat_map get_sube_exp exps 
+    | LenE e -> get_sube_exp e
+    | CatE (e1, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | IdxE (e1, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | SliceE (e1, e2, e3) -> List.concat_map get_sube_exp [e1; e2; e3]
+    | UpdE (e1, _, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | ExtE (e1, _, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
+    | CallE (_, args) -> List.concat_map get_sube_arg args
+    | IterE (e, _) -> get_sube_exp e
+    | SubE _ as e -> [e $$ (exp.at, exp.note)]
+    | _ -> []
+
+and get_sube_arg (arg : arg) = 
+  match arg.it with
+    | ExpA e -> get_sube_exp e
+    | TypA _ -> []
+
+let rec get_sube_prem (premise : prem) =
+  match premise.it with
+    | RulePr (_, _, e) -> get_sube_exp e
+    | IfPr e -> get_sube_exp e
+    | IterPr (p, _) -> get_sube_prem p
+    | _ -> []
+
+let get_sube_rule (r : rule) =
+  match r.it with
+    | RuleD (_, _, _, e, prems) -> List.append (get_sube_exp e) (List.concat_map get_sube_prem prems)
+
+let is_id_type (typ : typ) = 
+  match typ.it with
+    | VarT (_, args) -> args == []
+    | _ -> false
+
+let gen_typ_id (t : typ) =
+  match t.it with
+    | VarT (id, _) -> id
+    | _ -> "" $ t.at
+
+let rec is_same_type (t1 : typ) (t2 : typ) =
+  match (t1.it, t2.it) with
+    | VarT (id1, _), VarT (id2, _) -> id1.it = id2.it
+    | NumT nt1, NumT nt2 -> nt1 = nt2
+    | BoolT, BoolT -> true
+    | TextT, TextT -> true
+    | TupT tups, TupT tups2 -> (List.length tups) = (List.length tups2) && List.for_all2 (fun (_, t1') (_, t2') -> is_same_type t1' t2') tups tups2
+    | IterT (t1', iter1), IterT (t2', iter2) -> iter1 = iter2 && is_same_type t1' t2'
+    | _ -> false
+
+let rec find_same_typing (at : region) (m1 : ident) (t1 : typ) (t2_cases : sub_typ) =
+  match t2_cases with
+    | [] -> error t1.at "Subtyping expression cannot coerce correctly"
+    | (_, m2, t2) as s_t :: _ when is_same_type t1 t2 && m1 = (transform_mixop m2) -> s_t
+    | _ :: t2_cases' -> find_same_typing at m1 t1 t2_cases'
+
+let get_num_tuple_typ (t : typ) = 
+  match t.it with
+    | TupT tups -> List.length tups 
+    | _ -> 0
+
+let transform_sub_types (at : region) (t1_id : id) (t2_id : id) (t1_cases : sub_typ) (t2_cases : sub_typ) =
+  let func_name = func_prefix ^ coerce_prefix ^ transform_id t1_id ^ "__" ^ transform_id t2_id in 
+  
+  [Right (DefinitionD (func_name, 
+    [(var_prefix ^ transform_id t1_id, T_ident [transform_id t1_id])],
+    T_ident [transform_id t2_id], List.map (fun (id, m1, t1) ->
+      let (id2, m2, _) = find_same_typing at (transform_mixop m1) t1 t2_cases in
+      let var_list = List.init (get_num_tuple_typ t1) (fun i -> T_ident [var_prefix ^ string_of_int i]) in
+      (T_app (T_ident [transform_id id; transform_mixop m1], var_list),
+      T_app (T_ident [transform_id id2; transform_mixop m2], var_list))
+    ) t1_cases)); 
+  Right (CoercionD (func_name, transform_id t1_id, transform_id t2_id))]
+
+(* TODO can be extended to other defs if necessary *)
+let rec transform_sub_def (env : env) (d : def) = 
+  match d.it with
+    | RelD (_, _, _, rules) -> let sub_expressions = List.concat_map get_sube_rule rules in
+      List.append (List.concat_map (fun e -> match e.it with 
+        | SubE (_, t1, t2) when is_id_type t1 && is_id_type t2 -> 
+          let (t1_id, t2_id) = (gen_typ_id t1, gen_typ_id t2) in
+          let combined_name = (t1_id.it ^ "__" ^ t2_id.it) in 
+          (match (Hashtbl.find_opt sub_hastable combined_name) with
+            | Some _ -> []
+            | None -> let typ1_cases = find "Sub pass" env.subs t1_id in
+            let typ2_cases = find "Sub pass" env.subs t2_id in
+            Hashtbl.add sub_hastable combined_name combined_name;
+            transform_sub_types d.at t1_id t2_id typ1_cases typ2_cases)
+        | _ -> []) sub_expressions) [Left d]
+    | RecD defs -> let flat_list = List.concat_map (transform_sub_def env) defs in
+      let (defs, coq_defs) = partition_eitherlist flat_list in
+      (List.map Either.right coq_defs) @ [Left (RecD defs $ d.at)]
+    | _ -> [Left d]
+
+let transform_sub (e : env) (il : script) =
+  List.concat_map (transform_sub_def e) il
+
+(* Main transformation function *)
 let transform (il : script) : coq_script =
   env_ref := Case.get_case_env il;
-  List.map transform_def (List.filter is_not_hintdef il)
+  let sub_transformed = transform_sub !env_ref il in
+  List.filter_map (fun d -> 
+    match d with 
+      | Left def when is_not_hintdef def -> Some (transform_def def)
+      | Right c_def -> Some c_def
+      | _ -> None
+  ) sub_transformed
+

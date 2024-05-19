@@ -278,7 +278,7 @@ let () =
       Backend_interpreter.Runner.run args
     | Coq ->
       log "Coq generation...";
-      let coq_il = Backend_coq.Il2coq.transform il in 
+      let coq_il = Backend_coq.Else.transform (Backend_coq.Il2coq.transform il) in 
       (match !odsts with
       | [] -> print_endline (Backend_coq.Print.string_of_script coq_il)
       | [odst] -> 
