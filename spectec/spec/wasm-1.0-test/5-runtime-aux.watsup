@@ -1,0 +1,104 @@
+;;
+;; Auxiliary definitions on Values
+;;
+
+;; Default values
+
+def $default_(valtype) : val
+
+def $default_(INN I32) = (CONST (INN I32) 0)
+def $default_(INN I64) = (CONST (INN I64) 0)
+def $default_(FNN F32) = (CONST (FNN F32) $fzero(32))
+def $default_(FNN F64) = (CONST (FNN F64) $fzero(64))
+
+
+;; Projections
+
+def $funcsxv(externval*) : funcaddr*     hint(show $funcs(%))
+def $globalsxv(externval*) : globaladdr* hint(show $globals(%))
+def $tablesxv(externval*) : tableaddr*   hint(show $tables(%))
+def $memsxv(externval*) : memaddr*       hint(show $mems(%))
+
+def $funcsxv(eps) = eps
+def $funcsxv((FUNC fa) xv*) = fa $funcsxv(xv*)
+def $funcsxv(externval xv*) = $funcsxv(xv*)  -- otherwise
+
+def $globalsxv(eps) = eps
+def $globalsxv((GLOBAL ga) xv*) = ga $globalsxv(xv*)
+def $globalsxv(externval xv*) = $globalsxv(xv*)  -- otherwise
+
+def $tablesxv(eps) = eps
+def $tablesxv((TABLE ta) xv*) = ta $tablesxv(xv*)
+def $tablesxv(externval xv*) = $tablesxv(xv*)  -- otherwise
+
+def $memsxv(eps) = eps
+def $memsxv((MEM ma) xv*) = ma $memsxv(xv*)
+def $memsxv(externval xv*) = $memsxv(xv*)  -- otherwise
+
+
+
+;;
+;; Auxiliary definitions on State
+;;
+
+;; Short-hands
+
+def $store(state) : store             hint(show %.STORE)
+def $frame(state) : frame             hint(show %.FRAME)
+
+def $store((s; f)) = s
+def $frame((s; f)) = f
+
+
+def $funcaddr(state) : funcaddr*      hint(show %.MODULE.FUNCS)
+def $funcaddr((s; f)) = f.MODULE.FUNCS
+
+def $funcinst(state) : funcinst*      hint(show %.FUNCS)
+def $globalinst(state) : globalinst*  hint(show %.GLOBALS)
+def $tableinst(state) : tableinst*    hint(show %.TABLES)
+def $meminst(state) : meminst*        hint(show %.MEMS)
+def $moduleinst(state) : moduleinst   hint(show %.MODULE)
+
+def $funcinst((s; f)) = s.FUNCS
+def $globalinst((s; f)) = s.GLOBALS
+def $tableinst((s; f)) = s.TABLES
+def $meminst((s; f)) = s.MEMS
+def $moduleinst((s; f)) = f.MODULE
+
+def $type(state, typeidx) : functype        hint(show %.TYPES[%])
+def $func(state, funcidx) : funcinst        hint(show %.FUNCS[%])
+def $global(state, globalidx) : globalinst  hint(show %.GLOBALS[%])
+def $table(state, tableidx) : tableinst     hint(show %.TABLES[%])
+def $mem(state, memidx) : meminst           hint(show %.MEMS[%])
+def $local(state, localidx) : val           hint(show %.LOCALS[%])
+
+def $type((s; f), x) = f.MODULE.TYPES[x]
+def $func((s; f), x) = s.FUNCS[f.MODULE.FUNCS[x]]
+def $global((s; f), x) = s.GLOBALS[f.MODULE.GLOBALS[x]]
+def $table((s; f), x) = s.TABLES[f.MODULE.TABLES[x]]
+def $mem((s; f), x) = s.MEMS[f.MODULE.MEMS[x]]
+def $local((s; f), x) = f.LOCALS[x]
+
+
+;; Update
+
+def $with_local(state, localidx, val) : state               hint(show %[.LOCALS[%] = %])
+def $with_global(state, globalidx, val) : state             hint(show %[.GLOBALS[%].VALUE = %])
+def $with_table(state, tableidx, nat, funcaddr) : state     hint(show %[.TABLES[%].REFS[%] = %])
+def $with_tableinst(state, tableidx, tableinst) : state     hint(show %[.TABLES[%] = %])
+def $with_mem(state, memidx, nat, nat, byte*) : state       hint(show %[.MEMS[%].BYTES[% : %] = %])
+def $with_meminst(state, memidx, meminst) : state           hint(show %[.MEMS[%] = %])
+
+def $with_local((s; f), x, v) = s; f[.LOCALS[x] = v]
+def $with_global((s; f), x, v) = s[.GLOBALS[f.MODULE.GLOBALS[x]].VALUE = v]; f
+def $with_table((s; f), x, i, a) = s[.TABLES[f.MODULE.TABLES[x]].REFS[i] = a]; f
+def $with_tableinst((s; f), x, ti) = s[.TABLES[f.MODULE.TABLES[x]] = ti]; f
+def $with_mem((s; f), x, i, j, b*) = s[.MEMS[f.MODULE.MEMS[x]].BYTES[i : j] = b*]; f
+def $with_meminst((s; f), x, mi) = s[.MEMS[f.MODULE.MEMS[x]] = mi]; f
+
+
+;; Growing
+
+def $growtable(tableinst, nat) : tableinst  hint(partial)
+def $growmemory(meminst, nat) : meminst     hint(partial)
+

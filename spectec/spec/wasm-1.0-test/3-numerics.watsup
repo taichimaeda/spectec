@@ -1,0 +1,142 @@
+;;
+;; Numerics
+;;
+
+;; Signed numbers
+
+def $signed(N, nat) : int       hint(show $signed_(%,%))
+
+
+def $invsigned(N, int) : nat    hint(show $signed_(%)^(-1)#((%)))
+
+
+
+;; TODO
+
+def $unop(valtype, unop_(valtype), val_(valtype)) : val_(valtype)*
+    hint(show %2#$_(%1)#((%3)))
+def $binop(valtype, binop_(valtype), val_(valtype), val_(valtype)) : val_(valtype)*
+    hint(show %2#$_(%1)#(%3, %4))
+def $testop(valtype, testop_(valtype), val_(valtype)) : val_(INN I32)
+    hint(show %2#$_(%1)#((%3)))
+def $relop(valtype, relop_(valtype), val_(valtype), val_(valtype)) : val_(INN I32)
+    hint(show %2#$_(%1)#(%3, %4))
+def $cvtop(valtype_1, valtype_2, cvtop, sx?, val_(valtype_1)) : val_(valtype_2)*
+    hint(show %3#$_((%1,%2))^(%4)#((%5)))
+
+def $wrap(M, N, iN) : iN                      hint(show $wrap_((%,%))#((%)))
+def $ext(M, N, sx, iN) : iN                   hint(show $ext_((%,%))^(%)#((%)))
+def $trunc(M, N, sx, fN) : iN                 hint(show $trunc_((%,%))^(%)#((%)))
+def $demote(M, N, fN) : fN                    hint(show $demote_((%,%))#((%)))
+def $promote(M, N, fN) : fN                   hint(show $promote_((%,%))#((%)))
+def $convert(M, N, sx, iN) : fN               hint(show $convert_((%,%))^(%)#((%)))
+def $reinterpret(valtype_1, valtype_2, val_(valtype_1)) : val_(valtype_2)
+    hint(show $narrow_((%,%))#(%))
+
+def $ibytes(N, iN) : byte*                       hint(show $bytes_(I#%,%))
+def $fbytes(N, fN) : byte*                       hint(show $bytes_(F#%,%))
+def $bytes(valtype, val_(valtype)) : byte*          hint(show $bytes_(%,%))
+
+def $invibytes(N, byte*) : iN
+def $invfbytes(N, byte*) : fN
+
+def $iadd(N, iN, iN) : iN     hint(show $iadd_(%,%,%))
+def $isub(N, iN, iN) : iN      hint(show $isub_(%,%,%))
+def $imul(N, iN, iN) : iN      hint(show $imul_(%,%,%))
+def $idiv(N, sx, iN, iN) : iN  hint(show $idiv_(%)^(%)#((%,%)))
+def $irem(N, sx, iN, iN) : iN  hint(show $irem_(%)^(%)#((%,%)))
+def $inot(N, iN) : iN             hint(show $inot_(%,%))
+def $iand(N, iN, iN) : iN      hint(show $iand_(%,%,%))
+def $ior(N, iN, iN) : iN       hint(show $ior_(%,%,%))
+def $ixor(N, iN, iN) : iN      hint(show $ixor_(%,%,%))
+def $ishl(N, iN, u32) : iN        hint(show $ishl_(%,%,%))
+def $ishr(N, sx, iN, u32) : iN    hint(show $ishr_(%)^(%)#((%,%)))
+def $irotl(N, iN, iN) : iN     hint(show $irotl_(%,%,%))
+def $irotr(N, iN, iN) : iN     hint(show $irotr_(%,%,%))
+def $iclz(N, iN) : iN             hint(show $iclz_(%,%))
+def $ictz(N, iN) : iN             hint(show $iclz_(%,%))
+def $ipopcnt(N, iN) : iN          hint(show $ipopcnt_(%,%))
+def $ieqz(N, iN) : u32               hint(show $ieqz_(%,%))
+def $ieq(N, iN, iN) : u32         hint(show $ieq_(%,%,%))
+def $ine(N, iN, iN) : u32         hint(show $ine_(%,%,%))
+def $ilt(N, sx, iN, iN) : u32     hint(show $ilt_(%)^(%)#((%,%)))
+def $igt(N, sx, iN, iN) : u32     hint(show $igt_(%)^(%)#((%,%)))
+def $ile(N, sx, iN, iN) : u32     hint(show $ile_(%)^(%)#((%,%)))
+def $ige(N, sx, iN, iN) : u32     hint(show $ige_(%)^(%)#((%,%)))
+
+def $fadd(N, fN, fN) : fN      hint(show $fadd_(%,%,%))
+def $fsub(N, fN, fN) : fN      hint(show $fsub_(%,%,%))
+def $fmul(N, fN, fN) : fN      hint(show $fmul_(%,%,%))
+def $fdiv(N, fN, fN) : fN      hint(show $fdiv_(%,%,%))
+def $fmin(N, fN, fN) : fN      hint(show $fmin_(%,%,%))
+def $fmax(N, fN, fN) : fN      hint(show $fmax_(%,%,%))
+def $fcopysign(N, fN, fN) : fN hint(show $fcopysign_(%,%,%))
+def $fabs(N, fN) : fN             hint(show $fabs_(%,%))
+def $fneg(N, fN) : fN             hint(show $fneg_(%,%))
+def $fsqrt(N, fN) : fN            hint(show $fsqrt_(%,%))
+def $fceil(N, fN) : fN            hint(show $fceil_(%,%))
+def $ffloor(N, fN) : fN           hint(show $ffloor_(%,%))
+def $ftrunc(N, fN) : fN           hint(show $ftrunc_(%,%))
+def $fnearest(N, fN) : fN         hint(show $fnearest_(%,%))
+def $feq(N, fN, fN) : u32         hint(show $feq_(%,%,%))
+def $fne(N, fN, fN) : u32         hint(show $fne_(%,%,%))
+def $flt(N, fN, fN) : u32         hint(show $flt_(%,%,%))
+def $fgt(N, fN, fN) : u32         hint(show $fgt_(%,%,%))
+def $fle(N, fN, fN) : u32         hint(show $fle_(%,%,%))
+def $fge(N, fN, fN) : u32         hint(show $fge_(%,%,%))
+
+
+def $binop(INN inn, ADD, iN_1, iN_2) = $iadd($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, SUB, iN_1, iN_2) = $isub($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, MUL, iN_1, iN_2) = $imul($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, DIV sx, iN_1, iN_2) = $idiv($size(INN inn), sx, iN_1, iN_2)
+def $binop(INN inn, REM sx, iN_1, iN_2) = $irem($size(INN inn), sx, iN_1, iN_2)
+def $binop(INN inn, AND, iN_1, iN_2) = $iand($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, OR, iN_1, iN_2) = $ior($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, XOR, iN_1, iN_2) = $ixor($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, SHL, iN_1, iN_2) = $ishl($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, SHR sx, iN_1, iN_2) = $ishr($size(INN inn), sx, iN_1, iN_2)
+def $binop(INN inn, ROTL, iN_1, iN_2) = $irotl($size(INN inn), iN_1, iN_2)
+def $binop(INN inn, ROTR, iN_1, iN_2) = $irotr($size(INN inn), iN_1, iN_2)
+def $unop(INN inn, CLZ, iN) = $iclz($size(INN inn), iN)
+def $unop(INN inn, CTZ, iN) = $ictz($size(INN inn), iN)
+def $unop(INN inn, POPCNT, iN) = $ipopcnt($size(INN inn), iN)
+def $testop(INN inn, EQZ, iN) = $ieqz($size(INN inn), iN)
+def $relop(INN inn, EQ, iN_1, iN_2) = $ieq($size(INN inn), iN_1, iN_2)
+def $relop(INN inn, NE, iN_1, iN_2) = $ine($size(INN inn), iN_1, iN_2)
+def $relop(INN inn, LT sx, iN_1, iN_2) = $ilt($size(INN inn), sx, iN_1, iN_2)
+def $relop(INN inn, GT sx, iN_1, iN_2) = $igt($size(INN inn), sx, iN_1, iN_2)
+def $relop(INN inn, LE sx, iN_1, iN_2) = $ile($size(INN inn), sx, iN_1, iN_2)
+def $relop(INN inn, GE sx, iN_1, iN_2) = $ige($size(INN inn), sx, iN_1, iN_2)
+
+def $binop(FNN fnn, ADD, fN_1, fN_2) = $fadd($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, SUB, fN_1, fN_2) = $fsub($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, MUL, fN_1, fN_2) = $fmul($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, DIV, fN_1, fN_2) = $fdiv($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, MIN, fN_1, fN_2) = $fmin($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, MAX, fN_1, fN_2) = $fmax($size(FNN fnn), fN_1, fN_2)
+def $binop(FNN fnn, COPYSIGN, fN_1, fN_2) = $fcopysign($size(FNN fnn), fN_1, fN_2)
+
+def $unop(FNN fnn, ABS, fN) = $fabs($size(FNN fnn), fN)
+def $unop(FNN fnn, NEG, fN) = $fneg($size(FNN fnn), fN)
+def $unop(FNN fnn, SQRT, fN) = $fsqrt($size(FNN fnn), fN)
+def $unop(FNN fnn, CEIL, fN) = $fceil($size(FNN fnn), fN)
+def $unop(FNN fnn, FLOOR, fN) = $ffloor($size(FNN fnn), fN)
+def $unop(FNN fnn, TRUNC, fN) = $ftrunc($size(FNN fnn), fN)
+def $unop(FNN fnn, NEAREST, fN) = $fnearest($size(FNN fnn), fN)
+
+def $relop(FNN fnn, EQ, fN_1, fN_2) = $feq($size(FNN fnn), fN_1, fN_2)
+def $relop(FNN fnn, NE, fN_1, fN_2) = $fne($size(FNN fnn), fN_1, fN_2)
+def $relop(FNN fnn, LT, fN_1, fN_2) = $flt($size(FNN fnn), fN_1, fN_2)
+def $relop(FNN fnn, GT, fN_1, fN_2) = $fgt($size(FNN fnn), fN_1, fN_2)
+def $relop(FNN fnn, LE, fN_1, fN_2) = $fle($size(FNN fnn), fN_1, fN_2)
+def $relop(FNN fnn, GE, fN_1, fN_2) = $fge($size(FNN fnn), fN_1, fN_2)
+
+def $cvtop(INN I32, INN I64, CONVERT, sx, iN) = $ext(32, 64, sx, iN)
+def $cvtop(INN I64, INN I32, CONVERT, sx?, iN) = $wrap(64, 32, iN)
+def $cvtop(FNN fnn, INN inn, CONVERT, sx, fN) = $trunc($size(FNN fnn), $size(INN inn), sx, fN)
+def $cvtop(FNN F32, FNN F64, CONVERT, sx?, fN) = $promote(32, 64, fN)
+def $cvtop(FNN F64, FNN F32, CONVERT, sx?, fN) = $demote(64, 32, fN)
+def $cvtop(INN inn, FNN fnn, CONVERT, sx, iN) = $convert($size(INN inn), $size(FNN fnn), sx, iN)
+def $cvtop(INN inn, FNN fnn, REINTERPRET, sx?, iN) = $reinterpret(INN inn, FNN fnn, iN) -- if $size(INN inn) = $size(FNN fnn)
+def $cvtop(FNN fnn, INN inn, REINTERPRET, sx?, fN) = $reinterpret(FNN fnn, INN inn, fN) -- if $size(INN inn) = $size(FNN fnn)
