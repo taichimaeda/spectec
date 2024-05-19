@@ -54,7 +54,7 @@ let rec apart (e1 : coq_term) (e2: coq_term) : bool =
   | T_exp_basic T_string t1, T_exp_basic T_string t2 -> not (t1 = t2)
   | T_app (a1, exp1), T_app (a2, exp2) ->
     not (a1 = a2) || List.exists2 apart exp1 exp2
-  | T_exp_tuple es1, T_exp_tuple es2 when List.length es1 = List.length es2 ->
+  | T_match es1, T_match es2 when List.length es1 = List.length es2 ->
     List.exists2 apart es1 es2
   | (T_app_infix (T_exp_basic T_concat, _, _) | T_list _), (T_app_infix (T_exp_basic T_concat, _, _) | T_list _) ->
     list_exp_apart e1 e2
@@ -84,12 +84,12 @@ let error at msg = Error.error at "else removal" msg
 let is_else prem = prem = P_else
 
 let replace_else aux_name lhs prem = match prem with
-  | P_else -> P_neg (P_rule (aux_name, lhs))
+  | P_else -> P_neg (P_rule (aux_name, [lhs]))
   | _ -> prem
 
-let unarize ((r_id, binds), prems, term) = 
-    let lhs = match term with
-      | T_exp_tuple [lhs; _] -> lhs
+let unarize ((r_id, binds), prems, terms) = 
+    let lhs = match terms with
+      | [lhs; _] -> lhs
       | _ -> error no_region "expected manifest pair"
     in
     ((r_id, binds), prems, lhs)
@@ -99,22 +99,22 @@ let not_apart lhs (_, _, lhs2) = not (apart lhs lhs2)
 
 let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def list = function
   | [] -> [ InductiveRelationD (id, args, List.rev prev_rules) ]
-  | ((r_id, binds), prems, term) as r :: rules -> 
+  | ((r_id, binds), prems, terms) as r :: rules -> 
       if List.exists is_else prems
       then
-        let lhs = match term with
-          | T_exp_tuple [lhs; _] -> lhs
+        let lhs = match terms with
+          | [lhs; _] -> lhs
           | _ -> error no_region "expected manifest pair"
         in
         let aux_name = id ^ "_before_" ^ r_id in
         let applicable_prev_rules = prev_rules
               |> List.map unarize
               |> List.filter (not_apart lhs)
-              |> List.map (fun ((id', binds'), prems', term') -> ((id' ^ neg_suffix, binds'), prems', term'))
+              |> List.map (fun ((id', binds'), prems', term') -> ((id' ^ neg_suffix, binds'), prems', [term']))
               |> List.rev in
         [ InductiveRelationD (aux_name, [typ1], List.rev applicable_prev_rules) ] @
         let prems' = List.map (replace_else aux_name lhs) prems in
-        let rule' = ((r_id, binds), prems', term) in
+        let rule' = ((r_id, binds), prems', terms) in
         go id args typ1 (rule' :: prev_rules) rules
       else
         go id args typ1 (r :: prev_rules) rules

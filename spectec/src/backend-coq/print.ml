@@ -58,7 +58,6 @@ let rec string_of_terms (term : coq_term) =
     | T_list [] -> "[]"
     | T_listmap (id, exp) -> parens ("List.map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
     | T_listzipwith (id1, id2, exp) -> parens ("list_zipWith " ^ parens ("fun " ^ id1 ^ " " ^ id2 ^ " => " ^ string_of_terms exp) ^ " " ^ id1 ^ " " ^ id2)
-    | T_exp_tuple terms -> String.concat " " (List.map string_of_terms terms)
     | T_record_fields fields -> "{| " ^ (String.concat "; " (List.map (fun (id, term) -> id ^ " := " ^ string_of_terms term) fields)) ^ " |}"
     | T_list entries -> square_parens (String.concat ";" (List.map string_of_terms entries))
     | T_match [] -> ""
@@ -167,7 +166,7 @@ let string_of_definition (prefix : string) (id : ident) (binders : binders) (ret
 let rec string_of_premise (prem : coq_premise) =
   match prem with
     | P_if term -> string_of_terms term
-    | P_rule (id, term) -> parens (id ^ " " ^ string_of_terms term)
+    | P_rule (id, terms) -> parens (id ^ " " ^ String.concat " " (List.map string_of_terms terms))
     | P_neg p -> parens ("~" ^ string_of_premise p)
     | P_else -> "otherwise" (* Will be removed by an else pass *)
     | P_listforall (p, ids) -> (match ids with
@@ -184,10 +183,10 @@ let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) =
 
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
   prefix ^ id ^ ": " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
-  String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_term) ->
+  String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_terms) ->
     let string_prems = String.concat " /\\ " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
     let forall_quantifiers = if binds <> [] then "forall " ^ string_of_binders binds ^ ", " else ""in
-    "| " ^ case_id ^ " : " ^ forall_quantifiers ^ string_prems ^ id ^ " " ^ string_of_terms end_term
+    "| " ^ case_id ^ " : " ^ forall_quantifiers ^ string_prems ^ id ^ " " ^ String.concat " " (List.map string_of_terms end_terms)
   ) relations)
 
 let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =

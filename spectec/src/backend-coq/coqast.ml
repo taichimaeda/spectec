@@ -63,7 +63,6 @@ and coq_term =
   | T_list of (coq_term list)
   | T_listmap of (ident * coq_term)
   | T_listzipwith of (ident * ident * coq_term)
-  | T_exp_tuple of coq_term list
   | T_record_fields of (ident * coq_term) list
   | T_match of (coq_term list)
   | T_app of (coq_term * (coq_term list))
@@ -75,7 +74,7 @@ and coq_term =
 and coq_premise =
   | P_if of coq_term
   | P_neg of coq_premise
-  | P_rule of ident * coq_term
+  | P_rule of ident * coq_term list
   | P_else
   | P_listforall of coq_premise * ident list
   | P_unsupported of string
@@ -86,7 +85,7 @@ and record_entry = (ident * coq_term * struct_type option)
 
 and inductive_type_entry = (ident * binders)
 
-and relation_type_entry = inductive_type_entry * coq_premise list * coq_term
+and relation_type_entry = inductive_type_entry * coq_premise list * coq_term list
 
 and inductive_args = binders
 
