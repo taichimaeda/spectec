@@ -88,7 +88,6 @@ let get_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> Some id
     | _ -> None
-
 let gen_bind_name (bind : bind) =
   match bind.it with
     | ExpB (id, _, _) -> transform_id id
@@ -177,7 +176,7 @@ let is_terminal_type (typ : typ) =
 
 let transform_itertyp (it : iter) =
   match it with
-    | Opt -> T_type_basic T_list (*T_opt*)
+    | Opt -> T_type_basic T_opt
     | List | List1 | ListN _ -> T_type_basic T_list
 
 let transform_numtyp (typ : numtyp) = 
@@ -253,13 +252,14 @@ and transform_exp (exp : exp) =
     | UnE (unop, exp) -> transform_unop unop exp
     | BinE (binop, exp1, exp2) -> T_app_infix (transform_binop binop, transform_exp exp1, transform_exp exp2)
     | CmpE (cmpop, exp1, exp2) -> T_app_infix (transform_cmpop cmpop, transform_exp exp1, transform_exp exp2)
+    | TupE [] -> T_exp_basic T_exp_unit
     | TupE exps -> T_match (List.map transform_exp exps) 
     | ProjE (e, n) -> T_app (T_exp_basic T_listlookup, [transform_exp e; T_exp_basic (T_nat (Z.of_int n))])
     | CaseE (mixop, e) -> let actual_id, num_args = gen_case_name !env_ref exp.note in 
-      T_app (T_ident [transform_id actual_id; transform_mixop mixop], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp e))
+      T_app (T_ident [transform_id actual_id; transform_mixop mixop], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp transform_exp e))
     | UncaseE (_e, _mixop) -> T_unsupported ("Uncase: " ^ string_of_exp exp)
-    | OptE (Some e) -> T_list [transform_exp e] (*T_app (T_exp_basic T_some, [transform_exp e])*)
-    | OptE None -> T_list [] (*T_exp_basic T_none*)
+    | OptE (Some e) -> T_app (T_exp_basic T_some, [transform_exp e])
+    | OptE None -> T_exp_basic T_none
     | TheE e -> T_app (T_exp_basic T_the, [transform_exp e])
     | StrE expfields -> T_record_fields (List.map (fun (a, e) -> (gen_typ_name exp.note ^ "__" ^ transform_atom a, transform_exp e)) expfields)
     | DotE (e, atom) -> T_app (T_ident [gen_typ_name e.note; transform_atom atom], [transform_exp e])
@@ -274,13 +274,14 @@ and transform_exp (exp : exp) =
     | CallE (id, args) -> T_app (T_ident [transform_fun_id id], List.map transform_arg args)
     | IterE (exp, (iter, ids)) ->  
         let exp1 = transform_exp exp in
+        let t_iter = if iter = Opt then I_option else I_list in
         (match iter, ids, exp.it with
         | (List | List1 | ListN _), [], _ -> T_list [exp1] 
         | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
         | (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
-        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_listmap (transform_var_id v, transform_exp e)])
-        | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_listmap (transform_var_id v, exp1)
-        | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_listzipwith (transform_var_id v, transform_var_id s, transform_exp exp)
+        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_map (t_iter, transform_var_id v, transform_exp e)])
+        | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_map (t_iter, transform_var_id v, exp1)
+        | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_zipwith (t_iter, transform_var_id v, transform_var_id s, transform_exp exp)
         | _ -> exp1
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
@@ -299,7 +300,7 @@ and transform_match_exp (args : arg list) (binds : bind list) (exp : exp) =
     | _ -> transform_exp exp
   )
   | CaseE (m, e) -> (match (infer_match_name args binds (gen_typ_name exp.note)) with 
-    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], [transform_match_exp args binds e])])
+    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], transform_tuple_exp (transform_match_exp args binds) e)])
     | _ -> transform_exp exp
   )
   | BinE (AddOp _, exp1, {it = NatE n ;_}) -> let rec get_succ n = (match n with
@@ -308,10 +309,10 @@ and transform_match_exp (args : arg list) (binds : bind list) (exp : exp) =
   ) in get_succ (Z.to_int n)
   | _ -> transform_exp exp
 
-and transform_tuple_exp (exp : exp) = 
+and transform_tuple_exp (transform_func : exp -> coq_term) (exp : exp) = 
   match exp.it with
-    | TupE exps -> List.map transform_exp exps
-    | _ -> [transform_exp exp]
+    | TupE exps -> List.map transform_func exps
+    | _ -> [transform_func exp]
 
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
@@ -439,7 +440,7 @@ let rec transform_premise (p : prem) =
     | ElsePr -> P_else
     | LetPr _ -> P_unsupported ("LetPr: " ^ string_of_prem p)
     | IterPr (p, (_iter, id_types)) -> P_listforall (transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
-    | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp exp)
+    | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp transform_exp exp)
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
@@ -455,7 +456,7 @@ let transform_rule (id : id) (r : rule) =
   match r.it with
     | RuleD (rule_id, binds, mixop, exp, premises) -> 
       ((transform_id id ^ "__" ^ transform_id rule_id ^ transform_mixop mixop, List.map transform_relation_bind binds), 
-      List.map transform_premise premises, transform_tuple_exp exp)
+      List.map transform_premise premises, transform_tuple_exp transform_exp exp)
 
 let transform_clause (return_type : typ option) (c : clause) =
   match c.it with

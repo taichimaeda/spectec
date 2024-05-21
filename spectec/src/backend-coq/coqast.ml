@@ -21,6 +21,7 @@ type coq_basic_term =
   | T_nat of nat
   | T_int of int
   | T_string of string
+  | T_exp_unit
   | T_not
   | T_plusminus
   | T_minusplus
@@ -54,6 +55,10 @@ and coq_path_term =
   | P_listlookup of (ident * coq_term)
   | P_sliceupdate of (ident * coq_term * coq_term)
 
+and iterator =
+  | I_option
+  | I_list
+
 and coq_term = 
   | T_exp_basic of coq_basic_term
   | T_type_basic of coq_basic_types
@@ -61,8 +66,8 @@ and coq_term =
   | T_update of (coq_path_term list * coq_term * coq_term)
   | T_extend of (coq_path_term list * coq_term * coq_term)
   | T_list of (coq_term list)
-  | T_listmap of (ident * coq_term)
-  | T_listzipwith of (ident * ident * coq_term)
+  | T_map of (iterator * ident * coq_term)
+  | T_zipwith of (iterator * ident * ident * coq_term)
   | T_record_fields of (ident * coq_term) list
   | T_match of (coq_term list)
   | T_app of (coq_term * (coq_term list))

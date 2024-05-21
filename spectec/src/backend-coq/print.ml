@@ -18,6 +18,7 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_basic (T_nat n) -> Z.to_string n
     | T_exp_basic (T_int _i) -> "" (* TODO Manage ints well *)
     | T_exp_basic (T_string s) -> "\"" ^ String.escaped s ^ "\""
+    | T_exp_basic T_exp_unit -> "tt"
     | T_exp_basic T_not -> "~"
     | T_exp_basic T_plusminus -> "" (* TODO *)
     | T_exp_basic T_minusplus -> "" (* TODO *)
@@ -56,8 +57,10 @@ let rec string_of_terms (term : coq_term) =
     | T_update (paths, term1, term2) -> string_of_paths_start paths term1 "list_update" term2
     | T_extend (paths, term1, term2) -> string_of_paths_start paths term1 "list_extend" term2
     | T_list [] -> "[]"
-    | T_listmap (id, exp) -> parens ("List.map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
-    | T_listzipwith (id1, id2, exp) -> parens ("list_zipWith " ^ parens ("fun " ^ id1 ^ " " ^ id2 ^ " => " ^ string_of_terms exp) ^ " " ^ id1 ^ " " ^ id2)
+    | T_map (I_option, id, exp) -> parens ("option_map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
+    | T_map (I_list, id, exp) -> parens ("List.map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
+    | T_zipwith (I_option, id1, id2, exp) -> parens ("option_zipWith " ^ parens ("fun " ^ id1 ^ " " ^ id2 ^ " => " ^ string_of_terms exp) ^ " " ^ id1 ^ " " ^ id2)
+    | T_zipwith (I_list, id1, id2, exp) -> parens ("list_zipWith " ^ parens ("fun " ^ id1 ^ " " ^ id2 ^ " => " ^ string_of_terms exp) ^ " " ^ id1 ^ " " ^ id2)
     | T_record_fields fields -> "{| " ^ (String.concat "; " (List.map (fun (id, term) -> id ^ " := " ^ string_of_terms term) fields)) ^ " |}"
     | T_list entries -> square_parens (String.concat ";" (List.map string_of_terms entries))
     | T_match [] -> ""
@@ -269,30 +272,38 @@ let exported_string =
   "From RecordUpdate Require Import RecordSet.\n" ^
   "Require Import NArith.\n" ^
   "Require Import Arith.\n" ^
-  "Require Import BinNat.\n" ^
-  "Require Import FloatClass.\n" ^
-  "Require Import PrimFloat.\n" ^
-  "Require Import SpecFloat.\n" ^
-  "Require Import FloatOps.\n" ^
-  "Require Import FloatAxioms.\n" ^
-  "Require Import FloatLemmas.\n" ^
   "Declare Scope wasm_scope.\n\n" ^
   "Class Inhabited (T: Type) := { default_val : T }.\n\n" ^
   "Definition lookup_total {T: Type} {_: Inhabited T} (l: list T) (n: nat) : T :=\n" ^
   "\tList.nth n l default_val.\n\n" ^
-  "Definition the {T : Type} {_ : Inhabited T} (arg : list T) : T :=\n" ^
+  "Definition the {T : Type} {_ : Inhabited T} (arg : option T) : T :=\n" ^
 	"\tmatch arg with\n" ^
-	"\t\t| nil => default_val\n" ^
-	"\t\t| v :: vs => v\n" ^
+	"\t\t| None => default_val\n" ^
+	"\t\t| Some v => v\n" ^
 	"\tend.\n\n" ^
   "Definition list_zipWith {X Y Z : Type} (f : X -> Y -> Z) (xs : list X) (ys : list Y) : list Z :=\n" ^
   "\tmap (fun '(x, y) => f x y) (combine xs ys).\n\n" ^
+  "Definition option_zipWith {α β γ: Type} (f: α → β → γ) (x: option α) (y: option β): option γ := \n" ^
+  "\tmatch x, y with\n" ^
+  "\t\t| Some x, Some y => Some (f x y)\n" ^
+  "\t\t| _, _ => None\n" ^
+  "\tend.\n\n" ^
   "Fixpoint list_update {α: Type} (l: list α) (n: nat) (y: α): list α :=\n" ^
   "\tmatch l, n with\n" ^
   "\t\t| nil, _ => nil\n" ^
   "\t\t| x :: l', 0 => y :: l'\n" ^
   "\t\t| x :: l', S n => x :: list_update l' n y\n" ^
   "\tend.\n\n" ^
+  "Definition option_append {α: Type} (x y: option α) : option α :=\n" ^
+  "\tmatch x with\n" ^
+  "\t\t| Some _ => x\n" ^
+  "\t\t| None => y\n" ^
+  "\tend.\n\n" ^
+  "Definition option_map {α β : Type} (f : α -> β) (x : option α) : option β :=\n" ^
+	"\tmatch x with\n" ^
+	"\t\t| Some x => Some (f x)\n" ^
+	"\t\t| _ => None\n" ^
+	"\tend.\n\n" ^
   "Fixpoint list_update_func {α: Type} (l: list α) (n: nat) (y: α -> α): list α :=\n" ^
 	"\tmatch l, n with\n" ^
 	"\t\t| nil, _ => nil\n" ^
@@ -321,6 +332,7 @@ let exported_string =
   "Class Append (α: Type) := _append : α -> α -> α.\n\n" ^
   "Infix \"++\" := _append (right associativity, at level 60) : wasm_scope.\n\n" ^
   "Global Instance Append_List_ {α: Type}: Append (list α) := { _append l1 l2 := List.app l1 l2 }.\n\n" ^
+  "Global Instance Append_Option {α: Type}: Append (option α) := { _append o1 o2 := option_append o1 o2 }.\n\n" ^
   "Global Instance Append_nat : Append (nat) := { _append n1 n2 := n1 + n2}.\n\n" ^
   "Global Instance Inh_unit : Inhabited unit := { default_val := tt }.\n\n" ^
   "Global Instance Inh_nat : Inhabited nat := { default_val := O }.\n\n" ^
@@ -328,10 +340,15 @@ let exported_string =
   "Global Instance Inh_option {T: Type} : Inhabited (option T) := { default_val := None }.\n\n" ^
   "Global Instance Inh_Z : Inhabited Z := { default_val := Z0 }.\n\n" ^
   "Global Instance Inh_prod {T1 T2: Type} {_: Inhabited T1} {_: Inhabited T2} : Inhabited (prod T1 T2) := { default_val := (default_val, default_val) }.\n\n" ^
-  "\n" ^
+  "Definition option_to_list {T: Type} (arg : option T) : list T :=\n" ^
+	"\tmatch arg with\n" ^
+	"\t\t| None => nil\n" ^
+  "\t\t| Some a => a :: nil\n" ^ 
+	"\tend.\n\n" ^
+  "Coercion option_to_list: option >-> list.\n\n" ^
   "Open Scope wasm_scope.\n" ^
   "Import ListNotations.\n" ^
-  "Import RecordSetNotations.\n"
+  "Import RecordSetNotations.\n\n"
   
 
 let string_of_script (coq_il : coq_script) =
