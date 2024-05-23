@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Runtime Structure &#8212; WebAssembly 3.0 (Draft 2024-05-18)</title>
+    <title>Runtime Structure &#8212; WebAssembly 3.0 (Draft 2024-05-23)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -106,15 +106,15 @@ Any of the aformentioned references can furthermore be wrapped up as an <em>exte
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llcl}
 \def\mathdef2446#1{{}}\mathdef2446{number} &amp; \href{../exec/runtime.html#syntax-num}{\mathit{num}} &amp;::=&amp;
-  \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle32}} \\&amp;&amp;|&amp;
-  \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle64}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle64}} \\&amp;&amp;|&amp;
-  \href{../syntax/types.html#syntax-numtype}{\mathsf{f\scriptstyle32}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-float}{\mathit{f\scriptstyle32}} \\&amp;&amp;|&amp;
-  \href{../syntax/types.html#syntax-numtype}{\mathsf{f\scriptstyle64}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-float}{\mathit{f\scriptstyle64}} \\
+  \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle\kern-0.1em32}} \\&amp;&amp;|&amp;
+  \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle64}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle\kern-0.1em64}} \\&amp;&amp;|&amp;
+  \href{../syntax/types.html#syntax-numtype}{\mathsf{f\scriptstyle32}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-float}{\mathit{f\scriptstyle\kern-0.15em32}} \\&amp;&amp;|&amp;
+  \href{../syntax/types.html#syntax-numtype}{\mathsf{f\scriptstyle64}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-float}{\mathit{f\scriptstyle\kern-0.15em64}} \\
 \def\mathdef2446#1{{}}\mathdef2446{vector} &amp; \href{../exec/runtime.html#syntax-vec}{\mathit{vec}} &amp;::=&amp;
-  \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle128}} \\
+  \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~\href{../syntax/values.html#syntax-int}{\mathit{i\scriptstyle\kern-0.1em128}} \\
 \def\mathdef2446#1{{}}\mathdef2446{reference} &amp; \href{../exec/runtime.html#syntax-ref}{\mathit{ref}} &amp;::=&amp;
   \href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~(\href{../syntax/types.html#syntax-absheaptype}{\mathit{absheaptype}}~|~\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}) \\&amp;&amp;|&amp;
-  \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i31}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle31}} \\&amp;&amp;|&amp;
+  \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i31}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle\kern-0.1em31}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~\href{../exec/runtime.html#syntax-structaddr}{\mathit{structaddr}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~\href{../exec/runtime.html#syntax-arrayaddr}{\mathit{arrayaddr}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}} \\&amp;&amp;|&amp;
@@ -390,7 +390,7 @@ Both record their respective <a class="reference internal" href="../valid/conven
 \def\mathdef2446#1{{}}\mathdef2446{field value} &amp; \href{../exec/runtime.html#syntax-fieldval}{\mathit{fieldval}} &amp;::=&amp;
   \href{../exec/runtime.html#syntax-val}{\mathit{val}} ~|~ \href{../exec/runtime.html#syntax-packval}{\mathit{packval}} \\
 \def\mathdef2446#1{{}}\mathdef2446{packed value} &amp; \href{../exec/runtime.html#syntax-packval}{\mathit{packval}} &amp;::=&amp;
-  \href{../exec/runtime.html#syntax-packval}{\mathsf{i8.pack}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle8}} ~|~ \href{../exec/runtime.html#syntax-packval}{\mathsf{i16.pack}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle16}} \\
+  \href{../exec/runtime.html#syntax-packval}{\mathsf{i8.pack}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle\kern-0.1em8}} ~|~ \href{../exec/runtime.html#syntax-packval}{\mathsf{i16.pack}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle\kern-0.1em16}} \\
 \end{array}\end{split}\]</div>
 <section id="aux-unpackfield">
 <span id="aux-packfield"></span><span id="id5"></span><h3>Conventions<a class="headerlink" href="#aux-unpackfield" title="Permalink to this heading">¶</a></h3>
@@ -495,7 +495,7 @@ Locals are mutated by respective <a class="reference internal" href="../syntax/i
 \def\mathdef2446#1{{}}\mathdef2446{administrative instruction} &amp; \href{../syntax/instructions.html#syntax-instr}{\mathit{instr}} &amp;::=&amp;
   \dots \\ &amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}} \\ &amp;&amp;|&amp;
-  \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i31}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle31}} \\&amp;&amp;|&amp;
+  \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i31}}~\href{../syntax/values.html#syntax-int}{\mathit{u\scriptstyle\kern-0.1em31}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~\href{../exec/runtime.html#syntax-structaddr}{\mathit{structaddr}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~\href{../exec/runtime.html#syntax-arrayaddr}{\mathit{arrayaddr}} \\&amp;&amp;|&amp;
   \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}} \\&amp;&amp;|&amp;
