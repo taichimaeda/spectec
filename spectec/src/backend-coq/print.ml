@@ -40,6 +40,7 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_basic T_some -> "Some"
     | T_exp_basic T_none -> "None"
     | T_exp_basic T_concat -> " ++ "
+    | T_exp_basic T_listconcat -> "@app"
     | T_exp_basic T_listmatch -> " :: "
     | T_exp_basic T_listlength -> "List.length"
     | T_exp_basic T_slicelookup -> "list_slice"
@@ -172,9 +173,11 @@ let rec string_of_premise (prem : coq_premise) =
     | P_rule (id, terms) -> parens (id ^ " " ^ String.concat " " (List.map string_of_terms terms))
     | P_neg p -> parens ("~" ^ string_of_premise p)
     | P_else -> "otherwise" (* Will be removed by an else pass *)
-    | P_listforall (p, ids) -> (match ids with
-      | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ v
-      | [v; s] -> "List.Forall " ^ parens ("fun '(" ^ v ^ ", " ^ s ^ ") => " ^ string_of_premise p) ^ " " ^ parens ("combine " ^ v ^ " " ^ s)
+    | P_listforall (iterator, p, ids) -> 
+      let option_conversion = if iterator = I_option then "option_to_list " else "" in
+      (match ids with
+      | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v)
+      | [v; s] -> "List.Forall " ^ parens ("fun '(" ^ v ^ ", " ^ s ^ ") => " ^ string_of_premise p) ^ " " ^ parens ("combine " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s))
       | _ -> assert false (* Should not happen *)
     )
     | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"

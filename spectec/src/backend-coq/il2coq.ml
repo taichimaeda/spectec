@@ -266,7 +266,7 @@ and transform_exp (exp : exp) =
     | CompE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp1, transform_exp exp2)
     | ListE exps -> T_list (List.map transform_exp exps)
     | LenE e -> T_app (T_exp_basic T_listlength, [transform_exp e])
-    | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp1, transform_exp exp2)
+    | CatE (exp1, exp2) -> T_app (T_exp_basic T_listconcat, [T_ident ["_"] ;transform_exp exp1; transform_exp exp2])
     | IdxE (exp1, exp2) -> T_app (T_exp_basic T_listlookup, [transform_exp exp1; transform_exp exp2])
     | SliceE (exp1, exp2, exp3) -> T_app (T_exp_basic T_slicelookup, [transform_exp exp1; transform_exp exp2; transform_exp exp3])
     | UpdE (exp1, path, exp2) -> T_update (transform_path_start path exp1, transform_exp exp1, transform_exp exp2)
@@ -380,11 +380,11 @@ and transform_relation_bind (bind : bind) =
       let id_transformed = transform_id t_id in 
       let a = find_typ args id_transformed in
         (transform_var_id id, (match a with
-          | Some typ -> transform_type (transform_iter_bind its typ)
-          | None -> erase_dependent_type (transform_iter_bind its t)
+          | Some typ -> transform_type (transform_iter_bind (List.rev its) typ)
+          | None -> erase_dependent_type (transform_iter_bind (List.rev its) t)
         ))
     | ExpB (id, typ, its) -> 
-      (transform_var_id id, erase_dependent_type (transform_iter_bind its typ))
+      (transform_var_id id, erase_dependent_type (transform_iter_bind (List.rev its) typ))
     | TypB id -> (transform_var_id id, T_ident ["Type"])
 
 and transform_param (p : param) =
@@ -439,7 +439,8 @@ let rec transform_premise (p : prem) =
     | IfPr exp -> P_if (transform_exp exp)
     | ElsePr -> P_else
     | LetPr _ -> P_unsupported ("LetPr: " ^ string_of_prem p)
-    | IterPr (p, (_iter, id_types)) -> P_listforall (transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
+    | IterPr (p, (iter, id_types)) -> let t_iter = if iter = Opt then I_option else I_list in
+      P_listforall (t_iter, transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
     | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp transform_exp exp)
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =

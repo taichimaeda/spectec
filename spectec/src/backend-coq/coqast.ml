@@ -43,6 +43,7 @@ type coq_basic_term =
   | T_some
   | T_none
   | T_concat
+  | T_listconcat
   | T_listmatch
   | T_listlength
   | T_slicelookup
@@ -81,7 +82,7 @@ and coq_premise =
   | P_neg of coq_premise
   | P_rule of ident * coq_term list
   | P_else
-  | P_listforall of coq_premise * ident list
+  | P_listforall of iterator * coq_premise * ident list
   | P_unsupported of string
 
 and binders = (ident * coq_term) list
