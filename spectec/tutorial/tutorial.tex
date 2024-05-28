@@ -341,26 +341,30 @@ rule Step/<rule name>:
   ...
   -- if <condition>
 \end{lcverbatim}
-This means that if every \K{condition}s are satisfied, then the state and instructions from stack is reduced to the right hand side. \\
+This means that if every \K{condition}s are satisfied, then the state and instructions from stack is reduced to the right hand side. There may be no conditions. \\
 Now we'll declare each of the reduction rules one by one.
 
 \subsection{\K{NOP}}
-\K{NOP} means 'no operation', so if we get \K{NOP} from stack, we can just remove it from stack. Use \K{eps} to indicate an empty stack. \\
-We'll use metavariable \K{z} for a \K{state}. Since \K{NOP} makes no change on current \K{state}, just pass the input \K{state} to the output \K{state}.
-\begin{lcverbatim}
+%\K{NOP} means 'no operation', so if we get \K{NOP} from stack, we can just remove it from stack. \\
+Use \K{eps} to indicate an empty stack. \\
+Use metavariable \K{z} for a \K{state}. \\\\
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/nop:
   z; NOP  ~>  z; eps
-\end{lcverbatim}
+	\end{lcverbatim}
+}
 
 \subsection{\K{DROP}}
-If we get \K{DROP} from stack, then we should remove a value from stack. \\
+%If we get \K{DROP} from stack, then we should remove a value from stack. \\
 Use following syatax \K{val}, which is defined in \K{4-runtime.watsup}:
 \begin{lcverbatim}
 syntax val = CONST valtype val_(valtype)
 \end{lcverbatim}
-as a variable. \\
-Answer:
+as a variable. \\\\
 {\color{red}
+	Answer:
 	\begin{lcverbatim}
 rule Step/drop:
   z; val DROP  ~>  z; eps
@@ -368,9 +372,20 @@ rule Step/drop:
 }
 
 \subsection{\K{SELECT}}
-If we get \K{SELECT} from stack, then we have two cases: condition is true or false. \\
+When we get \K{SELECT} from stack, we have two cases: condition is true or false. \\
 Define each of the case as seperate rule as following:
 \begin{lcverbatim}
+rule Step/select-true:
+  ...
+
+rule Step/select-false:
+  ...
+\end{lcverbatim}
+Write like \K{val\_1}, \K{val\_2} (and so on) to distinguish multiple \K{val}s. \\
+Use \K{=/=} and \K{=} for integer comparison.\\\\
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/select-true:
   z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_1
   -- if c =/= 0
@@ -378,57 +393,49 @@ rule Step/select-true:
 rule Step/select-false:
   z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_2
   -- if c = 0
-\end{lcverbatim}
-As you can see here, we can distinguish multiple variables with same type by adding \K{\_1}, \K{\_2} (and so on) after the variable name. \\
-Also, the names of two rules should be the same before hyphen (-), so that they can be prosed as the same reduction rule.
+	\end{lcverbatim}
+	As you can see here, you can distinguish multiple metavariables with same type by adding \K{\_1}, \K{\_2} (and so on) after the metavariable name.
+	Also, the names of two rules should be the same before hyphen (-), so that they can be prosed as the same reduction rule.
+}
 
 \subsection{\K{BINOP}}
-When we get \K{BINOP} from stack, there are six cases. Two cases for \K{valtype} (\K{I32}, \K{I64}), and three cases for \K{binop\_(valtype)} (\K{ADD}, \K{SUB}, \K{MUL}). \\
-First, in the case that \K{valtype} is \K{I32} and \K{binop\_(valtype)} is \K{ADD}:
-\begin{lcverbatim}
-def $iadd(N, iN(N), iN(N)) : iN(N)
-rule Step/binop-add-i32:
-  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 ADD)  ~>  z; (CONST I32 c)
-  -- if $iadd(32, c_1, c_2) = c
-\end{lcverbatim}
-Here, \K{iadd} is a built-in function, so only its type is declared.\\
-We can do similarly with the case where \K{valtype} is \K{I64}:
-\begin{lcverbatim}
-def $iadd(N, iN(N), iN(N)) : iN(N)
-rule Step/binop-add-i32:
-  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 ADD)  ~>  z; (CONST I32 c)
-  -- if $iadd(32, c_1, c_2) = c
-rule Step/binop-add-i64:
-  z; (CONST I64 c_1) (CONST I64 c_2) (BINOP I64 ADD)  ~>  z; (CONST I64 c)
-  -- if $iadd(64, c_1, c_2) = c
-\end{lcverbatim}
-Now, we can combine them using the function \K{size} and metavariable \K{t}:
-\begin{lcverbatim}
-def $iadd(N, iN(N), iN(N)) : iN(N)
-rule Step/binop-add:
-  z; (CONST t c_1) (CONST t c_2) (BINOP t ADD)  ~>  z; (CONST t c)
-  -- if $iadd($size(t), c_1, c_2) = c
-\end{lcverbatim}
-We can do similarly with the case where \K{binop\_(valtype)} is \K{SUB} and \K{MUL}:
+When we get \K{BINOP} from stack, there are three cases for \K{binop\_(valtype)}: \K{ADD}, \K{SUB}, \K{MUL}. \\
+Define each of the case as seperate rule, and use built-in functions \K{iadd}, \K{isub}, \K{imul} as following:
 \begin{lcverbatim}
 def $iadd(N, iN(N), iN(N)) : iN(N)
 def $isub(N, iN(N), iN(N)) : iN(N)
 def $imul(N, iN(N), iN(N)) : iN(N)
 
 rule Step/binop-add:
-  z; (CONST t c_1) (CONST t c_2) (BINOP t ADD)  ~>  z; (CONST t c)
-  -- if $iadd($size(t), c_1, c_2) = c
+  ...
 
 rule Step/binop-sub:
-  z; (CONST t c_1) (CONST t c_2) (BINOP t SUB)  ~>  z; (CONST t c)
-  -- if $isub($size(t), c_1, c_2) = c
+  ...
 
 rule Step/binop-mul:
-  z; (CONST t c_1) (CONST t c_2) (BINOP t MUL)  ~>  z; (CONST t c)
-  -- if $imul($size(t), c_1, c_2) = c
+  ...
 \end{lcverbatim}
-Now, we can combine them by declaring a new function \K{binop} as follows:
+Use function \K{size}, which is defined from subsection 4.1.\\\\
 {\color{red}
+	Answer:
+	\begin{lcverbatim}
+def $iadd(N, iN(N), iN(N)) : iN(N)
+def $isub(N, iN(N), iN(N)) : iN(N)
+def $imul(N, iN(N), iN(N)) : iN(N)
+
+rule Step/binop-add:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t ADD)  ~>  z; (CONST t c)
+-- if $iadd($size(t), c_1, c_2) = c
+
+rule Step/binop-sub:
+z; (CONST t c_1) (CONST t c_2) (BINOP t SUB)  ~>  z; (CONST t c)
+-- if $isub($size(t), c_1, c_2) = c
+
+rule Step/binop-mul:
+z; (CONST t c_1) (CONST t c_2) (BINOP t MUL)  ~>  z; (CONST t c)
+-- if $imul($size(t), c_1, c_2) = c
+	\end{lcverbatim}
+	Now, we may combine them by declaring a new function \K{binop} as follows:
 	\begin{lcverbatim}
 def $iadd(N, iN(N), iN(N)) : iN(N)
 def $isub(N, iN(N), iN(N)) : iN(N)
@@ -445,18 +452,41 @@ rule Step/binop:
 	\end{lcverbatim}
 }
 
-
+\subsection{\K{BLOCK}}
+To indicate a label, refer to following syntax:
 \begin{lcverbatim}
-
-;; Block instructions
-
+LABEL_ n `{instr*} admininstr*
+\end{lcverbatim}
+$\\$
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
+rule Step/block-eps:
+  z; (BLOCK eps instr*)  ~>  z; (LABEL_ 0 `{eps} instr*)
+rule Step/block-val:
+  z; (BLOCK t instr*)  ~>  z; (LABEL_ 1 `{eps} instr*)
+	\end{lcverbatim}
+	Here, you may combine them by using \K{/\symbol{92}} for `and', \K{\symbol{92}/} for `or', and \K{?} for an optional argument:
+	\begin{lcverbatim}
 rule Step/block:
-z; (BLOCK t? instr*)  ~>  z; (LABEL_ n `{eps} instr*)
--- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
+  z; (BLOCK t? instr*)  ~>  z; (LABEL_ n `{eps} instr*)
+  -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1
+	\end{lcverbatim}
+}
 
+\subsection{\K{LOOP}}
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/loop:
-z; (LOOP t? instr*)  ~>  z; (LABEL_ 0 `{LOOP t? instr*} instr*)
+  z; (LOOP t? instr*)  ~>  z; (LABEL_ 0 `{LOOP t? instr*} instr*)
+	\end{lcverbatim}
+}
 
+\subsection{\K{IF}}
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/if-true:
 z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_1*)
 -- if c =/= 0
@@ -464,56 +494,101 @@ z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_1*)
 rule Step/if-false:
 z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_2*)
 -- if c = 0
+	\end{lcverbatim}
+}
 
-
-;; Branch instructions
-
-;; TODO: may want a label context instead of bubbling up
+\subsection{\K{BR}}
+For arithmetic expressions, you should write like \K{\$(l+1)}, instead of \K{l+1}.\\
+Use \K{\^} for a sequence with given length. e.g. \K{instr}\K{\^}\K{n}. \\\\
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/br-zero:
 z; (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  z; val^n instr'*
 
 rule Step/br-succ:
 z; (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  z; val* (BR l)
-\end{lcverbatim}
+	\end{lcverbatim}
+}
 
-\begin{lcverbatim}
+\subsection{\K{BR\_IF}}
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/br_if-true:
-z; (CONST I32 c) (BR_IF l)  ~>  z; (BR l)
--- if c =/= 0
+  z; (CONST I32 c) (BR_IF l)  ~>  z; (BR l)
+  -- if c =/= 0
 
 rule Step/br_if-false:
-z; (CONST I32 c) (BR_IF l)  ~>  z; eps
--- if c = 0
+  z; (CONST I32 c) (BR_IF l)  ~>  z; eps
+  -- if c = 0
+	\end{lcverbatim}
+}
 
-
-;; Function instructions
-
+\subsection{\K{CALL}}
+To get a sequence of \K{funcaddr} from \K{state z}, write \K{\$funcaddr(z)}.\\
+To get \K{n}th element of sequence \K{seq}, write \K{seq[n]}.\\\\
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/call:
-z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])  ;; TODO
+  z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])
+	\end{lcverbatim}
+}
 
+\subsection{\K{FRAME}}
+To indicate a frame, refer to following syntax:
+\begin{lcverbatim}
+FRAME_ n `{frame} admininstr*
+\end{lcverbatim}
+$\\$
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/frame-vals:
-z; (FRAME_ n `{f} val^n)  ~>  z; val^n
+  z; (FRAME_ n `{f} val^n)  ~>  z; val^n
+	\end{lcverbatim}
+}
 
+\subsection{\K{RETURN}}
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
 rule Step/return-frame:
-z; (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  z; val^n
+  z; (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  z; val^n
 
 rule Step/return-label:
-z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
+  z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
+	\end{lcverbatim}
+}
 
-
-;; Numeric instructions
-
-
-;; Local instructions
-
+\subsection{\K{LOCAL.GET}}
+To get a local value from \K{state z} and \K{idx x}, write \K{\$local(z, x)}.\\\\
+{\color{red}
+	Answer:
+\begin{lcverbatim}
 rule Step/local.get:
-z; (LOCAL.GET x)  ~>  z; $local(z, x)
-
-rule Step/local.set:
-z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps
-
-rule Step/local.tee:
-z; val (LOCAL.TEE x)  ~>  z; val val (LOCAL.SET x)
+  z; (LOCAL.GET x)  ~>  z; $local(z, x)
 \end{lcverbatim}
+}
+
+\subsection{\K{LOCAL.SET}}
+To get a new state which is exactly same with \K{state z} except that its local value with \K{idx x} is \K{val v}, write \K{\$with\_local(z, x, v)}.\\\\
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
+rule Step/local.set:
+  z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps
+	\end{lcverbatim}
+}
+
+\subsection{\K{LOCAL.TEE}}
+{\color{red}
+	Answer:
+	\begin{lcverbatim}
+rule Step/local.tee:
+  z; val (LOCAL.TEE x)  ~>  z; val val (LOCAL.SET x)
+	\end{lcverbatim}
+}
 
 \end{document}
