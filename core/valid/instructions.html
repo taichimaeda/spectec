@@ -1413,7 +1413,7 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 <section id="memory-instructions">
 <span id="valid-instr-memory"></span><span id="valid-memarg"></span><span id="index-10"></span><h2>Memory Instructions<a class="headerlink" href="#memory-instructions" title="Permalink to this heading">¶</a></h2>
 <section id="t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-load"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-load-val"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than the <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">bit width</span></a> of <span class="math notranslate nohighlight">\(t\)</span> divided by <span class="math notranslate nohighlight">\(8\)</span>.</p></li>
@@ -1425,42 +1425,33 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 {\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {|{\mathit{nt}}|} / 8
- \qquad
-({2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq n / 8 &lt; {|{\mathit{nt}}|} / 8)^?
- \qquad
-{n^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{{\mathit{{\scriptstyle N}}}}
 }{
-{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{({n}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}})^?}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {\mathit{nt}}
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {\mathit{nt}}
 }
 \qquad
 \end{array}\]</div>
-<div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq |t|/8
-}{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} t\mathsf{.load}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]
-}\]</div>
 </section>
 <section id="t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-loadn"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-load-pack"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq N/8
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {\mathit{{\scriptstyle M}}} / 8
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} t\mathsf{.load}N\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathsf{i}}{{\mathit{{\scriptstyle N}}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{{\scriptstyle M}}}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {\mathsf{i}}{{\mathit{{\scriptstyle N}}}}
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-store-val"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than the <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">bit width</span></a> of <span class="math notranslate nohighlight">\(t\)</span> divided by <span class="math notranslate nohighlight">\(8\)</span>.</p></li>
@@ -1472,55 +1463,68 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 {\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {|{\mathit{nt}}|} / 8
- \qquad
-({2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq n / 8 &lt; {|{\mathit{nt}}|} / 8)^?
- \qquad
-{n^?} = \epsilon \lor {\mathit{nt}} = {\mathsf{i}}{{\mathit{{\scriptstyle N}}}}
 }{
-{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{n^?}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~{\mathit{nt}} \rightarrow \epsilon
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~{\mathit{nt}} \rightarrow \epsilon
 }
 \qquad
 \end{array}\]</div>
-<div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq |t|/8
-}{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} t\mathsf{.store}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []
-}\]</div>
 </section>
 <section id="t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-storen"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-store-pack"></span><h3><span class="math notranslate nohighlight">\(t\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#t-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq N/8
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {\mathit{{\scriptstyle M}}} / 8
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} t\mathsf{.store}N~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathsf{i}}{{\mathit{{\scriptstyle N}}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{\mathit{{\scriptstyle M}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~{\mathsf{i}}{{\mathit{{\scriptstyle N}}}} \rightarrow \epsilon
+}
+\qquad
+\end{array}\]</div>
+</section>
+<section id="mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
+<span id="valid-vload-val"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
+<li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than the <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">bit width</span></a> of <span class="math notranslate nohighlight">\(t\)</span> divided by <span class="math notranslate nohighlight">\(8\)</span>.</p></li>
+<li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [t]\)</span>.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|} / 8
+}{
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
-<span id="valid-vload-ext"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{x}M\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<span id="valid-vload-pack"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{x}M\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-x-m-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
 <li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than <span class="math notranslate nohighlight">\(N/8 \cdot M\)</span>.</p></li>
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq N/8 \cdot M
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {\mathit{{\scriptstyle M}}} / 8 \cdot {\mathit{{\scriptstyle N}}}
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} \mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{x}M\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{{\scriptstyle M}}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{{\mathit{{\scriptstyle N}}}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="valid-vload-splat"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
@@ -1530,13 +1534,16 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq N/8
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {\mathit{{\scriptstyle N}}} / 8
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} \mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{{\scriptstyle N}}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{splat}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="valid-vload-zero"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
@@ -1546,13 +1553,16 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} \leq N/8
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} &lt; {\mathit{{\scriptstyle N}}} / 8
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} \mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{{\scriptstyle N}}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{zero}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
 <span id="valid-vload-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
@@ -1563,15 +1573,37 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} &lt; N/8
-  \qquad
-  \href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}} &lt; 128/N
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} &lt; {\mathit{{\scriptstyle N}}} / 8
+ \qquad
+i &lt; 128 / {\mathit{{\scriptstyle N}}}
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} \mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{\mathit{{\scriptstyle N}}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}~i : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+}
+\qquad
+\end{array}\]</div>
+</section>
+<section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
+<span id="valid-vstore"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The memory <span class="math notranslate nohighlight">\(C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x]\)</span> must be defined in the context.</p></li>
+<li><p>The alignment <span class="math notranslate nohighlight">\(2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}\)</span> must not be larger than the <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">bit width</span></a> of <span class="math notranslate nohighlight">\(t\)</span> divided by <span class="math notranslate nohighlight">\(8\)</span>.</p></li>
+<li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []\)</span>.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq {|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|} / 8
+}{
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} \rightarrow \epsilon
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx">
 <span id="valid-vstore-lane"></span><h3><span class="math notranslate nohighlight">\(\mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}\)</span><a class="headerlink" href="#mathsf-v128-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-xref-syntax-instructions-syntax-laneidx-mathit-laneidx" title="Permalink to this heading">¶</a></h3>
@@ -1582,15 +1614,18 @@ i &lt; {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})
 <li><p>Then the instruction is valid with type <span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span>.</p></li>
 </ul>
 <div class="math notranslate nohighlight">
-\[\frac{
-  C.\href{../valid/conventions.html#context}{\mathsf{mems}}[x] = \href{../syntax/types.html#syntax-memtype}{\mathit{memtype}}
-  \qquad
-  2^{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}} &lt; N/8
-  \qquad
-  \href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}} &lt; 128/N
+\[\begin{array}{&#64;{}c&#64;{}}\displaystyle
+\frac{
+{\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
+ \qquad
+{2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} &lt; {\mathit{{\scriptstyle N}}} / 8
+ \qquad
+i &lt; 128 / {\mathit{{\scriptstyle N}}}
 }{
-  C \href{../valid/instructions.html#valid-instr}{\vdash} \mathsf{v128.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}} : [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} []
-}\]</div>
+{\mathit{{\scriptstyle C}}} \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{\mathit{{\scriptstyle N}}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}~i : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} \rightarrow \epsilon
+}
+\qquad
+\end{array}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-memory-mathsf-memory-size-x">
 <span id="valid-memory-size"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory.size}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-size-x" title="Permalink to this heading">¶</a></h3>
@@ -2038,7 +2073,7 @@ a simple <a class="reference internal" href="../appendix/algorithm.html#algo-val
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <span class="math notranslate nohighlight">\(\mathsf{return}\)</span> instruction is <a class="reference internal" href="#polymorphism"><span class="std std-ref">stack-polymorphic</span></a>.</p>
-<p><span class="math notranslate nohighlight">\({\mathit{{\scriptstyle C}}}{.}\mathsf{return}\)</span> is absent (set to <span class="math notranslate nohighlight">\(\epsilon\)</span>) when validating an <a class="reference internal" href="#valid-expr"><span class="std std-ref">expression</span></a> that is not a function body.
+<p><span class="math notranslate nohighlight">\({\mathit{{\scriptstyle C}}}{.}\href{../valid/conventions.html#context}{\mathsf{return}}\)</span> is absent (set to <span class="math notranslate nohighlight">\(\epsilon\)</span>) when validating an <a class="reference internal" href="#valid-expr"><span class="std std-ref">expression</span></a> that is not a function body.
 This differs from it being set to the empty result type <span class="math notranslate nohighlight">\((\epsilon)\)</span>,
 which is the case for functions not returning anything.</p>
 </div>
