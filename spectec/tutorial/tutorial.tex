@@ -36,49 +36,49 @@
 \maketitle
 
 \section{Introduction}
-In this tutorial, we will practice how to write a spec.
+In this tutorial, we will practice how to write a spec in Wasm-DSL.
 Here, instead of a full Wasm, a very simplified version of Wasm (which we call Minimini-Wasm) is used as our goal.
 Abstract syntax of Minimini-Wasm is as follows:
 \[
 \begin{array}{rrl}
-\X{module} & ::= & \X{function}^*\ \X{start}^?\\
-\X{function} & ::= & \X{type}_{\X{func}}\ \X{code}\ \X{export}^*\\
-\X{start} & ::= & \X{idx}_{\X{func}}\\
-\X{export} & ::= & \mbox{``}\K{name}\mbox{''}\\
-\X{code} & ::= & (\K{local}\ \X{type}_{\X{val}})^*\ \X{instr}^*\\
-\X{init} & ::= & \X{instr}^*\\
+\X{module} & ::= & \K{module}\ \X{type}^*\ \X{func}^*\ \X{start}^*\ \X{export}^*\\
+\X{type} & ::= & \K{type}\ \X{type}_{\X{func}}\\ 
+\X{code} & ::= & \X{local}^*\ \X{instr}^*\\
+\X{local} & ::= & \K{local}\ \X{type}_{\X{val}}\\\
+\X{func} & ::= & \K{func}\ \X{idx}_{\X{type}}\ \X{code}\\
+\X{start} & ::= & \K{start}\ \X{idx}_{\X{func}}\\
+\X{export} & ::= & \K{export}\ \mbox{``}\K{name}\mbox{''}\ (\K{func}\ \X{idx}_{\X{func}})\\
 \X{instr} & ::= & \K{nop}~\mid~\K{drop}~\mid~\K{select}~\mid~
 \X{type}_{\X{val}}\K{.const}\ \X{value}\K{\_}(\X{type}_{\X{val}})~\mid~
-\X{binary}\\
-&\mid&(\K{set}\mid\K{get}\mid\K{tee})\K{\_}\K{local}\ \X{idx}_{\X{label}}~\mid~
-\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}~\mid~\K{block}~\mid~\K{loop}~\mid~\K{if}\\
-&\mid&\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
-\X{binary} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
+\X{binop}\\
+&\mid&(\K{get}\mid\K{set}\mid\K{tee})\K{\_}\K{local}\ \X{idx}_{\X{local}}~\mid~
+\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}\\
+&\mid&\K{block}\ \X{valtype?}\ \X{instr}^*~\mid~\K{loop}\ \X{valtype?}\ \X{instr}^*\\
+&\mid&\K{if}\ \X{valtype?}\ \X{instr}^*\ \K{else}\ \X{instr}^*~\mid~\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
+\X{binop} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
 \K{i64.add}~\mid~\K{i64.sub}~\mid~\K{i64.mul}\\
 \X{type}_{\X{val}} & ::= & \K{i32}~\mid~\K{i64}\\
 \X{type}_{\X{func}} & ::= & \X{type}_{\X{val}}^*\rightarrow \X{type}_{\X{val}}^*\\
-\X{idx}_{\X{func}|\X{local}|\X{label}} & \in & [0,\ 2^{32} - 1]\\
+\X{idx}_{\X{type}|\X{func}|\X{local}|\X{label}} & \in & [0,\ 2^{32} - 1]\\
 \X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
 \X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
 \end{array}
 \]
 
-\subsection{Directory of specs}
-Each folder in the directory \K{spectec/spec} indicates different versions of Wasm spec.
-Among them, directory \K{wasm-0.0} is where we will work on.
+\subsection{Working Directory}
+From root, the directory \K{spectec/tutorial} is where we will work on.
 
 \section{Syntax}
 Now, we will start from writing the syntax of Minimini-Wasm.
-Make a new file \K{1-syntax.wastup} in directory \K{wasm-0.0 }.
-
+Make a new file \K{1-syntax.wastup}.
 Declaring syntax in Wasm-DSL is basically done like this:
 \begin{lcverbatim}
-syntax <name_of_syntax> = | <case> | <case> | <case> |
+syntax <name_of_syntax> = | <case> | ... | <case> |
 \end{lcverbatim}
-Use keyword \K{syntax}, and simply list the possible cases with the separator \K{|}.
+Use keyword \K{syntax}, write the name of syntax in lowercase, and simply list the possible cases with the separator \K{|}. Here, each of the case can be a nonterminal node (usually written in lowercases) which refers to another syntax, or a terminal node (usually written in uppercases).\\
 We'll declare each of the syntax one by one.
 
-\subsection{\K{valtype}}
+\subsection{$type_{val}$}
 \[
 \X{type}_{\X{val}} ::= \K{i32}~\mid~\K{i64}
 \]
@@ -86,10 +86,9 @@ This syntax is simply written in Wasm-DSL like this:
 \begin{lcverbatim}
 syntax valtype = | I32 | I64 |
 \end{lcverbatim}
-This means the syntax \K{valtype} is either \K{I32} or \K{I64}.
-Similarly, let's declare each of the syntax one by one.
+This means the syntax \K{valtype} is either \K{I32} or \K{I64}. Here, write terminal nodes \K{I32} and \K{I64} instead of \K{i32} and \K{i64}, and nonterminal node \K{valtype} instead of \K{VALTYPE}.
 
-\subsection{\K{idx}}
+\subsection{$idx$}
 \[
 \X{idx}_{\X{func}|\X{local}|\X{label}} \in [0,\ 2^{32} - 1]
 \]
@@ -105,25 +104,26 @@ syntax labelidx = idx
 syntax localidx = idx
 \end{lcverbatim}
 
-\subsection{\K{value}}
+\subsection{$value$}
 \[
 \begin{array}{rrl}
 \X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
 \X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
 \end{array}
 \]
-Here, the syntax \K{value} is declared in regard with parameter \K{valtype}.
+Here, the syntax $value\_$ is declared in regard with parameter \K{valtype}.
 This can be done like this:
 \begin{lcverbatim}
-syntax val(valtype)
-syntax val(I32) = 0 | ... | 2^32-1
-syntax val(I64) = 0 | ... | 2^64-1
+syntax val_(valtype)
+syntax val_(I32) = 0 | ... | 2^32-1
+syntax val_(I64) = 0 | ... | 2^64-1
 \end{lcverbatim}
 Here we can declare a general range, by using parameter again.
 \begin{lcverbatim}
+syntax N = nat
 syntax iN(N) = 0 | ... | 2^N-1
 \end{lcverbatim}
-Here, \K{N} is a pre-defined syntax, which indicates any natural number.
+Here, \K{nat} is a pre-defined syntax, which indicates any natural number.
 Now, we can write \K{iN(32)} and \K{iN(64)} instead of \verb!0 | ... | 2^32-1! and \verb!0 | ... | 2^64-1!.
 New declaration of \K{idx} and \K{val} is as follows:
 \begin{lcverbatim}
@@ -133,22 +133,35 @@ syntax val(I32) = iN(32)
 syntax val(I64) = iN(64)
 \end{lcverbatim}
 
-\subsection{\K{char}}
+\subsection{$binop$}
+\[
+\begin{array}{rrl}
+	\X{binop} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
+	\K{i64.add}~\mid~\K{i64.sub}~\mid~\K{i64.mul}\\
+\end{array}
+\]
+We can declare two groups of \K{binop}, classifying them by one's parameter type:
 \begin{lcverbatim}
-syntax char = U+0000 | ... | U+D7FF | U+E000 | ... | U+10FFFF
+syntax binop_(I32) = | ADD | SUB | MUL
+syntax binop_(I64) = | ADD | SUB | MUL
 \end{lcverbatim}
-From the syntax \K{char}, we can declare \K{name}, which is an iteration of \K{char} s.
-Use \K{*} to represent a sequence:
-\begin{lcverbatim}
-syntax name = char*
-\end{lcverbatim}
-
-\subsection{\K{binop}}
+Now, using \K{valtype}, it can be combined as:
 \begin{lcverbatim}
 syntax binop_(valtype) = | ADD | SUB | MUL
 \end{lcverbatim}
 
-\subsection{\K{instr}}
+\subsection{$instr$}
+\[
+\begin{array}{rrl}
+	\X{instr} & ::= & \K{nop}~\mid~\K{drop}~\mid~\K{select}~\mid~
+	\X{type}_{\X{val}}\K{.const}\ \X{value}\K{\_}(\X{type}_{\X{val}})~\mid~
+	\X{binop}\\
+	&\mid&(\K{get}\mid\K{set}\mid\K{tee})\K{\_}\K{local}\ \X{idx}_{\X{local}}~\mid~
+	\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}~\mid~\K{block}\ \X{valtype?}\ \X{instr}^*\\
+	&\mid&\K{loop}\ \X{valtype?}\ \X{instr}^*~\mid~\K{if}\ \X{valtype?}\ \X{instr}^*\ \K{else}\ \X{instr}^*~\mid~\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
+\end{array}
+\]
+Use \K{*} to represent a sequence. Now we can fully write \K{instr} as follows:
 \begin{lcverbatim}
 syntax instr =
   | NOP
@@ -156,17 +169,367 @@ syntax instr =
   | SELECT
   | CONST valtype val_(valtype)
   | BINOP valtype binop_(valtype)
-  | LOCAL.GET idx
-  | LOCAL.SET idx
-  | LOCAL.TEE idx
-  | CALL idx
+  | LOCAL.GET localidx
+  | LOCAL.SET localidx
+  | LOCAL.TEE localidx
+  | CALL funcidx
   | RETURN
-  | BLOCK blocktype instr*
-  | LOOP blocktype instr*
-  | IF blocktype instr* ELSE instr*
+  | BLOCK valtype? instr*
+  | LOOP valtype? instr*
+  | IF valtype? instr* ELSE instr*
   | BR labelidx
   | BR_IF labelidx
 \end{lcverbatim}
 
+\subsection{$name$}
+We need a declaration of $name$, which indicates for a general string. We can declare a syntax for a character like this:
+\begin{lcverbatim}
+syntax char = U+0000 | ... | U+D7FF | U+E000 | ... | U+10FFFF
+\end{lcverbatim}
+Now, \K{name} is simply an iteration of \K{char}s.
+\begin{lcverbatim}
+syntax name = char*
+\end{lcverbatim}
+
+\subsection{$type_{func}$}
+\[
+\begin{array}{rrl}
+\X{type}_{\X{func}} & ::= & \X{type}_{\X{val}}^*\rightarrow \X{type}_{\X{val}}^*\\
+\end{array}
+\]
+We can use \K{->} to indicate a function:
+\begin{lcverbatim}
+syntax functype = valtype* -> valtype*
+\end{lcverbatim}
+
+\subsection{$module$}
+\[
+\begin{array}{rrl}
+	\X{module} & ::= & \K{module}\ \X{type}^*\ \X{func}^*\ \X{start}^*\ \X{export}^*\\
+	\X{type} & ::= & \K{type}\ \X{type}_{\X{func}}\\ 
+	\X{code} & ::= & \X{local}^*\ \X{instr}^*\\
+	\X{local} & ::= & \K{local}\ \X{type}_{\X{val}}\\\
+	\X{func} & ::= & \K{func}\ \X{idx}_{\X{type}}\ \X{code}\\
+	\X{start} & ::= & \K{start}\ \X{idx}_{\X{func}}\\
+	\X{export} & ::= & \K{export}\ \mbox{``}\K{name}\mbox{''}\ (\K{func}\ \X{idx}_{\X{func}})\\
+\end{array}
+\]
+Declare $module$ and its subcomponents as follows:
+\begin{lcverbatim}
+syntax module = MODULE type* func* start* export*
+syntax type = TYPE functype
+syntax code = local* instr*
+syntax local = LOCAL valtype
+syntax func = FUNC typeidx code
+syntax start = START funcidx
+syntax export = EXPORT name (FUNC funcidx)
+\end{lcverbatim}
+
+\section{Metavariables}
+We're done with writing syntax of Minimini-Wasm. Now, we will declare metavariables, which is used in reduction rules. \\
+There are three ways to make use of metavariables.
+
+\subsection{Explicit Declarartion}
+\begin{lcverbatim}
+var <name_of_var> : <type>
+\end{lcverbatim}
+We can explicitly declare a metavariable as above. Use keyword \K{var}, and give its name and type. Here, \K{<type>} may be a complex form, which contains iteration, parametric syntax, etc.\\
+Declare variables in file \K{1-syntax.wastup} as follows:
+\begin{lcverbatim}
+var x : idx
+var l : labelidx
+var t : valtype
+var ft : functype
+var in : instr
+var e : instr*
+var ty : type
+var loc : local
+var ex : export
+var st : start
+\end{lcverbatim}
+
+\subsection{Using Syntax Name}
+Also, we can use the syntax name directly as a variable of same type. For example, instead of below code:
+\begin{lcverbatim}
+rule Step/example:
+  z; (CONST t c_1) (CONST t c_2)  ~>  z; (CONST t c_1)
+\end{lcverbatim}
+
+we can write like this:
+\begin{lcverbatim}
+rule Step/example:
+  z; (CONST valtype c_1) (CONST valtype c_2)  ~>  z; (CONST valtype c_1)
+\end{lcverbatim}
+
+\subsection{Using Without Declaration}
+%\subsection{Implicit declaration? Infer? Using without declaration?}
+Finally, we can use a metavariable without declaration in suitable situations. In this case, its type will be inferred. Now, we may rewrite the above rule as:
+\begin{lcverbatim}
+rule Step/example:
+  z; (CONST anyname c_1) (CONST anyname c_2)  ~>  z; (CONST anyname c_1)
+\end{lcverbatim}
+
+\section{Functions}
+\begin{lcverbatim}
+def $<func_name>(<type_of_arg1>, <type_of_arg2>, ... , <type_of_argn>) : <result_type>
+def $<func_name>(<arg1>, <arg2>, ... , <argn>) = <result>
+\end{lcverbatim}
+We can declare functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out. \\
+
+\subsection{Declaring Function Body}
+Function body can be multiple lines to describe case-in-case. \\
+For example, we can define a function \K{size}, which returns the size of a \K{valtype} as:
+\begin{lcverbatim}
+def $size(valtype) : nat
+def $size(I32) = 32
+def $size(I64) = 64
+\end{lcverbatim}
+
+Now, the function \K{size} will return \K{32} for input \K{I32}, and 64 for input \K{64}. \\
+\\
+We can also add condition to a function body. \\
+For example, we can define a function \K{min}, which returns a smaller integer between two:
+\begin{lcverbatim}
+def $min(nat, nat) : nat
+def $min(i, j) = i
+  -- if i < j
+def $min(i, j) = j
+\end{lcverbatim}
+Now, the function \K{min} will return \K{i} if \K{i < j}, else \K{j}.
+
+\subsection{Built-in Functions}
+Here are some built-in functions that we can use:
+\begin{lcverbatim}
+$ibytes
+$inverse_of_ibytes
+$nbytes
+$vbytes
+...
+\end{lcverbatim}
+You can find their definition from the file \K{<root>/spectec/src/backend-interpreter/numerics.ml}.
+Also, even though they are built-in, you should declare their type first, and use them in Wasm-DSL.
+
+\subsection{Using Functions}
+Functions can be used in the definition of other functions or reduction rules like this:
+\begin{lcverbatim}
+rule Step/iadd:
+  z; (CONST t c_1) (CONST t c_2)  ~>  z; (CONST t c)
+  -- if c = $iadd(c_1, c_2)
+\end{lcverbatim}
+
+\section{Reduction Rules}
+Now, let's write the reduction rules for the instructions.
+First, make a new file \K{8-reduction.wastup} and write as follows:
+\begin{lcverbatim}
+relation Step: config ~> config
+\end{lcverbatim}
+It means that \K{rule}s of \K{relation Step} receives \K{config} as its input and then yields new \K{config} as its output. Here, \K{config} is defined in file \K{4-runtime.watsup}:
+\begin{lcverbatim}
+syntax config = state; admininstr*
+syntax admininstr =
+  | instr
+  | CALL_ADDR funcaddr
+  | LABEL_ n `{instr*} admininstr*
+  | FRAME_ n `{frame} admininstr*
+  | TRAP
+\end{lcverbatim}
+As you can see, \K{config} is a pair of \K{state} and sequence of \K{admininstr}. \K{admininstr} is a superset of \K{instr}, which contains some additional administrative instructions.\\ Declaring reduction rule in Wasm-DSL is basically done like this:
+\begin{lcverbatim}
+rule Step/<rule name>:
+  <input state>; <input instructions>  ~>  <output state>; <output instructions>
+  -- if <condition>
+  ...
+  -- if <condition>
+\end{lcverbatim}
+This means that if every \K{condition}s are satisfied, then the state and instructions from stack is reduced to the right hand side. \\
+Now we'll declare each of the reduction rules one by one.
+
+\subsection{\K{NOP}}
+\K{NOP} means 'no operation', so if we get \K{NOP} from stack, we can just remove it from stack. Use \K{eps} to indicate an empty stack. \\
+We'll use metavariable \K{z} for a \K{state}. Since \K{NOP} makes no change on current \K{state}, just pass the input \K{state} to the output \K{state}.
+\begin{lcverbatim}
+rule Step/nop:
+  z; NOP  ~>  z; eps
+\end{lcverbatim}
+
+\subsection{\K{DROP}}
+If we get \K{DROP} from stack, then we should remove a value from stack. \\
+Use following syatax \K{val}, which is defined in \K{4-runtime.watsup}:
+\begin{lcverbatim}
+syntax val = CONST valtype val_(valtype)
+\end{lcverbatim}
+as a variable. \\
+Answer:
+{\color{red}
+	\begin{lcverbatim}
+rule Step/drop:
+  z; val DROP  ~>  z; eps
+	\end{lcverbatim}
+}
+
+\subsection{\K{SELECT}}
+If we get \K{BINOP} from stack, then we have two cases: condition is true or false. \\
+Define each of the case as seperate rule as following:
+\begin{lcverbatim}
+rule Step/select-true:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_1
+  -- if c =/= 0
+
+rule Step/select-false:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_2
+  -- if c = 0
+\end{lcverbatim}
+As you can see here, we can distinguish multiple variables with same type by adding \K{\_1}, \K{\_2} (and so on) after the variable name. \\
+Also, the names of two rules should be the same before hyphen (-), so that they can be prosed as the same reduction rule.
+
+\subsection{\K{BINOP}}
+When we get \K{BINOP} from stack, there are six cases. Two cases for \K{valtype} (\K{I32}, \K{I64}), and three cases for \K{binop\_(valtype)} (\K{ADD}, \K{SUB}, \K{MUL}). \\
+First, in the case that \K{valtype} is \K{I32} and \K{binop\_(valtype)} is \K{ADD}:
+\begin{lcverbatim}
+def $iadd(N, iN(N), iN(N)) : iN(N)
+rule Step/binop-add-i32:
+  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 ADD)  ~>  z; (CONST I32 c)
+  -- if $iadd(32, c_1, c_2) = c
+\end{lcverbatim}
+Here, \K{iadd} is a built-in function, so only its type is declared.\\
+We can do similarly with the case where \K{valtype} is \K{I64}:
+\begin{lcverbatim}
+def $iadd(N, iN(N), iN(N)) : iN(N)
+rule Step/binop-add-i32:
+  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 ADD)  ~>  z; (CONST I32 c)
+  -- if $iadd(32, c_1, c_2) = c
+rule Step/binop-add-i64:
+  z; (CONST I64 c_1) (CONST I64 c_2) (BINOP I64 ADD)  ~>  z; (CONST I64 c)
+  -- if $iadd(64, c_1, c_2) = c
+\end{lcverbatim}
+Now, we can combine them using the function \K{size} and metavariable \K{t}:
+\begin{lcverbatim}
+rule Step/binop-add:
+z; (CONST t c_1) (CONST t c_2) (BINOP t ADD)  ~>  z; (CONST t c)
+-- if $iadd($size(t), c_1, c_2) = c
+\end{lcverbatim}
+We can do similarly with the case where \K{valtype} is \K{I64}:
+Answer:
+{\color{red}
+	\begin{lcverbatim}
+def $iadd(N, iN(N), iN(N)) : iN(N)
+def $isub(N, iN(N), iN(N)) : iN(N)
+def $imul(N, iN(N), iN(N)) : iN(N)
+
+rule Step/binop-add-i32:
+  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 ADD)  ~>  z; (CONST I32 c)
+  -- if $iadd(32, c_1, c_2) = c
+rule Step/binop-add-i64:
+  z; (CONST I64 c_1) (CONST I64 c_2) (BINOP I64 ADD)  ~>  z; (CONST I64 c)
+  -- if $iadd(64, c_1, c_2) = c
+
+rule Step/binop-sub-i32:
+  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 SUB)  ~>  z; (CONST I32 c)
+  -- if $isub(32, c_1, c_2) = c
+rule Step/binop-sub-i64:
+  z; (CONST I64 c_1) (CONST I64 c_2) (BINOP I64 SUB)  ~>  z; (CONST I64 c)
+  -- if $isub(64, c_1, c_2) = c
+
+rule Step/binop-mul-i32:
+  z; (CONST I32 c_1) (CONST I32 c_2) (BINOP I32 MUL)  ~>  z; (CONST I32 c)
+  -- if $imul(32, c_1, c_2) = c
+rule Step/binop-mul-i64:
+  z; (CONST I64 c_1) (CONST I64 c_2) (BINOP I64 MUL)  ~>  z; (CONST I64 c)
+  -- if $imul(64, c_1, c_2) = c
+
+	\end{lcverbatim}
+}
+
+\begin{lcverbatim}
+def $binop(valtype, binop_(valtype), val_(valtype), val_(valtype)) : val_(valtype)*
+hint(show %2#$_(%1)#(%3, %4))
+
+def $iadd(N, iN(N), iN(N)) : iN(N)      hint(show $iadd_(%,%,%))
+def $isub(N, iN(N), iN(N)) : iN(N)      hint(show $isub_(%,%,%))
+def $imul(N, iN(N), iN(N)) : iN(N)      hint(show $imul_(%,%,%))
+
+def $binop(Inn, ADD, iN_1, iN_2) = $iadd($size(Inn), iN_1, iN_2)
+def $binop(Inn, SUB, iN_1, iN_2) = $isub($size(Inn), iN_1, iN_2)
+def $binop(Inn, MUL, iN_1, iN_2) = $imul($size(Inn), iN_1, iN_2)
+
+rule Step/binop-val:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
+  -- if $binop(t, binop, c_1, c_2) = c  ;; TODO
+
+rule Step/binop-trap:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; TRAP
+  -- if $binop(t, binop, c_1, c_2) = eps  ;; TODO
+\end{lcverbatim}
+
+
+\begin{lcverbatim}
+
+;; Block instructions
+
+rule Step/block:
+z; (BLOCK t? instr*)  ~>  z; (LABEL_ n `{eps} instr*)
+-- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
+
+rule Step/loop:
+z; (LOOP t? instr*)  ~>  z; (LABEL_ 0 `{LOOP t? instr*} instr*)
+
+rule Step/if-true:
+z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_1*)
+-- if c =/= 0
+
+rule Step/if-false:
+z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_2*)
+-- if c = 0
+
+
+;; Branch instructions
+
+;; TODO: may want a label context instead of bubbling up
+rule Step/br-zero:
+z; (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  z; val^n instr'*
+
+rule Step/br-succ:
+z; (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  z; val* (BR l)
+\end{lcverbatim}
+
+\begin{lcverbatim}
+rule Step/br_if-true:
+z; (CONST I32 c) (BR_IF l)  ~>  z; (BR l)
+-- if c =/= 0
+
+rule Step/br_if-false:
+z; (CONST I32 c) (BR_IF l)  ~>  z; eps
+-- if c = 0
+
+
+;; Function instructions
+
+rule Step/call:
+z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])  ;; TODO
+
+rule Step/frame-vals:
+z; (FRAME_ n `{f} val^n)  ~>  z; val^n
+
+rule Step/return-frame:
+z; (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  z; val^n
+
+rule Step/return-label:
+z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
+
+
+;; Numeric instructions
+
+
+;; Local instructions
+
+rule Step/local.get:
+z; (LOCAL.GET x)  ~>  z; $local(z, x)
+
+rule Step/local.set:
+z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps
+
+rule Step/local.tee:
+z; val (LOCAL.TEE x)  ~>  z; val val (LOCAL.SET x)
+\end{lcverbatim}
 
 \end{document}
