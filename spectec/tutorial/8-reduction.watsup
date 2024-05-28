@@ -87,9 +87,11 @@ def $iadd(N, iN(N), iN(N)) : iN(N)      hint(show $iadd_(%,%,%))
 def $isub(N, iN(N), iN(N)) : iN(N)      hint(show $isub_(%,%,%))
 def $imul(N, iN(N), iN(N)) : iN(N)      hint(show $imul_(%,%,%))
 
-def $binop(Inn, ADD, iN_1, iN_2) = $iadd($size(Inn), iN_1, iN_2)
-def $binop(Inn, SUB, iN_1, iN_2) = $isub($size(Inn), iN_1, iN_2)
-def $binop(Inn, MUL, iN_1, iN_2) = $imul($size(Inn), iN_1, iN_2)
+def $binop(t, ADD, c_1, c_2) = $iadd($size(t), c_1, c_2)
+def $binop(t, SUB, c_1, c_2) = $isub($size(t), c_1, c_2)
+def $binop(t, MUL, c_1, c_2) = $imul($size(t), c_1, c_2)
+;; def $binop(Inn, SUB, iN_1, iN_2) = $isub($size(Inn), iN_1, iN_2)
+;; def $binop(Inn, MUL, iN_1, iN_2) = $imul($size(Inn), iN_1, iN_2)
 
 rule Step/binop-val:
   z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
