@@ -66,7 +66,14 @@ Abstract syntax of Minimini-Wasm is as follows:
 \]
 
 \subsection{Working Directory}
-From root, the directory \K{spectec/tutorial} is where we will work on.
+The directory \K{<root>/spectec/tutorial} is where we will work on.
+
+\subsection{How To Run}
+Running \K{make} in \K{<root>/spectec} will yield an executable file \K{watsup} in same directory. You can use this to generate various types of spec. For example, in directory \K{<root>/spectec}:
+\begin{lcverbatim}
+./watsup ./tutorial/*.watsup --prose
+\end{lcverbatim}
+will generate prose, using every \K{./watsup} file in directory \K{./tutorial} as input. There are various options including \K{--interpreter}, \K{--latex}, or \K{--print-il}. You can see all possible options with command \K{./watsup -help}.
 
 \section{Syntax}
 Now, we will start from writing the syntax of Minimini-Wasm.
@@ -274,7 +281,7 @@ rule Step/example:
 def $<func_name>(<type_of_arg1>, <type_of_arg2>, ... , <type_of_argn>) : <result_type>
 def $<func_name>(<arg1>, <arg2>, ... , <argn>) = <result>
 \end{lcverbatim}
-We can declare functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out. \\
+We can declare functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out.
 
 \subsection{Declaring Function Body}
 Function body can be multiple lines to describe case-in-case. \\
@@ -284,8 +291,7 @@ def $size(valtype) : nat
 def $size(I32) = 32
 def $size(I64) = 64
 \end{lcverbatim}
-
-Now, the function \K{size} will return \K{32} for input \K{I32}, and 64 for input \K{64}. \\
+Now, the function \K{size} will return \K{32} for input \K{I32}, and \K{64} for input \K{I64}. \\
 \\
 We can also add condition to a function body. \\
 For example, we can define a function \K{min}, which returns a smaller integer between two:
@@ -566,10 +572,10 @@ rule Step/return-label:
 To get a local value from \K{state z} and \K{idx x}, write \K{\$local(z, x)}.\\\\
 {\color{red}
 	Answer:
-\begin{lcverbatim}
+	\begin{lcverbatim}
 rule Step/local.get:
   z; (LOCAL.GET x)  ~>  z; $local(z, x)
-\end{lcverbatim}
+	\end{lcverbatim}
 }
 
 \subsection{\K{LOCAL.SET}}
