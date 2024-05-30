@@ -99,6 +99,7 @@ def $with_meminst((s; f), x, mi) = s[.MEMS[f.MODULE.MEMS[x]] = mi]; f
 
 ;; Growing
 
-def $growtable(tableinst, nat) : tableinst  hint(partial)
-def $growmemory(meminst, nat) : meminst     hint(partial)
+def $growtable(tableinst, nat) : tableinst
+def $growmemory(meminst, nat) : meminst
+
 
