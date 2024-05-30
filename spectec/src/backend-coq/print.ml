@@ -257,8 +257,8 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
     | MutualRecD defs -> (match defs with
       | [] -> ""
       | [d] -> string_of_def (not (is_inductive d)) d
-      | d :: defs -> let prefix = if is_inductive d then "with\n\n" else "" in
-        string_of_def false d ^ "\n\n" ^ prefix ^ String.concat "\n\n" (List.map (string_of_def true) defs)
+      | d :: defs -> let prefix = if is_inductive d then "\n\nwith\n\n" else "\n\n" in
+        string_of_def false d ^ prefix ^ String.concat prefix (List.map (string_of_def true) defs)
       )
     | DefinitionD (id, binds, typ, clauses) -> let prefix = if recursive then "Fixpoint " else "Definition " in
       string_of_definition prefix id binds typ clauses

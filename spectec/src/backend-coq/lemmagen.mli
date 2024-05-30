@@ -1,0 +1,1 @@
+val lemma_gen : Coqast.coq_script -> string

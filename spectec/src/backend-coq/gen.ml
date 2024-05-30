@@ -3,6 +3,9 @@ open Util
 open Source
 open Case
 
+(* First attempt to generate inductive definitions. Does not compile
+  completely for Wasm 1.0 (does not have sub pass, family type handling 
+  nor else pass integrated). *)
 let parens s = "(" ^ s ^ ")"
 let curly_parens s = "{" ^ s ^ "}"
 let square_parens s = "[" ^ s ^ "]"

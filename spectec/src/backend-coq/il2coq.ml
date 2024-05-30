@@ -263,7 +263,7 @@ and transform_exp (exp : exp) =
     | TheE e -> T_app (T_exp_basic T_the, [transform_exp e])
     | StrE expfields -> T_record_fields (List.map (fun (a, e) -> (gen_typ_name exp.note ^ "__" ^ transform_atom a, transform_exp e)) expfields)
     | DotE (e, atom) -> T_app (T_ident [gen_typ_name e.note; transform_atom atom], [transform_exp e])
-    | CompE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp1, transform_exp exp2)
+    | CompE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp2, transform_exp exp1)
     | ListE exps -> T_list (List.map transform_exp exps)
     | LenE e -> T_app (T_exp_basic T_listlength, [transform_exp e])
     | CatE (exp1, exp2) -> T_app (T_exp_basic T_listconcat, [T_ident ["_"] ;transform_exp exp1; transform_exp exp2])
@@ -571,6 +571,7 @@ let rec is_same_type (t1 : typ) (t2 : typ) =
     | IterT (t1', iter1), IterT (t2', iter2) -> iter1 = iter2 && is_same_type t1' t2'
     | _ -> false
 
+(* Assumes that tuple variables will be in same order, can be modified if necessary *)
 let rec find_same_typing (at : region) (m1 : ident) (t1 : typ) (t2_cases : sub_typ) =
   match t2_cases with
     | [] -> error t1.at "Subtyping expression cannot coerce correctly"
