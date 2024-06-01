@@ -1505,7 +1505,7 @@ Inductive Mem_ok: context -> mem -> memtype -> Prop :=
 	| Mem_ok__ : forall (v_C : context) (v_mt : memtype), (Memtype_ok v_mt) -> Mem_ok v_C (mem__MEMORY v_mt) v_mt.
 
 Inductive Elem_ok: context -> elem -> Prop :=
-	| Elem_ok__OK : forall (v_C : context) (v_expr : expr) (v_x : (list idx)) (v_lim : limits) (v_ft : (list functype)), (0 < (List.length (context__TABLES v_C))) /\ ((List.length v_ft) = (List.length v_x)) /\ List.Forall (fun '(v_ft, v_x) => (v_x < (List.length (context__FUNCS v_C)))) (combine (v_ft) (v_x)) /\ ((lookup_total (context__TABLES v_C) 0) = v_lim) /\ (Expr_ok_const v_C v_expr (Some (valtype__INN (inn__I32 )))) /\ List.Forall (fun '(v_ft, v_x) => ((lookup_total (context__FUNCS v_C) v_x) = v_ft)) (combine (v_ft) (v_x)) -> Elem_ok v_C (elem__ELEM v_expr v_x).
+	| Elem_ok__OK : forall (v_C : context) (v_expr : expr) (v_x : (list idx)) (v_lim : limits) (v_ft : (list functype)), (0 < (List.length (context__TABLES v_C))) /\ ((List.length v_ft) = (List.length v_x)) /\ List.Forall2 (fun v_ft v_x => (v_x < (List.length (context__FUNCS v_C)))) (v_ft) (v_x) /\ ((lookup_total (context__TABLES v_C) 0) = v_lim) /\ (Expr_ok_const v_C v_expr (Some (valtype__INN (inn__I32 )))) /\ List.Forall2 (fun v_ft v_x => ((lookup_total (context__FUNCS v_C) v_x) = v_ft)) (v_ft) (v_x) -> Elem_ok v_C (elem__ELEM v_expr v_x).
 
 Inductive Data_ok: context -> data -> Prop :=
 	| Data_ok__OK : forall (v_C : context) (v_expr : expr) (v_b : (list byte)) (v_lim : limits), (0 < (List.length (context__MEMS v_C))) /\ ((lookup_total (context__MEMS v_C) 0) = v_lim) /\ (Expr_ok_const v_C v_expr (Some (valtype__INN (inn__I32 )))) -> Data_ok v_C (data__DATA v_expr v_b).
@@ -1526,7 +1526,7 @@ Inductive Export_ok: context -> export -> externtype -> Prop :=
 	| Export_ok__ : forall (v_C : context) (v_name : name) (v_externidx : externidx) (v_xt : externtype), (Externidx_ok v_C v_externidx v_xt) -> Export_ok v_C (export__EXPORT v_name v_externidx) v_xt.
 
 Inductive Module_ok: module -> Prop :=
-	| Module_ok__OK : forall (v_type : (list type)) (v_import : (list import)) (v_func : (list func)) (v_global : (list global)) (v_table : (list table)) (v_mem : (list mem)) (v_elem : (list elem)) (v_data : (list data)) (v_start : (option start)) (v_export : (list export)) (v_ft' : (list functype)) (v_ixt : (list externtype)) (v_C' : context) (v_gt : (list globaltype)) (v_C : context) (v_ft : (list functype)) (v_reserved__tt : (list tabletype)) (v_mt : (list memtype)) (v_xt : (list externtype)) (v_ift : (list functype)) (v_igt : (list globaltype)) (v_itt : (list tabletype)) (v_imt : (list memtype)), ((List.length v_ft') = (List.length v_type)) /\ ((List.length v_import) = (List.length v_ixt)) /\ ((List.length v_global) = (List.length v_gt)) /\ ((List.length v_ft) = (List.length v_func)) /\ ((List.length v_table) = (List.length v_reserved__tt)) /\ ((List.length v_mem) = (List.length v_mt)) /\ ((List.length v_export) = (List.length v_xt)) /\ List.Forall (fun '(v_ft', v_type) => (Type_ok v_type v_ft')) (combine (v_ft') (v_type)) /\ List.Forall (fun '(v_import, v_ixt) => (Import_ok {| context__TYPES := v_ft'; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := None |} v_import v_ixt)) (combine (v_import) (v_ixt)) /\ List.Forall (fun '(v_global, v_gt) => (Global_ok v_C' v_global v_gt)) (combine (v_global) (v_gt)) /\ List.Forall (fun '(v_ft, v_func) => (Func_ok v_C v_func v_ft)) (combine (v_ft) (v_func)) /\ List.Forall (fun '(v_table, v_reserved__tt) => (Table_ok v_C v_table v_reserved__tt)) (combine (v_table) (v_reserved__tt)) /\ List.Forall (fun '(v_mem, v_mt) => (Mem_ok v_C v_mem v_mt)) (combine (v_mem) (v_mt)) /\ List.Forall (fun v_elem => (Elem_ok v_C v_elem)) (v_elem) /\ List.Forall (fun v_data => (Data_ok v_C v_data)) (v_data) /\ List.Forall (fun v_start => (Start_ok v_C v_start)) (option_to_list v_start) /\ List.Forall (fun '(v_export, v_xt) => (Export_ok v_C v_export v_xt)) (combine (v_export) (v_xt)) /\ ((List.length v_reserved__tt) <= 1) /\ ((List.length v_mt) <= 1) /\ (v_C = {| context__TYPES := v_ft'; context__FUNCS := (@app _ v_ift v_ft); context__GLOBALS := (@app _ v_igt v_gt); context__TABLES := (@app _ v_itt v_reserved__tt); context__MEMS := (@app _ v_imt v_mt); context__LOCALS := []; context__LABELS := []; context__RETURN := None |}) /\ (v_C' = {| context__TYPES := v_ft'; context__FUNCS := (@app _ v_ift v_ft); context__GLOBALS := v_igt; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := None |}) /\ (v_ift = (fun_funcsxt v_ixt)) /\ (v_igt = (fun_globalsxt v_ixt)) /\ (v_itt = (fun_tablesxt v_ixt)) /\ (v_imt = (fun_memsxt v_ixt)) -> Module_ok (module__MODULE v_type v_import v_func v_global v_table v_mem v_elem v_data v_start v_export).
+	| Module_ok__OK : forall (v_type : (list type)) (v_import : (list import)) (v_func : (list func)) (v_global : (list global)) (v_table : (list table)) (v_mem : (list mem)) (v_elem : (list elem)) (v_data : (list data)) (v_start : (option start)) (v_export : (list export)) (v_ft' : (list functype)) (v_ixt : (list externtype)) (v_C' : context) (v_gt : (list globaltype)) (v_C : context) (v_ft : (list functype)) (v_reserved__tt : (list tabletype)) (v_mt : (list memtype)) (v_xt : (list externtype)) (v_ift : (list functype)) (v_igt : (list globaltype)) (v_itt : (list tabletype)) (v_imt : (list memtype)), ((List.length v_ft') = (List.length v_type)) /\ ((List.length v_import) = (List.length v_ixt)) /\ ((List.length v_global) = (List.length v_gt)) /\ ((List.length v_ft) = (List.length v_func)) /\ ((List.length v_table) = (List.length v_reserved__tt)) /\ ((List.length v_mem) = (List.length v_mt)) /\ ((List.length v_export) = (List.length v_xt)) /\ List.Forall2 (fun v_ft' v_type => (Type_ok v_type v_ft')) (v_ft') (v_type) /\ List.Forall2 (fun v_import v_ixt => (Import_ok {| context__TYPES := v_ft'; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := None |} v_import v_ixt)) (v_import) (v_ixt) /\ List.Forall2 (fun v_global v_gt => (Global_ok v_C' v_global v_gt)) (v_global) (v_gt) /\ List.Forall2 (fun v_ft v_func => (Func_ok v_C v_func v_ft)) (v_ft) (v_func) /\ List.Forall2 (fun v_table v_reserved__tt => (Table_ok v_C v_table v_reserved__tt)) (v_table) (v_reserved__tt) /\ List.Forall2 (fun v_mem v_mt => (Mem_ok v_C v_mem v_mt)) (v_mem) (v_mt) /\ List.Forall (fun v_elem => (Elem_ok v_C v_elem)) (v_elem) /\ List.Forall (fun v_data => (Data_ok v_C v_data)) (v_data) /\ List.Forall (fun v_start => (Start_ok v_C v_start)) (option_to_list v_start) /\ List.Forall2 (fun v_export v_xt => (Export_ok v_C v_export v_xt)) (v_export) (v_xt) /\ ((List.length v_reserved__tt) <= 1) /\ ((List.length v_mt) <= 1) /\ (v_C = {| context__TYPES := v_ft'; context__FUNCS := (@app _ v_ift v_ft); context__GLOBALS := (@app _ v_igt v_gt); context__TABLES := (@app _ v_itt v_reserved__tt); context__MEMS := (@app _ v_imt v_mt); context__LOCALS := []; context__LABELS := []; context__RETURN := None |}) /\ (v_C' = {| context__TYPES := v_ft'; context__FUNCS := (@app _ v_ift v_ft); context__GLOBALS := v_igt; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := None |}) /\ (v_ift = (fun_funcsxt v_ixt)) /\ (v_igt = (fun_globalsxt v_ixt)) /\ (v_itt = (fun_tablesxt v_ixt)) /\ (v_imt = (fun_memsxt v_ixt)) -> Module_ok (module__MODULE v_type v_import v_func v_global v_table v_mem v_elem v_data v_start v_export).
 
 Definition fun_coec_val__admininstr (v_val : val) : admininstr :=
 	match (v_val) with
@@ -1646,7 +1646,7 @@ Inductive Val_ok: val -> valtype -> Prop :=
 	| Val_ok__ : forall (v_t : valtype) (v_c_t : val_), Val_ok (val__CONST v_t (v_c_t : val_)) v_t.
 
 Inductive Result_ok: result -> (list valtype) -> Prop :=
-	| Result_ok__result : forall (v_v : (list val)) (v_t : (list valtype)), ((List.length v_t) = (List.length v_v)) /\ List.Forall (fun '(v_t, v_v) => (Val_ok v_v v_t)) (combine (v_t) (v_v)) -> Result_ok (result___VALS v_v) v_t
+	| Result_ok__result : forall (v_v : (list val)) (v_t : (list valtype)), ((List.length v_t) = (List.length v_v)) /\ List.Forall2 (fun v_t v_v => (Val_ok v_v v_t)) (v_t) (v_v) -> Result_ok (result___VALS v_v) v_t
 	| Result_ok__trap : forall (v_t : (list valtype)), Result_ok (result__TRAP ) v_t.
 
 Inductive Externvals_ok: store -> externval -> externtype -> Prop :=
@@ -1659,7 +1659,7 @@ Inductive Memory_instance_ok: store -> meminst -> memtype -> Prop :=
 	| Memory_instance_ok__ : forall (v_S : store) (v_mt : memtype) (v_b : (list byte)) (v_n : n) (v_m : m), (v_mt = (limits__ v_n v_m)) /\ ((List.length v_b) = v_n) /\ (Memtype_ok v_mt) -> Memory_instance_ok v_S {| meminst__TYPE := v_mt; meminst__BYTES := v_b |} v_mt.
 
 Inductive Table_instance_ok: store -> tableinst -> tabletype -> Prop :=
-	| Table_instance_ok__ : forall (v_S : store) (v_reserved__tt : tabletype) (v_fa : (list (option funcaddr))) (v_n : n) (v_m : m) (v_functype : (list (option functype))), ((List.length v_fa) = (List.length v_functype)) /\ List.Forall (fun '(v_fa, v_functype) => ((v_fa = None) <-> (v_functype = None))) (combine (v_fa) (v_functype)) /\ (v_reserved__tt = (limits__ v_n v_m)) /\ ((List.length v_fa) = v_n) /\ List.Forall (fun '(v_fa, v_functype) => List.Forall (fun '(v_fa, v_functype) => (Externvals_ok v_S (externval__FUNC v_fa) (externtype__FUNC v_functype))) (combine (option_to_list v_fa) (option_to_list v_functype))) (combine (v_fa) (v_functype)) /\ (Tabletype_ok v_reserved__tt) -> Table_instance_ok v_S {| tableinst__TYPE := v_reserved__tt; tableinst__REFS := v_fa |} v_reserved__tt.
+	| Table_instance_ok__ : forall (v_S : store) (v_reserved__tt : tabletype) (v_fa : (list (option funcaddr))) (v_n : n) (v_m : m) (v_functype : (list (option functype))), ((List.length v_fa) = (List.length v_functype)) /\ List.Forall2 (fun v_fa v_functype => ((v_fa = None) <-> (v_functype = None))) (v_fa) (v_functype) /\ (v_reserved__tt = (limits__ v_n v_m)) /\ ((List.length v_fa) = v_n) /\ List.Forall2 (fun v_fa v_functype => List.Forall2 (fun v_fa v_functype => (Externvals_ok v_S (externval__FUNC v_fa) (externtype__FUNC v_functype))) (option_to_list v_fa) (option_to_list v_functype)) (v_fa) (v_functype) /\ (Tabletype_ok v_reserved__tt) -> Table_instance_ok v_S {| tableinst__TYPE := v_reserved__tt; tableinst__REFS := v_fa |} v_reserved__tt.
 
 Inductive Global_instance_ok: store -> globalinst -> globaltype -> Prop :=
 	| Global_instance_ok__ : forall (v_S : store) (v_gt : globaltype) (v_v : val) (v_mut : mut) (v_vt : valtype), (v_gt = (globaltype__ v_mut v_vt)) /\ (Globaltype_ok v_gt) /\ (Val_ok v_v v_vt) -> Global_instance_ok v_S {| globalinst__TYPE := v_gt; globalinst__VALUE := v_v |} v_gt.
@@ -1668,19 +1668,16 @@ Inductive Export_instance_ok: store -> exportinst -> Prop :=
 	| Export_instance_ok__OK : forall (v_S : store) (v_name : name) (v_eval : externval) (v_ext : externtype), (Externvals_ok v_S v_eval v_ext) -> Export_instance_ok v_S {| exportinst__NAME := v_name; exportinst__VALUE := v_eval |}.
 
 Inductive Module_instance_ok: store -> moduleinst -> context -> Prop :=
-	| Module_instance_ok__ : forall (v_S : store) (v_functype : (list functype)) (v_funcaddr : (list funcaddr)) (v_globaladdr : (list globaladdr)) (v_tableaddr : (list tableaddr)) (v_memaddr : (list memaddr)) (v_exportinst : (list exportinst)) (v_functype' : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcaddr) = (List.length v_functype')) /\ ((List.length v_tableaddr) = (List.length v_tabletype)) /\ ((List.length v_globaladdr) = (List.length v_globaltype)) /\ ((List.length v_memaddr) = (List.length v_memtype)) /\ List.Forall (fun v_functype => (Functype_ok v_functype)) (v_functype) /\ List.Forall (fun '(v_funcaddr, v_functype') => (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC v_functype'))) (combine (v_funcaddr) (v_functype')) /\ List.Forall (fun '(v_tableaddr, v_tabletype) => (Externvals_ok v_S (externval__TABLE v_tableaddr) (externtype__TABLE v_tabletype))) (combine (v_tableaddr) (v_tabletype)) /\ List.Forall (fun '(v_globaladdr, v_globaltype) => (Externvals_ok v_S (externval__GLOBAL v_globaladdr) (externtype__GLOBAL v_globaltype))) (combine (v_globaladdr) (v_globaltype)) /\ List.Forall (fun '(v_memaddr, v_memtype) => (Externvals_ok v_S (externval__MEM v_memaddr) (externtype__MEM v_memtype))) (combine (v_memaddr) (v_memtype)) /\ List.Forall (fun v_exportinst => (Export_instance_ok v_S v_exportinst)) (v_exportinst) -> Module_instance_ok v_S {| moduleinst__TYPES := v_functype; moduleinst__FUNCS := v_funcaddr; moduleinst__GLOBALS := v_globaladdr; moduleinst__TABLES := v_tableaddr; moduleinst__MEMS := v_memaddr; moduleinst__EXPORTS := v_exportinst |} {| context__TYPES := v_functype; context__FUNCS := v_functype'; context__GLOBALS := v_globaltype; context__TABLES := v_tabletype; context__MEMS := v_memtype; context__LOCALS := []; context__LABELS := []; context__RETURN := None |}.
+	| Module_instance_ok__ : forall (v_S : store) (v_functype : (list functype)) (v_funcaddr : (list funcaddr)) (v_globaladdr : (list globaladdr)) (v_tableaddr : (list tableaddr)) (v_memaddr : (list memaddr)) (v_exportinst : (list exportinst)) (v_functype' : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcaddr) = (List.length v_functype')) /\ ((List.length v_tableaddr) = (List.length v_tabletype)) /\ ((List.length v_globaladdr) = (List.length v_globaltype)) /\ ((List.length v_memaddr) = (List.length v_memtype)) /\ List.Forall (fun v_functype => (Functype_ok v_functype)) (v_functype) /\ List.Forall2 (fun v_funcaddr v_functype' => (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC v_functype'))) (v_funcaddr) (v_functype') /\ List.Forall2 (fun v_tableaddr v_tabletype => (Externvals_ok v_S (externval__TABLE v_tableaddr) (externtype__TABLE v_tabletype))) (v_tableaddr) (v_tabletype) /\ List.Forall2 (fun v_globaladdr v_globaltype => (Externvals_ok v_S (externval__GLOBAL v_globaladdr) (externtype__GLOBAL v_globaltype))) (v_globaladdr) (v_globaltype) /\ List.Forall2 (fun v_memaddr v_memtype => (Externvals_ok v_S (externval__MEM v_memaddr) (externtype__MEM v_memtype))) (v_memaddr) (v_memtype) /\ List.Forall (fun v_exportinst => (Export_instance_ok v_S v_exportinst)) (v_exportinst) -> Module_instance_ok v_S {| moduleinst__TYPES := v_functype; moduleinst__FUNCS := v_funcaddr; moduleinst__GLOBALS := v_globaladdr; moduleinst__TABLES := v_tableaddr; moduleinst__MEMS := v_memaddr; moduleinst__EXPORTS := v_exportinst |} {| context__TYPES := v_functype; context__FUNCS := v_functype'; context__GLOBALS := v_globaltype; context__TABLES := v_tabletype; context__MEMS := v_memtype; context__LOCALS := []; context__LABELS := []; context__RETURN := None |}.
 
 Inductive Function_instance_ok: store -> funcinst -> functype -> Prop :=
 	| Function_instance_ok__ : forall (v_S : store) (v_functype : functype) (v_moduleinst : moduleinst) (v_func : func) (v_C : context), (Functype_ok v_functype) /\ (Module_instance_ok v_S v_moduleinst v_C) /\ (Func_ok v_C v_func v_functype) -> Function_instance_ok v_S {| funcinst__TYPE := v_functype; funcinst__MODULE := v_moduleinst; funcinst__CODE := v_func |} v_functype.
 
 Inductive Store_ok: store -> Prop :=
-	| Store_ok__OK : forall (v_S : store) (v_funcinst : (list funcinst)) (v_globalinst : (list globalinst)) (v_tableinst : (list tableinst)) (v_meminst : (list meminst)) (v_functype : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcinst) = (List.length v_functype)) /\ ((List.length v_globalinst) = (List.length v_globaltype)) /\ ((List.length v_tableinst) = (List.length v_tabletype)) /\ ((List.length v_meminst) = (List.length v_memtype)) /\ (v_S = {| store__FUNCS := v_funcinst; store__GLOBALS := v_globalinst; store__TABLES := v_tableinst; store__MEMS := v_meminst |}) /\ List.Forall (fun '(v_funcinst, v_functype) => (Function_instance_ok v_S v_funcinst v_functype)) (combine (v_funcinst) (v_functype)) /\ List.Forall (fun '(v_globalinst, v_globaltype) => (Global_instance_ok v_S v_globalinst v_globaltype)) (combine (v_globalinst) (v_globaltype)) /\ List.Forall (fun '(v_tableinst, v_tabletype) => (Table_instance_ok v_S v_tableinst v_tabletype)) (combine (v_tableinst) (v_tabletype)) /\ List.Forall (fun '(v_meminst, v_memtype) => (Memory_instance_ok v_S v_meminst v_memtype)) (combine (v_meminst) (v_memtype)) -> Store_ok v_S.
+	| Store_ok__OK : forall (v_S : store) (v_funcinst : (list funcinst)) (v_globalinst : (list globalinst)) (v_tableinst : (list tableinst)) (v_meminst : (list meminst)) (v_functype : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcinst) = (List.length v_functype)) /\ ((List.length v_globalinst) = (List.length v_globaltype)) /\ ((List.length v_tableinst) = (List.length v_tabletype)) /\ ((List.length v_meminst) = (List.length v_memtype)) /\ (v_S = {| store__FUNCS := v_funcinst; store__GLOBALS := v_globalinst; store__TABLES := v_tableinst; store__MEMS := v_meminst |}) /\ List.Forall2 (fun v_funcinst v_functype => (Function_instance_ok v_S v_funcinst v_functype)) (v_funcinst) (v_functype) /\ List.Forall2 (fun v_globalinst v_globaltype => (Global_instance_ok v_S v_globalinst v_globaltype)) (v_globalinst) (v_globaltype) /\ List.Forall2 (fun v_tableinst v_tabletype => (Table_instance_ok v_S v_tableinst v_tabletype)) (v_tableinst) (v_tabletype) /\ List.Forall2 (fun v_meminst v_memtype => (Memory_instance_ok v_S v_meminst v_memtype)) (v_meminst) (v_memtype) -> Store_ok v_S.
 
 Inductive Frame_ok: store -> frame -> context -> Prop :=
-	| Frame_ok__ : forall (v_S : store) (v_val : (list val)) (v_moduleinst : moduleinst) (v_C : context) (v_t : (list valtype)), ((List.length v_t) = (List.length v_val)) /\ (Module_instance_ok v_S v_moduleinst v_C) /\ List.Forall (fun '(v_t, v_val) => (Val_ok v_val v_t)) (combine (v_t) (v_val)) -> Frame_ok v_S {| frame__LOCALS := v_val; frame__MODULE := v_moduleinst |} ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := v_t; context__LABELS := []; context__RETURN := None |} ++ v_C).
-
-Inductive Thread_ok: store -> resulttype -> frame -> (list admininstr) -> resulttype -> Prop :=
-	| Thread_ok__ : forall (v_S : store) (v_rt : (option valtype)) (v_F : frame) (v_instr : (list instr)) (v_t : (option valtype)) (v_C : context), (Frame_ok v_S v_F v_C) /\ (Instrs_ok ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (option_map (fun v_rt => (Some v_rt)) (v_rt)) |} ++ v_C) v_instr (functype__ [] v_t)) -> Thread_ok v_S v_rt v_F (list__instr__admininstr v_instr) v_t.
+	| Frame_ok__ : forall (v_S : store) (v_val : (list val)) (v_moduleinst : moduleinst) (v_C : context) (v_t : (list valtype)), ((List.length v_t) = (List.length v_val)) /\ (Module_instance_ok v_S v_moduleinst v_C) /\ List.Forall2 (fun v_t v_val => (Val_ok v_val v_t)) (v_t) (v_val) -> Frame_ok v_S {| frame__LOCALS := v_val; frame__MODULE := v_moduleinst |} ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := v_t; context__LABELS := []; context__RETURN := None |} ++ v_C).
 
 Inductive Admin_instr_ok: store -> context -> admininstr -> functype -> Prop :=
 	| Admin_instr_ok__instr : forall (v_S : store) (v_C : context) (v_instr : instr) (v_functype : functype), (Instr_ok v_C v_instr v_functype) -> Admin_instr_ok v_S v_C (v_instr : admininstr) v_functype
@@ -1696,7 +1693,12 @@ Admin_instrs_ok: store -> context -> (list admininstr) -> functype -> Prop :=
 	| Admin_instrs_ok__empty : forall (v_S : store) (v_C : context), Admin_instrs_ok v_S v_C [] (functype__ [] [])
 	| Admin_instrs_ok__seq : forall (v_S : store) (v_C : context) (v_admininstr_1 : (list admininstr)) (v_admininstr_2 : admininstr) (v_t_1 : (list valtype)) (v_t_3 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instrs_ok v_S v_C v_admininstr_1 (functype__ v_t_1 v_t_2)) /\ (Admin_instr_ok v_S v_C v_admininstr_2 (functype__ v_t_2 v_t_3)) -> Admin_instrs_ok v_S v_C (@app _ v_admininstr_1 [v_admininstr_2]) (functype__ v_t_1 v_t_3)
 	| Admin_instrs_ok__frame : forall (v_S : store) (v_C : context) (v_admininstr : (list admininstr)) (v_t : (list valtype)) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instrs_ok v_S v_C v_admininstr (functype__ v_t_1 v_t_2)) -> Admin_instrs_ok v_S v_C v_admininstr (functype__ (@app _ v_t v_t_1) (@app _ v_t v_t_2))
-	| Admin_instrs_ok__instrs : forall (v_S : store) (v_C : context) (v_instr : (list instr)) (v_functype : functype), (Instrs_ok v_C v_instr v_functype) -> Admin_instrs_ok v_S v_C (list__instr__admininstr v_instr) v_functype.
+	| Admin_instrs_ok__instrs : forall (v_S : store) (v_C : context) (v_instr : (list instr)) (v_functype : functype), (Instrs_ok v_C v_instr v_functype) -> Admin_instrs_ok v_S v_C (list__instr__admininstr v_instr) v_functype
+
+with
+
+Thread_ok: store -> resulttype -> frame -> (list admininstr) -> resulttype -> Prop :=
+	| Thread_ok__ : forall (v_S : store) (v_rt : (option valtype)) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)) (v_C : context), (Frame_ok v_S v_F v_C) /\ (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (option_map (fun v_rt => (Some v_rt)) (v_rt)) |} ++ v_C) v_admininstr (functype__ [] v_t)) -> Thread_ok v_S v_rt v_F v_admininstr v_t.
 
 Inductive Config_ok: config -> resulttype -> Prop :=
 	| Config_ok__ : forall (v_S : store) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Store_ok v_S) /\ (Thread_ok v_S None v_F v_admininstr v_t) -> Config_ok (config__ (state__ v_S v_F) v_admininstr) v_t.
@@ -1714,13 +1716,19 @@ Inductive Global_extension: globalinst -> globalinst -> Prop :=
 	| Global_extension__ : forall (v_gt : globaltype) (v_t : valtype) (v_val_ : val_), Global_extension {| globalinst__TYPE := v_gt; globalinst__VALUE := (val__CONST v_t (v_val_ : val_)) |} {| globalinst__TYPE := v_gt; globalinst__VALUE := (val__CONST v_t (v_val_ : val_)) |}.
 
 Inductive Store_extension: store -> store -> Prop :=
-	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_2 : (list meminst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_2)) /\ ((List.length v_tableinst_1) = (List.length v_tableinst_2)) /\ ((List.length v_meminst_1) = (List.length v_meminst_2)) /\ ((List.length v_globalinst_1) = (List.length v_globalinst_2)) /\ ((store__FUNCS v_store_1) = v_funcinst_1) /\ ((store__TABLES v_store_1) = v_tableinst_1) /\ ((store__MEMS v_store_1) = v_meminst_1) /\ ((store__GLOBALS v_store_1) = v_globalinst_1) /\ ((store__FUNCS v_store_2) = (@app _ v_funcinst_1 v_funcinst_2)) /\ ((store__TABLES v_store_2) = (@app _ v_tableinst_1 v_tableinst_2)) /\ ((store__MEMS v_store_2) = (@app _ v_meminst_1 v_meminst_2)) /\ ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1 v_globalinst_2)) /\ List.Forall (fun '(v_funcinst_1, v_funcinst_2) => (Func_extension v_funcinst_1 v_funcinst_2)) (combine (v_funcinst_1) (v_funcinst_2)) /\ List.Forall (fun '(v_tableinst_1, v_tableinst_2) => (Table_extension v_tableinst_1 v_tableinst_2)) (combine (v_tableinst_1) (v_tableinst_2)) /\ List.Forall (fun '(v_meminst_1, v_meminst_2) => (Mem_extension v_meminst_1 v_meminst_2)) (combine (v_meminst_1) (v_meminst_2)) /\ List.Forall (fun '(v_globalinst_1, v_globalinst_2) => (Global_extension v_globalinst_1 v_globalinst_2)) (combine (v_globalinst_1) (v_globalinst_2)) -> Store_extension v_store_1 v_store_2.
-
-
+	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_1' : (list funcinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_1' : (list tableinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_1' : (list meminst)) (v_meminst_2 : (list meminst)) (v_globalinst_1' : (list globalinst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_1')) /\ ((List.length v_tableinst_1) = (List.length v_tableinst_1')) /\ ((List.length v_meminst_1) = (List.length v_meminst_1')) /\ ((List.length v_globalinst_1) = (List.length v_globalinst_1')) /\ ((store__FUNCS v_store_1) = v_funcinst_1) /\ ((store__TABLES v_store_1) = v_tableinst_1) /\ ((store__MEMS v_store_1) = v_meminst_1) /\ ((store__GLOBALS v_store_1) = v_globalinst_1) /\ ((store__FUNCS v_store_2) = (@app _ v_funcinst_1' v_funcinst_2)) /\ ((store__TABLES v_store_2) = (@app _ v_tableinst_1' v_tableinst_2)) /\ ((store__MEMS v_store_2) = (@app _ v_meminst_1' v_meminst_2)) /\ ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1' v_globalinst_2)) /\ List.Forall2 (fun v_funcinst_1 v_funcinst_1' => (Func_extension v_funcinst_1 v_funcinst_1')) (v_funcinst_1) (v_funcinst_1') /\ List.Forall2 (fun v_tableinst_1 v_tableinst_1' => (Table_extension v_tableinst_1 v_tableinst_1')) (v_tableinst_1) (v_tableinst_1') /\ List.Forall2 (fun v_meminst_1 v_meminst_1' => (Mem_extension v_meminst_1 v_meminst_1')) (v_meminst_1) (v_meminst_1') /\ List.Forall2 (fun v_globalinst_1 v_globalinst_1' => (Global_extension v_globalinst_1 v_globalinst_1')) (v_globalinst_1) (v_globalinst_1') -> Store_extension v_store_1 v_store_2.
+   
 (* Proof Start *)
 
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq.
 (* Utility lemmas *)
+
+Ltac decomp :=
+repeat lazymatch goal with
+	| H: _ /\ _ |- _ => 
+		destruct H
+		
+end.
 
 
 (** Similar to [set (name := term)], but introduce an equality instead of a local definition. **)
@@ -1823,6 +1831,115 @@ Ltac gen_ind_subst H :=
   subst;
   gen_ind_post.
 
+Definition typeof (v_val : val): valtype :=
+	match v_val with
+		| val__CONST t _ => t
+	end.
+
+Lemma list_update_func_split : forall {A : Type} (x x' : list A) (idx : nat) (f : A -> A),
+	x' = list_update_func x idx f ->
+	(exists y, In (f y) x') \/ x = x'.
+Proof. 
+	move => A x x' idx f H.
+	generalize dependent idx.
+	generalize dependent x'.
+	induction x.
+	- right. rewrite H => //.
+	- move => x' idx H. destruct idx. 
+		- left. exists a. rewrite H. apply in_eq.
+		- destruct x'.
+			- discriminate.
+			- injection H as H2. apply IHx in H.
+				destruct H.
+				- destruct H. left. exists x0. apply List.in_cons => //.
+				- right. by f_equal.
+Qed.
+
+Lemma length_app_lt: forall {A : Type} (l l' l1' l2': list A),
+	length l = length l1' ->
+	l' = l1' ++ l2' -> 
+	(length l <= length l')%coq_nat.
+Proof.
+	move => A l l' l1' l2' HLength HApp.
+
+	apply f_equal with (f := fun t => length t) in HApp.
+	rewrite List.app_length in HApp.
+	rewrite <- HLength in HApp.
+	symmetry in HApp.
+	generalize dependent l2'.
+	generalize dependent l'.
+	clear HLength.
+	induction l; move => l' l2' HApp.
+	- simpl. apply Nat.le_0_l.
+	- destruct l' => //. simpl in HApp. 
+		injection HApp as H.
+		apply IHl in H.
+		simpl. apply le_n_S. apply H.
+Qed.  
+
+Lemma Forall2_nth {A : Type} {B : Type} (l : list A) (l' : list B) (R : A -> B -> Prop) :
+      Forall2 R l l' -> length l = length l' /\ (forall i d d', (i < length l)%coq_nat -> R (List.nth i l d) (List.nth i l' d')).
+Proof.
+	move => H.
+	split. apply (Forall2_length) in H. apply H.
+	move => i d d' H'.
+	generalize dependent i. induction H; move => i HLength. 
+		+ apply Nat.nlt_0_r in HLength. exfalso. apply HLength.
+		+ destruct i. 
+			+ simpl. apply H.
+			+ simpl in HLength. apply Nat.succ_lt_mono in HLength. apply IHForall2. apply HLength.
+Qed.
+
+Lemma Forall2_nth2 {A : Type} {B : Type} (l : list A) (l' : list B) (R : A -> B -> Prop) :
+      Forall2 R l l' -> length l = length l' /\ (forall i d d', (i < length l')%coq_nat -> R (List.nth i l d) (List.nth i l' d')).
+Proof.
+	move => H.
+	split. apply (Forall2_length) in H. apply H.
+	move => i d d' H'.
+	generalize dependent i. induction H; move => i HLength. 
+		+ apply Nat.nlt_0_r in HLength. exfalso. apply HLength.
+		+ destruct i. 
+			+ simpl. apply H.
+			+ simpl in HLength. apply Nat.succ_lt_mono in HLength. apply IHForall2. apply HLength.
+Qed.
+
+Lemma Forall2_lookup {A : Type} {X : Inhabited A} {B : Type} {Y : Inhabited B} (l : list A) (l' : list B) (R : A -> B -> Prop) :
+      Forall2 R l l' -> length l = length l' /\ (forall i, (i < length l)%coq_nat -> R (lookup_total l i) (lookup_total l' i)).
+Proof.
+	move => H.
+	split. apply (Forall2_length) in H. apply H.
+	move => i H'.
+	generalize dependent i. induction H; move => i HLength. 
+		+ apply Nat.nlt_0_r in HLength. exfalso. apply HLength.
+		+ destruct i. 
+			+ simpl. apply H.
+			+ simpl in HLength. apply Nat.succ_lt_mono in HLength. apply IHForall2. apply HLength.
+Qed.
+
+Lemma Forall2_lookup2 {A : Type} {X : Inhabited A} {B : Type} {Y : Inhabited B} (l : list A) (l' : list B) (R : A -> B -> Prop) :
+      Forall2 R l l' -> length l = length l' /\ (forall i, (i < length l')%coq_nat -> R (lookup_total l i) (lookup_total l' i)).
+Proof.
+	move => H.
+	split. apply (Forall2_length) in H. apply H.
+	move => i H'.
+	generalize dependent i. induction H; move => i HLength. 
+		+ apply Nat.nlt_0_r in HLength. exfalso. apply HLength.
+		+ destruct i. 
+			+ simpl. apply H.
+			+ simpl in HLength. apply Nat.succ_lt_mono in HLength. apply IHForall2. apply HLength.
+Qed.
+
+Lemma list_update_length: forall {A : Type} (l : list A) (i : nat) (x : A),
+	length (list_update l i x) = length l.
+Proof.
+	move => A l i x.
+	generalize dependent l.
+	generalize dependent x.
+	induction i; move => x l.
+	- destruct l => //=.
+	- destruct l => //=.
+		f_equal. apply IHi.
+Qed.
 
 Lemma split_append_last : forall {A : Type} (z : list A) (y : list A) (i : A) (j : A),
 	@app _ z [i] = @app _ y [j] ->
@@ -1839,7 +1956,6 @@ Proof.
 	move => A j k.
 	done.
 Qed.
-
 
 Lemma split_append_1 : forall {A : Type} (z : list A) (i : A) (j : A),
 	@app _ z [i] = [j] ->
@@ -2172,8 +2288,28 @@ Proof.
 	exists (v_t ++ x), x0. by repeat split => //=; rewrite <- app_assoc.
 Qed.
 
-Definition upd_label C lab :=
-	C <| context__LABELS := lab |>.
+Definition upd_label C labs :=
+	C <| context__LABELS := labs |>.
+
+Definition upd_local C locs :=
+	C <| context__LOCALS := locs |>.
+
+Definition upd_return C ret :=
+	C <| context__RETURN := ret |>.
+
+Definition upd_local_return C loc ret :=
+	upd_return (upd_local C loc) ret. 
+
+Ltac fold_upd_context :=
+	lazymatch goal with
+	| |- context [upd_local (upd_return ?C ?ret) ?loc] =>
+		replace (upd_local (upd_return C ret) loc) with
+			(upd_local_return C ret loc); try by destruct C
+	| |- context [upd_return (upd_local ?C ?ret) ?loc] =>
+		replace (upd_return (upd_local C ret) loc) with
+			(upd_local_return C ret loc); try by destruct C
+	end.
+	  
 
 Lemma _append_option_none: forall {A : Type} (c : option A) ,
 	_append c None = c.
@@ -2192,11 +2328,27 @@ Proof.
 Qed.
 
 Lemma upd_label_is_same_as_append: forall v_C lab,
-	v_C <| context__LABELS := (_append lab (context__LABELS v_C)) |> = _append {| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := lab; context__RETURN := None |} v_C.
+	upd_label v_C (_append lab (context__LABELS v_C)) = _append {| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := lab; context__RETURN := None |} v_C.
 Proof.
-	move => v_C lab.
-	unfold set. unfold _append. unfold Append_context. unfold _append_context. simpl. 
-	repeat rewrite app_nil_r. unfold Append_List_. rewrite _append_option_none_left. reflexivity.
+	move => v_C lab. reflexivity.
+Qed.
+
+Lemma upd_local_is_same_as_append: forall v_C loc,
+	upd_local v_C (_append loc (context__LOCALS v_C))  = _append {| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := loc; context__LABELS := []; context__RETURN := None |} v_C.
+Proof.
+	move => v_C loc. reflexivity.
+Qed.
+
+Lemma upd_local_return_is_same_as_append: forall v_C loc ret,
+	upd_local_return v_C (_append loc (context__LOCALS v_C)) (_append ret (context__RETURN v_C)) 
+	= upd_return (upd_local v_C (_append loc (context__LOCALS v_C))) (_append ret (context__RETURN ((upd_local v_C (_append loc (context__LOCALS v_C)))))).
+Proof. reflexivity. Qed.
+
+
+Lemma upd_return_is_same_as_append: forall v_C ret,
+	upd_return v_C (_append ret (context__RETURN v_C)) = _append {| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := ret |} v_C.
+Proof.
+	move => v_C ret. reflexivity.
 Qed.
 
 Lemma If_typing: forall v_S v_C t1s v_ais1 v_ais2 ts ts',
@@ -2306,7 +2458,22 @@ Proof.
 		- (* Instr *) inversion H; subst; try discriminate.
 		- (* Label *) destruct H. exists v_t_1, v_t_2. repeat split => //=.
 		- (* Weakening *) edestruct IHHType as [? [? [? [? ?]]]] => //=; subst. exists x, x0. by repeat split => //=; try rewrite <- app_assoc.
-Qed. 
+Qed.
+
+Lemma Set_local_typing: forall v_S C i t1s t2s,
+    Admin_instr_ok v_S C (admininstr__LOCAL_SET i) (functype__ t1s t2s) ->
+    exists t, lookup_total (context__LOCALS C) i = t /\
+    t1s = t2s ++ [t] /\
+    (i < length (context__LOCALS C))%coq_nat.
+Proof.
+	move => v_S C i t1s t2s HType.
+	gen_ind_subst HType => //=.
+		- (* Set Local *) inversion H; subst; try discriminate. destruct H4.
+			injection H3 as H2. exists v_t. subst; repeat split => //.
+		- (* Weakening *) edestruct IHHType as [? [? [? ?]]] => //=; subst.
+		exists (lookup_total (context__LOCALS C) i).
+		by repeat split => //=; try rewrite <- app_assoc.
+Qed.
 
 Lemma upd_label_unchanged: forall C lab,
     context__LABELS C = lab ->
@@ -2531,7 +2698,7 @@ Proof.
 	apply H4.
 Qed.
 
-(* Lemma Step_pure__label_vals_preserves : forall v_S v_C (v_n : n) (v_instr : (list instr)) (v_val : (list val)) v_func_type,
+Lemma Step_pure__label_vals_preserves : forall v_S v_C (v_n : n) (v_instr : (list instr)) (v_val : (list val)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr (list__val__admininstr v_val))] v_func_type ->
 	Step_pure [(admininstr__LABEL_ v_n v_instr (list__val__admininstr v_val))] (list__val__admininstr v_val) ->
 	Admin_instrs_ok v_S v_C (list__val__admininstr v_val) v_func_type.
@@ -2543,11 +2710,11 @@ Proof.
 	subst.
 	repeat rewrite -> app_assoc.
 	apply admin_instrs_weakening_empty_1.
+Admitted.
 
-Qed. *)
 
 
-(* Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
+Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] v_func_type ->
 	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) v_func_type.
@@ -2566,11 +2733,7 @@ Proof.
 	rewrite H0.
 	apply (Admin_instrs_ok__seq v_S v_C [] (v_instr0) [] v_t_2 []); split.
 	apply Admin_instrs_ok__empty. 
-	
-	
-	
-
-Admitted. *)
+Admitted.
 
 Lemma Step_pure__br_succ_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] v_func_type ->
@@ -2906,6 +3069,367 @@ Proof.
 		apply Instr_ok__local_set; split => //=.
 Qed.
 
+Lemma func_extension_same: forall f,
+	Forall2 (fun v s => Func_extension v s) f f.
+Proof.
+	move => f.
+	induction f => //.
+	apply Forall2_cons_iff. split.
+	- apply Func_extension__.
+	- apply IHf.
+Qed.
+
+Lemma table_extension_same: forall t,
+	Forall2 (fun v s => Table_extension v s) t t.
+Proof.
+	move => t.
+	induction t => //.
+	apply Forall2_cons_iff. split.
+	- induction a. induction tableinst__TYPE0. apply Table_extension__ => //.
+	- apply IHt.
+Qed.
+
+Lemma mem_extension_same: forall m,
+	Forall2 (fun v s => Mem_extension v s) m m.
+Proof.
+	move => m.
+	induction m => //.
+	apply Forall2_cons_iff. split.
+	- induction a. induction meminst__TYPE0. apply Mem_extension__ => //.
+	- apply IHm.
+Qed.
+
+Lemma global_extension_same: forall g,
+	Forall2 (fun v s => Global_extension v s) g g.
+Proof.
+	move => g.
+	induction g => //.
+	apply Forall2_cons_iff. split.
+	- induction a. induction globalinst__VALUE0. apply Global_extension__.
+	- apply IHg.
+Qed.
+
+Lemma store_extension_same: forall s,
+    Store_extension s s.
+Proof.
+  move => s. 
+  apply (Store_extension__ s s (store__FUNCS s) (store__TABLES s) (store__MEMS s) (store__GLOBALS s) (store__FUNCS s) [] (store__TABLES s) [] (store__MEMS s) [] (store__GLOBALS s) []).
+  repeat (split => //; try rewrite -> app_nil_r).
+  + by apply func_extension_same.
+  + by apply table_extension_same.
+  + by apply mem_extension_same.
+  + by apply global_extension_same.
+Qed.
+
+Lemma config_same: forall s f ais s' f' ais',
+	(config__ (state__ s f) ais) = (config__ (state__ s' f') ais') ->
+	s = s' /\ f = f' /\ ais = ais'.
+Proof.
+	move => s f ais s' f' ais' H.
+	injection H as H1 => //=.
+Qed.
+
+Lemma store_extension_reduce: forall s f ais s' f' ais' C tf loc lab ret,
+    Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
+    Module_instance_ok s (frame__MODULE f) C ->
+    Admin_instrs_ok s (upd_label (upd_local_return C loc ret) lab) ais tf ->
+    Store_ok s ->
+    Store_extension s s' /\ Store_ok s'.
+Proof.
+	move => s f ais s' f' ais' C tf loc lab ret HReduce HIT HType HStore.
+	remember (config__ (state__ s f) ais) as c1.
+	remember (config__ (state__ s' f') ais') as c2.
+	induction HReduce;
+	induction v_z; 
+	apply config_same in Heqc1; apply config_same in Heqc2; 
+	destruct Heqc1; destruct Heqc2;
+	subst; try (split => //; apply store_extension_same).
+	- (* Global Set *) unfold set. split.
+	- (* Store Num Val *)
+	- (* Store Pack Val *)
+	- (* Memory Grow Succeed *)
+Admitted.
+
+	
+Lemma func_agree_extension: forall v_S v_S' v_funcaddr v_funcinst_1' v_funcinst_2 v_functype,
+	Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC v_functype) ->
+	length (store__FUNCS v_S) = length v_funcinst_1' ->
+	store__FUNCS v_S' = (v_funcinst_1' ++ v_funcinst_2)%list -> 
+    Forall2 (fun v s => Func_extension v s) (store__FUNCS v_S) v_funcinst_1' ->
+    Externvals_ok v_S' (externval__FUNC v_funcaddr) (externtype__FUNC v_functype).
+Proof.
+	move => v_S v_S' v_funcaddr v_funcinst_1' v_funcinst_2 v_functype HOk HLength HApp Hext.
+	inversion HOk; destruct H2; subst.
+	apply Forall2_nth in Hext; destruct Hext.
+	apply (H0 _ default_val default_val) in H2 as H2'.
+	unfold lookup_total in H3.
+	apply (Externvals_ok__func _ _ _ v_minst v_code_func).
+	apply (length_app_lt) with (l':=(store__FUNCS v_S')) (l2':= v_funcinst_2) in HLength => //=.
+	split. 
+	- apply (Nat.lt_le_trans _ _ _ H2 HLength).
+	- unfold lookup_total.
+		rewrite H in H2.
+		apply app_nth1 with (l' := v_funcinst_2) (d := default_val) in H2.
+		rewrite <- HApp in H2.
+		induction default_val.
+		inversion H2'.
+		rewrite H2. 
+		rewrite <- H5.
+		apply H3.
+Qed.
+
+Lemma func_extension_C: forall v_S v_S' v_funcaddrs v_funcinst_1' v_funcinst_2 tcf,
+    Forall2 (fun v s => Externvals_ok v_S (externval__FUNC v) (externtype__FUNC s)) v_funcaddrs tcf ->
+	length (store__FUNCS v_S) = length v_funcinst_1' ->
+	store__FUNCS v_S' = (v_funcinst_1' ++ v_funcinst_2)%list -> 
+	Forall2 (fun v s => Func_extension v s) (store__FUNCS v_S) v_funcinst_1' ->
+    Forall2 (fun v s => Externvals_ok v_S' (externval__FUNC v) (externtype__FUNC s)) v_funcaddrs tcf.
+Proof.
+	move => v_S v_S' v_funcaddrs v_funcinst_1' v_funcinst_2.
+	move: v_S v_S'.
+	induction v_funcaddrs;
+	move => v_S v_S' tcf HOk Hlength HApp Hext => //=; destruct tcf => //=; simpl in HOk; try (apply Forall2_length in HOk; discriminate).
+	subst.
+	apply Forall2_cons_iff. split.
+	- inversion HOk; subst. apply (func_agree_extension v_S) with (v_funcinst_1' := v_funcinst_1') (v_funcinst_2 := v_funcinst_2) => //.
+	- eapply IHv_funcaddrs. inversion HOk. apply H4. apply Hlength. apply HApp. apply Hext.
+Qed. 	
+
+Lemma module_inst_typing_extension: forall v_S v_S' v_i v_C,
+    Store_extension v_S v_S' ->
+    Module_instance_ok v_S v_i v_C ->
+    Module_instance_ok v_S' v_i v_C.
+Proof.
+	move => v_S v_S' v_i v_C HStoreExtension HMIT.
+	inversion HStoreExtension. 
+	inversion HMIT; decomp.
+	subst.
+	apply Module_instance_ok__; repeat split => //=.
+	- apply (func_extension_C v_S) with (v_funcinst_1' := v_funcinst_1') (v_funcinst_2 := v_funcinst_2)  => //=.
+	-
+	-
+	-
+	-
+Admitted. 
+
+Lemma inst_t_context_local_empty: forall s i C,
+	Module_instance_ok s i C ->
+    context__LOCALS C = [].
+Proof.
+	move => s i C HMInst. inversion HMInst => //=.
+Qed.
+
+Lemma inst_t_context_labels_empty: forall s i C,
+	Module_instance_ok s i C ->
+    context__LABELS C = [].
+Proof.
+	move => s i C HMInst. inversion HMInst => //=.
+Qed.
+
+Lemma list_update_same_unchanged: forall {X : Type} {Y : Inhabited X} (l: list X) e i,
+    (lookup_total l i) = e ->
+	(i < length l)%coq_nat ->
+    list_update l i e = l.
+Proof.
+	move => X Y l e i.
+	generalize dependent l. generalize dependent e.
+	induction i; move => e l HLookup HLT.
+	- destruct l => //=. by f_equal.
+	- destruct l => //=.
+	f_equal. apply IHi. unfold lookup_total. unfold lookup_total in HLookup. simpl in HLookup. apply HLookup.
+	by apply Nat.succ_lt_mono.
+Qed.
+
+Lemma list_update_map: forall {X Y:Type} (l:list X) i val {f: X -> Y},
+    (i < length l)%coq_nat ->
+    List.map f (list_update l i val) = list_update (List.map f l) i (f val).
+Proof.
+	move => X Y l i val.
+	generalize dependent l. generalize dependent val.
+	induction i; move => val l f HSize => //=.
+  	- by destruct l => //=.
+  	- destruct l => //=.
+    	f_equal.
+    	apply IHi.
+		simpl in HSize. by apply Nat.succ_lt_mono.
+Qed.
+	
+Lemma Forall2_Val_ok_is_same_as_map: forall v_t1 v_local_vals,
+	Forall2 (fun v s => Val_ok s v) v_t1 v_local_vals <->
+	List.map typeof v_local_vals = v_t1.
+Proof.
+	split.
+	- move => H.
+		generalize dependent v_local_vals.
+		induction v_t1; move => v_local_vals H; destruct v_local_vals => //=; inversion H.
+		subst. f_equal. 
+		- inversion H3 => //=.
+		- by apply IHv_t1.
+	- move => H.
+		generalize dependent v_local_vals.
+		induction v_t1; move => v_local_vals H; destruct v_local_vals => //=.
+		simpl in H. inversion H.
+		apply Forall2_cons. 
+		- induction v. apply Val_ok__.
+		- rewrite H2. by apply IHv_t1.
+Qed. 
+
+
+Lemma t_preservation_vs_type: forall s f ais s' f' ais' C C' v_t1 lab ret t1s t2s,
+    Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
+    Store_ok s -> 
+	Store_ok s' ->
+    Module_instance_ok s (frame__MODULE f) C ->
+    Module_instance_ok s' (frame__MODULE f') C' ->
+	v_t1 = (context__LOCALS (upd_label (upd_local_return C (v_t1 ++ (context__LOCALS C)) ret) lab)) -> 
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS f) ->
+    Admin_instrs_ok s (upd_label (upd_local_return C (v_t1 ++ (context__LOCALS C)) ret) lab) ais (functype__ t1s t2s) ->
+    Forall2 (fun v_t v_val0 => Val_ok v_val0 v_t) v_t1 (frame__LOCALS f') 
+	/\ length v_t1 = length (frame__LOCALS f').
+Proof.
+	move => s f ais s' f' ais' C C' v_t1 
+		lab ret t1s t2s HReduce HStore HStore' HMInst HMInst' HValTypeEq HValOK HType.
+	remember (config__ (state__ s f) ais) as c1.
+	remember (config__ (state__ s' f') ais') as c2.
+	inversion HReduce; induction v_z; subst; try (apply config_same in H0; apply config_same in H1; 
+								destruct H0 as [Hbefore1 [Hbefore2 Hbefore3]]; 
+								destruct H1 as [Hafter1 [Hafter2 Hafter3]]; split; subst => //; try apply Forall2_length in HValOK => //).
+	- (* Local Set *)
+		rewrite -> Forall2_Val_ok_is_same_as_map in HValOK; rewrite -> Forall2_Val_ok_is_same_as_map.
+		injection H as H1. injection H0 as H1'; subst. 
+		simpl.
+		induction v_val.
+		apply_composition_typing HType.
+		apply AI_const_typing in  H4_comp0.
+		apply_composition_typing_single H4_comp.
+		apply Set_local_typing in H4_comp1; destruct H4_comp1 as [t [HLookup [H0' H1']]].
+		subst.
+		repeat rewrite -> app_assoc in H1_comp1; apply split_append_last in H1_comp1; destruct H1_comp1.
+		replace (context__LOCALS C) with ([::]: list valtype) in *; last by symmetry; eapply inst_t_context_local_empty; eauto.
+		rewrite -> cats0 in *.
+		simpl in H1'; simpl in H0. rewrite -> List.map_length in H1'. 
+		apply list_update_map with (f := typeof) (val := (val__CONST v_valtype v_val_)) in H1' as HUpdate.
+		rewrite HUpdate.
+		split => //=. rewrite list_update_same_unchanged => //=; try rewrite List.map_length => //=.
+		rewrite List.map_length; by rewrite list_update_length.
+	- (* Global Set *)
+		unfold fun_with_global in H0. apply config_same in H0; destruct H0 as [Hstore [HFrame HInstrs]]. 
+		apply config_same in H; destruct H as [Hstore' [HFrame' HInstrs']].
+		subst. split => //=. apply Forall2_length in HValOK => //.
+	- (* Memory Grow *)
+		apply config_same in H0; destruct H0 as [Hstore [HFrame HInstrs]]. 
+		apply config_same in H; destruct H as [Hstore' [HFrame' HInstrs']].
+		subst. split => //=. apply Forall2_length in HValOK => //.
+Qed.
+	
+Lemma reduce_inst_unchanged: forall s f ais s' f' ais',
+    Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
+    frame__MODULE f = frame__MODULE f'.
+Proof.
+	move => s f ais s' f' ais' HReduce.
+	remember (config__ (state__ s f) ais) as c1.
+	remember (config__ (state__ s' f') ais') as c2.
+	induction HReduce; induction v_z; apply config_same in Heqc1;
+	apply config_same in Heqc2; destruct Heqc1 as [? [? ?]];
+	destruct Heqc2 as [? [? ?]];
+	subst => //.
+Qed.
+
+Theorem t_pure_preservation: forall v_s v_minst v_ais v_ais' v_C loc lab ret tf,
+    Module_instance_ok v_s v_minst v_C ->
+    Admin_instrs_ok v_s (upd_label (upd_local_return v_C loc ret) lab) v_ais tf ->
+    Step_pure v_ais v_ais' ->
+    Admin_instrs_ok v_s (upd_label (upd_local_return v_C loc ret) lab) v_ais' tf.
+Proof.
+	move => v_s v_minst v_ais v_ais' v_C loc lab ret tf HInstType HType HReduce.
+	inversion HReduce; subst.
+	- by apply Step_pure__unreachable_preserves.
+	- by apply Step_pure__nop_preserves.
+	- by apply Step_pure__drop_preserves with (v_val := v_val).
+	- by apply Step_pure__select_true_preserves with (v_val_2 := v_val_2) (v_c := v_c).
+	- by apply Step_pure__select_false_preserves with (v_val_1 := v_val_1) (v_c := v_c).
+	- by apply Step_pure__if_true_preserves with (v_instr_2 := v_instr_2) (v_c := v_c).
+	- by apply Step_pure__if_false_preserves with (v_instr_1 := v_instr_1) (v_c := v_c).
+	- by apply Step_pure__label_vals_preserves with (v_n := v_n) (v_instr := v_instr).
+	- by apply Step_pure__br_zero_preserves with (v_n := v_n) (v_instr := v_instr) (v_val' := v_val') .
+	- by apply Step_pure__br_succ_preserves with (v_n := v_n) (v_instr := v_instr) (v_instr' := v_instr').
+	- by apply Step_pure__br_if_true_preserves with (v_c := v_c).
+	- by apply Step_pure__br_if_false_preserves with (v_c := v_c) (v_l := v_l).
+	- by apply Step_pure__br_table_lt_preserves with (v_l' := v_l').
+	- by apply Step_pure__br_table_ge_preserves with (v_l' := v_l') (v_i := v_i) (v_l := v_l).
+	- by apply Step_pure__frame_vals_preserves with (v_n := v_n) (v_f := v_f).
+	- by apply Step_pure__return_frame_preserves with (v_n := v_n) (v_f := v_f) (v_val' := v_val') (v_instr := v_instr).
+	- by apply Step_pure__return_label_preserves with (v_n := v_n) (v_instr := v_instr) (v_instr' := v_instr').
+	- by apply Step_pure__unop_val_preserves with (v_c_1 := v_c_1) (v_unop := v_unop).
+	- by apply Step_pure__unop_trap_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_unop := v_unop).
+	- by apply Step_pure__binop_val_preserves with (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_binop := v_binop).
+	- by apply Step_pure__binop_trap_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_binop := v_binop).
+	- by apply Step_pure__testop_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_testop := v_testop).
+	- by apply Step_pure__relop_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_relop := v_relop).
+	- by apply Step_pure__cvtop_val_preserves with (v_t_1 := v_t_1) (v_c_1 := v_c_1) (v_cvtop := v_cvtop) (v_sx := v_sx).
+	- by apply Step_pure__cvtop_trap_preserves with (v_t_1 := v_t_1) (v_c_1 := v_c_1) (v_t_2 := v_t_2) (v_cvtop := v_cvtop) (v_sx := v_sx).
+	- by apply Step_pure__local_tee_preserves.
+Qed.
+
+Lemma t_read_preservation: forall v_s v_f v_ais v_ais' v_C v_t1 t1s t2s lab ret,
+    Step_read (config__ (state__ v_s v_f) v_ais) v_ais' ->
+    Store_ok v_s ->
+    Module_instance_ok v_s (frame__MODULE v_f) v_C ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS v_f) ->
+    Admin_instrs_ok v_s (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) v_ais (functype__ t1s t2s) ->
+    Admin_instrs_ok v_s (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) v_ais' (functype__ t1s t2s).
+Proof.
+	move => v_s v_f v_ais v_ais' v_C v_t1 t1s t2s lab ret HReduce HST.
+	move: v_C ret lab t1s t2s.
+	remember (config__ (state__ v_s v_f) v_ais) as c1.
+	induction HReduce; move => C ret lab tx ty HIT1 HValOK HType; induction v_z; try eauto;
+	try (apply config_same in Heqc1; destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; subst => //).
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+	-
+Admitted. 
+
+Lemma t_preservation_type: forall v_s v_f v_ais v_s' v_f' v_ais' v_C v_t1 t1s t2s lab ret,
+    Step (config__ (state__ v_s v_f) v_ais) (config__ (state__ v_s' v_f') v_ais') ->
+    Store_ok v_s ->
+    Store_ok v_s' ->
+    Module_instance_ok v_s (frame__MODULE v_f) v_C ->
+    Module_instance_ok v_s' (frame__MODULE v_f) v_C ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS v_f) ->
+    Admin_instrs_ok v_s (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) v_ais (functype__ t1s t2s) ->
+    Admin_instrs_ok v_s' (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) v_ais' (functype__ t1s t2s).
+Proof.
+	move => v_s v_f v_ais v_s' v_f' v_ais' v_C v_t1 t1s t2s lab ret HReduce HST1 HST2.
+	move: v_C ret lab t1s t2s.
+	remember (config__ (state__ v_s v_f) v_ais) as c1.
+	remember (config__ (state__ v_s' v_f') v_ais') as c2.
+	induction HReduce; move => C ret lab tx ty HIT1 HIT2 HValOK HType; induction v_z; try eauto;
+	try (apply config_same in Heqc1; apply config_same in Heqc2; 
+		destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; 
+		destruct Heqc2 as [Hafter1 [Hafter2 Hafter3]]; subst => //).
+	- (* Step_pure *) apply t_pure_preservation with (v_minst := (frame__MODULE v_f')) (v_ais := (list__instr__admininstr v_instr)) => //=.
+	- (* Step_read *) apply t_read_preservation with (v_f := v_f') (v_ais := (list__instr__admininstr v_instr)) => //=.
+	- (* Local set *)
+	- (* Global set *)
+	- (* Store Num Trap *)
+	- (* Store Num Val *)
+	- (* Store Pack Trap *)
+	- (* Store Pack Val *)
+	- (* Memory Grow Succeed *)
+	- (* Memory Grow Fail *)
+	
+Admitted.
+
 (* Ultimate goal of project *)				
 Theorem t_preservation: forall c1 ts c2,
 	Step c1 c2 ->
@@ -2913,6 +3437,50 @@ Theorem t_preservation: forall c1 ts c2,
 	Config_ok c2 ts.
 Proof.
 	move => c1 ts c2 HReduce HType.
-	inversion HType.
-	
-Admitted.
+	induction c1; induction v_state.
+	induction c2. induction v_state.
+	inversion HType; destruct H3.
+	inversion H4; destruct H5.
+	rewrite <- upd_return_is_same_as_append in H11.
+	inversion H5. destruct H12 as [H0' [H1' H2']].
+	rewrite <- upd_local_is_same_as_append in H15.
+	subst.
+	rewrite <- upd_local_return_is_same_as_append in H11.
+	apply upd_label_unchanged_typing in H11.
+	assert (Store_extension v_store v_store0 /\ Store_ok v_store0).
+	{
+		apply (store_extension_reduce 
+			v_store  
+			{|frame__LOCALS := v_val;frame__MODULE := v_moduleinst|} 
+			v__ v_store0 v_frame0 v__0 v_C0 (functype__ [::] ts) 
+			(_append v_t1 (context__LOCALS v_C0)) 
+			(context__LABELS (upd_local_return v_C0 (_append v_t1 (context__LOCALS v_C0)) (_append (option_map [eta Some] None) (context__RETURN v_C0))))
+			(_append (option_map [eta Some] None) (context__RETURN v_C0))) => //.
+	}
+	destruct H.
+	apply reduce_inst_unchanged in HReduce as HModuleInst.
+	induction v_frame0.
+	simpl in HModuleInst.
+	remember {|frame__LOCALS := v_val;frame__MODULE := v_moduleinst|} as f.
+	assert (Module_instance_ok v_store0 v_moduleinst v_C0). { apply (module_inst_typing_extension v_store); eauto. }
+	apply Config_ok__; split => //=.
+	eapply Thread_ok__; split => //=.
+	rewrite <- HModuleInst.
+	eapply (Frame_ok__ v_store0 frame__LOCALS0 v_moduleinst v_C0 v_t1); eauto.
+	apply (t_preservation_vs_type) with (v_t1 := v_t1) (C := v_C0) (C' := v_C0) 
+		(lab:= (context__LABELS (upd_local_return v_C0 (_append v_t1 (context__LOCALS v_C0)) (_append (option_map [eta Some] None) (context__RETURN v_C0))))) 
+		(ret:= (_append (option_map [eta Some] None) (context__RETURN v_C0))) (t1s := []) (t2s := ts) in HReduce as H10; try destruct H10; try apply Forall2_length in H10; repeat split => //.
+	- apply H3.
+	- apply H0.
+	- by rewrite Heqf.
+	- by rewrite <- HModuleInst.
+	- simpl. apply inst_t_context_local_empty in H1. rewrite H1. by rewrite -> app_nil_r.
+	- by rewrite Heqf.
+	- apply H11.
+	(* Actual Typing proof *)
+	rewrite <- upd_return_is_same_as_append; simpl.
+	rewrite <- upd_local_is_same_as_append; simpl.
+	fold_upd_context.
+	rewrite -> _append_option_none_left.
+	eapply t_preservation_type; eauto; try rewrite -> Heqf; eauto.
+Qed.
