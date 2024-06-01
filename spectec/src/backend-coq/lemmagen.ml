@@ -47,24 +47,27 @@ let lemma_gen_step_pure_preservation (relation_id_to_relation : (name, coq_def) 
   String.concat ".\n\n" (List.map (fun ((case_id, binds), premises, end_terms) ->
     let (before_redux, after_redux) = split_reduction end_terms in
     let premises_gen = if premises <> [] then String.concat " ->\n\t" (List.map string_of_premise premises) ^ " ->\n\t" else "" in
-    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall v_S v_C " ^ string_of_binders binds ^ " " ^ function_type_var ^ ",\n\t" ^ 
+    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall va_S va_C " ^ string_of_binders binds ^ " " ^ function_type_var ^ ",\n\t" ^ 
     instr_ok_relation ^ " v_S v_C " ^ before_redux ^ " " ^ function_type_var ^ " ->\n\t" ^ 
     premises_gen ^
     instr_ok_relation ^ " v_S v_C " ^ after_redux ^ " " ^ function_type_var ^ ".\n" ^ proof_admitted
   ) relation_entries) ^ ".\n\n"
 
 
-let lemma_gen_step_read_preservation (relation_id_to_relation : (name, coq_def) Hashtbl.t) = 
+let _lemma_gen_step_read_preservation (relation_id_to_relation : (name, coq_def) Hashtbl.t) = 
   let (_, _, relation_entries) = get_inductive_relation (Hashtbl.find relation_id_to_relation step_read_relation) in
   String.concat ".\n\n" (List.map (fun ((case_id, binds), premises, end_terms) ->
     let (instrs, _, after_redux) = split_config_reduction end_terms in
+    let c' = "(upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)" in
+    let extra_vars = " " ^ function_type_var ^ " " ^ inst_var ^ " v_t1 lab ret " in
     let premises_gen = if premises <> [] then String.concat " ->\n\t" (List.map string_of_premise premises) ^ " ->\n\t" else "" in
-    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall v_S v_F v_C " ^ string_of_binders binds ^ " " ^ function_type_var ^ " " ^ inst_var ^ ",\n\t" ^ 
-    instr_ok_relation ^ " v_S v_C " ^ instrs ^ " " ^ function_type_var ^ " ->\n\t" ^ 
-    module_inst_relation ^ " v_S " ^ inst_var ^ " v_C ->\n\t" ^
-    "v_z = state__ v_S v_F ->\n\t" ^
+    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall v_S (va_f : frame) v_C " ^ string_of_binders binds ^ extra_vars ^ ",\n\t" ^ 
+    instr_ok_relation ^ " v_S " ^ c' ^ instrs ^ " " ^ function_type_var ^ " ->\n\t" ^ 
+    module_inst_relation ^ " v_S " ^ inst_var ^ " " ^ " v_C " ^ " ->\n\t" ^
+    "v_z = state__ v_S va_f ->\n\t" ^
     premises_gen ^
-    instr_ok_relation ^ " v_S v_C " ^ after_redux ^ " " ^ function_type_var ^ ".\n" ^ 
+    "Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS v_af) ->\n\t" ^ 
+    instr_ok_relation ^ " v_S " ^ c' ^ " " ^ after_redux ^ " " ^ function_type_var ^ ".\n" ^ 
     proof_admitted
   ) relation_entries) ^ ".\n\n"
   
@@ -72,5 +75,6 @@ let lemma_gen_step_read_preservation (relation_id_to_relation : (name, coq_def) 
 let lemma_gen (coq_ast : coq_script) : string =
   let relation_id_to_relation = Hashtbl.create 16 in
   List.iter (create_mapping relation_id_to_relation) coq_ast;
-  lemma_gen_step_pure_preservation relation_id_to_relation ^ 
-  lemma_gen_step_read_preservation relation_id_to_relation
+  lemma_gen_step_pure_preservation relation_id_to_relation
+  (* Won't compile since upd_label, etc. doesn't exist. However still useful for manual proof:
+  lemma_gen_step_read_preservation relation_id_to_relation *)
