@@ -177,7 +177,7 @@ let rec string_of_premise (prem : coq_premise) =
       let option_conversion = if iterator = I_option then "option_to_list " else "" in
       (match ids with
       | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v)
-      | [v; s] -> "List.Forall " ^ parens ("fun '(" ^ v ^ ", " ^ s ^ ") => " ^ string_of_premise p) ^ " " ^ parens ("combine " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s))
+      | [v; s] -> "List.Forall2 " ^ parens ("fun " ^ v ^ " " ^ s ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s)
       | _ -> assert false (* Should not happen *)
     )
     | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
