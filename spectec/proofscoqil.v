@@ -1595,6 +1595,9 @@ Inductive Step_pure: (list admininstr) -> (list admininstr) -> Prop :=
 	| Step_pure__frame_vals : forall (v_n : n) (v_f : frame) (v_val : (list val)), Step_pure [(admininstr__FRAME_ v_n v_f (list__val__admininstr v_val))] (list__val__admininstr v_val)
 	| Step_pure__return_frame : forall (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val)
 	| Step_pure__return_label : forall (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )])
+	| Step_pure__trap_vals : forall (v_val : (list val)) (v_instr : (list instr)), ((v_val <> []) \/ (v_instr <> [])) -> Step_pure (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] (list__instr__admininstr v_instr))) [(admininstr__TRAP )]
+	| Step_pure__trap_label : forall (v_n : n) (v_instr' : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' [(admininstr__TRAP )])] [(admininstr__TRAP )]
+	| Step_pure__trap_frame : forall (v_n : n) (v_f : frame), Step_pure [(admininstr__FRAME_ v_n v_f [(admininstr__TRAP )])] [(admininstr__TRAP )]
 	| Step_pure__unop_val : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_) (v_c : val_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = [(v_c : val_)]) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__CONST v_t (v_c : val_))]
 	| Step_pure__unop_trap : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = []) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__TRAP )]
 	| Step_pure__binop_val : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_binop : binop_) (v_c : val_), ((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = [(v_c : val_)]) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__CONST v_t (v_c : val_))]
@@ -1626,6 +1629,8 @@ Inductive Step_read: config -> (list admininstr) -> Prop :=
 Inductive Step: config -> config -> Prop :=
 	| Step__pure : forall (v_z : state) (v_instr : (list instr)) (v_instr' : (list instr)), (Step_pure (list__instr__admininstr v_instr) (list__instr__admininstr v_instr')) -> Step (config__ v_z (list__instr__admininstr v_instr)) (config__ v_z (list__instr__admininstr v_instr'))
 	| Step__read : forall (v_z : state) (v_instr : (list instr)) (v_instr' : (list instr)), (Step_read (config__ v_z (list__instr__admininstr v_instr)) (list__instr__admininstr v_instr')) -> Step (config__ v_z (list__instr__admininstr v_instr)) (config__ v_z (list__instr__admininstr v_instr'))
+	| Step__ctxt_label : forall (v_z : state) (v_n : n) (v_instr_0 : (list instr)) (v_instr : (list instr)) (v_z' : state) (v_instr' : (list instr)), (Step (config__ v_z (list__instr__admininstr v_instr)) (config__ v_z' (list__instr__admininstr v_instr'))) -> Step (config__ v_z [(admininstr__LABEL_ v_n v_instr_0 (list__instr__admininstr v_instr))]) (config__ v_z' [(admininstr__LABEL_ v_n v_instr_0 (list__instr__admininstr v_instr'))])
+	| Step__ctxt_frame : forall (v_s : store) (v_f : frame) (v_n : n) (v_f' : frame) (v_instr : (list instr)) (v_s' : store) (v_instr' : (list instr)), (Step (config__ (state__ v_s v_f') (list__instr__admininstr v_instr)) (config__ (state__ v_s' v_f') (list__instr__admininstr v_instr'))) -> Step (config__ (state__ v_s v_f) [(admininstr__FRAME_ v_n v_f' (list__instr__admininstr v_instr))]) (config__ (state__ v_s' v_f) [(admininstr__FRAME_ v_n v_f' (list__instr__admininstr v_instr'))])
 	| Step__local_set : forall (v_z : state) (v_val : val) (v_x : idx), Step (config__ v_z [(v_val : admininstr);(admininstr__LOCAL_SET v_x)]) (config__ (fun_with_local v_z v_x v_val) [])
 	| Step__global_set : forall (v_z : state) (v_val : val) (v_x : idx), Step (config__ v_z [(v_val : admininstr);(admininstr__GLOBAL_SET v_x)]) (config__ (fun_with_global v_z v_x v_val) [])
 	| Step__store_num_trap : forall (v_z : state) (v_i : nat) (v_t : valtype) (v_c : val_) (v_mo : memop), (((v_i + (memop__OFFSET v_mo)) + ((fun_size v_t) / 8)) > (List.length (meminst__BYTES (fun_mem v_z 0)))) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CONST v_t (v_c : val_));(admininstr__STORE v_t None v_mo)]) (config__ v_z [(admininstr__TRAP )])
@@ -2310,6 +2315,11 @@ Ltac fold_upd_context :=
 			(upd_local_return C ret loc); try by destruct C
 	end.
 	  
+Lemma upd_label_overwrite: forall C l1 l2,
+	upd_label (upd_label C l1) l2 = upd_label C l2.
+Proof.
+  by [].
+Qed.
 
 Lemma _append_option_none: forall {A : Type} (c : option A) ,
 	_append c None = c.
@@ -2460,6 +2470,19 @@ Proof.
 		- (* Weakening *) edestruct IHHType as [? [? [? [? ?]]]] => //=; subst. exists x, x0. by repeat split => //=; try rewrite <- app_assoc.
 Qed.
 
+Lemma Frame_typing: forall v_S v_C n v_F v_ais t1s t2s,
+    Admin_instr_ok v_S v_C (admininstr__FRAME_ n v_F v_ais) (functype__ t1s t2s) ->
+    exists (ts : resulttype), t2s = t1s ++ ts /\
+               Thread_ok v_S ts v_F v_ais ts.
+Proof.
+	move => v_S v_C n v_F v_ais t1s t2s HType.
+	gen_ind_subst HType => //=.
+	- (* Instr *) inversion H; subst; try discriminate.
+	- (* Frame *)  exists v_t => //=.
+	- (* Weakening *) edestruct IHHType as [ts2 [??]]; eauto. subst.
+		exists ts2. by repeat split => //=; try rewrite <- app_assoc.
+Qed.
+
 Lemma Set_local_typing: forall v_S C i t1s t2s,
     Admin_instr_ok v_S C (admininstr__LOCAL_SET i) (functype__ t1s t2s) ->
     exists t, lookup_total (context__LOCALS C) i = t /\
@@ -2490,37 +2513,6 @@ Proof.
   move => s C es tf HType.
   by rewrite upd_label_unchanged.
 Qed.
-
-Lemma t_Unop_preserve: forall v_S v_C v_v v_t v_unop_t v_bi v_tf,
-	Admin_instrs_ok v_S v_C [admininstr__CONST v_t v_v; admininstr__UNOP v_t v_unop_t] v_tf ->
-    Step_pure [admininstr__CONST v_t v_v; admininstr__UNOP v_t v_unop_t] [v_bi] ->
-    Admin_instrs_ok v_S v_C [v_bi] v_tf.
-Proof.
-	move => v_S v_C v t unop_op be tf HType HReduce.
-	destruct tf as [tf1 tf2].
-	
-	rewrite -cat1s in HType; subst.
-	apply admin_composition_typing_single in HType; destruct HType as [ts1 [ts2 [ts3 [ts4 [H1 [H3 [H4 H5]]]]]]].
-	rewrite -> app_left_nil in H4; subst.
-	apply admin_composition_typing_single in H4; destruct H4 as [ts5 [ts6 [ts7 [ts8 [H6 [H7 [H8 H9]]]]]]].
-	apply AI_const_typing in H9.
-	apply Unop_typing in H5; destruct H5 as [H10 [ts H11]]. 
-	apply admin_empty in H8; subst.
-	repeat rewrite app_assoc.
-	apply admin_instrs_weakening_empty_1.
-	inversion HReduce. subst.
-	- (* Success case *)
-		apply (Admin_instrs_ok__seq v_S v_C [] (admininstr__CONST t v_c) [] [t] []). split.
-		apply Admin_instrs_ok__empty.
-		apply (Admin_instr_ok__instr v_S v_C (instr__CONST t v_c) (functype__ [] [t])).
-		apply Instr_ok__const.
-	- (* Trap case *)
-		apply (Admin_instrs_ok__seq v_S v_C [] (admininstr__TRAP) [] [t] []). split.
-		apply Admin_instrs_ok__empty.
-		apply Admin_instr_ok__trap.
-Qed.
-
-
 
 (* Generated Lemmas *)
 
@@ -2865,6 +2857,25 @@ Lemma Step_pure__return_label_preserves : forall v_S v_C (v_n : n) (v_instr' : (
 Proof.
 Admitted.
 
+Lemma Step_pure__trap_vals_preserves : forall v_S v_C (v_val : (list val)) (v_instr : (list instr)) v_func_type,
+	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] (list__instr__admininstr v_instr))) v_func_type ->
+	((v_val <> []) \/ (v_instr <> [])) ->
+	Admin_instrs_ok v_S v_C [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_pure__trap_label_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' [(admininstr__TRAP )])] v_func_type ->
+	Admin_instrs_ok v_S v_C [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_pure__trap_frame_preserves : forall v_S v_C (v_n : n) (v_f : frame) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__FRAME_ v_n v_f [(admininstr__TRAP )])] v_func_type ->
+	Admin_instrs_ok v_S v_C [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
 Lemma Step_pure__unop_val_preserves : forall v_S v_C (v_t : valtype) (v_c_1 : val_) (v_unop : unop_) (v_c : val_) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] v_func_type ->
 	Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__CONST v_t (v_c : val_))] ->
@@ -3069,6 +3080,140 @@ Proof.
 		apply Instr_ok__local_set; split => //=.
 Qed.
 
+Lemma Step_read__block_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_t : (option valtype)) (v_instr : (list instr)) (v_n : n) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__BLOCK v_t v_instr)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(((v_t = None) /\ (v_n = 0)) \/ ((v_t <> None) /\ (v_n = 1))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__LABEL_ v_n [] (list__instr__admininstr v_instr))] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__loop_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_t : (option valtype)) (v_instr : (list instr)) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__LOOP v_t v_instr)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__LABEL_ 0 [(instr__LOOP v_t v_instr)] (list__instr__admininstr v_instr))] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__call_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_x : idx) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CALL v_x)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(v_x < (List.length (fun_funcaddr v_z)))%coq_nat ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__CALL_ADDR (lookup_total (fun_funcaddr v_z) v_x))] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__call_indirect_call_preserves : forall v_S (v_af : frame) v_C (v_z : state) (v_i : nat) (v_x : idx) (v_a : addr) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S v_af ->
+	(v_i < (List.length (tableinst__REFS (fun_table v_z 0))))%coq_nat ->
+	(v_a < (List.length (fun_funcinst v_z)))%coq_nat ->
+	((lookup_total (tableinst__REFS (fun_table v_z 0)) v_i) = (Some v_a)) ->
+	((fun_type v_z v_x) = (funcinst__TYPE (lookup_total (fun_funcinst v_z) v_a))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS v_af) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__CALL_ADDR v_a)] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__call_indirect_trap_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_i : nat) (v_x : idx) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(~(Step_read_before_Step_read__call_indirect_trap (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)]))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__call_addr_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_val : (list val)) (v_k : nat) (v_a : addr) (v_n : n) (v_f : frame) (v_instr : (list instr)) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)) (v_mm : moduleinst) (v_func : func) (v_x : idx) (v_t : (list valtype)) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)(@app _ (list__val__admininstr v_val) [(admininstr__CALL_ADDR v_a)]) v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(v_a < (List.length (fun_funcinst v_z)))%coq_nat ->
+	((lookup_total (fun_funcinst v_z) v_a) = {| funcinst__TYPE := (functype__ v_t_1 v_t_2); funcinst__MODULE := v_mm; funcinst__CODE := v_func |}) ->
+	(v_func = (func__FUNC v_x (List.map (fun v_t => (local__LOCAL v_t)) (v_t)) v_instr)) ->
+	(v_f = {| frame__LOCALS := (@app _ v_val (List.map (fun v_t => (fun_default_ v_t)) (v_t))); frame__MODULE := v_mm |}) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__FRAME_ v_n v_f [(admininstr__LABEL_ v_n [] (list__instr__admininstr v_instr))])] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__local_get_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_x : idx) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__LOCAL_GET v_x)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [((fun_local v_z v_x) : admininstr)] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__global_get_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_x : idx) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__GLOBAL_GET v_x)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [((globalinst__VALUE (fun_global v_z v_x)) : admininstr)] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__load_num_trap_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_i : nat) (v_t : valtype) (v_mo : memop) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__LOAD_ v_t None v_mo)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(((v_i + (memop__OFFSET v_mo)) + ((fun_size v_t) / 8)) > (List.length (meminst__BYTES (fun_mem v_z 0))))%coq_nat ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__load_num_val_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_i : nat) (v_t : valtype) (v_mo : memop) (v_c : val_) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__LOAD_ v_t None v_mo)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	((fun_bytes v_t (v_c : val_)) = (list_slice (meminst__BYTES (fun_mem v_z 0)) (v_i + (memop__OFFSET v_mo)) ((fun_size v_t) / 8))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__CONST v_t (v_c : val_))] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__load_pack_trap_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_i : nat) (v_inn : inn) (v_n : n) (v_sx : sx) (v_mo : memop) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__LOAD_ (valtype__INN v_inn) (Some ((packsize__ v_n), v_sx)) v_mo)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(((v_i + (memop__OFFSET v_mo)) + (v_n / 8)) > (List.length (meminst__BYTES (fun_mem v_z 0))))%coq_nat ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__TRAP )] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__load_pack_val_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_i : nat) (v_inn : inn) (v_n : n) (v_sx : sx) (v_mo : memop) (v_c : iN) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__LOAD_ (valtype__INN v_inn) (Some ((packsize__ v_n), v_sx)) v_mo)] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	((fun_ibytes v_n v_c) = (list_slice (meminst__BYTES (fun_mem v_z 0)) (v_i + (memop__OFFSET v_mo)) (v_n / 8))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__CONST (valtype__INN v_inn) (fun_ext v_n (fun_size (valtype__INN v_inn)) v_sx v_c))] v_func_type.
+Proof.
+Admitted.
+
+Lemma Step_read__memory_size_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_n : n) v_func_type v_minst v_t1 lab ret ,
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab)[(admininstr__MEMORY_SIZE )] v_func_type ->
+	Module_instance_ok v_S v_minst  v_C  ->
+	v_z = state__ v_S r_v_f ->
+	(((v_n * 64) * (fun_Ki )) = (List.length (meminst__BYTES (fun_mem v_z 0)))) ->
+	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
+	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__CONST (valtype__INN (inn__I32 )) (v_n : val_))] v_func_type.
+Proof.
+Admitted.
+
+
 Lemma func_extension_same: forall f,
 	Forall2 (fun v s => Func_extension v s) f f.
 Proof.
@@ -3129,6 +3274,14 @@ Proof.
 	injection H as H1 => //=.
 Qed.
 
+Lemma config_same2: forall s f ais s' f' ais',
+	s = s' /\ f = f' /\ ais = ais' ->
+ 	(config__ (state__ s f) ais) = (config__ (state__ s' f') ais').
+Proof.
+	move => s f ais s' f' ais' [? [? ?]].
+	f_equal => //=. f_equal => //=.
+Qed.
+
 Lemma store_extension_reduce: forall s f ais s' f' ais' C tf loc lab ret,
     Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
     Module_instance_ok s (frame__MODULE f) C ->
@@ -3139,11 +3292,37 @@ Proof.
 	move => s f ais s' f' ais' C tf loc lab ret HReduce HIT HType HStore.
 	remember (config__ (state__ s f) ais) as c1.
 	remember (config__ (state__ s' f') ais') as c2.
-	induction HReduce;
-	induction v_z; 
+	generalize dependent C. generalize dependent tf.
+  	generalize dependent loc. generalize dependent lab. generalize dependent ret.
+	generalize dependent ais. generalize dependent ais'. 
+	generalize dependent f. generalize dependent f'.
+	induction HReduce; try move => f' f ais' Heqc2 ais Heqc1 ret lab loc tf C HIT HType HST; try intros; destruct tf;
+	try (induction v_z; 
 	apply config_same in Heqc1; apply config_same in Heqc2; 
 	destruct Heqc1; destruct Heqc2;
-	subst; try (split => //; apply store_extension_same).
+	subst; try (split => //; apply store_extension_same)).
+	- (* Label Context *) 
+		injection Heqc1 as H1.
+		injection Heqc2 as H2.
+		rewrite <- H in HType.
+		apply_composition_typing_single HType.
+		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [? ?]]]]; subst.
+		rewrite upd_label_overwrite in H5; simpl in H5.
+		eapply IHHReduce; eauto.
+	- (* Label Frame *)
+		injection Heqc1 as H1.
+		injection Heqc2 as H2.
+		rewrite <- H0 in HType.
+		apply_composition_typing_single HType.
+		apply Frame_typing in H4_comp. destruct H4_comp as [ts [? ?]].
+		inversion H6; destruct H7.
+		inversion H7; destruct H14 as [? [? ?]]; subst.
+		simpl in H13.
+		rewrite <- upd_return_is_same_as_append in H13; simpl in H13.
+		rewrite <- upd_local_is_same_as_append in H13; simpl in H13.
+		rewrite -> _append_option_none_left in H13.
+		apply upd_label_unchanged_typing in H13.
+		eapply IHHReduce; eauto.
 	- (* Global Set *) unfold set. split.
 	- (* Store Num Val *)
 	- (* Store Pack Val *)
@@ -3291,13 +3470,22 @@ Proof.
 		lab ret t1s t2s HReduce HStore HStore' HMInst HMInst' HValTypeEq HValOK HType.
 	remember (config__ (state__ s f) ais) as c1.
 	remember (config__ (state__ s' f') ais') as c2.
-	inversion HReduce; induction v_z; subst; try (apply config_same in H0; apply config_same in H1; 
-								destruct H0 as [Hbefore1 [Hbefore2 Hbefore3]]; 
-								destruct H1 as [Hafter1 [Hafter2 Hafter3]]; split; subst => //; try apply Forall2_length in HValOK => //).
+	generalize dependent t2s. generalize dependent t1s.
+	generalize dependent lab. generalize dependent ais'. generalize dependent ais.
+	induction HReduce; try intros; try (induction v_z; subst); 
+	try (apply config_same in Heqc1; apply config_same in Heqc2; 
+		destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; 
+		destruct Heqc2 as [Hafter1 [Hafter2 Hafter3]]; split; subst => //; try apply Forall2_length in HValOK as ? => //).
+	- (* Label Context *)
+		injection Heqc1 as ?.
+		injection Heqc2 as ?; subst.
+		apply_composition_typing_single HType.
+		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [??]]]]; subst.
+		rewrite upd_label_overwrite in H1; simpl in H1.
+		simpl in HValTypeEq.
+		eapply IHHReduce; eauto.
 	- (* Local Set *)
 		rewrite -> Forall2_Val_ok_is_same_as_map in HValOK; rewrite -> Forall2_Val_ok_is_same_as_map.
-		injection H as H1. injection H0 as H1'; subst. 
-		simpl.
 		induction v_val.
 		apply_composition_typing HType.
 		apply AI_const_typing in  H4_comp0.
@@ -3310,16 +3498,8 @@ Proof.
 		simpl in H1'; simpl in H0. rewrite -> List.map_length in H1'. 
 		apply list_update_map with (f := typeof) (val := (val__CONST v_valtype v_val_)) in H1' as HUpdate.
 		rewrite HUpdate.
-		split => //=. rewrite list_update_same_unchanged => //=; try rewrite List.map_length => //=.
-		rewrite List.map_length; by rewrite list_update_length.
-	- (* Global Set *)
-		unfold fun_with_global in H0. apply config_same in H0; destruct H0 as [Hstore [HFrame HInstrs]]. 
-		apply config_same in H; destruct H as [Hstore' [HFrame' HInstrs']].
-		subst. split => //=. apply Forall2_length in HValOK => //.
-	- (* Memory Grow *)
-		apply config_same in H0; destruct H0 as [Hstore [HFrame HInstrs]]. 
-		apply config_same in H; destruct H as [Hstore' [HFrame' HInstrs']].
-		subst. split => //=. apply Forall2_length in HValOK => //.
+		rewrite list_update_same_unchanged => //=; try rewrite List.map_length => //=.
+		simpl. by rewrite list_update_length.
 Qed.
 	
 Lemma reduce_inst_unchanged: forall s f ais s' f' ais',
@@ -3329,10 +3509,11 @@ Proof.
 	move => s f ais s' f' ais' HReduce.
 	remember (config__ (state__ s f) ais) as c1.
 	remember (config__ (state__ s' f') ais') as c2.
-	induction HReduce; induction v_z; apply config_same in Heqc1;
+	generalize dependent ais. generalize dependent ais'.
+	induction HReduce; try intros; try (induction v_z); try induction v_z'; try (apply config_same in Heqc1;
 	apply config_same in Heqc2; destruct Heqc1 as [? [? ?]];
-	destruct Heqc2 as [? [? ?]];
-	subst => //.
+	destruct Heqc2 as [? [? ?]]; subst => //).
+	eapply IHHReduce; eauto.
 Qed.
 
 Theorem t_pure_preservation: forall v_s v_minst v_ais v_ais' v_C loc lab ret tf,
@@ -3343,32 +3524,35 @@ Theorem t_pure_preservation: forall v_s v_minst v_ais v_ais' v_C loc lab ret tf,
 Proof.
 	move => v_s v_minst v_ais v_ais' v_C loc lab ret tf HInstType HType HReduce.
 	inversion HReduce; subst.
-	- by apply Step_pure__unreachable_preserves.
-	- by apply Step_pure__nop_preserves.
-	- by apply Step_pure__drop_preserves with (v_val := v_val).
-	- by apply Step_pure__select_true_preserves with (v_val_2 := v_val_2) (v_c := v_c).
-	- by apply Step_pure__select_false_preserves with (v_val_1 := v_val_1) (v_c := v_c).
-	- by apply Step_pure__if_true_preserves with (v_instr_2 := v_instr_2) (v_c := v_c).
-	- by apply Step_pure__if_false_preserves with (v_instr_1 := v_instr_1) (v_c := v_c).
-	- by apply Step_pure__label_vals_preserves with (v_n := v_n) (v_instr := v_instr).
-	- by apply Step_pure__br_zero_preserves with (v_n := v_n) (v_instr := v_instr) (v_val' := v_val') .
-	- by apply Step_pure__br_succ_preserves with (v_n := v_n) (v_instr := v_instr) (v_instr' := v_instr').
-	- by apply Step_pure__br_if_true_preserves with (v_c := v_c).
-	- by apply Step_pure__br_if_false_preserves with (v_c := v_c) (v_l := v_l).
-	- by apply Step_pure__br_table_lt_preserves with (v_l' := v_l').
-	- by apply Step_pure__br_table_ge_preserves with (v_l' := v_l') (v_i := v_i) (v_l := v_l).
-	- by apply Step_pure__frame_vals_preserves with (v_n := v_n) (v_f := v_f).
-	- by apply Step_pure__return_frame_preserves with (v_n := v_n) (v_f := v_f) (v_val' := v_val') (v_instr := v_instr).
-	- by apply Step_pure__return_label_preserves with (v_n := v_n) (v_instr := v_instr) (v_instr' := v_instr').
-	- by apply Step_pure__unop_val_preserves with (v_c_1 := v_c_1) (v_unop := v_unop).
-	- by apply Step_pure__unop_trap_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_unop := v_unop).
-	- by apply Step_pure__binop_val_preserves with (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_binop := v_binop).
-	- by apply Step_pure__binop_trap_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_binop := v_binop).
-	- by apply Step_pure__testop_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_testop := v_testop).
-	- by apply Step_pure__relop_preserves with (v_t := v_t) (v_c_1 := v_c_1) (v_c_2 := v_c_2) (v_relop := v_relop).
-	- by apply Step_pure__cvtop_val_preserves with (v_t_1 := v_t_1) (v_c_1 := v_c_1) (v_cvtop := v_cvtop) (v_sx := v_sx).
-	- by apply Step_pure__cvtop_trap_preserves with (v_t_1 := v_t_1) (v_c_1 := v_c_1) (v_t_2 := v_t_2) (v_cvtop := v_cvtop) (v_sx := v_sx).
-	- by apply Step_pure__local_tee_preserves.
+	- eapply Step_pure__unreachable_preserves; eauto.
+	- eapply Step_pure__nop_preserves; eauto.
+	- eapply Step_pure__drop_preserves; eauto.
+	- eapply Step_pure__select_true_preserves; eauto.
+	- eapply Step_pure__select_false_preserves; eauto.
+	- eapply Step_pure__if_true_preserves; eauto.
+	- eapply Step_pure__if_false_preserves; eauto.
+	- eapply Step_pure__label_vals_preserves; eauto.
+	- eapply Step_pure__br_zero_preserves; eauto.
+	- eapply Step_pure__br_succ_preserves; eauto.
+	- eapply Step_pure__br_if_true_preserves; eauto.
+	- eapply Step_pure__br_if_false_preserves; eauto.
+	- eapply Step_pure__br_table_lt_preserves; eauto.
+	- eapply Step_pure__br_table_ge_preserves; eauto.
+	- eapply Step_pure__frame_vals_preserves; eauto.
+	- eapply Step_pure__return_frame_preserves; eauto.
+	- eapply Step_pure__return_label_preserves; eauto.
+	- eapply Step_pure__trap_vals_preserves; eauto.
+	- eapply Step_pure__trap_label_preserves; eauto.
+	- eapply Step_pure__trap_frame_preserves; eauto.
+	- eapply Step_pure__unop_val_preserves; eauto.
+	- eapply Step_pure__unop_trap_preserves; eauto.
+	- eapply Step_pure__binop_val_preserves; eauto.
+	- eapply Step_pure__binop_trap_preserves; eauto.
+	- eapply Step_pure__testop_preserves; eauto.
+	- eapply Step_pure__relop_preserves; eauto.
+	- eapply Step_pure__cvtop_val_preserves; eauto.
+	- eapply Step_pure__cvtop_trap_preserves; eauto.
+	- eapply Step_pure__local_tee_preserves; eauto.
 Qed.
 
 Lemma t_read_preservation: forall v_s v_f v_ais v_ais' v_C v_t1 t1s t2s lab ret,
@@ -3382,22 +3566,22 @@ Proof.
 	move => v_s v_f v_ais v_ais' v_C v_t1 t1s t2s lab ret HReduce HST.
 	move: v_C ret lab t1s t2s.
 	remember (config__ (state__ v_s v_f) v_ais) as c1.
-	induction HReduce; move => C ret lab tx ty HIT1 HValOK HType; induction v_z; try eauto;
+	induction HReduce; move => C ret lab tx ty HIT1 HValOK HType; decomp; induction v_z; try eauto;
 	try (apply config_same in Heqc1; destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; subst => //).
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-	-
-Admitted. 
+	- eapply Step_read__block_preserves; eauto.
+	- eapply Step_read__loop_preserves; eauto.
+	- eapply Step_read__call_preserves; eauto.
+	- eapply Step_read__call_indirect_call_preserves; eauto.
+	- eapply Step_read__call_indirect_trap_preserves; eauto.
+	- eapply Step_read__call_addr_preserves; eauto.
+	- eapply Step_read__local_get_preserves; eauto.
+	- eapply Step_read__global_get_preserves; eauto.
+	- eapply Step_read__load_num_trap_preserves; eauto.
+	- eapply Step_read__load_num_val_preserves; eauto.
+	- eapply Step_read__load_pack_trap_preserves; eauto.
+	- eapply Step_read__load_pack_val_preserves; eauto.
+	- eapply Step_read__memory_size_preserves; eauto.
+Qed.
 
 Lemma t_preservation_type: forall v_s v_f v_ais v_s' v_f' v_ais' v_C v_t1 t1s t2s lab ret,
     Step (config__ (state__ v_s v_f) v_ais) (config__ (state__ v_s' v_f') v_ais') ->
@@ -3413,12 +3597,14 @@ Proof.
 	move: v_C ret lab t1s t2s.
 	remember (config__ (state__ v_s v_f) v_ais) as c1.
 	remember (config__ (state__ v_s' v_f') v_ais') as c2.
-	induction HReduce; move => C ret lab tx ty HIT1 HIT2 HValOK HType; induction v_z; try eauto;
+	induction HReduce; move => C ret lab tx ty HIT1 HIT2 HValOK HType;  try (induction v_z; subst); try eauto;
 	try (apply config_same in Heqc1; apply config_same in Heqc2; 
 		destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; 
 		destruct Heqc2 as [Hafter1 [Hafter2 Hafter3]]; subst => //).
-	- (* Step_pure *) apply t_pure_preservation with (v_minst := (frame__MODULE v_f')) (v_ais := (list__instr__admininstr v_instr)) => //=.
-	- (* Step_read *) apply t_read_preservation with (v_f := v_f') (v_ais := (list__instr__admininstr v_instr)) => //=.
+	- (* Step_pure *) eapply t_pure_preservation; eauto.
+	- (* Step_read *) eapply t_read_preservation; eauto.
+	- (* Context Label *)
+	- (* Context Frame *)
 	- (* Local set *)
 	- (* Global set *)
 	- (* Store Num Trap *)
