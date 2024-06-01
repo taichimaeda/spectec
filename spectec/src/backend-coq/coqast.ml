@@ -34,6 +34,7 @@ type coq_basic_term =
   | T_mul
   | T_div
   | T_exp
+  | T_mod
   | T_eq
   | T_neq
   | T_lt

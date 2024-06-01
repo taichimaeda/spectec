@@ -344,6 +344,7 @@ and transform_binop (b : binop) =
     | MulOp _ -> T_exp_basic T_mul
     | DivOp _ -> T_exp_basic T_div
     | ExpOp _ -> T_exp_basic T_exp
+    | ModOp _ -> T_exp_basic T_mod
 
 and transform_cmpop (c : cmpop) =
   match c with

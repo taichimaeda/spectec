@@ -31,6 +31,7 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_basic T_mul -> " * "
     | T_exp_basic T_div -> " / "
     | T_exp_basic T_exp -> " ^ "
+    | T_exp_basic T_mod -> " mod "
     | T_exp_basic T_eq -> " = "
     | T_exp_basic T_neq -> " <> "
     | T_exp_basic T_lt -> " < "

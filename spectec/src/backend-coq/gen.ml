@@ -121,6 +121,7 @@ let gen_binop (b : binop) =
     | DivOp _ -> " / "
     | ExpOp _ -> " ^ "
     | EquivOp -> " <-> "
+    | ModOp _ -> " mod "
 let is_addop (b : binop) = 
   match b with
     | AddOp _ -> true
