@@ -44,6 +44,7 @@ let al_to_el_binop = function
   | Al.Ast.SubOp -> Some El.Ast.SubOp
   | Al.Ast.MulOp -> Some El.Ast.MulOp
   | Al.Ast.DivOp -> Some El.Ast.DivOp
+  | Al.Ast.ModOp -> Some El.Ast.ModOp
   | Al.Ast.ExpOp -> Some El.Ast.ExpOp
   | _ -> None
 
@@ -150,7 +151,7 @@ and al_to_el_expr expr =
       let ele =
         match ele.it with
         | El.Ast.IterE (_, eliter2) when eliter2 <> eliter ->
-          El.Ast.ParenE (ele, false) $ ele.at
+          El.Ast.ParenE (ele, `Insig) $ ele.at
         | _ -> ele
       in
       Some (El.Ast.IterE (ele, eliter))
@@ -165,7 +166,7 @@ and al_to_el_expr expr =
       let* elel = al_to_el_exprs el in
       let ele = El.Ast.SeqE ([ ela ] @ elel) in
       if List.length elel = 0 then Some ele
-      else Some (El.Ast.ParenE (ele $ no_region, false))
+      else Some (El.Ast.ParenE (ele $ no_region, `Insig))
     | Al.Ast.OptE (Some e) ->
       let* ele = al_to_el_expr e in
       Some (ele.it)
@@ -247,6 +248,7 @@ let render_al_binop = function
   | Al.Ast.SubOp -> "minus"
   | Al.Ast.MulOp -> "multiplied by"
   | Al.Ast.DivOp -> "divided by"
+  | Al.Ast.ModOp -> "modulo"
   | Al.Ast.ExpOp -> "to the power of"
   | Al.Ast.EqOp -> "is"
   | Al.Ast.NeOp -> "is not"

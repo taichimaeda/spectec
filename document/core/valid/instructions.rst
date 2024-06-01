@@ -15,7 +15,7 @@ In most cases, this is empty.
    consuming two ${:I32} values and producing one.
    The instruction ${:LOCAL.SET x} has type ${instrtype: t ->_(x) eps}, provided ${:t} is the type declared for the local ${:x}.
 
-Typing extends to :ref:`instruction sequences <valid-instr-seq>` ${:instr*}.
+Typing extends to :ref:`instruction sequences <valid-instrs>` ${:instr*}.
 Such a sequence has an instruction type ${instrtype: t_1* ->_(x*) t_2*} if the accumulative effect of executing the instructions is consuming values of types ${:t_1*} off the operand stack, pushing new values of types ${:t_2*}, and setting all locals ${:x*}.
 
 .. _polymorphism:
@@ -805,8 +805,8 @@ $${rule: Instr_ok/vshiftop}
 
 .. _valid-vbitmask:
 
-:math:`\ishape\K{.}\BITMASK`
-............................
+:math:`\ishape\K{.}\VBITMASK`
+.............................
 
 * The instruction is valid with type :math:`[\V128] \to [\I32]`.
 
@@ -815,8 +815,8 @@ $${rule: Instr_ok/vbitmask}
 
 .. _valid-vswizzle:
 
-:math:`\K{i8x16.}\SWIZZLE`
-..........................
+:math:`\K{i8x16.}\VSWIZZLE`
+...........................
 
 * The instruction is valid with type :math:`[\V128~\V128] \to [\V128]`.
 
@@ -825,8 +825,8 @@ $${rule: Instr_ok/vswizzle}
 
 .. _valid-vshuffle:
 
-:math:`\K{i8x16.}\SHUFFLE~\laneidx^{16}`
-........................................
+:math:`\K{i8x16.}\VSHUFFLE~\laneidx^{16}`
+.........................................
 
 * For all :math:`\laneidx_i`, in :math:`\laneidx^{16}`, :math:`\laneidx_i` must be smaller than :math:`32`.
 
@@ -837,8 +837,8 @@ $${rule: Instr_ok/vshuffle}
 
 .. _valid-vsplat:
 
-:math:`\shape\K{.}\SPLAT`
-.........................
+:math:`\shape\K{.}\VSPLAT`
+..........................
 
 * Let :math:`t` be :math:`\unpackshape(\shape)`.
 
@@ -849,8 +849,8 @@ $${rule: Instr_ok/vsplat}
 
 .. _valid-vextract_lane:
 
-:math:`\shape\K{.}\EXTRACTLANE\K{\_}\sx^?~\laneidx`
-...................................................
+:math:`\shape\K{.}\VEXTRACTLANE\K{\_}\sx^?~\laneidx`
+....................................................
 
 * The lane index :math:`\laneidx` must be smaller than :math:`\shdim(\shape)`.
 
@@ -863,8 +863,8 @@ $${rule: Instr_ok/vextract_lane}
 
 .. _valid-vreplace_lane:
 
-:math:`\shape\K{.}\REPLACELANE~\laneidx`
-........................................
+:math:`\shape\K{.}\VREPLACELANE~\laneidx`
+.........................................
 
 * The lane index :math:`\laneidx` must be smaller than :math:`\shdim(\shape)`.
 
@@ -877,8 +877,8 @@ $${rule: Instr_ok/vreplace_lane}
 
 .. _valid-vextunop:
 
-:math:`\ishape_1\K{.}\EXTADDPAIRWISE\K{\_}\ishape_2\K{\_}\sx`
-.............................................................
+:math:`\ishape_1\K{.}\VEXTADDPAIRWISE\K{\_}\ishape_2\K{\_}\sx`
+..............................................................
 
 * The instruction is valid with type :math:`[\V128] \to [\V128]`.
 
@@ -887,8 +887,8 @@ $${rule: Instr_ok/vextunop}
 
 .. _valid-vextbinop:
 
-:math:`\ishape_1\K{.}\EXTMUL\K{\_}\half\K{\_}\ishape_2\K{\_}\sx`
-................................................................
+:math:`\ishape_1\K{.}\VEXTMUL\K{\_}\half\K{\_}\ishape_2\K{\_}\sx`
+.................................................................
 
 * The instruction is valid with type :math:`[\V128~\V128] \to [\V128]`.
 
@@ -897,8 +897,8 @@ $${rule: Instr_ok/vextbinop}
 
 .. _valid-vnarrow:
 
-:math:`\ishape_1\K{.}\NARROW\K{\_}\ishape_2\K{\_}\sx`
-.....................................................
+:math:`\ishape_1\K{.}\VNARROW\K{\_}\ishape_2\K{\_}\sx`
+......................................................
 
 * The instruction is valid with type :math:`[\V128~\V128] \to [\V128]`.
 
@@ -1134,7 +1134,7 @@ $${rule: Instr_ok/elem.drop}
 Memory Instructions
 ~~~~~~~~~~~~~~~~~~~
 
-.. _valid-load:
+.. _valid-load-val:
 
 :math:`t\K{.}\LOAD~x~\memarg`
 .............................
@@ -1145,19 +1145,10 @@ Memory Instructions
 
 * Then the instruction is valid with type :math:`[\I32] \to [t]`.
 
-$${rule: Instr_ok/load}
-
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq |t|/8
-   }{
-     C \vdashinstr t\K{.load}~x~\memarg : [\I32] \to [t]
-   }
+$${rule: Instr_ok/load-val}
 
 
-.. _valid-loadn:
+.. _valid-load-pack:
 
 :math:`t\K{.}\LOAD{N}\K{\_}\sx~x~\memarg`
 .........................................
@@ -1168,15 +1159,10 @@ $${rule: Instr_ok/load}
 
 * Then the instruction is valid with type :math:`[\I32] \to [t]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq N/8
-   }{
-     C \vdashinstr t\K{.load}N\K{\_}\sx~x~\memarg : [\I32] \to [t]
-   }
+$${rule: Instr_ok/load-pack}
 
+
+.. _valid-store-val:
 
 :math:`t\K{.}\STORE~x~\memarg`
 ..............................
@@ -1187,19 +1173,10 @@ $${rule: Instr_ok/load}
 
 * Then the instruction is valid with type :math:`[\I32~t] \to []`.
 
-$${rule: Instr_ok/store}
-
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq |t|/8
-   }{
-     C \vdashinstr t\K{.store}~x~\memarg : [\I32~t] \to []
-   }
+$${rule: Instr_ok/store-val}
 
 
-.. _valid-storen:
+.. _valid-store-pack:
 
 :math:`t\K{.}\STORE{N}~x~\memarg`
 .................................
@@ -1210,17 +1187,24 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32~t] \to []`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq N/8
-   }{
-     C \vdashinstr t\K{.store}N~x~\memarg : [\I32~t] \to []
-   }
+$${rule: Instr_ok/store-pack}
 
 
-.. _valid-vload-ext:
+.. _valid-vload-val:
+
+:math:`\K{v128.}\K{.}\LOAD~x~\memarg`
+.....................................
+
+* The memory :math:`C.\CMEMS[x]` must be defined in the context.
+
+* The alignment :math:`2^{\memarg.\ALIGN}` must not be larger than the :ref:`bit width <syntax-numtype>` of :math:`t` divided by :math:`8`.
+
+* Then the instruction is valid with type :math:`[\I32] \to [t]`.
+
+$${rule: Instr_ok/vload-val}
+
+
+.. _valid-vload-pack:
 
 :math:`\K{v128.}\LOAD{N}\K{x}M\_\sx~x~\memarg`
 ..............................................
@@ -1231,14 +1215,7 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32] \to [\V128]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq N/8 \cdot M
-   }{
-     C \vdashinstr \K{v128.}\LOAD{N}\K{x}M\_\sx~x~\memarg : [\I32] \to [\V128]
-   }
+$${rule: Instr_ok/vload-pack}
 
 
 .. _valid-vload-splat:
@@ -1252,14 +1229,7 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32] \to [\V128]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq N/8
-   }{
-     C \vdashinstr \K{v128.}\LOAD{N}\K{\_splat}~x~\memarg : [\I32] \to [\V128]
-   }
+$${rule: Instr_ok/vload-splat}
 
 
 .. _valid-vload-zero:
@@ -1273,17 +1243,10 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32] \to [\V128]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} \leq N/8
-   }{
-     C \vdashinstr \K{v128.}\LOAD{N}\K{\_zero}~x~\memarg : [\I32] \to [\V128]
-   }
+$${rule: Instr_ok/vload-zero}
 
 
-.. _valid-vload-lane:
+.. _valid-vload_lane:
 
 :math:`\K{v128.}\LOAD{N}\K{\_lane}~x~\memarg~\laneidx`
 ......................................................
@@ -1296,19 +1259,24 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32~\V128] \to [\V128]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} < N/8
-     \qquad
-     \laneidx < 128/N
-   }{
-     C \vdashinstr \K{v128.}\LOAD{N}\K{\_lane}~x~\memarg~\laneidx : [\I32~\V128] \to [\V128]
-   }
+$${rule: Instr_ok/vload_lane}
 
 
-.. _valid-vstore-lane:
+.. _valid-vstore:
+
+:math:`\K{v128.}\STORE~x~\memarg`
+.................................
+
+* The memory :math:`C.\CMEMS[x]` must be defined in the context.
+
+* The alignment :math:`2^{\memarg.\ALIGN}` must not be larger than the :ref:`bit width <syntax-numtype>` of :math:`t` divided by :math:`8`.
+
+* Then the instruction is valid with type :math:`[\I32~t] \to []`.
+
+$${rule: Instr_ok/vstore}
+
+
+.. _valid-vstore_lane:
 
 :math:`\K{v128.}\STORE{N}\K{\_lane}~x~\memarg~\laneidx`
 .......................................................
@@ -1321,16 +1289,7 @@ $${rule: Instr_ok/store}
 
 * Then the instruction is valid with type :math:`[\I32~\V128] \to [\V128]`.
 
-.. math::
-   \frac{
-     C.\CMEMS[x] = \memtype
-     \qquad
-     2^{\memarg.\ALIGN} < N/8
-     \qquad
-     \laneidx < 128/N
-   }{
-     C \vdashinstr \K{v128.}\STORE{N}\K{\_lane}~x~\memarg~\laneidx : [\I32~\V128] \to []
-   }
+$${rule: Instr_ok/vstore_lane}
 
 
 .. _valid-memory.size:
@@ -1428,7 +1387,7 @@ Control Instructions
 * Let :math:`C'` be the same :ref:`context <context>` as :math:`C`, but with the :ref:`result type <syntax-resulttype>` :math:`[t_2^\ast]` prepended to the |CLABELS| list.
 
 * Under context :math:`C'`,
-  the instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instr-seq>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
+  the instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instrs>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
 * Then the compound instruction is valid with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
@@ -1448,7 +1407,7 @@ $${rule: Instr_ok/block}
 * Let :math:`C'` be the same :ref:`context <context>` as :math:`C`, but with the :ref:`result type <syntax-resulttype>` :math:`[t_1^\ast]` prepended to the |CLABELS| list.
 
 * Under context :math:`C'`,
-  the instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instr-seq>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
+  the instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instrs>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
 * Then the compound instruction is valid with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
@@ -1468,10 +1427,10 @@ $${rule: Instr_ok/loop}
 * Let :math:`C'` be the same :ref:`context <context>` as :math:`C`, but with the :ref:`result type <syntax-resulttype>` :math:`[t_2^\ast]` prepended to the |CLABELS| list.
 
 * Under context :math:`C'`,
-  the instruction sequence :math:`\instr_1^\ast` must be :ref:`valid <valid-instr-seq>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
+  the instruction sequence :math:`\instr_1^\ast` must be :ref:`valid <valid-instrs>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
 * Under context :math:`C'`,
-  the instruction sequence :math:`\instr_2^\ast` must be :ref:`valid <valid-instr-seq>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
+  the instruction sequence :math:`\instr_2^\ast` must be :ref:`valid <valid-instrs>` with type :math:`[t_1^\ast] \to [t_2^\ast]`.
 
 * Then the compound instruction is valid with type :math:`[t_1^\ast~\I32] \to [t_2^\ast]`.
 
@@ -1698,7 +1657,7 @@ $${rule: Instr_ok/return}
 .. note::
    The ${:RETURN} instruction is :ref:`stack-polymorphic <polymorphism>`.
 
-   ${:C.RETURN} is absent (set to ${:eps}) when validating an :ref:`expression <valid-expr>` that is not a function body.
+   ${resulttype?: C.RETURN} is absent (set to ${:eps}) when validating an :ref:`expression <valid-expr>` that is not a function body.
    This differs from it being set to the empty result type ${:(eps)},
    which is the case for functions not returning anything.
 
@@ -1771,7 +1730,7 @@ $${rule: Instr_ok/return_call_indirect}
 
 
 .. index:: instruction, instruction sequence, local type
-.. _valid-instr-seq:
+.. _valid-instrs:
 
 Instruction Sequences
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1849,7 +1808,7 @@ Expressions ${:expr} are classified by :ref:`result types <syntax-resulttype>` $
 :math:`\instr^\ast~\END`
 ........................
 
-* The instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instr-seq>` with :ref:`type <syntax-instrtype>` :math:`[] \to [t^\ast]`.
+* The instruction sequence :math:`\instr^\ast` must be :ref:`valid <valid-instrs>` with :ref:`type <syntax-instrtype>` :math:`[] \to [t^\ast]`.
 
 * Then the expression is valid with :ref:`result type <syntax-resulttype>` :math:`[t^\ast]`.
 

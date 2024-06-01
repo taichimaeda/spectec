@@ -317,7 +317,7 @@ It records its :ref:`type <syntax-tabletype>` and holds a list of :ref:`referenc
 .. math::
    \begin{array}{llll}
    \production{table instance} & \tableinst &::=&
-     \{ \TITYPE~\tabletype, \TIELEM~\list(\reff) \} \\
+     \{ \TITYPE~\tabletype, \TIREFS~\list(\reff) \} \\
    \end{array}
 
 Table elements can be mutated through :ref:`table instructions <syntax-instr-table>`, the execution of an active :ref:`element segment <syntax-elem>`, or by external means provided by the :ref:`embedder <embedder>`.
@@ -341,7 +341,7 @@ It records its :ref:`type <syntax-memtype>` and holds a list of :ref:`bytes <syn
 .. math::
    \begin{array}{llll}
    \production{memory instance} & \meminst &::=&
-     \{ \MITYPE~\memtype, \MIDATA~\list(\byte) \} \\
+     \{ \MITYPE~\memtype, \MIBYTES~\list(\byte) \} \\
    \end{array}
 
 The length of the list always is a multiple of the WebAssembly *page size*, which is defined to be the constant :math:`65536` -- abbreviated :math:`64\,\F{Ki}`.
@@ -387,7 +387,7 @@ It holds a list of references and their common :ref:`type <syntax-reftype>`.
 .. math::
   \begin{array}{llll}
   \production{element instance} & \eleminst &::=&
-    \{ \EITYPE~\reftype, \EIELEM~\list(\reff) \} \\
+    \{ \EITYPE~\reftype, \EIREFS~\list(\reff) \} \\
   \end{array}
 
 
@@ -405,7 +405,7 @@ It holds a list of :ref:`bytes <syntax-byte>`.
 .. math::
   \begin{array}{llll}
   \production{data instance} & \datainst &::=&
-    \{ \DIDATA~\list(\byte) \} \\
+    \{ \DIBYTES~\list(\byte) \} \\
   \end{array}
 
 
@@ -454,13 +454,13 @@ Conventions
 The following auxiliary notation is defined for sequences of external values.
 It filters out entries of a specific kind in an order-preserving fashion:
 
-* :math:`\evfuncs(\externval^\ast) = [\funcaddr ~|~ (\EVFUNC~\funcaddr) \in \externval^\ast]`
+* :math:`\funcsxv(\externval^\ast) = [\funcaddr ~|~ (\EVFUNC~\funcaddr) \in \externval^\ast]`
 
-* :math:`\evtables(\externval^\ast) = [\tableaddr ~|~ (\EVTABLE~\tableaddr) \in \externval^\ast]`
+* :math:`\tablesxv(\externval^\ast) = [\tableaddr ~|~ (\EVTABLE~\tableaddr) \in \externval^\ast]`
 
-* :math:`\evmems(\externval^\ast) = [\memaddr ~|~ (\EVMEM~\memaddr) \in \externval^\ast]`
+* :math:`\memsxv(\externval^\ast) = [\memaddr ~|~ (\EVMEM~\memaddr) \in \externval^\ast]`
 
-* :math:`\evglobals(\externval^\ast) = [\globaladdr ~|~ (\EVGLOBAL~\globaladdr) \in \externval^\ast]`
+* :math:`\globalsxv(\externval^\ast) = [\globaladdr ~|~ (\EVGLOBAL~\globaladdr) \in \externval^\ast]`
 
 
 .. index:: ! structure instance, ! array instance, structure type, array type, defined type, ! field value, ! packed value
@@ -665,7 +665,7 @@ It unifies the handling of different forms of calls.
 Analogously, |RETURNINVOKE| represents the imminent tail invocation of a function instance.
 
 The |LABEL| and |FRAME| instructions model :ref:`labels <syntax-label>` and :ref:`frames <syntax-frame>` :ref:`"on the stack" <exec-notation>`.
-Moreover, the administrative syntax maintains the nesting structure of the original :ref:`structured control instruction <syntax-instr-control>` or :ref:`function body <syntax-func>` and their :ref:`instruction sequences <syntax-instr-seq>` with an |END| marker.
+Moreover, the administrative syntax maintains the nesting structure of the original :ref:`structured control instruction <syntax-instr-control>` or :ref:`function body <syntax-func>` and their :ref:`instruction sequences <syntax-instrs>` with an |END| marker.
 That way, the end of the inner instruction sequence is known when part of an outer sequence.
 
 .. note::

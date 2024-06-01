@@ -86,7 +86,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
 
 3. Let :math:`a` be the first free :ref:`table address <syntax-tableaddr>` in :math:`S`.
 
-4. Let :math:`\tableinst` be the :ref:`table instance <syntax-tableinst>` :math:`\{ \TITYPE~\tabletype', \TIELEM~\reff^n \}` with :math:`n` elements set to :math:`\reff`.
+4. Let :math:`\tableinst` be the :ref:`table instance <syntax-tableinst>` :math:`\{ \TITYPE~\tabletype', \TIREFS~\reff^n \}` with :math:`n` elements set to :math:`\reff`.
 
 5. Append :math:`\tableinst` to the |STABLES| of :math:`S`.
 
@@ -98,7 +98,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
    \mbox{where:} \hfill \\
    \tabletype &=& \{\LMIN~n, \LMAX~m^?\}~\reftype \\
    \tableaddr &=& |S.\STABLES| \\
-   \tableinst &=& \{ \TITYPE~\tabletype, \TIELEM~\reff^n \} \\
+   \tableinst &=& \{ \TITYPE~\tabletype, \TIREFS~\reff^n \} \\
    S' &=& S \compose \{\STABLES~\tableinst\} \\
    \end{array}
 
@@ -115,7 +115,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
 
 3. Let :math:`a` be the first free :ref:`memory address <syntax-memaddr>` in :math:`S`.
 
-4. Let :math:`\meminst` be the :ref:`memory instance <syntax-meminst>` :math:`\{ \MITYPE~\memtype, \MIDATA~(\hex{00})^{n \cdot 64\,\F{Ki}} \}` that contains :math:`n` pages of zeroed :ref:`bytes <syntax-byte>`.
+4. Let :math:`\meminst` be the :ref:`memory instance <syntax-meminst>` :math:`\{ \MITYPE~\memtype, \MIBYTES~(\hex{00})^{n \cdot 64\,\F{Ki}} \}` that contains :math:`n` pages of zeroed :ref:`bytes <syntax-byte>`.
 
 5. Append :math:`\meminst` to the |SMEMS| of :math:`S`.
 
@@ -127,7 +127,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
    \mbox{where:} \hfill \\
    \memtype &=& \{\LMIN~n, \LMAX~m^?\} \\
    \memaddr &=& |S.\SMEMS| \\
-   \meminst &=& \{ \MITYPE~\memtype, \MIDATA~(\hex{00})^{n \cdot 64\,\F{Ki}} \} \\
+   \meminst &=& \{ \MITYPE~\memtype, \MIBYTES~(\hex{00})^{n \cdot 64\,\F{Ki}} \} \\
    S' &=& S \compose \{\SMEMS~\meminst\} \\
    \end{array}
 
@@ -168,7 +168,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
 
 2. Let :math:`a` be the first free :ref:`element address <syntax-elemaddr>` in :math:`S`.
 
-3. Let :math:`\eleminst` be the :ref:`element instance <syntax-eleminst>` :math:`\{ \EITYPE~\reftype, \EIELEM~\reff^\ast \}`.
+3. Let :math:`\eleminst` be the :ref:`element instance <syntax-eleminst>` :math:`\{ \EITYPE~\reftype, \EIREFS~\reff^\ast \}`.
 
 4. Append :math:`\eleminst` to the |SELEMS| of :math:`S`.
 
@@ -179,7 +179,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
   \allocelem(S, \reftype, \reff^\ast) &=& S', \elemaddr \\[1ex]
   \mbox{where:} \hfill \\
   \elemaddr &=& |S.\SELEMS| \\
-  \eleminst &=& \{ \EITYPE~\reftype, \EIELEM~\reff^\ast \} \\
+  \eleminst &=& \{ \EITYPE~\reftype, \EIREFS~\reff^\ast \} \\
   S' &=& S \compose \{\SELEMS~\eleminst\} \\
   \end{array}
 
@@ -194,7 +194,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
 
 2. Let :math:`a` be the first free :ref:`data address <syntax-dataaddr>` in :math:`S`.
 
-3. Let :math:`\datainst` be the :ref:`data instance <syntax-datainst>` :math:`\{ \DIDATA~b^\ast \}`.
+3. Let :math:`\datainst` be the :ref:`data instance <syntax-datainst>` :math:`\{ \DIBYTES~b^\ast \}`.
 
 4. Append :math:`\datainst` to the |SDATAS| of :math:`S`.
 
@@ -205,7 +205,7 @@ New instances of :ref:`functions <syntax-funcinst>`, :ref:`tables <syntax-tablei
   \allocdata(S, b^\ast) &=& S', \dataaddr \\[1ex]
   \mbox{where:} \hfill \\
   \dataaddr &=& |S.\SDATAS| \\
-  \datainst &=& \{ \DIDATA~b^\ast \} \\
+  \datainst &=& \{ \DIBYTES~b^\ast \} \\
   S' &=& S \compose \{\SDATAS~\datainst\} \\
   \end{array}
 
@@ -218,7 +218,7 @@ Growing :ref:`tables <syntax-tableinst>`
 
 1. Let :math:`\tableinst` be the :ref:`table instance <syntax-tableinst>` to grow, :math:`n` the number of elements by which to grow it, and :math:`\reff` the initialization value.
 
-2. Let :math:`\X{len}` be :math:`n` added to the length of :math:`\tableinst.\TIELEM`.
+2. Let :math:`\X{len}` be :math:`n` added to the length of :math:`\tableinst.\TIREFS`.
 
 3. If :math:`\X{len}` is larger than or equal to :math:`2^{32}`, then fail.
 
@@ -228,20 +228,20 @@ Growing :ref:`tables <syntax-tableinst>`
 
 6. If :math:`\limits'` is not :ref:`valid <valid-limits>`, then fail.
 
-7. Append :math:`\reff^n` to :math:`\tableinst.\TIELEM`.
+7. Append :math:`\reff^n` to :math:`\tableinst.\TIREFS`.
 
 8. Set :math:`\tableinst.\TITYPE` to the :ref:`table type <syntax-tabletype>` :math:`\limits'~t`.
 
 .. math::
    \begin{array}{rllll}
-   \growtable(\tableinst, n, \reff) &=& \tableinst \with \TITYPE = \limits'~t \with \TIELEM = \tableinst.\TIELEM~\reff^n \\
+   \growtable(\tableinst, n, \reff) &=& \tableinst \with \TITYPE = \limits'~t \with \TIREFS = \tableinst.\TIREFS~\reff^n \\
      && (
        \begin{array}[t]{@{}r@{~}l@{}}
-       \iff & \X{len} = n + |\tableinst.\TIELEM| \\
+       \iff & \X{len} = n + |\tableinst.\TIREFS| \\
        \wedge & \X{len} < 2^{32} \\
        \wedge & \limits~t = \tableinst.\TITYPE \\
        \wedge & \limits' = \limits \with \LMIN = \X{len} \\
-       \wedge & \vdashlimits \limits' \ok) \\
+       \wedge & \vdashlimits \limits' : \OKlimits) \\
        \end{array} \\
    \end{array}
 
@@ -254,9 +254,9 @@ Growing :ref:`memories <syntax-meminst>`
 
 1. Let :math:`\meminst` be the :ref:`memory instance <syntax-meminst>` to grow and :math:`n` the number of :ref:`pages <page-size>` by which to grow it.
 
-2. Assert: The length of :math:`\meminst.\MIDATA` is divisible by the :ref:`page size <page-size>` :math:`64\,\F{Ki}`.
+2. Assert: The length of :math:`\meminst.\MIBYTES` is divisible by the :ref:`page size <page-size>` :math:`64\,\F{Ki}`.
 
-3. Let :math:`\X{len}` be :math:`n` added to the length of :math:`\meminst.\MIDATA` divided by the :ref:`page size <page-size>` :math:`64\,\F{Ki}`.
+3. Let :math:`\X{len}` be :math:`n` added to the length of :math:`\meminst.\MIBYTES` divided by the :ref:`page size <page-size>` :math:`64\,\F{Ki}`.
 
 4. If :math:`\X{len}` is larger than :math:`2^{16}`, then fail.
 
@@ -266,20 +266,20 @@ Growing :ref:`memories <syntax-meminst>`
 
 7. If :math:`\limits'` is not :ref:`valid <valid-limits>`, then fail.
 
-8. Append :math:`n` times :math:`64\,\F{Ki}` :ref:`bytes <syntax-byte>` with value :math:`\hex{00}` to :math:`\meminst.\MIDATA`.
+8. Append :math:`n` times :math:`64\,\F{Ki}` :ref:`bytes <syntax-byte>` with value :math:`\hex{00}` to :math:`\meminst.\MIBYTES`.
 
 9. Set :math:`\meminst.\MITYPE` to the :ref:`memory type <syntax-memtype>` :math:`\limits'`.
 
 .. math::
    \begin{array}{rllll}
-   \growmem(\meminst, n) &=& \meminst \with \MITYPE = \limits' \with \MIDATA = \meminst.\MIDATA~(\hex{00})^{n \cdot 64\,\F{Ki}} \\
+   \growmem(\meminst, n) &=& \meminst \with \MITYPE = \limits' \with \MIBYTES = \meminst.\MIBYTES~(\hex{00})^{n \cdot 64\,\F{Ki}} \\
      && (
        \begin{array}[t]{@{}r@{~}l@{}}
-       \iff & \X{len} = n + |\meminst.\MIDATA| / 64\,\F{Ki} \\
+       \iff & \X{len} = n + |\meminst.\MIBYTES| / 64\,\F{Ki} \\
        \wedge & \X{len} \leq 2^{16} \\
        \wedge & \limits = \meminst.\MITYPE \\
        \wedge & \limits' = \limits \with \LMIN = \X{len} \\
-       \wedge & \vdashlimits \limits' \ok) \\
+       \wedge & \vdashlimits \limits' : \OKlimits) \\
        \end{array} \\
    \end{array}
 
@@ -394,10 +394,10 @@ where:
    \moduleinst &=& \{~
      \begin{array}[t]{@{}l@{}}
      \MITYPES~\deftype^\ast, \\
-     \MIFUNCS~\evfuncs(\externval_{\F{im}}^\ast)~\funcaddr^\ast, \\
-     \MITABLES~\evtables(\externval_{\F{im}}^\ast)~\tableaddr^\ast, \\
-     \MIMEMS~\evmems(\externval_{\F{im}}^\ast)~\memaddr^\ast, \\
-     \MIGLOBALS~\evglobals(\externval_{\F{im}}^\ast)~\globaladdr^\ast, \\
+     \MIFUNCS~\funcsxv(\externval_{\F{im}}^\ast)~\funcaddr^\ast, \\
+     \MITABLES~\tablesxv(\externval_{\F{im}}^\ast)~\tableaddr^\ast, \\
+     \MIMEMS~\memsxv(\externval_{\F{im}}^\ast)~\memaddr^\ast, \\
+     \MIGLOBALS~\globalsxv(\externval_{\F{im}}^\ast)~\globaladdr^\ast, \\
      \MIELEMS~\elemaddr^\ast, \\
      \MIDATAS~\dataaddr^\ast, \\
      \MIEXPORTS~\exportinst^\ast ~\}
@@ -419,14 +419,14 @@ where:
      \allocdata^\ast(S_5, \data.\DINIT^\ast) \\
    \exportinst^\ast &=&
      \{ \EINAME~(\export.\ENAME), \EIVALUE~\externval_{\F{ex}} \}^\ast \\[1ex]
-   \evfuncs(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIFUNCS[x])^\ast
-     \qquad~ (\where x^\ast = \edfuncs(\export^\ast)) \\
-   \evtables(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MITABLES[x])^\ast
-     \qquad (\where x^\ast = \edtables(\export^\ast)) \\
-   \evmems(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIMEMS[x])^\ast
-     \qquad (\where x^\ast = \edmems(\export^\ast)) \\
-   \evglobals(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIGLOBALS[x])^\ast
-     \qquad\!\!\! (\where x^\ast = \edglobals(\export^\ast)) \\
+   \funcsxv(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIFUNCS[x])^\ast
+     \qquad~ (\where x^\ast = \funcsxx(\export^\ast)) \\
+   \tablesxv(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MITABLES[x])^\ast
+     \qquad (\where x^\ast = \tablesxx(\export^\ast)) \\
+   \memsxv(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIMEMS[x])^\ast
+     \qquad (\where x^\ast = \memsxx(\export^\ast)) \\
+   \globalsxv(\externval_{\F{ex}}^\ast) &=& (\moduleinst.\MIGLOBALS[x])^\ast
+     \qquad\!\!\! (\where x^\ast = \globalsxx(\export^\ast)) \\
    \end{array}
 
 .. scratch
@@ -459,7 +459,7 @@ For types, however, allocation is defined in terms of :ref:`rolling <aux-roll-re
    \alloctype^\ast(\rectype^n) = \deftype^\ast \\[1ex]
    \mbox{where for all $i < n$:} \hfill \\
    \rectype^n[i] &=& \REC~\subtype_i^{m_i} \\
-   \deftype^\ast[x_i \slice m_i] &=& \rolldt_{x_i}(\REC~\subtype_i^{m_i})[\subst \deftype^\ast[0 \slice x_i]] \\
+   \deftype^\ast[x_i \slice m_i] &=& \rolldt_{x_i}^\ast(\REC~\subtype_i^{m_i})[\subst \deftype^\ast[0 \slice x_i]] \\
    x_{i+1} &=& x_i + m_i \\
    x_n &=& |\deftype^\ast| \\
    \end{array}
@@ -471,7 +471,7 @@ For types, however, allocation is defined in terms of :ref:`rolling <aux-roll-re
    \alloctype^\ast(\rectype^\ast~\rectype') = \deftype^\ast~{\deftype'}^\ast \\[1ex]
    \mbox{where:} \hfill \\
    \deftype^\ast &=& \alloctype^\ast(\reftype^\ast) \\
-   {\deftype'}^\ast &=& \rolldt_{|\deftype^\ast|}(\rectype)[\subst \deftype^\ast) \\
+   {\deftype'}^\ast &=& \rolldt_{|\deftype^\ast|}^\ast(\rectype)[\subst \deftype^\ast) \\
    \end{array}
 
 .. note::
@@ -561,7 +561,7 @@ It is up to the :ref:`embedder <embedder>` to define how such conditions are rep
 
     a. Let :math:`n` be the length of the list :math:`\elem_i.\EINIT`.
 
-    b. :ref:`Execute <exec-instr-seq>` the instruction sequence :math:`\X{einstr}^\ast_i`.
+    b. :ref:`Execute <exec-instrs>` the instruction sequence :math:`\X{einstr}^\ast_i`.
 
     c. :ref:`Execute <exec-const>` the instruction :math:`\I32.\CONST~0`.
 
@@ -571,7 +571,7 @@ It is up to the :ref:`embedder <embedder>` to define how such conditions are rep
 
     f. :ref:`Execute <exec-elem.drop>` the instruction :math:`\ELEMDROP~i`.
 
-13. For each :ref:`element segment <syntax-elem>` :math:`\elem_i` in :math:`\module.\MELEMS` whose :ref:`mode <syntax-elemmode>` is of the form :math:`\EDECLARATIVE`, do:
+13. For each :ref:`element segment <syntax-elem>` :math:`\elem_i` in :math:`\module.\MELEMS` whose :ref:`mode <syntax-elemmode>` is of the form :math:`\EDECLARE`, do:
 
     a. :ref:`Execute <exec-elem.drop>` the instruction :math:`\ELEMDROP~i`.
 
@@ -581,7 +581,7 @@ It is up to the :ref:`embedder <embedder>` to define how such conditions are rep
 
     b. Let :math:`n` be the length of the list :math:`\data_i.\DINIT`.
 
-    c. :ref:`Execute <exec-instr-seq>` the instruction sequence :math:`\X{dinstr}^\ast_i`.
+    c. :ref:`Execute <exec-instrs>` the instruction sequence :math:`\X{dinstr}^\ast_i`.
 
     d. :ref:`Execute <exec-const>` the instruction :math:`\I32.\CONST~0`.
 
@@ -614,7 +614,7 @@ It is up to the :ref:`embedder <embedder>` to define how such conditions are rep
    &(\iff
      & \vdashmodule \module : \externtype_{\F{im}}^k \rightarrow \externtype_{\F{ex}}^\ast \\
      &\wedge& (S' \vdashexternval \externval : \externtype)^k \\
-     &\wedge& (S' \vdashexterntypematch \externtype \matchesexterntype \insttype_{\moduleinst}(\externtype_{\F{im}}))^k \\[1ex]
+     &\wedge& (S' \vdashexterntypematch \externtype \subexterntypematch \insttype_{\moduleinst}(\externtype_{\F{im}}))^k \\[1ex]
      &\wedge& \module.\MGLOBALS = \global^\ast \\
      &\wedge& \module.\MELEMS = \elem^n \\
      &\wedge& \module.\MDATAS = \data^m \\
@@ -636,7 +636,7 @@ where:
    \F{runelem}_i(\{\ETYPE~\X{et}, \EINIT~\expr^n, \EMODE~\EPASSIVE\}) \quad=\quad \epsilon \\
    \F{runelem}_i(\{\ETYPE~\X{et}, \EINIT~\expr^n, \EMODE~\EACTIVE \{\ETABLE~x, \EOFFSET~\instr^\ast~\END\}\}) \quad=\\ \qquad
      \instr^\ast~(\I32.\CONST~0)~(\I32.\CONST~n)~(\TABLEINIT~x~i)~(\ELEMDROP~i) \\
-   \F{runelem}_i(\{\ETYPE~\X{et}, \EINIT~\expr^n, \EMODE~\EDECLARATIVE\}) \quad=\\ \qquad
+   \F{runelem}_i(\{\ETYPE~\X{et}, \EINIT~\expr^n, \EMODE~\EDECLARE\}) \quad=\\ \qquad
      (\ELEMDROP~i) \\[1ex]
    \F{rundata}_i(\{\DINIT~b^n, \DMODE~\DPASSIVE\}) \quad=\\ \qquad \epsilon \\
    \F{rundata}_i(\{\DINIT~b^n, \DMODE~\DACTIVE \{\DMEM~0, \DOFFSET~\instr^\ast~\END\}\}) \quad=\\ \qquad

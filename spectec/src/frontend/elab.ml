@@ -196,6 +196,8 @@ let to_eval_env env =
   let syms = Map.map ignore env.syms in
   Eval.{vars = Map.union (fun _ _ t -> Some t) gvars vars; typs; defs; syms}
 
+let valid_tid id = id.it <> ""
+
 
 (* More Errors *)
 
@@ -315,7 +317,7 @@ let expand_def env t =
 
 let rec expand_id env t =
   match (expand_nondef env t).it with
-  | VarT (id, _) -> id
+  | VarT (id, _) -> strip_var_suffix id
   | IterT (t1, _) -> expand_id env t1  (* TODO: this shouldn't be needed, but goes along with the as_*_typ functions unrolling iterations *)
   | _ -> "" $ no_region
 
@@ -450,8 +452,10 @@ let elab_hint tid mixop {hintid; hintexp} : Il.hint =
       struct
         include Iter.Skip
         let visit_atom atom =
+          assert (valid_tid tid);
+          assert (atom.note.Atom.def = "");
           atom.note.Atom.def <- tid.it;
-          atom.note.Atom.case <- Atom.string_name_of_mixop mixop
+          atom.note.Atom.case <- Atom.name_of_mixop mixop
       end
     )
   in
@@ -469,6 +473,13 @@ let elab_hints tid mixop = List.map (elab_hint tid mixop)
 (* Atoms and Operators *)
 
 let elab_atom atom tid =
+  assert (valid_tid tid);
+(*
+if atom.note.Atom.def <> "" && atom.note.Atom.def <> tid.it then
+Printf.eprintf "[elab_atom %s @ %s] def=%s/%s\n%!"
+(Atom.string_of_atom atom) (Source.string_of_region atom.at) tid.it atom.note.Atom.def;
+  assert (atom.note.Atom.def = "" || atom.note.Atom.def = tid.it);
+*)
   atom.note.Atom.def <- tid.it;
   atom
 
@@ -500,6 +511,7 @@ let infer_binop' = function
   | SubOp -> infer_numop (fun t -> Il.SubOp t) numtyps
   | MulOp -> infer_numop (fun t -> Il.MulOp t) numtyps
   | DivOp -> infer_numop (fun t -> Il.DivOp t) numtyps
+  | ModOp -> infer_numop (fun t -> Il.ModOp t) numtyps
   | ExpOp -> infer_numop (fun t -> Il.ExpOp t) numtyps
 
 let infer_cmpop' = function
@@ -609,7 +621,7 @@ and elab_typ env t : Il.typ =
     error t.at "this type is only allowed in type definitions"
 
 and elab_typ_definition env tid t : Il.deftyp =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   (match t.it with
   | StrT tfs ->
     let tfs' = filter_nl tfs in
@@ -623,10 +635,10 @@ and elab_typ_definition env tid t : Il.deftyp =
         let cases, dots = as_variant_typ "parent type" env Infer t t.at in
         if dots = Dots then
           error t.at "cannot include incomplete syntax type";
-        cases
+        List.map Iter.clone_typcase cases  (* ensure atom annotations are fresh *)
       ) ts
     in
-    let cases' = List.flatten (cases0 :: casess @ [filter_nl cases]) in
+    let cases' = List.flatten (List.map Iter.clone_typcase cases0 :: casess @ [filter_nl cases]) in
     let tcs' = List.map (elab_typcase env tid t.at) cases' in
     check_atoms "variant" "case" cases' t.at;
     Il.VariantT tcs'
@@ -672,7 +684,7 @@ and typ_rep env t : typ =
   | _ -> t
 
 and elab_typfield env tid at ((atom, (t, prems), hints) as tf) : Il.typfield =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let env' = local_env env in
   let _mixop, ts', ts = elab_typ_notation env' tid t in
   let es = Convert.pats_of_typs ts in
@@ -696,7 +708,7 @@ and elab_typfield env tid at ((atom, (t, prems), hints) as tf) : Il.typfield =
   )
 
 and elab_typcase env tid at ((_atom, (t, prems), hints) as tc) : Il.typcase =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let env' = local_env env in
   let mixop, ts', ts = elab_typ_notation env' tid t in
   let es = Convert.pats_of_typs ts in
@@ -720,7 +732,7 @@ and elab_typcase env tid at ((_atom, (t, prems), hints) as tc) : Il.typcase =
   )
 
 and elab_typcon env tid at (((t, prems), hints) as tc) : Il.typcase =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let env' = local_env env in
   let mixop, ts', ts = elab_typ_notation env' tid t in
   let es = Convert.pats_of_typs ts in
@@ -744,7 +756,7 @@ and elab_typcon env tid at (((t, prems), hints) as tc) : Il.typcase =
   )
 
 and elab_typenum env tid (e1, e2o) : typ * (Il.exp -> numtyp -> Il.exp) =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let _e1' = elab_exp env e1 (NumT IntT $ e1.at) in  (* ensure it's <= int *)
   let _, t1 = infer_exp env e1 in                    (* get precise type *)
   match e2o with
@@ -772,7 +784,7 @@ and elab_typ_notation env tid t : Il.mixop * Il.typ list * typ list =
     (fun _ -> fmt "%s = %s" tid.it (el_typ t))
     (fun (mixop, ts', _) -> fmt "%s(%s)" (il_mixop mixop) (list il_typ ts'))
   ) @@ fun _ ->
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   match t.it with
   | VarT (id, as_) ->
     let id' = strip_var_suffix id in
@@ -990,6 +1002,7 @@ and infer_exp' env e : Il.exp' * typ =
     (elab_exp env e1 t).it, t
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
+  | UnparenE _ -> error e.at "misplaced unparenthesize"
 
 
 and elab_exp env e t : Il.exp =
@@ -1094,7 +1107,7 @@ and elab_exp' env e t : Il.exp' =
   | SizeE _ ->
     let e', t' = infer_exp env e in
     cast_exp' "expansion length" env e' t' t
-  | ParenE (e1, true) when is_iter_typ env t ->
+  | ParenE (e1, `Sig) when is_iter_typ env t ->
     (* Significant parentheses indicate a singleton *)
     let t1, _iter = as_iter_typ "expression" env Check t e.at in
     let e1' = elab_exp env e1 t1 in
@@ -1145,13 +1158,14 @@ and elab_exp' env e t : Il.exp' =
     let e', t' = infer_exp env e in
     cast_exp' "type annotation" env e' t' t
   | HoleE _ -> error e.at "misplaced hole"
-  | FuseE _ -> error e.at "misplaced token fuse"
+  | FuseE _ -> error e.at "misplaced token concatenation"
+  | UnparenE _ -> error e.at "misplaced unparenthesize"
 
 and elab_expfields env tid efs tfs t0 at : Il.expfield list =
   Debug.(log_in_at "el.elab_expfields" at
     (fun _ -> fmt "{%s} : {%s} = %s" (list el_expfield efs) (list el_typfield tfs) (el_typ t0))
   );
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   match efs, tfs with
   | [], [] -> []
   | (atom1, e)::efs2, (atom2, (t, prems), _)::tfs2 when atom1.it = atom2.it ->
@@ -1203,7 +1217,7 @@ and elab_exp_iter' env es (t1, iter) t at : Il.exp' =
 
 and elab_exp_notation env tid e nt t : Il.exp =
   (* Convert notation into applications of mixin operators *)
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let es', _s = elab_exp_notation' env tid e nt in
   let mixop, _, _ = elab_typ_notation env tid nt in
   Il.CaseE (mixop, tup_exp_bind' es' e.at) $$ e.at % elab_typ env t
@@ -1213,14 +1227,14 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
     (fun _ -> fmt "%s : %s" (el_exp e) (el_typ t))
     (fun (es', _) -> fmt "%s" (seq il_exp es'))
   ) @@ fun _ ->
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   match e.it, t.it with
   | AtomE atom, AtomT atom' ->
     if atom.it <> atom'.it then error_typ env e.at "atom" t;
     ignore (elab_atom atom tid);
     [], Subst.empty
   | InfixE (e1, atom, e2), InfixT (_, atom', _) when Il.Atom.sub atom' atom ->
-    let e21 = ParenE (SeqE [] $ e2.at, false) $ e2.at in
+    let e21 = ParenE (SeqE [] $ e2.at, `Insig) $ e2.at in
     elab_exp_notation' env tid
       (InfixE (e1, atom', SeqE [e21; e2] $ e2.at) $ e.at) t
   | InfixE (e1, atom, e2), InfixT (t1, atom', t2) ->
@@ -1259,7 +1273,7 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
     )
   | SeqE ({it = AtomE atom; at; _}::es2), SeqT ({it = AtomT atom'; _}::_)
     when Il.Atom.sub atom' atom ->
-    let e21 = ParenE (SeqE [] $ at, false) $ at in
+    let e21 = ParenE (SeqE [] $ at, `Insig) $ at in
     elab_exp_notation' env tid (SeqE ((AtomE atom' $ at) :: e21 :: es2) $ e.at) t
   | SeqE (e1::es2), SeqT (t1::ts2) ->
     let es1', s1 = elab_exp_notation' env tid (unparen_exp e1) t1 in
@@ -1290,7 +1304,7 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
     let iter1' = elab_iterexp env iter1 in
     [Il.IterE (tup_exp' es1' e1.at, iter1') $$ e.at % !!!env tid t], Subst.empty
   (* Significant parentheses indicate a singleton *)
-  | ParenE (e1, true), IterT (t1, iter) ->
+  | ParenE (e1, `Sig), IterT (t1, iter) ->
     let es', _s = elab_exp_notation' env tid e1 t1 in
     [lift_exp' (tup_exp' es' e.at) iter $$ e.at % elab_typ env t], Subst.empty
   (* Elimination forms are considered splices *)
@@ -1312,7 +1326,7 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
 
 
 and elab_exp_notation_iter env tid es (t1, iter) t at : Il.exp =
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let e' = elab_exp_notation_iter' env tid es (t1, iter) t at in
   let _, ts', _ = elab_typ_notation env tid t in
   e' $$ at % tup_typ' ts' t.at
@@ -1352,7 +1366,7 @@ and elab_exp_variant env tid e cases t at : Il.exp =
     (fun _ -> fmt "%s : %s = %s" (el_exp e) tid.it (el_typ t))
     (fun e' -> fmt "%s" (il_exp e'))
   ) @@ fun _ ->
-  assert (tid.it <> "");
+  assert (valid_tid tid);
   let atom =
     match e.it with
     | AtomE atom
@@ -1608,6 +1622,7 @@ and elab_sym env g : typ * env =
     let _e' = elab_exp env1 e t1 in
     TupT [] $ g.at, env
   | FuseG _ -> error g.at "misplaced token concatenation"
+  | UnparenG _ -> error g.at "misplaced token unparenthesize"
 
 and elab_sym_list env = function
   | [] -> [], env
@@ -1697,7 +1712,7 @@ and elab_arg in_lhs env a p s : Il.arg option * Subst.subst =
   | TypA ({it = VarT (id', []); _} as t), TypP id when in_lhs = `Lhs ->
     let id'' = strip_var_suffix id' in
     env.typs <- bind "syntax type" env.typs id'' ([], Opaque);
-    env.gvars <- bind "variable" env.gvars id'' (VarT (id'', []) $ id''.at);
+    env.gvars <- bind "variable" env.gvars (strip_var_sub id'') (VarT (id'', []) $ id''.at);
     Some (Il.TypA (Il.VarT (id'', []) $ t.at) $ a.at), Subst.add_typid s id t
   | TypA t, TypP _ when in_lhs = `Lhs ->
     error t.at "misplaced syntax type"
@@ -1752,14 +1767,15 @@ let elab_params env ps : Il.param list =
     | ExpP (id, t) ->
       let t' = elab_typ env t in
       (* If a variable isn't globally declared, this is a local declaration. *)
-      if bound env.gvars (strip_var_suffix id) then (
-        let t2 = find "" env.gvars (strip_var_suffix id) in
+      let id' = strip_var_suffix id in
+      if bound env.gvars id' then (
+        let t2 = find "" env.gvars id' in
         if not (sub_typ env t t2) then
           error_typ2 env id.at "local variable" t t2 ", shadowing with different type"
       );
       (* Shadowing is allowed, but only with consistent type. *)
-      if bound env.vars (strip_var_suffix id) then (
-        let t2 = find "" env.vars (strip_var_suffix id) in
+      if bound env.vars id' then (
+        let t2 = find "" env.vars id' in
         if not (equiv_typ env t t2) then
           error_typ2 env id.at "local variable" t t2 ", shadowing with different type"
       )
@@ -1768,7 +1784,7 @@ let elab_params env ps : Il.param list =
       ps' @ [Il.ExpP (id, t') $ p.at]
     | TypP id ->
       env.typs <- bind "syntax type" env.typs id ([], Opaque);
-      env.gvars <- bind "variable" env.gvars id (VarT (id, []) $ id.at);
+      env.gvars <- bind "variable" env.gvars (strip_var_sub id) (VarT (id, []) $ id.at);
       ps' @ [Il.TypP id $ p.at]
     | GramP (id, t) ->
       (* Treat unbound type identifiers in t as implicitly bound. *)
@@ -1780,7 +1796,7 @@ let elab_params env ps : Il.param list =
           if id.it <> (strip_var_suffix id).it then
             error_id id "invalid identifer suffix in binding position";
           env.typs <- bind "syntax type" env.typs id ([], Opaque);
-          env.gvars <- bind "variable" env.gvars id (VarT (id, []) $ id.at);
+          env.gvars <- bind "variable" env.gvars (strip_var_sub id) (VarT (id, []) $ id.at);
         )
       ) free.typid;
       let _t' = elab_typ env t in
@@ -1800,7 +1816,7 @@ let infer_typdef env d =
     let _ps' = elab_params (local_env env) ps in
     env.typs <- bind "syntax type" env.typs id (ps, Family []);
     if ps = [] then  (* only types without parameters double as variables *)
-      env.gvars <- bind "variable" env.gvars id (VarT (id, []) $ id.at);
+      env.gvars <- bind "variable" env.gvars (strip_var_sub id) (VarT (id, []) $ id.at);
   | TypD (id1, _id2, as_, t, _hints) ->
     if bound env.typs id1 then (
       let _ps, k = find "syntax type" env.typs id1 in
@@ -1816,7 +1832,7 @@ let infer_typdef env d =
       let k = infer_typ_definition env' t in
       env.typs <- bind "syntax type" env.typs id1 (ps, k);
       if ps = [] then  (* only types without parameters double as variables *)
-        env.gvars <- bind "variable" env.gvars id1 (VarT (id1, []) $ id1.at);
+        env.gvars <- bind "variable" env.gvars (strip_var_sub id1) (VarT (id1, []) $ id1.at);
     )
   | VarD (id, t, _hints) ->
     (* This is to ensure that we get rebind errors in syntactic order. *)
@@ -1848,7 +1864,9 @@ let elab_hintdef _env hd : Il.def list =
   | DecH (id, hints) ->
     if hints = [] then [] else
     [Il.HintD (Il.DecH (id, elab_hints id [] hints) $ hd.at) $ hd.at]
-  | GramH _ | AtomH _ | VarH _ ->
+  | AtomH (id, atom, _hints) ->
+    let _ = elab_atom atom id in []
+  | GramH _ | VarH _ ->
     []
 
 

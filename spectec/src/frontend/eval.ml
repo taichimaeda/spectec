@@ -174,6 +174,9 @@ and reduce_exp env e : exp =
     | DivOp, NatE (op, n1), NatE (_, n2) -> NatE (op, Z.(n1 / n2)) $ e.at
     | DivOp, NatE (_, z0), _ when z0 = Z.zero -> e1'
     | DivOp, _, NatE (_, z1) when z1 = Z.one -> e1'
+    | ModOp, NatE (op, n1), NatE (_, n2) -> NatE (op, Z.rem n1 n2) $ e.at
+    | ModOp, NatE (_, z0), _ when z0 = Z.zero -> e1'
+    | ModOp, _, NatE (op, z1) when z1 = Z.one -> NatE (op, Z.zero) $ e.at
     | ExpOp, NatE (op, n1), NatE (_, n2) -> NatE (op, Z.(n1 ** to_int n2)) $ e.at
     | ExpOp, NatE (_, z01), _ when z01 = Z.zero || z01 = Z.one -> e1'
     | ExpOp, _, NatE (op, z0) when z0 = Z.zero -> NatE (op, Z.one) $ e.at
@@ -285,7 +288,7 @@ and reduce_exp env e : exp =
   | IterE (e1, iter) ->
     let e1' = reduce_exp env e1 in
     IterE (e1', iter) $ e.at  (* TODO *)
-  | HoleE _ | FuseE _ -> assert false
+  | HoleE _ | FuseE _ | UnparenE _ -> assert false
 
 and reduce_expfield env (atom, e) : expfield = (atom, reduce_exp env e)
 
@@ -544,8 +547,8 @@ and match_exp env s e1 e2 : subst option =
 *)
   | IterE (e11, iter1), IterE (e21, iter2) ->
     let* s' = match_exp env s e11 e21 in match_iter env s' iter1 iter2
-  | (HoleE _ | FuseE _), _
-  | _, (HoleE _ | FuseE _) -> assert false
+  | (HoleE _ | FuseE _ | UnparenE _), _
+  | _, (HoleE _ | FuseE _ | UnparenE _) -> assert false
   | _, _ when is_normal_exp e1 -> None
   | _, _ -> raise Irred
 

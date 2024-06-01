@@ -52,11 +52,11 @@ The following auxiliary typing rules specify this typing relation relative to a 
 
 .. math::
    \frac{
-     \vdashheaptype t \ok
+     \vdashheaptype t : \OKheaptype
      \qquad
      t' \in \{\NONE, \NOFUNC, \NOEXTERN\}
      \qquad
-     \vdashheaptypematch t' \matchesheaptype t
+     \vdashheaptypematch t' \subheaptypematch t
    }{
      S \vdashval \REFNULL~t : (\REF~\NULL~t')
    }
@@ -181,7 +181,7 @@ The following auxiliary typing rules specify this typing relation relative to a 
    \frac{
      S \vdashval \reff : \REF~\NULL^?~t
      \qquad
-     \vdashheaptypematch t \matchesheaptype \ANY
+     \vdashheaptypematch t \subheaptypematch \ANY
    }{
      S \vdashval \REFEXTERN~\reff : \REF~\NULL^?~\EXTERN
    }
@@ -199,9 +199,9 @@ Subsumption
    \frac{
      S \vdashval \val : t
      \qquad
-     \vdashvaltype t' \ok
+     \vdashvaltype t' : \OKvaltype
      \qquad
-     \vdashvaltypematch t \matchesvaltype t'
+     \vdashvaltypematch t \subvaltypematch t'
    }{
      S \vdashval \val : t'
    }
@@ -298,9 +298,9 @@ Subsumption
    \frac{
      S \vdashexternval \externval : \X{et}
      \qquad
-     \vdashexterntype \X{et'} \ok
+     \vdashexterntype \X{et'} : \OKexterntype
      \qquad
-     \vdashexterntypematch \X{et} \matchesexterntype \X{et'}
+     \vdashexterntypematch \X{et} \subexterntypematch \X{et'}
    }{
      S \vdashexternval \externval : \X{et'}
    }

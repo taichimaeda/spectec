@@ -86,6 +86,7 @@ and binop =
   | SubOp  (* `-` *)
   | MulOp  (* `*` *)
   | DivOp  (* `/` *)
+  | ModOp  (* `\` *)
   | ExpOp  (* `^` *)
 
 and cmpop =
@@ -118,7 +119,7 @@ and exp' =
   | CompE of exp * exp           (* exp `++` exp *)
   | LenE of exp                  (* `|` exp `|` *)
   | SizeE of id                  (* `||` exp `||` *)
-  | ParenE of exp * bool         (* `(` exp `)` *)
+  | ParenE of exp * [`Sig | `Insig]  (* `(` exp `)` *)
   | TupE of exp list             (* `(` list2(exp, `,`) `)` *)
   | InfixE of exp * atom * exp   (* exp atom exp *)
   | BrackE of atom * exp * atom  (* ``` ([{ exp }]) *)
@@ -127,6 +128,7 @@ and exp' =
   | TypE of exp * typ            (* exp `:` typ *)
   | HoleE of [`Num of int | `Next | `Rest | `None]  (* `%N` or `%` or `%%` or `!%` *)
   | FuseE of exp * exp           (* exp `#` exp *)
+  | UnparenE of exp              (* `##` exp *)
 
 and expfield = atom * exp        (* atom exp *)
 
@@ -155,6 +157,7 @@ and sym' =
   | ArithG of exp                            (* `$(` exp `)` *)
   | AttrG of exp * sym                       (* exp `:` sym *)
   | FuseG of sym * sym                       (* sym `#` sym *)
+  | UnparenG of sym                          (* `##` sym *)
 
 and prod = prod' phrase
 and prod' = sym * exp * prem nl_list         (* `|` sym `=>` exp (`--` prem)* *)
@@ -200,7 +203,7 @@ and prem' =
 
 and hintdef = hintdef' phrase
 and hintdef' =
-  | AtomH of id * hint list
+  | AtomH of id * atom * hint list
   | TypH of id * id * hint list
   | GramH of id * id * hint list
   | RelH of id * hint list
