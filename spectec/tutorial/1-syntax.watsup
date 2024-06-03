@@ -40,8 +40,7 @@ var l : labelidx
 
 ;; Types
 
-syntax valtype hint(desc "number type") =
-  | I32 | I64 |
+syntax valtype hint(desc "number type") = I32 | I64
 
 syntax Inn hint(show I#n) = I32 | I64
 
@@ -69,9 +68,8 @@ syntax val_(Inn) = iN($size(Inn))
 ;; Operators
 
 
-syntax binop_(valtype)
-syntax binop_(Inn) =
-  | ADD | SUB | MUL
+
+syntax binop = ADD | SUB | MUL
 
 ;; Instructions
 
@@ -103,7 +101,7 @@ syntax instr/call hint(desc "call instruction") = ...
 
 syntax instr/num hint(desc "numeric instruction") = ...
   | CONST valtype val_(valtype)      hint(show %.CONST %)
-  | BINOP valtype binop_(valtype)    hint(show %.%)
+  | BINOP valtype binop    hint(show %.%)
   | ...
 
 syntax instr/local hint(desc "local instruction") = ...

@@ -80,7 +80,7 @@ rule Step/return-label:
 
 ;; Numeric instructions
 
-def $binop(valtype, binop_(valtype), val_(valtype), val_(valtype)) : val_(valtype)*
+def $binop(valtype, binop, val_(valtype), val_(valtype)) : val_(valtype)*
     hint(show %2#$_(%1)#(%3, %4))
 
 def $iadd(N, iN(N), iN(N)) : iN(N)      hint(show $iadd_(%,%,%))
