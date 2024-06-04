@@ -47,10 +47,10 @@ let lemma_gen_step_pure_preservation (relation_id_to_relation : (name, coq_def) 
   String.concat ".\n\n" (List.map (fun ((case_id, binds), premises, end_terms) ->
     let (before_redux, after_redux) = split_reduction end_terms in
     let premises_gen = if premises <> [] then String.concat " ->\n\t" (List.map string_of_premise premises) ^ " ->\n\t" else "" in
-    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall va_S va_C " ^ string_of_binders binds ^ " " ^ function_type_var ^ ",\n\t" ^ 
-    instr_ok_relation ^ " v_S v_C " ^ before_redux ^ " " ^ function_type_var ^ " ->\n\t" ^ 
+    "Lemma " ^ case_id ^ preservation_prefix ^ " : forall r_v_S r_v_C " ^ string_of_binders binds ^ " " ^ function_type_var ^ ",\n\t" ^ 
+    instr_ok_relation ^ " r_v_S r_v_C " ^ before_redux ^ " " ^ function_type_var ^ " ->\n\t" ^ 
     premises_gen ^
-    instr_ok_relation ^ " v_S v_C " ^ after_redux ^ " " ^ function_type_var ^ ".\n" ^ proof_admitted
+    instr_ok_relation ^ " r_v_S r_v_C " ^ after_redux ^ " " ^ function_type_var ^ ".\n" ^ proof_admitted
   ) relation_entries) ^ ".\n\n"
 
 
