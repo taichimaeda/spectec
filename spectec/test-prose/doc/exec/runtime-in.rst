@@ -267,7 +267,7 @@ $${syntax: frame}
 Administrative Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-$${syntax: admininstr}
+$${syntax: instr/admin}
 
 .. _syntax-state:
 .. _syntax-config:
@@ -303,5 +303,5 @@ $${definition-prose: frame}
 $${definition: frame}
 
 $${rule+:
-  Ref_ok/*
+  Ref_type/*
 }

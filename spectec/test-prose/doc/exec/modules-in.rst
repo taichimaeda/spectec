@@ -126,13 +126,13 @@ $${definition-prose: growmem}
 
 $${definition: growmem}
 
-.. _def-instexport:
+.. _def-allocexport:
 
-$${definition-prose: instexport}
+$${definition-prose: allocexport}
 
 \
 
-$${definition: instexport}
+$${definition: allocexport}
 
 .. _def-allocmodule:
 
@@ -157,19 +157,19 @@ $${definition: inst_reftype}
 
 .. _def-rundata:
 
-$${definition-prose: rundata}
+$${definition-prose: rundata_}
 
 \
 
-$${definition: rundata}
+$${definition: rundata_}
 
 .. _def-runelem:
 
-$${definition-prose: runelem}
+$${definition-prose: runelem_}
 
 \
 
-$${definition: runelem}
+$${definition: runelem_}
 
 .. _def-instantiate:
 
