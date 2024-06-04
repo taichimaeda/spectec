@@ -31,17 +31,18 @@ rule Externvals_ok/func:
 
 rule Externvals_ok/table:
   S |- TABLE a : TABLE tt
-    -- if S.TABLES[a] = {TYPE tt, REFS fa?*}
+    -- if S.TABLES[a] = {TYPE tt', REFS fa?*}
+    -- Tabletype_sub: |- tt' <: tt
+
 
 rule Externvals_ok/mem:
   S |- MEM a : MEM mt
-    -- if S.MEMS[a] = {TYPE mt, BYTES b*}
-    -- if mt = `[n .. m]
-    -- if |b*| = $(n * 64 * $Ki)
+    -- if S.MEMS[a] = {TYPE mt', BYTES b*}
+    -- Memtype_sub: |- mt' <: mt
 
 rule Externvals_ok/global:
-  S |- GLOBAL a : GLOBAL gt
-    -- if S.GLOBALS[a] = {TYPE gt, VALUE v}
+  S |- GLOBAL a : GLOBAL (mut valtype)
+    -- if S.GLOBALS[a] = {TYPE (mut valtype), VALUE (CONST valtype val_)}
 
 ;; Memory instance 
 
@@ -158,8 +159,8 @@ rule Admin_instr_ok/call_addr:
 
 rule Admin_instr_ok/label:
   S; C |- LABEL_ n `{instr*} admininstr* : eps -> t_2?
-  -- Instrs_ok: C |- instr: t_1? -> t_2?
-  -- Admin_instrs_ok: S; $($(C , LABELS (t_1?))) |- admininstr: eps -> t_2?
+  -- Instrs_ok: C |- instr*: t_1? -> t_2?
+  -- Admin_instrs_ok: S; $($(C , LABELS (t_1?))) |- admininstr*: eps -> t_2?
 
 rule Admin_instr_ok/frame:
   S; C |- FRAME_ n `{F} admininstr* : eps -> t?
@@ -212,7 +213,8 @@ rule Mem_extension:
   -- if n1 <= n2
 
 rule Global_extension:
-  |- {TYPE gt, VALUE (CONST t val_)} : {TYPE gt, VALUE (CONST t val_)}
+  |- {TYPE (mut t2), VALUE (CONST t c1)} : {TYPE (mut t2), VALUE (CONST t c2)}
+  -- if (mut = MUT) \/ c1 = c2
 
 rule Store_extension:
   |- store_1 : store_2

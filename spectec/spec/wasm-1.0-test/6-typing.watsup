@@ -166,7 +166,7 @@ rule Instr_ok/block:
 
 rule Instr_ok/loop:
   C |- LOOP t? instr* : eps -> t?
-  -- Instrs_ok: C, LABELS (eps) |- instr* : eps -> eps
+  -- Instrs_ok: C, LABELS (eps) |- instr* : eps -> t?
 
 rule Instr_ok/if:
   C |- IF t? instr_1* ELSE instr_2* : (INN I32) -> t?

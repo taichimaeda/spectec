@@ -124,7 +124,8 @@ rule Step_read/call_indirect-trap:
 
 rule Step_read/call_addr:
   z; val^k (CALL_ADDR a)  ~>  (FRAME_ n `{f} (LABEL_ n `{eps} instr*))
-  -- if $funcinst(z)[a] = {TYPE (t_1^k -> t_2^n), MODULE mm, CODE func}
+  -- if $funcinst(z)[a] = {TYPE (t_1^k -> t_2?), MODULE mm, CODE func}
+  -- if |t_1^k| = |val^k|
   -- if func = FUNC x (LOCAL t)* instr*
   -- if f = {LOCALS val^k ($default_(t))*, MODULE mm}
 
