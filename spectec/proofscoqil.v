@@ -3380,13 +3380,12 @@ Proof.
 	apply Const_list_typing_empty.
 Qed.
 
-Lemma Step_pure__br_zero_preserves : forall v_S v_minst v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
+Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] v_func_type ->
-	Module_instance_ok v_S v_minst v_C ->
 	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) v_func_type.
 Proof.
-	move => v_S v_minst v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HMinst HReduce.
+	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? ?]]]].
@@ -3399,16 +3398,6 @@ Proof.
 	apply Val_Const_list_typing in H3_comp.
 	apply Val_Const_list_typing in H3_comp0.
 	subst.
-	apply inst_t_context_labels_empty in HMinst as ?.
-	rewrite H1 in H1_comp1. rewrite <- app_right_nil in H1_comp1. 
-	unfold upd_label in H1_comp1. unfold set in H1_comp1. 
-	simpl in H1_comp1.
-	unfold lookup_total in H1_comp1.
-	simpl in H1_comp1.
-	apply empty_append in H1_comp; destruct H1_comp; subst.
-	simpl in *.
-	apply admin_composition' with (t2s := (ts1 ++ ts)).
-
 Admitted.
 
 Lemma Step_pure__br_succ_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_instr : (list instr)) v_func_type,
@@ -3963,7 +3952,6 @@ Lemma concat_cancel_last_n: forall (l1 l2 l3 l4: seq valtype),
     (l1 = l3) /\  (l2 = l4).
 Proof.
   move => l1 l2 l3 l4 HCat HSize.
- 
   assert (length (l1 ++ l2) = length (l3 ++ l4)); first by rewrite HCat.
   repeat rewrite app_length in H.
   rewrite HSize in H. 
@@ -4584,10 +4572,6 @@ Proof.
 		- move => x y HIn. apply In2_split in HIn. destruct HIn.
 		eapply Forall2_forall2weak2 with (y := y) in H6 => //=; destruct H6 as [x' ?].
 		inversion H6; decomp; subst.
-		
-
-	
-	
 Admitted.
 
 Lemma list_update_same_unchanged: forall {X : Type} {Y : Inhabited X} (l: list X) e i,
