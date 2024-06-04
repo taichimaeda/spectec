@@ -16,7 +16,7 @@ var fa : funcaddr
 ;; Basic values
 
 syntax val hint(desc "value") =
-  | CONST valtype val_(valtype)   hint(show %.CONST %)
+  | CONST valtype num_(valtype)   hint(show %.CONST %)
 
 syntax result hint(desc "result") =
   | _VALS val* | TRAP
@@ -97,3 +97,8 @@ def $with_local((s; f), x, v) = s; f[.LOCALS[x] = v]
 
 def $funcinst(state) : funcinst*      hint(show %.FUNCS)
 def $funcinst((s; f)) = s.FUNCS
+
+def $default_(valtype) : val
+
+def $default_(I32) = (CONST I32 0)
+def $default_(I64) = (CONST I64 0)

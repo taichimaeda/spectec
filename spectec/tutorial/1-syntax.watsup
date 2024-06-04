@@ -42,8 +42,6 @@ var l : labelidx
 
 syntax valtype hint(desc "number type") = I32 | I64
 
-syntax Inn hint(show I#n) = I32 | I64
-
 var t : valtype
 
 syntax resulttype hint(desc "result type") =
@@ -62,8 +60,8 @@ var xt : externtype
 
 def $size(valtype) : nat  hint(partial) hint(show |%|)
 
-syntax val_(valtype)
-syntax val_(Inn) = iN($size(Inn))
+syntax num_(valtype)
+syntax num_(valtype) = iN($size(valtype))
 
 ;; Operators
 
@@ -73,10 +71,6 @@ syntax binop = ADD | SUB | MUL
 
 ;; Instructions
 
-syntax blocktype hint(desc "block type") = valtype?
-
-var bt : blocktype
-
 syntax instr/parametric hint(desc "parametric instruction") =
   | NOP
   | DROP
@@ -84,9 +78,9 @@ syntax instr/parametric hint(desc "parametric instruction") =
   | ...
 
 syntax instr/block hint(desc "block instruction") = ...
-  | BLOCK blocktype instr*
-  | LOOP blocktype instr*
-  | IF blocktype instr* ELSE instr*
+  | BLOCK functype instr*
+  | LOOP functype instr*
+  | IF functype instr* ELSE instr*
   | ...
 
 syntax instr/br hint(desc "branch instruction") = ...
@@ -100,14 +94,13 @@ syntax instr/call hint(desc "call instruction") = ...
   | ...
 
 syntax instr/num hint(desc "numeric instruction") = ...
-  | CONST valtype val_(valtype)      hint(show %.CONST %)
+  | CONST valtype num_(valtype)      hint(show %.CONST %)
   | BINOP valtype binop    hint(show %.%)
   | ...
 
 syntax instr/local hint(desc "local instruction") = ...
   | LOCAL.GET localidx
   | LOCAL.SET localidx
-  | LOCAL.TEE localidx
 
 
 syntax expr hint(desc "expression") =
@@ -127,8 +120,6 @@ syntax local hint(desc "local") =
   LOCAL valtype
 syntax func hint(desc "function") =
   FUNC typeidx local* expr
-syntax start hint(desc "start function") =
-  START funcidx
 
 syntax externidx hint(desc "external index") =
   | FUNC funcidx
@@ -136,11 +127,10 @@ syntax export hint(desc "export") =
   EXPORT name externidx
 
 syntax module hint(desc "module") =
-  MODULE type* func* start* export*
+  MODULE type* func* export*
 
 
 var ty : type
 var loc : local
 var ex : export
-var st : start
 var xx : externidx

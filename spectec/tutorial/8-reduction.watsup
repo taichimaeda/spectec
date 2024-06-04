@@ -29,18 +29,18 @@ rule Step/select-false:
 ;; Block instructions
 
 rule Step/block:
-  z; (BLOCK t? instr*)  ~>  z; (LABEL_ n `{eps} instr*)
+  z; (BLOCK (eps -> t?) instr*)  ~>  z; (LABEL_ n `{eps} instr*)
   -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
 
 rule Step/loop:
-  z; (LOOP t? instr*)  ~>  z; (LABEL_ 0 `{LOOP t? instr*} instr*)
+  z; (LOOP ft instr*)  ~>  z; (LABEL_ 0 `{LOOP ft instr*} instr*)
 
 rule Step/if-true:
-  z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_1*)
+  z; (CONST I32 c) (IF ft instr_1* ELSE instr_2*)  ~>  z; (BLOCK ft instr_1*)
   -- if c =/= 0
 
 rule Step/if-false:
-  z; (CONST I32 c) (IF t? instr_1* ELSE instr_2*)  ~>  z; (BLOCK t? instr_2*)
+  z; (CONST I32 c) (IF ft instr_1* ELSE instr_2*)  ~>  z; (BLOCK ft instr_2*)
   -- if c = 0
 
 
@@ -66,7 +66,13 @@ rule Step/br_if-false:
 ;; Function instructions
 
 rule Step/call:
-  z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])  ;; TODO
+  z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])
+
+rule Step/call_addr:
+  z; val^k (CALL_ADDR a)  ~>  z; (FRAME_ n `{f} (LABEL_ n `{eps} instr*))
+  -- if $funcinst(z)[a] = {TYPE (t_1^k -> t_2^n), MODULE mm, CODE func}
+  -- if func = FUNC x (LOCAL t)* instr*
+  -- if f = {LOCALS val^k ($default_(t))*, MODULE mm}
 
 rule Step/frame-vals:
   z; (FRAME_ n `{f} val^n)  ~>  z; val^n
@@ -78,20 +84,45 @@ rule Step/return-label:
   z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
 
 
+;; Traps
+
+rule Step/trap-vals:
+  z; val* TRAP instr*  ~>  z; TRAP
+  -- if val* =/= eps \/ instr* =/= eps
+
+rule Step/trap-label:
+  z; (LABEL_ n `{instr'*} TRAP)  ~>  z; TRAP
+
+rule Step/trap-frame:
+  z; (FRAME_ n `{f} TRAP)  ~>  z; TRAP
+
+
+;; Context
+
+rule Step/ctxt-label:
+  z; (LABEL_ n `{instr_0*} instr*)  ~>  z'; (LABEL_ n `{instr_0*} instr'*)
+  -- Step: z; instr* ~> z'; instr'*
+
+rule Step/ctxt-frame:
+  s; f; (FRAME_ n `{f'} instr*)  ~>  s'; f; (FRAME_ n `{f'} instr'*)
+  -- Step: s; f'; instr* ~> s'; f'; instr'*
+
+
 ;; Numeric instructions
 
-def $binop(valtype, binop, val_(valtype), val_(valtype)) : val_(valtype)*
+def $binop(valtype, binop, num_(valtype), num_(valtype)) : num_(valtype)*
     hint(show %2#$_(%1)#(%3, %4))
 
 def $iadd(N, iN(N), iN(N)) : iN(N)      hint(show $iadd_(%,%,%))
 def $isub(N, iN(N), iN(N)) : iN(N)      hint(show $isub_(%,%,%))
 def $imul(N, iN(N), iN(N)) : iN(N)      hint(show $imul_(%,%,%))
+def $iadd(N, c_1, c_2) = $((c_1 + c_2) \ 2^N)
+def $isub(N, c_1, c_2) = $((c_1 - c_2 + 2^N) \ 2^N)
+def $imul(N, c_1, c_2) = $((c_1 * c_2) \ 2^N)
 
 def $binop(t, ADD, c_1, c_2) = $iadd($size(t), c_1, c_2)
 def $binop(t, SUB, c_1, c_2) = $isub($size(t), c_1, c_2)
 def $binop(t, MUL, c_1, c_2) = $imul($size(t), c_1, c_2)
-;; def $binop(Inn, SUB, iN_1, iN_2) = $isub($size(Inn), iN_1, iN_2)
-;; def $binop(Inn, MUL, iN_1, iN_2) = $imul($size(Inn), iN_1, iN_2)
 
 rule Step/binop-val:
   z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
@@ -109,6 +140,3 @@ rule Step/local.get:
 
 rule Step/local.set:
   z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps
-
-rule Step/local.tee:
-  z; val (LOCAL.TEE x)  ~>  z; val val (LOCAL.SET x)

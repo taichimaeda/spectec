@@ -36,18 +36,17 @@ def $allocmodule(s, module, externval*) = (s_1, mm)
   -- if module =
     MODULE
       (TYPE ft)*
-      func^n_func
-      start?
+      func^n
       export*
   -- if fa_ex* = $funcs(externval*)
-  -- if fa* = $(|s.FUNCS|+i_func)^(i_func<n_func)
+  -- if fa* = $(|s.FUNCS|+i_func)^(i_func<n)
   -- if xi* = $instexport(fa_ex* fa*, export)*
   -- if mm = {
       TYPES ft*,
       FUNCS fa_ex* fa*,
       EXPORTS xi*
     }
-  -- if (s_1, fa*) = $allocfuncs(s, mm, func^n_func)
+  -- if (s_1, fa*) = $allocfuncs(s, mm, func^n)
 
 
 ;;
@@ -55,14 +54,13 @@ def $allocmodule(s, module, externval*) = (s_1, mm)
 ;;
 
 def $instantiate(store, module, externval*) : config
-def $instantiate(s, module, externval*) = s_1; f; (CALL x')?
-  -- if module = MODULE type* func* start? export*
+def $instantiate(s, module, externval*) = s_1; f; eps
+  -- if module = MODULE type* func* export*
   -- if type* = (TYPE functype)*
-  -- if start? = (START x')?
-  -- if n_F = |func*|
+  -- if n = |func*|
   -- if mm_init = {
       TYPES functype*,
-      FUNCS $funcs(externval*) $(|s.FUNCS|+i_F)^(i_F<n_F)
+      FUNCS $funcs(externval*) $(|s.FUNCS|+i_F)^(i_F<n)
     }
   -- if f_init = { MODULE mm_init }
   -- if z = s; f_init
