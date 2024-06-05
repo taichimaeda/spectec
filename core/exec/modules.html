@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-06-04)</title>
+    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-06-05)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -509,7 +509,7 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
-{\href{../exec/modules.html#exec-instantiation}{\mathrm{instantiate}}}(s, {\href{../syntax/modules.html#syntax-module}{\mathit{module}}}, {{\href{../exec/runtime.html#syntax-externval}{\mathit{externval}}}^\ast}) &amp;=&amp; \multicolumn{2}{l&#64;{}}{ {s'} ; f ; {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast}~{(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call}}~x)^?} } \\
+{\href{../exec/modules.html#exec-instantiation}{\mathrm{instantiate}}}(s, {\href{../syntax/modules.html#syntax-module}{\mathit{module}}}, {{\href{../exec/runtime.html#syntax-externval}{\mathit{externval}}}^\ast}) &amp;=&amp; \multicolumn{2}{l&#64;{}}{ {s'} ; f ; {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{s}}^?} } \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad \mbox{if}~{\href{../syntax/modules.html#syntax-module}{\mathit{module}}} = \href{../syntax/modules.html#syntax-module}{\mathsf{module}}~{{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}~{{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}~{{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}~{{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}~{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}~{{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}~{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}~{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}~{{\href{../syntax/modules.html#syntax-start}{\mathit{start}}}^?}~{{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast} = {(\href{../syntax/modules.html#syntax-global}{\mathsf{global}}~{\href{../syntax/types.html#syntax-globaltype}{\mathit{globaltype}}}~{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{g}})^\ast}} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast} = {(\href{../syntax/modules.html#syntax-table}{\mathsf{table}}~{\href{../syntax/types.html#syntax-tabletype}{\mathit{tabletype}}}~{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{t}})^\ast}} \\
@@ -530,6 +530,7 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\mathit{mm}} \}\end{array}} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast} = {\href{../syntax/conventions.html#notation-concat}{\mathrm{concat}}}({{{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{i_{\mathsf{e}}}({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}{}[i_{\mathsf{e}}])^{i_{\mathsf{e}}&lt;{|{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}|}}})} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast} = {\href{../syntax/conventions.html#notation-concat}{\mathrm{concat}}}({{{\href{../exec/modules.html#aux-rundata}{\mathrm{rundata}}}}_{i_{\mathsf{d}}}({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}{}[i_{\mathsf{d}}])^{i_{\mathsf{d}}&lt;{|{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}|}}})} \\
+   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{s}}^?} = {(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call}}~x)^?}} \\
 \end{array}\end{split}\]</div>
 <p>where:</p>
 <div class="math notranslate nohighlight" id="aux-rundata">
