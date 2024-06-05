@@ -263,7 +263,7 @@ and transform_exp (exp : exp) =
     | TheE e -> T_app (T_exp_basic T_the, [transform_exp e])
     | StrE expfields -> T_record_fields (List.map (fun (a, e) -> (gen_typ_name exp.note ^ "__" ^ transform_atom a, transform_exp e)) expfields)
     | DotE (e, atom) -> T_app (T_ident [gen_typ_name e.note; transform_atom atom], [transform_exp e])
-    | CompE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp2, transform_exp exp1)
+    | CompE (exp1, exp2) -> T_app_infix (T_exp_basic T_concat, transform_exp exp1, transform_exp exp2)
     | ListE exps -> T_list (List.map transform_exp exps)
     | LenE e -> T_app (T_exp_basic T_listlength, [transform_exp e])
     | CatE (exp1, exp2) -> T_app (T_exp_basic T_listconcat, [T_ident ["_"] ;transform_exp exp1; transform_exp exp2])

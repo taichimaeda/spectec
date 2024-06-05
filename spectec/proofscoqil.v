@@ -306,6 +306,12 @@ Definition list__valtype  := (list (valtype )).
 
 Global Instance Inhabited__valtype : Inhabited (valtype) := { default_val := valtype__INN default_val }.
 
+Definition fun_optionSize (v__ : (option valtype)) : nat :=
+match (v__) with
+	| ((Some (v_valtype))) => 1
+	| (None) => 0
+end.
+
 Definition resulttype  := (option valtype).
 
 Definition list__resulttype  := (list (resulttype )).
@@ -1586,14 +1592,14 @@ Inductive Step_pure: (list admininstr) -> (list admininstr) -> Prop :=
 	| Step_pure__if_true : forall (v_c : iN) (v_t : (option valtype)) (v_instr_1 : (list instr)) (v_instr_2 : (list instr)), ((v_c : val_) <> 0) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__IFELSE v_t v_instr_1 v_instr_2)] [(admininstr__BLOCK v_t v_instr_1)]
 	| Step_pure__if_false : forall (v_c : iN) (v_t : (option valtype)) (v_instr_1 : (list instr)) (v_instr_2 : (list instr)), ((v_c : val_) = 0) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__IFELSE v_t v_instr_1 v_instr_2)] [(admininstr__BLOCK v_t v_instr_2)]
 	| Step_pure__label_vals : forall (v_n : n) (v_instr : (list instr)) (v_val : (list val)), Step_pure [(admininstr__LABEL_ v_n v_instr (list__val__admininstr v_val))] (list__val__admininstr v_val)
-	| Step_pure__br_zero : forall (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr'))
+	| Step_pure__br_zero : forall (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), ((List.length v_val) = v_n) -> Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr'))
 	| Step_pure__br_succ : forall (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)])
 	| Step_pure__br_if_true : forall (v_c : iN) (v_l : labelidx), ((v_c : val_) <> 0) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] [(admininstr__BR v_l)]
 	| Step_pure__br_if_false : forall (v_c : iN) (v_l : labelidx), ((v_c : val_) = 0) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] []
 	| Step_pure__br_table_lt : forall (v_i : nat) (v_l : (list labelidx)) (v_l' : labelidx), (v_i < (List.length v_l)) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__BR_TABLE v_l v_l')] [(admininstr__BR (lookup_total v_l v_i))]
 	| Step_pure__br_table_ge : forall (v_i : nat) (v_l : (list labelidx)) (v_l' : labelidx), (v_i >= (List.length v_l)) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__BR_TABLE v_l v_l')] [(admininstr__BR v_l')]
 	| Step_pure__frame_vals : forall (v_n : n) (v_f : frame) (v_val : (list val)), Step_pure [(admininstr__FRAME_ v_n v_f (list__val__admininstr v_val))] (list__val__admininstr v_val)
-	| Step_pure__return_frame : forall (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val)
+	| Step_pure__return_frame : forall (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), ((List.length v_val) = v_n) -> Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val)
 	| Step_pure__return_label : forall (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )])
 	| Step_pure__trap_vals : forall (v_val : (list val)) (v_instr : (list instr)), ((v_val <> []) \/ (v_instr <> [])) -> Step_pure (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] (list__instr__admininstr v_instr))) [(admininstr__TRAP )]
 	| Step_pure__trap_label : forall (v_n : n) (v_instr' : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' [(admininstr__TRAP )])] [(admininstr__TRAP )]
@@ -1617,7 +1623,7 @@ Inductive Step_read: config -> (list admininstr) -> Prop :=
 	| Step_read__call : forall (v_z : state) (v_x : idx), (v_x < (List.length (fun_funcaddr v_z))) -> Step_read (config__ v_z [(admininstr__CALL v_x)]) [(admininstr__CALL_ADDR (lookup_total (fun_funcaddr v_z) v_x))]
 	| Step_read__call_indirect_call : forall (v_z : state) (v_i : nat) (v_x : idx) (v_a : addr), (v_i < (List.length (tableinst__REFS (fun_table v_z 0)))) /\ (v_a < (List.length (fun_funcinst v_z))) /\ ((lookup_total (tableinst__REFS (fun_table v_z 0)) v_i) = (Some v_a)) /\ ((fun_type v_z v_x) = (funcinst__TYPE (lookup_total (fun_funcinst v_z) v_a))) -> Step_read (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)]) [(admininstr__CALL_ADDR v_a)]
 	| Step_read__call_indirect_trap : forall (v_z : state) (v_i : nat) (v_x : idx), (~(Step_read_before_Step_read__call_indirect_trap (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)]))) -> Step_read (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CALL_INDIRECT v_x)]) [(admininstr__TRAP )]
-	| Step_read__call_addr : forall (v_z : state) (v_val : (list val)) (v_k : nat) (v_a : addr) (v_n : n) (v_f : frame) (v_instr : (list instr)) (v_t_1 : (list valtype)) (v_t_2 : (option valtype)) (v_mm : moduleinst) (v_func : func) (v_x : idx) (v_t : (list valtype)), (v_a < (List.length (fun_funcinst v_z))) /\ ((lookup_total (fun_funcinst v_z) v_a) = {| funcinst__TYPE := (functype__ v_t_1 v_t_2); funcinst__MODULE := v_mm; funcinst__CODE := v_func |}) /\ ((List.length v_t_1) = (List.length v_val)) /\ (v_func = (func__FUNC v_x (List.map (fun v_t => (local__LOCAL v_t)) (v_t)) v_instr)) /\ (v_f = {| frame__LOCALS := (@app _ v_val (List.map (fun v_t => (fun_default_ v_t)) (v_t))); frame__MODULE := v_mm |}) -> Step_read (config__ v_z (@app _ (list__val__admininstr v_val) [(admininstr__CALL_ADDR v_a)])) [(admininstr__FRAME_ v_n v_f [(admininstr__LABEL_ v_n [] (list__instr__admininstr v_instr))])]
+	| Step_read__call_addr : forall (v_z : state) (v_val : (list val)) (v_k : nat) (v_a : addr) (v_n : n) (v_f : frame) (v_instr : (list instr)) (v_t_1 : (list valtype)) (v_t_2 : (option valtype)) (v_mm : moduleinst) (v_func : func) (v_x : idx) (v_t : (list valtype)), (v_a < (List.length (fun_funcinst v_z))) /\ ((lookup_total (fun_funcinst v_z) v_a) = {| funcinst__TYPE := (functype__ v_t_1 v_t_2); funcinst__MODULE := v_mm; funcinst__CODE := v_func |}) /\ ((List.length v_t_1) = (List.length v_val)) /\ (v_n = (fun_optionSize v_t_2)) /\ (v_func = (func__FUNC v_x (List.map (fun v_t => (local__LOCAL v_t)) (v_t)) v_instr)) /\ (v_f = {| frame__LOCALS := (@app _ v_val (List.map (fun v_t => (fun_default_ v_t)) (v_t))); frame__MODULE := v_mm |}) -> Step_read (config__ v_z (@app _ (list__val__admininstr v_val) [(admininstr__CALL_ADDR v_a)])) [(admininstr__FRAME_ v_n v_f [(admininstr__LABEL_ v_n [] (list__instr__admininstr v_instr))])]
 	| Step_read__local_get : forall (v_z : state) (v_x : idx), Step_read (config__ v_z [(admininstr__LOCAL_GET v_x)]) [((fun_local v_z v_x) : admininstr)]
 	| Step_read__global_get : forall (v_z : state) (v_x : idx), Step_read (config__ v_z [(admininstr__GLOBAL_GET v_x)]) [((globalinst__VALUE (fun_global v_z v_x)) : admininstr)]
 	| Step_read__load_num_trap : forall (v_z : state) (v_i : nat) (v_t : valtype) (v_mo : memop), (((v_i + (memop__OFFSET v_mo)) + ((fun_size v_t) / 8)) > (List.length (meminst__BYTES (fun_mem v_z 0)))) -> Step_read (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__LOAD_ v_t None v_mo)]) [(admininstr__TRAP )]
@@ -1688,8 +1694,8 @@ Inductive Admin_instr_ok: store -> context -> admininstr -> functype -> Prop :=
 	| Admin_instr_ok__instr : forall (v_S : store) (v_C : context) (v_instr : instr) (v_functype : functype), (Instr_ok v_C v_instr v_functype) -> Admin_instr_ok v_S v_C (v_instr : admininstr) v_functype
 	| Admin_instr_ok__trap : forall (v_S : store) (v_C : context) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), Admin_instr_ok v_S v_C (admininstr__TRAP ) (functype__ v_t_1 v_t_2)
 	| Admin_instr_ok__call_addr : forall (v_S : store) (v_C : context) (v_funcaddr : funcaddr) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC (functype__ v_t_1 v_t_2))) -> Admin_instr_ok v_S v_C (admininstr__CALL_ADDR v_funcaddr) (functype__ v_t_1 v_t_2)
-	| Admin_instr_ok__label : forall (v_S : store) (v_C : context) (v_n : n) (v_instr : (list instr)) (v_admininstr : (list admininstr)) (v_t_2 : (option valtype)) (v_t_1 : (option valtype)), (Instrs_ok v_C v_instr (functype__ v_t_1 v_t_2)) /\ (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [v_t_1]; context__RETURN := None |} ++ v_C) v_admininstr (functype__ [] v_t_2)) -> Admin_instr_ok v_S v_C (admininstr__LABEL_ v_n v_instr v_admininstr) (functype__ [] v_t_2)
-	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S v_t v_F v_admininstr v_t) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
+	| Admin_instr_ok__label : forall (v_S : store) (v_C : context) (v_n : n) (v_instr : (list instr)) (v_admininstr : (list admininstr)) (v_t_2 : (option valtype)) (v_t_1 : (option valtype)), (Instrs_ok v_C v_instr (functype__ v_t_1 v_t_2)) /\ (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [v_t_1]; context__RETURN := None |} ++ v_C) v_admininstr (functype__ [] v_t_2)) /\ (v_n = (fun_optionSize v_t_1)) -> Admin_instr_ok v_S v_C (admininstr__LABEL_ v_n v_instr v_admininstr) (functype__ [] v_t_2)
+	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S v_t v_F v_admininstr v_t) /\ (v_n = (fun_optionSize v_t)) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
 	| Admin_instr_ok__weakening : forall (v_S : store) (v_C : context) (v_admininstr : admininstr) (v_t : (list valtype)) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instr_ok v_S v_C v_admininstr (functype__ v_t_1 v_t_2)) -> Admin_instr_ok v_S v_C v_admininstr (functype__ (@app _ v_t v_t_1) (@app _ v_t v_t_2))
 
 with
@@ -1718,7 +1724,7 @@ Inductive Mem_extension: meminst -> meminst -> Prop :=
 	| Mem_extension__ : forall (v_n1 : u32) (v_m : m) (v_b_1 : (list byte)) (v_n2 : u32) (v_b_2 : (list byte)), (v_n1 <= v_n2) -> Mem_extension {| meminst__TYPE := (limits__ v_n1 v_m); meminst__BYTES := v_b_1 |} {| meminst__TYPE := (limits__ v_n2 v_m); meminst__BYTES := v_b_2 |}.
 
 Inductive Global_extension: globalinst -> globalinst -> Prop :=
-	| Global_extension__ : forall (v_mut : mut) (v_t2 : valtype) (v_t : valtype) (v_c1 : val_) (v_c2 : val_), ((v_mut = (mut__MUT (Some tt))) \/ ((v_c1 : val_) = (v_c2 : val_))) -> Global_extension {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t (v_c1 : val_)) |} {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t (v_c2 : val_)) |}.
+	| Global_extension__ : forall (v_mut : mut) (v_t2 : valtype) (v_c1 : val_) (v_c2 : val_), ((v_mut = (mut__MUT (Some tt))) \/ ((v_c1 : val_) = (v_c2 : val_))) -> Global_extension {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t2 (v_c1 : val_)) |} {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t2 (v_c2 : val_)) |}.
 
 Inductive Store_extension: store -> store -> Prop :=
 	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_1' : (list funcinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_1' : (list tableinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_1' : (list meminst)) (v_meminst_2 : (list meminst)) (v_globalinst_1' : (list globalinst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_1')) /\ ((List.length v_tableinst_1) = (List.length v_tableinst_1')) /\ ((List.length v_meminst_1) = (List.length v_meminst_1')) /\ ((List.length v_globalinst_1) = (List.length v_globalinst_1')) /\ ((store__FUNCS v_store_1) = v_funcinst_1) /\ ((store__TABLES v_store_1) = v_tableinst_1) /\ ((store__MEMS v_store_1) = v_meminst_1) /\ ((store__GLOBALS v_store_1) = v_globalinst_1) /\ ((store__FUNCS v_store_2) = (@app _ v_funcinst_1' v_funcinst_2)) /\ ((store__TABLES v_store_2) = (@app _ v_tableinst_1' v_tableinst_2)) /\ ((store__MEMS v_store_2) = (@app _ v_meminst_1' v_meminst_2)) /\ ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1' v_globalinst_2)) /\ List.Forall2 (fun v_funcinst_1 v_funcinst_1' => (Func_extension v_funcinst_1 v_funcinst_1')) (v_funcinst_1) (v_funcinst_1') /\ List.Forall2 (fun v_tableinst_1 v_tableinst_1' => (Table_extension v_tableinst_1 v_tableinst_1')) (v_tableinst_1) (v_tableinst_1') /\ List.Forall2 (fun v_meminst_1 v_meminst_1' => (Mem_extension v_meminst_1 v_meminst_1')) (v_meminst_1) (v_meminst_1') /\ List.Forall2 (fun v_globalinst_1 v_globalinst_1' => (Global_extension v_globalinst_1 v_globalinst_1')) (v_globalinst_1) (v_globalinst_1') -> Store_extension v_store_1 v_store_2.
@@ -1879,6 +1885,29 @@ Proof.
 				destruct H.
 				- destruct H. left. exists x0. apply List.in_cons => //.
 				- right. by f_equal.
+Qed.
+
+(* Lemma list_update_func_lookup : forall {A : Type} (x x' : list A) (y : A) (idx : nat) (f : A -> A),
+	 *)
+
+Lemma list_update_func_split_strong : forall {A : Type} (x x' : list A) (idx : nat) (f : A -> A),
+	x' = list_update_func x idx f -> 
+	(idx < length x)%coq_nat ->
+	(exists y, In (f y) x').
+Proof. 
+	move => A x x' idx f H H2.
+	generalize dependent idx.
+	generalize dependent x'.
+	induction x; move => x' idx H H2. 
+	- apply Nat.nlt_0_r in H2. exfalso. apply H2.
+	- destruct idx. 
+		- simpl in H. destruct x' => //=.
+			injection H as ?; subst. exists a. by left.
+		- destruct x' => //=.
+			simpl in H. injection H as ?.
+			apply IHx in H0; destruct H0.
+			- exists x0. by right. 
+			- by apply Nat.succ_lt_mono.
 Qed.
 
 Lemma length_app_lt: forall {A : Type} (l l' l1' l2': list A),
@@ -2107,6 +2136,30 @@ Proof.
 		- simpl in HLength. injection HLength as ?. apply H0.
 Qed.
 
+Lemma Forall2_list_update_func {A B : Type} {C : Inhabited A} {D : Inhabited B}
+	(l : list A) (l' : list B) (R : A -> B -> Prop) (i : nat) (f : A -> A) (x : A) (y : B):
+	Forall2 R l l' ->
+	lookup_total l i = x -> 
+	lookup_total l' i = y -> 
+	R (f x) y -> Forall2 R (list_update_func l i f) l'.
+Proof.
+	generalize dependent l'.
+	generalize dependent i.
+	generalize dependent x.
+	generalize dependent y.
+	generalize dependent f.
+	induction l; move => f0 y0 x0 i0 l0' HForall HLx HLy HR.
+	- inversion HForall. destruct i0 => //=.
+	- destruct l0' => //=; inversion HForall => //=; subst.
+		destruct i0 => //=.
+		- apply Forall2_cons_iff; split.
+			- by unfold lookup_total in HR.
+			- apply H4.
+		- apply Forall2_cons_iff; split.
+			- apply H2.
+			- eapply IHl; eauto.
+Qed.
+		 
 
 
 
@@ -2446,6 +2499,8 @@ Proof.
 		apply Admin_instr_ok__weakening. apply H4_comp.
 Qed.
 
+
+
 Lemma admin_composition': forall v_S v_C v_ais1 v_ais2 t1s t2s t3s,
 	Admin_instrs_ok v_S v_C v_ais1 (functype__ t1s t2s) ->
 	Admin_instrs_ok v_S v_C v_ais2 (functype__ t2s t3s) ->
@@ -2750,19 +2805,21 @@ Lemma Label_typing: forall v_S v_C n v_instrs v_admininstrs ts1 ts2,
     Admin_instr_ok v_S v_C (admininstr__LABEL_ n v_instrs v_admininstrs) (functype__ ts1 ts2) ->
     exists (ts : resulttype) (ts2' : option valtype), ts2 = ts1 ++ ts2' /\
 					Instrs_ok v_C v_instrs (functype__ ts ts2') /\
+					fun_optionSize ts = n /\
                     Admin_instrs_ok v_S (upd_label v_C ([ts] ++ (context__LABELS v_C))) v_admininstrs (functype__ [] ts2').
 Proof.
 	move => v_S v_C n v_instrs v_admininstrs ts1 ts2 HType.
 	gen_ind_subst HType => //=.
 		- (* Instr *) inversion H; subst; try discriminate.
-		- (* Label *) destruct H. exists v_t_1, v_t_2. repeat split => //=.
+		- (* Label *) destruct H as [? [? ?]]. exists v_t_1, v_t_2. repeat split => //=.
 		- (* Weakening *) edestruct IHHType as [? [? [? [? ?]]]] => //=; subst. exists x, x0. by repeat split => //=; try rewrite <- app_assoc.
 Qed.
 
 Lemma Frame_typing: forall v_S v_C n v_F v_ais t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__FRAME_ n v_F v_ais) (functype__ t1s t2s) ->
     exists (ts : resulttype), t2s = t1s ++ ts /\
-               Thread_ok v_S ts v_F v_ais ts.
+               Thread_ok v_S ts v_F v_ais ts /\ 
+			   (n = (fun_optionSize ts)). 
 Proof.
 	move => v_S v_C n v_F v_ais t1s t2s HType.
 	gen_ind_subst HType => //=.
@@ -2896,7 +2953,7 @@ Proof.
 Lemma Break_typing: forall n v_S v_C t1s t2s,
 	Admin_instr_ok v_S v_C (admininstr__BR n) (functype__ t1s t2s) ->
 	exists ts ts0, 
-				(n < size (context__LABELS v_C))%coq_nat /\
+				(n < length (context__LABELS v_C))%coq_nat /\
 				lookup_total (context__LABELS v_C) n = ts /\
 				t1s = ts0 ++ ts.
 Proof.
@@ -3170,6 +3227,17 @@ Proof.
   rewrite -HLab. unfold upd_label. by destruct C.
 Qed.
 
+Lemma concat_cancel_last_n: forall (l1 l2 l3 l4: seq valtype),
+    l1 ++ l2 = l3 ++ l4 ->
+    length l2 = length l4 ->
+    (l1 = l3) /\  (l2 = l4).
+Proof.
+  move => l1 l2 l3 l4 HCat HSize.
+  assert (length (l1 ++ l2) = length (l3 ++ l4)); first by rewrite HCat.
+  repeat rewrite app_length in H.
+  rewrite HSize in H. 
+Admitted.
+
 Lemma upd_label_unchanged_typing: forall v_S v_C v_admininstrs v_func_type,
     Admin_instrs_ok v_S v_C v_admininstrs v_func_type <->
     Admin_instrs_ok v_S (upd_label v_C (context__LABELS v_C)) v_admininstrs v_func_type.
@@ -3370,26 +3438,27 @@ Proof.
 	move => v_S v_C v_n v_instr v_val v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	apply_composition_typing_single HType.
-	apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [H1 [H2 H3]]]].
+	apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [H1 [H2 [H3 H4]]]]].
 	subst.
 	repeat rewrite -> app_assoc.
 	apply admin_instrs_weakening_empty_1.
-	apply Val_Const_list_typing in H3; subst.
-	rewrite H3.
+	apply Val_Const_list_typing in H4; subst.
+	rewrite H4.
 	simpl.
 	apply Const_list_typing_empty.
 Qed.
 
 Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] v_func_type ->
+	((List.length v_val) = v_n) ->
 	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) v_func_type.
 Proof.
-	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HReduce.
+	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HLength HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
-	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? ?]]]].
-	apply_composition_typing H1.
+	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
+	apply_composition_typing H2.
 	apply_composition_typing H4_comp.
 	apply_composition_typing H4_comp0.
 	repeat rewrite <- app_right_nil in *.
@@ -3397,15 +3466,51 @@ Proof.
 	apply Break_typing in H3_comp1; destruct H3_comp1 as [ts0' [ts1' [? [? ?]]]].
 	apply Val_Const_list_typing in H3_comp.
 	apply Val_Const_list_typing in H3_comp0.
-	subst.
-Admitted.
+	apply empty_append in H1_comp; destruct H1_comp.
+	subst. simpl in *.
+	unfold upd_label, lookup_total in H1_comp1.
+	simpl in H1_comp1.
+	apply admin_instrs_weakening_empty_1.
+	apply admin_composition' with (t2s := ts).
+	repeat rewrite -> app_assoc in H1_comp1.
+	eapply concat_cancel_last_n in H1_comp1; destruct H1_comp1; subst.
+	rewrite <- H2.
+	apply Const_list_typing_empty.
+	rewrite List.map_length.
+	destruct ts => //=. 
+	eapply Admin_instrs_ok__instrs in H0; eauto.
+Qed.
 
 Lemma Step_pure__br_succ_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] v_func_type ->
 	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)]) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)]) v_func_type.
 Proof.
-Admitted.
+	move => v_S v_C v_n v_instr' v_val v_l v_instr v_func_type HType HReduce.
+	destruct v_func_type as [ts1 ts2].
+	rewrite <- admin_instrs_ok_eq in HType.
+	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
+	apply_composition_typing H2.
+	apply_composition_typing H4_comp.
+	rewrite <- admin_instrs_ok_eq in H3_comp0.
+	repeat rewrite <- app_right_nil in *.
+	apply Val_Const_list_typing in H3_comp.
+	apply Break_typing in H3_comp0; destruct H3_comp0 as [ts0 [ts1' [? [? ?]]]].
+	subst.
+	apply empty_append in H1_comp; destruct H1_comp; subst.
+	simpl in *.
+	apply admin_instrs_weakening_empty_1.
+	eapply admin_composition'.
+	apply Const_list_typing_empty.
+	rewrite H1_comp0.
+	rewrite H2_comp.
+	apply Admin_instrs_ok__frame.
+	rewrite <- admin_instrs_ok_eq.
+	apply Admin_instr_ok__instr with (v_instr := instr__BR v_l).
+	apply Instr_ok__br. split.
+	- simpl in H. rewrite addn1 in H. by apply Nat.succ_lt_mono in H.
+	- unfold lookup_total. by rewrite addn1.
+Qed.
 
 Lemma Step_pure__br_if_true_preserves : forall v_S v_C (v_c : iN) (v_l : labelidx) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] v_func_type ->
@@ -3517,20 +3622,52 @@ Proof.
 	move => v_S v_C v_n v_f v_val v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
-	apply Frame_typing in HType; destruct HType as [ts [? ?]].
-	inversion H0; destruct H1.
-	apply Val_Const_list_typing in H7; simpl in *; subst.
+	apply Frame_typing in HType; destruct HType as [ts [? [? ?]]].
+	inversion H0. destruct H2.
+	apply Val_Const_list_typing in H8; simpl in *; subst.
 	apply admin_instrs_weakening_empty_1.
-	rewrite H7.
+	rewrite H8.
 	apply Const_list_typing_empty.
 Qed.
 
 Lemma Step_pure__return_frame_preserves : forall v_S v_C (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] v_func_type ->
 	Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val) ->
+	((List.length v_val) = v_n) ->
 	Admin_instrs_ok v_S v_C (list__val__admininstr v_val) v_func_type.
 Proof.
-Admitted.
+	move => v_S v_C v_n v_f v_val' v_val v_instr v_func_type HType HReduce H.
+	destruct v_func_type as [ts1 ts2].
+	rewrite <- admin_instrs_ok_eq in HType.
+	apply Frame_typing in HType; destruct HType as [ts [? [? ?]]].
+	inversion H1; destruct H3.
+	apply_composition_typing H9.
+	apply_composition_typing H4_comp.
+	apply_composition_typing H4_comp0.
+	repeat rewrite <- app_right_nil in *.
+	rewrite <- admin_instrs_ok_eq in H3_comp1.
+	apply Val_Const_list_typing in H3_comp.
+	apply Val_Const_list_typing in H3_comp0.
+	apply empty_append in H1_comp; destruct H1_comp.
+	subst. simpl in *.
+	apply Return_typing in H3_comp1; destruct H3_comp1 as [ts0 [ts' [? ?]]].
+	subst.
+	inversion H3. destruct H0 as [? [? ?]].
+	subst.
+	inversion H7.
+	subst. simpl in *. rewrite _append_option_none_left in H2.
+	rewrite _append_option_none in H2.
+	injection H2 as ?; subst.
+	clear H4.
+	repeat rewrite -> app_assoc in H1_comp1.
+	eapply concat_cancel_last_n in H1_comp1; destruct H1_comp1.
+	rewrite <- H4.
+	apply admin_instrs_weakening_empty_1.
+	apply Const_list_typing_empty.
+	rewrite List.map_length.
+	rewrite H.
+	by destruct ts0.
+Qed.
 
 Lemma Step_pure__return_label_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] v_func_type ->
@@ -3540,8 +3677,8 @@ Proof.
 	move => v_S v_C v_n v_instr' v_val v_instr v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
-	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? ?]]]].
-	apply_composition_typing H1.
+	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
+	apply_composition_typing H2.
 	apply_composition_typing H4_comp.
 	repeat rewrite <- app_right_nil in *.
 	rewrite <- admin_instrs_ok_eq in H3_comp0.
@@ -3550,10 +3687,16 @@ Proof.
 	apply Val_Const_list_typing in H3_comp.
 	apply empty_append in H1_comp; destruct H1_comp.
 	subst. simpl in *.
-	
-
-
-Admitted.
+	apply admin_instrs_weakening_empty_1.
+	eapply admin_composition'.
+	apply Const_list_typing_empty.
+	rewrite H1_comp0.
+	rewrite H2_comp.
+	apply Admin_instrs_ok__frame.
+	rewrite <- admin_instrs_ok_eq.
+	apply Admin_instr_ok__instr with (v_instr := instr__RETURN).
+	by apply Instr_ok__return.
+Qed.
 
 Lemma Step_pure__trap_vals_preserves : forall v_S v_C (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] (list__instr__admininstr v_instr))) v_func_type ->
@@ -3805,10 +3948,12 @@ Proof.
 	rewrite <- admin_instrs_ok_eq.
 	apply admin_instr_weakening_empty_1.
 	apply Admin_instr_ok__label with (v_t_1 := v_t).
-	split.
+	repeat split => //=.
 	apply instrs_weakening_empty_both. apply Instrs_ok__empty.
 	apply Admin_instrs_ok__instrs with (v_S := v_S) in H2.
 	apply H2.
+	destruct H1; destruct H => //=; subst => //=.
+	destruct v_t => //=.
 Qed.
 
 Lemma Step_read__loop_preserves : forall v_S (r_v_f : frame) v_C (v_z : state) (v_t : (option valtype)) (v_instr : (list instr)) v_func_type v_t1 lab ret ,
@@ -3825,7 +3970,7 @@ Proof.
 	rewrite <- admin_instrs_ok_eq.
 	apply admin_instr_weakening_empty_1.
 	apply Admin_instr_ok__label with (v_t_1 := None).
-	split.
+	repeat split => //=.
 	- simpl.
 		rewrite app_left_single_nil.
 		apply (Instrs_ok__seq _ [] (instr__LOOP v_t v_instr) [] v_t []); split.
@@ -3946,16 +4091,7 @@ Proof.
 	apply Admin_instr_ok__trap.
 Qed.
 
-Lemma concat_cancel_last_n: forall (l1 l2 l3 l4: seq valtype),
-    l1 ++ l2 = l3 ++ l4 ->
-    length l2 = length l4 ->
-    (l1 = l3) /\  (l2 = l4).
-Proof.
-  move => l1 l2 l3 l4 HCat HSize.
-  assert (length (l1 ++ l2) = length (l3 ++ l4)); first by rewrite HCat.
-  repeat rewrite app_length in H.
-  rewrite HSize in H. 
-Admitted.
+
 
 Lemma typeof_default_inverse: forall (v_t : list valtype),
 	List.map typeof (List.map [eta fun_default_] v_t) = v_t.
@@ -3977,12 +4113,13 @@ Lemma Step_read__call_addr_preserves : forall v_S (r_v_f : frame) v_C (v_z : sta
 	v_z = state__ v_S r_v_f ->
 	(v_a < (List.length (fun_funcinst v_z)))%coq_nat ->
 	((lookup_total (fun_funcinst v_z) v_a) = {| funcinst__TYPE := (functype__ v_t_1 v_t_2); funcinst__MODULE := v_mm; funcinst__CODE := v_func |}) ->
+	(v_n = fun_optionSize v_t_2) ->
 	(v_func = (func__FUNC v_x (List.map (fun v_t => (local__LOCAL v_t)) (v_t)) v_instr)) ->
 	(v_f = {| frame__LOCALS := (@app _ v_val (List.map (fun v_t => (fun_default_ v_t)) (v_t))); frame__MODULE := v_mm |}) ->
 	Forall2 (fun v_t v_val => Val_ok v_val v_t) v_t1 (frame__LOCALS r_v_f) ->
 	Admin_instrs_ok v_S (upd_label (upd_local_return v_C (v_t1 ++ context__LOCALS v_C) ret) lab) [(admininstr__FRAME_ v_n v_f [(admininstr__LABEL_ v_n [] (list__instr__admininstr v_instr))])] v_func_type.
 Proof.
-	move => v_S r_v_f v_C v_z v_val v_k v_a v_n v_f v_instr v_t_1 v_t_2 v_mm v_func v_x v_t v_func_type v_t1 lab ret HType HMinst H1 H2 H3 H4 H5 H6 H7 H8.
+	move => v_S r_v_f v_C v_z v_val v_k v_a v_n v_f v_instr v_t_1 v_t_2 v_mm v_func v_x v_t v_func_type v_t1 lab ret HType HMinst H1 H2 H3 H4 H5 H6 H7 H8 H9.
 	destruct v_func_type as [ts1 ts2].
 	apply_composition_typing_single HType.
 	apply Val_Const_list_typing in H3_comp.
@@ -3997,23 +4134,23 @@ Proof.
 	repeat rewrite -> app_assoc.
 	apply admin_instrs_weakening_empty_1.
 	rewrite <- admin_instrs_ok_eq.
-	apply Admin_instr_ok__frame.
+	apply Admin_instr_ok__frame; split => //=.
 	eapply Thread_ok__. split. 
 	apply Frame_ok__ with (v_t := ((List.map typeof v_val) ++ v_t)). repeat split => //=.
 	repeat rewrite -> List.app_length.
 	repeat rewrite -> List.map_length => //=.
-	apply H9.
+	apply H10.
 	apply Forall2_Val_ok_is_same_as_map.
 	rewrite List.map_app.
 	rewrite List.app_inv_head_iff.
 	apply typeof_default_inverse.
 	rewrite <- admin_instrs_ok_eq.
-	apply Admin_instr_ok__label with (v_t_1 := v_t_2); split.
+	apply Admin_instr_ok__label with (v_t_1 := v_t_2); repeat split => //=.
 	- apply instrs_weakening_empty_both. apply Instrs_ok__empty.
 	- rewrite fold_append. simpl.
 		repeat rewrite _append_option_none_left.
 		apply Admin_instrs_ok__instrs.
-		apply H10.
+		apply H11. 
 Qed.
 
 
@@ -4218,26 +4355,37 @@ Proof.
 	- apply IHm.
 Qed.
 
-Lemma global_extension_same: forall g,
+Lemma global_extension_same: forall s g v_globaltype,
+	Forall2
+	(fun (v_globalinst : globalinst) (v_globaltype : globaltype) => Global_instance_ok s v_globalinst v_globaltype) g v_globaltype ->
 	Forall2 (fun v s => Global_extension v s) g g.
 Proof.
-	move => g.
-	induction g => //.
+	move => s g v_globaltype HGlobalInstOk.
+	generalize dependent v_globaltype.
+	induction g => //; move => v_globaltype HGlobalInstOk.
 	apply Forall2_cons_iff. split.
-	- destruct a. destruct globalinst__TYPE0. destruct globalinst__VALUE0. apply Global_extension__. right => //.
-	- apply IHg.
+	-
+		apply Forall2_length in HGlobalInstOk as ?. 
+		destruct v_globaltype => //=.
+		inversion HGlobalInstOk.
+		inversion H3; decomp; subst.
+		inversion H11; subst.
+		apply Global_extension__. right => //.
+	- destruct v_globaltype; inversion HGlobalInstOk. eapply IHg; eauto. 
 Qed.
 
 Lemma store_extension_same: forall s,
+	Store_ok s ->
     Store_extension s s.
 Proof.
-  move => s. 
+  move => s HST. 
+  inversion HST; decomp.
   apply (Store_extension__ s s (store__FUNCS s) (store__TABLES s) (store__MEMS s) (store__GLOBALS s) (store__FUNCS s) [] (store__TABLES s) [] (store__MEMS s) [] (store__GLOBALS s) []).
   repeat (split => //; try rewrite -> app_nil_r).
   + by apply func_extension_same.
   + by apply table_extension_same.
   + by apply mem_extension_same.
-  + by apply global_extension_same.
+  + subst. eapply global_extension_same; eauto.
 Qed.
 
 Lemma config_same: forall s f ais s' f' ais',
@@ -4256,23 +4404,48 @@ Proof.
 	f_equal => //=. f_equal => //=.
 Qed.
 
-Lemma Forall2_global: forall v_S v_idx v_val_0 v_valtype v_val_,
+Lemma Forall2_global: forall v_S v_globaltype v_idx v_val_0 v_valtype v_val_,
+	Forall2
+	(fun (v_globalinst : globalinst) (v_globaltype : globaltype) => Global_instance_ok v_S v_globalinst v_globaltype) (store__GLOBALS v_S) v_globaltype -> 
 	(v_idx < length (store__GLOBALS v_S))%coq_nat ->
 	lookup_total (store__GLOBALS v_S) v_idx = 
 	{| globalinst__TYPE := globaltype__ (mut__MUT (Some tt)) v_valtype; globalinst__VALUE := val__CONST v_valtype v_val_0|} ->
 	Forall2 (fun v s => Global_extension v s) (store__GLOBALS v_S) (list_update_func (store__GLOBALS v_S) v_idx 
 		(fun g => g <| globalinst__VALUE := (val__CONST v_valtype v_val_) |> )).
 Proof.
-	move => v_S v_idx v_val0 v_valtype v_val_.
+	move => v_S v_globaltype v_idx v_val0 v_valtype v_val_.
 	destruct v_S; simpl.
-	move: v_idx.
-	induction store__GLOBALS0; move => v_idx H H2 => //=.
+	move: v_idx v_globaltype.
+	induction store__GLOBALS0; move => v_idx v_globaltype HGlobalInstOk H H2 => //=.
 	destruct v_idx => //=.
+	
 	apply Forall2_cons_iff. unfold lookup_total in H2; simpl in H2; subst. split.
-	- unfold set. simpl. apply Global_extension__. left => //. by eapply global_extension_same.
+	- unfold set. simpl. apply Global_extension__. left => //.
+		destruct v_globaltype; inversion HGlobalInstOk.
+		eapply global_extension_same; eauto. 
 	- apply Forall2_cons. 
-		- destruct a. destruct globalinst__TYPE0. destruct globalinst__VALUE0. apply Global_extension__. right => //.
-		- unfold lookup_total in H2. simpl in H2. eapply IHstore__GLOBALS0 => //=. simpl in H. apply Nat.succ_lt_mono in H. apply H.
+		-
+			apply Forall2_length in HGlobalInstOk as ?. 
+			destruct v_globaltype => //=.
+			inversion HGlobalInstOk.
+			inversion H5; decomp; subst.
+			inversion H13; subst.
+			apply Global_extension__. right => //.
+		- unfold lookup_total in H2. simpl in H2. 
+			destruct v_globaltype; inversion HGlobalInstOk.
+			eapply IHstore__GLOBALS0 => //=.
+			- 
+				apply Forall2_length in H6.
+				apply Forall2_forall2; split => //=.
+				apply H6.
+				move => x0 y0 Hin.
+				inversion HGlobalInstOk; subst.
+				apply Forall2_forall2 in H12; destruct H12.
+				apply H1 in Hin.
+				inversion Hin; decomp; subst.
+				inversion H11.
+				eapply Global_instance_ok__; repeat split => //=.
+			- simpl in H. apply Nat.succ_lt_mono in H. apply H.
 Qed.
 
 Ltac removeinst2 H :=
@@ -4531,6 +4704,61 @@ Proof.
 	- eapply ext_extension_C; eauto.
 Qed.
 
+(* Lemma In2Join: forall {A B : Type} {C : Inhabited A} {D : Inhabited B} (x : A) (y : B) (l : list A) (l' : list B) (i : nat),
+	lookup_total l i = x ->
+	lookup_total l' i = y ->
+	length l = length l' ->
+	In2 x y l l'.
+Proof.
+	move => A B C D x y l l' i.
+	move: x y l' i.
+	induction l; move => x y l' i HLx HLy HLength.
+	- destruct l' => //=. unfold lookup_total in *. simpl in HLx.
+	- destruct l' => //=.
+		destruct HInx; destruct HIny => //=; try (left; repeat split => //=). *)
+
+
+Lemma global_instance_fine: forall s s' v_globaltype v_f v_x v_valtype v_val_,
+    Forall2 (fun v vt => Global_instance_ok s v vt) (store__GLOBALS s) v_globaltype ->
+	Forall2 (fun g g' => Global_extension g g') (store__GLOBALS s) (store__GLOBALS s') ->
+	(store__FUNCS s = store__FUNCS s') ->
+	(store__TABLES s = store__TABLES s') ->
+	(store__MEMS s = store__MEMS s') ->
+	(store__GLOBALS s') = list_update_func (store__GLOBALS s)
+	(lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x)
+	[eta set globalinst__VALUE (fun=> val__CONST v_valtype v_val_)] -> 
+	Forall2 (fun v vt => Global_instance_ok s' v vt) (store__GLOBALS s) v_globaltype.
+Proof.
+	move => s s' v_globaltype v_f v_x v_valtype v_val_ HGlobalInstOk HGlobExt HFEq HTab HMems HGlob.
+
+	destruct s. destruct s'.
+	simpl in *. subst store__FUNCS0. subst store__TABLES0. subst store__MEMS0.
+	generalize dependent v_globaltype.
+	induction store__GLOBALS0; move => v_globaltype HGlobalInstOk; apply Forall2_length in HGlobalInstOk as H'.
+	- symmetry in H'. 
+		apply List.length_zero_iff_nil in H'. 
+		subst. 
+		apply Forall2_nil.
+	- destruct v_globaltype => //=.
+		apply Forall2_cons_iff. split.
+		- inversion HGlobalInstOk; subst.
+			inversion H2. destruct H as [? [? ?]].
+			inversion H6; subst.
+			eapply Global_instance_ok__; eauto.
+		- apply Forall2_forall2; split.
+			- simpl in H'. by injection H' as ?.
+			- move => x y Hin.
+				inversion HGlobalInstOk.
+				subst.
+				apply Forall2_forall2 in H4; destruct H4.
+				apply H0 in Hin.
+				inversion Hin; subst. destruct H1 as [? [? ?]].
+				inversion H4; subst.
+				eapply Global_instance_ok__; eauto.
+Qed.
+
+	
+
 Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v_x,
     Store_ok s ->
     Store_extension s s' ->
@@ -4543,9 +4771,10 @@ Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v
     (store__FUNCS s = store__FUNCS s') ->
     (store__TABLES s = store__TABLES s') ->
     (store__MEMS s = store__MEMS s') ->
+	((lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x) < length (store__GLOBALS s))%coq_nat ->
     Store_ok s'.
 Proof.
-	move => s s' f C v_valtype v_val_ v_x HSOK Hext HIT HITS' HUpdate HLGlobal HFeq HTeq HMeq.
+	move => s s' f C v_valtype v_val_ v_x HSOK Hext HIT HITS' HUpdate HLGlobal HFeq HTeq HMeq HLength.
 	inversion HSOK; decomp.
 	inversion Hext; decomp; subst.
 	destruct s'.
@@ -4567,11 +4796,25 @@ Proof.
 		apply Forall2_forall2 in H5; destruct H5. apply H11 in HIn. inversion HIn; destruct H15 as [? [? ?]].
 		eapply Function_instance_ok__ with (v_C := v_C); repeat split => //=.
 		eapply module_inst_typing_extension; eauto.
-	- apply Forall2_forall2; split => //.
-		- by rewrite <- H1.
-		- move => x y HIn. apply In2_split in HIn. destruct HIn.
-		eapply Forall2_forall2weak2 with (y := y) in H6 => //=; destruct H6 as [x' ?].
-		inversion H6; decomp; subst.
+	- eapply Forall2_list_update_func; eauto.
+		- remember ({|
+				store__FUNCS := store__FUNCS0;
+				store__GLOBALS := v_globalinst;
+				store__TABLES := store__TABLES0;
+				store__MEMS := store__MEMS0
+			|}) as s.
+			assert (v_globalinst = (store__GLOBALS s)). {by subst. }
+			rewrite H11.
+			eapply global_instance_fine; subst; simpl; eauto.
+			apply Forall2_lookup in H26; destruct H26.
+			apply H15 in HLength.
+			inversion HLength.
+			apply Forall2_lookup in H6; destruct H6.
+			(* apply H11 in HLength as H''.
+			inversion H''.
+			destruct H17 as [? [? ?]].
+			inversion H20. subst.
+			eapply Global_instance_ok__; repeat split => //=. *)
 Admitted.
 
 Lemma list_update_same_unchanged: forall {X : Type} {Y : Inhabited X} (l: list X) e i,
@@ -4628,8 +4871,8 @@ Proof.
 		injection Heqc1 as ?.
 		injection Heqc2 as ?; subst.
 		apply_composition_typing_single HType.
-		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [??]]]]; subst.
-		rewrite upd_label_overwrite in H1; simpl in H1.
+		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [? [? ?]]]]]; subst.
+		rewrite upd_label_overwrite in H2; simpl in H2.
 		simpl in HValTypeEq.
 		eapply IHHReduce; eauto.
 	- (* Local Set *)
@@ -4665,31 +4908,31 @@ Proof.
 	generalize dependent ais. generalize dependent ais'. 
 	generalize dependent f. generalize dependent f'.
 	induction HReduce; try move => f' f ais' Heqc2 ais Heqc1 ret lab loc tf C HIT HType HST; try intros; destruct tf;
-	try (induction v_z; 
+	try (destruct v_z; 
 	apply config_same in Heqc1; apply config_same in Heqc2; 
 	destruct Heqc1; destruct Heqc2;
-	subst; try (split => //; apply store_extension_same)).
+	subst; try (split => //; eapply store_extension_same; eauto)).
 	- (* Label Context *) 
 		injection Heqc1 as H1.
 		injection Heqc2 as H2.
 		rewrite <- H in HType.
 		apply_composition_typing_single HType.
-		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [? ?]]]]; subst.
-		rewrite upd_label_overwrite in H5; simpl in H5.
+		apply Label_typing in H4_comp; destruct H4_comp as [ts [ts2' [? [? [? ?]]]]]; subst.
+		rewrite upd_label_overwrite in H6; simpl in H6.
 		eapply IHHReduce; eauto.
 	- (* Label Frame *)
 		injection Heqc1 as H1.
 		injection Heqc2 as H2.
 		rewrite <- H0 in HType.
 		apply_composition_typing_single HType.
-		apply Frame_typing in H4_comp. destruct H4_comp as [ts [? ?]].
-		inversion H6; destruct H7.
-		inversion H7; destruct H14 as [? [? ?]]; subst.
-		simpl in H13.
-		rewrite <- upd_return_is_same_as_append in H13; simpl in H13.
-		rewrite <- upd_local_is_same_as_append in H13; simpl in H13.
-		rewrite -> _append_option_none_left in H13.
-		apply upd_label_unchanged_typing in H13.
+		apply Frame_typing in H4_comp. destruct H4_comp as [ts [? [? ?]]].
+		inversion H6. destruct H8.
+		inversion H8. destruct H15 as [? [? ?]]; subst.
+		simpl in H14.
+		rewrite <- upd_return_is_same_as_append in H14; simpl in H14.
+		rewrite <- upd_local_is_same_as_append in H14; simpl in H14.
+		rewrite -> _append_option_none_left in H14.
+		apply upd_label_unchanged_typing in H14.
 		eapply IHHReduce; eauto.
 	- (* Global Set *) 
 		destruct H2; destruct H0; subst.
@@ -4717,14 +4960,21 @@ Proof.
 				repeat rewrite -> app_assoc in H0; apply split_append_last in H0; destruct H0.
 				subst.
 				rewrite H in H16. injection H16 as ?; subst.
-				eapply Forall2_global => //=. apply H18.
+				inversion HStore; decomp; subst. 
+				eapply Forall2_global => //=; eauto. 
 		}
 		split => //=.
-		eapply module_inst_typing_extension with (v_S' := s') in HIT; eauto.
-		apply update_global_unchagned in Heqs' as ?. destruct H3 as [? [? [??]]].
-
-		
-
+		eapply module_inst_typing_extension with (v_S' := s') in HIT as HITS'; eauto.
+		apply update_global_unchagned in Heqs' as ?.
+		destruct H3 as [? [? [??]]].
+		inversion HIT; decomp; subst.
+		simpl in *.
+		inversion HStore; decomp; subst; simpl in *.
+		destruct f. simpl in *. destruct frame__MODULE0. simpl in *.
+		injection H7 as ?; subst.
+		apply Forall2_lookup2 in H17; destruct H17.
+		apply H10 in H1.
+		inversion H1. destruct H29. simpl in *.
 
 
 	- (* Store Num Val *)
@@ -4841,20 +5091,21 @@ Proof.
 	- (* Step_read *) eapply t_read_preservation; eauto.
 	- (* Context Label *) 
 		rewrite <- admin_instrs_ok_eq in HType.
-		apply Label_typing in HType as H. destruct H as [ts [ts2' [? [? ?]]]].
+		apply Label_typing in HType as H. destruct H as [ts [ts2' [? [? [? ?]]]]].
 		subst.
 		apply admin_instrs_weakening_empty_1.
 		rewrite <- admin_instrs_ok_eq.
 		apply Admin_instr_ok__label with (v_t_1 := ts).
-		split => //=.
+		repeat split => //=.
 		eapply IHHReduce => //=.
 	- (* Context Frame *)
 		rewrite <- admin_instrs_ok_eq in HType.
-		apply Frame_typing in HType as H. destruct H as [ts [? ?]].
+		apply Frame_typing in HType as H. destruct H as [ts [? [? ?]]].
 		subst.
 		apply admin_instrs_weakening_empty_1.
 		rewrite <- admin_instrs_ok_eq.
 		apply Admin_instr_ok__frame.
+		split => //.
 		inversion H0. subst. destruct H.
 		apply Thread_ok__ with (v_C := v_C0).
 		inversion H; destruct H2 as [? [? ?]]. 

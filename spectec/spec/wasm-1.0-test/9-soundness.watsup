@@ -34,7 +34,6 @@ rule Externvals_ok/table:
     -- if S.TABLES[a] = {TYPE tt', REFS fa?*}
     -- Tabletype_sub: |- tt' <: tt
 
-
 rule Externvals_ok/mem:
   S |- MEM a : MEM mt
     -- if S.MEMS[a] = {TYPE mt', BYTES b*}
@@ -160,11 +159,13 @@ rule Admin_instr_ok/call_addr:
 rule Admin_instr_ok/label:
   S; C |- LABEL_ n `{instr*} admininstr* : eps -> t_2?
   -- Instrs_ok: C |- instr*: t_1? -> t_2?
-  -- Admin_instrs_ok: S; $($(C , LABELS (t_1?))) |- admininstr*: eps -> t_2?
+  -- Admin_instrs_ok: S; $($(C, LABELS (t_1?))) |- admininstr*: eps -> t_2?
+  -- if $(n = $optionSize(t_1?))
 
 rule Admin_instr_ok/frame:
   S; C |- FRAME_ n `{F} admininstr* : eps -> t?
   -- Thread_ok: S; t? |- F; admininstr*: t?
+  -- if $(n = $optionSize(t?))
 
 rule Admin_instr_ok/weakening:
   S; C |- admininstr : t* t_1* -> t* t_2*
@@ -213,7 +214,7 @@ rule Mem_extension:
   -- if n1 <= n2
 
 rule Global_extension:
-  |- {TYPE (mut t2), VALUE (CONST t c1)} : {TYPE (mut t2), VALUE (CONST t c2)}
+  |- {TYPE (mut t2), VALUE (CONST t2 c1)} : {TYPE (mut t2), VALUE (CONST t2 c2)}
   -- if (mut = MUT) \/ c1 = c2
 
 rule Store_extension:

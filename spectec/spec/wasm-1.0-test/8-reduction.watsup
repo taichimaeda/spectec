@@ -85,6 +85,7 @@ rule Step_pure/label-vals:
 ;; TODO: may want a label context instead of bubbling up
 rule Step_pure/br-zero:
   (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  val^n instr'*
+  -- if |val^n| = n
 
 rule Step_pure/br-succ:
   (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  val* (BR l)
@@ -126,6 +127,7 @@ rule Step_read/call_addr:
   z; val^k (CALL_ADDR a)  ~>  (FRAME_ n `{f} (LABEL_ n `{eps} instr*))
   -- if $funcinst(z)[a] = {TYPE (t_1^k -> t_2?), MODULE mm, CODE func}
   -- if |t_1^k| = |val^k|
+  -- if $(n = $optionSize(t_2?))
   -- if func = FUNC x (LOCAL t)* instr*
   -- if f = {LOCALS val^k ($default_(t))*, MODULE mm}
 
@@ -135,6 +137,7 @@ rule Step_pure/frame-vals:
 
 rule Step_pure/return-frame:
   (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  val^n
+  -- if |val^n| = n
 
 rule Step_pure/return-label:
   (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  val* RETURN
