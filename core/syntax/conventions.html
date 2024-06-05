@@ -105,8 +105,8 @@ All parts of this specification are defined in terms of this abstract syntax.</p
 (This is a shorthand for <span class="math notranslate nohighlight">\({A^{n}}\)</span> where <span class="math notranslate nohighlight">\(n \geq 1\)</span>.)</p></li>
 <li><p><span class="math notranslate nohighlight">\({A^?}\)</span> is an optional occurrence of <span class="math notranslate nohighlight">\(A\)</span>.
 (This is a shorthand for <span class="math notranslate nohighlight">\({A^{n}}\)</span> where <span class="math notranslate nohighlight">\(n \leq 1\)</span>.)</p></li>
-<li><p>Productions are written <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; A_1 ~|~ \dots ~|~ A_n \\ \end{array}\)</span>.</p></li>
-<li><p>Large productions may be split into multiple definitions, indicated by ending the first one with explicit ellipses, <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; A_1 ~|~ \dots \\ \end{array}\)</span>, and starting continuations with ellipses, <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; \dots ~|~ A_2 \\ \end{array}\)</span>.</p></li>
+<li><p>Productions are written <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; A_1 ~|~ \ldots ~|~ A_n \\ \end{array}\)</span>.</p></li>
+<li><p>Large productions may be split into multiple definitions, indicated by ending the first one with explicit ellipses, <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; A_1 ~|~ \ldots \\ \end{array}\)</span>, and starting continuations with ellipses, <span class="math notranslate nohighlight">\(\begin{array}{&#64;{}l&#64;{}r&#64;{~}r&#64;{~}l&#64;{}l&#64;{}} &amp; {\mathit{sym}} &amp;::=&amp; \ldots ~|~ A_2 \\ \end{array}\)</span>.</p></li>
 <li><p>Some productions are augmented with side conditions, “<span class="math notranslate nohighlight">\((\mathrel{\mbox{if}} \mathit{condition})\)</span>”, that provide a shorthand for a combinatorial expansion of the production into many separate cases.</p></li>
 <li><p>If the same meta variable or non-terminal symbol appears multiple times in a production, then all those occurrences must have the same instantiation.
 (This is a shorthand for a side condition requiring multiple different variables to be equal.)</p></li>
@@ -119,7 +119,7 @@ All parts of this specification are defined in terms of this abstract syntax.</p
 <li><p><span class="math notranslate nohighlight">\(\epsilon\)</span> denotes the empty sequence.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|s|}\)</span> denotes the length of a sequence <span class="math notranslate nohighlight">\(s\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(s{}[i]\)</span> denotes the <span class="math notranslate nohighlight">\(i\)</span>-th element of a sequence <span class="math notranslate nohighlight">\(s\)</span>, starting from <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(s{}[i : n]\)</span> denotes the sub-sequence <span class="math notranslate nohighlight">\(s{}[i] \dots s{}[i + n - 1]\)</span> of a sequence <span class="math notranslate nohighlight">\(s\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(s{}[i : n]\)</span> denotes the sub-sequence <span class="math notranslate nohighlight">\(s{}[i] \ldots s{}[i + n - 1]\)</span> of a sequence <span class="math notranslate nohighlight">\(s\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(s{}[{}[i] = A]\)</span> denotes the same sequence as <span class="math notranslate nohighlight">\(s\)</span>,
 except that the <span class="math notranslate nohighlight">\(i\)</span>-th element is replaced with <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(s{}[{}[i : n] = {A^{n}}]\)</span> denotes the same sequence as <span class="math notranslate nohighlight">\(s\)</span>,
@@ -130,7 +130,7 @@ except that the sub-sequence <span class="math notranslate nohighlight">\(s{}[i 
 <ul class="simple">
 <li><p>The notation <span class="math notranslate nohighlight">\({x^{n}}\)</span>, where <span class="math notranslate nohighlight">\(x\)</span> is a non-terminal symbol, is treated as a meta variable ranging over respective sequences of <span class="math notranslate nohighlight">\(x\)</span> (similarly for <span class="math notranslate nohighlight">\({x^\ast}\)</span>, <span class="math notranslate nohighlight">\({x^{+}}\)</span>, <span class="math notranslate nohighlight">\({x^?}\)</span>).</p></li>
 <li><p>When given a sequence <span class="math notranslate nohighlight">\({x^{n}}\)</span>,
-then the occurrences of <span class="math notranslate nohighlight">\(x\)</span> in an iterated sequence <span class="math notranslate nohighlight">\({( \dots x \dots )^{n}}\)</span> are assumed to be in point-wise correspondence with <span class="math notranslate nohighlight">\({x^{n}}\)</span>
+then the occurrences of <span class="math notranslate nohighlight">\(x\)</span> in an iterated sequence <span class="math notranslate nohighlight">\({( \ldots x \ldots )^{n}}\)</span> are assumed to be in point-wise correspondence with <span class="math notranslate nohighlight">\({x^{n}}\)</span>
 (similarly for <span class="math notranslate nohighlight">\({x^\ast}\)</span>, <span class="math notranslate nohighlight">\({x^{+}}\)</span>, <span class="math notranslate nohighlight">\({x^?}\)</span>).
 This implicitly expresses a form of mapping syntactic constructions over a sequence.</p></li>
 </ul>
@@ -138,7 +138,7 @@ This implicitly expresses a form of mapping syntactic constructions over a seque
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; r &amp;::=&amp; \{ \begin{array}[t]{&#64;{}l&#64;{}l&#64;{}}
-{\mathsf{field}}_{1}~A_1,\; {\mathsf{field}}_{2}~A_2,\; \dots~ \}\end{array} \\
+{\mathsf{field}}_{1}~A_1,\; {\mathsf{field}}_{2}~A_2,\; \ldots~ \}\end{array} \\
 \end{array}\end{split}\]</div>
 <p>The following notation is adopted for manipulating such records:</p>
 <ul>
@@ -150,7 +150,7 @@ except that <span class="math notranslate nohighlight">\({A^{n}}\)</span> is app
 i.e, it is short for <span class="math notranslate nohighlight">\(r{}[{.}\mathsf{field} = r{.}\mathsf{field}~{A^{n}}]\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(r_1 \oplus r_2\)</span> denotes the composition of two records with the same fields of sequences by appending each sequence point-wise:</p>
 <div class="math notranslate nohighlight">
-\[\{ {\mathsf{field}}_{1}\,{A_1^\ast}, {\mathsf{field}}_{2}\,{A_2^\ast}, \dots \} \oplus \{ {\mathsf{field}}_{1}\,{B_1^\ast}, {\mathsf{field}}_{2}\,{B_2^\ast}, \dots \} = \{ {\mathsf{field}}_{1}\,{A_1^\ast}~{B_1^\ast}, {\mathsf{field}}_{2}\,{A_2^\ast}~{B_2^\ast}, \dots \}\]</div>
+\[\{ {\mathsf{field}}_{1}\,{A_1^\ast}, {\mathsf{field}}_{2}\,{A_2^\ast}, \ldots \} \oplus \{ {\mathsf{field}}_{1}\,{B_1^\ast}, {\mathsf{field}}_{2}\,{B_2^\ast}, \ldots \} = \{ {\mathsf{field}}_{1}\,{A_1^\ast}~{B_1^\ast}, {\mathsf{field}}_{2}\,{A_2^\ast}~{B_2^\ast}, \ldots \}\]</div>
 </li>
 <li><p><span class="math notranslate nohighlight">\({ \bigoplus }\;{r^\ast}\)</span> denotes the composition of a sequence of records, respectively; if the sequence is empty, then all fields of the resulting record are empty.</p></li>
 </ul>

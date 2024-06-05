@@ -1445,7 +1445,7 @@ C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq M / 8
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathsf{i}}{N}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{M}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {\mathsf{i}}{N}
+C \href{../valid/instructions.html#valid-instr}{\vdash} {{\mathsf{i}}{N}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{(M~\mathsf{\_}~{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}})}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {\mathsf{i}}{N}
 }
 \qquad
 \end{array}\]</div>
@@ -1521,7 +1521,7 @@ C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq M / 8 \cdot N
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{M}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{N}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{({M}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{N}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}})}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1540,7 +1540,7 @@ C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} \leq N / 8
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{splat}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{({N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{splat}}})}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
@@ -1559,7 +1559,7 @@ C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x] = {\mathit{mt}}
  \qquad
 {2^{{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}}} &lt; N / 8
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{zero}}}}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
+C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{({N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{zero}}})}~x~{\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}} : \href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow \href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}
 }
 \qquad
 \end{array}\]</div>
