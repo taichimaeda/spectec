@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-06-05)</title>
+    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-06-07)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -269,13 +269,13 @@ Consequently, a function declaration can contain any number of exports, possibly
 \end{array}\end{split}\]</div>
 <span class="target" id="index-7"></span><span class="target" id="index-8"></span><span class="target" id="index-9"></span><section id="text-table-abbrev">
 <span id="index-10"></span><span id="id3"></span><h3>Abbreviations<a class="headerlink" href="#text-table-abbrev" title="Permalink to this heading">¶</a></h3>
-<p>A table’s initialization <a class="reference internal" href="instructions.html#text-expr"><span class="std std-ref">expression</span></a> can be omitted, in which case it defaults to <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}\)</span>:</p>
+<p>A table’s initialization <a class="reference internal" href="instructions.html#text-expr"><span class="std std-ref">expression</span></a> can be omitted, in which case it defaults to <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llclll}
 \def\mathdef3823#1{{}}\mathdef3823{module field} &amp;
   \def\mathdef3951#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3951{(}~\def\mathdef3952#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3952{table}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~\href{../text/types.html#text-tabletype}{\mathtt{tabletype}}~\def\mathdef3953#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3953{)}
     &amp;\equiv&amp;
-    \def\mathdef3954#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3954{(}~\def\mathdef3955#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3955{table}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~\href{../text/types.html#text-tabletype}{\mathtt{tabletype}}~~\def\mathdef3956#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3956{(}~\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref.null}}~\mathit{ht}~\def\mathdef3957#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3957{)}~\def\mathdef3958#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3958{)}
+    \def\mathdef3954#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3954{(}~\def\mathdef3955#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3955{table}~~\href{../text/values.html#text-id}{\mathtt{id}}^?~~\href{../text/types.html#text-tabletype}{\mathtt{tabletype}}~~\def\mathdef3956#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3956{(}~\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~\mathit{ht}~\def\mathdef3957#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3957{)}~\def\mathdef3958#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3958{)}
     \\ &amp;&amp;&amp; \qquad\qquad
     (\mathrel{\mbox{if}} \href{../text/types.html#text-tabletype}{\mathtt{tabletype}} = \href{../text/types.html#text-limits}{\mathtt{limits}}~\def\mathdef3959#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3959{(}~\def\mathdef3960#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3960{ref}~\def\mathdef3961#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3961{null}^?~\mathit{ht}~\def\mathdef3962#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef3962{)}) \\
 \end{array}\end{split}\]</div>
