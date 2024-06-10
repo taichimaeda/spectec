@@ -95,16 +95,18 @@ and string_of_paths (paths : coq_path_term list) (is_update : bool) (update_term
     | P_listlookup (id, term) :: ps, _ -> parens ("list_update_func " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_paths ps is_update update_term))
     | _ -> ""
 
+
 and string_of_paths_start (paths : coq_path_term list) (start_term : coq_term) (is_update : bool) (update_term : coq_term) = 
-  let start_ids = (match (List.hd paths) with
-    | P_recordlookup (ids, _n) -> ids
-    | _ -> [] (* Should not happen *)
-  ) in 
-  parens (string_of_terms start_term ^ " <|" ^ String.concat ";" start_ids ^ " := " ^ 
-    (if (List.tl paths <> []) 
-      then string_of_paths (List.tl paths) is_update update_term
-      else parens (lst_extend ^ " " ^ gen_projection start_ids (string_of_terms start_term) ^ " " ^ string_of_terms update_term) (* Has to be extend as no list lookup *)
-    ) ^ "|>")
+  match paths, is_update with
+    | P_recordlookup (ids, _n) :: ps, _ -> (parens (string_of_terms start_term ^ " <|" ^ String.concat ";" ids ^ " := " ^ 
+    (if (ps <> []) 
+      then string_of_paths ps is_update update_term
+      else parens (lst_extend ^ " " ^ gen_projection ids (string_of_terms start_term) ^ " " ^ string_of_terms update_term) (* Has to be extend as no list lookup *)
+    ) ^ "|>"))
+    | P_listlookup (_, exp) :: [], true ->  parens (lst_update ^ " " ^ string_of_terms start_term ^ " " ^ string_of_terms exp ^ " " ^ string_of_terms update_term)
+    | _ -> "" (* Can be extended to more cases if necessary *)
+
+  
 
 let string_of_binders (binds : binders) = 
   String.concat " " (List.map (fun (id, typ) -> 

@@ -389,9 +389,11 @@ and transform_relation_bind (bind : bind) =
       (transform_var_id id, erase_dependent_type (transform_iter_bind (List.rev its) typ))
     | TypB id -> (transform_var_id id, T_ident ["Type"])
 
-and transform_param (p : param) =
+and transform_param (arg : int * param) =
+  let (n, p) = arg in 
   match p.it with
-    | ExpP (id, typ) -> (transform_var_id id, erase_dependent_type typ)
+    | ExpP (id, typ) -> 
+      (transform_var_id id ^ "_" ^ string_of_int n, erase_dependent_type typ)
     | TypP id -> transform_id id, T_ident ["Type"]
 
 (* PATH Functions *)
@@ -404,9 +406,9 @@ and transform_list_path (p : path) =
 
 and gen_path_var_id (exp : exp) = 
   match exp.it with
-    | VarE id -> transform_var_id id
-    | _ -> error exp.at "Path start does not have an identifier as starter"
-    
+    | VarE id -> Some (transform_var_id id)
+    | _ -> None
+
 (* TODO: Improve this handling for the case of two listlookups in a row *)
 and transform_path (paths : path list) (n : int) (name : string option) = 
   let list_name num = (match name with
@@ -433,7 +435,7 @@ and transform_path_start (p : path) (start_name : exp) =
   let paths = List.rev (transform_list_path p) in
   match paths with
     | [] -> error p.at "Path should not be empty"
-    | _ -> transform_path paths 0 (Some (gen_path_var_id start_name))
+    | _ -> transform_path paths 0 (gen_path_var_id start_name)
 
 (* Premises *)
 let rec transform_premise (p : prem) =
@@ -486,7 +488,8 @@ let rec transform_def (d : def) : coq_def =
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
     | TypD (id, _, insts) -> InductiveFamilyD (transform_id id, List.map (transform_inst id) insts)
     | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
-    | DecD (id, params, typ, clauses) -> let binds = List.map transform_param params in 
+    | DecD (id, params, typ, clauses) -> 
+      let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
       if (clauses == []) 
         then AxiomD (transform_fun_id id, binds, transform_return_type typ)
       else (
@@ -555,7 +558,7 @@ let get_sube_rule (r : rule) =
 
 let is_id_type (typ : typ) = 
   match typ.it with
-    | VarT (_, args) -> args == []
+    | VarT (_, args) -> args = []
     | _ -> false
 
 let gen_typ_id (t : typ) =
@@ -574,10 +577,11 @@ let rec is_same_type (t1 : typ) (t2 : typ) =
     | _ -> false
 
 (* Assumes that tuple variables will be in same order, can be modified if necessary *)
+(* TODO must also check if some types inside the type are subtyppable and as such it should also be allowed *)
 let rec find_same_typing (at : region) (m1 : ident) (t1 : typ) (t2_cases : sub_typ) =
   match t2_cases with
-    | [] -> error t1.at "Subtyping expression cannot coerce correctly"
-    | (_, m2, t2) as s_t :: _ when is_same_type t1 t2 && m1 = (transform_mixop m2) -> s_t
+    | [] -> None
+    | (_, m2, t2) as s_t :: _ when is_same_type t1 t2 && m1 = (transform_mixop m2) -> Some s_t
     | _ :: t2_cases' -> find_same_typing at m1 t1 t2_cases'
 
 let get_num_tuple_typ (t : typ) = 
@@ -591,10 +595,13 @@ let transform_sub_types (at : region) (t1_id : id) (t2_id : id) (t1_cases : sub_
   [Right (DefinitionD (func_name, 
     [(var_prefix ^ transform_id t1_id, T_ident [transform_id t1_id])],
     T_ident [transform_id t2_id], List.map (fun (id, m1, t1) ->
-      let (id2, m2, _) = find_same_typing at (transform_mixop m1) t1 t2_cases in
-      let var_list = List.init (get_num_tuple_typ t1) (fun i -> T_ident [var_prefix ^ string_of_int i]) in
-      (T_app (T_ident [transform_id id; transform_mixop m1], var_list),
-      T_app (T_ident [transform_id id2; transform_mixop m2], var_list))
+      let s_t = find_same_typing at (transform_mixop m1) t1 t2_cases in
+      match s_t with
+        | Some (id2, m2, _) ->
+          let var_list = List.init (get_num_tuple_typ t1) (fun i -> T_ident [var_prefix ^ string_of_int i]) in
+          (T_app (T_ident [transform_id id; transform_mixop m1], var_list),
+          T_app (T_ident [transform_id id2; transform_mixop m2], var_list))
+        | None -> (T_ident [""], T_ident [""])
     ) t1_cases)); 
   Right (CoercionD (func_name, transform_id t1_id, transform_id t2_id))]
 
