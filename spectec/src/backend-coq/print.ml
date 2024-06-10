@@ -10,7 +10,8 @@ let is_inductive (d : coq_def) =
   match d with
     | (InductiveRelationD _ | InductiveD _) -> true
     | _ -> false
-
+let lst_update = "list_update"
+let lst_extend = "list_extend"
 
 let rec string_of_terms (term : coq_term) =
   match term with
@@ -56,8 +57,8 @@ let rec string_of_terms (term : coq_term) =
     | T_type_basic T_list -> "list"
     | T_type_basic T_opt -> "option"
     | T_ident ids -> String.concat "__" ids
-    | T_update (paths, term1, term2) -> string_of_paths_start paths term1 "list_update" term2
-    | T_extend (paths, term1, term2) -> string_of_paths_start paths term1 "list_extend" term2
+    | T_update (paths, term1, term2) -> string_of_paths_start paths term1 true term2
+    | T_extend (paths, term1, term2) -> string_of_paths_start paths term1 false term2
     | T_list [] -> "[]"
     | T_map (I_option, id, exp) -> parens ("option_map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
     | T_map (I_list, id, exp) -> parens ("List.map " ^ parens ("fun " ^ id ^ " => " ^ string_of_terms exp) ^ " " ^ parens id)
@@ -73,24 +74,37 @@ let rec string_of_terms (term : coq_term) =
     | T_cast (term, typ) -> parens (string_of_terms term ^ " : " ^ string_of_terms typ)
     | T_unsupported str -> "(* Unsupported Term: " ^ str ^ " *)"
 
+and string_of_ident_terms (term : coq_term) =
+  match term with
+    | T_app (base_term, args) -> (string_of_terms base_term, String.concat " " (List.map string_of_terms args))
+    | _ -> (string_of_terms term, "")
 
-and string_of_paths (paths : coq_path_term list) (list_func_name : string) (update_term : coq_term) =
-  match paths with
-    | [P_sliceupdate (id, term1, term2)] -> parens ("list_slice_update " ^ parens (id) ^ " " ^ 
+and gen_projection id_list name = parens (String.concat "( " (id_list) ^ " " ^ name ^ String.concat "" (List.init (List.length id_list - 1) (fun _ -> ")")))
+
+and string_of_paths (paths : coq_path_term list) (is_update : bool) (update_term : coq_term) =
+  match paths, is_update with
+    | [P_sliceupdate (id, term1, term2)], _ -> parens ("list_slice_update " ^ parens (id) ^ " " ^ 
       parens (string_of_terms term1) ^ " " ^ 
       parens (string_of_terms term2) ^ " " ^ 
       parens (string_of_terms update_term))
-      | [P_recordlookup (ids, name)] ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_terms update_term ^ "|>")
-    | P_recordlookup (ids, name) :: ps -> parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_paths ps list_func_name update_term ^ "|>")
-    | [P_listlookup (id, term)] -> parens (list_func_name ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_terms update_term))
-    | P_listlookup (id, term) :: ps -> parens ("list_update_func " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_paths ps list_func_name update_term))
+    | [P_recordlookup (ids, name)], true ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_terms update_term ^ "|>")
+    | [P_recordlookup (ids, name)], false ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ lst_extend ^ " " ^ gen_projection ids name ^ " " ^ string_of_terms update_term ^ "|>")
+    | [P_listlookup (id, term)], true -> parens (lst_update ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_terms update_term))
+    | [P_listlookup (id, _)], false -> parens (lst_extend ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms update_term))
+    | P_recordlookup (ids, name) :: ps, _ -> parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_paths ps is_update update_term ^ "|>")
+    | P_listlookup (id, term) :: ps, _ -> parens ("list_update_func " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_paths ps is_update update_term))
     | _ -> ""
 
-and string_of_paths_start (paths : coq_path_term list) (start_term : coq_term) (list_func_name : string) (update_term : coq_term) = 
+and string_of_paths_start (paths : coq_path_term list) (start_term : coq_term) (is_update : bool) (update_term : coq_term) = 
   let start_ids = (match (List.hd paths) with
-    | P_recordlookup (ids, _n) -> String.concat ";" ids
-    | _ -> "" (* Should not happen *)
-  ) in parens (string_of_terms start_term ^ " <|" ^ start_ids ^ " := " ^ string_of_paths (List.tl paths) list_func_name update_term ^ "|>")
+    | P_recordlookup (ids, _n) -> ids
+    | _ -> [] (* Should not happen *)
+  ) in 
+  parens (string_of_terms start_term ^ " <|" ^ String.concat ";" start_ids ^ " := " ^ 
+    (if (List.tl paths <> []) 
+      then string_of_paths (List.tl paths) is_update update_term
+      else parens (lst_extend ^ " " ^ gen_projection start_ids (string_of_terms start_term) ^ " " ^ string_of_terms update_term) (* Has to be extend as no list lookup *)
+    ) ^ "|>")
 
 let string_of_binders (binds : binders) = 
   String.concat " " (List.map (fun (id, typ) -> 
@@ -204,7 +218,8 @@ let is_typealias_familytype ((_, f_type) : family_entry) =
     | TypeAliasT _ -> true
     | _ -> false
 
-(* TODO refactor this function so it is not necessary to look at the head of the list *)
+(* TODO refactor this function so it is not necessary to look at the head of the list.
+Extend this when necessary for inductive types to also have coercion*)
 let string_of_family_types (id : ident) (entries : family_entry list) = 
   if is_typealias_familytype (List.hd entries) then 
   "Inductive " ^ id ^ ": Type :=\n\t" ^  
@@ -223,13 +238,14 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
            "\tAdmitted"
   ) ^ ".\n\n" ^
   
-  (* Coercions (TODO make this work better (only really works for T_ident terms)) *)
+  (* Coercions (TODO make this work better (only really works for T_ident terms and constant dependent types)) *)
   string_of_list_type id [] ^ ".\n\n" ^
   String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
   | TypeAliasT term -> 
-    "Coercion " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " >-> " ^ id ^ ".\n\n" ^
-    "Definition list__" ^ string_of_terms term ^ "_" ^ id ^ " : " ^ "list__" ^ string_of_terms term ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
-    "Coercion list__" ^ string_of_terms term ^ "_" ^ id ^ " : list__" ^ string_of_terms term ^ " >-> " ^ "list__" ^ id 
+    let (typealias_id, args) = string_of_ident_terms term in
+    "Coercion " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ typealias_id ^ " >-> " ^ id ^ ".\n\n" ^
+    "Definition list__" ^ typealias_id ^ "_" ^ id ^ " : " ^ "list__" ^ typealias_id ^ " " ^ args ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
+    "Coercion list__" ^ typealias_id ^ "_" ^ id ^ " : list__" ^ typealias_id ^ " >-> " ^ "list__" ^ id 
   | _ -> ""
 ) entries)
   else

@@ -1,9 +1,9 @@
 val string_of_terms : Coqast.coq_term -> string
 val string_of_paths :
-  Coqast.coq_path_term list -> string -> Coqast.coq_term -> string
+  Coqast.coq_path_term list -> bool -> Coqast.coq_term -> string
 val string_of_paths_start :
   Coqast.coq_path_term list ->
-  Coqast.coq_term -> string -> Coqast.coq_term -> string
+  Coqast.coq_term -> bool -> Coqast.coq_term -> string
 val string_of_binders : Coqast.binders -> string
 val string_of_binders_ids : Coqast.binders -> string
 val string_of_list_type : string -> Coqast.binders -> string
