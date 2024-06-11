@@ -1,0 +1,145 @@
+;;
+;; Configurations
+;;
+
+relation Step: config ~> config
+
+;;
+;; Instructions
+;;
+
+;; Polymorphic instructions
+
+rule Step/nop:
+  z; NOP  ~>  z; eps
+
+rule Step/drop:
+  z; val DROP  ~>  z; eps
+
+
+rule Step/select-true:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_1
+  -- if c =/= 0
+
+rule Step/select-false:
+  z; val_1 val_2 (CONST I32 c) SELECT  ~>  z; val_2
+  -- if c = 0
+
+
+;; Block instructions
+
+rule Step/block:
+  z; (BLOCK (eps -> t?) instr*)  ~>  z; (LABEL_ n `{eps} instr*)
+  -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
+
+rule Step/loop:
+  z; (LOOP ft instr*)  ~>  z; (LABEL_ 0 `{LOOP ft instr*} instr*)
+
+rule Step/if-true:
+  z; (CONST I32 c) (IF ft instr_1* ELSE instr_2*)  ~>  z; (BLOCK ft instr_1*)
+  -- if c =/= 0
+
+rule Step/if-false:
+  z; (CONST I32 c) (IF ft instr_1* ELSE instr_2*)  ~>  z; (BLOCK ft instr_2*)
+  -- if c = 0
+
+
+;; Branch instructions
+
+;; TODO: may want a label context instead of bubbling up
+rule Step/br-zero:
+  z; (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  z; val^n instr'*
+
+rule Step/br-succ:
+  z; (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  z; val* (BR l)
+
+
+rule Step/br_if-true:
+  z; (CONST I32 c) (BR_IF l)  ~>  z; (BR l)
+  -- if c =/= 0
+
+rule Step/br_if-false:
+  z; (CONST I32 c) (BR_IF l)  ~>  z; eps
+  -- if c = 0
+
+
+;; Function instructions
+
+rule Step/call:
+  z; (CALL x)  ~>  z; (CALL_ADDR $funcaddr(z)[x])
+
+rule Step/call_addr:
+  z; val^k (CALL_ADDR a)  ~>  z; (FRAME_ n `{f} (LABEL_ n `{eps} instr*))
+  -- if $funcinst(z)[a] = {TYPE (t_1^k -> t_2^n), MODULE mm, CODE func}
+  -- if func = FUNC x (LOCAL t)* instr*
+  -- if f = {LOCALS val^k ($default_(t))*, MODULE mm}
+
+rule Step/frame-vals:
+  z; (FRAME_ n `{f} val^n)  ~>  z; val^n
+
+rule Step/return-frame:
+  z; (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  z; val^n
+
+rule Step/return-label:
+  z; (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  z; val* RETURN
+
+
+;; Traps
+
+rule Step/trap-vals:
+  z; val* TRAP instr*  ~>  z; TRAP
+  -- if val* =/= eps \/ instr* =/= eps
+
+rule Step/trap-label:
+  z; (LABEL_ n `{instr'*} TRAP)  ~>  z; TRAP
+
+rule Step/trap-frame:
+  z; (FRAME_ n `{f} TRAP)  ~>  z; TRAP
+
+
+;; Context
+
+rule Step/ctxt-label:
+  z; (LABEL_ n `{instr_0*} instr*)  ~>  z'; (LABEL_ n `{instr_0*} instr'*)
+  -- Step: z; instr* ~> z'; instr'*
+
+rule Step/ctxt-frame:
+  s; f; (FRAME_ n `{f'} instr*)  ~>  s'; f; (FRAME_ n `{f'} instr'*)
+  -- Step: s; f'; instr* ~> s'; f'; instr'*
+
+
+;; Numeric instructions
+
+def $binop(valtype, binop, num_(valtype), num_(valtype)) : num_(valtype)*
+
+def $iadd(N, iN(N), iN(N)) : iN(N)
+def $isub(N, iN(N), iN(N)) : iN(N)
+def $imul(N, iN(N), iN(N)) : iN(N)
+def $idiv(N, iN(N), iN(N)) : iN(N)*
+def $iadd(N, c_1, c_2) = $((c_1 + c_2) \ 2^N)
+def $isub(N, c_1, c_2) = $((c_1 - c_2 + 2^N) \ 2^N)
+def $imul(N, c_1, c_2) = $((c_1 * c_2) \ 2^N)
+def $idiv(N, c_1, 0) = eps
+def $idiv(N, c_1, c_2) = $(c_1 / c_2)
+
+def $binop(t, ADD, c_1, c_2) = $iadd($size(t), c_1, c_2)
+def $binop(t, SUB, c_1, c_2) = $isub($size(t), c_1, c_2)
+def $binop(t, MUL, c_1, c_2) = $imul($size(t), c_1, c_2)
+def $binop(t, DIV, c_1, c_2) = $idiv($size(t), c_1, c_2)
+
+rule Step/binop-val:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
+  -- if $binop(t, binop, c_1, c_2) = c  ;; TODO
+
+rule Step/binop-trap:
+  z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; TRAP
+  -- if $binop(t, binop, c_1, c_2) = eps  ;; TODO
+
+
+;; Local instructions
+
+rule Step/local.get:
+  z; (LOCAL.GET x)  ~>  z; $local(z, x)
+
+rule Step/local.set:
+  z; val (LOCAL.SET x)  ~>  $with_local(z, x, val); eps

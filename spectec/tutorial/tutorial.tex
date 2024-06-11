@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{fullpage,fancyvrb,newverbs,xcolor,amsfonts}
+\usepackage{fullpage,fancyvrb,newverbs,xcolor,amsfonts, amsmath}
 
 \definecolor{cverbbg}{gray}{0.93}
 
@@ -39,33 +39,64 @@
 In this tutorial, we will practice how to write a spec in Wasm-DSL.
 Here, instead of a full Wasm, a very simplified version of Wasm (which we call Mini-Wasm) is used as our goal.
 
-\subsection{Abstract Syntax of Mini-Wasm}
+\subsection{Working Directory}
+The directory \K{<root>/spectec/tutorial} is where we will work on.
+
+\subsection{How To Run}
+Running \K{make} in \K{<root>/spectec} will yield an executable file \K{watsup} in same directory. You can use this to generate various types of spec. For example, in directory \K{<root>/spectec}:
+\begin{lcverbatim}
+./watsup ./tutorial/*.watsup --prose
+\end{lcverbatim}
+will generate prose, using every \K{./watsup} file in directory \K{./tutorial} as input. There are various options including \K{--interpreter}, \K{--latex}, or \K{--print-il}. You can see all possible options with command \K{./watsup -help}.
+
+\section{Basic Building Blocks of Wasm-DSL}
+First, we'll study basic building blocks of Wasm-DSL, and how to use them. \\
+For now, You don't have to understand this part completely. You may start from Section 3, and refer to this section when you want to.
+
+\subsection{Syntax Definitions}
+Syntax definitions describe the grammar of the input language or auxiliary constructs. These are essentially type definitions for Wasm-DSL.
+\begin{lcverbatim}
+syntax <name_of_syntax> = <case> | ... | <case>
+\end{lcverbatim}
+Defining syntax in Wasm-DSL is basically done as above. Use keyword \K{syntax}, write the name of syntax in lowercase, and simply list the possible cases with the separator \K{|}. Here, each of the case can be a nonterminal node (usually written in lowercases) which refers to another syntax, or a terminal node (usually written in uppercases).
+
+\subsection{Variable Declarations}
+Variable declarations ascribe the syntactic class (i.e., type) that meta variables used in rules range over.
+\begin{lcverbatim}
+var <name_of_var> : <type>
+\end{lcverbatim}
+We can explicitly declare a metavariable as above. Use keyword \K{var}, and give its name and type. Here, \K{<type>} may be a complex form, which contains iteration, parametric syntax, etc.\\
+Also, every syntax name is implicitly usable as a variable of the respective type.
+
+\subsection{Relation Declarations}
+Relation declarations, defining the shape of judgement forms, such as typing or reduction relations. These are essentially type declarations for the meta language. For example:
+\begin{lcverbatim}
+relation Instr_ok: context |- instr : functype
+relation Step: config ~> config
+\end{lcverbatim}
+%\begin{lcverbatim}
+%relation <name_of_relation>: context |- <type> : <type>
+%relation <name_of_relation>: <type> ~> <type>
+%\end{lcverbatim}
+
+\subsection{Rule Definitions}
+\begin{lcverbatim}
+rule <name_of_relation>/<name_of_rule>:
+  <content_of_rule>
+\end{lcverbatim}
+We can define the individual rules for each relation as above. \K{<content\_of\_rule>} has different form, depending on its relation.
+Every rule is named, so that it can be referenced. Each premise is introduced by a dash and includes the name of the relation it is referencing, easing checking and processing.
+
+\subsection{Auxiliary Functions}
+\begin{lcverbatim}
+def $<func_name>(<type_of_arg1>, <type_of_arg2>, ... , <type_of_argn>) : <result_type>
+def $<func_name>(<arg1>, <arg2>, ... , <argn>) = <result>
+\end{lcverbatim}
+We can declare auxiliary functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out. \\
+
+\section{Syntax}
+Now, we will start from writing the syntax of Mini-Wasm.
 Abstract syntax of Mini-Wasm is as follows:
-%\[
-%\begin{array}{rrl}
-%\X{module} & ::= & \K{module}\ \X{type}^*\ \X{func}^*\ \X{start}^*\ \X{export}^*\\
-%\X{type} & ::= & \K{type}\ \X{type}_{\X{func}}\\ 
-%\X{code} & ::= & \X{local}^*\ \X{instr}^*\\
-%\X{local} & ::= & \K{local}\ \X{type}_{\X{val}}\\\
-%\X{func} & ::= & \K{func}\ \X{idx}_{\X{type}}\ \X{code}\\
-%\X{start} & ::= & \K{start}\ \X{idx}_{\X{func}}\\
-%\X{export} & ::= & \K{export}\ \mbox{``}\K{name}\mbox{''}\ (\K{func}\ \X{idx}_{\X{func}})\\
-%\X{instr} & ::= & \K{nop}~\mid~\K{drop}~\mid~\K{select}~\mid~
-%\X{type}_{\X{val}}\K{.const}\ \X{value}\K{\_}(\X{type}_{\X{val}})~\mid~
-%\X{binop}\\
-%&\mid&(\K{get}\mid\K{set}\mid\K{tee})\K{\_}\K{local}\ \X{idx}_{\X{local}}~\mid~
-%\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}\\
-%&\mid&\K{block}\ \X{valtype?}\ \X{instr}^*~\mid~\K{loop}\ \X{valtype?}\ \X{instr}^*\\
-%&\mid&\K{if}\ \X{valtype?}\ \X{instr}^*\ \K{else}\ \X{instr}^*~\mid~\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
-%\X{binop} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
-%\K{i64.add}~\mid~\K{i64.sub}~\mid~\K{i64.mul}\\
-%\X{type}_{\X{val}} & ::= & \K{i32}~\mid~\K{i64}\\
-%\X{type}_{\X{func}} & ::= & \X{type}_{\X{val}}^*\rightarrow \X{type}_{\X{val}}^*\\
-%\X{idx}_{\X{type}|\X{func}|\X{local}|\X{label}} & \in & [0,\ 2^{32} - 1]\\
-%\X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
-%\X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
-%\end{array}
-%\]
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
@@ -78,7 +109,7 @@ $$
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(integer)} & {i}{N} &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
+	\mbox{(integer)} & {\mathit{iN}}(N) &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
 \end{array}
 $$
 
@@ -95,7 +126,7 @@ $$
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(index)} & {\mathit{idx}} &::=& {i}{32} \\
+	\mbox{(index)} & {\mathit{idx}} &::=& {\mathit{iN}}(32) \\
 	\mbox{(type index)} & {\mathit{typeidx}} &::=& {\mathit{idx}} \\
 	\mbox{(function index)} & {\mathit{funcidx}} &::=& {\mathit{idx}} \\
 	\mbox{(label index)} & {\mathit{labelidx}} &::=& {\mathit{idx}} \\
@@ -113,7 +144,6 @@ $$
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(result type)} & {\mathit{resulttype}} &::=& {{\mathit{valtype}}^?} \\
 	\mbox{(function type)} & {\mathit{functype}} &::=& {{\mathit{valtype}}^\ast} \rightarrow {{\mathit{valtype}}^\ast} \\
 	\mbox{(external type)} & {\mathit{externtype}} &::=& \mathsf{func}~{\mathit{functype}} \\
 \end{array}
@@ -122,8 +152,15 @@ $$
 \vspace{1ex}
 
 $$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{size}}(\mathsf{i{\scriptstyle 32}}) &=& 32 \\
+	{\mathrm{size}}(\mathsf{i{\scriptstyle 64}}) &=& 64 \\
+\end{array}
+$$
+
+$$
 \begin{array}{@{}lrrl@{}l@{}}
-	& {{\mathit{num}}}_{{\mathit{valtype}}} &::=& {i}{{|{\mathit{valtype}}|}} \\
+	& {{\mathit{num}}}_{{\mathit{valtype}}} &::=& {\mathit{iN}}({\mathrm{size}}({\mathit{valtype}})) \\
 \end{array}
 $$
 
@@ -131,7 +168,7 @@ $$
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	& {\mathit{binop}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} \\
+	& {\mathit{binop}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} \\
 \end{array}
 $$
 
@@ -149,8 +186,8 @@ $$
 	\mathsf{br\_if}~{\mathit{labelidx}} \\ &&|&
 	\mathsf{call}~{\mathit{funcidx}} \\ &&|&
 	\mathsf{return} \\ &&|&
-	{\mathit{valtype}}{.}\mathsf{const}~{{\mathit{num}}}_{{\mathit{valtype}}} \\ &&|&
-	{\mathit{valtype}} {.} {\mathit{binop}} \\ &&|&
+	\mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\ &&|&
+	\mathsf{binop}~{\mathit{valtype}}~{\mathit{binop}} \\ &&|&
 	\mathsf{local.get}~{\mathit{localidx}} \\ &&|&
 	\mathsf{local.set}~{\mathit{localidx}} \\
 \end{array}
@@ -177,24 +214,113 @@ $$
 \end{array}
 $$
 
-\subsection{Working Directory}
-The directory \K{<root>/spectec/tutorial} is where we will work on.
+\vspace{1ex}
 
-\subsection{How To Run}
-Running \K{make} in \K{<root>/spectec} will yield an executable file \K{watsup} in same directory. You can use this to generate various types of spec. For example, in directory \K{<root>/spectec}:
-\begin{lcverbatim}
-./watsup ./tutorial/*.watsup --prose
-\end{lcverbatim}
-will generate prose, using every \K{./watsup} file in directory \K{./tutorial} as input. There are various options including \K{--interpreter}, \K{--latex}, or \K{--print-il}. You can see all possible options with command \K{./watsup -help}.
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
+	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
+\end{array}
+$$
 
-\section{Syntax}
-Now, we will start from writing the syntax of Mini-Wasm.
-Make a new file \K{1-syntax.wastup}.
-Declaring syntax in Wasm-DSL is basically done like this:
-\begin{lcverbatim}
-syntax <name_of_syntax> = <case> | ... | <case>
-\end{lcverbatim}
-Use keyword \K{syntax}, write the name of syntax in lowercase, and simply list the possible cases with the separator \K{|}. Here, each of the case can be a nonterminal node (usually written in lowercases) which refers to another syntax, or a terminal node (usually written in uppercases).\\
+\vspace{1ex}
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{type}~{\mathit{functype}},\; \\
+		\mathsf{module}~{\mathit{moduleinst}},\; \\
+		\mathsf{code}~{\mathit{func}} \}\end{array} \\
+	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{name}~{\mathit{name}},\; \\
+		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
+	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
+		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
+		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
+	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
+		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
+	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
+	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
+	\mathsf{call\_addr}~{\mathit{funcaddr}} \\ &&|&
+	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	\mathsf{trap} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
+\end{array}
+$$
+\\
+Make a new file \K{1-syntax.wastup}. \\
 We'll declare each of the syntax one by one.
 
 \subsection{$N$, $n$}
@@ -215,10 +341,9 @@ This means the syntax \K{N} and \K{n} is a natural number.
 \subsection{${i}{N}$}
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(integer)} & {i}{N} &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
+	\mbox{(integer)} & {\mathit{iN}}(N) &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
 \end{array}
 $$
-Write as following:
 \begin{lcverbatim}
 syntax iN(N) = 0 | ... | 2^N-1
 \end{lcverbatim}
@@ -236,31 +361,30 @@ We need a declaration of $name$, which indicates for a general string. We can de
 syntax char = U+0000 | ... | U+D7FF | U+E000 | ... | U+10FFFF
 \end{lcverbatim}
 This syntax is built-in, and denotes Unicode code points.
-Now, \K{name} is simply an iteration of \K{char}s.
+Now, \K{name} is simply an iteration of \K{char}s. Use \K{*} to represent a sequence.
 \begin{lcverbatim}
 syntax name = char*
 \end{lcverbatim}
 
-\subsection{$idx$}
+\subsection{$idx$, $typeidx$, $funcidx$, $labelidx$, $localidx$}
 $$
 \begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(index)} & {\mathit{idx}} &::=& {i}{32} \\
+	\mbox{(index)} & {\mathit{idx}} &::=& {\mathit{iN}}(32) \\
 	\mbox{(type index)} & {\mathit{typeidx}} &::=& {\mathit{idx}} \\
 	\mbox{(function index)} & {\mathit{funcidx}} &::=& {\mathit{idx}} \\
 	\mbox{(label index)} & {\mathit{labelidx}} &::=& {\mathit{idx}} \\
 	\mbox{(local index)} & {\mathit{localidx}} &::=& {\mathit{idx}} \\
 \end{array}
 $$
-You can use \K{...} to describe a range.
-The Wasm-DSL version of upper syntax will be:
 \begin{lcverbatim}
-	syntax idx = 0 | ... | 2^32-1
+syntax idx = I32
 \end{lcverbatim}
-Since we have three types of index (which are semantically same, but syntactically different), write like this:
+Since we have four types of index (which are semantically same, but syntactically different), write like this:
 \begin{lcverbatim}
-	syntax funcidx = idx
-	syntax labelidx = idx
-	syntax localidx = idx
+syntax typeidx = idx
+syntax funcidx = idx
+syntax labelidx = idx
+syntax localidx = idx
 \end{lcverbatim}
 
 \subsection{$\mathit{valtype}$}
@@ -269,114 +393,289 @@ $$
 	\mbox{(number type)} & {\mathit{valtype}} &::=& \mathsf{i{\scriptstyle 32}} ~|~ \mathsf{i{\scriptstyle 64}} \\
 \end{array}
 $$
-This syntax is simply written in Wasm-DSL like this:
 \begin{lcverbatim}
 syntax valtype = I32 | I64
 \end{lcverbatim}
-This means the syntax \K{valtype} is either \K{I32} or \K{I64}. Here, write terminal nodes \K{I32} and \K{I64} instead of \K{i32} and \K{i64}, and nonterminal node \K{valtype} instead of \K{VALTYPE}.
 
-\subsection{$value$}
-\[
-\begin{array}{rrl}
-\X{value}\K{\_}(\X{i32}) & \in & [0,\ 2^{32} - 1]\\
-\X{value}\K{\_}(\X{i64}) & \in & [0,\ 2^{64} - 1]\\
+\subsection{$\mathit{functype}$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(function type)} & {\mathit{functype}} &::=& {{\mathit{valtype}}^\ast} \rightarrow {{\mathit{valtype}}^\ast} \\
 \end{array}
-\]
-Here, the syntax $value\_$ is declared in regard with parameter \K{valtype}.
-This can be done like this:
-\begin{lcverbatim}
-syntax val_(valtype)
-syntax val_(I32) = 0 | ... | 2^32-1
-syntax val_(I64) = 0 | ... | 2^64-1
-\end{lcverbatim}
-The type is defined differently for different parameters, by pattern-matching on the parameter.
-Here we can declare a general range, by using parameter again.
-\begin{lcverbatim}
-syntax iN(N) = 0 | ... | 2^N-1
-\end{lcverbatim}
-Now, we can write \K{iN(32)} and \K{iN(64)} instead of \verb!0 | ... | 2^32-1! and \verb!0 | ... | 2^64-1!.
-New declaration of \K{idx} and \K{val} is as follows:
-\begin{lcverbatim}
-syntax idx = iN(32)
-syntax val(valtype)
-syntax val(I32) = iN(32)
-syntax val(I64) = iN(64)
-\end{lcverbatim}
-
-\subsection{$binop$}
-\[
-\begin{array}{rrl}
-	\X{binop} & ::= & \K{i32.add}~\mid~\K{i32.sub}~\mid~\K{i32.mul}~\mid~
-	\K{i64.add}~\mid~\K{i64.sub}~\mid~\K{i64.mul}\\
-\end{array}
-\]
-We can declare two groups of \K{binop}, classifying them by one's parameter type:
-\begin{lcverbatim}
-syntax binop = ADD | SUB | MUL
-\end{lcverbatim}
-
-\subsection{$instr$}
-\[
-\begin{array}{rrl}
-	\X{instr} & ::= & \K{nop}~\mid~\K{drop}~\mid~\K{select}~\mid~
-	\X{type}_{\X{val}}\K{.const}\ \X{value}\K{\_}(\X{type}_{\X{val}})~\mid~
-	\X{binop}\\
-	&\mid&(\K{get}\mid\K{set})\K{\_}\K{local}\ \X{idx}_{\X{local}}~\mid~
-	\K{call}\ \X{idx}_{\X{func}}~\mid~\K{return}~\mid~\K{block}\ \X{valtype?}\ \X{instr}^*\\
-	&\mid&\K{loop}\ \X{valtype?}\ \X{instr}^*~\mid~\K{if}\ \X{valtype?}\ \X{instr}^*\ \K{else}\ \X{instr}^*~\mid~\K{br}\ \X{idx}_{\X{label}}~\mid~\K{br\_if}\ \X{idx}_{\X{label}}\\
-\end{array}
-\]
-Use \K{*} to represent a sequence. Now we can fully write \K{instr} as follows:
-\begin{lcverbatim}
-syntax instr =
-  | NOP
-  | DROP
-  | SELECT
-  | CONST valtype val_(valtype)
-  | BINOP valtype binop_(valtype)
-  | LOCAL.GET localidx
-  | LOCAL.SET localidx
-  | CALL funcidx
-  | RETURN
-  | BLOCK valtype? instr*
-  | LOOP valtype? instr*
-  | IF valtype? instr* ELSE instr*
-  | BR labelidx
-  | BR_IF labelidx
-\end{lcverbatim}
-
-\subsection{$type_{func}$}
-\[
-\begin{array}{rrl}
-\X{type}_{\X{func}} & ::= & \X{type}_{\X{val}}^*\rightarrow \X{type}_{\X{val}}^*\\
-\end{array}
-\]
+$$
 We can use \K{->} to indicate a function:
 \begin{lcverbatim}
 syntax functype = valtype* -> valtype*
 \end{lcverbatim}
 
-\subsection{$module$}
-\[
-\begin{array}{rrl}
-	\X{module} & ::= & \K{module}\ \X{type}^*\ \X{func}^*\ \X{start}^*\ \X{export}^*\\
-	\X{type} & ::= & \K{type}\ \X{type}_{\X{func}}\\ 
-	\X{code} & ::= & \X{local}^*\ \X{instr}^*\\
-	\X{local} & ::= & \K{local}\ \X{type}_{\X{val}}\\\
-	\X{func} & ::= & \K{func}\ \X{idx}_{\X{type}}\ \X{code}\\
-	\X{start} & ::= & \K{start}\ \X{idx}_{\X{func}}\\
-	\X{export} & ::= & \K{export}\ \mbox{``}\K{name}\mbox{''}\ (\K{func}\ \X{idx}_{\X{func}})\\
+\subsection{$\mathit{externtype}$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(external type)} & {\mathit{externtype}} &::=& \mathsf{func}~{\mathit{functype}} \\
 \end{array}
-\]
+$$
+\begin{lcverbatim}
+syntax externtype = FUNC functype
+\end{lcverbatim}
+
+\subsection{$size$, ${{\mathit{num}}}_{{\mathit{valtype}}}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{size}}(\mathsf{i{\scriptstyle 32}}) &=& 32 \\
+	{\mathrm{size}}(\mathsf{i{\scriptstyle 64}}) &=& 64 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	& {{\mathit{num}}}_{{\mathit{valtype}}} &::=& {\mathit{iN}}({\mathrm{size}}({\mathit{valtype}})) \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax num_(valtype) = iN($size(valtype))
+\end{lcverbatim}
+The first line declares the syntax \K{num\_}, and the remaining lines give the actual definition. \\
+We'll redefine this syntax later on Section 4.2, using function \K{size}.
+
+\subsection{$binop$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	& {\mathit{binop}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax binop = ADD | SUB | MUL | DIV
+\end{lcverbatim}
+
+\subsection{$instr$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(instruction)} & {\mathit{instr}} &::=& \mathsf{nop} \\ &&|&
+	\mathsf{drop} \\ &&|&
+	\mathsf{select} \\ &&|&
+	\mathsf{block}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
+	\mathsf{loop}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
+	\mathsf{if}~{\mathit{functype}}~{{\mathit{instr}}^\ast}~\mathsf{else}~{{\mathit{instr}}^\ast} \\ &&|&
+	\mathsf{br}~{\mathit{labelidx}} \\ &&|&
+	\mathsf{br\_if}~{\mathit{labelidx}} \\ &&|&
+	\mathsf{call}~{\mathit{funcidx}} \\ &&|&
+	\mathsf{return} \\ &&|&
+	{\mathit{valtype}}{.}\mathsf{const}~{{\mathit{num}}}_{{\mathit{valtype}}} \\ &&|&
+	{\mathit{valtype}} {.} {\mathit{binop}} \\ &&|&
+	\mathsf{local.get}~{\mathit{localidx}} \\ &&|&
+	\mathsf{local.set}~{\mathit{localidx}} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax instr =
+  | NOP
+  | DROP
+  | SELECT
+  | BLOCK functype instr*
+  | LOOP functype instr*
+  | IF functype instr* ELSE instr*
+  | BR labelidx
+  | BR_IF labelidx
+  | CALL funcidx
+  | RETURN
+  | CONST valtype num_(valtype)
+  | BINOP valtype binop
+  | LOCAL.GET localidx
+  | LOCAL.SET localidx
+\end{lcverbatim}
+
+\subsection{$expr$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(expression)} & {\mathit{expr}} &::=& {{\mathit{instr}}^\ast} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax expr = instr*
+\end{lcverbatim}
+
+\subsection{$module$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(type)} & {\mathit{type}} &::=& \mathsf{type}~{\mathit{functype}} \\
+	\mbox{(local)} & {\mathit{local}} &::=& \mathsf{local}~{\mathit{valtype}} \\
+	\mbox{(function)} & {\mathit{func}} &::=& \mathsf{func}~{\mathit{typeidx}}~{{\mathit{local}}^\ast}~{\mathit{expr}} \\
+	\mbox{(external index)} & {\mathit{externidx}} &::=& \mathsf{func}~{\mathit{funcidx}} \\
+	\mbox{(export)} & {\mathit{export}} &::=& \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} \\
+	\mbox{(module)} & {\mathit{module}} &::=& \mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} \\
+\end{array}
+$$
 Declare $module$ and its subcomponents as follows:
 \begin{lcverbatim}
-syntax module = MODULE type* func* start* export*
 syntax type = TYPE functype
-syntax code = local* instr*
 syntax local = LOCAL valtype
-syntax func = FUNC typeidx code
-syntax start = START funcidx
-syntax export = EXPORT name (FUNC funcidx)
+syntax func = FUNC typeidx local* expr
+syntax externidx = FUNC funcidx
+syntax export = EXPORT name externidx
+syntax module = MODULE type* func* export*
+\end{lcverbatim}
+
+\subsection{$addr$, $funcaddr$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
+	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax addr = nat
+syntax funcaddr = addr
+\end{lcverbatim}
+
+\subsection{$val$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax val = CONST valtype num_(valtype)
+\end{lcverbatim}
+
+\subsection{$externval$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax externval = FUNC funcaddr
+\end{lcverbatim}
+
+\subsection{$funcinst$, $exportinst$, $moduleinst$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{type}~{\mathit{functype}},\; \\
+		\mathsf{module}~{\mathit{moduleinst}},\; \\
+		\mathsf{code}~{\mathit{func}} \}\end{array} \\
+	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{name}~{\mathit{name}},\; \\
+		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
+	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
+		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
+		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax funcinst =
+{ TYPE functype,
+	MODULE moduleinst,
+	CODE func }
+syntax exportinst =
+{ NAME name,
+	VALUE externval }
+
+syntax moduleinst =
+{ TYPES functype*,
+	FUNCS funcaddr*,
+	EXPORTS exportinst* }
+\end{lcverbatim}
+
+\subsection{$store$, $frame$, $state$, $config$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
+	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
+		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
+	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
+	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax store =
+{ FUNCS funcinst* }
+
+syntax frame =
+{ LOCALS val*,
+	MODULE moduleinst }
+
+syntax state = store; frame
+syntax config = state; admininstr*
+\end{lcverbatim}
+
+\subsection{$admininstr$}
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
+	\mathsf{call\_addr}~{\mathit{funcaddr}} \\ &&|&
+	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	\mathsf{trap} \\
+\end{array}
+$$
+\begin{lcverbatim}
+syntax admininstr =
+| instr
+| CALL_ADDR funcaddr
+| LABEL_ n `{instr*} admininstr*
+| FRAME_ n `{frame} admininstr*
+| TRAP
+\end{lcverbatim}
+
+\subsection{$\mathrm{funcaddr}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
+\end{array}
+$$
+\begin{lcverbatim}
+def $funcaddr(state) : funcaddr*
+def $funcaddr((s; f)) = f.MODULE.FUNCS
+\end{lcverbatim}
+
+\subsection{$\mathrm{local}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
+\end{array}
+$$
+\begin{lcverbatim}
+def $local(state, localidx) : val
+def $local((s; f), x) = f.LOCALS[x]
+\end{lcverbatim}
+
+\subsection{$\mathrm{with_{\mathit{local}}}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
+\end{array}
+$$
+\begin{lcverbatim}
+def $with_local(state, localidx, val) : state
+def $with_local((s; f), x, v) = s; f[.LOCALS[x] = v]
+\end{lcverbatim}
+
+\subsection{$\mathrm{funcinst}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
+\end{array}
+$$
+\begin{lcverbatim}
+def $funcinst(state) : funcinst*
+def $funcinst((s; f)) = s.FUNCS
+\end{lcverbatim}
+
+\subsection{${{\mathrm{default}}}_{valtype}$}
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
+\end{array}
+$$
+\begin{lcverbatim}
+def $default_(valtype) : val
+def $default_(I32) = (CONST I32 0)
+def $default_(I64) = (CONST I64 0)
 \end{lcverbatim}
 
 \section{Metavariables}
@@ -384,10 +683,6 @@ We're done with writing syntax of Mini-Wasm. Now, we will declare metavariables,
 There are three ways to make use of metavariables.
 
 \subsection{Explicit Declarartion}
-\begin{lcverbatim}
-var <name_of_var> : <type>
-\end{lcverbatim}
-We can explicitly declare a metavariable as above. Use keyword \K{var}, and give its name and type. Here, \K{<type>} may be a complex form, which contains iteration, parametric syntax, etc.\\
 Declare variables in file \K{1-syntax.wastup} as follows:
 \begin{lcverbatim}
 var x : idx
@@ -424,12 +719,6 @@ rule Step/example:
 \end{lcverbatim}
 
 \section{Functions}
-\begin{lcverbatim}
-def $<func_name>(<type_of_arg1>, <type_of_arg2>, ... , <type_of_argn>) : <result_type>
-def $<func_name>(<arg1>, <arg2>, ... , <argn>) = <result>
-\end{lcverbatim}
-We can declare functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out.
-
 \subsection{Declaring Function Body}
 Function body can be multiple cases, which defines a function by pattern matching. \\
 For example, we can define a function \K{size}, which returns the size of a \K{valtype} as:
@@ -467,11 +756,11 @@ Functions can be used in definition of other functions or reduction rules. When 
 \begin{lcverbatim}
 $<func_name>(<arg1>, <arg2>, ... , <argn>)
 \end{lcverbatim}
-For example,
+For example, put the definition of the function \K{size} before the syntax \K{num\_} from Section 2.7.
+Then, we can use \K{size} to redefine \K{num\_} as below:
 \begin{lcverbatim}
-$iadd(c_1, c_2)
+syntax num_(valtype) = iN($size(valtype))
 \end{lcverbatim}
-equals to the return value of function \K{iadd} with arguments \K{c\_1}, \K{c\_2}.
 
 \section{Reduction Rules}
 Now, let's write the reduction rules for the instructions.
@@ -529,7 +818,7 @@ rule Step/drop:
 
 \subsection{\K{SELECT}}
 When we get \K{SELECT} from stack, we have two cases: condition is true or false. \\
-Define each of the case as seperate rule as following:
+Define each of the case as seperate rule as follows:
 \begin{lcverbatim}
 rule Step/select-true:
   ...
@@ -556,7 +845,7 @@ rule Step/select-false:
 
 \subsection{\K{BINOP}}
 When we get \K{BINOP} from stack, there are three cases for \K{binop\_(valtype)}: \K{ADD}, \K{SUB}, \K{MUL}. \\
-Define each of the case as seperate rule, and use built-in functions \K{iadd}, \K{isub}, \K{imul} as following:
+Define each of the case as seperate rule, and use built-in functions \K{iadd}, \K{isub}, \K{imul} as follows:
 \begin{lcverbatim}
 def $iadd(N, iN(N), iN(N)) : iN(N)
 def $isub(N, iN(N), iN(N)) : iN(N)

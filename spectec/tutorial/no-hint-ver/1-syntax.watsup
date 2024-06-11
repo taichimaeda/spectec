@@ -10,7 +10,7 @@ syntax n hint(macro) = nat  ;; hack
 
 ;; Integers
 
-syntax iN(N) hint(desc "integer") hint(show i#%) =
+syntax iN(N) hint(desc "integer") =
   0 | ... | 2^N-1
 
 
@@ -55,7 +55,7 @@ var ft : functype
 
 ;; Constants
 
-def $size(valtype) : nat  hint(partial) hint(show |%|)
+def $size(valtype) : nat  hint(partial)
 def $size(I32) = 32
 def $size(I64) = 64
 
@@ -92,8 +92,8 @@ syntax instr/call hint(desc "call instruction") = ...
   | ...
 
 syntax instr/num hint(desc "numeric instruction") = ...
-  | CONST valtype num_(valtype)      hint(show %.CONST %)
-  | BINOP valtype binop    hint(show %.%)
+  | CONST valtype num_(valtype)
+  | BINOP valtype binop
   | ...
 
 syntax instr/local hint(desc "local instruction") = ...

@@ -16,13 +16,9 @@ var fa : funcaddr
 ;; Basic values
 
 syntax val hint(desc "value") =
-  | CONST valtype num_(valtype)   hint(show %.CONST %)
-
-syntax result hint(desc "result") =
-  | _VALS val* | TRAP
+  | CONST valtype num_(valtype)
 
 var v : val
-var res : result
 
 
 ;; External values
@@ -78,24 +74,24 @@ var z : state
 ;; Administrative Instructions
 ;;
 
-syntax admininstr hint(show instr) hint(desc "administrative instruction") =
+syntax admininstr hint(desc "administrative instruction") =
   | instr
-  | CALL_ADDR funcaddr             hint(show CALL %)
-  | LABEL_ n `{instr*} admininstr* hint(show LABEL_%#% %%)
-  | FRAME_ n `{frame} admininstr*  hint(show FRAME_%#% %%)
+  | CALL_ADDR funcaddr
+  | LABEL_ n `{instr*} admininstr*
+  | FRAME_ n `{frame} admininstr*
   | TRAP
 
-def $funcaddr(state) : funcaddr*      hint(show %.MODULE.FUNCS)
+def $funcaddr(state) : funcaddr*
 def $funcaddr((s; f)) = f.MODULE.FUNCS
 
 
-def $local(state, localidx) : val           hint(show %.LOCALS[%])
+def $local(state, localidx) : val
 def $local((s; f), x) = f.LOCALS[x]
 
-def $with_local(state, localidx, val) : state               hint(show %[.LOCALS[%] = %])
+def $with_local(state, localidx, val) : state
 def $with_local((s; f), x, v) = s; f[.LOCALS[x] = v]
 
-def $funcinst(state) : funcinst*      hint(show %.FUNCS)
+def $funcinst(state) : funcinst*
 def $funcinst((s; f)) = s.FUNCS
 
 def $default_(valtype) : val

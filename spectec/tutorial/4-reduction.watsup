@@ -116,13 +116,17 @@ def $binop(valtype, binop, num_(valtype), num_(valtype)) : num_(valtype)*
 def $iadd(N, iN(N), iN(N)) : iN(N)      hint(show $iadd_(%,%,%))
 def $isub(N, iN(N), iN(N)) : iN(N)      hint(show $isub_(%,%,%))
 def $imul(N, iN(N), iN(N)) : iN(N)      hint(show $imul_(%,%,%))
+def $idiv(N, iN(N), iN(N)) : iN(N)*     hint(show $idiv_(%,%,%))
 def $iadd(N, c_1, c_2) = $((c_1 + c_2) \ 2^N)
 def $isub(N, c_1, c_2) = $((c_1 - c_2 + 2^N) \ 2^N)
 def $imul(N, c_1, c_2) = $((c_1 * c_2) \ 2^N)
+def $idiv(N, c_1, 0) = eps
+def $idiv(N, c_1, c_2) = $(c_1 / c_2)
 
 def $binop(t, ADD, c_1, c_2) = $iadd($size(t), c_1, c_2)
 def $binop(t, SUB, c_1, c_2) = $isub($size(t), c_1, c_2)
 def $binop(t, MUL, c_1, c_2) = $imul($size(t), c_1, c_2)
+def $binop(t, DIV, c_1, c_2) = $idiv($size(t), c_1, c_2)
 
 rule Step/binop-val:
   z; (CONST t c_1) (CONST t c_2) (BINOP t binop)  ~>  z; (CONST t c)
