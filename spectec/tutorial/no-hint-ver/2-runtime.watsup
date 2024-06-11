@@ -5,9 +5,6 @@
 syntax addr hint(desc "address") = nat
 syntax funcaddr hint(desc "function address") = addr
 
-var a : addr
-var fa : funcaddr
-
 
 ;;
 ;; Values
@@ -18,15 +15,11 @@ var fa : funcaddr
 syntax val hint(desc "value") =
   | CONST valtype num_(valtype)
 
-var v : val
-
 
 ;; External values
 
 syntax externval hint(desc "external value") =
   | FUNC funcaddr
-
-var xv : externval
 
 
 ;;
@@ -48,10 +41,6 @@ syntax moduleinst hint(desc "module instance") =
     FUNCS funcaddr*,
     EXPORTS exportinst* }
 
-var mm : moduleinst
-var fi : funcinst
-var xi : exportinst
-
 
 ;; Configurations proper
 
@@ -64,10 +53,6 @@ syntax frame hint(desc "frame") =
 
 syntax state hint(desc "state") = store; frame
 syntax config hint(desc "configuration") = state; admininstr*
-
-var s : store
-var f : frame
-var z : state
 
 
 ;;

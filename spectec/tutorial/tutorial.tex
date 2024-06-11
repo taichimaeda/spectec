@@ -49,9 +49,9 @@ Running \K{make} in \K{<root>/spectec} will yield an executable file \K{watsup} 
 \end{lcverbatim}
 will generate prose, using every \K{./watsup} file in directory \K{./tutorial} as input. There are various options including \K{--interpreter}, \K{--latex}, or \K{--print-il}. You can see all possible options with command \K{./watsup -help}.
 
-\section{Basic Building Blocks of Wasm-DSL}
-First, we'll study basic building blocks of Wasm-DSL, and how to use them. \\
-For now, You don't have to understand this part completely. You may start from Section 3, and refer to this section when you want to.
+\section{Building Blocks of Wasm-DSL}
+First, we'll study building blocks of Wasm-DSL, and how to use them. \\
+(For now, You don't have to understand this part completely. You may start from Section 3, and refer to this section when you want to.)
 
 \subsection{Syntax Definitions}
 Syntax definitions describe the grammar of the input language or auxiliary constructs. These are essentially type definitions for Wasm-DSL.
@@ -66,7 +66,25 @@ Variable declarations ascribe the syntactic class (i.e., type) that meta variabl
 var <name_of_var> : <type>
 \end{lcverbatim}
 We can explicitly declare a metavariable as above. Use keyword \K{var}, and give its name and type. Here, \K{<type>} may be a complex form, which contains iteration, parametric syntax, etc.\\
-Also, every syntax name is implicitly usable as a variable of the respective type.
+\\
+Also, every syntax name is implicitly usable as a variable of the respective type. For example, instead of below code:
+\begin{lcverbatim}
+var t : valtype
+
+rule Step/example:
+  z; (CONST t c_1) (CONST t c_2)  ~>  z; (CONST t c_1)
+\end{lcverbatim}
+
+we can write like this:
+\begin{lcverbatim}
+rule Step/example:
+  z; (CONST valtype c_1) (CONST valtype c_2)  ~>  z; (CONST valtype c_1)
+\end{lcverbatim}
+Also, we can use a metavariable without declaration in suitable situations. In this case, its type will be inferred. Now, we may rewrite the above rule as:
+\begin{lcverbatim}
+rule Step/example:
+  z; (CONST anyname c_1) (CONST anyname c_2)  ~>  z; (CONST anyname c_1)
+\end{lcverbatim}
 
 \subsection{Relation Declarations}
 Relation declarations, defining the shape of judgement forms, such as typing or reduction relations. These are essentially type declarations for the meta language. For example:
@@ -78,6 +96,7 @@ relation Step: config ~> config
 %relation <name_of_relation>: context |- <type> : <type>
 %relation <name_of_relation>: <type> ~> <type>
 %\end{lcverbatim}
+(TODO: more explanation with examples)
 
 \subsection{Rule Definitions}
 \begin{lcverbatim}
@@ -85,7 +104,8 @@ rule <name_of_relation>/<name_of_rule>:
   <content_of_rule>
 \end{lcverbatim}
 We can define the individual rules for each relation as above. \K{<content\_of\_rule>} has different form, depending on its relation.
-Every rule is named, so that it can be referenced. Each premise is introduced by a dash and includes the name of the relation it is referencing, easing checking and processing.
+Every rule is named, so that it can be referenced. Each premise is introduced by a dash and includes the name of the relation it is referencing, easing checking and processing. \\
+(TODO: more explanation with examples)
 
 \subsection{Auxiliary Functions}
 \begin{lcverbatim}
@@ -93,10 +113,36 @@ def $<func_name>(<type_of_arg1>, <type_of_arg2>, ... , <type_of_argn>) : <result
 def $<func_name>(<arg1>, <arg2>, ... , <argn>) = <result>
 \end{lcverbatim}
 We can declare auxiliary functions as above. The first line indicates the type of arguments and result of the function. The second line is function body, which describes how the actual result comes out. \\
+Function body can be multiple cases, which defines a function by pattern matching. \\
+For example, we can define a function \K{size}, which returns the size of a \K{valtype} as:
+\begin{lcverbatim}
+def $size(valtype) : nat
+def $size(I32) = 32
+def $size(I64) = 64
+\end{lcverbatim}
+Now, the function \K{size} will return \K{32} for input \K{I32}, and \K{64} for input \K{I64}. \\
+\\
+We can also add condition to a function body. \\
+For example, we can define a function \K{min}, which returns a smaller integer between two:
+\begin{lcverbatim}
+def $min(nat, nat) : nat
+def $min(i, j) = i
+  -- if i < j
+def $min(i, j) = j
+\end{lcverbatim}
+Now, the function \K{min} will return \K{i} if \K{i < j}, else \K{j}. \\
+Functions can be used when defining other functions or reduction rules. When using function, write as below form:
+\begin{lcverbatim}
+$<func_name>(<arg1>, <arg2>, ... , <argn>)
+\end{lcverbatim}
+For example, you can use the function \K{size} to define the syntax \K{num\_} as below:
+\begin{lcverbatim}
+syntax num_(valtype) = iN($size(valtype))
+\end{lcverbatim}
 
-\section{Syntax}
-Now, we will start from writing the syntax of Mini-Wasm.
-Abstract syntax of Mini-Wasm is as follows:
+\section{Basic Syntax}
+Now, we will start from writing the basic syntax of Mini-Wasm.
+Basic syntax of Mini-Wasm is as follows:
 
 $$
 \begin{array}{@{}lrrl@{}l@{}}
@@ -213,114 +259,8 @@ $$
 	\mbox{(module)} & {\mathit{module}} &::=& \mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} \\
 \end{array}
 $$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
-	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{type}~{\mathit{functype}},\; \\
-		\mathsf{module}~{\mathit{moduleinst}},\; \\
-		\mathsf{code}~{\mathit{func}} \}\end{array} \\
-	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{name}~{\mathit{name}},\; \\
-		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
-	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
-		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
-		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
-	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
-		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
-	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
-	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
-	\mathsf{call\_addr}~{\mathit{funcaddr}} \\ &&|&
-	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	\mathsf{trap} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
-\end{array}
-$$
 \\
-Make a new file \K{1-syntax.wastup}. \\
+Make a new file \K{1-syntax.wastup} and write on it. \\
 We'll declare each of the syntax one by one.
 
 \subsection{$N$, $n$}
@@ -418,7 +358,7 @@ $$
 syntax externtype = FUNC functype
 \end{lcverbatim}
 
-\subsection{$size$, ${{\mathit{num}}}_{{\mathit{valtype}}}$}
+\subsection{$\mathrm{size}$, ${{\mathit{num}}}_{{\mathit{valtype}}}$}
 $$
 \begin{array}{@{}lcl@{}l@{}}
 	{\mathrm{size}}(\mathsf{i{\scriptstyle 32}}) &=& 32 \\
@@ -432,10 +372,13 @@ $$
 \end{array}
 $$
 \begin{lcverbatim}
+def $size(valtype) : nat
+def $size(I32) = 32
+def $size(I64) = 64
+
 syntax num_(valtype) = iN($size(valtype))
 \end{lcverbatim}
-The first line declares the syntax \K{num\_}, and the remaining lines give the actual definition. \\
-We'll redefine this syntax later on Section 4.2, using function \K{size}.
+The first line declares the type of function \K{size}, and the next two lines give the actual definition of it. Then, you can use \K{size} to declare \K{num\_}. \\
 
 \subsection{$binop$}
 $$
@@ -515,6 +458,113 @@ syntax export = EXPORT name externidx
 syntax module = MODULE type* func* export*
 \end{lcverbatim}
 
+\section{Runtime-Related Syntax}
+Runtime-related syntax of Mini-Wasm is as follows:
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
+	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{type}~{\mathit{functype}},\; \\
+		\mathsf{module}~{\mathit{moduleinst}},\; \\
+		\mathsf{code}~{\mathit{func}} \}\end{array} \\
+	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{name}~{\mathit{name}},\; \\
+		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
+	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
+		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
+		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
+	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
+		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
+	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
+	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
+	\mathsf{call\_addr}~{\mathit{funcaddr}} \\ &&|&
+	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
+	\mathsf{trap} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
+	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
+\end{array}
+$$
+Make a new file \K{2-runtime.wastup} and write on it. \\
+
 \subsection{$addr$, $funcaddr$}
 $$
 \begin{array}{@{}lrrl@{}l@{}}
@@ -565,17 +615,16 @@ $$
 $$
 \begin{lcverbatim}
 syntax funcinst =
-{ TYPE functype,
-	MODULE moduleinst,
-	CODE func }
+  { TYPE functype,
+    MODULE moduleinst,
+    CODE func }
 syntax exportinst =
-{ NAME name,
-	VALUE externval }
-
+  { NAME name,
+    VALUE externval }
 syntax moduleinst =
-{ TYPES functype*,
-	FUNCS funcaddr*,
-	EXPORTS exportinst* }
+  { TYPES functype*,
+    FUNCS funcaddr*,
+    EXPORTS exportinst* }
 \end{lcverbatim}
 
 \subsection{$store$, $frame$, $state$, $config$}
@@ -591,12 +640,11 @@ $$
 \end{array}
 $$
 \begin{lcverbatim}
-syntax store =
-{ FUNCS funcinst* }
+syntax store = { FUNCS funcinst* }
 
 syntax frame =
-{ LOCALS val*,
-	MODULE moduleinst }
+  { LOCALS val*,
+    MODULE moduleinst }
 
 syntax state = store; frame
 syntax config = state; admininstr*
@@ -614,11 +662,11 @@ $$
 $$
 \begin{lcverbatim}
 syntax admininstr =
-| instr
-| CALL_ADDR funcaddr
-| LABEL_ n `{instr*} admininstr*
-| FRAME_ n `{frame} admininstr*
-| TRAP
+  | instr
+  | CALL_ADDR funcaddr
+  | LABEL_ n `{instr*} admininstr*
+  | FRAME_ n `{frame} admininstr*
+  | TRAP
 \end{lcverbatim}
 
 \subsection{$\mathrm{funcaddr}$}
@@ -678,93 +726,38 @@ def $default_(I32) = (CONST I32 0)
 def $default_(I64) = (CONST I64 0)
 \end{lcverbatim}
 
-\section{Metavariables}
-We're done with writing syntax of Mini-Wasm. Now, we will declare metavariables, which is used in reduction rules. \\
-There are three ways to make use of metavariables.
-
-\subsection{Explicit Declarartion}
-Declare variables in file \K{1-syntax.wastup} as follows:
+\section{Validation Rules}
+We're done with writing syntax of Mini-Wasm. Now, we will declare validation rules of Mini-Wasm. \\
+Make a new file \K{3-typing.watsup} and write on it. \\
+First, declare some variables to use in validation rules as below:
 \begin{lcverbatim}
+var i : nat
 var x : idx
 var l : labelidx
 var t : valtype
 var ft : functype
 var in : instr
-var e : instr*
+var e : expr
+var a : addr
+var fa : funcaddr
+var v : val
+var xv : externval
+var mm : moduleinst
+var fi : funcinst
+var xi : exportinst
+var s : store
+var f : frame
+var z : state
 var ty : type
 var loc : local
 var ex : export
-var st : start
+var xx : externidx
 \end{lcverbatim}
-
-\subsection{Using Syntax Name}
-Also, we can use the syntax name directly as a variable of same type. For example, instead of below code:
-\begin{lcverbatim}
-rule Step/example:
-  z; (CONST t c_1) (CONST t c_2)  ~>  z; (CONST t c_1)
-\end{lcverbatim}
-
-we can write like this:
-\begin{lcverbatim}
-rule Step/example:
-  z; (CONST valtype c_1) (CONST valtype c_2)  ~>  z; (CONST valtype c_1)
-\end{lcverbatim}
-
-\subsection{Using Without Declaration}
-%\subsection{Implicit declaration? Infer? Using without declaration?}
-Finally, we can use a metavariable without declaration in suitable situations. In this case, its type will be inferred. Now, we may rewrite the above rule as:
-\begin{lcverbatim}
-rule Step/example:
-  z; (CONST anyname c_1) (CONST anyname c_2)  ~>  z; (CONST anyname c_1)
-\end{lcverbatim}
-
-\section{Functions}
-\subsection{Declaring Function Body}
-Function body can be multiple cases, which defines a function by pattern matching. \\
-For example, we can define a function \K{size}, which returns the size of a \K{valtype} as:
-\begin{lcverbatim}
-def $size(valtype) : nat
-def $size(I32) = 32
-def $size(I64) = 64
-\end{lcverbatim}
-Now, the function \K{size} will return \K{32} for input \K{I32}, and \K{64} for input \K{I64}. \\
-\\
-We can also add condition to a function body. \\
-For example, we can define a function \K{min}, which returns a smaller integer between two:
-\begin{lcverbatim}
-def $min(nat, nat) : nat
-def $min(i, j) = i
-  -- if i < j
-def $min(i, j) = j
-\end{lcverbatim}
-Now, the function \K{min} will return \K{i} if \K{i < j}, else \K{j}.
-
-%\subsection{Built-in Functions}
-%Here are some built-in functions that we can use:
-%\begin{lcverbatim}
-%$ibytes
-%$inverse_of_ibytes
-%$nbytes
-%$vbytes
-%...
-%\end{lcverbatim}
-%You can find their definition from the file \K{<root>/spectec/src/backend-interpreter/numerics.ml}.
-%Also, even though they are built-in, you should declare their type first, and use them in Wasm-DSL.
-%
-\subsection{Using Functions}
-Functions can be used in definition of other functions or reduction rules. When using function, write as below form:
-\begin{lcverbatim}
-$<func_name>(<arg1>, <arg2>, ... , <argn>)
-\end{lcverbatim}
-For example, put the definition of the function \K{size} before the syntax \K{num\_} from Section 2.7.
-Then, we can use \K{size} to redefine \K{num\_} as below:
-\begin{lcverbatim}
-syntax num_(valtype) = iN($size(valtype))
-\end{lcverbatim}
+(TODO: add validation rules)
 
 \section{Reduction Rules}
 Now, let's write the reduction rules for the instructions.
-First, make a new file \K{8-reduction.wastup} and write as follows:
+First, make a new file \K{4-reduction.wastup} and write as follows:
 \begin{lcverbatim}
 relation Step: config ~> config
 \end{lcverbatim}

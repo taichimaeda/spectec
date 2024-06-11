@@ -1,6 +1,5 @@
 ;; General variables
 
-var i : nat  ;; hack
 syntax N hint(macro) = nat  ;; hack
 syntax n hint(macro) = nat  ;; hack
 
@@ -34,23 +33,16 @@ syntax funcidx hint(desc "function index") = idx
 syntax labelidx hint(desc "label index") = idx
 syntax localidx hint(desc "local index") = idx
 
-var x : idx
-var l : labelidx
-
 
 ;; Types
 
 syntax valtype hint(desc "number type") = I32 | I64
-
-var t : valtype
 
 syntax functype hint(desc "function type") =
   valtype* -> valtype*
 
 syntax externtype hint(desc "external type") =
   | FUNC functype
-
-var ft : functype
 
 
 ;; Constants
@@ -106,9 +98,6 @@ syntax expr hint(desc "expression") =
 
 syntax instr hint(desc "instruction")
 
-var in : instr
-var e : expr
-
 
 ;; Modules
 
@@ -126,9 +115,3 @@ syntax export hint(desc "export") =
 
 syntax module hint(desc "module") =
   MODULE type* func* export*
-
-
-var ty : type
-var loc : local
-var ex : export
-var xx : externidx
