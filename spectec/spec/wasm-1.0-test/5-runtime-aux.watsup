@@ -100,6 +100,16 @@ def $with_meminst((s; f), x, mi) = s[.MEMS[f.MODULE.MEMS[x]] = mi]; f
 ;; Growing
 
 def $growtable(tableinst, nat) : tableinst
-def $growmemory(meminst, nat) : meminst
+
+relation growmemory: |- meminst; nat : meminst
+
+rule growmemory:
+  |- meminst_1; n : meminst_2
+  -- if meminst_1 = { TYPE `[i .. j], BYTES b* }
+  -- if i' = $(i + n)
+  -- if meminst_2 = { TYPE `[i' .. j], BYTES b* 0^(n * $($(64 * $Ki))) }
+  -- if $(i' <= j)
+
+
 
 

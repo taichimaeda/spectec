@@ -267,7 +267,7 @@ rule Step_read/memory.size:
 
 rule Step/memory.grow-succeed:
   z; (CONST (INN I32) n) (MEMORY.GROW)  ~>  $with_meminst(z, 0, mi); (CONST (INN I32) $(|$mem(z, 0).BYTES| / (64 * $Ki)))
-  -- if $growmemory($mem(z, 0), n) = mi
+  -- growmemory: |- $mem(z, 0); n : mi
 
 rule Step/memory.grow-fail:
   z; (CONST (INN I32) n) (MEMORY.GROW)  ~>  z; (CONST (INN I32) $invsigned(32, $(-1)))

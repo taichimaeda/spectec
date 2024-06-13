@@ -126,21 +126,21 @@ Definition list__m  := (list (m )).
 
 Definition fun_Ki : nat := 1024.
 
-Fixpoint fun_min (v_reserved__nat : nat) (v_reserved__nat : nat) : nat :=
-	match (v_reserved__nat, v_reserved__nat) with
+Fixpoint fun_min (v_reserved__nat_0 : nat) (v_reserved__nat_1 : nat) : nat :=
+	match (v_reserved__nat_0, v_reserved__nat_1) with
 		| (0, v_j) => 0
 		| (v_i, 0) => 0
 		| ((S v_i), (S v_j)) => (fun_min v_i v_j)
 	end.
 
-Fixpoint fun_sum (v__ : (list nat)) : nat :=
-	match (v__) with
+Fixpoint fun_sum (v___0 : (list nat)) : nat :=
+	match (v___0) with
 		| ([]) => 0
 		| ((v_n :: v_n')) => (v_n + (fun_sum v_n'))
 	end.
 
-Fixpoint fun_concat_ (X : Type) (v__ : (list (list X))) : (list X) :=
-	match (X, v__) with
+Fixpoint fun_concat_ (X : Type) (v___1 : (list (list X))) : (list X) :=
+	match (X, v___1) with
 		| (_, []) => []
 		| (_, (v_w :: v_w')) => (@app _ v_w (fun_concat_ X v_w'))
 	end.
@@ -183,27 +183,27 @@ Notation u64 := uN.
 
 Definition list__u64  := (list (u64 )).
 
-Definition fun_signif (v_reserved__N : reserved__N) : (option nat) :=
-	match (v_reserved__N) with
+Definition fun_signif (v_reserved__N_0 : reserved__N) : (option nat) :=
+	match (v_reserved__N_0) with
 		| (32) => (Some 23)
 		| (64) => (Some 52)
 		| (v_x0) => None
 	end.
 
-Definition fun_expon (v_reserved__N : reserved__N) : (option nat) :=
-	match (v_reserved__N) with
+Definition fun_expon (v_reserved__N_0 : reserved__N) : (option nat) :=
+	match (v_reserved__N_0) with
 		| (32) => (Some 8)
 		| (64) => (Some 11)
 		| (v_x0) => None
 	end.
 
-Definition fun_M (v_reserved__N : reserved__N) : nat :=
-	match (v_reserved__N) with
+Definition fun_M (v_reserved__N_0 : reserved__N) : nat :=
+	match (v_reserved__N_0) with
 		| (v_reserved__N) => (the (fun_signif v_reserved__N))
 	end.
 
-Definition fun_E (v_reserved__N : reserved__N) : nat :=
-	match (v_reserved__N) with
+Definition fun_E (v_reserved__N_0 : reserved__N) : nat :=
+	match (v_reserved__N_0) with
 		| (v_reserved__N) => (the (fun_expon v_reserved__N))
 	end.
 
@@ -219,18 +219,18 @@ Notation f64 := fN.
 
 Definition list__f64  := (list (f64 )).
 
-Definition fun_fzero (v_reserved__N : reserved__N) : fN :=
-	match (v_reserved__N) with
+Definition fun_fzero (v_reserved__N_0 : reserved__N) : fN :=
+	match (v_reserved__N_0) with
 		| (v_reserved__N) => (0 : fN)
 	end.
 
-Definition fun_fone (v_reserved__N : reserved__N) : fN :=
-	match (v_reserved__N) with
+Definition fun_fone (v_reserved__N_0 : reserved__N) : fN :=
+	match (v_reserved__N_0) with
 		| (v_reserved__N) => (1 : fN)
 	end.
 
-Definition fun_canon_ (v_reserved__N : reserved__N) : nat :=
-	match (v_reserved__N) with
+Definition fun_canon_ (v_reserved__N_0 : reserved__N) : nat :=
+	match (v_reserved__N_0) with
 		| (v_reserved__N) => (2 ^ ((the (fun_signif v_reserved__N)) - 1))
 	end.
 
@@ -241,7 +241,7 @@ Definition list__char  := (list (char )).
 
 Global Instance Inhabited__char : Inhabited (char) := { default_val := char__ default_val }.
 
-Axiom fun_utf8 : forall (v__ : (list char)), (list__byte ).
+Axiom fun_utf8 : forall (v___0 : (list char)), (list__byte ).
 
 Inductive name  : Type :=
 	| name__ (v__ : (list char)) : name .
@@ -306,11 +306,11 @@ Definition list__valtype  := (list (valtype )).
 
 Global Instance Inhabited__valtype : Inhabited (valtype) := { default_val := valtype__INN default_val }.
 
-Definition fun_optionSize (v__ : (option valtype)) : nat :=
-match (v__) with
-	| ((Some (v_valtype))) => 1
-	| (None) => 0
-end.
+Definition fun_optionSize (v___0 : (option valtype)) : nat :=
+	match (v___0) with
+		| ((Some v_valtype)) => 1
+		| (None) => 0
+	end.
 
 Definition resulttype  := (option valtype).
 
@@ -362,8 +362,8 @@ Definition list__externtype  := (list (externtype )).
 
 Global Instance Inhabited__externtype : Inhabited (externtype) := { default_val := externtype__FUNC default_val }.
 
-Definition fun_size (v_valtype : valtype) : nat :=
-	match (v_valtype) with
+Definition fun_size (v_valtype_0 : valtype) : nat :=
+	match (v_valtype_0) with
 		| ((valtype__INN (inn__I32 ))) => 32
 		| ((valtype__INN (inn__I64 ))) => 64
 		| ((valtype__FNN (fnn__F32 ))) => 32
@@ -380,13 +380,13 @@ Definition list__val_  := (list (val_ )).
 
 Coercion val___inn__entry : iN >-> val_.
 
-Definition list__iN_val_ : list__iN -> list__val_ := map val___inn__entry.
+Definition list__iN_val_ : list__iN  -> list__val_ := map val___inn__entry.
 
 Coercion list__iN_val_ : list__iN >-> list__val_.
 
 Coercion val___fnn__entry : fN >-> val_.
 
-Definition list__fN_val_ : list__fN -> list__val_ := map val___fnn__entry.
+Definition list__fN_val_ : list__fN  -> list__val_ := map val___fnn__entry.
 
 Coercion list__fN_val_ : list__fN >-> list__val_.
 
@@ -699,29 +699,29 @@ Definition list__module  := (list (module )).
 
 Global Instance Inhabited__module : Inhabited (module) := { default_val := module__MODULE default_val default_val default_val default_val default_val default_val default_val default_val default_val default_val }.
 
-Fixpoint fun_funcsxt (v__ : (list externtype)) : (list functype) :=
-	match (v__) with
+Fixpoint fun_funcsxt (v___0 : (list externtype)) : (list functype) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externtype__FUNC v_ft) :: v_xt)) => (@app _ [v_ft] (fun_funcsxt v_xt))
 		| ((v_externtype :: v_xt)) => (fun_funcsxt v_xt)
 	end.
 
-Fixpoint fun_globalsxt (v__ : (list externtype)) : (list globaltype) :=
-	match (v__) with
+Fixpoint fun_globalsxt (v___0 : (list externtype)) : (list globaltype) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externtype__GLOBAL v_gt) :: v_xt)) => (@app _ [v_gt] (fun_globalsxt v_xt))
 		| ((v_externtype :: v_xt)) => (fun_globalsxt v_xt)
 	end.
 
-Fixpoint fun_tablesxt (v__ : (list externtype)) : (list tabletype) :=
-	match (v__) with
+Fixpoint fun_tablesxt (v___0 : (list externtype)) : (list tabletype) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externtype__TABLE v_reserved__tt) :: v_xt)) => (@app _ [v_reserved__tt] (fun_tablesxt v_xt))
 		| ((v_externtype :: v_xt)) => (fun_tablesxt v_xt)
 	end.
 
-Fixpoint fun_memsxt (v__ : (list externtype)) : (list memtype) :=
-	match (v__) with
+Fixpoint fun_memsxt (v___0 : (list externtype)) : (list memtype) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externtype__MEM v_mt) :: v_xt)) => (@app _ [v_mt] (fun_memsxt v_xt))
 		| ((v_externtype :: v_xt)) => (fun_memsxt v_xt)
@@ -729,32 +729,32 @@ Fixpoint fun_memsxt (v__ : (list externtype)) : (list memtype) :=
 
 Definition fun_memop0 : memop := {| memop__ALIGN := 0; memop__OFFSET := 0 |}.
 
-Axiom fun_signed : forall (v_reserved__N : reserved__N) (v_reserved__nat : nat), nat.
+Axiom fun_signed : forall (v_reserved__N_0 : reserved__N) (v_reserved__nat_1 : nat), nat.
 
-Axiom fun_invsigned : forall (v_reserved__N : reserved__N) (v_int : nat), nat.
+Axiom fun_invsigned : forall (v_reserved__N_0 : reserved__N) (v_int_1 : nat), nat.
 
-Axiom fun_fabs : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_fabs : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_fceil : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_fceil : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_ffloor : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_ffloor : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_fnearest : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_fnearest : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_fneg : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_fneg : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_fsqrt : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_fsqrt : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_ftrunc : forall (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_ftrunc : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-Axiom fun_iclz : forall (v_reserved__N : reserved__N) (v_iN : iN), iN.
+Axiom fun_iclz : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 
-Axiom fun_ictz : forall (v_reserved__N : reserved__N) (v_iN : iN), iN.
+Axiom fun_ictz : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 
-Axiom fun_ipopcnt : forall (v_reserved__N : reserved__N) (v_iN : iN), iN.
+Axiom fun_ipopcnt : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 
-Definition fun_unop (v_valtype : valtype) (v_unop_ : unop_) (v_val_ : val_) : list__val_ :=
-	match (v_valtype, v_unop_, v_val_) with
+Definition fun_unop (v_valtype_0 : valtype) (v_unop__1 : unop_) (v_val__2 : val_) : list__val_ :=
+	match (v_valtype_0, v_unop__1, v_val__2) with
 		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CLZ )), (val___inn__entry v_iN)) => [((fun_iclz (fun_size (valtype__INN v_inn)) v_iN) : val_)]
 		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CTZ )), (val___inn__entry v_iN)) => [((fun_ictz (fun_size (valtype__INN v_inn)) v_iN) : val_)]
 		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__POPCNT )), (val___inn__entry v_iN)) => [((fun_ipopcnt (fun_size (valtype__INN v_inn)) v_iN) : val_)]
@@ -768,46 +768,46 @@ Definition fun_unop (v_valtype : valtype) (v_unop_ : unop_) (v_val_ : val_) : li
 		| _ => default_val
 	end.
 
-Axiom fun_fadd : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fadd : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fcopysign : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fcopysign : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fdiv : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fdiv : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fmax : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fmax : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fmin : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fmin : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fmul : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fmul : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_fsub : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), fN.
+Axiom fun_fsub : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), fN.
 
-Axiom fun_iadd : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_iadd : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_iand : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_iand : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_idiv : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_idiv : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), iN.
 
-Axiom fun_imul : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_imul : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_ior : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_ior : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_irem : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_irem : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), iN.
 
-Axiom fun_irotl : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_irotl : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_irotr : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_irotr : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_ishl : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_u32 : u32), iN.
+Axiom fun_ishl : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_u32_2 : u32), iN.
 
-Axiom fun_ishr : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_u32 : u32), iN.
+Axiom fun_ishr : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_u32_3 : u32), iN.
 
-Axiom fun_isub : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_isub : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Axiom fun_ixor : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), iN.
+Axiom fun_ixor : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
-Definition fun_binop (v_valtype : valtype) (v_binop_ : binop_) (v_val_ : val_) (v_val_ : val_) : list__val_ :=
-	match (v_valtype, v_binop_, v_val_, v_val_) with
+Definition fun_binop (v_valtype_0 : valtype) (v_binop__1 : binop_) (v_val__2 : val_) (v_val__3 : val_) : list__val_ :=
+	match (v_valtype_0, v_binop__1, v_val__2, v_val__3) with
 		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ADD )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_iadd (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
 		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SUB )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_isub (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
 		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__MUL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_imul (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
@@ -830,40 +830,40 @@ Definition fun_binop (v_valtype : valtype) (v_binop_ : binop_) (v_val_ : val_) (
 		| _ => default_val
 	end.
 
-Axiom fun_ieqz : forall (v_reserved__N : reserved__N) (v_iN : iN), u32.
+Axiom fun_ieqz : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), u32.
 
-Definition fun_testop (v_valtype : valtype) (v_testop_ : testop_) (v_val_ : val_) : val_ :=
-	match (v_valtype, v_testop_, v_val_) with
+Definition fun_testop (v_valtype_0 : valtype) (v_testop__1 : testop_) (v_val__2 : val_) : val_ :=
+	match (v_valtype_0, v_testop__1, v_val__2) with
 		| ((valtype__INN v_inn), (testop___inn__entry (testop___inn__EQZ )), (val___inn__entry v_iN)) => (fun_ieqz (fun_size (valtype__INN v_inn)) v_iN)
 		| _ => default_val
 	end.
 
-Axiom fun_feq : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_feq : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_fge : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_fge : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_fgt : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_fgt : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_fle : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_fle : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_flt : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_flt : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_fne : forall (v_reserved__N : reserved__N) (v_fN : fN) (v_fN : fN), u32.
+Axiom fun_fne : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN) (v_fN_2 : fN), u32.
 
-Axiom fun_ieq : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_ieq : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), u32.
 
-Axiom fun_ige : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_ige : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), u32.
 
-Axiom fun_igt : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_igt : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), u32.
 
-Axiom fun_ile : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_ile : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), u32.
 
-Axiom fun_ilt : forall (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_ilt : forall (v_reserved__N_0 : reserved__N) (v_sx_1 : sx) (v_iN_2 : iN) (v_iN_3 : iN), u32.
 
-Axiom fun_ine : forall (v_reserved__N : reserved__N) (v_iN : iN) (v_iN : iN), u32.
+Axiom fun_ine : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), u32.
 
-Definition fun_relop (v_valtype : valtype) (v_relop_ : relop_) (v_val_ : val_) (v_val_ : val_) : val_ :=
-	match (v_valtype, v_relop_, v_val_, v_val_) with
+Definition fun_relop (v_valtype_0 : valtype) (v_relop__1 : relop_) (v_val__2 : val_) (v_val__3 : val_) : val_ :=
+	match (v_valtype_0, v_relop__1, v_val__2, v_val__3) with
 		| ((valtype__INN v_inn), (relop___inn__entry (relop___inn__EQ )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (fun_ieq (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2)
 		| ((valtype__INN v_inn), (relop___inn__entry (relop___inn__NE )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (fun_ine (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2)
 		| ((valtype__INN v_inn), (relop___inn__entry (relop___inn__LT v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (fun_ilt (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2)
@@ -879,22 +879,22 @@ Definition fun_relop (v_valtype : valtype) (v_relop_ : relop_) (v_val_ : val_) (
 		| _ => default_val
 	end.
 
-Axiom fun_convert : forall (v_M : M) (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN), fN.
+Axiom fun_convert : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_sx_2 : sx) (v_iN_3 : iN), fN.
 
-Axiom fun_demote : forall (v_M : M) (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_demote : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_fN_2 : fN), fN.
 
-Axiom fun_ext : forall (v_M : M) (v_reserved__N : reserved__N) (v_sx : sx) (v_iN : iN), iN.
+Axiom fun_ext : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_sx_2 : sx) (v_iN_3 : iN), iN.
 
-Axiom fun_promote : forall (v_M : M) (v_reserved__N : reserved__N) (v_fN : fN), fN.
+Axiom fun_promote : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_fN_2 : fN), fN.
 
-Axiom fun_reinterpret : forall (v_valtype_1 : valtype) (v_valtype_2 : valtype) (v_val_ : val_), val_.
+Axiom fun_reinterpret : forall (v_valtype_1_0 : valtype) (v_valtype_2_1 : valtype) (v_val__2 : val_), val_.
 
-Axiom fun_trunc : forall (v_M : M) (v_reserved__N : reserved__N) (v_sx : sx) (v_fN : fN), iN.
+Axiom fun_trunc : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_sx_2 : sx) (v_fN_3 : fN), iN.
 
-Axiom fun_wrap : forall (v_M : M) (v_reserved__N : reserved__N) (v_iN : iN), iN.
+Axiom fun_wrap : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_iN_2 : iN), iN.
 
-Definition fun_cvtop (v_valtype_1 : valtype) (v_valtype_2 : valtype) (v_cvtop : cvtop) (v__ : (option sx)) (v_val_ : val_) : list__val_ :=
-	match (v_valtype_1, v_valtype_2, v_cvtop, v__, v_val_) with
+Definition fun_cvtop (v_valtype_1_0 : valtype) (v_valtype_2_1 : valtype) (v_cvtop_2 : cvtop) (v___3 : (option sx)) (v_val__4 : val_) : list__val_ :=
+	match (v_valtype_1_0, v_valtype_2_1, v_cvtop_2, v___3, v_val__4) with
 		| ((valtype__INN (inn__I32 )), (valtype__INN (inn__I64 )), (cvtop__CONVERT ), (Some v_sx), (val___inn__entry v_iN)) => [((fun_ext 32 64 v_sx v_iN) : val_)]
 		| ((valtype__INN (inn__I64 )), (valtype__INN (inn__I32 )), (cvtop__CONVERT ), v_sx, (val___inn__entry v_iN)) => [((fun_wrap 64 32 v_iN) : val_)]
 		| ((valtype__FNN v_fnn), (valtype__INN v_inn), (cvtop__CONVERT ), (Some v_sx), (val___fnn__entry v_fN)) => [((fun_trunc (fun_size (valtype__FNN v_fnn)) (fun_size (valtype__INN v_inn)) v_sx v_fN) : val_)]
@@ -906,17 +906,17 @@ Definition fun_cvtop (v_valtype_1 : valtype) (v_valtype_2 : valtype) (v_cvtop : 
 		| _ => default_val
 	end.
 
-Axiom fun_ibytes : forall (v_reserved__N : reserved__N) (v_iN : iN), (list__byte ).
+Axiom fun_ibytes : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), (list__byte ).
 
-Axiom fun_fbytes : forall (v_reserved__N : reserved__N) (v_fN : fN), (list__byte ).
+Axiom fun_fbytes : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), (list__byte ).
 
-Axiom fun_bytes : forall (v_valtype : valtype) (v_val_ : val_), (list__byte ).
+Axiom fun_bytes : forall (v_valtype_0 : valtype) (v_val__1 : val_), (list__byte ).
 
-Axiom fun_invibytes : forall (v_reserved__N : reserved__N) (v__ : (list byte)), iN.
+Axiom fun_invibytes : forall (v_reserved__N_0 : reserved__N) (v___1 : (list byte)), iN.
 
-Axiom fun_invfbytes : forall (v_reserved__N : reserved__N) (v__ : (list byte)), fN.
+Axiom fun_invfbytes : forall (v_reserved__N_0 : reserved__N) (v___1 : (list byte)), fN.
 
-Axiom fun_inot : forall (v_reserved__N : reserved__N) (v_iN : iN), iN.
+Axiom fun_inot : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 
 Notation addr := nat.
 
@@ -1221,145 +1221,146 @@ Definition list__E  := (list (E )).
 
 Global Instance Inhabited__E : Inhabited (E) := { default_val := E___HOLE_  }.
 
-Definition fun_default_ (v_valtype : valtype) : val :=
-	match (v_valtype) with
+Definition fun_default_ (v_valtype_0 : valtype) : val :=
+	match (v_valtype_0) with
 		| ((valtype__INN (inn__I32 ))) => (val__CONST (valtype__INN (inn__I32 )) 0)
 		| ((valtype__INN (inn__I64 ))) => (val__CONST (valtype__INN (inn__I64 )) 0)
 		| ((valtype__FNN (fnn__F32 ))) => (val__CONST (valtype__FNN (fnn__F32 )) (fun_fzero 32))
 		| ((valtype__FNN (fnn__F64 ))) => (val__CONST (valtype__FNN (fnn__F64 )) (fun_fzero 64))
 	end.
 
-Fixpoint fun_funcsxv (v__ : (list externval)) : (list funcaddr) :=
-	match (v__) with
+Fixpoint fun_funcsxv (v___0 : (list externval)) : (list funcaddr) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externval__FUNC v_fa) :: v_xv)) => (@app _ [v_fa] (fun_funcsxv v_xv))
 		| ((v_externval :: v_xv)) => (fun_funcsxv v_xv)
 	end.
 
-Fixpoint fun_globalsxv (v__ : (list externval)) : (list globaladdr) :=
-	match (v__) with
+Fixpoint fun_globalsxv (v___0 : (list externval)) : (list globaladdr) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externval__GLOBAL v_ga) :: v_xv)) => (@app _ [v_ga] (fun_globalsxv v_xv))
 		| ((v_externval :: v_xv)) => (fun_globalsxv v_xv)
 	end.
 
-Fixpoint fun_tablesxv (v__ : (list externval)) : (list tableaddr) :=
-	match (v__) with
+Fixpoint fun_tablesxv (v___0 : (list externval)) : (list tableaddr) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externval__TABLE v_ta) :: v_xv)) => (@app _ [v_ta] (fun_tablesxv v_xv))
 		| ((v_externval :: v_xv)) => (fun_tablesxv v_xv)
 	end.
 
-Fixpoint fun_memsxv (v__ : (list externval)) : (list memaddr) :=
-	match (v__) with
+Fixpoint fun_memsxv (v___0 : (list externval)) : (list memaddr) :=
+	match (v___0) with
 		| ([]) => []
 		| (((externval__MEM v_ma) :: v_xv)) => (@app _ [v_ma] (fun_memsxv v_xv))
 		| ((v_externval :: v_xv)) => (fun_memsxv v_xv)
 	end.
 
-Definition fun_store (v_state : state) : store :=
-	match (v_state) with
+Definition fun_store (v_state_0 : state) : store :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => v_s
 	end.
 
-Definition fun_frame (v_state : state) : frame :=
-	match (v_state) with
+Definition fun_frame (v_state_0 : state) : frame :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => v_f
 	end.
 
-Definition fun_funcaddr (v_state : state) : (list funcaddr) :=
-	match (v_state) with
+Definition fun_funcaddr (v_state_0 : state) : (list funcaddr) :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (moduleinst__FUNCS (frame__MODULE v_f))
 	end.
 
-Definition fun_funcinst (v_state : state) : (list funcinst) :=
-	match (v_state) with
+Definition fun_funcinst (v_state_0 : state) : (list funcinst) :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (store__FUNCS v_s)
 	end.
 
-Definition fun_globalinst (v_state : state) : (list globalinst) :=
-	match (v_state) with
+Definition fun_globalinst (v_state_0 : state) : (list globalinst) :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (store__GLOBALS v_s)
 	end.
 
-Definition fun_tableinst (v_state : state) : (list tableinst) :=
-	match (v_state) with
+Definition fun_tableinst (v_state_0 : state) : (list tableinst) :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (store__TABLES v_s)
 	end.
 
-Definition fun_meminst (v_state : state) : (list meminst) :=
-	match (v_state) with
+Definition fun_meminst (v_state_0 : state) : (list meminst) :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (store__MEMS v_s)
 	end.
 
-Definition fun_moduleinst (v_state : state) : moduleinst :=
-	match (v_state) with
+Definition fun_moduleinst (v_state_0 : state) : moduleinst :=
+	match (v_state_0) with
 		| ((state__ v_s v_f)) => (frame__MODULE v_f)
 	end.
 
-Definition fun_type (v_state : state) (v_typeidx : typeidx) : functype :=
-	match (v_state, v_typeidx) with
+Definition fun_type (v_state_0 : state) (v_typeidx_1 : typeidx) : functype :=
+	match (v_state_0, v_typeidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (moduleinst__TYPES (frame__MODULE v_f)) v_x)
 	end.
 
-Definition fun_func (v_state : state) (v_funcidx : funcidx) : funcinst :=
-	match (v_state, v_funcidx) with
+Definition fun_func (v_state_0 : state) (v_funcidx_1 : funcidx) : funcinst :=
+	match (v_state_0, v_funcidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (store__FUNCS v_s) (lookup_total (moduleinst__FUNCS (frame__MODULE v_f)) v_x))
 	end.
 
-Definition fun_global (v_state : state) (v_globalidx : globalidx) : globalinst :=
-	match (v_state, v_globalidx) with
+Definition fun_global (v_state_0 : state) (v_globalidx_1 : globalidx) : globalinst :=
+	match (v_state_0, v_globalidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (store__GLOBALS v_s) (lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x))
 	end.
 
-Definition fun_table (v_state : state) (v_tableidx : tableidx) : tableinst :=
-	match (v_state, v_tableidx) with
+Definition fun_table (v_state_0 : state) (v_tableidx_1 : tableidx) : tableinst :=
+	match (v_state_0, v_tableidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (store__TABLES v_s) (lookup_total (moduleinst__TABLES (frame__MODULE v_f)) v_x))
 	end.
 
-Definition fun_mem (v_state : state) (v_memidx : memidx) : meminst :=
-	match (v_state, v_memidx) with
+Definition fun_mem (v_state_0 : state) (v_memidx_1 : memidx) : meminst :=
+	match (v_state_0, v_memidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (store__MEMS v_s) (lookup_total (moduleinst__MEMS (frame__MODULE v_f)) v_x))
 	end.
 
-Definition fun_local (v_state : state) (v_localidx : localidx) : val :=
-	match (v_state, v_localidx) with
+Definition fun_local (v_state_0 : state) (v_localidx_1 : localidx) : val :=
+	match (v_state_0, v_localidx_1) with
 		| ((state__ v_s v_f), v_x) => (lookup_total (frame__LOCALS v_f) v_x)
 	end.
 
-Definition fun_with_local (v_state : state) (v_localidx : localidx) (v_val : val) : state :=
-	match (v_state, v_localidx, v_val) with
+Definition fun_with_local (v_state_0 : state) (v_localidx_1 : localidx) (v_val_2 : val) : state :=
+	match (v_state_0, v_localidx_1, v_val_2) with
 		| ((state__ v_s v_f), v_x, v_v) => (state__ v_s (v_f <|frame__LOCALS := (list_update (frame__LOCALS v_f) (v_x) (v_v))|>))
 	end.
 
-Definition fun_with_global (v_state : state) (v_globalidx : globalidx) (v_val : val) : state :=
-	match (v_state, v_globalidx, v_val) with
+Definition fun_with_global (v_state_0 : state) (v_globalidx_1 : globalidx) (v_val_2 : val) : state :=
+	match (v_state_0, v_globalidx_1, v_val_2) with
 		| ((state__ v_s v_f), v_x, v_v) => (state__ (v_s <|store__GLOBALS := (list_update_func (store__GLOBALS v_s) ((lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x)) ((fun v_1 => v_1 <|globalinst__VALUE := v_v|>)))|>) v_f)
 	end.
 
-Definition fun_with_table (v_state : state) (v_tableidx : tableidx) (v_reserved__nat : nat) (v_funcaddr : funcaddr) : state :=
-	match (v_state, v_tableidx, v_reserved__nat, v_funcaddr) with
+Definition fun_with_table (v_state_0 : state) (v_tableidx_1 : tableidx) (v_reserved__nat_2 : nat) (v_funcaddr_3 : funcaddr) : state :=
+	match (v_state_0, v_tableidx_1, v_reserved__nat_2, v_funcaddr_3) with
 		| ((state__ v_s v_f), v_x, v_i, v_a) => (state__ (v_s <|store__TABLES := (list_update_func (store__TABLES v_s) ((lookup_total (moduleinst__TABLES (frame__MODULE v_f)) v_x)) ((fun v_1 => v_1 <|tableinst__REFS := (list_update (tableinst__REFS v_1) (v_i) ((Some v_a)))|>)))|>) v_f)
 	end.
 
-Definition fun_with_tableinst (v_state : state) (v_tableidx : tableidx) (v_tableinst : tableinst) : state :=
-	match (v_state, v_tableidx, v_tableinst) with
+Definition fun_with_tableinst (v_state_0 : state) (v_tableidx_1 : tableidx) (v_tableinst_2 : tableinst) : state :=
+	match (v_state_0, v_tableidx_1, v_tableinst_2) with
 		| ((state__ v_s v_f), v_x, v_ti) => (state__ (v_s <|store__TABLES := (list_update (store__TABLES v_s) ((lookup_total (moduleinst__TABLES (frame__MODULE v_f)) v_x)) (v_ti))|>) v_f)
 	end.
 
-Definition fun_with_mem (v_state : state) (v_memidx : memidx) (v_reserved__nat : nat) (v_reserved__nat : nat) (v__ : (list byte)) : state :=
-	match (v_state, v_memidx, v_reserved__nat, v_reserved__nat, v__) with
+Definition fun_with_mem (v_state_0 : state) (v_memidx_1 : memidx) (v_reserved__nat_2 : nat) (v_reserved__nat_3 : nat) (v___4 : (list byte)) : state :=
+	match (v_state_0, v_memidx_1, v_reserved__nat_2, v_reserved__nat_3, v___4) with
 		| ((state__ v_s v_f), v_x, v_i, v_j, v_b) => (state__ (v_s <|store__MEMS := (list_update_func (store__MEMS v_s) ((lookup_total (moduleinst__MEMS (frame__MODULE v_f)) v_x)) ((fun v_1 => v_1 <|meminst__BYTES := (list_slice_update (meminst__BYTES v_1) (v_i) (v_j) (v_b))|>)))|>) v_f)
 	end.
 
-Definition fun_with_meminst (v_state : state) (v_memidx : memidx) (v_meminst : meminst) : state :=
-	match (v_state, v_memidx, v_meminst) with
+Definition fun_with_meminst (v_state_0 : state) (v_memidx_1 : memidx) (v_meminst_2 : meminst) : state :=
+	match (v_state_0, v_memidx_1, v_meminst_2) with
 		| ((state__ v_s v_f), v_x, v_mi) => (state__ (v_s <|store__MEMS := (list_update (store__MEMS v_s) ((lookup_total (moduleinst__MEMS (frame__MODULE v_f)) v_x)) (v_mi))|>) v_f)
 	end.
 
-Axiom fun_growtable : forall (v_tableinst : tableinst) (v_reserved__nat : nat), tableinst.
+Axiom fun_growtable : forall (v_tableinst_0 : tableinst) (v_reserved__nat_1 : nat), tableinst.
 
-Axiom fun_growmemory : forall (v_meminst : meminst) (v_reserved__nat : nat), meminst.
+Inductive growmemory: meminst -> nat -> meminst -> Prop :=
+	| growmemory__ : forall (v_meminst_1 : meminst) (v_n : n) (v_meminst_2 : meminst) (v_i : nat) (v_j : nat) (v_b : (list byte)) (v_i' : nat), (v_meminst_1 = {| meminst__TYPE := (limits__ v_i v_j); meminst__BYTES := v_b |}) /\ (v_i' = (v_i + v_n)) /\ (v_meminst_2 = {| meminst__TYPE := (limits__ v_i' v_j); meminst__BYTES := (@app _ v_b [(byte__ 0)]) |}) /\ (v_i' <= v_j) -> growmemory v_meminst_1 v_n v_meminst_2.
 
 Record context := mkcontext
 {	context__TYPES : (list functype)
@@ -1643,7 +1644,7 @@ Inductive Step: config -> config -> Prop :=
 	| Step__store_num_val : forall (v_z : state) (v_i : nat) (v_t : valtype) (v_c : val_) (v_mo : memop) (v_b : (list byte)), (v_b = (fun_bytes v_t (v_c : val_))) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CONST v_t (v_c : val_));(admininstr__STORE v_t None v_mo)]) (config__ (fun_with_mem v_z 0 (v_i + (memop__OFFSET v_mo)) ((fun_size v_t) / 8) v_b) [])
 	| Step__store_pack_trap : forall (v_z : state) (v_i : nat) (v_inn : inn) (v_c : iN) (v_n : n) (v_mo : memop), (((v_i + (memop__OFFSET v_mo)) + (v_n / 8)) > (List.length (meminst__BYTES (fun_mem v_z 0)))) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CONST (valtype__INN v_inn) (v_c : val_));(admininstr__STORE (valtype__INN v_inn) (Some (packsize__ v_n)) v_mo)]) (config__ v_z [(admininstr__TRAP )])
 	| Step__store_pack_val : forall (v_z : state) (v_i : nat) (v_inn : inn) (v_c : iN) (v_n : n) (v_mo : memop) (v_b : (list byte)), (v_b = (fun_ibytes v_n (fun_wrap (fun_size (valtype__INN v_inn)) v_n v_c))) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__CONST (valtype__INN v_inn) (v_c : val_));(admininstr__STORE (valtype__INN v_inn) (Some (packsize__ v_n)) v_mo)]) (config__ (fun_with_mem v_z 0 (v_i + (memop__OFFSET v_mo)) (v_n / 8) v_b) [])
-	| Step__memory_grow_succeed : forall (v_z : state) (v_n : n) (v_mi : meminst), ((fun_growmemory (fun_mem v_z 0) v_n) = v_mi) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_n : val_));(admininstr__MEMORY_GROW )]) (config__ (fun_with_meminst v_z 0 v_mi) [(admininstr__CONST (valtype__INN (inn__I32 )) ((List.length (meminst__BYTES (fun_mem v_z 0))) / (64 * (fun_Ki ))))])
+	| Step__memory_grow_succeed : forall (v_z : state) (v_n : n) (v_mi : meminst), (growmemory (fun_mem v_z 0) v_n v_mi) -> Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_n : val_));(admininstr__MEMORY_GROW )]) (config__ (fun_with_meminst v_z 0 v_mi) [(admininstr__CONST (valtype__INN (inn__I32 )) ((List.length (meminst__BYTES (fun_mem v_z 0))) / (64 * (fun_Ki ))))])
 	| Step__memory_grow_fail : forall (v_z : state) (v_n : n), Step (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (v_n : val_));(admininstr__MEMORY_GROW )]) (config__ v_z [(admininstr__CONST (valtype__INN (inn__I32 )) (fun_invsigned 32 (0 - (1 : nat))))]).
 
 Inductive Steps: config -> config -> Prop :=
@@ -1667,10 +1668,10 @@ Inductive Externvals_ok: store -> externval -> externtype -> Prop :=
 	| Externvals_ok__global : forall (v_S : store) (v_a : addr) (v_mut : mut) (v_valtype : valtype) (v_val_ : val_), (v_a < (List.length (store__GLOBALS v_S))) /\ ((lookup_total (store__GLOBALS v_S) v_a) = {| globalinst__TYPE := (globaltype__ v_mut v_valtype); globalinst__VALUE := (val__CONST v_valtype (v_val_ : val_)) |}) -> Externvals_ok v_S (externval__GLOBAL v_a) (externtype__GLOBAL (globaltype__ v_mut v_valtype)).
 
 Inductive Memory_instance_ok: store -> meminst -> memtype -> Prop :=
-	| Memory_instance_ok__ : forall (v_S : store) (v_mt : memtype) (v_b : (list byte)) (v_n : n) (v_m : m), (v_mt = (limits__ v_n v_m)) /\ ((List.length v_b) = v_n) /\ (Memtype_ok v_mt) -> Memory_instance_ok v_S {| meminst__TYPE := v_mt; meminst__BYTES := v_b |} v_mt.
+	| Memory_instance_ok__ : forall (v_S : store) (v_mt : memtype) (v_b : (list byte)) (v_n : n) (v_m : m), (v_mt = (limits__ v_n v_m)) /\ (Memtype_ok v_mt) -> Memory_instance_ok v_S {| meminst__TYPE := v_mt; meminst__BYTES := v_b |} v_mt.
 
 Inductive Table_instance_ok: store -> tableinst -> tabletype -> Prop :=
-	| Table_instance_ok__ : forall (v_S : store) (v_reserved__tt : tabletype) (v_fa : (list (option funcaddr))) (v_n : n) (v_m : m) (v_functype : (list (option functype))), ((List.length v_fa) = (List.length v_functype)) /\ List.Forall2 (fun v_fa v_functype => ((v_fa = None) <-> (v_functype = None))) (v_fa) (v_functype) /\ (v_reserved__tt = (limits__ v_n v_m)) /\ ((List.length v_fa) = v_n) /\ List.Forall2 (fun v_fa v_functype => List.Forall2 (fun v_fa v_functype => (Externvals_ok v_S (externval__FUNC v_fa) (externtype__FUNC v_functype))) (option_to_list v_fa) (option_to_list v_functype)) (v_fa) (v_functype) /\ (Tabletype_ok v_reserved__tt) -> Table_instance_ok v_S {| tableinst__TYPE := v_reserved__tt; tableinst__REFS := v_fa |} v_reserved__tt.
+	| Table_instance_ok__ : forall (v_S : store) (v_reserved__tt : tabletype) (v_fa : (list (option funcaddr))) (v_n : n) (v_m : m) (v_functype : (list (option functype))), ((List.length v_fa) = (List.length v_functype)) /\ List.Forall2 (fun v_fa v_functype => ((v_fa = None) <-> (v_functype = None))) (v_fa) (v_functype) /\ (v_reserved__tt = (limits__ v_n v_m)) /\ List.Forall2 (fun v_fa v_functype => List.Forall2 (fun v_fa v_functype => (Externvals_ok v_S (externval__FUNC v_fa) (externtype__FUNC v_functype))) (option_to_list v_fa) (option_to_list v_functype)) (v_fa) (v_functype) /\ (Tabletype_ok v_reserved__tt) -> Table_instance_ok v_S {| tableinst__TYPE := v_reserved__tt; tableinst__REFS := v_fa |} v_reserved__tt.
 
 Inductive Global_instance_ok: store -> globalinst -> globaltype -> Prop :=
 	| Global_instance_ok__ : forall (v_S : store) (v_gt : globaltype) (v_v : val) (v_mut : mut) (v_vt : valtype), (v_gt = (globaltype__ v_mut v_vt)) /\ (Globaltype_ok v_gt) /\ (Val_ok v_v v_vt) -> Global_instance_ok v_S {| globalinst__TYPE := v_gt; globalinst__VALUE := v_v |} v_gt.
@@ -1728,7 +1729,7 @@ Inductive Global_extension: globalinst -> globalinst -> Prop :=
 
 Inductive Store_extension: store -> store -> Prop :=
 	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_1' : (list funcinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_1' : (list tableinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_1' : (list meminst)) (v_meminst_2 : (list meminst)) (v_globalinst_1' : (list globalinst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_1')) /\ ((List.length v_tableinst_1) = (List.length v_tableinst_1')) /\ ((List.length v_meminst_1) = (List.length v_meminst_1')) /\ ((List.length v_globalinst_1) = (List.length v_globalinst_1')) /\ ((store__FUNCS v_store_1) = v_funcinst_1) /\ ((store__TABLES v_store_1) = v_tableinst_1) /\ ((store__MEMS v_store_1) = v_meminst_1) /\ ((store__GLOBALS v_store_1) = v_globalinst_1) /\ ((store__FUNCS v_store_2) = (@app _ v_funcinst_1' v_funcinst_2)) /\ ((store__TABLES v_store_2) = (@app _ v_tableinst_1' v_tableinst_2)) /\ ((store__MEMS v_store_2) = (@app _ v_meminst_1' v_meminst_2)) /\ ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1' v_globalinst_2)) /\ List.Forall2 (fun v_funcinst_1 v_funcinst_1' => (Func_extension v_funcinst_1 v_funcinst_1')) (v_funcinst_1) (v_funcinst_1') /\ List.Forall2 (fun v_tableinst_1 v_tableinst_1' => (Table_extension v_tableinst_1 v_tableinst_1')) (v_tableinst_1) (v_tableinst_1') /\ List.Forall2 (fun v_meminst_1 v_meminst_1' => (Mem_extension v_meminst_1 v_meminst_1')) (v_meminst_1) (v_meminst_1') /\ List.Forall2 (fun v_globalinst_1 v_globalinst_1' => (Global_extension v_globalinst_1 v_globalinst_1')) (v_globalinst_1) (v_globalinst_1') -> Store_extension v_store_1 v_store_2.
-   
+
 (* Proof Start *)
 
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq.
@@ -1738,7 +1739,6 @@ Ltac decomp :=
 repeat lazymatch goal with
 	| H: _ /\ _ |- _ => 
 		destruct H
-		
 end.
 
 
@@ -1863,6 +1863,15 @@ lazymatch Ht with
 	induction H
 end.
 
+Lemma leadd: forall (i n : nat),
+	(i <= (i + n))%coq_nat.
+Proof.
+	move => i.
+	induction i; move => n.
+	- apply Nat.le_0_l.
+	- simpl. rewrite addSn.	 apply le_n_S. apply IHi.
+Qed.
+
 Definition typeof (v_val : val): valtype :=
 	match v_val with
 		| val__CONST t _ => t
@@ -1960,6 +1969,19 @@ Proof.
 	rewrite <- List.length_zero_iff_nil => //=.
 Qed.  
 
+Lemma length_app_nil: forall {A : Type} (l' l1' l2': list A),
+	length l' = length l1' -> 
+	l' = l1' ++ l2' -> 
+	l2' = [].
+Proof.
+	move => A l' l1' l2' HLength HApp.
+	apply f_equal with (f := fun t => List.length t) in HApp.
+	rewrite List.app_length in HApp.
+	rewrite <- HLength in HApp.
+	apply length_same_split_zero in HApp.
+	rewrite <- List.length_zero_iff_nil => //=.
+Qed.  
+
 Lemma Forall2_nth {A : Type} {B : Type} (l : list A) (l' : list B) (R : A -> B -> Prop) :
       Forall2 R l l' -> length l = length l' /\ (forall i d d', (i < length l)%coq_nat -> R (List.nth i l d) (List.nth i l' d')).
 Proof.
@@ -2039,6 +2061,20 @@ Fixpoint In2 {A B : Type} (x : A) (y : B) (l : list A) (l' : list B) : Prop :=
 	  | a :: ns, [] => False
       | a :: ns, b :: ms => (a = x /\ b = y) \/ In2 x y ns ms
     end.
+
+Lemma lookup_list_update_func: forall {A : Type} {B : Inhabited A} (x : A) (f : A -> A) (l : list A) (idx : nat),
+	(idx < length l)%coq_nat ->
+	x = lookup_total (list_update_func l idx f) idx -> 
+	exists y, x = f y.
+Proof.
+	move => A B x f l idx.
+	move: x idx f.
+	induction l; move => x idx f HLength HLookup.
+	- apply Nat.nlt_0_r in HLength. exfalso. apply HLength.
+	- destruct idx.
+		- simpl in *. unfold lookup_total in HLookup. simpl in HLookup. by exists a.
+		- simpl in HLength. apply Nat.succ_lt_mono in HLength. eapply IHl; eauto.
+Qed.
 
 Lemma In2_split: forall {A B : Type} (x : A) (y : B) (l : list A) (l' : list B),
 	In2 x y l l' -> In x l /\ In y l'.
@@ -2159,9 +2195,95 @@ Proof.
 			- apply H2.
 			- eapply IHl; eauto.
 Qed.
-		 
 
+Lemma Forall2_list_update_func2 {A B : Type} {C : Inhabited A} {D : Inhabited B}
+	(l : list A) (l' : list B) (R : A -> B -> Prop) (i : nat) (f : B -> B) (x : A) (y : B):
+	Forall2 R l l' ->
+	lookup_total l i = x -> 
+	lookup_total l' i = y -> 
+	R x (f y) -> Forall2 R l (list_update_func l' i f).
+Proof.
+	generalize dependent l'.
+	generalize dependent i.
+	generalize dependent x.
+	generalize dependent y.
+	generalize dependent f.
+	induction l; move => f0 y0 x0 i0 l0' HForall HLx HLy HR.
+	- inversion HForall. destruct i0 => //=.
+	- destruct l0' => //=; inversion HForall => //=; subst.
+		destruct i0 => //=.
+		- apply Forall2_cons_iff; split.
+			- by unfold lookup_total in HR.
+			- apply H4.
+		- apply Forall2_cons_iff; split.
+			- apply H2.
+			- eapply IHl; eauto.
+Qed.
 
+Lemma Forall2_list_update {A B : Type} {C : Inhabited A} {D : Inhabited B}
+	(l : list A) (l' : list B) (R : A -> B -> Prop) (i : nat) (x : A) (y : B):
+	Forall2 R l l' ->
+	lookup_total l' i = y -> 
+	R x y -> Forall2 R (list_update l i x) l'.
+Proof.
+	generalize dependent l'.
+	generalize dependent i.
+	generalize dependent x.
+	generalize dependent y.
+	induction l; move => y0 x0 i0 l0' HForall HLx HR.
+	- inversion HForall. destruct i0 => //=.
+	- destruct l0' => //=; inversion HForall => //=; subst.
+		destruct i0 => //=.
+		- apply Forall2_cons_iff; split.
+			- by unfold lookup_total in HR.
+			- apply H4.
+		- apply Forall2_cons_iff; split.
+			- apply H2.
+			- eapply IHl; eauto.
+Qed.
+
+Lemma Forall2_list_update2 {A B : Type} {C : Inhabited A} {D : Inhabited B}
+	(l : list A) (l' : list B) (R : A -> B -> Prop) (i : nat) (x : A) (y : B):
+	Forall2 R l l' ->
+	lookup_total l i = x -> 
+	R x y -> Forall2 R l (list_update l' i y).
+Proof.
+	generalize dependent l'.
+	generalize dependent i.
+	generalize dependent x.
+	generalize dependent y.
+	induction l; move => y0 x0 i0 l0' HForall HLx HR.
+	- inversion HForall. destruct i0 => //=.
+	- destruct l0' => //=; inversion HForall => //=; subst.
+		destruct i0 => //=.
+		- apply Forall2_cons_iff; split.
+			- by unfold lookup_total in HR.
+			- apply H4.
+		- apply Forall2_cons_iff; split.
+			- apply H2.
+			- eapply IHl; eauto.
+Qed.
+
+Lemma Forall2_list_update_both {A B : Type} {C : Inhabited A} {D : Inhabited B}
+	(l : list A) (l' : list B) (R : A -> B -> Prop) (i : nat) (x : A) (y : B):
+	Forall2 R l l' ->
+	R x y -> Forall2 R (list_update l i x) (list_update l' i y).
+Proof.
+	generalize dependent l'.
+	generalize dependent i.
+	generalize dependent x.
+	generalize dependent y.
+	induction l; move => y0 x0 i0 l0' HForall HR.
+	- inversion HForall. destruct i0 => //=.
+	- destruct l0' => //=; inversion HForall => //=; subst.
+		destruct i0 => //=.
+		- apply Forall2_cons_iff; split.
+			- by unfold lookup_total in HR.
+			- apply H4.
+		- apply Forall2_cons_iff; split.
+			- apply H2.
+			- eapply IHl; eauto.
+Qed.
 
 Lemma list_update_length: forall {A : Type} (l : list A) (i : nat) (x : A),
 	length (list_update l i x) = length l.
@@ -3223,27 +3345,76 @@ Lemma upd_label_unchanged: forall C lab,
     context__LABELS C = lab ->
     upd_label C lab = C.
 Proof.
-  move => C lab HLab.
-  rewrite -HLab. unfold upd_label. by destruct C.
+	move => C lab HLab.
+	rewrite -HLab. unfold upd_label. by destruct C.
 Qed.
 
-Lemma concat_cancel_last_n: forall (l1 l2 l3 l4: seq valtype),
+Lemma add_false: forall (n m : nat),
+	~ (n + (S m) = n).
+Proof.
+	move => n m H.
+	induction n. simpl in H.
+	- rewrite add0n in H. discriminate.
+	- apply IHn.
+		rewrite addSn in H.
+		by injection H.
+Qed.
+
+Lemma concat_cancel_last_n: forall (l1 l2 l3 l4: list valtype),
     l1 ++ l2 = l3 ++ l4 ->
     length l2 = length l4 ->
     (l1 = l3) /\  (l2 = l4).
 Proof.
-  move => l1 l2 l3 l4 HCat HSize.
-  assert (length (l1 ++ l2) = length (l3 ++ l4)); first by rewrite HCat.
-  repeat rewrite app_length in H.
-  rewrite HSize in H. 
-Admitted.
+	move => l1.
+	induction l1; move => l2 l3 l4 HApp HLength.
+	- destruct l3; destruct l2; destruct l4 => //=.
+		simpl in HApp. injection HApp as ?.
+		simpl in HLength. injection HLength as ?.
+		apply f_equal with (f := fun t => List.length t) in H0 as ?.
+		rewrite app_length in H2. simpl in H2.
+		rewrite H2 in H1.
+		rewrite <- addnC in H1.
+		rewrite addSn in H1.
+		rewrite <- addnS in H1.
+		apply add_false in H1. exfalso. apply H1.
+	- destruct l3; destruct l2; destruct l4 => //=.
+		simpl in HApp. 
+		apply f_equal with (f := fun t => List.length t) in HApp as ?.
+		simpl in H.
+		injection H as H.
+		rewrite app_length in H. simpl in H.
+		simpl in HLength. injection HLength as ?.
+		rewrite H0 in H.
+		rewrite <- addnC in H.
+		rewrite addSn in H.
+		rewrite <- addnS in H.
+		apply add_false in H. exfalso. apply H.
+	-
+		split => //=.
+		simpl in HApp.
+		repeat rewrite <- app_right_nil in HApp => //=.
+	-
+		repeat rewrite <- app_comm_cons in HApp.
+		injection HApp as ?; subst. 
+		assert (l1 = l3 /\ v0 :: l2 = v1 :: l4 -> v :: l1 = v :: l3 /\ v0 :: l2 = v1 :: l4).
+		{
+			move => H2.
+			destruct H2.
+			split.
+			- f_equal. apply H.
+			- apply H1.	
+		}
+		apply H.
+		eapply IHl1; eauto.
+Qed.
+
 
 Lemma upd_label_unchanged_typing: forall v_S v_C v_admininstrs v_func_type,
     Admin_instrs_ok v_S v_C v_admininstrs v_func_type <->
     Admin_instrs_ok v_S (upd_label v_C (context__LABELS v_C)) v_admininstrs v_func_type.
 Proof.
-  move => s C es tf.
-  split.
+	move => s C es tf.
+	split.
 	- move => HType.
 		by rewrite upd_label_unchanged.
 	- move => HType.
@@ -4448,9 +4619,16 @@ Proof.
 			- simpl in H. apply Nat.succ_lt_mono in H. apply H.
 Qed.
 
+
+
 Ltac removeinst2 H :=
 	let H1 := fresh "HLength" in
 	eapply length_app_both_nil in H as H1; eauto;
+	rewrite H1 in H; rewrite <- app_right_nil in H.
+
+Ltac removeinstSimpler H :=
+	let H1 := fresh "HLength" in
+	eapply length_app_nil in H as H1; eauto;
 	rewrite H1 in H; rewrite <- app_right_nil in H.
 
 Lemma update_global_unchagned: forall v_S v_S' v_f v_x v_valtype v_val_,
@@ -4469,6 +4647,33 @@ Proof.
 	injection H as ?; subst; repeat split => //=.
 	by erewrite <- list_update_length_func.
 Qed.
+
+Lemma update_mem_unchagned_func: forall v_S v_S' func v_idx,
+	v_S' = v_S <| store__MEMS := list_update_func (store__MEMS v_S) v_idx func |> ->
+	store__FUNCS v_S = store__FUNCS v_S' /\
+	store__TABLES v_S = store__TABLES v_S' /\
+	length (store__MEMS v_S) = length (store__MEMS v_S') /\
+	store__GLOBALS v_S = store__GLOBALS v_S'.
+Proof.
+	move => v_S v_S' func v_idx H.
+	destruct v_S'. unfold set in H. simpl in *.
+	injection H as ?; subst; repeat split => //=.
+	by erewrite <- list_update_length_func.
+Qed.
+
+Lemma update_mem_unchagned: forall v_S v_S' func v_idx,
+	v_S' = v_S <| store__MEMS := list_update (store__MEMS v_S) v_idx func |> ->
+	store__FUNCS v_S = store__FUNCS v_S' /\
+	store__TABLES v_S = store__TABLES v_S' /\
+	length (store__MEMS v_S) = length (store__MEMS v_S') /\
+	store__GLOBALS v_S = store__GLOBALS v_S'.
+Proof.
+	move => v_S v_S' func v_idx H.
+	destruct v_S'. unfold set in H. simpl in *.
+	injection H as ?; subst; repeat split => //=.
+	by erewrite <- list_update_length.
+Qed.
+
 
 Lemma func_agree_extension: forall v_S v_S' v_funcaddr v_funcinst_1' v_funcinst_2 v_functype,
 	Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC v_functype) ->
@@ -4704,19 +4909,6 @@ Proof.
 	- eapply ext_extension_C; eauto.
 Qed.
 
-(* Lemma In2Join: forall {A B : Type} {C : Inhabited A} {D : Inhabited B} (x : A) (y : B) (l : list A) (l' : list B) (i : nat),
-	lookup_total l i = x ->
-	lookup_total l' i = y ->
-	length l = length l' ->
-	In2 x y l l'.
-Proof.
-	move => A B C D x y l l' i.
-	move: x y l' i.
-	induction l; move => x y l' i HLx HLy HLength.
-	- destruct l' => //=. unfold lookup_total in *. simpl in HLx.
-	- destruct l' => //=.
-		destruct HInx; destruct HIny => //=; try (left; repeat split => //=). *)
-
 
 Lemma global_instance_fine: forall s s' v_globaltype v_f v_x v_valtype v_val_,
     Forall2 (fun v vt => Global_instance_ok s v vt) (store__GLOBALS s) v_globaltype ->
@@ -4757,9 +4949,7 @@ Proof.
 				eapply Global_instance_ok__; eauto.
 Qed.
 
-	
-
-Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v_x,
+Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v_x v_mut v_valtype0 v_val_0,
     Store_ok s ->
     Store_extension s s' ->
 	Module_instance_ok s (frame__MODULE v_f) v_C ->
@@ -4767,6 +4957,11 @@ Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v
 	(store__GLOBALS s') = list_update_func (store__GLOBALS s)
 	(lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x)
 	[eta set globalinst__VALUE (fun=> val__CONST v_valtype v_val_)] ->
+	lookup_total (store__GLOBALS s) (lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x) =
+	{|
+	globalinst__TYPE := globaltype__ v_mut v_valtype0;
+	globalinst__VALUE := val__CONST v_valtype0 v_val_0
+	|} ->
 	Datatypes.length (store__GLOBALS s) = Datatypes.length (store__GLOBALS s') ->
     (store__FUNCS s = store__FUNCS s') ->
     (store__TABLES s = store__TABLES s') ->
@@ -4774,7 +4969,7 @@ Lemma store_global_extension_store_typed: forall s s' v_f v_C v_valtype v_val_ v
 	((lookup_total (moduleinst__GLOBALS (frame__MODULE v_f)) v_x) < length (store__GLOBALS s))%coq_nat ->
     Store_ok s'.
 Proof.
-	move => s s' f C v_valtype v_val_ v_x HSOK Hext HIT HITS' HUpdate HLGlobal HFeq HTeq HMeq HLength.
+	move => s s' f C v_valtype v_val_ v_x v_mut v_valtype0 v_val_0 HSOK Hext HIT HITS' HUpdate HGlobInst HLGlobal HFeq HTeq HMeq HLength.
 	inversion HSOK; decomp.
 	inversion Hext; decomp; subst.
 	destruct s'.
@@ -4807,15 +5002,32 @@ Proof.
 			rewrite H11.
 			eapply global_instance_fine; subst; simpl; eauto.
 			apply Forall2_lookup in H26; destruct H26.
-			apply H15 in HLength.
-			inversion HLength.
-			apply Forall2_lookup in H6; destruct H6.
-			(* apply H11 in HLength as H''.
+			apply H15 in HLength as H''.
+			rewrite HGlobInst in H''.
 			inversion H''.
-			destruct H17 as [? [? ?]].
-			inversion H20. subst.
-			eapply Global_instance_ok__; repeat split => //=. *)
-Admitted.
+			subst.
+			apply Forall2_lookup in H6; destruct H6.
+			apply H16 in HLength as H'''.
+			rewrite HGlobInst in H'''.
+			inversion H'''.
+			destruct H22 as [? [? ?]].
+			eapply Global_instance_ok__; repeat split => //=.
+			inversion H29. subst.
+			eapply lookup_list_update_func in H21; eauto; destruct H21 as [y ?].
+			unfold set in H18.
+			injection H18 as ?; subst.
+			apply Val_ok__.
+	- apply Forall2_forall2; split => //=. move => x y HIn.
+		apply Forall2_forall2 in H7; destruct H7. apply H11 in HIn. inversion HIn; decomp; subst.
+		eapply Table_instance_ok__; repeat split => //=; eauto.
+		apply Forall2_forall2; split => //=. move => x y HIn'. apply Forall2_forall2 in H21; destruct H21.
+		apply H17 in HIn'. apply Forall2_forall2 in HIn'; destruct HIn'.
+		apply Forall2_forall2; split => //=. move => x' y' HIn''.
+		apply H20 in HIn''. inversion HIn''; decomp; subst. eapply Externvals_ok__func; eauto.
+	- apply Forall2_forall2; split => //=. move => x y HIn.
+		apply Forall2_forall2 in H8; destruct H8. apply H11 in HIn. inversion HIn; decomp; subst. 
+		eapply Memory_instance_ok__; repeat split => //=; eauto.
+Qed.
 
 Lemma list_update_same_unchanged: forall {X : Type} {Y : Inhabited X} (l: list X) e i,
     (lookup_total l i) = e ->
@@ -4961,7 +5173,7 @@ Proof.
 				subst.
 				rewrite H in H16. injection H16 as ?; subst.
 				inversion HStore; decomp; subst. 
-				eapply Forall2_global => //=; eauto. 
+				eapply Forall2_global; eauto. 
 		}
 		split => //=.
 		eapply module_inst_typing_extension with (v_S' := s') in HIT as HITS'; eauto.
@@ -4970,17 +5182,296 @@ Proof.
 		inversion HIT; decomp; subst.
 		simpl in *.
 		inversion HStore; decomp; subst; simpl in *.
-		destruct f. simpl in *. destruct frame__MODULE0. simpl in *.
-		injection H7 as ?; subst.
 		apply Forall2_lookup2 in H17; destruct H17.
-		apply H10 in H1.
+		apply H17 in H1.
 		inversion H1. destruct H29. simpl in *.
-
-
+		destruct H30.
+		eapply store_global_extension_store_typed; eauto.
+		- unfold set. simpl. reflexivity.
+		- rewrite <- H7. simpl. apply H30.
+		- simpl. by rewrite <- H7.
 	- (* Store Num Val *)
+		destruct H3; destruct H1; subst.
+		apply_composition_typing_and_single HType.
+		apply_composition_typing_and_single H4_comp.
+		apply AI_const_typing in H4_comp0.
+		apply AI_const_typing in H4_comp.
+		rewrite <- admin_instrs_ok_eq in H4_comp1.
+		apply Store_typing in H4_comp1; destruct H4_comp1 as [v_n [v_mt [v_inn [? [? [? [? [? ?]]]]]]]].
+		subst.
+		remember ((s <| store__MEMS :=
+		list_update_func (store__MEMS s)
+		  (lookup_total (moduleinst__MEMS (frame__MODULE f)) 0)
+		  (λ v_1 : meminst,
+			 v_1 <| meminst__BYTES :=
+			 list_slice_update (meminst__BYTES v_1) (v_i + memop__OFFSET v_mo)%coq_nat
+			   (fun_size v_t / 8) (fun_bytes v_t v_c) |>) |>)) as s'.
+		assert (Store_extension s s').
+		{
+			eapply Store_extension__ with (v_meminst_1 := (store__MEMS s)) (v_meminst_1' := (store__MEMS s')) (v_meminst_2 := []);
+			repeat split; subst; simpl; try rewrite <- app_right_nil => //=.
+			- by rewrite list_update_length_func.
+			- by eapply func_extension_same.
+			- by eapply table_extension_same.
+			- (* Mem extension *)
+				inversion HIT; decomp; subst; simpl in *.
+				apply Forall2_lookup2 in H15; destruct H15. apply H7 in H0.
+				inversion H0; decomp; subst.
+				inversion HStore; decomp; subst; simpl in *.
+				eapply Forall2_list_update_func2; eauto.
+				- by apply mem_extension_same.
+				- unfold set; simpl. destruct v_mt'. apply Mem_extension__ => //=.
+			- inversion HStore; decomp; subst; simpl in *.
+				eapply global_extension_same; eauto.
+		}
+		split => //=.
+		eapply update_mem_unchagned_func in Heqs' as ?; decomp.
+		subst; simpl in *.
+		destruct s. simpl in *.
+		inversion HStore; decomp; subst. 
+		injection H14 as ?; subst.
+		eapply Store_ok__OK; repeat split; simpl; eauto.
+		- erewrite list_update_length_func; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H15; destruct H15. apply H14 in HIn. inversion HIn; destruct H15 as [? [? ?]].
+			eapply Function_instance_ok__ with (v_C := v_C); repeat split => //=.
+			eapply module_inst_typing_extension; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H16; destruct H16. apply H14 in HIn. inversion HIn. destruct H16 as [? [? ?]].
+			eapply Global_instance_ok__; repeat split; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H17; destruct H17. apply H14 in HIn. inversion HIn; decomp; subst.
+			inversion H25. inversion H19; subst; destruct H27.
+			eapply Table_instance_ok__; repeat split; eauto.
+			apply Forall2_forall2; split => //=; move => x' y' HIn'. 
+			apply Forall2_forall2 in H24; destruct H24.
+			apply H24 in HIn'. 
+			apply Forall2_forall2 in HIn'; destruct HIn'.
+			apply Forall2_forall2; split => //=; move => x'' y'' HIn''.
+			apply H27 in HIn''. 
+			inversion HIn''; decomp; subst.
+			eapply Externvals_ok__func; eauto.
+		- eapply Forall2_list_update_func; eauto.
+			- apply Forall2_forall2; split => //=; move => x y HIn.
+				apply Forall2_forall2 in H18. apply H18 in HIn.
+				inversion HIn; decomp; subst.
+				eapply Memory_instance_ok__; eauto.
+			- 	
+				inversion H1; decomp; subst. simpl in *.
+				removeinstSimpler H27.
+				removeinstSimpler H28.
+				removeinstSimpler H30.
+				rewrite H7 in H21.
+				removeinstSimpler H29.
+				subst.
+				simpl in *.
+				apply Forall2_lookup in H33; destruct H33.
+				inversion HIT; decomp; subst; simpl in *.
+				apply Forall2_lookup2 in H37; destruct H37.
+				apply H26 in H0. inversion H0. destruct H41 as [? [? ?]]; simpl in H41.
+				simpl in H42. 
+				apply H19 in H41 as H'.
+				rewrite H42 in H'.
+				inversion H'. subst.
+				unfold set.
+				rewrite H42. simpl.
+				apply Forall2_lookup in H18; destruct H18.
+				apply H37 in H41.
+				inversion H41; decomp; subst.
+				rewrite H42 in H39.
+				injection H39 as ?.
+				rewrite H39.
+				rewrite H39 in H48.
+				inversion H48. inversion H46; decomp.
+				eapply Memory_instance_ok__; repeat split; eauto.
 	- (* Store Pack Val *)
+		destruct H3; destruct H1; subst.
+		apply_composition_typing_and_single HType.
+		apply_composition_typing_and_single H4_comp.
+		apply AI_const_typing in H4_comp0.
+		apply AI_const_typing in H4_comp.
+		rewrite <- admin_instrs_ok_eq in H4_comp1.
+		apply Store_typing in H4_comp1; destruct H4_comp1 as [v_n' [v_mt' [v_inn' [? [? [? [? [? ?]]]]]]]].
+		subst.
+		remember (s <| store__MEMS :=
+		list_update_func (store__MEMS s)
+		  (lookup_total (moduleinst__MEMS (frame__MODULE f)) 0)
+		  (λ v_1 : meminst,
+			 v_1 <| meminst__BYTES :=
+			 list_slice_update (meminst__BYTES v_1)
+			   (v_i + memop__OFFSET v_mo)%coq_nat (v_n / 8)
+			   (fun_ibytes v_n
+				  (fun_wrap (fun_size (valtype__INN v_inn)) v_n v_c)) |>) |>) as s'.
+		assert (Store_extension s s').
+		{
+			eapply Store_extension__ with (v_meminst_1 := (store__MEMS s)) (v_meminst_1' := (store__MEMS s')) (v_meminst_2 := []);
+			repeat split; subst; simpl; try rewrite <- app_right_nil => //=.
+			- by rewrite list_update_length_func.
+			- by eapply func_extension_same.
+			- by eapply table_extension_same.
+			- (* Mem extension *)
+				inversion HIT; decomp; subst; simpl in *.
+				apply Forall2_lookup2 in H15; destruct H15. apply H7 in H0.
+				inversion H0; decomp; subst.
+				inversion HStore; decomp; subst; simpl in *.
+				eapply Forall2_list_update_func2; eauto.
+				- by apply mem_extension_same.
+				- unfold set; simpl. destruct v_mt'. apply Mem_extension__ => //=.
+			- inversion HStore; decomp; subst; simpl in *.
+				eapply global_extension_same; eauto.
+		}
+		split => //=.
+		eapply update_mem_unchagned_func in Heqs' as ?; decomp.
+		subst; simpl in *.
+		destruct s. simpl in *.
+		inversion HStore; decomp; subst. 
+		injection H14 as ?; subst.
+		eapply Store_ok__OK; repeat split; simpl; eauto.
+		- erewrite list_update_length_func; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H15; destruct H15. apply H14 in HIn. inversion HIn; destruct H15 as [? [? ?]].
+			eapply Function_instance_ok__ with (v_C := v_C); repeat split => //=.
+			eapply module_inst_typing_extension; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H16; destruct H16. apply H14 in HIn. inversion HIn. destruct H16 as [? [? ?]].
+			eapply Global_instance_ok__; repeat split; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H17; destruct H17. apply H14 in HIn. inversion HIn; decomp; subst.
+			inversion H25. inversion H19; subst. destruct H27.
+			eapply Table_instance_ok__; repeat split; eauto.
+			apply Forall2_forall2; split => //=; move => x' y' HIn'. 
+			apply Forall2_forall2 in H24; destruct H24.
+			apply H24 in HIn'. 
+			apply Forall2_forall2 in HIn'; destruct HIn'.
+			apply Forall2_forall2; split => //=; move => x'' y'' HIn''.
+			apply H27 in HIn''. 
+			inversion HIn''; decomp; subst.
+			eapply Externvals_ok__func; eauto.
+		- eapply Forall2_list_update_func; eauto.
+			- apply Forall2_forall2; split => //=; move => x y HIn.
+				apply Forall2_forall2 in H18. apply H18 in HIn.
+				inversion HIn; decomp; subst.
+				eapply Memory_instance_ok__; eauto.
+			- 	
+				inversion H1; decomp; subst. simpl in *.
+				removeinstSimpler H27.
+				removeinstSimpler H28.
+				removeinstSimpler H30.
+				rewrite H7 in H21.
+				removeinstSimpler H29.
+				subst.
+				simpl in *.
+				apply Forall2_lookup in H33; destruct H33.
+				inversion HIT; decomp; subst; simpl in *.
+				apply Forall2_lookup2 in H37; destruct H37.
+				apply H26 in H0. inversion H0. destruct H41 as [? [? ?]]; simpl in H41.
+				simpl in H42. 
+				apply H19 in H41 as H'.
+				rewrite H42 in H'.
+				inversion H'. subst.
+				unfold set.
+				rewrite H42. simpl.
+				apply Forall2_lookup in H18; destruct H18.
+				apply H37 in H41.
+				inversion H41; decomp; subst.
+				rewrite H42 in H39.
+				injection H39 as ?.
+				rewrite H39.
+				rewrite H39 in H48.
+				inversion H48. inversion H46; decomp.
+				eapply Memory_instance_ok__; repeat split; eauto.
 	- (* Memory Grow Succeed *)
-Admitted.
+		destruct H3; destruct H1; subst.
+		apply_composition_typing_and_single HType.
+		rewrite <- admin_instrs_ok_eq in H4_comp.
+		apply Grow_memory_typing in H4_comp; destruct H4_comp as [v_mt' [ts' [? [? [? ?]]]]].
+		subst.
+		remember (s <| store__MEMS :=
+		list_update (store__MEMS s)
+		  (lookup_total (moduleinst__MEMS (frame__MODULE f)) 0) v_mi |>) as s'.
+
+		assert (Store_extension s s').
+		{
+			eapply Store_extension__ with (v_meminst_1 := (store__MEMS s)) (v_meminst_1' := (store__MEMS s')) (v_meminst_2 := []);
+			repeat split; subst s'; simpl; try rewrite <- app_right_nil => //=.
+			- by rewrite list_update_length.
+			- by eapply func_extension_same.
+			- by eapply table_extension_same.
+			- (* Mem extension *)
+				inversion HIT; decomp; subst; simpl in *.
+				apply Forall2_lookup2 in H13; destruct H13. apply H5 in H0.
+				inversion H0; decomp; subst.
+				inversion HStore; decomp; subst; simpl in *.
+				eapply Forall2_list_update2; eauto.
+				- by apply mem_extension_same.
+				- unfold fun_mem in H.
+					inversion H; decomp; subst.
+					simpl in H15. rewrite <- H1 in H15. simpl in H15. rewrite H15 in H18.
+					injection H18 as ?; subst.
+					apply Mem_extension__ => //=.
+					apply leadd.
+			- inversion HStore; decomp; subst; simpl in *.
+				eapply global_extension_same; eauto.
+		}
+		split => //=.
+		eapply update_mem_unchagned in Heqs' as ?; decomp.
+		subst; simpl in *.
+		destruct s. simpl in *.
+		inversion HStore; decomp; subst. 
+		injection H12 as ?; subst.
+		inversion H; decomp.
+		unfold fun_mem in H8.
+
+		eapply Store_ok__OK with (v_memtype := list_update v_memtype ((lookup_total (moduleinst__MEMS (frame__MODULE f)) 0)) (limits__ (v_i + v_n)%coq_nat v_j)); repeat split; simpl; eauto.
+		- erewrite list_update_length; rewrite list_update_length; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H13; destruct H13. apply H22 in HIn. inversion HIn. destruct H23 as [? [? ?]].
+			eapply Function_instance_ok__ with (v_C := v_C); repeat split => //=.
+			eapply module_inst_typing_extension; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H14; destruct H14. apply H22 in HIn. inversion HIn. destruct H23 as [? [? ?]].
+			eapply Global_instance_ok__; repeat split; eauto.
+		- apply Forall2_forall2; split => //=. move => x y HIn.
+			apply Forall2_forall2 in H15; destruct H15. apply H22 in HIn. inversion HIn; decomp; subst.
+			inversion H30. inversion H12; subst. destruct H24.
+			eapply Table_instance_ok__; repeat split; eauto.
+			apply Forall2_forall2; split => //=; move => x' y' HIn'. 
+			apply Forall2_forall2 in H29; destruct H29.
+			apply H20 in HIn'. 
+			apply Forall2_forall2 in HIn'; destruct HIn'.
+			apply Forall2_forall2; split => //=; move => x'' y'' HIn''.
+			apply H25 in HIn''. 
+			inversion HIn''; decomp; subst.
+			eapply Externvals_ok__func; eauto.
+		- 	
+			eapply Forall2_list_update_both; eauto.
+			- apply Forall2_forall2; split => //=; move => x y HIn.
+				apply Forall2_forall2 in H16; destruct H16. apply H22 in HIn.
+				inversion HIn; decomp; subst.
+				eapply Memory_instance_ok__; eauto.
+			-
+				subst.
+				eapply Memory_instance_ok__; split; eauto.
+				eapply Memtype_ok__OK.
+				eapply Limits_ok__; split; eauto.
+				simpl in H8.
+				inversion HIT; decomp; subst.
+				rewrite <- H12 in H8.
+				simpl in H8.
+				apply Forall2_lookup in H16; destruct H16.
+				simpl in H0.
+				apply Forall2_lookup2 in H28; destruct H28.
+				apply H28 in H0. inversion H0; decomp.
+				simpl in H33.
+				apply H17 in H33.
+				rewrite H8 in H33.
+				inversion H33.
+				destruct H38.
+				inversion H41.
+				inversion H42.
+				decomp.
+				apply H48.
+Qed.
 	
 Lemma reduce_inst_unchanged: forall s f ais s' f' ais',
     Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
@@ -5191,7 +5682,7 @@ Proof.
 		rewrite <- admin_instrs_ok_eq in H4_comp.
 		apply Grow_memory_typing in H4_comp; destruct H4_comp as [v_mt [ts [? [? [? ?]]]]].
 		subst.
-		repeat rewrite -> app_assoc in H2; apply split_append_last in H2; destruct H2; subst.
+		repeat rewrite -> app_assoc in H3; apply split_append_last in H3; destruct H3; subst.
 		repeat rewrite -> app_assoc.
 		apply admin_instrs_weakening_empty_1.
 		rewrite <- admin_instrs_ok_eq.
