@@ -38,6 +38,9 @@ syntax localidx hint(desc "local index") = idx
 
 syntax valtype hint(desc "number type") = I32 | I64
 
+syntax resulttype hint(desc "result type") =
+  valtype?
+
 syntax functype hint(desc "function type") =
   valtype* -> valtype*
 

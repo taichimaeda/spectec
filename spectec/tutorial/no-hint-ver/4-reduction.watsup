@@ -3,6 +3,11 @@
 ;;
 
 relation Step: config ~> config
+;; relation Test: |- (config |- config) ~> config
+
+;; rule Test/test:
+;;   |- ((z; NOP) |- (z; NOP))  ~>  z; eps
+;;   -- if z = z
 
 ;;
 ;; Instructions

@@ -30,7 +30,7 @@ var xx : externidx
 
 syntax context hint(desc "context") =
   { TYPES functype*, FUNCS functype*, 
-    LOCALS valtype*, LABELS (valtype?)*, RETURN (valtype?)? }
+    LOCALS valtype*, LABELS resulttype*, RETURN resulttype? }
 
 var C : context
 
@@ -41,22 +41,30 @@ var C : context
 ;;
 
 relation Functype_ok: |- functype : OK
+relation Externtype_ok: |- externtype : OK
 
 rule Functype_ok:
   |- t_1* -> t_2? : OK
+
+rule Externtype_ok/func:
+  |- FUNC functype : OK
+  -- Functype_ok: |- functype : OK
 
 
 ;;
 ;; Subtyping
 ;;
 
-;; External types
-
 relation Functype_sub: |- functype <: functype
+relation Externtype_sub: |- externtype <: externtype
 
 
 rule Functype_sub:
   |- ft <: ft
+
+rule Externtype_sub/func:
+  |- FUNC ft_1 <: FUNC ft_2
+  -- Functype_sub: |- ft_1 <: ft_2
 
 
 ;;
@@ -65,7 +73,7 @@ rule Functype_sub:
 
 relation Instr_ok: context |- instr : functype
 relation Instrs_ok: context |- instr* : functype
-relation Expr_ok: context |- expr : valtype?
+relation Expr_ok: context |- expr : resulttype
 
 
 ;; Expressions
@@ -172,7 +180,8 @@ rule Instr_const/const:
   C |- (CONST t c) CONST
 
 
-rule Expr_const: C |- instr* CONST
+rule Expr_const:
+  C |- instr* CONST
   -- (Instr_const: C |- instr CONST)*
 
 
