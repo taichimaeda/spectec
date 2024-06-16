@@ -3622,10 +3622,9 @@ Qed.
 Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] v_func_type ->
 	((List.length v_val) = v_n) ->
-	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) v_func_type.
 Proof.
-	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HLength HReduce.
+	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HLength.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
