@@ -61,7 +61,6 @@ syntax config hint(desc "configuration") = state; admininstr*
 
 syntax admininstr hint(desc "administrative instruction") =
   | instr
-  | CALL_ADDR funcaddr
   | LABEL_ n `{instr*} admininstr*
   | FRAME_ n `{frame} admininstr*
   | TRAP
@@ -83,3 +82,18 @@ def $default_(valtype) : val
 
 def $default_(I32) = (CONST I32 0)
 def $default_(I64) = (CONST I64 0)
+
+var a : addr
+var fa : funcaddr
+var v : val
+var xv : externval
+var mm : moduleinst
+var fi : funcinst
+var xi : exportinst
+var s : store
+var f : frame
+var z : state
+var ty : type
+var loc : local
+var ex : export
+var xx : externidx

@@ -118,3 +118,11 @@ syntax export hint(desc "export") =
 
 syntax module hint(desc "module") =
   MODULE type* func* export*
+
+var i : nat  ;; hack
+var x : idx
+var l : labelidx
+var t : valtype
+var ft : functype
+var in : instr
+var e : expr

@@ -2,27 +2,8 @@
 ;; Metavariables
 ;;
 
-var i : nat  ;; hack
-var x : idx
-var l : labelidx
-var t : valtype
-var ft : functype
-var in : instr
-var e : expr
-var a : addr
-var fa : funcaddr
-var v : val
-var xv : externval
-var mm : moduleinst
-var fi : funcinst
-var xi : exportinst
-var s : store
-var f : frame
-var z : state
-var ty : type
-var loc : local
-var ex : export
-var xx : externidx
+
+
 
 ;;
 ;; Contexts
