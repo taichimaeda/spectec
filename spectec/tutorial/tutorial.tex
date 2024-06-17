@@ -152,14 +152,9 @@ Make a new file \K{1-syntax.wastup} and write on it. \\
 We'll declare each of the syntax one by one.
 
 \subsection{$N$, $n$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& N &::=& \mathbb{N} \\
-	& n &::=& \mathbb{N} \\
-\end{array}
-$$
+##{syntax+: {N n}}
 Use a pre-defined syntax \K{nat}, to indicate any natural number.\\
-Hint: Refer to Section 2.1. \\
+Hint: Refer to Subsection 2.1. \\
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -170,11 +165,7 @@ This means the syntax \K{N} and \K{n} is a natural number.
 }
 
 \subsection{${i}{N}$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(integer)} & {\mathit{iN}}(N) &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
-\end{array}
-$$
+##{syntax+: {iN}}
 You can declare a parametric syntax as below:
 \begin{lcverbatim}
 syntax <name_of_syntax>(<parameter>) = <case> | <case> | <case>
@@ -190,12 +181,7 @@ Now, the syntax \K{iN} is declared in regard with parameter \K{N}.
 }
 
 \subsection{$char$, $name$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(character)} & {\mathit{char}} &::=& \mathrm{U{+}00} ~|~ \dots ~|~ \mathrm{U{+}D7FF} ~|~ \mathrm{U{+}E000} ~|~ \dots ~|~ \mathrm{U{+}10FFFF} \\
-	\mbox{(name)} & {\mathit{name}} &::=& {{\mathit{char}}^\ast} \\
-\end{array}
-$$
+##{syntax+: {char name}}
 Use a built-in syntax like below:
 \begin{lcverbatim}
 U+0000 | ... | U+1111
@@ -212,15 +198,7 @@ syntax name = char*
 }
 
 \subsection{$idx$, $typeidx$, $funcidx$, $labelidx$, $localidx$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(index)} & {\mathit{idx}} &::=& {\mathit{iN}}(32) \\
-	\mbox{(type index)} & {\mathit{typeidx}} &::=& {\mathit{idx}} \\
-	\mbox{(function index)} & {\mathit{funcidx}} &::=& {\mathit{idx}} \\
-	\mbox{(label index)} & {\mathit{labelidx}} &::=& {\mathit{idx}} \\
-	\mbox{(local index)} & {\mathit{localidx}} &::=& {\mathit{idx}} \\
-\end{array}
-$$
+##{syntax+: idx {typeidx funcidx labelidx localidx}}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -234,11 +212,7 @@ syntax localidx = idx
 }
 
 \subsection{$\mathit{valtype}$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(number type)} & {\mathit{valtype}} &::=& \mathsf{i{\scriptstyle 32}} ~|~ \mathsf{i{\scriptstyle 64}} \\
-\end{array}
-$$
+##{syntax+: valtype}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -247,11 +221,7 @@ syntax valtype = I32 | I64
 }
 
 \subsection{$\mathit{functype}$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(function type)} & {\mathit{functype}} &::=& {{\mathit{valtype}}^\ast} \rightarrow {{\mathit{valtype}}^\ast} \\
-\end{array}
-$$
+##{syntax+: functype}
 Use \K{->} to indicate a function: \\
 {\color{red}
 	Answer:
@@ -261,11 +231,7 @@ syntax functype = valtype* -> valtype*
 }
 
 \subsection{$\mathit{externtype}$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(external type)} & {\mathit{externtype}} &::=& \mathsf{func}~{\mathit{functype}} \\
-\end{array}
-$$
+##{syntax+: externtype}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -274,19 +240,9 @@ syntax externtype = FUNC functype
 }
 
 \subsection{$\mathrm{size}$, ${{\mathit{num}}}_{{\mathit{valtype}}}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{size}}(\mathsf{i{\scriptstyle 32}}) &=& 32 \\
-	{\mathrm{size}}(\mathsf{i{\scriptstyle 64}}) &=& 64 \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& {{\mathit{num}}}_{{\mathit{valtype}}} &::=& {\mathit{iN}}({\mathrm{size}}({\mathit{valtype}})) \\
-\end{array}
-$$
-You need to declare an auxiliary function named \K{size} here. About auxiliary function, refer to Section 2.5. \\
+##{definition: size}
+##{syntax+: num_}
+You need to declare an auxiliary function named \K{size} here. About auxiliary function, refer to Subsection 2.5. \\
 Hint: The type declaration of function \K{size} is as follows:
 \begin{lcverbatim}
 def $size(valtype) : nat
@@ -304,11 +260,7 @@ The first line declares the type of function \K{size}, and the next two lines gi
 }
 
 \subsection{$binop$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& {\mathit{binop}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} \\
-\end{array}
-$$
+##{syntax+: binop}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -317,24 +269,7 @@ syntax binop = ADD | SUB | MUL | DIV
 }
 
 \subsection{$instr$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(instruction)} & {\mathit{instr}} &::=& \mathsf{nop} \\ &&|&
-	\mathsf{drop} \\ &&|&
-	\mathsf{select} \\ &&|&
-	\mathsf{block}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{loop}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{if}~{\mathit{functype}}~{{\mathit{instr}}^\ast}~\mathsf{else}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{br}~{\mathit{labelidx}} \\ &&|&
-	\mathsf{br\_if}~{\mathit{labelidx}} \\ &&|&
-	\mathsf{call}~{\mathit{funcidx}} \\ &&|&
-	\mathsf{return} \\ &&|&
-	{\mathit{valtype}}{.}\mathsf{const}~{{\mathit{num}}}_{{\mathit{valtype}}} \\ &&|&
-	{\mathit{valtype}} {.} {\mathit{binop}} \\ &&|&
-	\mathsf{local.get}~{\mathit{localidx}} \\ &&|&
-	\mathsf{local.set}~{\mathit{localidx}} \\
-\end{array}
-$$
+##{syntax+: instr}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -357,11 +292,7 @@ syntax instr =
 }
 
 \subsection{$expr$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(expression)} & {\mathit{expr}} &::=& {{\mathit{instr}}^\ast} \\
-\end{array}
-$$
+##{syntax+: expr}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -370,16 +301,7 @@ syntax expr = instr*
 }
 
 \subsection{$module$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(type)} & {\mathit{type}} &::=& \mathsf{type}~{\mathit{functype}} \\
-	\mbox{(local)} & {\mathit{local}} &::=& \mathsf{local}~{\mathit{valtype}} \\
-	\mbox{(function)} & {\mathit{func}} &::=& \mathsf{func}~{\mathit{typeidx}}~{{\mathit{local}}^\ast}~{\mathit{expr}} \\
-	\mbox{(external index)} & {\mathit{externidx}} &::=& \mathsf{func}~{\mathit{funcidx}} \\
-	\mbox{(export)} & {\mathit{export}} &::=& \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} \\
-	\mbox{(module)} & {\mathit{module}} &::=& \mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} \\
-\end{array}
-$$
+##{syntax+: {type local func externidx export module}}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -409,12 +331,7 @@ Refer to Appendix A-2 for a full version. \\
 Make a new file \K{2-runtime.wastup} and write on it. \\
 
 \subsection{$addr$, $funcaddr$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
-	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
-\end{array}
-$$
+##{syntax+: {addr funcaddr}}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -424,11 +341,7 @@ syntax funcaddr = addr
 }
 
 \subsection{$val$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
-\end{array}
-$$
+##{syntax+: val}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -437,11 +350,7 @@ syntax val = CONST valtype num_(valtype)
 }
 
 \subsection{$externval$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
-\end{array}
-$$
+##{syntax+: externval}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -450,21 +359,7 @@ syntax externval = FUNC funcaddr
 }
 
 \subsection{$funcinst$, $exportinst$, $moduleinst$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{type}~{\mathit{functype}},\; \\
-		\mathsf{module}~{\mathit{moduleinst}},\; \\
-		\mathsf{code}~{\mathit{func}} \}\end{array} \\
-	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{name}~{\mathit{name}},\; \\
-		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
-	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
-		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
-		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
-\end{array}
-$$
+##{syntax+: {funcinst exportinst moduleinst}}
 Use \K{\{} and \K{\}} to indicate records. \\
 {\color{red}
 	Answer:
@@ -484,18 +379,7 @@ syntax moduleinst =
 }
 
 \subsection{$store$, $frame$, $state$, $config$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
-	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
-		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
-	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
-	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
-\end{array}
-$$
-Use \K{;} to indicate pairs. \\
+##{syntax+: {store frame state config}}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -511,14 +395,7 @@ syntax config = state; admininstr*
 }
 
 \subsection{$admininstr$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
-	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	\mathsf{trap} \\
-\end{array}
-$$
+##{syntax+: admininstr}
 Write like below to indicate ??:
 \begin{lcverbatim}
 `{<syntax>}
@@ -536,11 +413,7 @@ syntax admininstr =
 }
 
 \subsection{$\mathrm{funcaddr}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
-\end{array}
-$$
+##{definition: funcaddr}
 Hint: The type declaration of function \K{funcaddr} is as follows:
 \begin{lcverbatim}
 def $funcaddr(state) : funcaddr*
@@ -554,11 +427,7 @@ def $funcaddr((s; f)) = f.MODULE.FUNCS
 }
 
 \subsection{$\mathrm{local}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
-\end{array}
-$$
+##{definition: local}
 Use \K{[} and \K{]} to indicate an index. \\
 Hint: The type declaration of function \K{local} is as follows:
 \begin{lcverbatim}
@@ -573,11 +442,7 @@ def $local((s; f), x) = f.LOCALS[x]
 }
 
 \subsection{$\mathrm{with_{\mathit{local}}}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
-\end{array}
-$$
+##{definition: with_local}
 Hint: The type declaration of function \K{with\_local} is as follows:
 \begin{lcverbatim}
 def $with_local(state, localidx, val) : state
@@ -591,11 +456,7 @@ def $with_local((s; f), x, v) = s; f[.LOCALS[x] = v]
 }
 
 \subsection{$\mathrm{funcinst}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
-\end{array}
-$$
+##{definition: funcinst}
 Hint: The type declaration of function \K{funcinst} is as follows:
 \begin{lcverbatim}
 def $funcinst(state) : funcinst*
@@ -609,12 +470,7 @@ def $funcinst((s; f)) = s.FUNCS
 }
 
 \subsection{${{\mathrm{default}}}_{valtype}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
-\end{array}
-$$
+##{definition: default_}
 Hint: The type declaration of function \K{default\_} is as follows:
 \begin{lcverbatim}
 def $default_(valtype) : val
@@ -653,13 +509,7 @@ Refer to Appendix A-3 for a full version. \\
 Make a new file \K{3-typing.watsup} and write on it. \\
 
 \subsection{$\mathit{context}$}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(context)} & {\mathit{context}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{types}~{{\mathit{functype}}^\ast},\; \mathsf{funcs}~{{\mathit{functype}}^\ast},\; \\
-		\mathsf{locals}~{{\mathit{valtype}}^\ast},\; \mathsf{labels}~{{\mathit{resulttype}}^\ast},\; \mathsf{return}~{{\mathit{resulttype}}^?} \}\end{array} \\
-\end{array}
-$$
+##{syntax+: context}
 {\color{red}
 	Answer:
 %Define \K{context} and its metavariable as below:
@@ -675,11 +525,11 @@ var C : context
 }
 
 \subsection{Types}
-$\boxed{{ \vdash }\;{\mathit{functype}} : \mathsf{ok}}$ \\
-$\boxed{{ \vdash }\;{\mathit{externtype}} : \mathsf{ok}}$ \\\\
+##{relation: Functype_ok}
+##{relation: Externtype_ok}
 Name the two relations \K{Functype\_ok}, and \K{Externtype\_ok}. \\
 Use \K{OK} to indicate the type is valid. \\
-Hint: Refer to Section 5.3. \\
+Hint: Refer to Subsection 2.3. \\
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -689,16 +539,8 @@ relation Externtype_ok: |- externtype : OK
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Functype\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		{ \vdash }\;{t_1^\ast} \rightarrow {t_2^?} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Functype\_ok}]}
-	\qquad
-\end{array}
-$$
-Hint: Refer to Section 5.4. \\
+##{rule+: Functype_ok}
+Hint: Refer to Subsection 2.4. \\
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -708,16 +550,7 @@ rule Functype_ok:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Externtype\_ok-func}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{functype}} : \mathsf{ok}
-	}{
-		{ \vdash }\;\mathsf{func}~{\mathit{functype}} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Externtype\_ok{-}func}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Externtype_ok/func}
 Premise of $[\textsc{\scriptsize Externtype\_ok{-}func}]$ comes from relation \K{Functype\_ok}. \\
 {\color{red}
 	Answer:
@@ -729,8 +562,8 @@ rule Externtype_ok/func:
 }
 
 \subsection{Subtyping}
-$\boxed{{ \vdash }\;{\mathit{functype}} \leq {\mathit{functype}}}$ \\
-$\boxed{{ \vdash }\;{\mathit{externtype}} \leq {\mathit{externtype}}}$\\\\
+##{relation: Functype_sub}
+##{relation: Externtype_sub}
 Name the two relations \K{Functype\_sub}, and \K{Externtype\_sub}. \\
 Use \K{<:} to indicate subtype. \\
 {\color{red}
@@ -742,15 +575,7 @@ relation Externtype_sub: |- externtype <: externtype
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Functype\_sub}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		{ \vdash }\;{\mathit{ft}} \leq {\mathit{ft}}
-	} \, {[\textsc{\scriptsize Functype\_sub}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Functype_sub}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -760,16 +585,7 @@ rule Functype_sub:
 }
   
 \subsubsection{\normalfont\normalsize\textsc {Externtype\_sub-func}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{ft}}_1 \leq {\mathit{ft}}_2
-	}{
-		{ \vdash }\;\mathsf{func}~{\mathit{ft}}_1 \leq \mathsf{func}~{\mathit{ft}}_2
-	} \, {[\textsc{\scriptsize Externtype\_sub{-}func}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Externtype_sub/func}
 Premise of $[\textsc{\scriptsize Externtype\_sub{-}func}]$ comes from relation \K{Functype\_sub}. \\
 {\color{red}
 	Answer:
@@ -781,9 +597,9 @@ rule Externtype_sub/func:
 }
 
 \subsection{Instructions}
-$\boxed{{\mathit{context}} \vdash {\mathit{instr}} : {\mathit{functype}}}$ \\
-$\boxed{{\mathit{context}} \vdash {{\mathit{instr}}^\ast} : {\mathit{functype}}}$ \\
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {\mathit{resulttype}}}$ \\\\
+##{relation: Instr_ok}
+##{relation: Instrs_ok}
+##{relation: Expr_ok}
 Name the three relations \K{Instr\_ok}, \K{Instrs\_ok}, and \K{Expr\_ok}. \\
 {\color{red}
 	Answer:
@@ -795,16 +611,7 @@ relation Expr_ok: context |- expr : resulttype
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Expr\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash {{\mathit{instr}}^\ast} : {t^?}
-	} \, {[\textsc{\scriptsize Expr\_ok}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Expr_ok}
 Premise of $[\textsc{\scriptsize Expr\_ok}]$ comes from relation \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -816,15 +623,7 @@ rule Expr_ok:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instrs\_ok-empty}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \epsilon : \epsilon \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}empty}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instrs_ok/empty}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -834,18 +633,7 @@ rule Instrs_ok/empty:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instrs\_ok-seq}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{instr}}_1 : {t_1^\ast} \rightarrow {t_2^\ast}
-		\qquad
-		C \vdash {\mathit{instr}}_2 : {t_2^\ast} \rightarrow {t_3^\ast}
-	}{
-		C \vdash {\mathit{instr}}_1~{{\mathit{instr}}_2^\ast} : {t_1^\ast} \rightarrow {t_3^\ast}
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}seq}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instrs_ok/seq}
 Premises of $[\textsc{\scriptsize Instrs\_ok{-}seq}]$ come from relation \K{Instr\_ok} and \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -858,16 +646,7 @@ rule Instrs_ok/seq:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instrs\_ok-frame}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {{\mathit{instr}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
-	}{
-		C \vdash {{\mathit{instr}}^\ast} : {t^\ast}~{t_1^\ast} \rightarrow {t^\ast}~{t_2^\ast}
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}frame}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instrs_ok/frame}
 Premise of $[\textsc{\scriptsize Instrs\_ok{-}frame}]$ comes from relation \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -879,15 +658,7 @@ rule Instrs_ok/frame:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-nop}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}nop}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/nop}
 Use \K{eps} to indicate an empty instruction sequence. \\
 {\color{red}
 	Answer:
@@ -898,15 +669,7 @@ rule Instr_ok/nop:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-drop}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{drop} : t \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}drop}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/drop}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -916,15 +679,7 @@ rule Instr_ok/drop:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-select}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{select} : t~t~\mathsf{i{\scriptstyle 32}} \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}select}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/select}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -934,16 +689,7 @@ rule Instr_ok/select:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-block}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash \mathsf{block}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}block}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/block}
 Premise of $[\textsc{\scriptsize Instr\_ok{-}block}]$ comes from relation \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -955,16 +701,7 @@ rule Instr_ok/block:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-loop}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~(\epsilon) \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow \epsilon
-	}{
-		C \vdash \mathsf{loop}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}loop}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/loop}
 Premise of $[\textsc{\scriptsize Instr\_ok{-}loop}]$ comes from relation \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -976,18 +713,7 @@ rule Instr_ok/loop:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-if}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}_1^\ast} : \epsilon \rightarrow {t^?}
-		\qquad
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}_2^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash \mathsf{if}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast} : \mathsf{i{\scriptstyle 32}} \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}if}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/if}
 Premises of $[\textsc{\scriptsize Instr\_ok{-}block}]$ come from relation \K{Instrs\_ok}. \\
 {\color{red}
 	Answer:
@@ -1000,16 +726,7 @@ rule Instr_ok/if:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-br}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{labels}{}[l] = {t^?}
-	}{
-		C \vdash \mathsf{br}~l : {t_1^\ast}~{t^?} \rightarrow {t_2^\ast}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}br}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/br}
 Write like below to indicate a condition:
 \begin{lcverbatim}
 rule Instr_ok/br:
@@ -1026,16 +743,7 @@ rule Instr_ok/br:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-br\_if}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{labels}{}[l] = {t^?}
-	}{
-		C \vdash \mathsf{br\_if}~l : {t^?}~\mathsf{i{\scriptstyle 32}} \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}br\_if}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/br_if}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1046,16 +754,7 @@ rule Instr_ok/br_if:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-call}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{funcs}{}[x] = {t_1^\ast} \rightarrow {t_2^?}
-	}{
-		C \vdash \mathsf{call}~x : {t_1^\ast} \rightarrow {t_2^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}call}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/call}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1066,16 +765,7 @@ rule Instr_ok/call:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-return}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{return} = {t^?}
-	}{
-		C \vdash \mathsf{return} : {t_1^\ast}~{t^?} \rightarrow {t_2^\ast}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}return}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/return}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1086,15 +776,7 @@ rule Instr_ok/return:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-const}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{const}~t~c_t : \epsilon \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}const}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/const}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1104,15 +786,7 @@ rule Instr_ok/const:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-binop}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{binop}~t~{\mathit{binop}}_t : t~t \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}binop}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/binop}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1122,16 +796,7 @@ rule Instr_ok/binop:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-local.get}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{locals}{}[x] = t
-	}{
-		C \vdash \mathsf{local.get}~x : \epsilon \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}local.get}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/local.get}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1142,16 +807,7 @@ rule Instr_ok/local.get:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_ok-local.set}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{locals}{}[x] = t
-	}{
-		C \vdash \mathsf{local.set}~x : t \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}local.set}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_ok/local.set}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1162,9 +818,9 @@ rule Instr_ok/local.set:
 }
 
 \subsection{Constant Expressions}
-$\boxed{{\mathit{context}} \vdash {\mathit{instr}}~\mathsf{const}}$ \\
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}}~\mathsf{const}}$ \\
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {{\mathit{valtype}}^?}~\mathsf{const}}$ \\\\
+##{relation: Instr_const}
+##{relation: Expr_const}
+##{relation: Expr_ok_const}
 Name the three relations \K{Instr\_const}, \K{Expr\_const}, and \K{Expr\_ok\_const}. \\
 {\color{red}
 	Answer:
@@ -1176,15 +832,7 @@ relation Expr_ok_const: context |- expr : valtype? CONST
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Instr\_const-const}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash (\mathsf{const}~t~c)~\mathsf{const}
-	} \, {[\textsc{\scriptsize Instr\_const{-}const}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Instr_const/const}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1194,16 +842,7 @@ rule Instr_const/const:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Expr\_const}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		(C \vdash {\mathit{instr}}~\mathsf{const})^\ast
-	}{
-		C \vdash {{\mathit{instr}}^\ast}~\mathsf{const}
-	} \, {[\textsc{\scriptsize Expr\_const}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Expr_const}
 Premise of $[\textsc{\scriptsize Expr\_const}]$ is a sequence of premise, each one of which comes from relation \K{Instr\_const}. \\
 To indicate a sequence of premise, group a single premise by \K{(} and \K{)}, then use \K{*} . \\
 {\color{red}
@@ -1216,18 +855,7 @@ rule Expr_const:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Expr\_ok\_const}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{expr}} : {t^?}
-		\qquad
-		C \vdash {\mathit{expr}}~\mathsf{const}
-	}{
-		C \vdash {\mathit{expr}} : {t^?}~\mathsf{const}
-	} \, {[\textsc{\scriptsize Expr\_ok\_const}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Expr_ok_const}
 Premises of $[\textsc{\scriptsize Expr\_ok\_const}]$ come from relation \K{Expr\_ok} and \K{Expr\_const}. \\
 {\color{red}
 	Answer:
@@ -1240,11 +868,11 @@ rule Expr_ok_const:
 }
 
 \subsection{Modules}
-$\boxed{{ \vdash }\;{\mathit{type}} : {\mathit{functype}}}$ \\
-$\boxed{{\mathit{context}} \vdash {\mathit{func}} : {\mathit{functype}}}$\\
-$\boxed{{\mathit{context}} \vdash {\mathit{export}} : {\mathit{externtype}}}$ \\
-$\boxed{{\mathit{context}} \vdash {\mathit{externidx}} : {\mathit{externtype}}}$ \\
-$\boxed{{ \vdash }\;{\mathit{module}} : \mathsf{ok}}$ \\\\
+##{relation: Type_ok}
+##{relation: Func_ok}
+##{relation: Export_ok}
+##{relation: Externidx_ok}
+##{relation: Module_ok}
 Name the five relations \K{Type\_ok}, \K{Func\_ok}, \K{Export\_ok}, \K{Externidx\_ok}, and \K{Module\_ok}. \\
 {\color{red}
 	Answer:
@@ -1258,16 +886,7 @@ relation Module_ok: |- module : OK
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Type\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{ft}} : \mathsf{ok}
-	}{
-		{ \vdash }\;\mathsf{type}~{\mathit{ft}} : {\mathit{ft}}
-	} \, {[\textsc{\scriptsize Type\_ok}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Type_ok}
 Premise of $[\textsc{\scriptsize Type\_ok}]$ comes from relation \K{Functype\_ok}. \\
 {\color{red}
 	Answer:
@@ -1279,18 +898,7 @@ rule Type_ok:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Func\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{types}{}[x] = {t_1^\ast} \rightarrow {t_2^?}
-		\qquad
-		C, \mathsf{locals}~{t_1^\ast}~{t^\ast}, \mathsf{labels}~({t_2^?}), \mathsf{return}~({t_2^?}) \vdash {\mathit{expr}} : {t_2^?}
-	}{
-		C \vdash \mathsf{func}~x~{(\mathsf{local}~t)^\ast}~{\mathit{expr}} : {t_1^\ast} \rightarrow {t_2^?}
-	} \, {[\textsc{\scriptsize Func\_ok}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Func_ok}
 The second premise of $[\textsc{\scriptsize Func\_ok}]$ comes from relation \K{Expr\_ok}. \\
 {\color{red}
 	Answer:
@@ -1303,16 +911,7 @@ rule Func_ok:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Export\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{externidx}} : {\mathit{xt}}
-	}{
-		C \vdash \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} : {\mathit{xt}}
-	} \, {[\textsc{\scriptsize Export\_ok}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Export_ok}
 Premise of $[\textsc{\scriptsize Export\_ok}]$ comes from relation \K{Externidx\_ok}. \\
 {\color{red}
 	Answer:
@@ -1324,16 +923,7 @@ rule Export_ok:
 }
   
 \subsubsection{\normalfont\normalsize\textsc {Externidx\_ok-func}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{funcs}{}[x] = {\mathit{ft}}
-	}{
-		C \vdash \mathsf{func}~x : \mathsf{func}~{\mathit{ft}}
-	} \, {[\textsc{\scriptsize Externidx\_ok{-}func}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Externidx_ok/func}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1344,27 +934,10 @@ rule Externidx_ok/func:
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Module\_ok}}
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		({ \vdash }\;{\mathit{type}} : {\mathit{ft}'})^\ast
-		\qquad
-		(C \vdash {\mathit{func}} : {\mathit{ft}})^\ast
-		\qquad
-		(C \vdash {\mathit{export}} : {\mathit{xt}})^\ast
-		\qquad
-		C = \{ \begin{array}[t]{@{}l@{}}
-			\mathsf{types}~{{\mathit{ft}'}^\ast},\; \mathsf{funcs}~{{\mathit{ift}}^\ast}~{{\mathit{ft}}^\ast} \}\end{array}
-	}{
-		{ \vdash }\;\mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Module\_ok}]}
-	\qquad
-\end{array}
-$$
+##{rule+: Module_ok}
 The first premise of $[\textsc{\scriptsize Module\_ok}]$ is a sequence of premise, each one of which comes from relation \K{Type\_ok}. \\
 The second premise of $[\textsc{\scriptsize Module\_ok}]$ is a sequence of premise, each one of which comes from relation \K{Func\_ok}. \\
 The third premise of $[\textsc{\scriptsize Module\_ok}]$ is a sequence of premise, each one of which comes from relation \K{Export\_ok}. \\
-The 
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1405,29 +978,11 @@ Make a new file \K{4-reduction.wastup} and write on it.
 %Now we'll declare each of the reduction rules one by one.
 
 \subsection{Relations}
-
-$\boxed{{\mathit{config}} \hookrightarrow {\mathit{config}}}$ \\
-$\boxed{{{\mathit{admininstr}}^\ast} \hookrightarrow {{\mathit{admininstr}}^\ast}}$ \\
-$\boxed{{\mathit{config}} \hookrightarrow {{\mathit{admininstr}}^\ast}}$ \\
-$\boxed{{\mathit{config}} \hookrightarrow^\ast {\mathit{config}}}$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}pure}]} \quad & z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
-	&\qquad \mbox{if}~{{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step{-}read}]} \quad & z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
-	&\qquad \mbox{if}~z ; {{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Steps{-}refl}]} \quad & z ; {{\mathit{admininstr}}^\ast} &\hookrightarrow^\ast& z ; {{\mathit{admininstr}}^\ast} \\
-	{[\textsc{\scriptsize Steps{-}trans}]} \quad & z ; {{\mathit{admininstr}}^\ast} &\hookrightarrow^\ast& {z''} ; {{\mathit{admininstr}''}^\ast}
-	&\qquad \mbox{if}~z ; {{\mathit{admininstr}}^\ast} \hookrightarrow {z'} ; {{\mathit{admininstr}'}^\ast} \\
-	&&&&\qquad {\land}~{z'} ; {\mathit{admininstr}'} \hookrightarrow^\ast {z''} ; {{\mathit{admininstr}''}^\ast} \\
-\end{array}
-$$
+##{relation: Step}
+##{relation: Step_pure}
+##{relation: Step_read}
+##{relation: Steps}
+##{rule+: {Step/pure Step/read Steps/refl Steps/trans}}
 Name the four relations \K{Step}, \K{Step\_pure}, \K{Step\_read}, and \K{Steps}. \\
 Premise of $[\textsc{\scriptsize Step{-}pure}]$ comes from relation \K{Step\_pure}. \\
 Premise of $[\textsc{\scriptsize Step{-}read}]$ comes from relation \K{Step\_read}. \\
@@ -1460,11 +1015,7 @@ rule Steps/trans:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure-nop}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}nop}]} \quad & \mathsf{nop} &\hookrightarrow& \epsilon \\
-\end{array}
-$$
+##{rule+: Step_pure/nop}
 %Use metavariable \K{z} for a \K{state}. \\\\
 {\color{red}
 	Answer:
@@ -1475,11 +1026,7 @@ rule Step_pure/nop:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure-drop}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}drop}]} \quad & {\mathit{val}}~\mathsf{drop} &\hookrightarrow& \epsilon \\
-\end{array}
-$$
+##{rule+: Step_pure/drop}
 %Use following syatax \K{val}, which is defined in \K{4-runtime.watsup}:
 %\begin{lcverbatim}
 %syntax val = CONST valtype val_(valtype)
@@ -1494,14 +1041,7 @@ rule Step_pure/drop:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}select}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}select{-}true}]} \quad & {\mathit{val}}_1~{\mathit{val}}_2~(\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~\mathsf{select} &\hookrightarrow& {\mathit{val}}_1
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}select{-}false}]} \quad & {\mathit{val}}_1~{\mathit{val}}_2~(\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~\mathsf{select} &\hookrightarrow& {\mathit{val}}_2
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
+##{rule+: Step_pure/select-*}
 When we get \K{SELECT} from stack, we have two cases: condition is true or false. \\
 Define each of the case as seperate rule as follows:
 \begin{lcverbatim}
@@ -1529,12 +1069,7 @@ rule Step_pure/select-false:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_read{-}block}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}block}]} \quad & z ; (\mathsf{block}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({\mathsf{label}}_{n}\,\{ \epsilon \}~{{\mathit{instr}}^\ast})
-	&\qquad \mbox{if}~{t^?} = \epsilon \land n = 0 \lor {t^?} \neq \epsilon \land n = 1 \\
-\end{array}
-$$
+##{rule+: Step_read/block}
 Use \K{/\symbol{92}} and \K{\symbol{92}/} for logical and/or.
 %To indicate a label, refer to following syntax:
 %\begin{lcverbatim}
@@ -1558,11 +1093,7 @@ rule Step_pure/block:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_read{-}loop}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}loop}]} \quad & z ; (\mathsf{loop}~{\mathit{ft}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({\mathsf{label}}_{0}\,\{ \mathsf{loop}~{\mathit{ft}}~{{\mathit{instr}}^\ast} \}~{{\mathit{instr}}^\ast}) \\
-\end{array}
-$$
+##{rule+: Step_read/loop}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1572,14 +1103,7 @@ rule Step_pure/loop:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}if}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}if{-}true}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{if}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast})
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}if{-}false}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{if}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{ft}}~{{\mathit{instr}}_2^\ast})
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
+##{rule+: Step_pure/if-*}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1594,12 +1118,7 @@ rule Step_pure/if-false:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}br}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}br{-}zero}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{n}}~(\mathsf{br}~0)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{n}}~{{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step\_pure{-}br{-}succ}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}}^\ast}~(\mathsf{br}~l + 1)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~(\mathsf{br}~l) \\
-\end{array}
-$$
+##{rule+: Step_pure/br-*}
 For arithmetic expressions, you should write like \K{\$(l+1)}, instead of \K{l+1}.\\
 Use \K{\^} for a sequence with given length. e.g. \K{instr}\K{\^}\K{n}. \\\\
 {\color{red}
@@ -1614,14 +1133,7 @@ rule Step_pure/br-succ:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}br\_if}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}br\_if{-}true}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{br\_if}~l) &\hookrightarrow& (\mathsf{br}~l)
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}br\_if{-}false}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{br\_if}~l) &\hookrightarrow& \epsilon
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
+##{rule+: Step_pure/br_if-*}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1636,17 +1148,7 @@ rule Step_pure/br_if-false:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_read{-}call}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}call}]} \quad & z ; {{\mathit{val}}^{k}}~(\mathsf{call}~x) &\hookrightarrow& ({\mathsf{frame}}_{n}\,\{ f \}~({\mathsf{label}}_{n}\,\{ \epsilon \}~{{\mathit{instr}}^\ast}))
-	&\qquad \mbox{if}~a = {\mathrm{funcaddr}}(z){}[x] \\
-	&&&&\qquad {\land}~{\mathrm{funcinst}}(z){}[a] = \{ \begin{array}[t]{@{}l@{}}
-		\mathsf{type}~({t_1^{k}} \rightarrow {t_2^{n}}),\; \mathsf{module}~{\mathit{mm}},\; \mathsf{code}~{\mathit{func}} \}\end{array} \\
-	&&&&\qquad {\land}~{\mathit{func}} = \mathsf{func}~x~{(\mathsf{local}~t)^\ast}~{{\mathit{instr}}^\ast} \\
-	&&&&\qquad {\land}~f = \{ \begin{array}[t]{@{}l@{}}
-		\mathsf{locals}~{{\mathit{val}}^{k}}~{({{\mathrm{default}}}_{t})^\ast},\; \mathsf{module}~{\mathit{mm}} \}\end{array} \\
-\end{array}
-$$
+##{rule+: Step_read/call}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1660,11 +1162,7 @@ rule Step_read/call:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}frame{-}vals}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}frame{-}vals}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~{{\mathit{val}}^{n}}) &\hookrightarrow& {{\mathit{val}}^{n}} \\
-\end{array}
-$$
+##{rule+: Step_pure/frame-vals}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1674,12 +1172,7 @@ rule Step_pure/frame-vals:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}return}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}return{-}frame}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{n}}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{n}} \\
-	{[\textsc{\scriptsize Step\_pure{-}return{-}label}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}}^\ast}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~\mathsf{return} \\
-\end{array}
-$$
+##{rule+: Step_pure/return-*}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1692,14 +1185,7 @@ rule Step_pure/return-label:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}trap}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}vals}]} \quad & {{\mathit{val}}^\ast}~\mathsf{trap}~{{\mathit{instr}}^\ast} &\hookrightarrow& \mathsf{trap}
-	&\qquad \mbox{if}~{{\mathit{val}}^\ast} \neq \epsilon \lor {{\mathit{instr}}^\ast} \neq \epsilon \\
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}label}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~\mathsf{trap}) &\hookrightarrow& \mathsf{trap} \\
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}frame}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~\mathsf{trap}) &\hookrightarrow& \mathsf{trap} \\
-\end{array}
-$$
+##{rule+: Step_pure/trap-*}
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
@@ -1716,14 +1202,7 @@ rule Step_pure/trap-frame:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step{-}ctxt}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}ctxt{-}label}]} \quad & z ; ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}}_0^\ast} \}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {z'} ; ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}}_0^\ast} \}~{{\mathit{instr}'}^\ast})
-	&\qquad \mbox{if}~z ; {{\mathit{instr}}^\ast} \hookrightarrow {z'} ; {{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step{-}ctxt{-}frame}]} \quad & s ; f ; ({\mathsf{frame}}_{n}\,\{ {f'} \}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {s'} ; f ; ({\mathsf{frame}}_{n}\,\{ {f'} \}~{{\mathit{instr}'}^\ast})
-	&\qquad \mbox{if}~s ; {f'} ; {{\mathit{instr}}^\ast} \hookrightarrow {s'} ; {f'} ; {{\mathit{instr}'}^\ast} \\
-\end{array}
-$$
+##{rule+: Step/ctxt-*}
 Premise of $[\textsc{\scriptsize Step{-}ctxt{-}label}]$ comes from relation \K{Step}. \\
 Premise of $[\textsc{\scriptsize Step{-}ctxt{-}frame}]$ comes from relation \K{Step}. \\
 {\color{red}
@@ -1741,27 +1220,7 @@ rule Step/ctxt-frame:
 
 \subsection{\normalfont\normalsize\textsc {Step\_pure{-}binop}}
 \subsubsection{$\mathrm{iadd}$, $\mathrm{isub}$, $\mathrm{imul}$, $\mathrm{idiv}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{iadd}}(N, c_1, c_2) &=& (c_1 + c_2) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{isub}}(N, c_1, c_2) &=& (c_1 - c_2 + {2^{N}}) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{imul}}(N, c_1, c_2) &=& (c_1 \cdot c_2) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{idiv}}(N, c_1, 0) &=& \epsilon \\
-	{\mathrm{idiv}}(N, c_1, c_2) &=& c_1 / c_2 \\
-\end{array}
-$$
+##{definition: iadd isub imul idiv}
 Use \K{\symbol{92}} to indicate modular calculation. \\
 Hint: The type declaration of functions \K{iadd}, \K{isub}, \K{imul}, and \K{idiv} is as follows:
 \begin{lcverbatim}
@@ -1786,14 +1245,7 @@ def $idiv(N, c_1, c_2) = $(c_1 / c_2)
 }
 
 \subsubsection{$\mathrm{binop}$}
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{binop}}(t, \mathsf{add}, c_1, c_2) &=& {\mathrm{iadd}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{sub}, c_1, c_2) &=& {\mathrm{isub}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{mul}, c_1, c_2) &=& {\mathrm{imul}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{div}, c_1, c_2) &=& {\mathrm{idiv}}({\mathrm{size}}(t), c_1, c_2) \\
-\end{array}
-$$
+##{definition: binop}
 Hint: The type declaration of function \K{binop} is as follows:
 \begin{lcverbatim}
 def $binop(valtype, binop, num_(valtype), num_(valtype)) : num_(valtype)*
@@ -1811,14 +1263,7 @@ def $binop(t, DIV, c_1, c_2) = $idiv($size(t), c_1, c_2)
 }
 
 \subsubsection{\normalfont\normalsize\textsc {Step\_pure{-}binop}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}binop{-}val}]} \quad & (\mathsf{const}~t~c_1)~(\mathsf{const}~t~c_2)~(\mathsf{binop}~t~{\mathit{binop}}) &\hookrightarrow& (\mathsf{const}~t~c)
-	&\qquad \mbox{if}~{\mathrm{binop}}(t, {\mathit{binop}}, c_1, c_2) = c \\
-	{[\textsc{\scriptsize Step\_pure{-}binop{-}trap}]} \quad & (\mathsf{const}~t~c_1)~(\mathsf{const}~t~c_2)~(\mathsf{binop}~t~{\mathit{binop}}) &\hookrightarrow& \mathsf{trap}
-	&\qquad \mbox{if}~{\mathrm{binop}}(t, {\mathit{binop}}, c_1, c_2) = \epsilon \\
-\end{array}
-$$
+##{rule+: Step_pure/binop-*}
 %When we get \K{BINOP} from stack, there are three cases for \K{binop\_(valtype)}: \K{ADD}, \K{SUB}, \K{MUL}. \\
 %Define each of the case as seperate rule, and use built-in functions \K{iadd}, \K{isub}, \K{imul} as follows:
 %\begin{lcverbatim}
@@ -1853,26 +1298,18 @@ rule Step_pure/binop-trap:
 }
 
 \subsection{\normalfont\normalsize\textsc {Step\_read{-}local.get}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}local.get}]} \quad & z ; (\mathsf{local.get}~x) &\hookrightarrow& {\mathrm{local}}(z, x) \\
-\end{array}
-$$
+##{rule+: Step_read/local.get}
 %To get a local value from \K{state z} and \K{idx x}, write \K{\$local(z, x)}.\\\\
 {\color{red}
 	Answer:
 	\begin{lcverbatim}
-rule Step/local.get:
-  z; (LOCAL.GET x)  ~>  z; $local(z, x)
+rule Step_read/local.get:
+  z; (LOCAL.GET x)  ~>  $local(z, x)
 	\end{lcverbatim}
 }
 
 \subsection{\normalfont\normalsize\textsc {Step{-}local.set}}
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}local.set}]} \quad & z ; {\mathit{val}}~(\mathsf{local.set}~x) &\hookrightarrow& {\mathrm{with}}_{\mathit{local}}(z, x, {\mathit{val}}) ; \epsilon \\
-\end{array}
-$$
+##{rule+: Step/local.set}
 %To get a new state which is exactly same with \K{state z} except that its local value with \K{idx x} is \K{val v}, write \K{\$with\_local(z, x, v)}.\\\\
 {\color{red}
 	Answer:
@@ -1883,831 +1320,106 @@ rule Step/local.set:
 }
 
 \appendix
-\section{Appendices}
+\section{Appendix}
 \subsection{Basic Syntax}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& N &::=& \mathbb{N} \\
-	& n &::=& \mathbb{N} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(integer)} & {\mathit{iN}}(N) &::=& 0 ~|~ \dots ~|~ {2^{N}} - 1 \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(character)} & {\mathit{char}} &::=& \mathrm{U{+}00} ~|~ \dots ~|~ \mathrm{U{+}D7FF} ~|~ \mathrm{U{+}E000} ~|~ \dots ~|~ \mathrm{U{+}10FFFF} \\
-	\mbox{(name)} & {\mathit{name}} &::=& {{\mathit{char}}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(index)} & {\mathit{idx}} &::=& {\mathit{iN}}(32) \\
-	\mbox{(type index)} & {\mathit{typeidx}} &::=& {\mathit{idx}} \\
-	\mbox{(function index)} & {\mathit{funcidx}} &::=& {\mathit{idx}} \\
-	\mbox{(label index)} & {\mathit{labelidx}} &::=& {\mathit{idx}} \\
-	\mbox{(local index)} & {\mathit{localidx}} &::=& {\mathit{idx}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(number type)} & {\mathit{valtype}} &::=& \mathsf{i{\scriptstyle 32}} ~|~ \mathsf{i{\scriptstyle 64}} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(function type)} & {\mathit{functype}} &::=& {{\mathit{valtype}}^\ast} \rightarrow {{\mathit{valtype}}^\ast} \\
-	\mbox{(result type)} & {\mathit{resulttype}} &::=& {{\mathit{valtype}}^?} \\
-	\mbox{(external type)} & {\mathit{externtype}} &::=& \mathsf{func}~{\mathit{functype}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{size}}(\mathsf{i{\scriptstyle 32}}) &=& 32 \\
-	{\mathrm{size}}(\mathsf{i{\scriptstyle 64}}) &=& 64 \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& {{\mathit{num}}}_{{\mathit{valtype}}} &::=& {\mathit{iN}}({\mathrm{size}}({\mathit{valtype}})) \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	& {\mathit{binop}} &::=& \mathsf{add} ~|~ \mathsf{sub} ~|~ \mathsf{mul} ~|~ \mathsf{div} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(instruction)} & {\mathit{instr}} &::=& \mathsf{nop} \\ &&|&
-	\mathsf{drop} \\ &&|&
-	\mathsf{select} \\ &&|&
-	\mathsf{block}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{loop}~{\mathit{functype}}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{if}~{\mathit{functype}}~{{\mathit{instr}}^\ast}~\mathsf{else}~{{\mathit{instr}}^\ast} \\ &&|&
-	\mathsf{br}~{\mathit{labelidx}} \\ &&|&
-	\mathsf{br\_if}~{\mathit{labelidx}} \\ &&|&
-	\mathsf{call}~{\mathit{funcidx}} \\ &&|&
-	\mathsf{return} \\ &&|&
-	\mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\ &&|&
-	\mathsf{binop}~{\mathit{valtype}}~{\mathit{binop}} \\ &&|&
-	\mathsf{local.get}~{\mathit{localidx}} \\ &&|&
-	\mathsf{local.set}~{\mathit{localidx}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(expression)} & {\mathit{expr}} &::=& {{\mathit{instr}}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(type)} & {\mathit{type}} &::=& \mathsf{type}~{\mathit{functype}} \\
-	\mbox{(local)} & {\mathit{local}} &::=& \mathsf{local}~{\mathit{valtype}} \\
-	\mbox{(function)} & {\mathit{func}} &::=& \mathsf{func}~{\mathit{typeidx}}~{{\mathit{local}}^\ast}~{\mathit{expr}} \\
-	\mbox{(external index)} & {\mathit{externidx}} &::=& \mathsf{func}~{\mathit{funcidx}} \\
-	\mbox{(export)} & {\mathit{export}} &::=& \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} \\
-	\mbox{(module)} & {\mathit{module}} &::=& \mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} \\
-\end{array}
-$$
+##{syntax+: {N n}}
+##{syntax+: {iN}}
+##{syntax+: {char name}}
+##{syntax+: idx {typeidx funcidx labelidx localidx}}
+##{syntax+: valtype}
+##{syntax+: functype}
+##{syntax+: externtype}
+##{definition: size}
+##{syntax+: num_}
+##{syntax+: binop}
+##{syntax+: instr}
+##{syntax+: expr}
+##{syntax+: {type local func externidx export module}}
 
 \subsection{Runtime-Related Syntax}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(address)} & {\mathit{addr}} &::=& \mathbb{N} \\
-	\mbox{(function address)} & {\mathit{funcaddr}} &::=& {\mathit{addr}} \\
-\end{array}
-$$
+##{syntax+: {addr funcaddr}}
+##{syntax+: val}
+##{syntax+: externval}
+##{syntax+: {funcinst exportinst moduleinst}}
+##{syntax+: {store frame state config}}
+##{syntax+: admininstr}
+##{definition: funcaddr}
+##{definition: local}
+##{definition: with_local}
+##{definition: funcinst}
+##{definition: default_}
+##{syntax+: context}
 
-\vspace{1ex}
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(value)} & {\mathit{val}} &::=& \mathsf{const}~{\mathit{valtype}}~{{\mathit{num}}}_{{\mathit{valtype}}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(external value)} & {\mathit{externval}} &::=& \mathsf{func}~{\mathit{funcaddr}} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(function instance)} & {\mathit{funcinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{type}~{\mathit{functype}},\; \\
-		\mathsf{module}~{\mathit{moduleinst}},\; \\
-		\mathsf{code}~{\mathit{func}} \}\end{array} \\
-	\mbox{(export instance)} & {\mathit{exportinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{name}~{\mathit{name}},\; \\
-		\mathsf{value}~{\mathit{externval}} \}\end{array} \\
-	\mbox{(module instance)} & {\mathit{moduleinst}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{types}~{{\mathit{functype}}^\ast},\; \\
-		\mathsf{funcs}~{{\mathit{funcaddr}}^\ast},\; \\
-		\mathsf{exports}~{{\mathit{exportinst}}^\ast} \}\end{array} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(store)} & {\mathit{store}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{funcs}~{{\mathit{funcinst}}^\ast} \}\end{array} \\
-	\mbox{(frame)} & {\mathit{frame}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{locals}~{{\mathit{val}}^\ast},\; \\
-		\mathsf{module}~{\mathit{moduleinst}} \}\end{array} \\
-	\mbox{(state)} & {\mathit{state}} &::=& {\mathit{store}} ; {\mathit{frame}} \\
-	\mbox{(configuration)} & {\mathit{config}} &::=& {\mathit{state}} ; {{\mathit{admininstr}}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(administrative instruction)} & {\mathit{admininstr}} &::=& {\mathit{instr}} \\ &&|&
-	{\mathsf{label}}_{n}\,\{ {{\mathit{instr}}^\ast} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	{\mathsf{frame}}_{n}\,\{ {\mathit{frame}} \}~{{\mathit{admininstr}}^\ast} \\ &&|&
-	\mathsf{trap} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcaddr}}((s ; f)) &=& f{.}\mathsf{module}{.}\mathsf{funcs} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{local}}((s ; f), x) &=& f{.}\mathsf{locals}{}[x] \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{with}}_{\mathit{local}}((s ; f), x, v) &=& s ; f{}[{.}\mathsf{locals}{}[x] = v] \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{funcinst}}((s ; f)) &=& s{.}\mathsf{funcs} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 32}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~0) \\
-	{{\mathrm{default}}}_{\mathsf{i{\scriptstyle 64}}} &=& (\mathsf{const}~\mathsf{i{\scriptstyle 64}}~0) \\
-\end{array}
-$$
 \subsection{Context, Validation Rules}
-$$
-\begin{array}{@{}lrrl@{}l@{}}
-	\mbox{(context)} & {\mathit{context}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
-		\mathsf{types}~{{\mathit{functype}}^\ast},\; \mathsf{funcs}~{{\mathit{functype}}^\ast},\; \\
-		\mathsf{locals}~{{\mathit{valtype}}^\ast},\; \mathsf{labels}~{{\mathit{resulttype}}^\ast},\; \mathsf{return}~{{\mathit{resulttype}}^?} \}\end{array} \\
-\end{array}
-$$
+##{relation: Functype_ok}
+##{relation: Externtype_ok}
+##{rule+: Functype_ok}
+##{rule+: Externtype_ok/func}
+##{relation: Functype_sub}
+##{relation: Externtype_sub}
+##{rule+: Functype_sub}
+##{rule+: Externtype_sub/func}
+##{relation: Instr_ok}
+##{relation: Instrs_ok}
+##{relation: Expr_ok}
+##{rule+: Expr_ok}
+##{rule+: Instrs_ok/empty}
+##{rule+: Instrs_ok/seq}
+##{rule+: Instrs_ok/frame}
+##{rule+: Instr_ok/nop}
+##{rule+: Instr_ok/drop}
+##{rule+: Instr_ok/select}
+##{rule+: Instr_ok/block}
+##{rule+: Instr_ok/loop}
+##{rule+: Instr_ok/if}
+##{rule+: Instr_ok/br}
+##{rule+: Instr_ok/br_if}
+##{rule+: Instr_ok/call}
+##{rule+: Instr_ok/return}
+##{rule+: Instr_ok/const}
+##{rule+: Instr_ok/binop}
+##{rule+: Instr_ok/local.get}
+##{rule+: Instr_ok/local.set}
+##{relation: Instr_const}
+##{relation: Expr_const}
+##{relation: Expr_ok_const}
+##{rule+: Instr_const/const}
+##{rule+: Expr_const}
+##{rule+: Expr_ok_const}
+##{relation: Type_ok}
+##{relation: Func_ok}
+##{relation: Export_ok}
+##{relation: Externidx_ok}
+##{relation: Module_ok}
+##{rule+: Type_ok}
+##{rule+: Func_ok}
+##{rule+: Export_ok}
+##{rule+: Externidx_ok/func}
+##{rule+: Module_ok}
 
-\vspace{1ex}
-
-$\boxed{{ \vdash }\;{\mathit{functype}} : \mathsf{ok}}$
-
-$\boxed{{ \vdash }\;{\mathit{externtype}} : \mathsf{ok}}$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		{ \vdash }\;{t_1^\ast} \rightarrow {t_2^?} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Functype\_ok}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{functype}} : \mathsf{ok}
-	}{
-		{ \vdash }\;\mathsf{func}~{\mathit{functype}} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Externtype\_ok{-}func}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{ \vdash }\;{\mathit{functype}} \leq {\mathit{functype}}}$
-
-$\boxed{{ \vdash }\;{\mathit{externtype}} \leq {\mathit{externtype}}}$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		{ \vdash }\;{\mathit{ft}} \leq {\mathit{ft}}
-	} \, {[\textsc{\scriptsize Functype\_sub}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{ft}}_1 \leq {\mathit{ft}}_2
-	}{
-		{ \vdash }\;\mathsf{func}~{\mathit{ft}}_1 \leq \mathsf{func}~{\mathit{ft}}_2
-	} \, {[\textsc{\scriptsize Externtype\_sub{-}func}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{\mathit{context}} \vdash {\mathit{instr}} : {\mathit{functype}}}$
-
-$\boxed{{\mathit{context}} \vdash {{\mathit{instr}}^\ast} : {\mathit{functype}}}$
-
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {\mathit{resulttype}}}$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash {{\mathit{instr}}^\ast} : {t^?}
-	} \, {[\textsc{\scriptsize Expr\_ok}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \epsilon : \epsilon \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}empty}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{instr}}_1 : {t_1^\ast} \rightarrow {t_2^\ast}
-		\qquad
-		C \vdash {\mathit{instr}}_2 : {t_2^\ast} \rightarrow {t_3^\ast}
-	}{
-		C \vdash {\mathit{instr}}_1~{{\mathit{instr}}_2^\ast} : {t_1^\ast} \rightarrow {t_3^\ast}
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}seq}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {{\mathit{instr}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
-	}{
-		C \vdash {{\mathit{instr}}^\ast} : {t^\ast}~{t_1^\ast} \rightarrow {t^\ast}~{t_2^\ast}
-	} \, {[\textsc{\scriptsize Instrs\_ok{-}frame}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{nop} : \epsilon \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}nop}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{drop} : t \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}drop}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{select} : t~t~\mathsf{i{\scriptstyle 32}} \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}select}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash \mathsf{block}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}block}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~(\epsilon) \vdash {{\mathit{instr}}^\ast} : \epsilon \rightarrow \epsilon
-	}{
-		C \vdash \mathsf{loop}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast} : \epsilon \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}loop}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}_1^\ast} : \epsilon \rightarrow {t^?}
-		\qquad
-		C, \mathsf{labels}~({t^?}) \vdash {{\mathit{instr}}_2^\ast} : \epsilon \rightarrow {t^?}
-	}{
-		C \vdash \mathsf{if}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast} : \mathsf{i{\scriptstyle 32}} \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}if}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{labels}{}[l] = {t^?}
-	}{
-		C \vdash \mathsf{br}~l : {t_1^\ast}~{t^?} \rightarrow {t_2^\ast}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}br}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{labels}{}[l] = {t^?}
-	}{
-		C \vdash \mathsf{br\_if}~l : {t^?}~\mathsf{i{\scriptstyle 32}} \rightarrow {t^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}br\_if}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{funcs}{}[x] = {t_1^\ast} \rightarrow {t_2^?}
-	}{
-		C \vdash \mathsf{call}~x : {t_1^\ast} \rightarrow {t_2^?}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}call}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{return} = {t^?}
-	}{
-		C \vdash \mathsf{return} : {t_1^\ast}~{t^?} \rightarrow {t_2^\ast}
-	} \, {[\textsc{\scriptsize Instr\_ok{-}return}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{const}~t~c_t : \epsilon \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}const}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash \mathsf{binop}~t~{\mathit{binop}}_t : t~t \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}binop}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{locals}{}[x] = t
-	}{
-		C \vdash \mathsf{local.get}~x : \epsilon \rightarrow t
-	} \, {[\textsc{\scriptsize Instr\_ok{-}local.get}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{locals}{}[x] = t
-	}{
-		C \vdash \mathsf{local.set}~x : t \rightarrow \epsilon
-	} \, {[\textsc{\scriptsize Instr\_ok{-}local.set}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{\mathit{context}} \vdash {\mathit{instr}}~\mathsf{const}}$
-
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}}~\mathsf{const}}$
-
-$\boxed{{\mathit{context}} \vdash {\mathit{expr}} : {{\mathit{valtype}}^?}~\mathsf{const}}$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-	}{
-		C \vdash (\mathsf{const}~t~c)~\mathsf{const}
-	} \, {[\textsc{\scriptsize Instr\_const{-}const}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		(C \vdash {\mathit{instr}}~\mathsf{const})^\ast
-	}{
-		C \vdash {{\mathit{instr}}^\ast}~\mathsf{const}
-	} \, {[\textsc{\scriptsize Expr\_const}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{expr}} : {t^?}
-		\qquad
-		C \vdash {\mathit{expr}}~\mathsf{const}
-	}{
-		C \vdash {\mathit{expr}} : {t^?}~\mathsf{const}
-	} \, {[\textsc{\scriptsize Expr\_ok\_const}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{ \vdash }\;{\mathit{type}} : {\mathit{functype}}}$
-
-$\boxed{{\mathit{context}} \vdash {\mathit{func}} : {\mathit{functype}}}$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		{ \vdash }\;{\mathit{ft}} : \mathsf{ok}
-	}{
-		{ \vdash }\;\mathsf{type}~{\mathit{ft}} : {\mathit{ft}}
-	} \, {[\textsc{\scriptsize Type\_ok}]}
-	\qquad
-\end{array}
-$$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{types}{}[x] = {t_1^\ast} \rightarrow {t_2^?}
-		\qquad
-		C, \mathsf{locals}~{t_1^\ast}~{t^\ast}, \mathsf{labels}~({t_2^?}), \mathsf{return}~({t_2^?}) \vdash {\mathit{expr}} : {t_2^?}
-	}{
-		C \vdash \mathsf{func}~x~{(\mathsf{local}~t)^\ast}~{\mathit{expr}} : {t_1^\ast} \rightarrow {t_2^?}
-	} \, {[\textsc{\scriptsize Func\_ok}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{\mathit{context}} \vdash {\mathit{export}} : {\mathit{externtype}}}$
-
-$\boxed{{\mathit{context}} \vdash {\mathit{externidx}} : {\mathit{externtype}}}$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C \vdash {\mathit{externidx}} : {\mathit{xt}}
-	}{
-		C \vdash \mathsf{export}~{\mathit{name}}~{\mathit{externidx}} : {\mathit{xt}}
-	} \, {[\textsc{\scriptsize Export\_ok}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		C{.}\mathsf{funcs}{}[x] = {\mathit{ft}}
-	}{
-		C \vdash \mathsf{func}~x : \mathsf{func}~{\mathit{ft}}
-	} \, {[\textsc{\scriptsize Externidx\_ok{-}func}]}
-	\qquad
-\end{array}
-$$
-
-\vspace{1ex}
-
-$\boxed{{ \vdash }\;{\mathit{module}} : \mathsf{ok}}$
-
-$$
-\begin{array}{@{}c@{}}\displaystyle
-	\frac{
-		({ \vdash }\;{\mathit{type}} : {\mathit{ft}'})^\ast
-		\qquad
-		(C \vdash {\mathit{func}} : {\mathit{ft}})^\ast
-		\qquad
-		(C \vdash {\mathit{export}} : {\mathit{xt}})^\ast
-		\qquad
-		C = \{ \begin{array}[t]{@{}l@{}}
-			\mathsf{types}~{{\mathit{ft}'}^\ast},\; \mathsf{funcs}~{{\mathit{ift}}^\ast}~{{\mathit{ft}}^\ast} \}\end{array}
-	}{
-		{ \vdash }\;\mathsf{module}~{{\mathit{type}}^\ast}~{{\mathit{func}}^\ast}~{{\mathit{export}}^\ast} : \mathsf{ok}
-	} \, {[\textsc{\scriptsize Module\_ok}]}
-	\qquad
-\end{array}
-$$
 \subsection{Reduction Rules}
+##{relation: Step}
+##{relation: Step_pure}
+##{relation: Step_read}
+##{relation: Steps}
+##{rule+: {Step/pure Step/read Steps/refl Steps/trans}}
+##{rule+: Step_pure/nop}
+##{rule+: Step_pure/drop}
+##{rule+: Step_pure/select-*}
+##{rule+: Step_read/block}
+##{rule+: Step_read/loop}
+##{rule+: Step_pure/if-*}
+##{rule+: Step_pure/br-*}
+##{rule+: Step_pure/br_if-*}
+##{rule+: Step_read/call}
+##{rule+: Step_pure/frame-vals}
+##{rule+: Step_pure/return-*}
+##{rule+: Step_pure/trap-*}
+##{rule+: Step/ctxt-*}
+##{definition: iadd isub imul idiv}
+##{definition: binop}
+##{rule+: Step_pure/binop-*}
+##{rule+: Step_read/local.get}
+##{rule+: Step/local.set}
 
-$$$$
-
-$\boxed{{\mathit{config}} \hookrightarrow {\mathit{config}}}$
-
-$\boxed{{{\mathit{admininstr}}^\ast} \hookrightarrow {{\mathit{admininstr}}^\ast}}$
-
-$\boxed{{\mathit{config}} \hookrightarrow {{\mathit{admininstr}}^\ast}}$
-
-$\boxed{{\mathit{config}} \hookrightarrow^\ast {\mathit{config}}}$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}pure}]} \quad & z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
-	&\qquad \mbox{if}~{{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step{-}read}]} \quad & z ; {{\mathit{instr}}^\ast} &\hookrightarrow& z ; {{\mathit{instr}'}^\ast}
-	&\qquad \mbox{if}~z ; {{\mathit{instr}}^\ast} \hookrightarrow {{\mathit{instr}'}^\ast} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Steps{-}refl}]} \quad & z ; {{\mathit{admininstr}}^\ast} &\hookrightarrow^\ast& z ; {{\mathit{admininstr}}^\ast} \\
-	{[\textsc{\scriptsize Steps{-}trans}]} \quad & z ; {{\mathit{admininstr}}^\ast} &\hookrightarrow^\ast& {z''} ; {{\mathit{admininstr}''}^\ast}
-	&\qquad \mbox{if}~z ; {{\mathit{admininstr}}^\ast} \hookrightarrow {z'} ; {{\mathit{admininstr}'}^\ast} \\
-	&&&&\qquad {\land}~{z'} ; {\mathit{admininstr}'} \hookrightarrow^\ast {z''} ; {{\mathit{admininstr}''}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}nop}]} \quad & \mathsf{nop} &\hookrightarrow& \epsilon \\
-	{[\textsc{\scriptsize Step\_pure{-}drop}]} \quad & {\mathit{val}}~\mathsf{drop} &\hookrightarrow& \epsilon \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}select{-}true}]} \quad & {\mathit{val}}_1~{\mathit{val}}_2~(\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~\mathsf{select} &\hookrightarrow& {\mathit{val}}_1
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}select{-}false}]} \quad & {\mathit{val}}_1~{\mathit{val}}_2~(\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~\mathsf{select} &\hookrightarrow& {\mathit{val}}_2
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}block}]} \quad & z ; (\mathsf{block}~(\epsilon \rightarrow {t^?})~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({\mathsf{label}}_{n}\,\{ \epsilon \}~{{\mathit{instr}}^\ast})
-	&\qquad \mbox{if}~{t^?} = \epsilon \land n = 0 \lor {t^?} \neq \epsilon \land n = 1 \\
-	{[\textsc{\scriptsize Step\_read{-}loop}]} \quad & z ; (\mathsf{loop}~{\mathit{ft}}~{{\mathit{instr}}^\ast}) &\hookrightarrow& ({\mathsf{label}}_{0}\,\{ \mathsf{loop}~{\mathit{ft}}~{{\mathit{instr}}^\ast} \}~{{\mathit{instr}}^\ast}) \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}if{-}true}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{if}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast})
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}if{-}false}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{if}~{\mathit{ft}}~{{\mathit{instr}}_1^\ast}~\mathsf{else}~{{\mathit{instr}}_2^\ast}) &\hookrightarrow& (\mathsf{block}~{\mathit{ft}}~{{\mathit{instr}}_2^\ast})
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}br{-}zero}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{n}}~(\mathsf{br}~0)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{n}}~{{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step\_pure{-}br{-}succ}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}}^\ast}~(\mathsf{br}~l + 1)~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~(\mathsf{br}~l) \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}br\_if{-}true}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{br\_if}~l) &\hookrightarrow& (\mathsf{br}~l)
-	&\qquad \mbox{if}~c \neq 0 \\
-	{[\textsc{\scriptsize Step\_pure{-}br\_if{-}false}]} \quad & (\mathsf{const}~\mathsf{i{\scriptstyle 32}}~c)~(\mathsf{br\_if}~l) &\hookrightarrow& \epsilon
-	&\qquad \mbox{if}~c = 0 \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}call}]} \quad & z ; {{\mathit{val}}^{k}}~(\mathsf{call}~x) &\hookrightarrow& ({\mathsf{frame}}_{n}\,\{ f \}~({\mathsf{label}}_{n}\,\{ \epsilon \}~{{\mathit{instr}}^\ast}))
-	&\qquad \mbox{if}~a = {\mathrm{funcaddr}}(z){}[x] \\
-	&&&&\qquad {\land}~{\mathrm{funcinst}}(z){}[a] = \{ \begin{array}[t]{@{}l@{}}
-		\mathsf{type}~({t_1^{k}} \rightarrow {t_2^{n}}),\; \mathsf{module}~{\mathit{mm}},\; \mathsf{code}~{\mathit{func}} \}\end{array} \\
-	&&&&\qquad {\land}~{\mathit{func}} = \mathsf{func}~x~{(\mathsf{local}~t)^\ast}~{{\mathit{instr}}^\ast} \\
-	&&&&\qquad {\land}~f = \{ \begin{array}[t]{@{}l@{}}
-		\mathsf{locals}~{{\mathit{val}}^{k}}~{({{\mathrm{default}}}_{t})^\ast},\; \mathsf{module}~{\mathit{mm}} \}\end{array} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}frame{-}vals}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~{{\mathit{val}}^{n}}) &\hookrightarrow& {{\mathit{val}}^{n}} \\
-	{[\textsc{\scriptsize Step\_pure{-}return{-}frame}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~{{\mathit{val}'}^\ast}~{{\mathit{val}}^{n}}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^{n}} \\
-	{[\textsc{\scriptsize Step\_pure{-}return{-}label}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~{{\mathit{val}}^\ast}~\mathsf{return}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {{\mathit{val}}^\ast}~\mathsf{return} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}vals}]} \quad & {{\mathit{val}}^\ast}~\mathsf{trap}~{{\mathit{instr}}^\ast} &\hookrightarrow& \mathsf{trap}
-	&\qquad \mbox{if}~{{\mathit{val}}^\ast} \neq \epsilon \lor {{\mathit{instr}}^\ast} \neq \epsilon \\
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}label}]} \quad & ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}'}^\ast} \}~\mathsf{trap}) &\hookrightarrow& \mathsf{trap} \\
-	{[\textsc{\scriptsize Step\_pure{-}trap{-}frame}]} \quad & ({\mathsf{frame}}_{n}\,\{ f \}~\mathsf{trap}) &\hookrightarrow& \mathsf{trap} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}ctxt{-}label}]} \quad & z ; ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}}_0^\ast} \}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {z'} ; ({\mathsf{label}}_{n}\,\{ {{\mathit{instr}}_0^\ast} \}~{{\mathit{instr}'}^\ast})
-	&\qquad \mbox{if}~z ; {{\mathit{instr}}^\ast} \hookrightarrow {z'} ; {{\mathit{instr}'}^\ast} \\
-	{[\textsc{\scriptsize Step{-}ctxt{-}frame}]} \quad & s ; f ; ({\mathsf{frame}}_{n}\,\{ {f'} \}~{{\mathit{instr}}^\ast}) &\hookrightarrow& {s'} ; f ; ({\mathsf{frame}}_{n}\,\{ {f'} \}~{{\mathit{instr}'}^\ast})
-	&\qquad \mbox{if}~s ; {f'} ; {{\mathit{instr}}^\ast} \hookrightarrow {s'} ; {f'} ; {{\mathit{instr}'}^\ast} \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{iadd}}(N, c_1, c_2) &=& (c_1 + c_2) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{isub}}(N, c_1, c_2) &=& (c_1 - c_2 + {2^{N}}) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{imul}}(N, c_1, c_2) &=& (c_1 \cdot c_2) \mathbin{\mathrm{mod}} {2^{N}} \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{idiv}}(N, c_1, 0) &=& \epsilon \\
-	{\mathrm{idiv}}(N, c_1, c_2) &=& c_1 / c_2 \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}lcl@{}l@{}}
-	{\mathrm{binop}}(t, \mathsf{add}, c_1, c_2) &=& {\mathrm{iadd}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{sub}, c_1, c_2) &=& {\mathrm{isub}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{mul}, c_1, c_2) &=& {\mathrm{imul}}({\mathrm{size}}(t), c_1, c_2) \\
-	{\mathrm{binop}}(t, \mathsf{div}, c_1, c_2) &=& {\mathrm{idiv}}({\mathrm{size}}(t), c_1, c_2) \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_pure{-}binop{-}val}]} \quad & (\mathsf{const}~t~c_1)~(\mathsf{const}~t~c_2)~(\mathsf{binop}~t~{\mathit{binop}}) &\hookrightarrow& (\mathsf{const}~t~c)
-	&\qquad \mbox{if}~{\mathrm{binop}}(t, {\mathit{binop}}, c_1, c_2) = c \\
-	{[\textsc{\scriptsize Step\_pure{-}binop{-}trap}]} \quad & (\mathsf{const}~t~c_1)~(\mathsf{const}~t~c_2)~(\mathsf{binop}~t~{\mathit{binop}}) &\hookrightarrow& \mathsf{trap}
-	&\qquad \mbox{if}~{\mathrm{binop}}(t, {\mathit{binop}}, c_1, c_2) = \epsilon \\
-\end{array}
-$$
-
-\vspace{1ex}
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step\_read{-}local.get}]} \quad & z ; (\mathsf{local.get}~x) &\hookrightarrow& {\mathrm{local}}(z, x) \\
-\end{array}
-$$
-
-$$
-\begin{array}{@{}l@{}rcl@{}l@{}}
-	{[\textsc{\scriptsize Step{-}local.set}]} \quad & z ; {\mathit{val}}~(\mathsf{local.set}~x) &\hookrightarrow& {\mathrm{with}}_{\mathit{local}}(z, x, {\mathit{val}}) ; \epsilon \\
-\end{array}
-$$
 \end{document}
