@@ -77,7 +77,12 @@ let transform_fun_id (id : id) = func_prefix ^ transform_id' id.it
 let gen_typ_name (t : typ) =
   match t.it with
     | VarT (id, _) -> id.it
-    | _ -> "" (* This should never happen (FIXME raise an actual error) *)
+    | _ -> "" (* Not an issue if this happens *)
+  
+let get_typ_args (t : typ) = 
+  match t.it with
+    | VarT (_, args) -> args
+    | _ -> []
 
 let gen_exp_name (e : exp) =
   match e.it with
@@ -105,17 +110,14 @@ let gen_arg_names (arg : arg) =
       gen_argexp_name e
     | TypA _ -> []
       
-(* Family types infer function*)
-(* TODO improve this function to instead only look at the actual dependent type only *)
-let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
+(* Family types infer function *)
+let infer_match_name (args : arg list) (type_name : text) =
   let rec infer_function lst =
     match lst with
       | [] -> None
       | l :: lst' -> let name = (type_name ^ "__" ^ l) in 
       if (Hashtbl.mem family_helper name) then Some name else infer_function lst'
     in
-
-  let infer_match_name_from_binds bs = infer_function (List.map gen_bind_name bs) in
   let rec infer_match_name_from_args ags = 
     match ags with
       | [] -> None
@@ -125,10 +127,7 @@ let infer_match_name (args : arg list) (binds: bind list) (type_name : text) =
           then infer_match_name_from_args ags' 
           else inferred_name
   in
-  let result = infer_match_name_from_binds binds in
-  if Option.is_none result 
-    then infer_match_name_from_args args 
-    else result
+  infer_match_name_from_args args 
 
 let find_typ (args : arg list) (type_name : text) =
   let rec infer_function lst =
@@ -287,25 +286,25 @@ and transform_exp (exp : exp) =
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
 
-and transform_match_exp (args : arg list) (binds : bind list) (exp : exp) =
+and transform_match_exp (exp : exp) =
   match exp.it with
   | VarE id -> 
-    (match (infer_match_name args binds (gen_typ_name exp.note)) with
+    (match (infer_match_name (get_typ_args exp.note) (gen_typ_name exp.note)) with
     | Some new_id -> T_app (T_ident [new_id; family_type_suffix], [T_ident [transform_var_id id]])
     | _ -> transform_exp exp
   )
-  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp args binds exp1, transform_match_exp args binds exp2)
-  | IterE (exp, _) -> transform_match_exp args binds exp
+  | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp exp1, transform_match_exp exp2)
+  | IterE (exp, _) -> transform_match_exp exp
   | ListE exps -> (match exps with
-    | [e] -> transform_match_exp args binds e
+    | [e] -> transform_match_exp e
     | _ -> transform_exp exp
   )
-  | CaseE (m, e) -> (match (infer_match_name args binds (gen_typ_name exp.note)) with 
-    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], transform_tuple_exp (transform_match_exp args binds) e)])
+  | CaseE (m, e) -> (match (infer_match_name (get_typ_args exp.note) (gen_typ_name exp.note)) with 
+    | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], transform_tuple_exp transform_match_exp e)])
     | _ -> transform_exp exp
   )
   | BinE (AddOp _, exp1, {it = NatE n ;_}) -> let rec get_succ n = (match n with
-    | 0 -> transform_match_exp args binds exp1
+    | 0 -> transform_match_exp exp1
     | m -> T_app (T_exp_basic T_succ, [get_succ (m - 1)])
   ) in get_succ (Z.to_int n)
   | _ -> transform_exp exp
@@ -362,9 +361,9 @@ and transform_arg (arg : arg) =
     | ExpA exp -> transform_exp exp
     | TypA typ -> erase_dependent_type typ
 
-and transform_match_arg (args : arg list) (binds : bind list) (arg : arg) =
+and transform_match_arg (arg : arg) =
   match arg.it with
-    | ExpA exp -> transform_match_exp args binds exp
+    | ExpA exp -> transform_match_exp exp
     | TypA _ -> T_ident ["_"]
 
 and transform_bind (bind : bind) =
@@ -465,7 +464,7 @@ let transform_rule (id : id) (r : rule) =
 
 let transform_clause (return_type : typ option) (c : clause) =
   match c.it with
-    | DefD (binds, args, exp, _prems) -> (T_match (List.map (transform_match_arg args binds) args), transform_return_exp return_type exp)
+    | DefD (_binds, args, exp, _prems) -> (T_match (List.map transform_match_arg args), transform_return_exp return_type exp)
 
 let transform_inst (id : id) (i : inst) =
   match i.it with
