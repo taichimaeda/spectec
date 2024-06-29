@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-06-28)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-06-29)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -3151,6 +3151,14 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \\ \qquad
   (\mathrel{\mbox{otherwise}}) \\
 \end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{M}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{K}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + M \cdot K / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{M}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{K}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) } \\
+  &amp; \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad \mbox{if}~({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{M}}(j) = z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + k \cdot M / 8 : M / 8])^{k&lt;K}} \\
+  &amp; \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{K}}^{{-1}}}}{({{{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{M, N}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{(j)}^{K}})} \land N = M \cdot 2} \\
+\end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="exec-vload-splat"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
@@ -3200,6 +3208,16 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \\ \qquad
   (\mathrel{\mbox{otherwise}}) \\
 \end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{splat}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + N / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{splat}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{N}}(j) = z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : N / 8]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~N = {|{\mathsf{i}}{N}|}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~M = 128 / N} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({j^{M}})}} \\
+\end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="exec-vload-zero"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
@@ -3247,6 +3265,14 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \end{array}
 \\ \qquad
   (\mathrel{\mbox{otherwise}}) \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{zero}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + N / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{zero}}}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{N}}(j) = z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : N / 8]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~c = {{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{N, 128}^{\href{../syntax/instructions.html#syntax-sx}{\mathsf{u}}}}}{(j)}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y">
@@ -3298,6 +3324,16 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \end{array}
 \\ \qquad
   (\mathrel{\mbox{otherwise}}) \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\mathit{ao}}~j) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + N / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\mathit{ao}}~j) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) } \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{N}}(k) = z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : N / 8]} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~N = {|{\mathsf{i}}{N}|}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~M = {|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|} / N} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1){}[{}[j] = k])}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="mathit-nt-xref-syntax-instructions-syntax-instr-memory-mathsf-store-xref-syntax-instructions-syntax-sz-mathit-sz-mathit-u-kern-0-1em-scriptstyle-1-x-mathit-ao">
@@ -3356,6 +3392,10 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + n / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}} \\
 &amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~({\mathsf{i}}{N}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~({{\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{n}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ z{}[{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : n / 8] = {b^\ast}] ; \epsilon } \\
   &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~{b^\ast} = {{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{n}}({{{\href{../exec/numerics.html#op-wrap}{\mathrm{wrap}}}}_{{|{\mathsf{i}}{N}|}, n}}{(c)})} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; z ; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + {|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|} / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}~x~{\mathit{ao}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; z{}[{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : {|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|} / 8] = {b^\ast}] ; \epsilon
+  &amp;\qquad \mbox{if}~{b^\ast} = {{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c) \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y">
@@ -3404,6 +3444,15 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \end{array}
 \\ \qquad
   (\mathrel{\mbox{otherwise}}) \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\mathit{ao}}~j) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; z ; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + N &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|} \\
+&amp; z ; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~({\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{N}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{lane}}}~x~{\mathit{ao}}~j) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; z{}[{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : N / 8] = {b^\ast}] ; \epsilon
+  &amp;\qquad \mbox{if}~N = {|{\mathsf{i}}{N}|} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~M = 128 / N \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{b^\ast} = {{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{N}}({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c){}[j]) \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-memory-mathsf-memory-size-x">
