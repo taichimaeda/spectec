@@ -507,7 +507,7 @@ C \href{../valid/modules.html#valid-start}{\vdash} \href{../syntax/modules.html#
 \frac{
 C \href{../valid/modules.html#valid-externidx}{\vdash} {\href{../syntax/modules.html#syntax-externidx}{\mathit{externidx}}} : {\mathit{xt}}
 }{
-C \href{../valid/modules.html#valid-export}{\vdash} \href{../syntax/modules.html#syntax-export}{\mathsf{export}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}}~{\href{../syntax/modules.html#syntax-externidx}{\mathit{externidx}}} : {\mathit{xt}}
+C \href{../valid/modules.html#valid-export}{\vdash} \href{../syntax/modules.html#syntax-export}{\mathsf{export}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}}~{\href{../syntax/modules.html#syntax-externidx}{\mathit{externidx}}} : {\href{../syntax/values.html#syntax-name}{\mathit{name}}}~{\mathit{xt}}
 }
 \qquad
 \end{array}\]</div>
@@ -699,7 +699,9 @@ the segment <span class="math notranslate nohighlight">\(\href{../syntax/modules
  \qquad
 (C \href{../valid/modules.html#valid-start}{\vdash} {\href{../syntax/modules.html#syntax-start}{\mathit{start}}} : \href{../valid/modules.html#valid-start}{\mathsf{ok}})^?
  \qquad
-(C \href{../valid/modules.html#valid-export}{\vdash} {\href{../syntax/modules.html#syntax-export}{\mathit{export}}} : {\mathit{xt}}_{\mathsf{e}})^\ast
+(C \href{../valid/modules.html#valid-export}{\vdash} {\href{../syntax/modules.html#syntax-export}{\mathit{export}}} : {\mathit{nm}}~{\mathit{xt}}_{\mathsf{e}})^\ast
+ \qquad
+{{\mathit{nm}}^\ast}~{\mathrm{disjoint}}
  \\
 C = \{ \begin{array}[t]{&#64;{}l&#64;{}}
 \href{../valid/conventions.html#context}{\mathsf{types}}~{{\mathit{dt}'}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{funcs}}~{{\mathit{dt}}_{\mathsf{i}}^\ast}~{{\mathit{dt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{globals}}~{{\mathit{gt}}_{\mathsf{i}}^\ast}~{{\mathit{gt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{tables}}~{{\mathit{tt}}_{\mathsf{i}}^\ast}~{{\mathit{tt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{mems}}~{{\mathit{mt}}_{\mathsf{i}}^\ast}~{{\mathit{mt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{elems}}~{{\mathit{rt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{datas}}~{{\mathit{ok}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{refs}}~{x^\ast} \}\end{array}
