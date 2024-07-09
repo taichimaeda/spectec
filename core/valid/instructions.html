@@ -88,7 +88,7 @@
   <section id="instructions">
 <span id="valid-instr"></span><span id="index-0"></span><h1>Instructions<a class="headerlink" href="#instructions" title="Permalink to this heading">¶</a></h1>
 <p><a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">Instructions</span></a> are classified by <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction types</span></a> that describe how they manipulate the <a class="reference internal" href="../exec/runtime.html#stack"><span class="std std-ref">operand stack</span></a> and initialize <a class="reference internal" href="../syntax/modules.html#syntax-local"><span class="std std-ref">locals</span></a>:
-A type <span class="math notranslate nohighlight">\({t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~{t_2^\ast}\)</span> describes the required input stack with argument values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> that an instruction pops off
+A type <span class="math notranslate nohighlight">\({t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} {t_2^\ast}\)</span> describes the required input stack with argument values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> that an instruction pops off
 and the provided output stack with result values of types <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> that it pushes back.
 Moreover, it enumerates the <a class="reference internal" href="../syntax/modules.html#syntax-localidx"><span class="std std-ref">indices</span></a> <span class="math notranslate nohighlight">\({x^\ast}\)</span> of locals that have been set by the instruction.
 In most cases, this is empty.</p>
@@ -96,10 +96,10 @@ In most cases, this is empty.</p>
 <p class="admonition-title">Note</p>
 <p>For example, the instruction <span class="math notranslate nohighlight">\(\mathsf{binop}~\mathsf{i{\scriptstyle 32}}~\mathsf{add}\)</span> has type <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle 32}}~\mathsf{i{\scriptstyle 32}} \rightarrow \mathsf{i{\scriptstyle 32}}\)</span>,
 consuming two <span class="math notranslate nohighlight">\(\mathsf{i{\scriptstyle 32}}\)</span> values and producing one.
-The instruction <span class="math notranslate nohighlight">\(\mathsf{local{.}set}~x\)</span> has type <span class="math notranslate nohighlight">\(t~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~(x)~\epsilon\)</span>, provided <span class="math notranslate nohighlight">\(t\)</span> is the type declared for the local <span class="math notranslate nohighlight">\(x\)</span>.</p>
+The instruction <span class="math notranslate nohighlight">\(\mathsf{local{.}set}~x\)</span> has type <span class="math notranslate nohighlight">\(t \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{x} \epsilon\)</span>, provided <span class="math notranslate nohighlight">\(t\)</span> is the type declared for the local <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </div>
 <p>Typing extends to <a class="reference internal" href="#valid-instrs"><span class="std std-ref">instruction sequences</span></a> <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.
-Such a sequence has an instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~{t_2^\ast}\)</span> if the accumulative effect of executing the instructions is consuming values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> off the operand stack, pushing new values of types <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>, and setting all locals <span class="math notranslate nohighlight">\({x^\ast}\)</span>.</p>
+Such a sequence has an instruction type <span class="math notranslate nohighlight">\({t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} {t_2^\ast}\)</span> if the accumulative effect of executing the instructions is consuming values of types <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> off the operand stack, pushing new values of types <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>, and setting all locals <span class="math notranslate nohighlight">\({x^\ast}\)</span>.</p>
 <p id="polymorphism">For some instructions, the typing rules do not fully constrain the type,
 and therefore allow for multiple types.
 Such instructions are called <em>polymorphic</em>.
@@ -1202,7 +1202,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 \frac{
 C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-variable}{\mathsf{local{.}set}}~x : t~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~(x)~\epsilon
+C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-variable}{\mathsf{local{.}set}}~x : t \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{x} \epsilon
 }
 \qquad
 \end{array}\]</div>
@@ -1219,7 +1219,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 \frac{
 C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-variable}{\mathsf{local{.}tee}}~x : t~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~(x)~t
+C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-variable}{\mathsf{local{.}tee}}~x : t \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{x} t
 }
 \qquad
 \end{array}\]</div>
@@ -1748,7 +1748,7 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 C \href{../valid/types.html#valid-blocktype}{\vdash} {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
 \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~{t_2^\ast}
+\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} {t_2^\ast}
 }{
 C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{block}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
@@ -1774,7 +1774,7 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 C \href{../valid/types.html#valid-blocktype}{\vdash} {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
 \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_1^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~{t_2^\ast}
+\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_1^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} {t_2^\ast}
 }{
 C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{loop}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \rightarrow {t_2^\ast}
 }
@@ -1802,10 +1802,10 @@ the instruction sequence <span class="math notranslate nohighlight">\(\href{../s
 C \href{../valid/types.html#valid-blocktype}{\vdash} {\mathit{bt}} : {t_1^\ast} \rightarrow {t_2^\ast}
  \qquad
 \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x_1^\ast})~{t_2^\ast}
+\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x_1^\ast}} {t_2^\ast}
  \qquad
 \{ \begin{array}[t]{&#64;{}l&#64;{}}
-\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x_2^\ast})~{t_2^\ast}
+\href{../valid/conventions.html#context}{\mathsf{labels}}~({t_2^\ast}) \}\end{array} \oplus C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x_2^\ast}} {t_2^\ast}
 }{
 C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{if}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast}~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{else}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}} \rightarrow {t_2^\ast}
 }
@@ -2212,13 +2212,13 @@ but with:</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1 : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x_1^\ast})~{t_2^\ast}
+C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1 : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x_1^\ast}} {t_2^\ast}
  \qquad
 (C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x_1] = {\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)^\ast
  \qquad
-C{}[{.}\href{../syntax/modules.html#syntax-local}{\mathsf{local}}{}[{x_1^\ast}] = {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t)^\ast}] \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_2^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x_2^\ast})~{t_3^\ast}
+C{}[{.}\href{../syntax/modules.html#syntax-local}{\mathsf{local}}{}[{x_1^\ast}] = {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t)^\ast}] \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_2^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x_2^\ast}} {t_3^\ast}
 }{
-C \href{../valid/instructions.html#valid-instrs}{\vdash} {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x_1^\ast}~{x_2^\ast})~{t_3^\ast}
+C \href{../valid/instructions.html#valid-instrs}{\vdash} {\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x_1^\ast}~{x_2^\ast}} {t_3^\ast}
 }
 \qquad
 \end{array}\]</div>
@@ -2244,11 +2244,11 @@ C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instr
 }
 \\[3ex]\displaystyle
 \frac{
-C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast}~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~{t_2^\ast}
+C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t_1^\ast} \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} {t_2^\ast}
  \qquad
 C \href{../valid/types.html#valid-resulttype}{\vdash} {t^\ast} : \href{../valid/types.html#valid-resulttype}{\mathsf{ok}}
 }{
-C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : ({t^\ast}~{t_1^\ast})~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~({x^\ast})~({t^\ast}~{t_2^\ast})
+C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : ({t^\ast}~{t_1^\ast}) \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{{x^\ast}} ({t^\ast}~{t_2^\ast})
 }
 \qquad
 \end{array}\end{split}\]</div>
@@ -2280,7 +2280,7 @@ The subsumption rule allows to weaken the type of <span class="math notranslate 
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
-C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : \epsilon~\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}~(\epsilon)~{t^\ast}
+C \href{../valid/instructions.html#valid-instrs}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : \epsilon \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}_{\epsilon} {t^\ast}
 }{
 C \href{../valid/instructions.html#valid-expr}{\vdash} {{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast} : {t^\ast}
 }

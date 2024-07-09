@@ -154,7 +154,7 @@ Similarly, both <span class="math notranslate nohighlight">\(\mathtt{0x83}~\math
 <p>The auxiliary <span class="math notranslate nohighlight">\({\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}\)</span> function expressing this encoding is defined as follows:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
-{\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}({{\mathit{ch}}^\ast}) &amp;=&amp; { \href{../syntax/conventions.html#notation-concat}{\bigoplus} }\;{{\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}({\mathit{ch}})^\ast} \\
+{\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}({{\mathit{ch}}^\ast}) &amp;=&amp; {\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {{\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}({\mathit{ch}})^\ast} \\
 {\href{../binary/values.html#binary-utf8}{\mathrm{utf\scriptstyle8}}}({\mathit{ch}}) &amp;=&amp; b
   &amp;\qquad \mbox{if}~{\mathit{ch}} &lt; \mathrm{U{+}80} \\
   &amp;&amp;&amp;\qquad {\land}~{\mathit{ch}} = b \\
