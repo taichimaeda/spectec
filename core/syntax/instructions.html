@@ -238,9 +238,9 @@ For the other integer instructions, the use of two’s complement for the signed
   &amp;\qquad \mbox{if}~N \leq \mathsf{{\scriptstyle 16}} \\ &amp;&amp;|&amp;
 \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{mul}}
   &amp;\qquad \mbox{if}~N \geq \mathsf{{\scriptstyle 16}} \\ &amp;&amp;|&amp;
-\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{avgr\_u}}
+{\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{avgr}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-sx}{\mathsf{u}}}
   &amp;\qquad \mbox{if}~N \leq \mathsf{{\scriptstyle 16}} \\ &amp;&amp;|&amp;
-\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{q{\scriptstyle15}mulr\_sat\_s}}
+{\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{q{\scriptstyle15}mulr\_sat}}}{\mathsf{\_}}{\href{../syntax/instructions.html#syntax-sx}{\mathsf{s}}}
   &amp;\qquad \mbox{if}~N = \mathsf{{\scriptstyle 16}} \\ &amp;&amp;|&amp;
 {\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{min}}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}
   &amp;\qquad \mbox{if}~N \leq \mathsf{{\scriptstyle 32}} \\ &amp;&amp;|&amp;
@@ -276,9 +276,8 @@ For the other integer instructions, the use of two’s complement for the signed
 \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{promote}}
   &amp;\qquad \mbox{if}~N_1 &lt; N_2 \\
 \end{array}\end{split}\]</div>
-<p id="syntax-vec-shape">Vector instructions have a naming convention involving a prefix that
-determines how their operands will be interpreted.
-This prefix describes the <em>shape</em> of the operand,
+<p>Vector instructions have a naming convention involving a <em>shape</em> prefix that
+determines how their operands will be interpreted,
 written <span class="math notranslate nohighlight">\({t}{\mathsf{x}}{N}\)</span>, and consisting of a <em>lane type</em> <span class="math notranslate nohighlight">\(t\)</span>, a possibly <em>packed</em> <a class="reference internal" href="types.html#syntax-numtype"><span class="std std-ref">numeric type</span></a>, and the number of <em>lanes</em> <span class="math notranslate nohighlight">\(N\)</span> of that type.
 Operations are performed point-wise on the values of each lane.</p>
 <div class="admonition note">
