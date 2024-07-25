@@ -698,6 +698,9 @@ syntax import hint(desc "import") =
 syntax module hint(desc "module") =
   MODULE type* import* func* global* table* mem* elem* data* start? export*
 
+syntax dec/syn = type | import | func | global | table | mem | elem | data | start | export | ...
+syntax dec/admin = ... | FIX u32
+
 
 var ty : type
 var loc : local

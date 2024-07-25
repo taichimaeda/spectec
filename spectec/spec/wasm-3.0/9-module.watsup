@@ -2,188 +2,234 @@
 ;; Allocation
 ;;
 
-;; Definitions
-
-def $alloctypes(type*) : deftype* hint(show $alloctype*#((%)))
-def $alloctypes(eps) = eps
-def $alloctypes(type'* type) = deftype'* deftype*
-  -- if deftype'* = $alloctypes(type'*)
-  -- if type = TYPE rectype
-  -- if deftype* = $subst_all_deftypes($rolldt(x, rectype), deftype'*)
-  -- if x = |deftype'*|
-
 def $allocfunc(store, deftype, funccode, moduleinst) : (store, funcaddr)
 def $allocfunc(s, deftype, funccode, moduleinst) = (s ++ {FUNCS funcinst}, |s.FUNCS|)
   ---- ----
-  -- if funcinst = { TYPE deftype, MODULE moduleinst, CODE funccode }
-
-def $allocfuncs(store, deftype*, funccode*, moduleinst*) : (store, funcaddr*) hint(show $allocfunc*#((%,%,%,%)))
-def $allocfuncs(s, eps, eps, eps) = (s, eps)
-def $allocfuncs(s, dt dt'*, funccode funccode'*, moduleinst moduleinst'*) = (s_2, fa fa'*)
-  -- if (s_1, fa) = $allocfunc(s, dt, funccode, moduleinst)
-  -- if (s_2, fa'*) = $allocfuncs(s_1, dt'*, funccode'*, moduleinst'*)
+  -- if funcinst = {TYPE deftype, MODULE moduleinst, CODE funccode}
 
 def $allocglobal(store, globaltype, val) : (store, globaladdr)
 def $allocglobal(s, globaltype, val) = (s ++ {GLOBALS globalinst}, |s.GLOBALS|)
   ---- ----
-  -- if globalinst = { TYPE globaltype, VALUE val }
-
-def $allocglobals(store, globaltype*, val*) : (store, globaladdr*) hint(show $allocglobal*#((%,%,%)))
-def $allocglobals(s, eps, eps) = (s, eps)
-def $allocglobals(s, globaltype globaltype'*, val val'*) = (s_2, ga ga'*)
-  -- if (s_1, ga) = $allocglobal(s, globaltype, val)
-  -- if (s_2, ga'*) = $allocglobals(s_1, globaltype'*, val'*)
+  -- if globalinst = {TYPE globaltype, VALUE val}
 
 def $alloctable(store, tabletype, ref) : (store, tableaddr)
 def $alloctable(s, `[i .. j] rt, ref) = (s ++ {TABLES tableinst}, |s.TABLES|)
   ---- ----
-  -- if tableinst = { TYPE (`[i .. j] rt), REFS ref^i }
-
-def $alloctables(store, tabletype*, ref*) : (store, tableaddr*) hint(show $alloctable*#((%,%,%)))
-def $alloctables(s, eps, eps) = (s, eps)
-def $alloctables(s, tabletype tabletype'*, ref ref'*) = (s_2, ta ta'*)
-  -- if (s_1, ta) = $alloctable(s, tabletype, ref)
-  -- if (s_2, ta'*) = $alloctables(s_1, tabletype'*, ref'*)
+  -- if tableinst = {TYPE (`[i .. j] rt), REFS ref^i}
 
 def $allocmem(store, memtype) : (store, memaddr)
 def $allocmem(s, `[i .. j] PAGE) = (s ++ {MEMS meminst}, |s.MEMS|)
   ---- ----
-  -- if meminst = { TYPE (`[i .. j] PAGE), BYTES (0x00)^(i * $($(64 * $Ki))) }
-
-def $allocmems(store, memtype*) : (store, memaddr*) hint(show $allocmem*#((%,%)))
-def $allocmems(s, eps) = (s, eps)
-def $allocmems(s, memtype memtype'*) = (s_2, ma ma'*)
-  -- if (s_1, ma) = $allocmem(s, memtype)
-  -- if (s_2, ma'*) = $allocmems(s_1, memtype'*)
+  -- if meminst = {TYPE (`[i .. j] PAGE), BYTES (0x00)^(i * $($(64 * $Ki)))}
 
 def $allocelem(store, elemtype, ref*) : (store, elemaddr)
 def $allocelem(s, elemtype, ref*) = (s ++ {ELEMS eleminst}, |s.ELEMS|)
   ---- ----
-  -- if eleminst = { TYPE elemtype, REFS ref* }
-
-def $allocelems(store, elemtype*, (ref*)*) : (store, elemaddr*) hint(show $allocelem*#((%,%,%)))
-def $allocelems(s, eps, eps) = (s, eps)
-def $allocelems(s, rt rt'*, (ref*) (ref'*)*) = (s_2, ea ea'*)
-  -- if (s_1, ea) = $allocelem(s, rt, ref*)
-  -- if (s_2, ea'*) = $allocelems(s_2, rt'*, (ref'*)*)
+  -- if eleminst = {TYPE elemtype, REFS ref*}
 
 def $allocdata(store, datatype, byte*) : (store, dataaddr)
 def $allocdata(s, OK, byte*) = (s ++ {DATAS datainst}, |s.DATAS|)
   ---- ----
-  -- if datainst = { BYTES byte* }
-
-def $allocdatas(store, datatype*, (byte*)*) : (store, dataaddr*) hint(show $allocdata*#((%,%,%)))
-def $allocdatas(s, eps, eps) = (s, eps)
-def $allocdatas(s, ok ok'*, (b*) (b'*)*) = (s_2, da da'*)
-  -- if (s_1, da) = $allocdata(s, ok, b*)
-  -- if (s_2, da'*) = $allocdatas(s_1, ok'*, (b'*)*)
-
-def $allocexport(moduleinst, export) : exportinst hint(show $allocexport(moduleinst, %2))  ;; HACK !
-def $allocexport(moduleinst, EXPORT name (FUNC x)) = { NAME name, VALUE (FUNC moduleinst.FUNCS[x]) }
-def $allocexport(moduleinst, EXPORT name (GLOBAL x)) = { NAME name, VALUE (GLOBAL moduleinst.GLOBALS[x]) }
-def $allocexport(moduleinst, EXPORT name (TABLE x)) = { NAME name, VALUE (TABLE moduleinst.TABLES[x]) }
-def $allocexport(moduleinst, EXPORT name (MEM x)) = { NAME name, VALUE (MEM moduleinst.MEMS[x]) }
-
-def $allocexports(moduleinst, export*) : exportinst* hint(show $allocexport*#(%,%))
-def $allocexports(moduleinst, export*) = $allocexport(moduleinst, export)*
-
-
-;; Modules
-
-def $allocmodule(store, module, externval*, val*, ref*, (ref*)*) : (store, moduleinst)
-def $allocmodule(s, module, externval*, val_G*, ref_T*, (ref_E*)*) = (s_6, moduleinst)
-  ---- ----
-  -- if module = MODULE type* import* func* global* table* mem* elem* data* start? export*
-  -- if func* = (FUNC x local* expr_F)*
-  -- if global* = (GLOBAL globaltype expr_G)*
-  -- if table* = (TABLE tabletype expr_T)*
-  -- if mem* = (MEMORY memtype)*
-  -- if elem* = (ELEM elemtype expr_E* elemmode)*
-  -- if data* = (DATA byte* datamode)*
-  ;; TODO(3, rossberg): inline these
-  -- if fa_I* = $funcsxv(externval*)
-  -- if ga_I* = $globalsxv(externval*)
-  -- if ta_I* = $tablesxv(externval*)
-  -- if ma_I* = $memsxv(externval*)
-  ;; TODO(2, rossberg): get rid of these forward guesses
-  -- if fa* = ($(|s.FUNCS|+i_F))^(i_F<|func*|)
-  -- if ga* = ($(|s.GLOBALS|+i_G))^(i_G<|global*|)
-  -- if ta* = ($(|s.TABLES|+i_T))^(i_T<|table*|)
-  -- if ma* = ($(|s.MEMS|+i_M))^(i_M<|mem*|)
-  -- if ea* = ($(|s.ELEMS|+i_E))^(i_E<|elem*|)
-  -- if da* = ($(|s.DATAS|+i_D))^(i_D<|data*|)
-  -- if dt* = $alloctypes(type*)
-  -- if (s_1, fa*) = $allocfuncs(s, dt*[x]*, (FUNC x local* expr_F)*, moduleinst^(|func*|))
-  -- if (s_2, ga*) = $allocglobals(s_1, globaltype*, val_G*)
-  -- if (s_3, ta*) = $alloctables(s_2, tabletype*, ref_T*)
-  -- if (s_4, ma*) = $allocmems(s_3, memtype*)
-  -- if (s_5, ea*) = $allocelems(s_4, elemtype*, (ref_E*)*)
-  -- if (s_6, da*) = $allocdatas(s_5, OK^(|data*|), (byte*)*)
-  ;; TODO(2, rossberg): use moduleinst here and remove hack above
-  -- if xi* = $allocexports({FUNCS fa_I* fa*, GLOBALS ga_I* ga*, TABLES ta_I* ta*, MEMS ma_I* ma*}, export*)
-  -- if moduleinst = {
-      TYPES dt*,
-      FUNCS fa_I* fa*, \
-      GLOBALS ga_I* ga*,
-      TABLES ta_I* ta*, \
-      MEMS ma_I* ma*,
-      ELEMS ea*, \
-      DATAS da*,
-      EXPORTS xi*
-    }
+  -- if datainst = {BYTES byte*}
 
 
 ;;
 ;; Instantiation
 ;;
 
-def $runelem_(elemidx, elem) : instr*
-def $runelem_(x, ELEM rt e^n (PASSIVE)) = eps
-def $runelem_(x, ELEM rt e^n (DECLARE)) = (ELEM.DROP x)
-def $runelem_(x, ELEM rt e^n (ACTIVE y instr*)) =
+def $elemexpr__(elemidx, u32, elemmode) : instr*
+def $elemexpr__(x, n, PASSIVE) = eps
+def $elemexpr__(x, n, DECLARE) = (ELEM.DROP x)
+def $elemexpr__(x, n, ACTIVE y instr*) =
   instr* (CONST I32 0) (CONST I32 n) (TABLE.INIT y x) (ELEM.DROP x)
 
-def $rundata_(dataidx, data) : instr*
-def $rundata_(x, DATA b^n (PASSIVE)) = eps
-def $rundata_(x, DATA b^n (ACTIVE y instr*)) =
+def $dataexpr__(dataidx, u32, datamode) : instr*
+def $dataexpr__(x, n, PASSIVE) = eps
+def $dataexpr__(x, n, ACTIVE y instr*) =
   instr* (CONST I32 0) (CONST I32 n) (MEMORY.INIT y x) (DATA.DROP x)
 
-def $instantiate(store, module, externval*) : config
-def $instantiate(s, module, externval*) = s'; f; instr_E* instr_D* instr_S?
+syntax instconfig = store; moduleinst; externval*; dec*
+syntax decconfig = store; moduleinst; dec*
+
+relation Inst: instconfig ~> instconfig   hint(show "I") hint(macro "instto")
+relation Inst_def: decconfig ~> decconfig hint(show "I") hint(macro "instto")
+relation Inst_import: instconfig ~> decconfig hint(show "I") hint(macro "instto")
+relation Insts: instconfig ~>* instconfig  hint(show "I") hint(macro "insttostar")
+
+rule Inst/import:
+  s; mm; ev ev'*; dec dec'*  ~>  s'; mm'; ev'*; dec'*
+  -- Inst_import: s; mm; ev; dec ~> s'; mm'; eps
+
+rule Inst/def:
+  s; mm; ev*; dec dec'*  ~>  s'; mm'; ev*; dec'*
+  -- Inst_def: s; mm; dec ~> s'; mm'; eps
+
+rule Insts/refl:
+  s; mm; ev*; dec*  ~>*  s; mm; ev*; dec*
+
+rule Insts/trans:
+  s; mm; ev*; dec*  ~>*  s''; mm''; ev''*; dec''*
+  -- Inst: s; mm; ev*; dec*  ~>  s'; mm'; ev'*; dec'*
+  -- Insts: s'; mm'; ev'*; dec'*  ~>*  s''; mm''; ev''*; dec''*
+
+
+rule Inst_import/func:
+  s; mm; (FUNC a); (IMPORT nm_1 nm_2 (FUNC yy))  ~>  s; mm++{FUNCS a}; eps
+
+rule Inst_import/global:
+  s; mm; (GLOBAL a); (IMPORT nm_1 nm_2 (GLOBAL gt))  ~>  s; mm++{GLOBALS a}; eps
+
+rule Inst_import/table:
+  s; mm; (TABLE a); (IMPORT nm_1 nm_2 (TABLE tt))  ~>  s; mm++{TABLES a}; eps
+
+rule Inst_import/mem:
+  s; mm; (MEM a); (IMPORT nm_1 nm_2 (MEM mt))  ~>  s; mm++{MEMS a}; eps
+
+
+rule Inst_def/type:
+  s; mm; (TYPE rectype)  ~>  s; mm++{TYPES dt*}; eps
+  -- if dt* = $subst_all_deftypes($rolldt(|mm.TYPES|, rectype), dt'*)
+  -- if dt'* = mm.TYPES  ;; TODO(2, rossberg): inline
+
+rule Inst_def/func:
+  s; mm; (FUNC x local* expr)  ~>  s'; mm++{FUNCS a}; eps
+  ;; TODO(0, rossberg): what is the store-wf invariant for this?
+  -- if (s', a) = $allocfunc(s, mm.TYPES[x], (FUNC x local* expr), {})
+
+rule Inst_def/global:
+  s; mm; (GLOBAL gt expr)  ~>  s'; mm++{GLOBALS a}; eps
+  -- Eval_expr : s; {MODULE mm}; expr ~>* s; f; val
+  -- if (s', a) = $allocglobal(s, gt, val)
+
+rule Inst_def/table:
+  s; mm; (TABLE tt expr)  ~>  s'; mm++{TABLES a}; eps
+  -- Eval_expr : s; {MODULE mm}; expr ~>* s; f; ref
+  -- if (s', a) = $alloctable(s, tt, ref)
+
+rule Inst_def/mem:
+  s; mm; (MEMORY mt)  ~>  s'; mm++{MEMS a}; eps
+  -- if (s', a) = $allocmem(s, mt)
+
+rule Inst_def/elem:
+  s; mm; (ELEM rt expr* elemmode)  ~>  s''; mm++{ELEMS a}; eps
+  -- (Eval_expr : s; {MODULE mm}; expr ~>* s; f; ref)*
+  -- if (s', a) = $allocelem(s, rt, ref*)
+  -- Eval_expr: s'; {MODULE mm++{ELEMS a}}; $elemexpr__(|mm.ELEMS|, |expr*|, elemmode) ~>* s''; f; eps
+
+rule Inst_def/data:
+  s; mm; (DATA b* datamode)  ~>  s''; mm++{DATAS a}; eps
+  -- if (s', a) = $allocdata(s, OK, b*)
+  -- Eval_expr: s'; {MODULE mm++{DATAS a}}; $dataexpr__(|mm.DATAS|, |b*|, datamode) ~>* s''; f; eps
+
+rule Inst_def/fix:
+  s; mm; (FIX n)  ~>  s'; mm; eps
+  -- if a = mm.FUNCS[|mm.FUNCS| - n]
+  -- if fi* = s.FUNCS[a : n]
+  -- if s' = s[.FUNCS[a : n] = (fi[.MODULE = mm])*]
+
+rule Inst_def/start:
+  s; mm; (START x)  ~>  s'; mm; eps
+  -- Eval_expr: s; {MODULE mm}; (CALL x) ~>* s'; f; eps
+
+rule Inst_def/export-func:
+  s; mm; (EXPORT nm (FUNC x))  ~>  s; mm++{EXPORTS xi}; eps
+  -- if xi = {NAME nm, VALUE (FUNC mm.FUNCS[x])}
+
+rule Inst_def/export-global:
+  s; mm; (EXPORT nm (GLOBAL x))  ~>  s; mm++{EXPORTS xi}; eps
+  -- if xi = {NAME nm, VALUE (GLOBAL mm.GLOBALS[x])}
+
+rule Inst_def/export-table:
+  s; mm; (EXPORT nm (TABLE x))  ~>  s; mm++{EXPORTS xi}; eps
+  -- if xi = {NAME nm, VALUE (TABLE mm.TABLES[x])}
+
+rule Inst_def/export-mem:
+  s; mm; (EXPORT nm (MEM x))  ~>  s; mm++{EXPORTS xi}; eps
+  -- if xi = {NAME nm, VALUE (MEM mm.MEMS[x])}
+
+
+def $instantiate(store, module, externval*) : (store, moduleinst)
+def $instantiate(s, module, ev*) = (s', mm)
+  ---- ----
+  -- Module_ok: |- module : xt_1* -> xt_2*
+  -- (Externval_type: s |- externval : xt_2)*
+  ----
+  ;; TODO(4, rossberg): match as MODULE dec*
+  -- if module = MODULE type* import* func* global* table* mem* elem* data* start? export*
+  -- Inst: s; {}; ev*; type* import* func* global* table* mem* elem* data* (FIX $(|func*|)) start? export* ~> s'; mm; eps; eps
+
+
+(; scratch
+def $runelem__(elemidx, u32, elemmode) : instr*
+def $runelem__(x, n, PASSIVE) = eps
+def $runelem__(x, n, DECLARE) = (ELEM.DROP x)
+def $runelem__(x, n, ACTIVE y instr*) =
+  instr* (CONST I32 0) (CONST I32 n) (TABLE.INIT y x) (ELEM.DROP x)
+
+def $rundata__(dataidx, u32, datamode) : instr*
+def $rundata__(x, n, PASSIVE) = eps
+def $rundata__(x, n, ACTIVE y instr*) =
+  instr* (CONST I32 0) (CONST I32 n) (MEMORY.INIT y x) (DATA.DROP x)
+
+
+;; TODO(2, rossberg): turn into reduction relation
+def $instdecs(store, moduleinst, externval*, dec*) : (store, moduleinst) hint(show $instdec*#((%,%,%)))
+def $instdecs(s, mm, eps, eps) = (s, mm)
+def $instdecs(s, mm, ev*, (TYPE rectype) dec*) = $instdecs(s, mm++{TYPES dt*}, ev*, dec*)
+  -- if dt* = $subst_all_deftypes($rolldt(|mm.TYPES|, rectype), dt'*)
+  -- if dt'* = mm.TYPES  ;; TODO(2, rossberg): inline
+def $instdecs(s, mm, (FUNC a) ev*, (IMPORT nm_1 nm_2 (FUNC yy)) dec*) = $instdecs(s, mm++{FUNCS a}, ev*, dec*)
+def $instdecs(s, mm, (GLOBAL a) ev*, (IMPORT nm_1 nm_2 (GLOBAL gt)) dec*) = $instdecs(s, mm++{GLOBALS a}, ev*, dec*)
+def $instdecs(s, mm, (TABLE a) ev*, (IMPORT nm_1 nm_2 (TABLE tt)) dec*) = $instdecs(s, mm++{TABLES a}, ev*, dec*)
+def $instdecs(s, mm, (MEM a) ev*, (IMPORT nm_1 nm_2 (MEM mt)) dec*) = $instdecs(s, mm++{MEMS a}, ev*, dec*)
+def $instdecs(s, mm, ev*, (FUNC x local* expr) dec*) = $instdecs(s', mm++{FUNCS a}, ev*, dec*)
+  -- if (s', a) = $allocfunc(s, mm.TYPES[x], (FUNC x local* expr), mm)
+def $instdecs(s, mm, ev*, (GLOBAL gt expr) dec*) = $instdecs(s', mm++{GLOBALS a}, ev*, dec*)
+  -- Eval_expr : s; {MODULE mm}; expr ~>* s; f; val
+  -- if (s', a) = $allocglobal(s, gt, val)
+def $instdecs(s, mm, ev*, (TABLE tt expr) dec*) = $instdecs(s', mm++{TABLES a}, ev*, dec*)
+  -- Eval_expr : s; {MODULE mm}; expr ~>* s; f; ref
+  -- if (s', a) = $alloctable(s, tt, ref)
+def $instdecs(s, mm, ev*, (MEMORY mt) dec*) = $instdecs(s', mm++{MEMS a}, ev*, dec*)
+  -- if (s', a) = $allocmem(s, mt)
+def $instdecs(s, mm, ev*, (ELEM rt expr* elemmode) dec*) = $instdecs(s'', mm++{ELEMS a}, ev*, dec*)
+  -- (Eval_expr : s; {MODULE mm}; expr ~>* s; f; ref)*
+  -- if (s', a) = $allocelem(s, rt, ref*)
+  -- Eval_expr: s'; {MODULE mm++{ELEMS a}}; $runelem__(|mm.ELEMS|, |expr*|, elemmode) ~>* s''; f; eps
+def $instdecs(s, mm, ev*, (DATA b* datamode) dec*) = $instdecs(s'', mm++{DATAS a}, ev*, dec*)
+  -- if (s', a) = $allocdata(s, OK, b*)
+  -- Eval_expr: s'; {MODULE mm++{DATAS a}}; $rundata__(|mm.DATAS|, |b*|, datamode) ~>* s''; f; eps
+def $instdecs(s, mm, ev*, (START x) dec*) = $instdecs(s', mm, ev*, dec*)
+  -- Eval_expr: s; {MODULE mm}; (CALL x) ~>* s'; f; eps
+def $instdecs(s, mm, ev*, (EXPORT nm (FUNC x)) dec*) = $instdecs(s, mm++{EXPORTS xi}, ev*, dec*)
+  -- if xi = {NAME nm, VALUE (FUNC mm.FUNCS[x])}
+def $instdecs(s, mm, ev*, (EXPORT nm (GLOBAL x)) dec*) = $instdecs(s, mm++{EXPORTS xi}, ev*, dec*)
+  -- if xi = {NAME nm, VALUE (GLOBAL mm.GLOBALS[x])}
+def $instdecs(s, mm, ev*, (EXPORT nm (TABLE x)) dec*) = $instdecs(s, mm++{EXPORTS xi}, ev*, dec*)
+  -- if xi = {NAME nm, VALUE (TABLE mm.TABLES[x])}
+def $instdecs(s, mm, ev*, (EXPORT nm (MEM x)) dec*) = $instdecs(s, mm++{EXPORTS xi}, ev*, dec*)
+  -- if xi = {NAME nm, VALUE (MEM mm.MEMS[x])}
+
+def $instantiate(store, module, externval*) : (store, moduleinst)
+def $instantiate(s, module, ev*) = (s', moduleinst)
   ---- ----
   -- Module_ok: |- module : xt_I* -> xt_E*
   -- (Externval_type: s |- externval : xt_I)*
   ----
+  ;; TODO(4, rossberg): match as MODULE dec*
   -- if module = MODULE type* import* func* global* table* mem* elem* data* start? export*
-  -- if global* = (GLOBAL globaltype expr_G)*
-  -- if table* = (TABLE tabletype expr_T)*
-  -- if elem* = (ELEM reftype expr_E* elemmode)*
-  -- if data* = (DATA byte* datamode)*
-  -- if start? = (START x)?
-  ;; TODO(2, rossberg): avoid this HACK and use moduleinst directly, or built it fully incrementally
-  -- if moduleinst_0 = {
-      TYPES $alloctypes(type*),
-      FUNCS $funcsxv(externval*) ($(|s.FUNCS|+i_F))^(i_F<|func*|),
-      GLOBALS $globalsxv(externval*), \
-    }
-  -- if z = s; {MODULE moduleinst_0}  ;; TODO(2, rossberg): inline
-  -- (Eval_expr : z; expr_G ~>* z; val_G)*
-  -- (Eval_expr : z; expr_T ~>* z; ref_T)*
-  -- (Eval_expr : z; expr_E ~>* z; ref_E)**
-  -- if (s', moduleinst) = $allocmodule(s, module, externval*, val_G*, ref_T*, (ref_E*)*)
-  -- if f = {MODULE moduleinst}  ;; TODO(2, rossberg): inline
-  -- if instr_E* = $concat_(instr, $runelem_(i_E, elem*[i_E])^(i_E<|elem*|))
-  -- if instr_D* = $concat_(instr, $rundata_(i_D, data*[i_D])^(i_D<|data*|))
-  -- if instr_S? = (CALL x)?
+  -- if dec* = type* import* func* global* table* mem* elem* data* export*
+  -- if (s', moduleinst) = $instdecs(s, {}, ev*, dec*)
+;)
 
 
 ;;
 ;; Invocation
 ;;
 
-def $invoke(store, funcaddr, val*) : config
-def $invoke(s, funcaddr, val*) = s; f; val* (REF.FUNC_ADDR funcaddr) (CALL_REF s.FUNCS[funcaddr].TYPE)
+def $invoke(store, funcaddr, val*) : (store, val*)
+def $invoke(s, funcaddr, val*) = (s', val'*)
   ---- ----
   -- Expand: s.FUNCS[funcaddr].TYPE ~~ FUNC (t_1* -> t_2*)
   -- (Val_type: s |- val : t_1)*
-  -- if f = {MODULE {}}  ;; TODO(2, rossberg): inline
+  -- Eval_expr: s; {MODULE {}}; val* (REF.FUNC_ADDR funcaddr) (CALL_REF s.FUNCS[funcaddr].TYPE) ~>* s'; f; val'*

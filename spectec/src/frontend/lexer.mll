@@ -193,6 +193,7 @@ and token = parse
   | "=>_" { ARROW2SUB }
   | "<=>" { DARROW2 }
   | "~>" { SQARROW }
+  | "~>_" { SQARROWSUB }
   | "~>*" { SQARROWSTAR }
   | "<<" { PREC }
   | ">>" { SUCC }

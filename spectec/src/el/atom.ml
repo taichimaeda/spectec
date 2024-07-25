@@ -28,6 +28,7 @@ and atom' =
   | Equiv                        (* `==` *)
   | Approx                       (* `~~` *)
   | SqArrow                      (* `~>` *)
+  | SqArrowSub                   (* `~>_` *)
   | SqArrowStar                  (* `~>*` *)
   | Prec                         (* `<<` *)
   | Succ                         (* `>>` *)
@@ -58,14 +59,15 @@ let compare atom1 atom2 =
 let is_sub atom =
   match atom.it with
   | Atom id -> id <> "" && id.[String.length id - 1] = '_'
-  | ArrowSub | Arrow2Sub -> true
+  | ArrowSub | Arrow2Sub | SqArrowSub -> true
   | _ -> false
 
 let sub atom1 atom2 = 
   match atom1.it, atom2.it with
   | Atom id1, Atom id2 -> id1 = id2 ^ "_"
   | ArrowSub, Arrow
-  | Arrow2Sub, Arrow2 -> true
+  | Arrow2Sub, Arrow2
+  | SqArrowSub, SqArrow -> true
   | _, _ -> false
 
 
@@ -93,6 +95,7 @@ let to_string atom =
   | Equiv -> "=="
   | Approx -> "~~"
   | SqArrow -> "~>"
+  | SqArrowSub -> "~>_"
   | SqArrowStar -> "~>*"
   | Prec -> "<<"
   | Succ -> ">>"
@@ -144,6 +147,7 @@ let name atom =
   | Equiv -> "equiv"
   | Approx -> "approx"
   | SqArrow -> "sqarrow"          (* Latex: \hookrightarrow *)
+  | SqArrowSub -> "sqarrowsub"    (* Latex: \hookrightarrow with subscript *)
   | SqArrowStar -> "sqarrowstar"  (* Latex: \hookrightarrow^\ast *)
   | Prec -> "prec"
   | Succ -> "succ"

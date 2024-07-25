@@ -123,7 +123,7 @@ let rec is_typcon t =
 %token EQ NE LT GT LE GE APPROX EQUIV ASSIGN SUB SUP EQCAT
 %token NOT AND OR
 %token QUEST PLUS MINUS STAR SLASH BACKSLASH UP CAT PLUSMINUS MINUSPLUS
-%token ARROW ARROW2 ARROWSUB ARROW2SUB DARROW2 SQARROW SQARROWSTAR
+%token ARROW ARROW2 ARROWSUB ARROW2SUB DARROW2 SQARROW SQARROWSUB SQARROWSTAR
 %token MEM PREC SUCC TURNSTILE TILESTURN
 %token DOLLAR TICK
 %token BOT TOP
@@ -144,7 +144,7 @@ let rec is_typcon t =
 %left AND
 %nonassoc TURNSTILE
 %nonassoc TILESTURN
-%right SQARROW SQARROWSTAR PREC SUCC BIGAND BIGOR BIGADD BIGMUL BIGCAT
+%right SQARROW SQARROWSUB SQARROWSTAR PREC SUCC BIGAND BIGOR BIGADD BIGMUL BIGCAT
 %left COLON SUB SUP ASSIGN EQUIV APPROX
 %left COMMA COMMA_NL
 %right EQ NE LT GT LE GE MEM
@@ -342,6 +342,7 @@ check_atom :
   | EQUIV { Atom.Equiv }
   | APPROX { Atom.Approx }
   | SQARROW { Atom.SqArrow }
+  | SQARROWSUB { Atom.SqArrowSub }
   | SQARROWSTAR { Atom.SqArrowStar }
   | PREC { Atom.Prec }
   | SUCC { Atom.Succ }
@@ -600,8 +601,7 @@ exp_rel_ :
 exp : exp_rel { $1 }
 
 fieldexp :
-  | fieldid exp_atom+
-    { ($1, match $2 with [e] -> e | es -> SeqE es $ $loc($2)) }
+  | fieldid exp_bin { ($1, $2) }
 
 
 arith_prim : arith_prim_ { $1 $ $sloc }

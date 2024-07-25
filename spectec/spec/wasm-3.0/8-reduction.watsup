@@ -16,7 +16,7 @@ rule Step/read:
   -- Step_read: z; instr* ~> instr'*
 
 rule Steps/refl:
-  z; instr* ~>* z; instr*
+  z; instr*  ~>*  z; instr*
 
 rule Steps/trans:
   z; instr*  ~>*  z''; instr''*
