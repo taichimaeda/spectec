@@ -203,17 +203,13 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}|}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}\)</span>.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
-</ol>
-</li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}\)</span> is <span class="math notranslate nohighlight">\(\epsilon\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Todo</p>
@@ -224,7 +220,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}} {.} {\mathit{unop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~{{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)} = c \\
+  &amp;\qquad \mbox{if}~c \in {{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)} \\
 &amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}} {.} {\mathit{unop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
   &amp;\qquad \mbox{if}~{{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)} = \epsilon \\
 \end{array}\end{split}\]</div>
@@ -236,17 +232,13 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}|}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}\)</span>.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
-</ol>
-</li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}\)</span> is <span class="math notranslate nohighlight">\(\epsilon\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Todo</p>
@@ -257,7 +249,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{nt}} {.} {\mathit{binop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~{{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)} = c \\
+  &amp;\qquad \mbox{if}~c \in {{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)} \\
 &amp; ({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{nt}} {.} {\mathit{binop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
   &amp;\qquad \mbox{if}~{{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)} = \epsilon \\
 \end{array}\end{split}\]</div>
@@ -309,17 +301,13 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}_1\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}_1{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}|}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}\)</span>.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}_2{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
-</ol>
-</li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}\)</span> is <span class="math notranslate nohighlight">\(\epsilon\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}_2{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id6">
 <p class="admonition-title">Todo</p>
@@ -330,7 +318,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; ({\mathit{nt}}_1{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}}_2 {.} {{\mathit{cvtop}}}{\mathsf{\_}}{{\mathit{nt}}_1}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; ({\mathit{nt}}_2{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~{{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)} = c \\
+  &amp;\qquad \mbox{if}~c \in {{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)} \\
 &amp; ({\mathit{nt}}_1{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{nt}}_2 {.} {{\mathit{cvtop}}}{\mathsf{\_}}{{\mathit{nt}}_1}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
   &amp;\qquad \mbox{if}~{{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)} = \epsilon \\
 \end{array}\end{split}\]</div>
@@ -1873,13 +1861,14 @@ respectively.</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)}\)</span>.</p></li>
+<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~c = {{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)} \\
+  &amp;\qquad \mbox{if}~c \in {{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvbinop-mathit-vvbinop">
@@ -1889,13 +1878,14 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)}\)</span>.</p></li>
+<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~c = {{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)} \\
+  &amp;\qquad \mbox{if}~c \in {{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvternop-mathit-vvternop">
@@ -1907,13 +1897,14 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}\)</span>.</p></li>
+<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_3)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \multicolumn{2}{l&#64;{}}{ (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) } \\
-  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~c = {{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}} \\
+  &amp;&amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~c \in {{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}} \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-instr-vec-mathsf-any-true">
@@ -1935,13 +1926,20 @@ respectively.</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)}\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
+<ol class="loweralpha simple">
+<li><p>Trap.</p></li>
+</ol>
+</li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{sh}} {.} {\mathit{vunop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~c = {{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)} \\
+  &amp;\qquad \mbox{if}~c \in {{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)} \\
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{sh}} {.} {\mathit{vunop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
+  &amp;\qquad \mbox{if}~{{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)} = \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="mathit-sh-mathit-vbinop">
@@ -1951,17 +1949,13 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}|}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span>.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
-</ol>
-</li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span> is <span class="math notranslate nohighlight">\(\epsilon\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id29">
 <p class="admonition-title">Todo</p>
@@ -1972,7 +1966,7 @@ respectively.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{sh}} {.} {\mathit{vbinop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~{{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)} = c \\
+  &amp;\qquad \mbox{if}~c \in {{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)} \\
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{sh}} {.} {\mathit{vbinop}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}}
   &amp;\qquad \mbox{if}~{{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)} = \epsilon \\
 \end{array}\end{split}\]</div>
@@ -2499,8 +2493,8 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_1)\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_2^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_2)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{cj}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{({\mathit{ci}}_1)}^\ast}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{cj}}_2^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{({\mathit{ci}}_2)}^\ast}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{cj}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{{\mathit{ci}}_1}^\ast}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{cj}}_2^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{{\mathit{ci}}_2}^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{\mathit{cj}}_1^\ast}~{{\mathit{cj}}_2^\ast})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
@@ -2526,8 +2520,8 @@ respectively.</p>
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
   &amp;\qquad \mbox{if}~{{\mathit{ci}}_1^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_1) \\
   &amp;&amp;&amp;&amp;\qquad {\land}~{{\mathit{ci}}_2^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_2) \\
-  &amp;&amp;&amp;&amp;\qquad {\land}~{{\mathit{cj}}_1^\ast} = {{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{({\mathit{ci}}_1)}^\ast} \\
-  &amp;&amp;&amp;&amp;\qquad {\land}~{{\mathit{cj}}_2^\ast} = {{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{({\mathit{ci}}_2)}^\ast} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{{\mathit{cj}}_1^\ast} = {{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{{\mathit{ci}}_1}^\ast} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{{\mathit{cj}}_2^\ast} = {{{{{\href{../exec/numerics.html#op-narrow}{\mathrm{narrow}}}}_{{|{{\mathsf{i}}{N}}_1|}, {|{{\mathsf{i}}{N}}_2|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{{\mathit{ci}}_2}^\ast} \\
   &amp;&amp;&amp;&amp;\qquad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{\mathit{cj}}_1^\ast}~{{\mathit{cj}}_2^\ast})} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
@@ -2560,9 +2554,10 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
-  &amp;\qquad \mbox{if}~{{c'}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1) \\
-  &amp;&amp;&amp;&amp;\qquad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{{\mathit{vcvtop}}}{{{}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}, {{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}}}{({c'})}^\ast})} \\
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
+  &amp;\qquad \mbox{if}~{{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1) \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{{{\mathit{cj}}^\ast}^\ast} = \Large\times~{{{\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}, {{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}({\mathit{vcvtop}}, {\mathit{ci}})^\ast} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~c \in {{{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{\mathit{cj}}^\ast})}^\ast} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{l}
@@ -2602,9 +2597,10 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{{\mathit{half}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{\epsilon}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{{\mathit{half}}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
   &amp;\qquad \mbox{if}~{{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_1){}[{\href{../syntax/instructions.html#syntax-half}{\mathit{half}}}({\mathit{half}}, 0, M_2) : M_2] \\
-  &amp;&amp;&amp;&amp;\qquad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{{\mathit{vcvtop}}}{{{}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}, {{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}}}{({\mathit{ci}})}^\ast})} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{{{\mathit{cj}}^\ast}^\ast} = \Large\times~{{{\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}}}_{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}, {{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}({\mathit{vcvtop}}, {\mathit{ci}})^\ast} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~c \in {{{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{\mathit{cj}}^\ast})}^\ast} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{l}
@@ -2641,9 +2637,10 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{{\mathit{zero}}}{\mathsf{\_}}{{{\mathit{nt}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2} {.} {{\mathit{vcvtop}}}{\mathsf{\_}}{{\mathit{zero}}}{\mathsf{\_}}{{{\mathit{nt}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{\epsilon}) &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)
   &amp;\qquad \mbox{if}~{{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}(c_1) \\
-  &amp;&amp;&amp;&amp;\qquad {\land}~c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{{\mathit{vcvtop}}}{{{}_{{{\mathit{nt}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}, {{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}}}{({\mathit{ci}})}^\ast}~{0^{M_1}})} \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~{{{\mathit{cj}}^\ast}^\ast} = \Large\times~({{{\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}}}_{{{\mathit{nt}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}, {{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}({\mathit{vcvtop}}, {\mathit{ci}})^\ast} \oplus {0^{M_1}}) \\
+  &amp;&amp;&amp;&amp;\qquad {\land}~c \in {{{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}}^{{-1}}}}{({{\mathit{cj}}^\ast})}^\ast} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{l}
