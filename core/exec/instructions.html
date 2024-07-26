@@ -3030,8 +3030,8 @@ However, it may be substantially slower on some hardware.</p>
 <ol class="loweralpha simple">
 <li><p>If <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop}}_{{\mathit{((Inn : Inn &lt;: numtype))}}_0}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\((n, {\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}})\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop}}_{{\mathit{((Inn : Inn &lt;: numtype))}}_0}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((n, {\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}})\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + n / 8\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
@@ -3042,8 +3042,8 @@ However, it may be substantially slower on some hardware.</p>
 <li><p>Let <span class="math notranslate nohighlight">\({\mathsf{i}}{N}\)</span> be <span class="math notranslate nohighlight">\({\mathit{numty}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop}}_{{\mathit{((Inn : Inn &lt;: numtype))}}_0}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\((n, {\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}})\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop}}_{{\mathit{((Inn : Inn &lt;: numtype))}}_0}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loado}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((n, {\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}})\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be the result for which <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{n}}(c)\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : n / 8]\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\(({\mathsf{i}}{N}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{n, {|{\mathsf{i}}{N}|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{(c)})\)</span> to the stack.</p></li>
 </ol>
