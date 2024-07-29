@@ -122,6 +122,7 @@ let argspec = Arg.align
     " Warn about unused or multiply used math splices";
   "--warn-prose", Arg.Set warn_prose,
     " Warn about unused or multiply used prose splices";
+  "--no-readable", Arg.Clear Il2al.Translate.readable, " Disable readability improvements during translation";
 
   "--check", Arg.Unit (fun () -> target := Check), " Check only (default)";
   "--latex", Arg.Unit (fun () -> target := Latex), " Generate Latex";
@@ -206,13 +207,13 @@ let () =
     in
 
     let match_function_name function_name al_elt=
-      
+
       if function_name="" then true
       else
       match al_elt.Util.Source.it with
-      | Al.Ast.RuleA (a, _, _) -> 
+      | Al.Ast.RuleA (a, _, _) ->
         (Al.Print.string_of_atom a) = (String.uppercase_ascii function_name)
-      | Al.Ast.FuncA (id , _, _) -> 
+      | Al.Ast.FuncA (id , _, _) ->
         id = (String.lowercase_ascii function_name)
     in
 

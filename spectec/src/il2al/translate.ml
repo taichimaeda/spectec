@@ -16,6 +16,11 @@ struct
 end
 
 
+(* Readability *)
+
+let readable = ref true
+
+
 (* Errors *)
 
 let error at msg = Error.error at "prose translation" msg
@@ -968,7 +973,7 @@ let translate_helper partial_funcs def =
       Transpile.merge_blocks blocks
       |> Transpile.insert_frame_binding
       |> Walk.(walk_instrs { default_config with pre_expr = Transpile.remove_sub })
-      |> Transpile.enhance_readability
+      |> (if !readable then Transpile.enhance_readability else Fun.id)
       |> (if List.mem id partial_funcs then Fun.id else Transpile.ensure_return)
       |> Transpile.flatten_if in
 
@@ -1273,7 +1278,7 @@ and translate_rgroup (instr_name, rgroup) =
     |> Transpile.insert_frame_binding
     |> insert_nop
     |> Walk.(walk_instrs { default_config with pre_expr = Transpile.remove_sub })
-    |> Transpile.enhance_readability
+    |> (if !readable then Transpile.enhance_readability else Fun.id)
     |> Transpile.infer_assert
     |> Transpile.flatten_if
   in
