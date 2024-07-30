@@ -169,13 +169,13 @@
 The mapping of numeric instructions to their underlying operators is expressed by the following definition:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lll&#64;{\qquad}l}
-\mathit{op}_{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}\scriptstyle\kern-0.1emN}}(i_1,\dots,i_k) &amp;=&amp; \href{../exec/numerics.html#int-ops}{\mathrm{i}\mathit{op}}_N(i_1,\dots,i_k) \\
-\mathit{op}_{\href{../syntax/types.html#syntax-numtype}{\mathsf{f}\scriptstyle\kern-0.1emN}}(z_1,\dots,z_k) &amp;=&amp; \href{../exec/numerics.html#float-ops}{\mathrm{f}\mathit{op}}_N(z_1,\dots,z_k) \\
+\mathit{op}_{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}\scriptstyle\kern-0.1emN}}(i_1,\dots,i_k) &amp;=&amp; \href{../Step_pure/numerics.html#int-ops}{\mathrm{i}\mathit{op}}_N(i_1,\dots,i_k) \\
+\mathit{op}_{\href{../syntax/types.html#syntax-numtype}{\mathsf{f}\scriptstyle\kern-0.1emN}}(z_1,\dots,z_k) &amp;=&amp; \href{../Step_pure/numerics.html#float-ops}{\mathrm{f}\mathit{op}}_N(z_1,\dots,z_k) \\
 \end{array}\end{split}\]</div>
 <p>And for <a class="reference internal" href="#exec-cvtop"><span class="std std-ref">conversion operators</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lll&#64;{\qquad}l}
-\href{../syntax/instructions.html#syntax-cvtop}{\mathit{cvtop}}^{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?}_{t_1,t_2}(c) &amp;=&amp; \href{../exec/numerics.html#convert-ops}{\mathit{cvtop}}^{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?}_{|t_1|,|t_2|}(c) \\
+\href{../syntax/instructions.html#syntax-cvtop}{\mathit{cvtop}}^{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?}_{t_1,t_2}(c) &amp;=&amp; \href{../Step_pure/numerics.html#convert-ops}{\mathit{cvtop}}^{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?}_{|t_1|,|t_2|}(c) \\
 \end{array}\end{split}\]</div>
 <p>Where the underlying operators are partial, the corresponding instruction will <a class="reference internal" href="../intro/overview.html#trap"><span class="std std-ref">trap</span></a> when the result is not defined.
 Where the underlying operators are non-deterministic, because they may return one of multiple possible <a class="reference internal" href="../syntax/values.html#syntax-nan"><span class="std std-ref">NaN</span></a> values, so are the corresponding instructions.</p>
@@ -1674,13 +1674,13 @@ since the instruction form is already a <a class="reference internal" href="runt
 <p>Vector instructions that operate bitwise are handled as integer operations of respective width.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lll&#64;{\qquad}l}
-\mathit{op}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v}\scriptstyle\kern-0.1emN}}(i_1,\dots,i_k) &amp;=&amp; \href{../exec/numerics.html#int-ops}{\mathrm{i}\mathit{op}}_N(i_1,\dots,i_k) \\
+\mathit{op}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v}\scriptstyle\kern-0.1emN}}(i_1,\dots,i_k) &amp;=&amp; \href{../Step_pure/numerics.html#int-ops}{\mathrm{i}\mathit{op}}_N(i_1,\dots,i_k) \\
 \end{array}\end{split}\]</div>
 <p>Most other vector instructions are defined in terms of numeric operators that are applied lane-wise according to the given <a class="reference internal" href="../syntax/instructions.html#syntax-shape"><span class="std std-ref">shape</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llll}
 \mathit{op}_{t\mathsf{x}N}(n_1,\dots,n_k) &amp;=&amp;
-  \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t\mathsf{x}N}(\href{../exec/instructions.html#exec-instr-numeric}{\mathit{op}}_t(i_1,\dots,i_k)^\ast) &amp; \qquad(\mathrel{\mbox{if}} i_1^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_1) \land \dots \land i_k^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_k) \\
+  \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t\mathsf{x}N}(\href{../Step_pure/instructions.html#exec-instr-numeric}{\mathit{op}}_t(i_1,\dots,i_k)^\ast) &amp; \qquad(\mathrel{\mbox{if}} i_1^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_1) \land \dots \land i_k^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_k) \\
 \end{array}\end{split}\]</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
