@@ -927,31 +927,27 @@ since the instruction form is already a <a class="reference internal" href="runt
 \href{../exec/runtime.html#syntax-arrayinst}{\mathsf{type}}~z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x],\; \href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}~{({{\href{../exec/runtime.html#aux-packfield}{\mathrm{pack}}}}_{{\mathit{zt}}}({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}))^{n}} \}\end{array}} \\
 \end{array}\end{split}\]</div>
 </section>
-<section id="mathsf-array-new-data-x-y">
-<span id="exec-array-new-data"></span><h3><span class="math notranslate nohighlight">\(\mathsf{array{.}new\_data}~x~y\)</span><a class="headerlink" href="#mathsf-array-new-data-x-y" title="Permalink to this heading">¶</a></h3>
+<section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-new-data-x-y">
+<span id="exec-array-new-data"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_data}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-new-data-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\((\mathsf{const}~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~n)\)</span> from the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\((\mathsf{const}~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~i)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~y_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}})\)</span> be <span class="math notranslate nohighlight">\(y_0\)</span>.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\href{../syntax/types.html#syntax-arraytype}{\mathit{arraytype}}}_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-arraytype}{\mathit{arraytype}}}_0\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n \cdot {|{\mathit{zt}}|} / 8\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}|}\)</span>, then:</p>
-<ol class="arabic simple">
+<ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{cnn}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({b^\ast}\)</span> be <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}{}[i : n \cdot {|{\mathit{zt}}|} / 8]\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{gb}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({\mathrm{group}}_{{\mathit{bytes}}_{\mathit{by}}}({|{\mathit{zt}}|} / 8, {b^\ast})\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({c^{n}}\)</span> be <span class="math notranslate nohighlight">\({{\mathrm{inverse}}_{{\mathit{of}}_{\mathit{ibytes}}}({|{\mathit{zt}}|}, {\mathit{gb}})^\ast}\)</span>.</p></li>
-<li><p>Push the values <span class="math notranslate nohighlight">\({(\mathsf{const}~{\mathit{cnn}}~c)^{n}}\)</span> to the stack.</p></li>
-<li><p>Execute the instruction <span class="math notranslate nohighlight">\((\mathsf{array{.}new\_fixed}~x~n)\)</span>.</p></li>
-</ol>
-</li>
+<li><p>Assert: Due to validation, the length of <span class="math notranslate nohighlight">\(({\mathit{fresh}}_0)\)</span> for which <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {|{\mathit{zt}}|} / 8\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}{}[i : n \cdot {|{\mathit{zt}}|} / 8]\)</span> is <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{tmp}}^\ast}\)</span> be the result for which <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {|{\mathit{zt}}|} / 8\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}{}[i : n \cdot {|{\mathit{zt}}|} / 8]\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({c^\ast}\)</span> be the result for which for all <span class="math notranslate nohighlight">\({({\mathit{tmp}})^\ast}\)</span>, <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\mathit{zt}}}({c^\ast})\)</span> is <span class="math notranslate nohighlight">\({\mathit{tmp}}\)</span>.</p></li>
+<li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}){.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{{\href{../exec/numerics.html#aux-unpacknum}{\mathrm{unpack}}}}_{{\mathit{zt}}}(c)^{n}}\)</span> to the stack.</p></li>
+<li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_fixed}}~x~n)\)</span>.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id19">
 <p class="admonition-title">Todo</p>
