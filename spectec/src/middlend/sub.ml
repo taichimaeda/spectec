@@ -63,7 +63,7 @@ let arg_of_param param =
   | ExpP (id, t) -> ExpA (VarE id $$ param.at % t) $ param.at
   | TypP id -> TypA (VarT (id, []) $ param.at) $ param.at
   | DefP (id, _ps, _t) -> DefA id $ param.at
-  | GramP (id, _t) -> GramA (VarG (id, []) $ param.at) $ param.at
+  | GramP (id, t) -> GramA (VarG (id, []) $$ param.at % t) $ param.at
 
 let register_variant (env : env) (id : id) params (cases : typcase list) =
   if M.mem id.it env.typ then
@@ -164,6 +164,7 @@ and t_exp' env = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | MemE (exp1, exp2) -> MemE (t_exp env exp1, t_exp env exp2)
   | CaseE (mixop, e) -> CaseE (mixop, t_exp env e)
+  | SizeE sym -> SizeE (t_sym env sym)
   | SubE (e, t1, t2) -> SubE (e, t1, t2)
 
 and t_iter env = function
@@ -189,7 +190,7 @@ and t_sym' env = function
   | IterG (sym, iter) -> IterG (t_sym env sym, t_iterexp env iter)
   | AttrG (e, sym) -> AttrG (t_exp env e, t_sym env sym)
 
-and t_sym env x = { x with it = t_sym' env x.it }
+and t_sym env x = { x with it = t_sym' env x.it; note = t_typ env x.note }
 
 and t_arg' env = function
   | ExpA exp -> ExpA (t_exp env exp)
@@ -247,8 +248,8 @@ let t_inst env (inst : inst) = { inst with it = t_inst' env inst.it }
 let t_insts env = List.map (t_inst env)
 
 let t_prod' env = function
- | ProdD (binds, lhs, rhs, prems) ->
-   ProdD (t_binds env binds, t_sym env lhs, t_exp env rhs, t_prems env prems)
+ | ProdD (binds, args, lhs, rhs, prems) ->
+   ProdD (t_binds env binds, t_args env args, t_sym env lhs, t_exp env rhs, t_prems env prems)
 
 let t_prod env (prod : prod) = { prod with it = t_prod' env prod.it }
 
@@ -314,8 +315,9 @@ let rec rename_params s = function
       rename_params (Il.Subst.add_defid s id id') params
   | { it = GramP (id, t); at; _ } :: params ->
     let id' = (id.it ^ "_2") $ id.at in
+    let t' = Il.Subst.subst_typ s t in
     (GramP (id', t) $ at) ::
-      rename_params (Il.Subst.add_gramid s id (VarG (id', []) $ id.at)) params
+      rename_params (Il.Subst.add_gramid s id (VarG (id', []) $$ id.at % t')) params
 
 let insert_injections env (def : def) : def list =
   add_type_info env def;

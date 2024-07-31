@@ -156,19 +156,19 @@ and reduce_exp env e : exp =
     | AddOp _, NatE n1, NatE n2 -> NatE Z.(n1 + n2) $> e
     | AddOp _, NatE z0, _ when z0 = Z.zero -> e2'
     | AddOp _, _, NatE z0 when z0 = Z.zero -> e1'
-    | SubOp _, NatE n1, NatE n2 -> NatE Z.(n1 - n2) $> e
+    | SubOp _, NatE n1, NatE n2 when n1 >= n2 -> NatE Z.(n1 - n2) $> e
     | SubOp t, NatE z0, _ when z0 = Z.zero -> UnE (MinusOp t, e2') $> e
     | SubOp _, _, NatE z0 when z0 = Z.zero -> e1'
     | MulOp _, NatE n1, NatE n2 -> NatE Z.(n1 * n2) $> e
     | MulOp _, NatE z1, _ when z1 = Z.one -> e2'
     | MulOp _, _, NatE z1 when z1 = Z.one -> e1'
-    | DivOp _, NatE n1, NatE n2 -> NatE Z.(n1 / n2) $> e
+    | DivOp _, NatE n1, NatE n2 when Z.(rem n1 n2 = Z.zero) -> NatE Z.(n1 / n2) $> e
     | DivOp _, NatE z0, _ when z0 = Z.zero -> e1'
     | DivOp _, _, NatE z1 when z1 = Z.one -> e1'
     | ModOp _, NatE n1, NatE n2 -> NatE Z.(rem n1 n2) $> e
     | ModOp _, NatE z0, _ when z0 = Z.zero -> e1'
     | ModOp _, _, NatE z1 when z1 = Z.one -> NatE Z.zero $> e
-    | ExpOp _, NatE n1, NatE n2 -> NatE Z.(n1 ** to_int n2) $> e
+    | ExpOp _, NatE n1, NatE n2 when n2 >= Z.zero -> NatE Z.(n1 ** to_int n2) $> e
     | ExpOp _, NatE z01, _ when z01 = Z.zero || z01 = Z.one -> e1'
     | ExpOp _, _, NatE z0 when z0 = Z.zero -> NatE Z.one $> e
     | ExpOp _, _, NatE z1 when z1 = Z.one -> e1'
@@ -333,6 +333,9 @@ and reduce_exp env e : exp =
     | _ -> CatE (e1', e2')
     ) $> e
   | CaseE (op, e1) -> CaseE (op, reduce_exp env e1) $> e
+  | SizeE {it = NatG _; _} -> NatE Z.one $> e
+  | SizeE {it = TextG t; _} -> NatE (Z.of_int (String.length t)) $> e
+  | SizeE _ -> e
   | SubE (e1, t1, t2) when equiv_typ env t1 t2 ->
     reduce_exp env e1
   | SubE (e1, t1, t2) ->
@@ -602,6 +605,10 @@ and match_exp' env s e1 e2 : subst option =
   | CallE (id1, args1), CallE (id2, args2) when id1.it = id2.it ->
     match_list match_arg env s args1 args2
 *)
+  | _, UncaseE (e21, mixop) ->
+    match_exp' env s (CaseE (mixop, e1) $$ e1.at % e21.note) e21
+  | _, ProjE (e21, i) ->  (* TODO: TERRIBLE HACK, this should do proper eta expansion *)
+    match_exp' env s (TupE (List.init (i + 1) (fun _ -> e1)) $$ e1.at % e21.note) e21
   | IterE (e11, iter1), IterE (e21, iter2) ->
     let* s' = match_exp' env s e11 e21 in
     match_iterexp env s' iter1 iter2
@@ -683,6 +690,9 @@ and match_sym env s g1 g2 : subst option =
   match g1.it, g2.it with
   | _, VarG (id, []) when Subst.mem_gramid s id ->
     match_sym env s g1 (Subst.subst_sym s g2)
+  | _, VarG (id, []) when not (Map.mem id.it env.grams) ->
+    (* An unbound grammar is treated as a pattern variable *)
+    Some (Subst.add_gramid s id g1)
   | VarG (id1, args1), VarG (id2, args2) when id1.it = id2.it ->
     match_list match_arg env s args1 args2
   | IterG (g11, iter1), IterG (g21, iter2) ->
@@ -693,7 +703,10 @@ and match_sym env s g1 g2 : subst option =
 (* Parameters *)
 
 and match_arg env s a1 a2 : subst option =
-  Debug.(log_in "il.match_arg" (fun _ -> fmt "%s =: %s" (il_arg a1) (il_arg a2)));
+  Debug.(log "il.match_arg"
+    (fun _ -> fmt "%s =: %s" (il_arg a1) (il_arg a2))
+    (fun r -> fmt "%s" (opt il_subst r))
+  ) @@ fun _ ->
   match a1.it, a2.it with
   | ExpA e1, ExpA e2 -> match_exp env s e1 e2
   | TypA t1, TypA t2 -> match_typ env s t1 t2
@@ -799,7 +812,7 @@ and equiv_params env ps1 ps2 =
       Some (Subst.add_defid s id2 id1)
     | GramP (id1, t1), GramP (id2, t2) ->
       if not (equiv_typ env t1 t2) then None else
-      Some (Subst.add_gramid s id2 (VarG (id1, []) $ p1.at))
+      Some (Subst.add_gramid s id2 (VarG (id1, []) $$ p1.at % t1))
     | _, _ -> assert false
   ) (Some Subst.empty) ps1 ps2
 

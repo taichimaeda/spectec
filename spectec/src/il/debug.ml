@@ -16,6 +16,9 @@ let il_param = string_of_param
 let il_args = list il_arg
 let il_params = list il_param
 let il_def = string_of_def
+
+let il_text s = il_exp Util.Source.(Ast.(TextE s $$ no_region % (TextT $ no_region)))
+
 let il_free s = String.concat " "
   Free.[
     set s.typid;
@@ -23,6 +26,7 @@ let il_free s = String.concat " "
     set s.gramid;
     set s.defid;
   ]
+
 let il_subst s = String.concat " "
   Subst.[
     mapping il_typ s.typid;

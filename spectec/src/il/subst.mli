@@ -23,6 +23,7 @@ val subst_typ : subst -> typ -> typ
 val subst_exp : subst -> exp -> exp
 val subst_path : subst -> path -> path
 val subst_sym : subst -> sym -> sym
+val subst_prod : subst -> prod -> prod
 val subst_prem : subst -> prem -> prem
 val subst_arg : subst -> arg -> arg
 val subst_param : subst -> param -> param
@@ -34,5 +35,6 @@ val subst_typbind : subst -> exp * typ -> exp * typ
 val subst_args : subst -> arg list -> arg list
 val subst_binds : subst -> bind list -> bind list * subst
 val subst_params : subst -> param list -> param list * subst
+val subst_prems : subst -> prem list -> prem list
 
 val subst_list : (subst -> 'a -> 'a) -> subst -> 'a list -> 'a list

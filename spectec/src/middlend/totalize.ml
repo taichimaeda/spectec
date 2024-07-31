@@ -102,6 +102,7 @@ and t_exp' env = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | MemE (exp1, exp2) -> MemE (t_exp env exp1, t_exp env exp2)
   | CaseE (mixop, e) -> CaseE (mixop, t_exp env e)
+  | SizeE sym -> SizeE (t_sym env sym)
   | SubE (exp, t1, t2) -> SubE (t_exp env exp, t_typ env t1, t_typ env t2)
 
 and t_iter env = function
@@ -127,7 +128,7 @@ and t_sym' env = function
   | IterG (sym, iter) -> IterG (t_sym env sym, t_iterexp env iter)
   | AttrG (e, sym) -> AttrG (t_exp env e, t_sym env sym)
 
-and t_sym env x = { x with it = t_sym' env x.it }
+and t_sym env x = { x with it = t_sym' env x.it; note = t_typ env x.note }
 
 and t_arg' env = function
   | ExpA exp -> ExpA (t_exp env exp)
@@ -183,8 +184,8 @@ let t_inst env (inst : inst) = { inst with it = t_inst' env inst.it }
 let t_insts env = List.map (t_inst env)
 
 let t_prod' env = function
- | ProdD (binds, lhs, rhs, prems) ->
-   ProdD (t_binds env binds, t_sym env lhs, t_exp env rhs, t_prems env prems)
+ | ProdD (binds, args, lhs, rhs, prems) ->
+   ProdD (t_binds env binds, t_args env args, t_sym env lhs, t_exp env rhs, t_prems env prems)
 
 let t_prod env (prod : prod) = { prod with it = t_prod' env prod.it }
 
@@ -213,7 +214,7 @@ let rec t_def' env = function
           [ExpB (x, typI, []) $ x.at], ExpA (VarE x $$ no_region % typI) $ no_region
         | TypP id -> [], TypA (VarT (id, []) $ no_region) $ no_region
         | DefP (id, _, _) -> [], DefA id $ no_region
-        | GramP (id, _) -> [], GramA (VarG (id, []) $ no_region) $ no_region
+        | GramP (id, typI) -> [], GramA (VarG (id, []) $$ no_region % typI) $ no_region
         ) params' |> List.split in
       let catch_all = DefD (List.concat binds, args,
         OptE None $$ no_region % typ'', []) $ no_region in

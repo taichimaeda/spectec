@@ -106,11 +106,11 @@ and subst_deftyp s dt =
 
 and subst_typfield s (atom, (bs, t, prems), hints) =
   let bs', s' = subst_binds s bs in
-  (atom, (bs', subst_typ s' t, subst_list subst_prem s' prems), hints)
+  (atom, (bs', subst_typ s' t, subst_prems s' prems), hints)
 
 and subst_typcase s (op, (bs, t, prems), hints) =
   let bs', s' = subst_binds s bs in
-  (op, (bs', subst_typ s' t, subst_list subst_prem s' prems), hints)
+  (op, (bs', subst_typ s' t, subst_prems s' prems), hints)
 
 
 (* Expressions *)
@@ -145,6 +145,7 @@ and subst_exp s e =
   | ListE es -> ListE (subst_list subst_exp s es)
   | CatE (e1, e2) -> CatE (subst_exp s e1, subst_exp s e2)
   | CaseE (op, e1) -> CaseE (op, subst_exp s e1)
+  | SizeE g -> SizeE (subst_sym s g)
   | SubE (e1, t1, t2) -> SubE (subst_exp s e1, subst_typ s t1, subst_typ s t2)
   ) $$ e.at % subst_typ s e.note
 
@@ -214,7 +215,17 @@ and subst_sym s g =
   | RangeG (g1, g2) -> RangeG (subst_sym s g1, subst_sym s g2)
   | IterG (g1, iter) -> IterG (subst_sym s g1, subst_iterexp s iter)
   | AttrG (e, g1) -> AttrG (subst_exp s e, subst_sym s g1)
-  ) $ g.at
+  ) $$ g.at % subst_typ s g.note
+
+and subst_prod s prod =
+  (match prod.it with
+  | ProdD (bs, as_, g, e, prems) ->
+    let bs', s' = subst_binds s bs in
+    ProdD (
+      bs', subst_args s' as_,
+      subst_sym s' g, subst_exp s' e, subst_prems s' prems
+    )
+  ) $ prod.at
 
 
 (* Premises *)
@@ -228,6 +239,8 @@ and subst_prem s prem =
     IterPr (subst_prem s prem1, subst_iterexp s iterexp)
   | LetPr (e1, e2, ids) -> LetPr (subst_exp s e1, subst_exp s e2, ids)
   ) $ prem.at
+
+and subst_prems s prems = subst_list subst_prem s prems
 
 
 (* Definitions *)
@@ -273,4 +286,5 @@ let subst_typ s t = if s = empty then t else subst_typ s t
 let subst_deftyp s dt = if s = empty then dt else subst_deftyp s dt
 let subst_exp s e = if s = empty then e else subst_exp s e
 let subst_sym s g = if s = empty then g else subst_sym s g
+let subst_prod s pr = if s = empty then pr else subst_prod s pr
 let subst_prem s pr = if s = empty then pr else subst_prem s pr

@@ -10,6 +10,24 @@ let prefix s f x = s ^ f x
 let space f x = " " ^ f x ^ " "
 
 
+let add_hex buf c = Printf.bprintf buf "\\%02x" (Char.code c)
+let add_char buf = function
+  | '\n' -> Buffer.add_string buf "\\n"
+  | '\t' -> Buffer.add_string buf "\\t"
+  | '\"' -> Buffer.add_string buf "\\\""
+  | '\\' -> Buffer.add_string buf "\\\\"
+  | c when '\x20' <= c && c < '\x7f' -> Buffer.add_char buf c
+  | c -> add_hex buf c
+
+let string_with add_char s =
+  let buf = Buffer.create 256 in
+  String.iter (add_char buf) s;
+  Buffer.contents buf
+
+let binary = string_with add_hex
+let escape = string_with add_char
+
+
 (* Operators *)
 
 let string_of_unop = function
@@ -114,7 +132,10 @@ and string_of_exp e =
   | VarE id -> id.it
   | BoolE b -> string_of_bool b
   | NatE n -> Z.to_string n
-  | TextE t -> "\"" ^ String.escaped t ^ "\""
+  | TextE t when String.for_all (fun c -> '\x20' <= c && c < '\x7f') t ->
+    "\"" ^ escape t ^ "\""
+  | TextE t ->
+    "\"" ^ binary t ^ "\""
   | UnE (op, e2) -> string_of_unop op ^ " " ^ string_of_exp e2
   | BinE (op, e1, e2) ->
     "(" ^ string_of_exp e1 ^ space string_of_binop op ^ string_of_exp e2 ^ ")"
@@ -140,14 +161,19 @@ and string_of_exp e =
   | CallE (id, as1) -> "$" ^ id.it ^ string_of_args as1
   | IterE (e1, iter) -> string_of_exp e1 ^ string_of_iterexp iter
   | ProjE (e1, i) -> string_of_exp e1 ^ "." ^ string_of_int i
+  | UncaseE (e1, [[]; []]) ->
+    string_of_exp e1 ^ "!" ^ string_of_typ_name e1.note
   | UncaseE (e1, op) ->
     string_of_exp e1 ^ "!" ^ string_of_mixop op ^ "_" ^ string_of_typ_name e1.note
   | OptE eo -> "?(" ^ string_of_exps "" (Option.to_list eo) ^ ")"
   | TheE e1 -> "!(" ^ string_of_exp e1 ^ ")"
   | ListE es -> "[" ^ string_of_exps " " es ^ "]"
   | CatE (e1, e2) -> string_of_exp e1 ^ " :: " ^ string_of_exp e2
+  | CaseE ([[]; []], e1) ->
+    string_of_typ_name e.note ^ string_of_exp_args e1
   | CaseE (op, e1) ->
     string_of_mixop op ^ "_" ^ string_of_typ_name e.note ^ string_of_exp_args e1
+  | SizeE g -> "||" ^ string_of_sym g ^ "||"
   | SubE (e1, t1, t2) ->
     "(" ^ string_of_exp e1 ^ " : " ^ string_of_typ t1 ^ " <: " ^ string_of_typ t2 ^ ")"
 
@@ -185,7 +211,7 @@ and string_of_iterexp (iter, bs) =
 and string_of_sym g =
   match g.it with
   | VarG (id, args) -> id.it ^ string_of_args args
-  | NatG n -> Printf.sprintf "0x%02X" n
+  | NatG b -> Printf.sprintf "0x%02X" (Char.code b)
   | TextG t -> "\"" ^ String.escaped t ^ "\""
   | EpsG -> "eps"
   | SeqG gs -> "{" ^ concat " " (List.map string_of_sym gs) ^ "}"
@@ -227,7 +253,8 @@ and string_of_bind bind =
   match bind.it with
   | ExpB (id, t, iters) ->
     let dim = String.concat "" (List.map string_of_iter iters) in
-    id.it ^ dim ^ " : " ^ string_of_typ t ^ dim
+    let ty = string_of_typ t in
+    id.it ^ dim ^ (if ty = id.it then "" else " : " ^ ty ^ dim)
   | TypB id -> "syntax " ^ id.it
   | DefB (id, ps, t) -> "def $" ^ id.it ^ string_of_params ps ^ " : " ^ string_of_typ t
   | GramB (id, ps, t) -> "grammar " ^ id.it ^ string_of_params ps ^ " : " ^ string_of_typ t
@@ -278,10 +305,10 @@ let string_of_clause ?(suppress_pos = false) id clause =
 
 let string_of_prod ?(suppress_pos = false) prod =
   match prod.it with
-  | ProdD (bs, g, e, prems) ->
+  | ProdD (bs, as_, g, e, prems) ->
     "\n" ^ region_comment ~suppress_pos "  " prod.at ^
-    "  prod" ^ string_of_binds bs ^ " " ^ string_of_sym g ^ " => " ^
-      string_of_exp e ^
+    "  prod" ^ string_of_binds bs ^ string_of_args as_ ^ " " ^
+      string_of_sym g ^ " => " ^ string_of_exp e ^
       concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
 let rec string_of_def ?(suppress_pos = false) d =

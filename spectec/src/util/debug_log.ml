@@ -1,5 +1,5 @@
 (* List of actively logged functions' labels *)
-let active : string list = []
+let active : string list = ["il.parse_prod"]
 
 let fmt = Printf.sprintf
 
