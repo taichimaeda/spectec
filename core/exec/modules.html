@@ -524,9 +524,9 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
   \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}}~{\href{../exec/runtime.html#syntax-externval}{\mathrm{globals}}}({{\href{../exec/runtime.html#syntax-externval}{\mathit{externval}}}^\ast}) \}\end{array}} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~z = s ; \{ \begin{array}[t]{&#64;{}l&#64;{}}
 \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}_0 \}\end{array}} \\
-   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~(z ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{g}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} z ; {\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_{\mathsf{g}})^\ast} \\
-   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~(z ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{t}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} z ; {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}})^\ast} \\
-   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{(z ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{e}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} z ; {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}})^\ast}^\ast} \\
+   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~({z'}, {{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_{\mathsf{g}}^\ast}) = {{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, {{\href{../syntax/types.html#syntax-globaltype}{\mathit{globaltype}}}^\ast}, {{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{g}}^\ast})}} \\
+   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~({z'} ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{t}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} {z'} ; {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}})^\ast} \\
+   \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{({z'} ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{e}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} {z'} ; {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}})^\ast}^\ast} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~({s'}, {\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}) = {\href{../exec/modules.html#alloc-module}{\mathrm{allocmodule}}}(s, {\href{../syntax/modules.html#syntax-module}{\mathit{module}}}, {{\href{../exec/runtime.html#syntax-externval}{\mathit{externval}}}^\ast}, {{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_{\mathsf{g}}^\ast}, {{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}}^\ast}, {({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}}^\ast})^\ast})} \\
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~f = \{ \begin{array}[t]{&#64;{}l&#64;{}}
 \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}} \}\end{array}} \\
@@ -535,6 +535,15 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
    \multicolumn{4}{&#64;{}l&#64;{}}{\qquad\quad {\land}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{s}}^?} = {(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call}}~x)^?}} \\
 \end{array}\end{split}\]</div>
 <p>where:</p>
+<div class="math notranslate nohighlight" id="eval-globals">
+\[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
+{{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, \epsilon, \epsilon)} &amp;=&amp; (z, \epsilon) \\
+{{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, {\mathit{gt}}~{{\mathit{gt}'}^\ast}, {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}~{{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}'}^\ast})} &amp;=&amp; \multicolumn{2}{l&#64;{}}{ ({z'}, {\href{../exec/runtime.html#syntax-val}{\mathit{val}}}~{{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}) } \\
+  &amp;&amp; \multicolumn{2}{l&#64;{}}{\quad \mbox{if}~z ; {\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}} \href{../exec/conventions.html#exec-notation}{\hookrightarrow^\ast} z ; {\href{../exec/runtime.html#syntax-val}{\mathit{val}}}} \\
+  &amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~z = s ; f} \\
+  &amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~({s'}, a) = {\href{../exec/modules.html#alloc-global}{\mathrm{allocglobal}}}(s, {\mathit{gt}}, {\href{../exec/runtime.html#syntax-val}{\mathit{val}}})} \\
+  &amp;&amp; \multicolumn{2}{l&#64;{}}{\quad {\land}~({z'}, {{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}) = {{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(({s'} ; f{}[{.}\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}} \mathrel{{=}{\oplus}} a]), {{\mathit{gt}'}^\ast}, {{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}'}^\ast})}} \\
+\end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight" id="aux-rundata">
 <span id="aux-runelem"></span>\[\begin{split}\begin{array}{&#64;{}lcl&#64;{}l&#64;{}}
 {{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{x}(\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}~{\mathit{rt}}~{e^{n}}~(\href{../syntax/modules.html#syntax-elemmode}{\mathsf{passive}})) &amp;=&amp; \epsilon \\
