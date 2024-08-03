@@ -2,6 +2,7 @@
 let active : string list = ["il.parse_prod"]
 
 let fmt = Printf.sprintf
+let loc = Source.string_of_region
 
 let log_exn _exn =
   if active <> [] then

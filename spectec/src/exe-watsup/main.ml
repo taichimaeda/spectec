@@ -206,13 +206,12 @@ let () =
     log "IL Validation...";
     Il.Valid.valid il;
 
-    (match !target with
-    | Prose | Splice _ | Interpreter _ ->
-      enable_pass Sideconditions;
-    | _ when !print_al || !print_al_o <> "" ->
-      enable_pass Sideconditions;
-    | _ -> ()
-    );
+    let need_al =
+      match !target with
+      | Prose | Splice _ | Interpreter _ -> true
+      | _ -> !print_al || !print_al_o <> ""
+    in
+    if need_al then enable_pass Sideconditions;
 
     let il =
       List.fold_left (fun il pass ->
@@ -233,8 +232,8 @@ let () =
     if !print_final_il && not !print_all_il then print_il il;
 
     let al =
-      if not (!print_al || !print_al_o <> "") && (!target = Check || !target = Latex) then []
-      else (
+      if not need_al then [] else
+      (
         log "Translating to AL...";
         (Il2al.Translate.translate il @ Il2al.Manual.manual_algos)
       )
@@ -255,6 +254,11 @@ let () =
     else if !print_al_o <> "" then
       Printf.printf "%s\n%!"
         (List.filter (match_algo_name !print_al_o) al |> List.map Al.Print.string_of_algorithm |> String.concat "\n");
+
+    (* WIP
+    log "AL Validation...";
+    Al.Valid.valid al;
+    *)
 
     (match !target with
     | Check -> ()

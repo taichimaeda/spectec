@@ -17,13 +17,13 @@ let empty = ""
 let error at msg step = raise (Exception.Error (at, msg, step))
 
 let fail_expr expr msg =
-  failwith ("on expr `" ^ structured_string_of_expr expr ^ "` " ^ msg)
+  failwith ("on expr `" ^ string_of_expr expr ^ "` " ^ msg)
 
 let fail_path path msg =
-  failwith ("on path `" ^ structured_string_of_path path ^ "` " ^ msg)
+  failwith ("on path `" ^ string_of_path path ^ "` " ^ msg)
 
 let try_with_error fname at stringifier f step =
-  let prefix = if fname <> empty then fname ^ ": " else fname in
+  let prefix = if fname <> empty then "$" ^ fname ^ ": " else fname in
   try f step with
   | Construct.InvalidConversion msg
   | Exception.InvalidArg msg
@@ -49,6 +49,12 @@ let transpose matrix =
       let new_rows = transpose' (xs :: List.map List.tl xss) in
       new_row :: new_rows in
   transpose' matrix
+
+let extract_exp a =
+  match a.it with
+  | ExpA e -> Some e
+  | TypA _ -> None
+let extract_expargs = List.filter_map extract_exp
 
 
 let rec create_sub_al_context names iter env =
@@ -221,13 +227,15 @@ and eval_expr env expr =
     let v1 = eval_expr env e1 in
     eval_expr env e2 |> unwrap_listv_to_array |> Array.exists ((=) v1) |> boolV
   (* Function Call *)
-  | CallE (fname, el) ->
+  | CallE (fname, al) ->
+    let el = extract_expargs al in
     let args = List.map (eval_expr env) el in
     (match call_func fname args  with
     | Some v -> v
     | _ -> raise (Exception.MissingReturnValue fname)
     )
-  | InvCallE (fname, _, el) ->
+  | InvCallE (fname, _, al) ->
+    let el = extract_expargs al in
     (* TODO: refactor numerics function name *)
     let args = List.map (eval_expr env) el in
     (match call_func ("inverse_of_"^fname) args  with
@@ -536,9 +544,11 @@ and step_instr (fname: string) (ctx: AlContext.t) (env: value Env.t) (instr: ins
     ctx
   | PopI e ->
     (match e.it with
-    | FrameE _ ->
+    | FrameE (_, inner_e) ->
       (match WasmContext.pop_context () with
-      | FrameV _, _, _ -> ctx
+      | FrameV (_, inner_v), _, _ ->
+        let new_env = assign inner_e inner_v env in
+        AlContext.set_env new_env ctx
       | v, _, _ -> failwith (sprintf "current context `%s` is not a frame" (string_of_value v))
       )
     | IterE ({ it = VarE name; _ }, [name'], ListN (e', None)) when name = name' ->
@@ -560,7 +570,8 @@ and step_instr (fname: string) (ctx: AlContext.t) (env: value Env.t) (instr: ins
   | LetI (e1, e2) ->
     let new_env = ctx |> AlContext.get_env |> assign e1 (eval_expr env e2) in
     AlContext.set_env new_env ctx
-  | PerformI (f, el) ->
+  | PerformI (f, al) ->
+    let el = extract_expargs al in
     let args = List.map (eval_expr env) el in
     call_func f args |> ignore;
     ctx
@@ -614,7 +625,7 @@ and step_instr (fname: string) (ctx: AlContext.t) (env: value Env.t) (instr: ins
   | _ -> failwith "cannot step instr"
 
 and try_step_instr fname ctx env instr =
-  try_with_error fname instr.at structured_string_of_instr (step_instr fname ctx env) instr
+  try_with_error fname instr.at string_of_instr (step_instr fname ctx env) instr
 
 and step_wasm (ctx: AlContext.t) : value -> AlContext.t = function
   (* TODO: Change ref.null semantics *)
@@ -685,6 +696,8 @@ and create_context (name: string) (args: value list) : AlContext.mode =
   let algo = lookup_algo name in
   let params = params_of_algo algo in
   let body = body_of_algo algo in
+
+  let params = params |> extract_expargs in
 
   if List.length args <> List.length params then (
     error
