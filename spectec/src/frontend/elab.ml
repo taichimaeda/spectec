@@ -1618,13 +1618,11 @@ and elab_sym' env g : Il.sym' * typ * env =
   | RangeG (g1, g2) ->
     let g1', t1, env1 = elab_sym env g1 in
     let g2', t2, env2 = elab_sym env g2 in
-    if env1 != env then
-      error g1.at "invalid symbol in range";
-    if env2 != env then
-      error g2.at "invalid symbol in range";
+    if env1 <> env2 then
+      error g2.at "inconsistent symbols in range";
     if not (equiv_typ env t1 t2) then
       error_typ2 env g2.at "range item" t2 t1 " of other range item";
-    Il.RangeG (g1', g2'), TupT [] $ g.at, env
+    Il.RangeG (g1', g2'), TupT [] $ g.at, env1
   | ParenG g1 -> elab_sym' env g1
   | TupG _ -> error g.at "malformed grammar"
   | ArithG e -> elab_sym' env (sym_of_exp e)

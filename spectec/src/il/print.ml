@@ -219,7 +219,7 @@ and string_of_path p =
 
 and string_of_iterexp (iter, xes) =
   string_of_iter iter ^ "{" ^ String.concat ", "
-    (List.map (fun (id, e) -> string_of_id id ^ " <- " ^ string_of_exp e) xes) ^ "}"
+    (List.map (fun (id, e) -> string_of_id id ^ "<-" ^ string_of_exp e) xes) ^ "}"
 
 
 (* Grammars *)

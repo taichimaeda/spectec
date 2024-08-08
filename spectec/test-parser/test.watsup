@@ -1,0 +1,85 @@
+grammar Teps : nat = eps => 42
+
+grammar Tbyte : nat = i:0x32 => i
+
+grammar Ttext : () = "AÄÜ" => ()
+
+grammar Bseq : nat = i:0x03 j:0x04 eps k:0x02 => $(i + j * k)
+
+grammar Tseq : () = eps "A" eps "BC" "D" => ()
+
+grammar Talt : () = "A" | "BC" | "D" | "" => ()
+
+grammar Tprod : nat = "A" => 1 | "BC" => 2 | "D" => 3 | "" => 0
+
+grammar Brng : nat = i:0x10 | ... | i:0x20 => i
+
+var ns : nat*
+var no : nat?
+
+grammar Bstar : nat* = ns:0x01* => ns
+grammar Bstar2 : nat* = is*:0x01* => is*
+
+grammar Tstar : () = "AB"* => ()
+
+grammar Bplus : nat* = ns:0x01+ => ns
+grammar Bplus2 : nat* = i*:0x01+ => i*
+
+grammar Tplus : () = "ABC"+ => ()
+
+grammar Bquest : nat? = no:0x01? => no
+grammar Bquest2 : nat? = i?:0x01? => i?
+
+grammar Tquest : () = "ABCD"? => ()
+
+grammar Bnth : nat* = ns:0x01^(2*2) => ns
+grammar Bnth2 : nat* = i*:0x01^(2*2) => i*
+
+grammar Tnth : () = "ABC"^(7-4) => ()
+
+grammar Bdef : nat = i:0x03 j:0x04 => $(i + j)
+grammar Bvar : nat = i:0x01 k:Bdef j:0x10 => $(i*j + k)
+
+grammar Brec : nat* = eps => eps | 0x01 ns:Brec => 1 ns
+grammar Brec2 : nat* = eps => eps | 0x01 i*:Brec2 => 1 i*
+
+grammar Btest1 : nat* = 0x01 i*:Brng* 0x02 => i*
+
+grammar Btest2 : nat* = 0x00 => eps | i:Brng j*:Btest2 => i j*
+
+
+syntax N = nat
+syntax byte = 0x00|...|0xFF
+syntax expr = nat*
+syntax local = nat
+syntax code hint(macro none) = (local*, expr)
+
+grammar Bbyte : byte = b:0x00 | ... | b:0xFF => b
+
+grammar BuN(N) : nat =
+  | n:Bbyte                 => n                       -- if $(n < 2^7 /\ n < 2^N)
+  | n:Bbyte m:BuN(($(N-7))) => $(2^7 * m + (n - 2^7))  -- if $(n >= 2^7 /\ N > 7)
+grammar Bu32 : nat = n:BuN(32) => n
+
+grammar Blist(grammar BX : el) : el* =
+  | n:Bu32 el*:BX^n => el*
+
+def $concat_(syntax X, (X*)*) : X*  hint(show (++) %2)
+def $concat_(syntax X, eps) = eps
+def $concat_(syntax X, (w*) (w'*)*) = w* ++ $concat_(X, (w'*)*)
+
+grammar Binstr : nat =
+  | 0x1A => 0x1A
+  | 0x1B => 0x1B
+
+grammar Bexpr : expr =
+  | in*:Binstr* 0x0B => in*
+
+grammar Bvaltype : nat = 0x7F => 0x7F
+grammar Blocals : local* =
+  | n:Bu32 t:Bvaltype => t^n
+
+var e : expr
+grammar Bfunc : code =
+  | loc**:Blist(Blocals) e:Bexpr => ($concat_(local, loc**), e)
+    -- if $(|$concat_(local, loc**)| < 2^32)

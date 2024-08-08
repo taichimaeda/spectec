@@ -312,7 +312,7 @@ and reduce_exp env e : exp =
         else if List.for_all Option.is_some eos' then
           let es1' = List.map Option.get eos' in
           let s = List.fold_left2 Subst.add_varid Subst.empty ids es1' in
-          reduce_exp env (Subst.subst_exp s e1')
+          OptE (Some (reduce_exp env (Subst.subst_exp s e1'))) $> e
         else
           IterE (e1', iterexp') $> e
       | List | List1 ->
@@ -327,7 +327,7 @@ and reduce_exp env e : exp =
         let ns = List.map List.length ess' in
         let n = Z.to_int n' in
         if List.for_all ((=) n) ns then
-          (TupE (List.init n (fun i ->
+          (ListE (List.init n (fun i ->
             let esI' = List.map (fun es -> List.nth es i) ess' in
             let s = List.fold_left2 Subst.add_varid Subst.empty ids esI' in
             let s' =

@@ -3,6 +3,7 @@
   (deps
     (file ../src/exe-watsup/main.exe)
     (glob_files_rec ../spec/*)
+    (glob_files *.watsup)
   )
   (files TEST.md)
 )

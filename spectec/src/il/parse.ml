@@ -69,7 +69,7 @@ let rec parse_sym env is s g : results =
   Debug.(log "il.parse_sym"
   	(fun _ -> fmt "%s: %s" (il_sym g) (il_text (rest is)))
   	(function
-    | Success (is, _, e, _) -> fmt "success[%s] %s" (il_exp e) (il_text (rest is))
+    | Success (is, s, e, _) -> fmt "success[%s] {%s} %s" (il_exp e) (mapping il_exp s.varid) (il_text (rest is))
     | Failure (_, msg) -> "failure: " ^ msg
     )
   ) @@ fun _ ->
@@ -108,13 +108,15 @@ let rec parse_sym env is s g : results =
     failure is "out of range byte"
   | RangeG _ ->
     failure is "unexpected end of input"
-  | IterG (g1, (Opt, _)) ->
+  | IterG (g1, (Opt, _xes)) ->
+    (* TODO(3, rossberg): need to reverse-match xes *)
     success is 0 s (OptE None $$ at is 0 % g.note) |||
     lazy (
       let* is', s', e = parse_sym env is s g1 in
       success is' 0 s' (OptE (Some e) $$ e.at % g.note)
     )
-  | IterG (g1, (List, _)) ->
+  | IterG (g1, (List, _xes)) ->
+    (* TODO(3, rossberg): need to reverse-match xes *)
     success is 0 s (ListE [] $$ at is 0 % g.note) |||
     lazy (
       let* is', s', e = parse_sym env is s g1 in
@@ -122,19 +124,21 @@ let rec parse_sym env is s g : results =
       let at = over_region [e.at; e'.at] in
       success is'' 0 s'' (ListE (e :: as_listE e') $$ at % g.note)
     )
-  | IterG (g1, (List1, xts)) ->
+  | IterG (g1, (List1, xes)) ->
     let* is', s', e = parse_sym env is s g1 in
-    let g' = {g with it = IterG (g1, (List, xts))} in
+    let g' = {g with it = IterG (g1, (List, xes))} in
     let* is'', s'', e' = parse_sym env is' s' g' in
     let at = over_region [e.at; e'.at] in
     success is'' 0 s'' (ListE (e :: as_listE e') $$ at % g.note)
-  | IterG (g1, (ListN (en, ido), xts)) ->
+  | IterG (g1, (ListN (en, ido), xes)) ->
     (match (Eval.reduce_exp env (Subst.subst_exp s en)).it with
     | NatE n when n = Z.zero ->
+      (* TODO(3, rossberg): need to reverse-match xes *)
       success is 0 s (ListE [] $$ at is 0 % g.note)
     | NatE n ->
+      (* TODO(3, rossberg): need to reverse-match xes *)
       let en' = {en with it = NatE Z.(sub n one)} in
-      let g' = {g with it = IterG (g1, (ListN (en', ido), xts))} in
+      let g' = {g with it = IterG (g1, (ListN (en', ido), xes))} in
       let* is', s', e = parse_sym env is s g1 in
       let* is'', s'', e' = parse_sym env is' s' g' in
       let at = over_region [e.at; e'.at] in
@@ -166,12 +170,14 @@ and parse_prod env is as_ prod =
 	  | Some s ->
 	    let g', e', prems' =
     	  Subst.(subst_sym s g, subst_exp s e, subst_prems s prems) in
+      Debug.(log_in "il.parse_prod" (fun _ -> "arg subst: " ^ mapping il_exp s.varid));
       let* is', s', _e' = parse_sym env is Subst.empty g' in
-      Debug.(log_in "il.parse_prod" (fun _ -> "premises " ^ mapping il_exp s'.varid));
+      Debug.(log_in "il.parse_prod" (fun _ -> "prem subst: " ^ mapping il_exp s'.varid));
       match Eval.reduce_prems env (Subst.subst_prems s' prems') with
       | None -> Printf.printf "[1]\n%!"; failure is "cannot verify side condition"
       | Some false -> Printf.printf "[2]\n%!"; failure is "violating side condition"
-      | Some true -> Printf.printf "[3]\n%!"; success is' 0 Subst.empty (Eval.reduce_exp env (Subst.subst_exp s' e'))
+      | Some true -> Printf.printf "[3] e'=%s\n%!" (Debug.il_exp e');
+      success is' 0 Subst.empty (Eval.reduce_exp env (Subst.subst_exp s' e'))
   )
 
 and parse_prods env is as_ = function
