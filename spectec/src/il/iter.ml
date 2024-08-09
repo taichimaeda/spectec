@@ -162,7 +162,7 @@ and sym g =
   | TextG s -> text s
   | EpsG -> ()
   | SeqG gs | AltG gs -> list sym gs
-  | RangeG (g1, g2) -> sym g1; sym g2
+  | RangeG (n1, n2) -> nat n1; nat n2
   | IterG (g1, it) -> sym g1; iterexp it
   | AttrG (e, g1) -> exp e; sym g1
 

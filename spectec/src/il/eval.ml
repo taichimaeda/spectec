@@ -498,6 +498,10 @@ and reduce_prems env = function
     | other -> other
 
 and reduce_prem env prem : bool option =
+  Debug.(log "il.reduce_prem"
+    (fun _ -> fmt "%s" (il_prem prem))
+    (fun r -> fmt "%s" (match r with None -> "-" | Some b -> string_of_bool b))
+  ) @@ fun _ ->
   match prem.it with
   | RulePr _ -> None
   | IfPr e ->
@@ -512,7 +516,49 @@ and reduce_prem env prem : bool option =
     | None -> None
     | exception Irred -> None
     )
-  | IterPr (_prem, _iter) -> None  (* TODO(3, rossberg): reduce? *)
+  | IterPr (prem1, iterexp) ->
+    let iter', xes' = reduce_iterexp env iterexp in
+    let ids, es' = List.split xes' in
+    match iter' with
+    | Opt ->
+      let eos' = List.map as_opt_exp es' in
+      if List.for_all Option.is_none eos' then
+        Some true
+      else if List.for_all Option.is_some eos' then
+        let es1' = List.map Option.get eos' in
+        let s = List.fold_left2 Subst.add_varid Subst.empty ids es1' in
+        reduce_prem env (Subst.subst_prem s prem1)
+      else
+        None
+    | List | List1 ->
+      let n = List.length (as_list_exp (List.hd es')) in
+      if iter' = List || n >= 1 then
+        let en = NatE (Z.of_int n) $$ prem.at % (NumT NatT $ prem.at) in
+        reduce_prem env (IterPr (prem1, (ListN (en, None), xes')) $ prem.at)
+      else
+        None
+    | ListN ({it = NatE n'; _}, ido) ->
+      let ess' = List.map as_list_exp es' in
+      let ns = List.map List.length ess' in
+      let n = Z.to_int n' in
+      if List.for_all ((=) n) ns then
+        List.fold_left (fun b_opt i ->
+          match b_opt with
+          | None | Some false -> b_opt
+          | Some true ->
+            let esI' = List.map (fun es -> List.nth es i) ess' in
+            let s = List.fold_left2 Subst.add_varid Subst.empty ids esI' in
+            let s' =
+              Option.fold ido ~none:s ~some:(fun id ->
+                let en = NatE (Z.of_int i) $$ id.at % (NumT NatT $ id.at) in
+                Subst.add_varid s id en
+              )
+            in reduce_prem env (Subst.subst_prem s' prem1)
+        ) (Some true) (List.init n Fun.id)
+      else
+        None
+    | ListN _ ->
+      None
 
 
 (* Matching *)

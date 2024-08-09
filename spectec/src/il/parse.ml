@@ -22,8 +22,8 @@ let at is n =
 
 (* Results *)
 
-type results =
-  | Success of stream * Subst.t * exp * results Lazy.t
+type 'a results =
+  | Success of stream * Subst.t * 'a * 'a results Lazy.t
   | Failure of stream * string
 
 let failure is msg = Failure (is, msg)
@@ -37,7 +37,7 @@ let rec append_results r1 lr2 =
 
 let rec map_results r f =
   match r with
-  | Failure _ -> r
+  | Failure (is, s) -> Failure (is, s)
   | Success (is, s, e, tl) ->
     append_results (f (is, s, e)) (lazy (map_results (Lazy.force tl) f))
 
@@ -47,25 +47,7 @@ let (|||) r lr = append_results r (lazy (Printf.printf "[|||]\n%!"; Lazy.force l
 
 (* Parsing *)
 
-let as_listE e =
-  match e.it with
-  | ListE es -> es
-  | _ -> assert false
-
-let rec sym_value g =
-  match g.it with
-  | NatG b -> b
-  | AttrG (_, g1) -> sym_value g1
-  | _ -> assert false
-
-let rec value_sym g b =
-  (match g.it with
-  | NatG _ -> NatG b
-  | AttrG (e, g1) -> AttrG (e, value_sym g1 b)
-  | _ -> assert false
-  ) $$ g.at % g.note
-
-let rec parse_sym env is s g : results =
+let rec parse_sym env is s g : exp results =
   Debug.(log "il.parse_sym"
   	(fun _ -> fmt "%s: %s" (il_sym g) (il_text (rest is)))
   	(function
@@ -79,16 +61,22 @@ let rec parse_sym env is s g : results =
     let src = str is (pos is' - pos is) in
     let s' = Subst.add_gramid s x (TextG src $$ x.at % (TextT $ x.at)) in (* HACK *)
     success is' 0 s' e
+  | NatG _b when eof is ->
+    failure is "unexpected end of input"
   | NatG b ->
     let n = Char.code b in
-    if eof is then failure is "unexpected end of input" else
-    if get is <> b then failure is (Printf.sprintf "byte 0x%02X expected" n) else
-    success is 1 s (NatE (Z.of_int n) $$ at is 1 % g.note)
+    if get is = b then
+      success is 1 s (NatE (Z.of_int n) $$ at is 1 % g.note)
+    else
+      failure is (Printf.sprintf "byte 0x%02X expected" n)
+  | TextG t when rem is < String.length t ->
+    failure is "unexpected end of input"
   | TextG t ->
     let n = String.length t in
-    if rem is < n then failure is "unexpected end of input" else
-    if str is n <> t then failure is (Printf.sprintf "text `%s` expected" t) else
-    success is n s (TextE t $$ at is n % g.note)
+    if str is n = t then
+      success is n s (TextE t $$ at is n % g.note)
+    else
+      failure is (Printf.sprintf "text `%s` expected" t)
   | EpsG ->
     success is 0 s (TupE [] $$ at is 0 % g.note)
   | SeqG [] ->
@@ -100,56 +88,54 @@ let rec parse_sym env is s g : results =
     failure is "unexpected input"
   | AltG (g1::gs) ->
     parse_sym env is s g1 ||| lazy (parse_sym env is s {g with it = AltG gs})
-  | RangeG (g1, g2) when not (eof is) && get is >= sym_value g1 && get is < sym_value g2->
-    parse_sym env is s (value_sym g1 (get is))
-  | RangeG (_g1, g2) when not (eof is) && get is = sym_value g2 ->
-    parse_sym env is s g2
-  | RangeG _ when not (eof is) ->
-    failure is "out of range byte"
-  | RangeG _ ->
+  | RangeG _ when eof is ->
     failure is "unexpected end of input"
+  | RangeG (b1, b2) when b1 <= get is && get is <= b2->
+    parse_sym env is s (NatG (get is) $$ g.at % g.note)
+  | RangeG _ ->
+    failure is "out of range byte"
   | IterG (g1, (Opt, _xes)) ->
-    (* TODO(3, rossberg): need to reverse-match xes *)
-    success is 0 s (OptE None $$ at is 0 % g.note) |||
-    lazy (
-      let* is', s', e = parse_sym env is s g1 in
-      success is' 0 s' (OptE (Some e) $$ e.at % g.note)
-    )
+    (let* is', s', eo = parse_exp_opt env is s g1 in
+    success is' 0 s' (OptE eo $$ g.at % g.note) : exp results)
   | IterG (g1, (List, _xes)) ->
-    (* TODO(3, rossberg): need to reverse-match xes *)
-    success is 0 s (ListE [] $$ at is 0 % g.note) |||
-    lazy (
-      let* is', s', e = parse_sym env is s g1 in
-      let* is'', s'', e' = parse_sym env is' s' g in
-      let at = over_region [e.at; e'.at] in
-      success is'' 0 s'' (ListE (e :: as_listE e') $$ at % g.note)
-    )
-  | IterG (g1, (List1, xes)) ->
-    let* is', s', e = parse_sym env is s g1 in
-    let g' = {g with it = IterG (g1, (List, xes))} in
-    let* is'', s'', e' = parse_sym env is' s' g' in
-    let at = over_region [e.at; e'.at] in
-    success is'' 0 s'' (ListE (e :: as_listE e') $$ at % g.note)
-  | IterG (g1, (ListN (en, ido), xes)) ->
+    let* is', s', es = parse_exp_list env is s g1 in
+    success is' 0 s' (ListE es $$ g.at % g.note)
+  | IterG (g1, (List1, _xes)) ->
+    let* is', s', es = parse_exp_list env is s g1 in
+    if es = [] then
+      failure is "non-empty sequence expected"
+    else
+      success is' 0 s' (ListE es $$ g.at % g.note)
+  | IterG (g1, (ListN (en, _ido), _xes)) ->
+    let* is', s', es = parse_exp_list env is s g1 in
     (match (Eval.reduce_exp env (Subst.subst_exp s en)).it with
-    | NatE n when n = Z.zero ->
-      (* TODO(3, rossberg): need to reverse-match xes *)
-      success is 0 s (ListE [] $$ at is 0 % g.note)
+    | NatE n when n = Z.of_int (List.length es) ->
+      success is' 0 s' (ListE es $$ g.at % g.note)
     | NatE n ->
-      (* TODO(3, rossberg): need to reverse-match xes *)
-      let en' = {en with it = NatE Z.(sub n one)} in
-      let g' = {g with it = IterG (g1, (ListN (en', ido), xes))} in
-      let* is', s', e = parse_sym env is s g1 in
-      let* is'', s'', e' = parse_sym env is' s' g' in
-      let at = over_region [e.at; e'.at] in
-      success is'' 0 s'' (ListE (e :: as_listE e') $$ at % g.note)
-    | _ -> failure is "cannot determine list length"
+      failure is ("sequence of length " ^ Z.to_string n ^ " expected")
+    | _ ->
+      failure is "cannot determine expected length of sequence"
     )
   | AttrG (e, g1) ->
     let* is', s', e' = parse_sym env is s g1 in
     match Eval.match_exp env s' e' e with
     | Some s'' -> success is' 0 s'' e'
     | None -> failure is "result does not match attribute pattern"
+
+and parse_exp_opt env is s g1 : exp option results =
+    success is 0 s None |||
+    lazy (
+      let* is', s', e = parse_sym env is s g1 in
+      success is' 0 s' (Some e)
+    )
+
+and parse_exp_list env is s g1 : exp list results =
+    success is 0 s [] |||
+    lazy (
+      let* is', s', e = parse_sym env is s g1 in
+      let* is'', s'', es = parse_exp_list env is' s' g1 in
+      success is'' 0 s'' (e::es)
+    )
 
 and parse_prod env is as_ prod =
   Debug.(log "il.parse_prod"
@@ -173,6 +159,13 @@ and parse_prod env is as_ prod =
       Debug.(log_in "il.parse_prod" (fun _ -> "arg subst: " ^ mapping il_exp s.varid));
       let* is', s', _e' = parse_sym env is Subst.empty g' in
       Debug.(log_in "il.parse_prod" (fun _ -> "prem subst: " ^ mapping il_exp s'.varid));
+let active = !Debug.active in
+Debug.active := "il.reduce_exp" :: "il.reduce_prem" :: "il.subst_prem" :: !Debug.active;
+let prs = Subst.subst_prems s' prems' in
+Debug.(log_in "il.parse_prod" (fun _ -> "prems: " ^ list il_prem prs));
+let b = Eval.reduce_prems env prs in
+Debug.active := active;
+Debug.(log_in "il.parse_prod" (fun _ -> "prems: " ^ (match b with None -> "-" | Some b -> string_of_bool b)));
       match Eval.reduce_prems env (Subst.subst_prems s' prems') with
       | None -> Printf.printf "[1]\n%!"; failure is "cannot verify side condition"
       | Some false -> Printf.printf "[2]\n%!"; failure is "violating side condition"

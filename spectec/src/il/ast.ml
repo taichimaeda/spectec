@@ -128,7 +128,7 @@ and sym' =
   | EpsG                                     (* `eps` *)
   | SeqG of sym list                         (* sym sym *)
   | AltG of sym list                         (* sym `|` sym *)
-  | RangeG of sym * sym                      (* sym `|` `...` `|` sym *)
+  | RangeG of char * char                    (* nat `|` `...` `|` nat *)
   | IterG of sym * iterexp                   (* sym iter *)
   | AttrG of exp * sym                       (* exp `:` sym *)
 

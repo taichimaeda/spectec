@@ -118,8 +118,6 @@ let argspec = Arg.align
   "-i", Arg.Set in_place, " Splice patch files in-place";
   "-d", Arg.Set dry, " Dry run (when -p) ";
   "-o", Arg.Unit (fun () -> file_kind := Output), " Output files";
-  "-l", Arg.Set logging, " Log execution steps";
-  "-ll", Arg.Set Backend_interpreter.Runner.logging, " Log interpreter execution";
   "-w", Arg.Unit (fun () -> warn_math := true; warn_prose := true),
     " Warn about unused or multiply used splices";
   "--warn-math", Arg.Set warn_math,
@@ -140,6 +138,11 @@ let argspec = Arg.align
     " Generate interpreter";
 
   "--latex-macros", Arg.Set latex_macros, " Splice Latex with macro invocations";
+
+  "-l", Arg.Set logging, " Log execution steps";
+  "-ll", Arg.Set Backend_interpreter.Runner.logging, " Log interpreter execution";
+  "--debug", Arg.String (fun s -> Util.Debug_log.active := s :: !Util.Debug_log.active),
+    " Turn on debugging log for named function";
 
   "--print-el", Arg.Set print_el, " Print EL";
   "--print-il", Arg.Set print_elab_il, " Print IL (after elaboration)";

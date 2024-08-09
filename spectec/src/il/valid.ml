@@ -525,16 +525,18 @@ and valid_sym env g : typ =
     TupT [] $ g.at
   | AltG gs ->
     let _ts = List.map (valid_sym env) gs in
+    if Free.(free_list free_sym gs).varid <> Free.Set.empty then
+      error g.at "variable occurrences in alternative grammar";
     TupT [] $ g.at
-  | RangeG (g1, g2) ->
-    let t1 = valid_sym env g1 in
-    let t2 = valid_sym env g2 in
-    equiv_typ env t1 (NumT NatT $ g1.at) g.at;
-    equiv_typ env t2 (NumT NatT $ g2.at) g.at;
-    TupT [] $ g.at
+  | RangeG (b1, b2) ->
+    if b1 > b2 then
+      error g.at "inconsistent range bounds";
+    NumT NatT $ g.at
   | IterG (g1, iterexp) ->
     let iter, env' = valid_iterexp ~side:`Lhs env iterexp g.at in
     let t1 = valid_sym env' g1 in
+    if (Free.free_sym g1).varid <> Free.Set.empty then
+      error g.at "variable occurrences in iteration grammar";
     IterT (t1, iter) $ g.at
   | AttrG (e, g1) ->
     let t1 = valid_sym env g1 in

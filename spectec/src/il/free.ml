@@ -160,9 +160,8 @@ and bound_iterexp (iter, xes) =
 and free_sym g =
   match g.it with
   | VarG (id, as_) -> free_gramid id + free_args as_
-  | NatG _ | TextG _ | EpsG -> empty
+  | NatG _ | TextG _ | EpsG | RangeG _ -> empty
   | SeqG gs | AltG gs -> free_list free_sym gs
-  | RangeG (g1, g2) -> free_sym g1 + free_sym g2
   | IterG (g1, iter) -> (free_sym g1 - bound_iterexp iter) + free_iterexp iter
   | AttrG (e, g1) -> free_exp e + free_sym g1
 

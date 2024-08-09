@@ -68,7 +68,7 @@ let subst_varid s id =
   match Map.find_opt id.it s.varid with
   | None -> id
   | Some {it = VarE id'; _} -> id'
-  | Some _ -> raise (Invalid_argument "subst_varid")
+  | Some _ -> assert false
 
 let subst_defid s id =
   match Map.find_opt id.it s.defid with
@@ -79,7 +79,7 @@ let subst_gramid s id =
   match Map.find_opt id.it s.gramid with
   | None -> id
   | Some {it = VarG (id', []); _} -> id'
-  | Some _ -> raise (Invalid_argument "subst_varid")
+  | Some _ -> assert false
 
 
 (* Iterations *)
@@ -133,9 +133,9 @@ and subst_exp s e =
   (match e.it with
   | VarE id ->
     (match Map.find_opt id.it s.varid with
-    | None -> VarE id
-    | Some e' -> e'.it
-    )
+    | None -> e
+    | Some e' -> e'
+    ).it
   | BoolE _ | NatE _ | TextE _ -> e.it
   | UnE (op, e1) -> UnE (op, subst_exp s e1)
   | BinE (op, e1, e2) -> BinE (op, subst_exp s e1, subst_exp s e2)
@@ -187,12 +187,15 @@ and subst_iterexp s (iter, xes) =
 
 and subst_sym s g =
   (match g.it with
+  | VarG (id, []) ->
+    (match Map.find_opt id.it s.gramid with
+    | None -> g
+    | Some g' -> g'
+    ).it
   | VarG (id, args) -> VarG (subst_gramid s id, List.map (subst_arg s) args)
-  | NatG _ | TextG _ -> g.it
-  | EpsG -> EpsG
+  | NatG _ | TextG _ | EpsG | RangeG _ -> g.it
   | SeqG gs -> SeqG (subst_list subst_sym s gs)
   | AltG gs -> AltG (subst_list subst_sym s gs)
-  | RangeG (g1, g2) -> RangeG (subst_sym s g1, subst_sym s g2)
   | IterG (g1, iterexp) ->
     let it', s' = subst_iterexp s iterexp in
     IterG (subst_sym s' g1, it')
@@ -213,6 +216,7 @@ and subst_prod s prod =
 (* Premises *)
 
 and subst_prem s prem =
+  Util.Debug_log.(log "il.subst_prem" (fun _ -> Print.string_of_prem prem) Print.string_of_prem) @@ fun _ ->
   (match prem.it with
   | RulePr (id, op, e) -> RulePr (id, op, subst_exp s e)
   | IfPr e -> IfPr (subst_exp s e)

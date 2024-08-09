@@ -184,10 +184,9 @@ and t_path env x = { x with it = t_path' env x.it; note = t_typ env x.note }
 
 and t_sym' env = function
   | VarG (id, args) -> VarG (id, t_args env args)
-  | (NatG _ | TextG _ | EpsG) as g -> g
+  | (NatG _ | TextG _ | EpsG | RangeG _) as g -> g
   | SeqG syms -> SeqG (List.map (t_sym env) syms)
   | AltG syms -> AltG (List.map (t_sym env) syms)
-  | RangeG (sym1, sym2) -> RangeG (t_sym env sym1, t_sym env sym2)
   | IterG (sym, iter) -> IterG (t_sym env sym, t_iterexp env iter)
   | AttrG (e, sym) -> AttrG (t_exp env e, t_sym env sym)
 

@@ -1614,23 +1614,42 @@ and elab_sym' env g : Il.sym' * typ * env =
     Il.SeqG gs', TupT [] $ g.at, env'
   | AltG gs ->
     let gs', _ts, _env' = elab_sym_list env (filter_nl gs) in
+    if Free.(free_nl_list free_sym gs).varid <> Free.Set.empty then
+      error g.at "variable occurrences in alternative grammar";
     Il.AltG gs', TupT [] $ g.at, env
   | RangeG (g1, g2) ->
-    let g1', t1, env1 = elab_sym env g1 in
-    let g2', t2, env2 = elab_sym env g2 in
-    if env1 <> env2 then
-      error g2.at "inconsistent symbols in range";
-    if not (equiv_typ env t1 t2) then
-      error_typ2 env g2.at "range item" t2 t1 " of other range item";
-    Il.RangeG (g1', g2'), TupT [] $ g.at, env1
+    (match g1.it, g2.it with
+    | AttrG (e1, g11), AttrG (e2, g21) ->
+      (* allow inner attributes as long as they are consistent *)
+      if not (Eq.eq_exp e1 e2) then
+        error g.at "inconsistent attribute patterns in range";
+      elab_sym' env (AttrG (e1, RangeG (g11, g21) $ g.at) $ g.at)
+    | NatG (_, n1), NatG (_, n2) ->
+      let _g1', _t1, _env1 = elab_sym env g1 in
+      let _g2', _t2, _env2 = elab_sym env g2 in
+      if n1 > n2 then
+        error g.at "inconsistent range bounds";
+      Il.RangeG (Char.chr (Z.to_int n1), Char.chr (Z.to_int n2)),
+        NumT NatT $ g.at, env
+    | _, _ -> error g.at "malformed range"
+    )
   | ParenG g1 -> elab_sym' env g1
   | TupG _ -> error g.at "malformed grammar"
   | ArithG e -> elab_sym' env (sym_of_exp e)
   | IterG (g1, iter) ->
-    let g1', t1, env1 = elab_sym env g1 in
-    let iterexp' = elab_iterexp env iter in
-    let iter' = match iter with Opt -> Opt | _ -> List in
-    Il.IterG (g1', iterexp'), IterT (t1, iter') $ g.at, env1
+    (match g1.it with
+    | AttrG (e11, g11) | ParenG {it = AttrG (e11, g11); _} ->
+      (* allow inner attributes as long as they are immediate *)
+      elab_sym' env (AttrG (IterE (e11, Iter.clone_iter iter) $ g.at,
+        IterG (g11, iter) $ g.at) $ g.at)
+    | _ ->
+      let g1', t1, env1 = elab_sym env g1 in
+      let iterexp' = elab_iterexp env iter in
+      let iter' = match iter with Opt -> Opt | _ -> List in
+      if (Free.free_sym g1).varid <> Free.Set.empty then
+        error g.at "variable occurrences in iteration grammar";
+      Il.IterG (g1', iterexp'), IterT (t1, iter') $ g.at, env1
+    )
   | AttrG (e, g1) ->
     let g1', t1, env1 = elab_sym env g1 in
     let e' = elab_exp env1 e t1 in

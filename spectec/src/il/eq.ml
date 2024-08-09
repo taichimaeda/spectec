@@ -123,7 +123,6 @@ and eq_sym g1 g2 =
     eq_id id1 id2 && eq_list eq_arg args1 args2
   | SeqG gs1, SeqG gs2
   | AltG gs1, AltG gs2 -> eq_list eq_sym gs1 gs2
-  | RangeG (g11, g12), RangeG (g21, g22) -> eq_sym g11 g21 && eq_sym g12 g22
   | IterG (g11, iter1), IterG (g21, iter2) ->
     eq_sym g11 g21 && eq_iterexp iter1 iter2
   | AttrG (e1, g11), AttrG (e2, g21) -> eq_exp e1 e2 && eq_sym g11 g21

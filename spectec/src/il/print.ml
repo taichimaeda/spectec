@@ -224,15 +224,18 @@ and string_of_iterexp (iter, xes) =
 
 (* Grammars *)
 
+and string_of_byte b =
+  Printf.sprintf "0x%02X" (Char.code b)
+
 and string_of_sym g =
   match g.it with
   | VarG (id, args) -> string_of_id id ^ string_of_args args
-  | NatG b -> Printf.sprintf "0x%02X" (Char.code b)
+  | NatG b -> string_of_byte b
   | TextG t -> "\"" ^ String.escaped t ^ "\""
   | EpsG -> "eps"
   | SeqG gs -> "{" ^ concat " " (List.map string_of_sym gs) ^ "}"
   | AltG gs -> "(" ^ concat " | " (List.map string_of_sym gs) ^ ")"
-  | RangeG (g1, g2) -> string_of_sym g1 ^ " | ... | " ^ string_of_sym g2
+  | RangeG (b1, b2) -> "(" ^ string_of_byte b1  ^ " | ... | " ^ string_of_byte b2 ^ ")"
   | IterG (g1, iter) -> string_of_sym g1 ^ string_of_iterexp iter
   | AttrG (e, g1) -> string_of_exp e ^ ":" ^ string_of_sym g1
 

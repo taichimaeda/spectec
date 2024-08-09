@@ -109,6 +109,15 @@ $ ../src/exe-watsup/main.exe test.watsup --parse-string Bstar2 "\01\01\01"
 ```
 
 ```sh
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bstar3 ""
+[]
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bstar3 "\01"
+[1]
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bstar3 "\01\01\01"
+[1 1 1]
+```
+
+```sh
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Tstar ""
 ()
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Tstar "AB"
@@ -140,6 +149,15 @@ $ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus2 ""
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus2 "\01"
 [1]
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus2 "\01\01\01"
+[1 1 1]
+```
+
+```sh
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus3 ""
+0: unexpected end of input
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus3 "\01"
+[1]
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bplus3 "\01\01\01"
 [1 1 1]
 ```
 
@@ -177,6 +195,13 @@ $ ../src/exe-watsup/main.exe test.watsup --parse-string Bquest2 "\01"
 ```
 
 ```sh
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bquest3 ""
+?()
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bquest3 "\01"
+?(1)
+```
+
+```sh
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Tquest ""
 ()
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Tquest "ABCD"
@@ -200,6 +225,11 @@ $ ../src/exe-watsup/main.exe test.watsup --parse-string Bnth "\01\01\01\01\01"
 
 ```sh
 $ ../src/exe-watsup/main.exe test.watsup --parse-string Bnth2 "\01\01\01\01"
+[1 1 1 1]
+```
+
+```sh
+$ ../src/exe-watsup/main.exe test.watsup --parse-string Bnth3 "\01\01\01\01"
 [1 1 1 1]
 ```
 
@@ -273,14 +303,14 @@ $ ../src/exe-watsup/main.exe test.watsup --parse-string Btest2 "\00\00"
 # Types
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bnumtype "\7f"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bnumtype "\7f"
 I32_numtype
 ```
 
 # Values
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bu32 "\00" "\80\00" "\80\80\80\80\00" "\80\80\80\80\80\00" "\81\03"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bu32 "\00" "\80\00" "\80\80\80\80\00" "\80\80\80\80\80\00" "\81\03"
 u32(0)
 u32(0)
 u32(0)
@@ -292,27 +322,29 @@ u32(385)
 
 ```sh
 $ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bfunc "\00\0B"
-()
+([], [])
 ```
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcode "\02\00\0B"
-()
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcode "\02\00\0B"
+([], [])
 ```
 
 # Modules
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmagic "\00\61\73\6D"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmagic "\00\61\73\6D"
 ()
 ```
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcustomsec "\00\00"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcustomsec "" # "\00\01\00" "\00\07\03boo\01\02\03"
+()
+()
 ()
 ```
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
 MODULE_module
 ```
