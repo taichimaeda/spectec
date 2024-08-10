@@ -32,15 +32,8 @@ let escape = string_with add_char
 
 (* Identifiers *)
 
-let is_alphanum = function
-  | '0'..'9'
-  | 'A'..'Z'
-  | 'a'..'z'
-  | '_' | '.' | '\'' -> true
-  | _ -> false
-
 let string_of_id id =
-  if String.for_all is_alphanum id.it
+  if String.for_all Lib.Char.is_alphanum_ascii id.it
   then id.it
   else "`" ^ id.it ^ "`"
 

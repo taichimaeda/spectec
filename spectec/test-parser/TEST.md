@@ -338,13 +338,13 @@ $ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmagic "\0
 ```
 
 ```sh
-$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcustomsec "" # "\00\01\00" "\00\07\03boo\01\02\03"
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcustomsec "" "\00\01\00" "\00\07\03boo\01\02\03"
 ()
 ()
 ()
 ```
 
 ```sh
-$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
+$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
 MODULE_module
 ```

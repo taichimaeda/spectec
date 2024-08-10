@@ -30,6 +30,11 @@ let snd3 (_, x, _) = x
 let unordered s1 s2 = not Set.(subset s1 s2 || subset s2 s1)
 
 
+let as_iter_typ t =
+  match t.it with
+  | IterT (t1, _) -> t1
+  | _ -> failwith "as_iter_typ"
+
 let as_opt_exp e =
   match e.it with
   | OptE eo -> eo
@@ -89,7 +94,7 @@ and reduce_typdef env t : deftyp =
 
 and reduce_typ_app env id args at : deftyp option =
   Debug.(log "il.reduce_typ_app"
-    (fun _ -> fmt "%s(%s)" id.it (il_args args))
+    (fun _ -> fmt "%s(%s)" (il_id id) (il_args args))
     (fun r -> fmt "%s" (opt il_deftyp r))
   ) @@ fun _ ->
   reduce_typ_app' env id (List.map (reduce_arg env) args) at (Env.find_opt_typ env id)
@@ -102,7 +107,7 @@ and reduce_typ_app' env id args at = function
       ("undefined instance of partial type `" ^ id.it ^ "`")
   | Some (ps, {it = InstD (_binds, args', dt); _}::insts') ->
     Debug.(log "il.reduce_typ_app'"
-      (fun _ -> fmt "%s(%s) =: %s(%s)" id.it (il_args args) id.it (il_args args'))
+      (fun _ -> fmt "%s(%s) =: %s(%s)" (il_id id) (il_args args) (il_id id) (il_args args'))
       (fun r -> fmt "%s" (opt (Fun.const "!") r))
     ) @@ fun _ ->
     match match_list match_arg env Subst.empty args args' with
@@ -475,7 +480,7 @@ and reduce_exp_call env id args at = function
       ("undefined call to partial function `$" ^ id.it ^ "`")
   | {it = DefD (_binds, args', e, prems); _}::clauses' ->
     Debug.(log "il.reduce_exp_call"
-      (fun _ -> fmt "$%s(%s) =: $%s(%s)" id.it (il_args args) id.it (il_args args'))
+      (fun _ -> fmt "$%s(%s) =: $%s(%s)" (il_id id) (il_args args) (il_id id) (il_args args'))
       (function None -> "-" | Some e' -> fmt "%s" (il_exp e'))
     ) @@ fun _ ->
     assert (List.for_all (fun a -> Eq.eq_arg a (reduce_arg env a)) args);
@@ -744,7 +749,8 @@ and match_exp' env s e1 e2 : subst option =
     let xs, exs = List.split xes in
     let* s''' =
       match_list (fun env s xI exI ->
-        let eI = ListE (List.map (fun sJ -> Subst.subst_exp sJ (VarE xI $> exI)) ss) $> e2 in
+        let varI = VarE xI $$ xI.at % as_iter_typ exI.note in
+        let eI = ListE (List.map (fun sJ -> Subst.subst_exp sJ varI) ss) $> e2 in
         match_exp' env s eI exI
       ) env s' xs exs
     in Some (Subst.union s''' s)  (* re-add possibly locally shadowed bindings *)
