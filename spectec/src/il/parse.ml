@@ -42,7 +42,7 @@ let rec map_results r f =
     append_results (f (is, s, e)) (lazy (map_results (Lazy.force tl) f))
 
 let (let*) = map_results
-let (|||) r lr = append_results r (lazy (Printf.printf "[|||]\n%!"; Lazy.force lr))
+let (|||) r lr = append_results r (lazy (Lazy.force lr))
 
 
 (* Parsing *)
@@ -159,18 +159,11 @@ and parse_prod env is as_ prod =
       Debug.(log_in "il.parse_prod" (fun _ -> "arg subst: " ^ mapping il_exp s.varid));
       let* is', s', _e' = parse_sym env is Subst.empty g' in
       Debug.(log_in "il.parse_prod" (fun _ -> "prem subst: " ^ mapping il_exp s'.varid));
-let active = !Debug.active in
-Debug.active := "il.reduce_exp" :: "il.reduce_prem" :: "il.subst_prem" :: !Debug.active;
-let prs = Subst.subst_prems s' prems' in
-Debug.(log_in "il.parse_prod" (fun _ -> "prems: " ^ list il_prem prs));
-let b = Eval.reduce_prems env prs in
-Debug.active := active;
-Debug.(log_in "il.parse_prod" (fun _ -> "prems: " ^ (match b with None -> "-" | Some b -> string_of_bool b)));
       match Eval.reduce_prems env (Subst.subst_prems s' prems') with
-      | None -> Printf.printf "[1]\n%!"; failure is "cannot verify side condition"
-      | Some false -> Printf.printf "[2]\n%!"; failure is "violating side condition"
-      | Some true -> Printf.printf "[3] e'=%s\n%!" (Debug.il_exp e');
-      success is' 0 Subst.empty (Eval.reduce_exp env (Subst.subst_exp s' e'))
+      | None -> failure is "cannot verify side condition"
+      | Some false -> failure is "violating side condition"
+      | Some true ->
+        success is' 0 Subst.empty (Eval.reduce_exp env (Subst.subst_exp s' e'))
   )
 
 and parse_prods env is as_ = function

@@ -1221,8 +1221,13 @@ grammar Bmodule : module =
 
 
     Bcustomsec* =>
-      MODULE type* import* func* global* table* mem* elem* data* start? export*
+;; TODO(2, rossberg): enable binding for func
+;;      MODULE type* import* func* global* table* mem* elem* data* start? export*
+;;    ----
+;;    -- (if n = |data*|)?
+;;    -- if n? =/= eps \/ $dataidx_funcs(func*) = eps
+;;    -- (if func = FUNC typeidx local* expr)*
+      MODULE type* import* (FUNC typeidx local* expr)* global* table* mem* elem* data* start? export*
     ----
     -- (if n = |data*|)?
-    -- if n? =/= eps \/ $dataidx_funcs(func*) = eps
-    -- (if func = FUNC typeidx local* expr)*
+    -- if n? =/= eps \/ $dataidx_funcs((FUNC typeidx local* expr)*) = eps

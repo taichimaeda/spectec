@@ -345,6 +345,6 @@ $ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bcustomsec
 ```
 
 ```sh
-$ #../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
-MODULE_module
+$ ../src/exe-watsup/main.exe ../spec/wasm-3.0/*.watsup --parse-string Bmodule "\00\61\73\6D\01\00\00\00"
+MODULE_module([], [], [], [], [], [], [], [], ?(), [])
 ```
