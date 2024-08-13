@@ -428,12 +428,10 @@ try
     let cases = as_variant_typ "case" env Check t e.at in
     let _binds, t1, _prems = find_case cases op e1.at in
     valid_exp ~side env e1 t1
-  | SizeE g ->
-    let _t = valid_sym env g in
-    (match g.it with
-    | VarG _ | NatG _ | TextG _ -> ()
-    | _ -> error e.at "invalid grammar symbol in size expression"
-    )
+  | SizeE id ->
+    let ps, _t', _prods = Env.find_gram env id in
+    if ps <> [] then
+      error e.at "parameterized grammar in size expression"
   | SubE (e1, t1, t2) ->
     valid_typ env t1;
     valid_typ env t2;

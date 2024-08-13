@@ -136,7 +136,7 @@ and free_exp e =
   | CaseE (_, e1) | UncaseE (e1, _) -> free_exp e1
   | CallE (id, as1) -> free_defid id + free_args as1
   | IterE (e1, iter) -> (free_exp e1 - bound_iterexp iter) + free_iterexp iter
-  | SizeE g -> free_sym g
+  | SizeE id -> free_gramid id
   | SubE (e1, t1, t2) -> free_exp e1 + free_typ t1 + free_typ t2
 
 and free_expfield (_, e) = free_exp e

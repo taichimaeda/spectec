@@ -3,6 +3,7 @@ include Util.Debug_log
 open Print
 
 let il_side = function `Lhs -> "L" | `Rhs -> ""
+let il_text = string_of_text
 let il_id = string_of_id
 let il_atom = string_of_atom
 let il_mixop = string_of_mixop
@@ -19,8 +20,6 @@ let il_args = list il_arg
 let il_binds = string_of_binds
 let il_params = list il_param
 let il_def = string_of_def
-
-let il_text s = il_exp Util.Source.(Ast.(TextE s $$ no_region % (TextT $ no_region)))
 
 let il_free s = String.concat " "
   Free.[

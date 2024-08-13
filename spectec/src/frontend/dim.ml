@@ -428,9 +428,8 @@ and annot_exp env e : Il.Ast.exp * occur =
     | CaseE (atom, e1) ->
       let e1', occur1 = annot_exp env e1 in
       CaseE (atom, e1'), occur1
-    | SizeE g ->
-      let g', occur = annot_sym env g in
-      SizeE g', occur
+    | SizeE id ->
+      SizeE id, Env.empty
     | SubE (e1, t1, t2) ->
       let e1', occur1 = annot_exp env e1 in
       SubE (e1', t1, t2), occur1

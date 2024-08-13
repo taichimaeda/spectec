@@ -1,6 +1,6 @@
 grammar Teps : nat = eps => 42
 
-grammar Tbyte : nat = i:0x32 => i
+grammar Tbyte : nat = i:0x3A => i
 
 grammar Ttext : () = "AÄÜ" => ()
 
@@ -8,7 +8,8 @@ grammar Bseq : nat = i:0x03 j:0x04 eps k:0x02 => $(i + j * k)
 
 grammar Tseq : () = eps "A" eps "BC" "D" => ()
 
-grammar Talt : () = "A" | "BC" | "D" | "" => ()
+grammar Talt : () = "A" | "BC" | "D" => ()
+grammar Talt2 : () = "A" | "B" | "BC" | "A" | "DE" | "" => ()
 
 grammar Tprod : nat = "A" => 1 | "BC" => 2 | "D" => 3 | "" => 0
 

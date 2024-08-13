@@ -3,6 +3,9 @@ open Ast
 type env = Env.t
 type subst = Subst.t
 
+val is_normal_exp : exp -> bool
+val is_head_normal_exp : exp -> bool
+
 val (let*) : subst option -> (subst -> subst option) -> subst option
 
 val reduce_exp : env -> exp -> exp

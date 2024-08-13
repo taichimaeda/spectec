@@ -136,7 +136,7 @@ and exp e =
   | UpdE (e1, p, e2) | ExtE (e1, p, e2) -> exp e1; path p; exp e2
   | CallE (x, as_) -> defid x; args as_
   | IterE (e1, it) -> exp e1; iterexp it
-  | SizeE g -> sym g
+  | SizeE id -> gramid id
   | SubE (e1, t1, t2) -> exp e1; typ t1; typ t2
 
 and expfield (at, e) = atom at; exp e

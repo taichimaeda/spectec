@@ -377,8 +377,6 @@ and reduce_exp env e : exp =
     | _ -> CatE (e1', e2')
     ) $> e
   | CaseE (op, e1) -> CaseE (op, reduce_exp env e1) $> e
-  | SizeE {it = NatG _; _} -> NatE Z.one $> e
-  | SizeE {it = TextG t; _} -> NatE (Z.of_int (String.length t)) $> e
   | SizeE _ -> e
   | SubE (e1, t1, t2) when equiv_typ env t1 t2 ->
     reduce_exp env e1

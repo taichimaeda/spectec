@@ -142,6 +142,7 @@ let argspec = Arg.align
 
   "-l", Arg.Set logging, " Log execution steps";
   "-ll", Arg.Set Backend_interpreter.Runner.logging, " Log interpreter execution";
+  "--trace-parse", Arg.Set Il.Parse.trace, " Trace parsing execution";
   "--debug", Arg.String (fun s -> Util.Debug_log.active := s :: !Util.Debug_log.active),
     " Turn on debugging log for named function";
 
@@ -278,7 +279,7 @@ let () =
         match Il.Parse.parse il id src with
         | Ok e -> print_endline (Il.Print.string_of_exp e)
         | Error (i, msg) -> prerr_endline (string_of_int i ^ ": " ^ msg)
-        | exception Invalid_argument _ -> prerr_endline ("unknown grammar `" ^ id ^ "`")
+        | exception Il.Parse.Grammar_unknown -> prerr_endline ("unknown grammar `" ^ id ^ "`")
       ) !inps
 
     | Latex ->

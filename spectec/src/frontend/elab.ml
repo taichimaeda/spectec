@@ -995,8 +995,10 @@ and infer_exp' env e : Il.exp' * typ =
     let _t11 = as_list_typ "expression" env Infer t1 e1.at in
     Il.LenE e1', NumT NatT $ e.at
   | SizeE id ->
-    let _, t, _, _ = find "grammar" env.grams id in
-    Il.SizeE (Il.VarG (id, []) $$ id.at % elab_typ env t), NumT NatT $ e.at
+    let ps, _, _, _ = find "grammar" env.grams id in
+    if ps <> [] then
+      error e.at "parameterized grammar in size expression";
+    Il.SizeE id, NumT NatT $ e.at
   | ParenE (e1, _) | ArithE e1 ->
     infer_exp' env e1
   | TupE es ->

@@ -78,7 +78,7 @@ and t_typcase env (atom, (binds, t, prems), hints) =
 and t_exp2 env x = { x with it = t_exp' env x.it; note = t_typ env x.note }
 
 and t_exp' env = function
-  | (VarE _ | BoolE _ | NatE _ | TextE _) as e -> e
+  | (VarE _ | BoolE _ | NatE _ | TextE _ | SizeE _) as e -> e
   | UnE (unop, exp) -> UnE (unop, t_exp env exp)
   | BinE (binop, exp1, exp2) -> BinE (binop, t_exp env exp1, t_exp env exp2)
   | CmpE (cmpop, exp1, exp2) -> CmpE (cmpop, t_exp env exp1, t_exp env exp2)
@@ -102,7 +102,6 @@ and t_exp' env = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | MemE (exp1, exp2) -> MemE (t_exp env exp1, t_exp env exp2)
   | CaseE (mixop, e) -> CaseE (mixop, t_exp env e)
-  | SizeE sym -> SizeE (t_sym env sym)
   | SubE (exp, t1, t2) -> SubE (t_exp env exp, t_typ env t1, t_typ env t2)
 
 and t_iter env = function

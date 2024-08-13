@@ -103,7 +103,7 @@ and exp' =
   | ExtE of exp * path * exp     (* exp[path =.. exp] *)
   | CallE of id * arg list       (* defid( arg* ) *)
   | IterE of exp * iterexp       (* exp iter *)
-  | SizeE of sym                 (* ||sym|| *)
+  | SizeE of id                  (* ||gramid|| *)
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
 
 and expfield = atom * exp        (* atom exp *)
