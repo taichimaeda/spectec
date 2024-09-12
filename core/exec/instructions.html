@@ -133,7 +133,7 @@
 <section id="xref-syntax-instructions-syntax-instr-parametric-mathsf-select-t-ast">
 <span id="exec-select"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~{({t^\ast})^?}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-parametric-mathsf-select-t-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_2\)</span> from the stack.</p></li>
@@ -201,9 +201,8 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <section id="mathit-nt-mathit-unop">
 <span id="exec-unop"></span><h3><span class="math notranslate nohighlight">\({\mathit{nt}} {.} {\mathit{unop}}\)</span><a class="headerlink" href="#mathit-nt-mathit-unop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{unop}}}{{}_{{\mathit{nt}}}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
@@ -229,10 +228,9 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <section id="mathit-nt-mathit-binop">
 <span id="exec-binop"></span><h3><span class="math notranslate nohighlight">\({\mathit{nt}} {.} {\mathit{binop}}\)</span><a class="headerlink" href="#mathit-nt-mathit-binop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{binop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -259,9 +257,8 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <section id="mathit-nt-mathit-testop">
 <span id="exec-testop"></span><h3><span class="math notranslate nohighlight">\({\mathit{nt}} {.} {\mathit{testop}}\)</span><a class="headerlink" href="#mathit-nt-mathit-testop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{testop}}}{{}_{{\mathit{nt}}}(c_1)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
@@ -280,10 +277,9 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <section id="mathit-nt-mathit-relop">
 <span id="exec-relop"></span><h3><span class="math notranslate nohighlight">\({\mathit{nt}} {.} {\mathit{relop}}\)</span><a class="headerlink" href="#mathit-nt-mathit-relop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{relop}}}{{}_{{\mathit{nt}}}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -303,9 +299,8 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <section id="mathit-nt-2-mathit-cvtop-mathsf-mathit-nt-1">
 <span id="exec-cvtop"></span><h3><span class="math notranslate nohighlight">\({\mathit{nt}}_2 {.} {{\mathit{cvtop}}}{\mathsf{\_}}{{\mathit{nt}}_1}\)</span><a class="headerlink" href="#mathit-nt-2-mathit-cvtop-mathsf-mathit-nt-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}_1\)</span>.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\mathit{nt}}_1\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{nt}}_1{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{cvtop}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
@@ -573,7 +568,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <section id="xref-syntax-instructions-syntax-instr-i31-mathsf-ref-i-scriptstyle31">
 <span id="exec-ref-i31"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-i31}{\mathsf{ref{.}i\scriptstyle31}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-i31-mathsf-ref-i-scriptstyle31" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i31}}~{{\href{../exec/numerics.html#op-wrap}{\mathrm{wrap}}}}_{32, 31}(i))\)</span> to the stack.</p></li>
 </ol>
@@ -847,7 +842,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <section id="xref-syntax-instructions-syntax-instr-array-mathsf-array-new-x">
 <span id="exec-array-new"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-new-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
@@ -863,7 +858,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-new-default"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_default}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-new-default-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\href{../syntax/types.html#syntax-arraytype}{\mathit{arraytype}}}_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span>.</p></li>
@@ -950,9 +945,9 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-new-data"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_data}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-new-data-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\href{../syntax/types.html#syntax-arraytype}{\mathit{arraytype}}}_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span>.</p></li>
@@ -1018,9 +1013,9 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-new-elem"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_elem}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-new-elem-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{elems}}{}[y]{.}\href{../exec/runtime.html#syntax-eleminst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -1044,7 +1039,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-get-sx"></span><span id="exec-array-get"></span><h3><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}get}}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-get-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> from the stack.</p></li>
@@ -1123,7 +1118,7 @@ since the instruction form is already a <a class="reference internal" href="runt
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> from the stack.</p></li>
@@ -1231,11 +1226,11 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-fill"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}fill}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-fill-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> from the stack.</p></li>
@@ -1420,11 +1415,11 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-init-data"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}init\_data}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-init-data-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~j)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> from the stack.</p></li>
@@ -1557,11 +1552,11 @@ since the instruction form is already a <a class="reference internal" href="runt
 <span id="exec-array-init-elem"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}init\_elem}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-array-mathsf-array-init-elem-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~j)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> from the stack.</p></li>
@@ -1719,7 +1714,7 @@ respectively.</p>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvunop-mathit-vvunop">
 <span id="exec-vvunop"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvunop-mathit-vvunop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvunop}{\mathit{vvunop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1)}\)</span>.</p></li>
@@ -1734,9 +1729,9 @@ respectively.</p>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvbinop-mathit-vvbinop">
 <span id="exec-vvbinop"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvbinop-mathit-vvbinop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvbinop}{\mathit{vvbinop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2)}\)</span>.</p></li>
@@ -1751,11 +1746,11 @@ respectively.</p>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvternop-mathit-vvternop">
 <span id="exec-vvternop"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} {\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-vvternop-mathit-vvternop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_3)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}|}\)</span> is greater than <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vvternop}{\mathit{vvternop}}}}{{}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}}(c_1, c_2, c_3)}\)</span>.</p></li>
@@ -1770,7 +1765,7 @@ respectively.</p>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-instr-vec-mathsf-any-true">
 <span id="exec-vvtestop"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{any\_true}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-xref-syntax-instructions-syntax-instr-vec-mathsf-any-true" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#op-ine}{\mathrm{ine}}}}_{{|\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}|}}(c_1, 0)\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -1784,7 +1779,7 @@ respectively.</p>
 <section id="mathit-sh-mathit-vunop">
 <span id="exec-vunop"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}} {.} {\mathit{vunop}}\)</span><a class="headerlink" href="#mathit-sh-mathit-vunop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{vunop}}}{{}_{{\mathit{sh}}}(c_1)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -1805,9 +1800,9 @@ respectively.</p>
 <section id="mathit-sh-mathit-vbinop">
 <span id="exec-vbinop"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}} {.} {\mathit{vbinop}}\)</span><a class="headerlink" href="#mathit-sh-mathit-vbinop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({|{{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -1834,7 +1829,7 @@ respectively.</p>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-all-true">
 <span id="exec-vtestop"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{all\_true}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-all-true" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c)\)</span>.</p></li>
 <li><p>If for all <span class="math notranslate nohighlight">\({({\mathit{ci}}_1)^\ast}\)</span>, <span class="math notranslate nohighlight">\({\mathit{ci}}_1\)</span> is not <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
@@ -1860,9 +1855,9 @@ respectively.</p>
 <section id="mathit-sh-mathit-vrelop">
 <span id="exec-vrelop"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}} {.} {\mathit{vrelop}}\)</span><a class="headerlink" href="#mathit-sh-mathit-vrelop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vrelop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -1901,9 +1896,9 @@ respectively.</p>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-mathit-vshiftop">
 <span id="exec-vshiftop"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} {\mathit{vshiftop}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-mathit-vshiftop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{\mathit{vshiftop}}}{{}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}}{({c'}, n)}^\ast})}\)</span>.</p></li>
@@ -1944,7 +1939,7 @@ respectively.</p>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-bitmask">
 <span id="exec-vbitmask"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{bitmask}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-bitmask" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c)\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{ci}}\)</span> be the result for which <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bits}{\mathrm{bits}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{32}}({\mathit{ci}})\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-ilt}{\mathrm{ilt}}}}_{{|{\mathsf{i}}{N}|}}^{\href{../syntax/instructions.html#syntax-sx}{\mathsf{s}}}}}{({\mathit{ci}}_1, 0)}^\ast}\)</span>.</p></li>
@@ -1980,9 +1975,9 @@ respectively.</p>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-swizzle">
 <span id="exec-vswizzle"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-swizzle" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)~{0^{256 - M}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_2)\)</span>.</p></li>
@@ -2028,9 +2023,9 @@ respectively.</p>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-shuffle-i-ast">
 <span id="exec-vshuffle"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{shuffle}}~{i^\ast}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-shuffle-i-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, for all <span class="math notranslate nohighlight">\({(k)^{k&lt;M}}\)</span>, <span class="math notranslate nohighlight">\(k\)</span> is less than <span class="math notranslate nohighlight">\({|{i^\ast}|}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)~{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_2)\)</span>.</p></li>
@@ -2108,7 +2103,7 @@ respectively.</p>
 <section id="xref-syntax-instructions-syntax-lanetype-mathit-lanetype-mathit-u-kern-0-1em-scriptstyle-0-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathit-u-kern-0-1em-scriptstyle-1-i">
 <span id="exec-vextract-lane"></span><h3><span class="math notranslate nohighlight">\({{{\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extract\_lane}}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}}~i\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-lanetype-mathit-lanetype-mathit-u-kern-0-1em-scriptstyle-0-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathit-u-kern-0-1em-scriptstyle-1-i" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined and the type of <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}\)</span> is numtype, then:</p>
 <ol class="loweralpha simple">
@@ -2176,7 +2171,7 @@ respectively.</p>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathsf{i}}{N})\)</span>.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1){}[{}[i] = {{\href{../exec/numerics.html#aux-packnum}{\mathrm{pack}}}}_{{\mathsf{i}}{N}}(c_2)])}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -2216,7 +2211,7 @@ respectively.</p>
 <section id="mathit-sh-2-mathit-vextunop-mathsf-mathit-sh-1">
 <span id="exec-vextadd-pairwise"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}}_2 {.} {{\mathit{vextunop}}}{\mathsf{\_}}{{\mathit{sh}}_1}\)</span><a class="headerlink" href="#mathit-sh-2-mathit-vextunop-mathsf-mathit-sh-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vextunop}}}{{}_{{\mathit{sh}}_1, {\mathit{sh}}_2}(c_1)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -2256,9 +2251,9 @@ respectively.</p>
 <section id="mathit-sh-2-mathit-vextbinop-mathsf-mathit-sh-1">
 <span id="exec-vextmul"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}}_2 {.} {{\mathit{vextbinop}}}{\mathsf{\_}}{{\mathit{sh}}_1}\)</span><a class="headerlink" href="#mathit-sh-2-mathit-vextbinop-mathsf-mathit-sh-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vextbinop}}}{{}_{{\mathit{sh}}_1, {\mathit{sh}}_2}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
@@ -2349,9 +2344,9 @@ respectively.</p>
 <section id="mathsf-i-n-2-xref-syntax-instructions-syntax-shape-mathsf-x-m-2-xref-syntax-instructions-syntax-instr-vec-mathsf-narrow-mathsf-mathsf-i-n-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-1-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx">
 <span id="exec-vnarrow"></span><h3><span class="math notranslate nohighlight">\({{{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}}{\mathsf{\_}}{{{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}\)</span><a class="headerlink" href="#mathsf-i-n-2-xref-syntax-instructions-syntax-shape-mathsf-x-m-2-xref-syntax-instructions-syntax-instr-vec-mathsf-narrow-mathsf-mathsf-i-n-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-1-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1})}(c_1)\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_2^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{{\mathsf{i}}{N}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_1})}(c_2)\)</span>.</p></li>
@@ -2592,7 +2587,7 @@ respectively.</p>
 <span id="exec-table-get"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}get}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-get-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i\)</span> is greater than or equal to <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[x]{.}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2615,7 +2610,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i\)</span> is greater than or equal to <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[x]{.}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2649,7 +2644,7 @@ respectively.</p>
 <span id="exec-table-grow"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-grow-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> from the stack.</p></li>
@@ -2692,11 +2687,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-table-fill"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}fill}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-fill-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[x]{.}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2735,11 +2730,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-table-copy"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}copy}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-copy-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~j)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[y]{.}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2801,11 +2796,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-table-init"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}init}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-init-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~j)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{elems}}{}[y]{.}\href{../exec/runtime.html#syntax-eleminst}{\mathsf{elem}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2871,7 +2866,7 @@ However, it may be substantially slower on some hardware.</p>
 <span id="exec-vload-val"></span><span id="exec-load-pack"></span><span id="exec-load-val"></span><h3><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{loadop\_u{\kern-0.1em\scriptstyle 2}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-numtype-mathit-numtype-mathit-u-kern-0-1em-scriptstyle-0-xref-syntax-instructions-syntax-instr-memory-mathsf-load-mathit-loadop-u-kern-0-1em-scriptstyle-2-x-mathit-ao" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 2}}}^?}\)</span> is not defined, then:</p>
 <ol class="loweralpha simple">
@@ -3200,9 +3195,9 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 <span id="exec-vstore"></span><span id="exec-store-pack"></span><span id="exec-store-val"></span><h3><span class="math notranslate nohighlight">\({{\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{{\href{../syntax/instructions.html#syntax-sz}{\mathit{sz}}}_{\mathit{u{\kern-0.1em\scriptstyle 0}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#mathit-nt-xref-syntax-instructions-syntax-instr-memory-mathsf-store-xref-syntax-instructions-syntax-sz-mathit-sz-mathit-u-kern-0-1em-scriptstyle-0-x-mathit-ao" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3332,7 +3327,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 <span id="exec-memory-grow"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-grow-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Either:</p>
 <ol class="loweralpha simple">
@@ -3373,11 +3368,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-memory-fill"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}fill}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-fill-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3416,11 +3411,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-memory-copy"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}copy}}~x_1~x_2\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-copy-x-1-x-2" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i_2)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i_1)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i_1 + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x_1]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3482,11 +3477,11 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <span id="exec-memory-init"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}init}}~x~y\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-init-x-y" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~j)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + n\)</span> is greater than <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3575,7 +3570,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-if-mathit-bt-xref-syntax-instructions-syntax-instr-mathit-instr-1-ast-xref-syntax-instructions-syntax-instr-mathit-instr-2-ast">
 <span id="exec-if"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{if}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-if-mathit-bt-xref-syntax-instructions-syntax-instr-mathit-instr-1-ast-xref-syntax-instructions-syntax-instr-mathit-instr-2-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(c\)</span> is not <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3652,7 +3647,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-br-if-l">
 <span id="exec-br-if"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_if}}~l\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-br-if-l" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(c\)</span> is not <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -3676,7 +3671,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-br-table-l-ast-l">
 <span id="exec-br-table"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_table}}~{l^\ast}~{l'}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-br-table-l-ast-l" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Assert: Due to validation, a value is on the top of the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i\)</span> is less than <span class="math notranslate nohighlight">\({|{l^\ast}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
