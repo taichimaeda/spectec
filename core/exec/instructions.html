@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-09-11)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-09-12)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -3863,8 +3863,8 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>If the top of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(f\)</span> be the current frame.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be the arity of <span class="math notranslate nohighlight">\(f\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(F\)</span> be the current frame.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be the arity of <span class="math notranslate nohighlight">\(F\)</span>.</p></li>
 <li><p>Assert: Due to validation, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> from the stack.</p></li>
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> from the top of the stack.</p></li>
