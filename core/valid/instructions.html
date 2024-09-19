@@ -2036,7 +2036,7 @@ C \href{../valid/matching.html#match-reftype}{\vdash} {\mathit{rt}}_2 \href{../v
  \qquad
 C \href{../valid/matching.html#match-reftype}{\vdash} {\mathit{rt}}_2 \href{../valid/matching.html#match-reftype}{\leq} {\mathit{rt}}
 }{
-C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_on\_cast}}~l~{\mathit{rt}}_1~{\mathit{rt}}_2 : {t^\ast}~{\mathit{rt}}_1 \rightarrow {t^\ast}~({\mathit{rt}}_1 \setminus {\mathit{rt}}_2)
+C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_on\_cast}}~l~{\mathit{rt}}_1~{\mathit{rt}}_2 : {t^\ast}~{\mathit{rt}}_1 \rightarrow {t^\ast}~({\mathit{rt}}_1 \href{../valid/conventions.html#aux-reftypediff}{\setminus} {\mathit{rt}}_2)
 }
 \qquad
 \end{array}\]</div>
@@ -2065,7 +2065,7 @@ C \href{../valid/types.html#valid-reftype}{\vdash} {\mathit{rt}}_2 : \href{../va
  \qquad
 C \href{../valid/matching.html#match-reftype}{\vdash} {\mathit{rt}}_2 \href{../valid/matching.html#match-reftype}{\leq} {\mathit{rt}}_1
  \qquad
-C \href{../valid/matching.html#match-reftype}{\vdash} {\mathit{rt}}_1 \setminus {\mathit{rt}}_2 \href{../valid/matching.html#match-reftype}{\leq} {\mathit{rt}}
+C \href{../valid/matching.html#match-reftype}{\vdash} {\mathit{rt}}_1 \href{../valid/conventions.html#aux-reftypediff}{\setminus} {\mathit{rt}}_2 \href{../valid/matching.html#match-reftype}{\leq} {\mathit{rt}}
 }{
 C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_on\_cast\_fail}}~l~{\mathit{rt}}_1~{\mathit{rt}}_2 : {t^\ast}~{\mathit{rt}}_1 \rightarrow {t^\ast}~{\mathit{rt}}_2
 }
