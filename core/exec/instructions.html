@@ -4292,7 +4292,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Let <span class="math notranslate nohighlight">\(({t_1^{m}}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^{n}})\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#aux-blocktype}{\mathrm{instrtype}}}}_{z}({\mathit{bt}})\)</span>.</p></li>
 <li><p>Assert: Due to validation, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\(({{\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}}_{n}}{\{}~{{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}~\})\)</span> to the stack.</p></li>
+<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({{\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}}_{n}}{\{}~{{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}~\})\)</span> to the stack.</p></li>
 <li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with label <span class="math notranslate nohighlight">\(({{\href{../exec/runtime.html#syntax-label}{\mathsf{label}}}_{n}}{\{}~\epsilon~\})\)</span>.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id63">
