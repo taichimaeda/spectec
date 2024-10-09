@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-10-04)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2024-10-09)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1723,12 +1723,12 @@ since the instruction form is already a <a class="reference internal" href="runt
 </section>
 <section id="vector-instructions">
 <span id="exec-instr-vec"></span><span id="index-4"></span><h2>Vector Instructions<a class="headerlink" href="#vector-instructions" title="Permalink to this heading">¶</a></h2>
-<p>Vector instructions that operate bitwise are handled as integer operations of respective width.</p>
+<p>Vector instructions that operate bitwise are handled as integer operations of respective bit width.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{lll&#64;{\qquad}l}
 \mathit{op}_{\href{../syntax/types.html#syntax-vectype}{\mathsf{v}\scriptstyle\kern-0.1emN}}(i_1,\dots,i_k) &amp;=&amp; \href{../Step_pure/numerics.html#int-ops}{\mathrm{i}\mathit{op}}_N(i_1,\dots,i_k) \\
 \end{array}\end{split}\]</div>
-<p>Most other vector instructions are defined in terms of numeric operators that are applied lane-wise according to the given <a class="reference internal" href="../syntax/instructions.html#syntax-shape"><span class="std std-ref">shape</span></a>.</p>
+<p>Most other vector instructions are defined in terms of <a class="reference internal" href="numerics.html#exec-numeric"><span class="std std-ref">numeric operators</span></a> that are applied lane-wise according to the given <a class="reference internal" href="../syntax/instructions.html#syntax-shape"><span class="std std-ref">shape</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}{llll}
 \mathit{op}_{t\mathsf{x}N}(n_1,\dots,n_k) &amp;=&amp;
@@ -1743,6 +1743,17 @@ where <span class="math notranslate nohighlight">\(i_1^\ast\)</span> and <span c
 <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\mathsf{i32x4}}(v_1)\)</span> and <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\mathsf{i32x4}}(v_2)\)</span>
 respectively.</p>
 </div>
+<p>For non-deterministic operators this definition is generalized to sets:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{lll}
+\mathit{op}_{t\mathsf{x}N}(n_1,\dots,n_k) &amp;=&amp;
+  \{ \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t\mathsf{x}N}(i^\ast) ~|~ i^\ast \in \Large\times\href{../Step_pure/instructions.html#exec-instr-numeric}{\mathit{op}}_t(i_1,\dots,i_k)^\ast \land i_1^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_1) \land \dots \land i_k^\ast = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(n_k) \} \\
+\end{array}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Large\times \{x^\ast\}^N\)</span> transforms a sequence of <span class="math notranslate nohighlight">\(N\)</span> sets of values into a set of sequences of <span class="math notranslate nohighlight">\(N\)</span> values by computing the set product:</p>
+<div class="math notranslate nohighlight">
+\[\begin{array}{lll}
+\Large\times (S_1 \dots S_N) &amp;=&amp; \{ x_1 \dots x_N ~|~ x_1 \in S_1 \land \dots \land x_N \in S_N \}
+\end{array}\]</div>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c">
 <span id="exec-vconst"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-vec-mathsf-const-c" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
@@ -1854,31 +1865,37 @@ respectively.</p>
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{sh}} {.} {\mathit{vbinop}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}} &amp; \quad \mbox{if}~ {{\mathit{vbinop}}}{{}_{{\mathit{sh}}}(c_1, c_2)} = \epsilon \\
 \end{array}\end{split}\]</div>
 </section>
-<section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-all-true">
-<span id="exec-vtestop"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{all\_true}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-all-true" title="Permalink to this heading">¶</a></h3>
+<section id="mathit-sh-mathit-vternop">
+<span id="exec-vternop"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}} {.} {\mathit{vternop}}\)</span><a class="headerlink" href="#mathit-sh-mathit-vternop" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}_1^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c)\)</span>.</p></li>
-<li><p>If for all <span class="math notranslate nohighlight">\({({\mathit{ci}}_1)^\ast}\)</span>, <span class="math notranslate nohighlight">\({\mathit{ci}}_1\)</span> is not <span class="math notranslate nohighlight">\(0\)</span>, then:</p>
-<ol class="loweralpha simple">
-<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~1)\)</span> to the stack.</p></li>
-</ol>
-</li>
-<li><p>Else:</p>
-<ol class="loweralpha simple">
-<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~0)\)</span> to the stack.</p></li>
-</ol>
-</li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_3)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be an element of <span class="math notranslate nohighlight">\({{\mathit{vternop}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
+<li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({{\mathit{vternop}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)}\)</span> is <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
+<li><p>Trap.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{all\_true}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~1) &amp; \quad
-\begin{array}[t]{&#64;{}l&#64;{}}
-\mbox{if}~ {{\mathit{ci}}_1^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c) \\
-{\land}~ ({\mathit{ci}}_1 \neq 0)^\ast \\
-\end{array} \\
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)~({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{all\_true}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~0) &amp; \mbox{otherwise} \\
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_3)~({\mathit{sh}} {.} {\mathit{vternop}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad \mbox{if}~ c \in {{\mathit{vternop}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)} \\
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_3)~({\mathit{sh}} {.} {\mathit{vternop}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; \href{../exec/runtime.html#syntax-trap}{\mathsf{trap}} &amp; \quad \mbox{if}~ {{\mathit{vternop}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)} = \epsilon \\
+\end{array}\end{split}\]</div>
+</section>
+<section id="mathit-sh-mathit-vtestop">
+<span id="exec-vtestop"></span><h3><span class="math notranslate nohighlight">\({\mathit{sh}} {.} {\mathit{vtestop}}\)</span><a class="headerlink" href="#mathit-sh-mathit-vtestop" title="Permalink to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(i\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vtestop}}}{{}_{{\mathit{sh}}}(c_1)}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> to the stack.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({\mathit{sh}} {.} {\mathit{vtestop}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i) &amp; \quad \mbox{if}~ {{\mathit{vtestop}}}{{}_{{\mathit{sh}}}(c_1)} = i \\
 \end{array}\end{split}\]</div>
 </section>
 <section id="mathit-sh-mathit-vrelop">
@@ -1891,34 +1908,9 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vrelop}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id30">
-<p class="admonition-title">Todo</p>
-<p>Below is the actual prose.</p>
-</div>
-<ol class="arabic simple">
-<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-vrelop"><span class="std std-ref">validation</span></a>, two values of <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> are on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2\)</span> from the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(i_1^\ast\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(c_1)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(i_2^\ast\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(c_2)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(i^\ast\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-vrelop}{\mathit{vrelop}}_t(i_1^\ast, i_2^\ast)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(j^\ast\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-ext}{\mathrm{extend}^{\mathsf{s}}}_{1,|t|}(i^\ast)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t\mathsf{x}N}(j^\ast)\)</span>.</p></li>
-<li><p>Push the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span> to the stack.</p></li>
-</ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
 &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\mathit{sh}} {.} {\mathit{vrelop}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad \mbox{if}~ {{\mathit{vrelop}}}{{}_{{\mathit{sh}}}(c_1, c_2)} = c \\
-\end{array}\end{split}\]</div>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{array}{l}
-\begin{array}{lcl&#64;{\qquad}l}
-(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2)~t\mathsf{x}N\mathsf{.}\href{../syntax/instructions.html#syntax-vrelop}{\mathit{vrelop}} &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c)
-\end{array}
-\\ \qquad
-  \begin{array}[t]{&#64;{}r&#64;{~}l&#64;{}}
-  (\mathrel{\mbox{if}} c = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t\mathsf{x}N}(\href{../exec/numerics.html#op-ext}{\mathrm{extend}^{\mathsf{s}}}_{1,|t|}(\href{../syntax/instructions.html#syntax-vrelop}{\mathit{vrelop}}_t(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(c_1), \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{t\mathsf{x}N}(c_2)))))
-  \end{array}
 \end{array}\end{split}\]</div>
 </section>
 <section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-mathit-vshiftop">
@@ -1932,7 +1924,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{\mathit{vshiftop}}}{{}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}}{({c'}, n)}^\ast})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id31">
+<div class="admonition-todo admonition" id="id30">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -1975,7 +1967,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{ci}}\)</span> be the result for which <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bits}{\mathrm{bits}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{32}}({\mathit{ci}})\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\({{{{{\href{../exec/numerics.html#op-ilt}{\mathrm{ilt}}}}_{{|{\mathsf{i}}{N}|}}^{\href{../syntax/instructions.html#syntax-sx}{\mathsf{s}}}}}{({\mathit{ci}}_1, 0)}^\ast}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{\mathit{ci}})\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id32">
+<div class="admonition-todo admonition" id="id31">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2004,19 +1996,31 @@ respectively.</p>
   \\
 \end{array}\end{split}\]</div>
 </section>
-<section id="mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-swizzle">
-<span id="exec-vswizzle"></span><h3><span class="math notranslate nohighlight">\({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}\)</span><a class="headerlink" href="#mathsf-i-n-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-swizzle" title="Permalink to this heading">¶</a></h3>
+<section id="xref-syntax-types-syntax-storagetype-mathsf-i-scriptstyle8-xref-syntax-instructions-syntax-shape-mathsf-x-m-mathit-vswizzlop-u-kern-0-1em-scriptstyle-0">
+<span id="exec-vswizzlop"></span><h3><span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} {\mathit{vswizzlop\_u{\kern-0.1em\scriptstyle 0}}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-storagetype-mathsf-i-scriptstyle8-xref-syntax-instructions-syntax-shape-mathsf-x-m-mathit-vswizzlop-u-kern-0-1em-scriptstyle-0" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)~{0^{256 - M}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_2)\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})}\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{vswizzlop\_u{\kern-0.1em\scriptstyle 0}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}\)</span>, then:</p>
+<ol class="loweralpha simple">
+<li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)~{0^{256 - M}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_2)\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id33">
+</li>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{vswizzlop\_u{\kern-0.1em\scriptstyle 0}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_swizzle}}\)</span>, then:</p>
+<ol class="loweralpha simple">
+<li><p>Let <span class="math notranslate nohighlight">\({{c'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1)~{0^{256 - M}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\mathit{ci}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_2)\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})}\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
+</ol>
+</li>
+</ol>
+<div class="admonition-todo admonition" id="id32">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2032,11 +2036,17 @@ respectively.</p>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
-&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad
 \begin{array}[t]{&#64;{}l&#64;{}}
-\mbox{if}~ {{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_2) \\
-{\land}~ {{c'}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)~{0^{256 - M}} \\
-{\land}~ c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})} \\
+\mbox{if}~ {{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_2) \\
+{\land}~ {{c'}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)~{0^{256 - M}} \\
+{\land}~ c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})} \\
+\end{array} \\
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)~({\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M} {.} \href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_swizzle}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad
+\begin{array}[t]{&#64;{}l&#64;{}}
+\mbox{if}~ {{\mathit{ci}}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_2) \\
+{\land}~ {{c'}^\ast} = {{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)~{0^{256 - M}} \\
+{\land}~ c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{\href{../syntax/types.html#syntax-storagetype}{\mathsf{i\scriptstyle8}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{{c'}^\ast}{}[{{\mathit{ci}}^\ast}{}[k]]^{k&lt;M}})} \\
 \end{array} \\
 \end{array}\end{split}\]</div>
 <div class="math notranslate nohighlight">
@@ -2063,7 +2073,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{c'}^\ast}{}[{i^\ast}{}[k]]^{k&lt;M}})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id34">
+<div class="admonition-todo admonition" id="id33">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2107,7 +2117,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{{\href{../exec/numerics.html#aux-packnum}{\mathrm{pack}}}}_{{\mathsf{i}}{N}}(c_1)^{M}})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id35">
+<div class="admonition-todo admonition" id="id34">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2156,7 +2166,7 @@ respectively.</p>
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id36">
+<div class="admonition-todo admonition" id="id35">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2197,7 +2207,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}^{{-1}}}}{({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{\mathsf{i}}{N}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M})}(c_1){}[{}[i] = {{\href{../exec/numerics.html#aux-packnum}{\mathrm{pack}}}}_{{\mathsf{i}}{N}}(c_2)])}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id37">
+<div class="admonition-todo admonition" id="id36">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2236,7 +2246,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vextunop}}}{{}_{{\mathit{sh}}_1, {\mathit{sh}}_2}(c_1)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id38">
+<div class="admonition-todo admonition" id="id37">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2277,7 +2287,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{\mathit{vextbinop}}}{{}_{{\mathit{sh}}_1, {\mathit{sh}}_2}(c_1, c_2)}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id39">
+<div class="admonition-todo admonition" id="id38">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2329,7 +2339,7 @@ respectively.</p>
 </section>
 <section id="mathsf-i32x4-xref-syntax-instructions-syntax-instr-vec-mathsf-dot-mathsf-i16x8-s">
 <span id="exec-vdot"></span><h3><span class="math notranslate nohighlight">\(\mathsf{i32x4.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{dot}}\mathsf{\_i16x8\_s}\)</span><a class="headerlink" href="#mathsf-i32x4-xref-syntax-instructions-syntax-instr-vec-mathsf-dot-mathsf-i16x8-s" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id40">
+<div class="admonition-todo admonition" id="id39">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, for this seems to be WIP on &#64;Andreas.</p>
 </div>
@@ -2373,7 +2383,7 @@ respectively.</p>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{({{{\mathsf{i}}{N}}_2}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M_2})}^{{-1}}}}{({{\mathit{cj}}_1^\ast}~{{\mathit{cj}}_2^\ast})}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id41">
+<div class="admonition-todo admonition" id="id40">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.</p>
 </div>
@@ -2413,10 +2423,67 @@ respectively.</p>
   \wedge &amp; c = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{t_2\mathsf{x}N}(d_1^M~d_2^M))
   \end{array}
 \end{array}\end{split}\]</div>
+<div class="admonition-todo admonition" id="id41">
+<span id="exec-vrelaxed-dot"></span><p class="admonition-title">Todo</p>
+<p>move more of this to numerics</p>
+</div>
+<ol class="arabic simple">
+<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a>, two values of <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> are on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2\)</span> from the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1\)</span> from the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((i_1~i_2)^8\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-irelaxed-dot-mul}{\mathrm{irelaxed\_dot\_mul}}_{8, 16}(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_1), \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_2))\)</span></p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(j^8\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-iadd-sat}{\mathrm{iadd\_sat\_s}}_{16}(i_1, i_2)^8\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}}(j^8)\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span> onto the stack.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{l}
+\begin{array}{llcl&#64;{\qquad}l}
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2)~\mathsf{i16x8.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_dot}}\mathsf{\_i8x16\_i7x16\_s} &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c) \\
+\end{array}
+\\ \qquad
+  \begin{array}[t]{&#64;{}r&#64;{~}l&#64;{}}
+  (\mathrel{\mbox{if}} &amp; (i_1~i_2)^8 = \href{../exec/numerics.html#op-irelaxed-dot-mul}{\mathrm{irelaxed\_dot\_mul}}_{8,16}(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_1), \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_2)) \\
+  \wedge &amp; j^8 = \href{../exec/numerics.html#op-iadd-sat}{\mathrm{iadd\_sat\_s}}_{16}(i_1, i_2)^8 \\
+  \wedge &amp; c = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}}(j^8))
+  \end{array}
+\end{array}\end{split}\]</div>
+<div class="admonition-todo admonition" id="id42">
+<span id="exec-vrelaxed-dot-add"></span><p class="admonition-title">Todo</p>
+<p>move more of this to numerics</p>
+</div>
+<ol class="arabic simple">
+<li><p>Assert: due to <a class="reference internal" href="../valid/instructions.html#valid-vextternop"><span class="std std-ref">validation</span></a>, three values of <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> are on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_3\)</span> from the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2\)</span> from the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1\)</span> from the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((i_1~i_2)^8\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-irelaxed-dot-mul}{\mathrm{irelaxed\_dot\_mul}}_{8, 16}(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_1), \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_2))\)</span></p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((j_1~j_2)^4\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-iadd-sat}{\mathrm{iadd\_sat\_s}}_{16}(i_1, i_2)^8\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(j^4\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-iadd}{\mathrm{iadd}}_{32}(\href{../exec/numerics.html#op-ext}{\mathrm{extend}}^{s}_{16, 32}(j_1), \href{../exec/numerics.html#op-ext}{\mathrm{extend}}^{s}_{16, 32}(j_2))^4\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(k^4\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}}(c_3)\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(l^4\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#op-iadd}{\mathrm{iadd}}_{32}(j, k)^4\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be the result of computing <span class="math notranslate nohighlight">\(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}}(l^4)\)</span>.</p></li>
+<li><p>Push the value <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c\)</span> onto the stack.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{l}
+\begin{array}{llcl&#64;{\qquad}l}
+&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_1)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_2)~(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c_3)~\mathsf{i32x4.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_dot}}\mathsf{\_i8x16\_i7x16\_add\_s} &amp;\href{../exec/conventions.html#exec-notation}{\hookrightarrow}&amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c) \\
+\end{array}
+\\ \qquad
+  \begin{array}[t]{&#64;{}r&#64;{~}l&#64;{}}
+  (\mathrel{\mbox{if}} &amp; (i_1~i_2)^8 = \href{../exec/numerics.html#op-irelaxed-dot-mul}{\mathrm{irelaxed\_dot\_mul}}_{8,16}(\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_1), \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}}(c_2)) \\
+  \wedge &amp; (j_1~j_2)^4 = \href{../exec/numerics.html#op-iadd-sat}{\mathrm{iadd\_sat\_s}}_{16}(i_1, i_2)^8 \\
+  \wedge &amp; j^4 = \href{../exec/numerics.html#op-iadd}{\mathrm{iadd}}_{32}(\href{../exec/numerics.html#op-ext}{\mathrm{extend}^{\mathsf{s}}}_{16,32}(j_1), \href{../exec/numerics.html#op-ext}{\mathrm{extend}^{\mathsf{s}}}_{16,32}(j_2))^4 \\
+  \wedge &amp; k^4 = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}}(c_3) \\
+  \wedge &amp; l^4 = \href{../exec/numerics.html#op-iadd}{\mathrm{iadd}}_{32}(j, k)^4 \\
+  \wedge &amp; c = \href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}^{-1}_{\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}}(l^4))
+  \end{array}
+\end{array}\end{split}\]</div>
 </section>
 <section id="t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx">
 <span id="exec-vcvtop"></span><h3><span class="math notranslate nohighlight">\(t_2\mathsf{x}N\mathsf{.}\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}\mathsf{\_}t_1\mathsf{x}M\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}\)</span><a class="headerlink" href="#t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id42">
+<div class="admonition-todo admonition" id="id43">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.</p>
 </div>
@@ -2451,7 +2518,7 @@ respectively.</p>
 </section>
 <section id="t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-xref-syntax-instructions-syntax-half-mathit-half-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx">
 <h3><span class="math notranslate nohighlight">\(t_2\mathsf{x}N\mathsf{.}\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}\mathsf{\_}\href{../syntax/instructions.html#syntax-half}{\mathit{half}}\mathsf{\_}t_1\mathsf{x}M\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?\)</span><a class="headerlink" href="#t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-xref-syntax-instructions-syntax-half-mathit-half-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id43">
+<div class="admonition-todo admonition" id="id44">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.</p>
 </div>
@@ -2502,7 +2569,7 @@ respectively.</p>
 </section>
 <section id="t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathsf-zero">
 <h3><span class="math notranslate nohighlight">\(t_2\mathsf{x}N\mathsf{.}\href{../syntax/instructions.html#syntax-vcvtop}{\mathit{vcvtop}}\mathsf{\_}t_1\mathsf{x}M\mathsf{\_}\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}^?\mathsf{\_zero}\)</span><a class="headerlink" href="#t-2-mathsf-x-n-mathsf-xref-syntax-instructions-syntax-vcvtop-mathit-vcvtop-mathsf-t-1-mathsf-x-m-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathsf-zero" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id44">
+<div class="admonition-todo admonition" id="id45">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, for it has merged multiple rules for vcvtop into one algorithm.</p>
 </div>
@@ -2660,7 +2727,7 @@ respectively.</p>
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-table-mathsf-table-grow-x">
-<span id="exec-table-grow"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-grow-x" title="Permalink to this heading">¶</a></h3>
+<span id="exec-table-grow"></span><span id="index-7"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-table-mathsf-table-grow-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
@@ -2680,7 +2747,7 @@ respectively.</p>
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id45">
+<div class="admonition-todo admonition" id="id46">
 <p class="admonition-title">Todo</p>
 <ol class="arabic simple" start="6">
 <li><p>Maybe we want to be more precise than just saying “Either” in the prose, elaborating that it may succeed or fail non-deterministically.</p></li>
@@ -2890,7 +2957,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </section>
 </section>
 <section id="memory-instructions">
-<span id="exec-instr-memory"></span><span id="exec-memarg"></span><span id="index-7"></span><h2>Memory Instructions<a class="headerlink" href="#memory-instructions" title="Permalink to this heading">¶</a></h2>
+<span id="exec-instr-memory"></span><span id="exec-memarg"></span><span id="index-8"></span><h2>Memory Instructions<a class="headerlink" href="#memory-instructions" title="Permalink to this heading">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The alignment <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}.\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{align}}\)</span> in load and store instructions does not affect the semantics.
@@ -2942,7 +3009,7 @@ However, it may be substantially slower on some hardware.</p>
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id46">
+<div class="admonition-todo admonition" id="id47">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.
 (7) Render $inverse_of_nbytes with display hint.</p>
@@ -3002,7 +3069,7 @@ However, it may be substantially slower on some hardware.</p>
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-m-mathsf-x-n-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="exec-vload-pack"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{M}\mathsf{x}N\_\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-m-mathsf-x-n-xref-syntax-instructions-syntax-sx-mathit-sx-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id47">
+<div class="admonition-todo admonition" id="id48">
 <p class="admonition-title">Todo</p>
 <p>(*) Rule and prose both not spliced.</p>
 </div>
@@ -3066,7 +3133,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="exec-vload-splat"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_splat}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-splat-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id48">
+<div class="admonition-todo admonition" id="id49">
 <p class="admonition-title">Todo</p>
 <p>(*) Rule and prose both not spliced.</p>
 </div>
@@ -3129,7 +3196,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg">
 <span id="exec-vload-zero"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_zero}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-zero-x-xref-syntax-instructions-syntax-memarg-mathit-memarg" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id49">
+<div class="admonition-todo admonition" id="id50">
 <p class="admonition-title">Todo</p>
 <p>(*) Rule and prose both not spliced.</p>
 </div>
@@ -3189,7 +3256,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y">
 <span id="exec-vload-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~y\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-load-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id50">
+<div class="admonition-todo admonition" id="id51">
 <p class="admonition-title">Todo</p>
 <p>(*) Rule and prose both not spliced.</p>
 </div>
@@ -3322,7 +3389,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 </section>
 <section id="xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y">
 <span id="exec-vstore-lane"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\mathsf{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}{N}\mathsf{\_lane}~x~\href{../syntax/instructions.html#syntax-memarg}{\mathit{memarg}}~y\)</span><a class="headerlink" href="#xref-syntax-types-syntax-vectype-mathsf-v-scriptstyle128-mathsf-xref-syntax-instructions-syntax-instr-memory-mathsf-store-n-mathsf-lane-x-xref-syntax-instructions-syntax-memarg-mathit-memarg-y" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id51">
+<div class="admonition-todo admonition" id="id52">
 <p class="admonition-title">Todo</p>
 <p>(*) Rule and prose both not spliced.</p>
 </div>
@@ -3391,7 +3458,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-syntax-instructions-syntax-instr-memory-mathsf-memory-grow-x">
-<span id="exec-memory-grow"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-grow-x" title="Permalink to this heading">¶</a></h3>
+<span id="exec-memory-grow"></span><span id="index-9"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}grow}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-memory-mathsf-memory-grow-x" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value of value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
@@ -3409,7 +3476,7 @@ S; F; (\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}.\hre
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id52">
+<div class="admonition-todo admonition" id="id53">
 <p class="admonition-title">Todo</p>
 <ol class="arabic simple" start="6">
 <li><p>Maybe we want to be more precise than just saying “Either” in the prose, elaborating that it may succeed or fail non-deterministically.</p></li>
@@ -3619,7 +3686,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </section>
 </section>
 <section id="control-instructions">
-<span id="exec-instr-control"></span><span id="exec-label"></span><span id="index-8"></span><h2>Control Instructions<a class="headerlink" href="#control-instructions" title="Permalink to this heading">¶</a></h2>
+<span id="exec-instr-control"></span><span id="exec-label"></span><span id="index-10"></span><h2>Control Instructions<a class="headerlink" href="#control-instructions" title="Permalink to this heading">¶</a></h2>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-block-mathit-bt-xref-syntax-instructions-syntax-instr-mathit-instr-ast">
 <span id="exec-block"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{block}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-block-mathit-bt-xref-syntax-instructions-syntax-instr-mathit-instr-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
@@ -3776,7 +3843,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id53">
+<div class="admonition-todo admonition" id="id54">
 <p class="admonition-title">Todo</p>
 <ol class="arabic simple" start="3">
 <li><p>Introduce if-let instruction instead of “is of the case”.</p></li>
@@ -3805,7 +3872,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id54">
+<div class="admonition-todo admonition" id="id55">
 <p class="admonition-title">Todo</p>
 <ol class="arabic simple" start="3">
 <li><p>Introduce if-let instruction instead of “is of the case”.</p></li>
@@ -3836,7 +3903,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id55">
+<div class="admonition-todo admonition" id="id56">
 <p class="admonition-title">Todo</p>
 <p>Below is the acutal prose.
 (9) Need to handle RulePr s |- ref : rt properly in prose instead of $ref_type_of</p>
@@ -3886,7 +3953,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </ol>
 </li>
 </ol>
-<div class="admonition-todo admonition" id="id56">
+<div class="admonition-todo admonition" id="id57">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.
 (9) Need to handle RulePr s |- ref : rt properly in prose instead of $ref_type_of</p>
@@ -3973,7 +4040,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-call-ref-x">
 <span id="exec-call-ref"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-call-ref-x" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id57">
+<div class="admonition-todo admonition" id="id58">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, for the prose merges the two cases of null and non-null references.</p>
 </div>
@@ -4007,7 +4074,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}cast}}~(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~(\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~()~{}^?)~y))\)</span>.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~y)\)</span>.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id58">
+<div class="admonition-todo admonition" id="id59">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.
 (11) ref.cast (ref (null ()) y) is rendered differently. Need to handle TERMINAL? case in AL-to-EL-expr phase.</p>
@@ -4065,7 +4132,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </section>
 <section id="xref-syntax-instructions-syntax-instr-control-mathsf-return-call-ref-x">
 <span id="exec-return-call-ref"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return\_call\_ref}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-return-call-ref-x" title="Permalink to this heading">¶</a></h3>
-<div class="admonition-todo admonition" id="id59">
+<div class="admonition-todo admonition" id="id60">
 <p class="admonition-title">Todo</p>
 <p>(*) Prose not spliced, Sphinx cannot build the document with deeply nested ordered list. (mainly caused by spurious conditions that should be assertions)</p>
 </div>
@@ -4101,7 +4168,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}cast}}~(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~(\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}~()~{}^?)~y))\)</span>.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return\_call\_ref}}~y)\)</span>.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id60">
+<div class="admonition-todo admonition" id="id61">
 <p class="admonition-title">Todo</p>
 <p>Below is the actual prose.
 (11) ref.cast (ref (null ()) y) is rendered differently. Need to handle TERMINAL? case in AL-to-EL-expr phase.</p>
@@ -4158,7 +4225,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a)\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{throw\_ref}}\)</span>.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id61">
+<div class="admonition-todo admonition" id="id62">
 <p class="admonition-title">Todo</p>
 <p>check prose</p>
 </div>
@@ -4186,7 +4253,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 \href{../exec/runtime.html#syntax-exninst}{\mathsf{tag}}~z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[x],\; \href{../exec/runtime.html#syntax-exninst}{\mathsf{fields}}~{{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}} \}\end{array} \\
 \end{array} \\
 \end{array}\end{split}\]</div>
-<div class="admonition-todo admonition" id="id62">
+<div class="admonition-todo admonition" id="id63">
 <span id="exec-throw-ref"></span><p class="admonition-title">Todo</p>
 <p>Too deeply nested</p>
 </div>
@@ -4295,7 +4362,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({{\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}}_{n}}{\{}~{{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}~\})\)</span> to the stack.</p></li>
 <li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with label <span class="math notranslate nohighlight">\(({{\href{../exec/runtime.html#syntax-label}{\mathsf{label}}}_{n}}{\{}~\epsilon~\})\)</span>.</p></li>
 </ol>
-<div class="admonition-todo admonition" id="id63">
+<div class="admonition-todo admonition" id="id64">
 <p class="admonition-title">Todo</p>
 <p>check prose</p>
 </div>
@@ -4314,7 +4381,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 </section>
 </section>
 <section id="blocks">
-<span id="exec-instrs"></span><span id="index-9"></span><h2>Blocks<a class="headerlink" href="#blocks" title="Permalink to this heading">¶</a></h2>
+<span id="exec-instrs"></span><span id="index-11"></span><h2>Blocks<a class="headerlink" href="#blocks" title="Permalink to this heading">¶</a></h2>
 <p>The following auxiliary rules define the semantics of executing an <a class="reference internal" href="../syntax/instructions.html#syntax-instrs"><span class="std std-ref">instruction sequence</span></a>
 that forms a <a class="reference internal" href="#exec-instr-control"><span class="std std-ref">block</span></a>.</p>
 <section id="entering-xref-syntax-instructions-syntax-instr-mathit-instr-ast-with-label-l">
@@ -4351,7 +4418,7 @@ Therefore, execution of a loop falls off the end, unless a backwards branch is p
 </section>
 </section>
 <section id="exception-handling">
-<span id="exec-handler"></span><span id="index-10"></span><h2>Exception Handling<a class="headerlink" href="#exception-handling" title="Permalink to this heading">¶</a></h2>
+<span id="exec-handler"></span><span id="index-12"></span><h2>Exception Handling<a class="headerlink" href="#exception-handling" title="Permalink to this heading">¶</a></h2>
 <p>The following auxiliary rules define the semantics of entering and exiting <span class="math notranslate nohighlight">\(\mathsf{try\_table}\)</span> blocks.</p>
 <section id="entering-xref-syntax-instructions-syntax-instr-mathit-instr-ast-with-label-l-and-exception-handler-h">
 <span id="exec-handler-enter"></span><h3>Entering <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast\)</span> with label <span class="math notranslate nohighlight">\(L\)</span> and exception handler <span class="math notranslate nohighlight">\(H\)</span><a class="headerlink" href="#entering-xref-syntax-instructions-syntax-instr-mathit-instr-ast-with-label-l-and-exception-handler-h" title="Permalink to this heading">¶</a></h3>
@@ -4386,7 +4453,7 @@ that the <span class="math notranslate nohighlight">\(\mathsf{try\_table}\)</spa
 </section>
 </section>
 <section id="function-calls">
-<span id="index-11"></span><h2>Function Calls<a class="headerlink" href="#function-calls" title="Permalink to this heading">¶</a></h2>
+<span id="index-13"></span><h2>Function Calls<a class="headerlink" href="#function-calls" title="Permalink to this heading">¶</a></h2>
 <p>The following auxiliary rules define the semantics of invoking a <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a>
 through one of the <a class="reference internal" href="#exec-instr-control"><span class="std std-ref">call instructions</span></a>
 and returning from it.</p>
@@ -4443,7 +4510,7 @@ and returning from it.</p>
 \end{array}\end{split}\]</div>
 </section>
 <section id="host-functions">
-<span id="exec-invoke-host"></span><span id="index-12"></span><h3>Host Functions<a class="headerlink" href="#host-functions" title="Permalink to this heading">¶</a></h3>
+<span id="exec-invoke-host"></span><span id="index-14"></span><h3>Host Functions<a class="headerlink" href="#host-functions" title="Permalink to this heading">¶</a></h3>
 <p>Invoking a <a class="reference internal" href="runtime.html#syntax-hostfunc"><span class="std std-ref">host function</span></a> has non-deterministic behavior.
 It may either terminate with a <a class="reference internal" href="../intro/overview.html#trap"><span class="std std-ref">trap</span></a>, an <a class="reference internal" href="../syntax/instructions.html#exception"><span class="std std-ref">exception</span></a>, or return regularly.
 However, in the latter case, it must consume and produce the right number and types of WebAssembly <a class="reference internal" href="runtime.html#syntax-val"><span class="std std-ref">values</span></a> on the stack,
@@ -4491,7 +4558,7 @@ However, the effects of any such call are subsumed by the non-deterministic beha
 </section>
 </section>
 <section id="expressions">
-<span id="exec-expr"></span><span id="index-13"></span><h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this heading">¶</a></h2>
+<span id="exec-expr"></span><span id="index-15"></span><h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this heading">¶</a></h2>
 <p>An <a class="reference internal" href="../syntax/instructions.html#syntax-expr"><span class="std std-ref">expression</span></a> is <em>evaluated</em> relative to a <a class="reference internal" href="conventions.html#exec-notation-textual"><span class="std std-ref">current</span></a> <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> pointing to its containing <a class="reference internal" href="runtime.html#syntax-moduleinst"><span class="std std-ref">module instance</span></a>.</p>
 <ol class="arabic simple">
 <li><p>Jump to the start of the instruction sequence <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast\)</span> of the expression.</p></li>
