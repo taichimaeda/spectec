@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-12-03)</title>
+    <title>Modules &#8212; WebAssembly 3.0 (Draft 2024-12-23)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -97,7 +97,7 @@ Furthermore, most definitions are themselves classified with a suitable type.</p
 <p>The type definition <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-type}{\mathsf{type}}~{\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}})\)</span> is valid with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\({|C{.}\href{../valid/conventions.html#context}{\mathsf{types}}|}\)</span> is equal to <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p>The index <span class="math notranslate nohighlight">\({|C{.}\href{../valid/conventions.html#context}{\mathsf{types}}|}\)</span> is equal to <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
 <li><p>The defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({{{{\href{../valid/conventions.html#aux-roll-deftype}{\mathrm{roll}}}}_{x}^\ast}}{({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}})}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> appended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{types}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the recursive type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}}\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{x})\)</span>.</p></li>
@@ -198,7 +198,7 @@ C \href{../valid/modules.html#valid-types}{\vdash} {\href{../syntax/types.html#s
 <li><p>The local <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-local}{\mathit{local}}}\)</span> is valid with the local type <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span>.</p></li>
 </ul>
 </li>
-<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../valid/conventions.html#context}{\mathsf{locals}} \mathrel{{=}{\oplus}} {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t_1)^\ast}~{{{\mathit{lt}}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{labels}} \mathrel{{=}{\oplus}} {t_2^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{return}} \mathrel{{=}{\oplus}} {t_2^\ast}]\)</span>, the expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the value type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>.</p></li>
+<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../valid/conventions.html#context}{\mathsf{locals}} \mathrel{{=}{\oplus}} {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t_1)^\ast}~{{{\mathit{lt}}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{labels}} \mathrel{{=}{\oplus}} {t_2^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{return}} \mathrel{{=}{\oplus}} {t_2^\ast}]\)</span>, the expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the result type <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id2">
