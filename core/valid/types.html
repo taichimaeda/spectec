@@ -209,29 +209,37 @@ C \href{../valid/types.html#valid-reftype}{\vdash} \href{../syntax/types.html#sy
 <span id="valid-valtype"></span><span id="index-4"></span><h2>Value Types<a class="headerlink" href="#value-types" title="Permalink to this heading">¶</a></h2>
 <p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is valid if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span>.</p></li>
 <li><p>The number type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 <li><p>The vector type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-valtype-ext}{\mathsf{bot}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -276,11 +284,13 @@ C \href{../valid/types.html#valid-blocktype}{\vdash} {\href{../syntax/modules.ht
 <h3><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}^?]\)</span><a class="headerlink" href="#xref-syntax-types-syntax-valtype-mathit-valtype" title="Permalink to this heading">¶</a></h3>
 <p>The block type <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}^?}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(\epsilon~\rightarrow~{{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}^?}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is defined, then:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -309,11 +319,13 @@ C \href{../valid/types.html#valid-blocktype}{\vdash} {{\href{../syntax/types.htm
 <h3><span class="math notranslate nohighlight">\([t^\ast]\)</span><a class="headerlink" href="#t-ast" title="Permalink to this heading">¶</a></h3>
 <p>The result type <span class="math notranslate nohighlight">\({t^\ast}\)</span> is valid if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\(t\)</span> in <span class="math notranslate nohighlight">\({t^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -340,19 +352,23 @@ C \href{../valid/types.html#valid-resulttype}{\vdash} {t^\ast} : \href{../valid/
 <span id="valid-instrtype"></span><span id="index-7"></span><h2>Instruction Types<a class="headerlink" href="#instruction-types" title="Permalink to this heading">¶</a></h2>
 <p>The instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span> is valid if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The result type <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> is valid.</p></li>
 <li><p>The result type <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> is valid.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{x*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{lct*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> exists.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>For all <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span> in <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -448,11 +464,13 @@ C \href{../valid/types.html#valid-comptype}{\vdash} \href{../syntax/types.html#s
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}^\ast\)</span><a class="headerlink" href="#xref-syntax-types-syntax-comptype-mathsf-struct-xref-syntax-types-syntax-fieldtype-mathit-fieldtype-ast" title="Permalink to this heading">¶</a></h3>
 <p>The composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}}^\ast})\)</span> is valid if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The field type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -509,7 +527,7 @@ C \href{../valid/types.html#valid-comptype}{\vdash} \href{../syntax/types.html#s
 <span id="valid-packtype"></span><span id="valid-storagetype"></span><span id="valid-fieldtype"></span><span id="index-10"></span><h2>Field Types<a class="headerlink" href="#field-types" title="Permalink to this heading">¶</a></h2>
 <section id="xref-syntax-types-syntax-mut-mathit-mut-xref-syntax-types-syntax-storagetype-mathit-storagetype">
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-mut-mathit-mut-xref-syntax-types-syntax-storagetype-mathit-storagetype" title="Permalink to this heading">¶</a></h3>
-<p>The field type <span class="math notranslate nohighlight">\(({\mathsf{mut}^?}, {\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}})\)</span> is valid if:</p>
+<p>The field type <span class="math notranslate nohighlight">\(({\mathsf{mut}^?}~{\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}})\)</span> is valid if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The storage type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-storagetype}{\mathit{storagetype}}}\)</span> is valid.</p></li>
@@ -560,25 +578,31 @@ C \href{../valid/types.html#valid-packtype}{\vdash} {\href{../syntax/types.html#
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}^\ast\)</span><a class="headerlink" href="#xref-syntax-types-syntax-rectype-mathsf-rec-xref-syntax-types-syntax-subtype-mathit-subtype-ast" title="Permalink to this heading">¶</a></h3>
 <p>The recursive type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\mathit{st}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast})\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{x})\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The sub type sequence <span class="math notranslate nohighlight">\({{\mathit{st}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The sub type sequence <span class="math notranslate nohighlight">\({{\mathit{st}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}_1~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast}\)</span>.</p></li>
 <li><p>The sub type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}_1\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{x})\)</span>.</p></li>
 <li><p>The recursive type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast})\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{x + 1})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The sub type sequence <span class="math notranslate nohighlight">\({{\mathit{st}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the sub type sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../appendix/properties.html#context-ext}{\mathsf{recs}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the recursive type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast})\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x, 0)})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -617,30 +641,38 @@ C \href{../valid/types.html#valid-rectype}{\vdash} \href{../syntax/types.html#sy
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~\href{../syntax/types.html#syntax-subtype}{\mathsf{final}}^?~y^\ast~\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-subtype-mathsf-sub-xref-syntax-types-syntax-subtype-mathsf-final-y-ast-xref-syntax-types-syntax-comptype-mathit-comptype" title="Permalink to this heading">¶</a></h3>
 <p>The sub type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~{\mathsf{final}^?}~{x^\ast}~{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}})\)</span> is valid with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{x_0})\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p><span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(1\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The index <span class="math notranslate nohighlight">\(x\)</span> is less than <span class="math notranslate nohighlight">\(x_0\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{x*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{comptype'*}}|}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{x'**}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{comptype'*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}\)</span> and <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{x'*}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{x'*}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The sub type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-unroll-deftype}{\mathrm{unroll}}}(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x])\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~\epsilon~{{x'}^\ast}~{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>The composite type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}}\)</span> is valid.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The composite type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}}\)</span> matches the composite type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -732,7 +764,7 @@ C \href{../valid/types.html#valid-deftype}{\vdash} {\href{../syntax/types.html#s
 <p><a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">Limits</span></a> must have meaningful bounds that are within a given range.</p>
 <section id="xref-syntax-types-syntax-limits-mathsf-min-n-xref-syntax-types-syntax-limits-mathsf-max-m">
 <h3><span class="math notranslate nohighlight">\(\{ \href{../syntax/types.html#syntax-limits}{\mathsf{min}}~n, \href{../syntax/types.html#syntax-limits}{\mathsf{max}}~m^? \}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-limits-mathsf-min-n-xref-syntax-types-syntax-limits-mathsf-max-m" title="Permalink to this heading">¶</a></h3>
-<p>The limits <span class="math notranslate nohighlight">\(({}[~n~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m~])\)</span> is valid with <span class="math notranslate nohighlight">\(k\)</span> if:</p>
+<p>The limits <span class="math notranslate nohighlight">\({}[~n~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m~]\)</span> is valid with <span class="math notranslate nohighlight">\(k\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(n\)</span> is less than or equal to <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
@@ -768,7 +800,7 @@ C \href{../valid/types.html#valid-limits}{\vdash} {}[ n \href{../syntax/types.ht
 <span id="valid-tabletype"></span><span id="index-14"></span><h2>Table Types<a class="headerlink" href="#table-types" title="Permalink to this heading">¶</a></h2>
 <section id="xref-syntax-types-syntax-addrtype-mathit-addrtype-xref-syntax-types-syntax-limits-mathit-limits-xref-syntax-types-syntax-reftype-mathit-reftype">
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}~\href{../syntax/types.html#syntax-limits}{\mathit{limits}}~\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-addrtype-mathit-addrtype-xref-syntax-types-syntax-limits-mathit-limits-xref-syntax-types-syntax-reftype-mathit-reftype" title="Permalink to this heading">¶</a></h3>
-<p>The table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}, {\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}, {\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}})\)</span> is valid if:</p>
+<p>The table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}~{\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}~{\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}})\)</span> is valid if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The limits <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}\)</span> is valid with <span class="math notranslate nohighlight">\({2^{32}} - 1\)</span>.</p></li>
@@ -863,7 +895,7 @@ C \href{../valid/types.html#valid-tagtype}{\vdash} {\href{../valid/conventions.h
 <span id="valid-globaltype"></span><span id="index-17"></span><h2>Global Types<a class="headerlink" href="#global-types" title="Permalink to this heading">¶</a></h2>
 <section id="xref-syntax-types-syntax-mut-mathit-mut-xref-syntax-types-syntax-valtype-mathit-valtype">
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-mut}{\mathit{mut}}~\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-mut-mathit-mut-xref-syntax-types-syntax-valtype-mathit-valtype" title="Permalink to this heading">¶</a></h3>
-<p>The global type <span class="math notranslate nohighlight">\(({\mathsf{mut}^?}, t)\)</span> is valid if:</p>
+<p>The global type <span class="math notranslate nohighlight">\(({\mathsf{mut}^?}~t)\)</span> is valid if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t\)</span> is valid.</p></li>

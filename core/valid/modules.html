@@ -122,21 +122,25 @@ C \href{../valid/modules.html#valid-type}{\vdash} \href{../syntax/modules.html#s
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-rectype}{\mathit{type}}^\ast\)</span><a class="headerlink" href="#xref-syntax-types-syntax-rectype-mathit-type-ast" title="Permalink to this heading">¶</a></h3>
 <p>The type definition sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is valid with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The type definition sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 <li><p>The defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The type definition sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_1~{{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}\)</span>.</p></li>
 <li><p>The defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({{\mathit{dt}}_1^\ast}~{{\mathit{dt}}^\ast}\)</span>.</p></li>
 <li><p>The type definition <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_1\)</span> is valid with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_1^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_1^\ast}\)</span> appended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{types}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the type definition sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}\)</span> is valid with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -189,16 +193,18 @@ C \href{../valid/modules.html#valid-types}{\vdash} {\href{../syntax/types.html#s
 <h3><span class="math notranslate nohighlight">\(\{ \href{../syntax/modules.html#syntax-func}{\mathsf{type}}~x, \href{../syntax/modules.html#syntax-func}{\mathsf{locals}}~t^\ast, \href{../syntax/modules.html#syntax-func}{\mathsf{body}}~\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}} \}\)</span><a class="headerlink" href="#xref-syntax-modules-syntax-func-mathsf-type-x-xref-syntax-modules-syntax-func-mathsf-locals-t-ast-xref-syntax-modules-syntax-func-mathsf-body-xref-syntax-instructions-syntax-expr-mathit-expr" title="Permalink to this heading">¶</a></h3>
 <p>The function <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-func}{\mathsf{func}}~x~{{\href{../syntax/modules.html#syntax-local}{\mathit{local}}}^\ast}~{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}})\)</span> is valid with the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t_1^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^\ast})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{local*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{lct*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span> in <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-local}{\mathit{local}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-local}{\mathit{local}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The local <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-local}{\mathit{local}}}\)</span> is valid with the local type <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
-<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../valid/conventions.html#context}{\mathsf{locals}} \mathrel{{=}{\oplus}} {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t_1)^\ast}~{{{\mathit{lt}}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{labels}} \mathrel{{=}{\oplus}} {t_2^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{return}} \mathrel{{=}{\oplus}} {t_2^\ast}]\)</span>, the expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the result type <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>.</p></li>
+<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../valid/conventions.html#context}{\mathsf{locals}} \mathrel{{=}{\oplus}} {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t_1)^\ast}~{{{\mathit{lt}}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{labels}} \mathrel{{=}{\oplus}} {t_2^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{return}} \mathrel{{=}{\oplus}} {t_2^\ast}]\)</span>, the expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the result type <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id2">
@@ -247,20 +253,24 @@ C \href{../valid/modules.html#valid-func}{\vdash} \href{../syntax/modules.html#s
 <p>Locals <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-local}{\mathit{local}}}\)</span> are classified with <a class="reference internal" href="conventions.html#syntax-localtype"><span class="std std-ref">local types</span></a>.</p>
 <section id="xref-syntax-modules-syntax-local-mathsf-type-xref-syntax-types-syntax-valtype-mathit-valtype">
 <h3><span class="math notranslate nohighlight">\(\{ \href{../syntax/modules.html#syntax-local}{\mathsf{type}}~\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}} \}\)</span><a class="headerlink" href="#xref-syntax-modules-syntax-local-mathsf-type-xref-syntax-types-syntax-valtype-mathit-valtype" title="Permalink to this heading">¶</a></h3>
-<p>The local <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-local}{\mathsf{local}}~t)\)</span> is valid with the local type <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}, t)\)</span> if:</p>
+<p>The local <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-local}{\mathsf{local}}~t)\)</span> is valid with the local type <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}~t)\)</span> if:</p>
+<blockquote>
+<div><ul>
+<li><p>Either:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>Either:</p>
-<ul>
 <li><p>The initialization status <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}\)</span>.</p></li>
 <li><p>A <a class="reference internal" href="../exec/runtime.html#default-val"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\(t\)</span> is defined.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The initialization status <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-init}{\mathsf{unset}}\)</span>.</p></li>
 <li><p>A <a class="reference internal" href="../exec/runtime.html#default-val"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\(t\)</span> is not defined.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -311,7 +321,7 @@ C \href{../valid/modules.html#valid-local}{\vdash} \href{../syntax/modules.html#
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\({\mathit{tt}}\)</span> is valid.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-tabletype}{\mathit{tabletype}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-tabletype}{\mathit{tabletype}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 <li><p>The expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the value type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is const.</p></li>
 </ul>
@@ -382,7 +392,7 @@ C \href{../valid/modules.html#valid-mem}{\vdash} \href{../syntax/modules.html#sy
 <blockquote>
 <div><ul class="simple">
 <li><p>The global type <span class="math notranslate nohighlight">\({\mathit{gt}}\)</span> is valid.</p></li>
-<li><p>The global type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-globaltype}{\mathit{globaltype}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, t)\)</span>.</p></li>
+<li><p>The global type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-globaltype}{\mathit{globaltype}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~t)\)</span>.</p></li>
 <li><p>The expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the value type <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is const.</p></li>
 </ul>
@@ -415,21 +425,25 @@ C \href{../valid/modules.html#valid-global}{\vdash} \href{../syntax/modules.html
 <h3><span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-global}{\mathit{global}}^\ast\)</span><a class="headerlink" href="#xref-syntax-modules-syntax-global-mathit-global-ast" title="Permalink to this heading">¶</a></h3>
 <p>The global sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is valid with the global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The global sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 <li><p>The global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The global sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-global}{\mathit{global}}}_1~{{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}\)</span>.</p></li>
 <li><p>The global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{gt}}_1~{{\mathit{gt}}^\ast}\)</span>.</p></li>
 <li><p>The global <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-global}{\mathit{global}}}_1\)</span> is valid with the global type <span class="math notranslate nohighlight">\({\mathit{gt}}_1\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the global type <span class="math notranslate nohighlight">\({\mathit{gt}}_1\)</span> appended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{globals}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the global sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}\)</span> is valid with the global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}^\ast}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -507,13 +521,15 @@ C \href{../valid/modules.html#valid-tag}{\vdash} \href{../syntax/modules.html#sy
 <h3><span class="math notranslate nohighlight">\(\{ \href{../syntax/modules.html#syntax-elem}{\mathsf{type}}~t, \href{../syntax/modules.html#syntax-elem}{\mathsf{init}}~e^\ast, \href{../syntax/modules.html#syntax-elem}{\mathsf{mode}}~\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}} \}\)</span><a class="headerlink" href="#xref-syntax-modules-syntax-elem-mathsf-type-t-xref-syntax-modules-syntax-elem-mathsf-init-e-ast-xref-syntax-modules-syntax-elem-mathsf-mode-xref-syntax-modules-syntax-elemmode-mathit-elemmode" title="Permalink to this heading">¶</a></h3>
 <p>The table segment <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}~{\href{../syntax/types.html#syntax-elemtype}{\mathit{elemtype}}}~{{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}^\ast}~{\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}})\)</span> is valid with the element type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-elemtype}{\mathit{elemtype}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The element type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-elemtype}{\mathit{elemtype}}}\)</span> is valid.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the element type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-elemtype}{\mathit{elemtype}}}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is const.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>The element mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}\)</span> is valid with the element type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-elemtype}{\mathit{elemtype}}}\)</span>.</p></li>
 </ul>
@@ -549,26 +565,32 @@ C \href{../valid/modules.html#valid-elem}{\vdash} \href{../syntax/modules.html#s
 \end{array}\]</div>
 <p id="valid-elemmode">The element mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is valid with the element type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The element mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-elemmode}{\mathsf{active}}~x~{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}})\)</span>.</p></li>
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}'})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}'})\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}'}\)</span>.</p></li>
 <li><p>The expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is const.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The element mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-elemmode}{\mathsf{passive}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The element mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-elemmode}{\mathsf{declare}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -659,20 +681,24 @@ C \href{../valid/modules.html#valid-data}{\vdash} \href{../syntax/modules.html#s
 \end{array}\]</div>
 <p id="valid-datamode">The data mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is valid with the data type <span class="math notranslate nohighlight">\(\href{../valid/modules.html#valid-data}{\mathsf{ok}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The data mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-datamode}{\mathsf{active}}~x~{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}})\)</span>.</p></li>
 <li><p>The memory type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x]\)</span> exists.</p></li>
 <li><p>The memory type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{mems}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{mt}}\)</span>.</p></li>
 <li><p>The expression <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is valid with the value type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> is const.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The data mode <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-datamode}{\mathsf{passive}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -943,67 +969,85 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 <p>The <a class="reference internal" href="../syntax/types.html#syntax-externtype"><span class="std std-ref">external types</span></a> classifying a module may contain free <a class="reference internal" href="../syntax/modules.html#syntax-typeidx"><span class="std std-ref">type indices</span></a> that refer to types defined within the module.</p>
 <p>The module <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-module}{\mathsf{module}}~{{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}~{{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}~{{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}~{{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}~{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}~{{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}~{{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}~{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}~{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}~{{\href{../syntax/modules.html#syntax-start}{\mathit{start}}}^?}~{{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast})\)</span> is valid with the module type <span class="math notranslate nohighlight">\(t\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Under the context <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../valid/conventions.html#context}{\mathsf{types}}~\epsilon,\; \href{../appendix/properties.html#context-ext}{\mathsf{recs}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{funcs}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{globals}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{tables}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{mems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{tags}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{elems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{datas}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{locals}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{labels}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{return}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{refs}}~\epsilon \}\end{array}\)</span>, the type definition sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}\)</span> is valid with the defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}'}^\ast}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{xt}}_{\mathsf{i*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{import*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-import}{\mathit{import}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{i}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>Under the context <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../valid/conventions.html#context}{\mathsf{types}}~{{\mathit{dt}'}^\ast},\; \href{../appendix/properties.html#context-ext}{\mathsf{recs}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{funcs}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{globals}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{tables}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{mems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{tags}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{elems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{datas}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{locals}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{labels}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{return}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{refs}}~\epsilon \}\end{array}\)</span>, the import <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-import}{\mathit{import}}}\)</span> is valid with the external type <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the global sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}\)</span> is valid with the global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}^\ast}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{tt*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{table*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-table}{\mathit{table}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{tt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{tt}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the table <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-table}{\mathit{table}}}\)</span> is valid with the table type <span class="math notranslate nohighlight">\({\mathit{tt}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{mt*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{mem*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{mt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{mt}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the memory <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}\)</span> is valid with the memory type <span class="math notranslate nohighlight">\({\mathit{mt}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{tag*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{jt*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{jt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{jt}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the tag <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}\)</span> is valid with the tag type <span class="math notranslate nohighlight">\({\mathit{jt}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{func*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{dt*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-func}{\mathit{func}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The function <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-func}{\mathit{func}}}\)</span> is valid with the defined type <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{rt*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{elem*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{rt}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The table segment <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> is valid with the element type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{ok*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{data*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-data}{\mathit{data}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{ok}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{ok}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The memory segment <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-data}{\mathit{data}}}\)</span> is valid with the data type <span class="math notranslate nohighlight">\({\mathit{ok}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-start}{\mathit{start}}}\)</span> is defined, then:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The start function <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-start}{\mathit{start}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{nm*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{export*}}|}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{xt}}_{\mathsf{e*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{export*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-export}{\mathit{export}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{nm}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{nm}}^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{e}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{e}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The export <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-export}{\mathit{export}}}\)</span> is valid with the name <span class="math notranslate nohighlight">\({\mathit{nm}}\)</span> and the external type <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{e}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><span class="math notranslate nohighlight">\({{\mathit{nm}}^\ast}~{\mathrm{disjoint}}\)</span> is equal to true.</p></li>
 <li><p>The context <span class="math notranslate nohighlight">\(C\)</span> is equal to <span class="math notranslate nohighlight">\({C'}{}[{.}\href{../valid/conventions.html#context}{\mathsf{globals}} \mathrel{{=}{\oplus}} {{\mathit{gt}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{tables}} \mathrel{{=}{\oplus}} {{\mathit{tt}}_{\mathsf{i}}^\ast}~{{\mathit{tt}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{mems}} \mathrel{{=}{\oplus}} {{\mathit{mt}}_{\mathsf{i}}^\ast}~{{\mathit{mt}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{tags}} \mathrel{{=}{\oplus}} {{\mathit{jt}}_{\mathsf{i}}^\ast}~{{\mathit{jt}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{elems}} \mathrel{{=}{\oplus}} {{\mathit{rt}}^\ast}]{}[{.}\href{../valid/conventions.html#context}{\mathsf{datas}} \mathrel{{=}{\oplus}} {{\mathit{ok}}^\ast}]\)</span>.</p></li>
 <li><p>The context <span class="math notranslate nohighlight">\({C'}\)</span> is equal to <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../valid/conventions.html#context}{\mathsf{types}}~{{\mathit{dt}'}^\ast},\; \href{../appendix/properties.html#context-ext}{\mathsf{recs}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{funcs}}~{{\mathit{dt}}_{\mathsf{i}}^\ast}~{{\mathit{dt}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{globals}}~{{\mathit{gt}}_{\mathsf{i}}^\ast},\; \href{../valid/conventions.html#context}{\mathsf{tables}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{mems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{tags}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{elems}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{datas}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{locals}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{labels}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{return}}~\epsilon,\; \href{../valid/conventions.html#context}{\mathsf{refs}}~{x^\ast} \}\end{array}\)</span>.</p></li>
-<li><p>The function index sequence <span class="math notranslate nohighlight">\({x^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-funcidx}{\mathrm{funcidx}}}(({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}, {{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}, {{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}, {{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}, {{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}))\)</span>.</p></li>
+<li><p>The function index sequence <span class="math notranslate nohighlight">\({x^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-funcidx}{\mathrm{funcidx}}}({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}~{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}~{{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}~{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}~{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast})\)</span>.</p></li>
 <li><p>The defined type sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}_{\mathsf{i}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-externtype}{\mathrm{funcs}}}({{\mathit{xt}}_{\mathsf{i}}^\ast})\)</span>.</p></li>
 <li><p>The global type sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathsf{i}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-externtype}{\mathrm{globals}}}({{\mathit{xt}}_{\mathsf{i}}^\ast})\)</span>.</p></li>
 <li><p>The table type sequence <span class="math notranslate nohighlight">\({{\mathit{tt}}_{\mathsf{i}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-externtype}{\mathrm{tables}}}({{\mathit{xt}}_{\mathsf{i}}^\ast})\)</span>.</p></li>

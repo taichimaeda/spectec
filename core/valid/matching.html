@@ -132,125 +132,159 @@ C \href{../valid/matching.html#match-vectype}{\vdash} {\href{../syntax/types.htm
 <span id="match-heaptype"></span><span id="index-3"></span><h2>Heap Types<a class="headerlink" href="#heap-types" title="Permalink to this heading">¶</a></h2>
 <p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> matches the heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}_1\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}_2\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}'}\)</span> is valid.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}_1\)</span> matches the heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}'}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}'}\)</span> matches the heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{eq}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{i\scriptstyle31}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{eq}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{struct}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{eq}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{array}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{eq}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{struct}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}}^\ast})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{array}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\href{../syntax/types.html#syntax-fieldtype}{\mathit{fieldtype}}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{\href{../syntax/types.html#syntax-functype}{\mathit{functype}}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> exists.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> matches the heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> exists.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span> matches the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-heaptype}{\mathsf{rec}}~i)\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}{}[j]\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}|}\)</span> is greater than <span class="math notranslate nohighlight">\(j\)</span>.</p></li>
 <li><p>The sub type <span class="math notranslate nohighlight">\(C{.}\href{../appendix/properties.html#context-ext}{\mathsf{recs}}{}[i]\)</span> exists.</p></li>
 <li><p>The sub type <span class="math notranslate nohighlight">\(C{.}\href{../appendix/properties.html#context-ext}{\mathsf{recs}}{}[i]\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~{\href{../syntax/types.html#syntax-subtype}{\mathsf{final}}^?}~{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}~{\mathit{ct}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{none}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span> matches the heap type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{nofunc}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span> matches the heap type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{noextern}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span> matches the heap type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-valtype-ext}{\mathsf{bot}}\)</span>.</p></li>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-heaptype}{\mathit{heaptype}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -377,19 +411,23 @@ C \href{../valid/matching.html#match-heaptype}{\vdash} \href{../valid/convention
 <span id="match-reftype"></span><span id="index-4"></span><h2>Reference Types<a class="headerlink" href="#reference-types" title="Permalink to this heading">¶</a></h2>
 <p>The reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~{{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}~{\mathit{ht}}_1)\)</span> matches the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~{{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}~{\mathit{ht}}_2)\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_1\)</span> matches the heap type <span class="math notranslate nohighlight">\({\mathit{ht}}_2\)</span>.</p></li>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is absent.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is absent.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathsf{null}^?}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\mathsf{null}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -422,33 +460,41 @@ C \href{../valid/matching.html#match-reftype}{\vdash} \href{../syntax/types.html
 <span id="match-valtype"></span><span id="index-5"></span><h2>Value Types<a class="headerlink" href="#value-types" title="Permalink to this heading">¶</a></h2>
 <p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> matches the value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_2\)</span>.</p></li>
 <li><p>The number type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1\)</span> matches the number type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}_1\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}_2\)</span>.</p></li>
 <li><p>The vector type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}_1\)</span> matches the vector type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_1\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_2\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_1\)</span> matches the reference type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-valtype-ext}{\mathsf{bot}}\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\(t_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -475,12 +521,14 @@ C \href{../valid/matching.html#match-valtype}{\vdash} \href{../valid/conventions
 <span id="match-resulttype"></span><span id="index-6"></span><h2>Result Types<a class="headerlink" href="#result-types" title="Permalink to this heading">¶</a></h2>
 <p>The value type sequence <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> matches the value type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p><span class="math notranslate nohighlight">\({|t_{\mathit{{\scriptstyle 2}*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|t_{\mathit{{\scriptstyle 1}*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(t_1\)</span> in <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> and <span class="math notranslate nohighlight">\(t_2\)</span> in <span class="math notranslate nohighlight">\({t_2^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type <span class="math notranslate nohighlight">\(t_1\)</span> matches the value type <span class="math notranslate nohighlight">\(t_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -507,20 +555,24 @@ C \href{../valid/matching.html#match-resulttype}{\vdash} {t_1^\ast} \href{../val
 <span id="match-instrtype"></span><span id="index-7"></span><h2>Instruction Types<a class="headerlink" href="#instruction-types" title="Permalink to this heading">¶</a></h2>
 <p>The instruction type <span class="math notranslate nohighlight">\({t_{11}^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}}\,{t_{12}^\ast}\)</span> matches the instruction type <span class="math notranslate nohighlight">\({t_{21}^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_2^\ast}}\,{t_{22}^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{21}^\ast}\)</span> matches the value type sequence <span class="math notranslate nohighlight">\({t_{11}^\ast}\)</span>.</p></li>
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{12}^\ast}\)</span> matches the value type sequence <span class="math notranslate nohighlight">\({t_{22}^\ast}\)</span>.</p></li>
 <li><p>The local index sequence <span class="math notranslate nohighlight">\({x^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({x_2^\ast} \setminus {x_1^\ast}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{x*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{t*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> exists.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>For all <span class="math notranslate nohighlight">\(t\)</span> in <span class="math notranslate nohighlight">\({t^\ast}\)</span> and <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
-<ul>
-<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t)\)</span>.</p></li>
+<blockquote>
+<div><ul class="simple">
+<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -593,32 +645,40 @@ C \href{../valid/matching.html#match-functype}{\vdash} {t_{11}^\ast} \href{../sy
 <span id="match-arraytype"></span><span id="match-structtype"></span><span id="match-comptype"></span><span id="index-9"></span><h2>Composite Types<a class="headerlink" href="#composite-types" title="Permalink to this heading">¶</a></h2>
 <p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> matches the composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul>
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\mathit{yt}}_1^\ast}~{\mathit{yt}'}_1)\)</span>.</p></li>
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\mathit{yt}}_2^\ast})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{yt}}_{\mathit{{\scriptstyle 2}*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{yt}}_{\mathit{{\scriptstyle 1}*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{yt}}_1\)</span> in <span class="math notranslate nohighlight">\({{\mathit{yt}}_1^\ast}\)</span> and <span class="math notranslate nohighlight">\({\mathit{yt}}_2\)</span> in <span class="math notranslate nohighlight">\({{\mathit{yt}}_2^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The field type <span class="math notranslate nohighlight">\({\mathit{yt}}_1\)</span> matches the field type <span class="math notranslate nohighlight">\({\mathit{yt}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\mathit{yt}}_1)\)</span>.</p></li>
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~{\mathit{yt}}_2)\)</span>.</p></li>
 <li><p>The field type <span class="math notranslate nohighlight">\({\mathit{yt}}_1\)</span> matches the field type <span class="math notranslate nohighlight">\({\mathit{yt}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{\mathit{ft}}_1)\)</span>.</p></li>
 <li><p>The composite type <span class="math notranslate nohighlight">\({\mathit{ct}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{\mathit{ft}}_2)\)</span>.</p></li>
 <li><p>The function type <span class="math notranslate nohighlight">\({\mathit{ft}}_1\)</span> matches the function type <span class="math notranslate nohighlight">\({\mathit{ft}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -673,22 +733,26 @@ C \href{../valid/matching.html#match-comptype}{\vdash} \href{../syntax/types.htm
 </section>
 <section id="field-types">
 <span id="match-packtype"></span><span id="match-storagetype"></span><span id="match-fieldtype"></span><span id="index-10"></span><h2>Field Types<a class="headerlink" href="#field-types" title="Permalink to this heading">¶</a></h2>
-<p>The field type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}, {\mathit{zt}}_1)\)</span> matches the field type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}, {\mathit{zt}}_2)\)</span> if:</p>
+<p>The field type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}~{\mathit{zt}}_1)\)</span> matches the field type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}~{\mathit{zt}}_2)\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_1\)</span> matches the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_2\)</span>.</p></li>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is absent.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is absent.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\mathsf{mut}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\mathsf{mut}\)</span>.</p></li>
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_2\)</span> matches the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_1\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -721,20 +785,24 @@ C \href{../valid/matching.html#match-fieldtype}{\vdash} \mathsf{mut}~{\mathit{zt
 \end{array}\]</div>
 <p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> matches the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1\)</span>.</p></li>
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1\)</span> matches the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}_1\)</span>.</p></li>
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}_2\)</span>.</p></li>
 <li><p>The packed type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}_1\)</span> matches the packed type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -769,18 +837,22 @@ C \href{../valid/matching.html#match-packtype}{\vdash} {\href{../syntax/types.ht
 <span id="match-deftype"></span><span id="index-11"></span><h2>Defined Types<a class="headerlink" href="#defined-types" title="Permalink to this heading">¶</a></h2>
 <p>The defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\({{\href{../valid/conventions.html#aux-clostype}{\mathsf{clos}}}}_{C}({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1)\)</span> is equal to <span class="math notranslate nohighlight">\({{\href{../valid/conventions.html#aux-clostype}{\mathsf{clos}}}}_{C}({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The sub type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-unroll-deftype}{\mathrm{unroll}}}({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1)\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~{\href{../syntax/types.html#syntax-subtype}{\mathsf{final}}^?}~{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}~{\mathit{ct}})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}|}\)</span> is greater than <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
 <li><p>The type use <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}{}[i]\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -824,7 +896,7 @@ as used in the premise of the former rule above.</p>
 </section>
 <section id="limits">
 <span id="match-limits"></span><span id="index-12"></span><h2>Limits<a class="headerlink" href="#limits" title="Permalink to this heading">¶</a></h2>
-<p>The limits <span class="math notranslate nohighlight">\(({}[~n_1~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m_1~])\)</span> matches the limits <span class="math notranslate nohighlight">\(({}[~n_2~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m_2~])\)</span> if:</p>
+<p>The limits <span class="math notranslate nohighlight">\({}[~n_1~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m_1~]\)</span> matches the limits <span class="math notranslate nohighlight">\({}[~n_2~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m_2~]\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(n_1\)</span> is greater than or equal to <span class="math notranslate nohighlight">\(n_2\)</span>.</p></li>
@@ -864,7 +936,7 @@ C \href{../valid/matching.html#match-limits}{\vdash} {}[ n_1 \href{../syntax/typ
 </section>
 <section id="table-types">
 <span id="match-tabletype"></span><span id="index-13"></span><h2>Table Types<a class="headerlink" href="#table-types" title="Permalink to this heading">¶</a></h2>
-<p>The table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}, {\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_1, {\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_1)\)</span> matches the table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}, {\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_2, {\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_2)\)</span> if:</p>
+<p>The table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}~{\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_1~{\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_1)\)</span> matches the table type <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}~{\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_2~{\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}_2)\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The limits <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_1\)</span> matches the limits <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}_2\)</span>.</p></li>
@@ -925,22 +997,26 @@ C \href{../valid/matching.html#match-memtype}{\vdash} {\href{../syntax/types.htm
 </section>
 <section id="global-types">
 <span id="match-globaltype"></span><span id="index-15"></span><h2>Global Types<a class="headerlink" href="#global-types" title="Permalink to this heading">¶</a></h2>
-<p>The global type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}, {\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1)\)</span> matches the global type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}, {\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2)\)</span> if:</p>
+<p>The global type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}~{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1)\)</span> matches the global type <span class="math notranslate nohighlight">\(({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}~{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2)\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1\)</span> matches the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2\)</span>.</p></li>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is absent.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is absent.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\mathsf{mut}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}}_{\mathit{u{\kern-0.1em\scriptstyle 2}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\mathsf{mut}\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_2\)</span> matches the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_1\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>

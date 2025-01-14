@@ -218,19 +218,23 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <span id="valid-select"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~(t^\ast)^?\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-parametric-mathsf-select-t-ast" title="Permalink to this heading">¶</a></h3>
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~{t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(t~t~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\rightarrow~t\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The value type <span class="math notranslate nohighlight">\(t\)</span> is valid.</p></li>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is equal to <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is absent.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\(t\)</span> matches the value type <span class="math notranslate nohighlight">\({t'}\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\({t'}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> or <span class="math notranslate nohighlight">\({t'}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -606,7 +610,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}})^\ast})\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}})^\ast})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({t^\ast}\)</span> be the value type sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})^\ast}\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -641,13 +645,15 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <span id="valid-struct-new-default"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-struct}{\mathsf{struct{.}new\_default}}~x\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-struct-mathsf-struct-new-default-x" title="Permalink to this heading">¶</a></h3>
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-struct}{\mathsf{struct{.}new\_default}}~x)\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(\epsilon~\rightarrow~(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~x)\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}})^\ast})\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}})^\ast})\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{zt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{zt}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>A <a class="reference internal" href="../exec/runtime.html#default-val"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -689,7 +695,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\mathit{yt}}^\ast})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{{\mathit{yt}}^\ast}|}\)</span> is greater than <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
-<li><p>The field type <span class="math notranslate nohighlight">\({{\mathit{yt}}^\ast}{}[i]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}})\)</span>.</p></li>
+<li><p>The field type <span class="math notranslate nohighlight">\({{\mathit{yt}}^\ast}{}[i]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}})\)</span>.</p></li>
 <li><p>The signedness <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}\)</span> is absent if and only if the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
@@ -728,7 +734,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/instruc
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{{\mathit{yt}}^\ast})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{{\mathit{yt}}^\ast}|}\)</span> is greater than <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
-<li><p>The field type <span class="math notranslate nohighlight">\({{\mathit{yt}}^\ast}{}[i]\)</span> is equal to <span class="math notranslate nohighlight">\((\mathsf{mut}, {\mathit{zt}})\)</span>.</p></li>
+<li><p>The field type <span class="math notranslate nohighlight">\({{\mathit{yt}}^\ast}{}[i]\)</span> is equal to <span class="math notranslate nohighlight">\((\mathsf{mut}~{\mathit{zt}})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -762,7 +768,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -793,7 +799,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>A <a class="reference internal" href="../exec/runtime.html#default-val"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
 </ul>
 </div></blockquote>
@@ -828,7 +834,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -859,7 +865,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{rt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{rt}}))\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> exists.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
 </ul>
@@ -896,7 +902,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> or <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 <li><p>The data type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{datas}}{}[y]\)</span> exists.</p></li>
 <li><p>The data type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{datas}}{}[y]\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/modules.html#valid-data}{\mathsf{ok}}\)</span>.</p></li>
@@ -936,7 +942,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>The signedness <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}^?}\)</span> is absent if and only if the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
@@ -971,7 +977,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} {\href{../syntax/instruc
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -1022,7 +1028,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -1054,9 +1060,9 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_1]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_1]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}, {\mathit{zt}}_1))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_1]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}~{\mathit{zt}}_1))\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_2]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_2]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, {\mathit{zt}}_2))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x_2]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}_2))\)</span>.</p></li>
 <li><p>The storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_2\)</span> matches the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}_1\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -1095,7 +1101,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> exists.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> matches the storage type <span class="math notranslate nohighlight">\({\mathit{zt}}\)</span>.</p></li>
 </ul>
@@ -1133,7 +1139,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}, {\mathit{zt}}))\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~(\mathsf{mut}~{\mathit{zt}}))\)</span>.</p></li>
 <li><p>The value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> or <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 <li><p>The data type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{datas}}{}[y]\)</span> exists.</p></li>
 <li><p>The data type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{datas}}{}[y]\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/modules.html#valid-data}{\mathsf{ok}}\)</span>.</p></li>
@@ -1513,11 +1519,13 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} {\mathit{sh}} {.} {\math
 <span id="valid-vshuffle"></span><h3><span class="math notranslate nohighlight">\(\mathsf{i8x16.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{shuffle}}~\href{../syntax/instructions.html#syntax-laneidx}{\mathit{laneidx}}^{16}\)</span><a class="headerlink" href="#mathsf-i8x16-xref-syntax-instructions-syntax-instr-vec-mathsf-shuffle-xref-syntax-instructions-syntax-laneidx-mathit-laneidx-16" title="Permalink to this heading">¶</a></h3>
 <p>The instruction <span class="math notranslate nohighlight">\(({\mathit{sh}}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{shuffle}}~{i^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\rightarrow~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\(i\)</span> in <span class="math notranslate nohighlight">\({i^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The lane index <span class="math notranslate nohighlight">\(i\)</span> is less than <span class="math notranslate nohighlight">\(2 \cdot {\href{../syntax/instructions.html#aux-dim}{\mathrm{dim}}}({\mathit{sh}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -1719,7 +1727,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} {\mathit{sh}}_1 {.} {{\m
 <blockquote>
 <div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> exists.</p></li>
-<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t)\)</span>.</p></li>
+<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t)\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id58">
@@ -1748,7 +1756,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> exists.</p></li>
-<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}, t)\)</span>.</p></li>
+<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id59">
@@ -1776,7 +1784,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> exists.</p></li>
-<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}, t)\)</span>.</p></li>
+<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id60">
@@ -1804,7 +1812,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> exists.</p></li>
-<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}, t)\)</span>.</p></li>
+<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~t)\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id61">
@@ -1832,7 +1840,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> exists.</p></li>
-<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\mathsf{mut}, t)\)</span>.</p></li>
+<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\mathsf{mut}~t)\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id62">
@@ -1864,7 +1872,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id63">
@@ -1892,7 +1900,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id64">
@@ -1920,7 +1928,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id65">
@@ -1949,7 +1957,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id66">
@@ -1977,7 +1985,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id67">
@@ -2005,9 +2013,9 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_1]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_1]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}_1, {\mathit{lim}}_1, {\mathit{rt}}_1)\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_1]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}_1~{\mathit{lim}}_1~{\mathit{rt}}_1)\)</span>.</p></li>
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_2]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_2]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}_2, {\mathit{lim}}_2, {\mathit{rt}}_2)\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x_2]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}_2~{\mathit{lim}}_2~{\mathit{rt}}_2)\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_1\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(t\)</span> be the address type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-addrtype-min}{\mathrm{min}}}({\mathit{at}}_1, {\mathit{at}}_2)\)</span>.</p></li>
 </ul>
@@ -2045,7 +2053,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}}_1)\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}}_1)\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> exists.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_1\)</span>.</p></li>
@@ -2777,14 +2785,16 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <span id="valid-try-table"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{try\_table}}~\href{../syntax/instructions.html#syntax-blocktype}{\mathit{blocktype}}~\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}^\ast~\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}^\ast~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{end}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-try-table-xref-syntax-instructions-syntax-blocktype-mathit-blocktype-xref-syntax-instructions-syntax-catch-mathit-catch-ast-xref-syntax-instructions-syntax-instr-mathit-instr-ast-xref-syntax-instructions-syntax-instr-control-mathsf-end" title="Permalink to this heading">¶</a></h3>
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{try\_table}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the result type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{labels}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The catch clause <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -3019,16 +3029,20 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <span id="valid-br-table"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_table}}~l^\ast~l_N\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-control-mathsf-br-table-l-ast-l-n" title="Permalink to this heading">¶</a></h3>
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br\_table}}~{l^\ast}~{l'})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{t^\ast}~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\(l\)</span> in <span class="math notranslate nohighlight">\({l^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span> exists.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>For all <span class="math notranslate nohighlight">\(l\)</span> in <span class="math notranslate nohighlight">\({l^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t^\ast}\)</span> matches the result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>The result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[{l'}]\)</span> exists.</p></li>
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t^\ast}\)</span> matches the result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[{l'}]\)</span>.</p></li>
@@ -3291,7 +3305,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> matches the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\mathsf{null}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}})\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[y]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[y]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t_1^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^\ast})\)</span>.</p></li>
@@ -3452,7 +3466,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
-<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}, {\mathit{lim}}, {\mathit{rt}})\)</span>.</p></li>
+<li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}})\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> matches the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\mathsf{null}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{func}})\)</span>.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[y]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[y]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t_1^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^\ast})\)</span>.</p></li>
@@ -3574,49 +3588,61 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <h3>Empty Instruction Sequence: <span class="math notranslate nohighlight">\(\epsilon\)</span><a class="headerlink" href="#empty-instruction-sequence-epsilon" title="Permalink to this heading">¶</a></h3>
 <p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon~\rightarrow~\epsilon\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul>
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}~{x_2^\ast}}\,{t_3^\ast}\)</span>.</p></li>
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{\mathit{t*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{init*}}|}\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|x_{\mathit{{\scriptstyle 1}*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{init*}}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x_1\)</span> in <span class="math notranslate nohighlight">\({x_1^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x_1]\)</span> exists.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../valid/conventions.html#syntax-init}{\mathit{init}}}^\ast}\)</span> and <span class="math notranslate nohighlight">\(t\)</span> in <span class="math notranslate nohighlight">\({t^\ast}\)</span> and <span class="math notranslate nohighlight">\(x_1\)</span> in <span class="math notranslate nohighlight">\({x_1^\ast}\)</span>:</p>
-<ul>
-<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x_1]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}, t)\)</span>.</p></li>
+<blockquote>
+<div><ul class="simple">
+<li><p>The local type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x_1]\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../valid/conventions.html#syntax-init}{\mathit{init}}}~t)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
-<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../syntax/modules.html#syntax-local}{\mathsf{local}}{}[{x_1^\ast}] = {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}, t)^\ast}]\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_2^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_2^\ast}}\,{t_3^\ast}\)</span>.</p></li>
+<li><p>Under the context <span class="math notranslate nohighlight">\(C{}[{.}\href{../syntax/modules.html#syntax-local}{\mathsf{local}}{}[{x_1^\ast}] = {(\href{../valid/conventions.html#syntax-init}{\mathsf{set}}~t)^\ast}]\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_2^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_2^\ast}}\,{t_3^\ast}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{it}'}\)</span>.</p></li>
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({\mathit{it}}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\mathit{it}}\)</span> matches the instruction type <span class="math notranslate nohighlight">\({\mathit{it}'}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\mathit{it}'}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({t^\ast}~{t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t^\ast}~{t_2^\ast}\)</span>.</p></li>
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 <li><p>The result type <span class="math notranslate nohighlight">\({t^\ast}\)</span> is valid.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
@@ -3751,90 +3777,120 @@ C \href{../valid/instructions.html#valid-expr}{\vdash} {{\href{../syntax/instruc
 <span id="valid-constant"></span><span id="index-14"></span><h3>Constant Expressions<a class="headerlink" href="#constant-expressions" title="Permalink to this heading">¶</a></h3>
 <p><span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is const if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is const.</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>
 <p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is const if:</p>
 <blockquote>
-<div><ul class="simple">
+<div><ul>
 <li><p>Either:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_{\mathit{nt}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{vt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_{\mathit{vt}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~{\mathit{ht}})\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-i31}{\mathsf{ref{.}i\scriptstyle31}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}func}}~x)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-struct}{\mathsf{struct{.}new}}~x)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-struct}{\mathsf{struct{.}new\_default}}~x)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new}}~x)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_default}}~x)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_fixed}}~x~n)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{any{.}convert\_extern}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{extern{.}convert\_any}}\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-variable}{\mathsf{global{.}get}}~x)\)</span>.</p></li>
 <li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> exists.</p></li>
-<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\epsilon, t)\)</span>.</p></li>
+<li><p>The global type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{globals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\((\epsilon~t)\)</span>.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p>Or:</p>
-<ul>
+<blockquote>
+<div><ul class="simple">
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}} {.} {\mathit{binop}})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> is contained in [<span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span>; <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle64}}\)</span>].</p></li>
 <li><p><span class="math notranslate nohighlight">\({\mathit{binop}}\)</span> is contained in [<span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{add}}\)</span>; <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{sub}}\)</span>; <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{mul}}\)</span>].</p></li>
 </ul>
+</div></blockquote>
 </li>
 </ul>
 </div></blockquote>

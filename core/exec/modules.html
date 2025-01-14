@@ -147,9 +147,9 @@ but may be allocated by the <a class="reference internal" href="../intro/overvie
 <span id="alloc-table"></span><span id="index-2"></span><h3><a class="reference internal" href="runtime.html#syntax-tableinst"><span class="std std-ref">Tables</span></a><a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h3>
 </section>
 <section id="xref-exec-modules-alloc-table-mathrm-alloctable-s-mathit-at-i-xref-syntax-types-syntax-limits-j-mathit-rt-xref-exec-runtime-syntax-ref-mathit-ref">
-<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-table}{\mathrm{alloctable}}}(s, ({\mathit{at}}, ({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]), {\mathit{rt}}), {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}})\)</span><a class="headerlink" href="#xref-exec-modules-alloc-table-mathrm-alloctable-s-mathit-at-i-xref-syntax-types-syntax-limits-j-mathit-rt-xref-exec-runtime-syntax-ref-mathit-ref" title="Permalink to this heading">¶</a></h3>
+<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-table}{\mathrm{alloctable}}}(s, {\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~{\mathit{rt}}, {\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}})\)</span><a class="headerlink" href="#xref-exec-modules-alloc-table-mathrm-alloctable-s-mathit-at-i-xref-syntax-types-syntax-limits-j-mathit-rt-xref-exec-runtime-syntax-ref-mathit-ref" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}, ({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]), {\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}^{i}} \}\end{array}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~{\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}^{i}} \}\end{array}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(a\)</span> be <span class="math notranslate nohighlight">\({|s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}|}\)</span>.</p></li>
 <li><p>Append <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span> to <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
@@ -182,9 +182,9 @@ but may be allocated by the <a class="reference internal" href="../intro/overvie
 <span id="alloc-mem"></span><span id="index-3"></span><h3><a class="reference internal" href="runtime.html#syntax-meminst"><span class="std std-ref">Memories</span></a><a class="headerlink" href="#memories" title="Permalink to this heading">¶</a></h3>
 </section>
 <section id="xref-exec-modules-alloc-mem-mathrm-allocmem-s-mathit-at-i-xref-syntax-types-syntax-limits-j-xref-syntax-types-syntax-memtype-mathsf-page">
-<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-mem}{\mathrm{allocmem}}}(s, ({\mathit{at}}~({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~])~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}))\)</span><a class="headerlink" href="#xref-exec-modules-alloc-mem-mathrm-allocmem-s-mathit-at-i-xref-syntax-types-syntax-limits-j-xref-syntax-types-syntax-memtype-mathsf-page" title="Permalink to this heading">¶</a></h3>
+<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-mem}{\mathrm{allocmem}}}(s, {\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}})\)</span><a class="headerlink" href="#xref-exec-modules-alloc-mem-mathrm-allocmem-s-mathit-at-i-xref-syntax-types-syntax-limits-j-xref-syntax-types-syntax-memtype-mathsf-page" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~])~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{\mathtt{0x00}^{i \cdot 64 \, {\mathrm{Ki}}}} \}\end{array}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{\mathtt{0x00}^{i \cdot 64 \, {\mathrm{Ki}}}} \}\end{array}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(a\)</span> be <span class="math notranslate nohighlight">\({|s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}|}\)</span>.</p></li>
 <li><p>Append <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span> to <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(a\)</span>.</p></li>
@@ -355,16 +355,15 @@ but may be allocated by the <a class="reference internal" href="../intro/overvie
 <section id="xref-exec-modules-grow-table-mathrm-growtable-xref-exec-runtime-syntax-tableinst-mathit-tableinst-n-r">
 <h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#grow-table}{\mathrm{growtable}}}({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}, n, r)\)</span><a class="headerlink" href="#xref-exec-modules-grow-table-mathrm-growtable-xref-exec-runtime-syntax-tableinst-mathit-tableinst-n-r" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}, ({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]), {\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{r'}^\ast} \}\end{array}\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{r'}^\ast}|} + n \leq j\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>Let <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~{\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{r'}^\ast} \}\end{array}\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({|{{r'}^\ast}|} + n \leq j\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({i'}\)</span> be <span class="math notranslate nohighlight">\({|{{r'}^\ast}|} + n\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}'}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}, ({}[~{i'}~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]), {\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{r'}^\ast}~{r^{n}} \}\end{array}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}'}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}}~({\mathit{at}}~{}[~{i'}~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~{\mathit{rt}}),\; \href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}~{{r'}^\ast}~{r^{n}} \}\end{array}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}'}\)</span>.</p></li>
 </ol>
-</div></blockquote>
+</li>
+</ol>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}\)</span> be the <a class="reference internal" href="runtime.html#syntax-tableinst"><span class="std std-ref">table instance</span></a> to grow, <span class="math notranslate nohighlight">\(n\)</span> the number of elements by which to grow it, and <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}\)</span> the initialization value.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(\mathit{len}\)</span> be <span class="math notranslate nohighlight">\(n\)</span> added to the length of <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}.\href{../exec/runtime.html#syntax-tableinst}{\mathsf{elem}}\)</span>.</p></li>
@@ -392,16 +391,15 @@ but may be allocated by the <a class="reference internal" href="../intro/overvie
 <section id="xref-exec-modules-grow-mem-mathrm-growmem-xref-exec-runtime-syntax-meminst-mathit-meminst-n">
 <h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#grow-mem}{\mathrm{growmem}}}({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}, n)\)</span><a class="headerlink" href="#xref-exec-modules-grow-mem-mathrm-growmem-xref-exec-runtime-syntax-meminst-mathit-meminst-n" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~({}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~])~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{b^\ast} \}\end{array}\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{b^\ast}|} / 64 \, {\mathrm{Ki}} + n \leq j\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({i'}\)</span> be <span class="math notranslate nohighlight">\({|{b^\ast}|} / 64 \, {\mathrm{Ki}} + n\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}'}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~({}[~{i'}~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~])~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{b^\ast}~{\mathtt{0x00}^{n \cdot 64 \, {\mathrm{Ki}}}} \}\end{array}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~{}[~i~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{b^\ast} \}\end{array}\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({|{b^\ast}|} / (64 \, {\mathrm{Ki}}) + n \leq j\)</span>, then:</p>
+<ol class="loweralpha simple">
+<li><p>Let <span class="math notranslate nohighlight">\({i'}\)</span> be <span class="math notranslate nohighlight">\({|{b^\ast}|} / (64 \, {\mathrm{Ki}}) + n\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}'}\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}}~({\mathit{at}}~{}[~{i'}~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~j~]~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}}),\; \href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}~{b^\ast}~{\mathtt{0x00}^{n \cdot 64 \, {\mathrm{Ki}}}} \}\end{array}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}'}\)</span>.</p></li>
 </ol>
-</div></blockquote>
+</li>
+</ol>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}\)</span> be the <a class="reference internal" href="runtime.html#syntax-meminst"><span class="std std-ref">memory instance</span></a> to grow and <span class="math notranslate nohighlight">\(n\)</span> the number of <a class="reference internal" href="runtime.html#page-size"><span class="std std-ref">pages</span></a> by which to grow it.</p></li>
 <li><p>Assert: The length of <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}.\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}\)</span> is divisible by the <a class="reference internal" href="runtime.html#page-size"><span class="std std-ref">page size</span></a> <span class="math notranslate nohighlight">\(64\,\mathrm{Ki}\)</span>.</p></li>
@@ -576,14 +574,11 @@ and list of <a class="reference internal" href="runtime.html#syntax-ref"><span c
 <section id="xref-exec-modules-alloc-type-mathrm-alloctype-ast-xref-syntax-types-syntax-rectype-mathit-type-mathit-u-kern-0-1em-scriptstyle-1-ast">
 <span id="alloc-type"></span><h3><span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#alloc-type}{\mathrm{alloctype}}}^\ast}}{({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast})}\)</span><a class="headerlink" href="#xref-exec-modules-alloc-type-mathrm-alloctype-ast-xref-syntax-types-syntax-rectype-mathit-type-mathit-u-kern-0-1em-scriptstyle-1-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Return <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}'}^\ast}~{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span>.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-type}{\mathsf{type}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-type}{\mathsf{type}}~{\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}\)</span>.</p></li>
@@ -612,44 +607,32 @@ and list of <a class="reference internal" href="runtime.html#syntax-ref"><span c
 </ol>
 </section>
 <section id="xref-exec-modules-alloc-export-mathrm-allocexport-xref-exec-runtime-syntax-moduleinst-mathit-moduleinst-xref-syntax-modules-syntax-export-mathsf-export-xref-syntax-values-syntax-name-mathit-name-mathit-xx-mathit-u-kern-0-1em-scriptstyle-1">
-<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-export}{\mathrm{allocexport}}}({\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}, (\href{../syntax/modules.html#syntax-export}{\mathsf{export}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}}~{\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}))\)</span><a class="headerlink" href="#xref-exec-modules-alloc-export-mathrm-allocexport-xref-exec-runtime-syntax-moduleinst-mathit-moduleinst-xref-syntax-modules-syntax-export-mathsf-export-xref-syntax-values-syntax-name-mathit-name-mathit-xx-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
+<h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-export}{\mathrm{allocexport}}}({\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}, \href{../syntax/modules.html#syntax-export}{\mathsf{export}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}}~{\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}})\)</span><a class="headerlink" href="#xref-exec-modules-alloc-export-mathrm-allocexport-xref-exec-runtime-syntax-moduleinst-mathit-moduleinst-xref-syntax-modules-syntax-export-mathsf-export-xref-syntax-values-syntax-name-mathit-name-mathit-xx-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{func}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{func}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-externidx}{\mathsf{func}}~x)\)</span> be <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-exportinst}{\mathsf{name}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}},\; \href{../exec/runtime.html#syntax-exportinst}{\mathsf{addr}}~(\href{../exec/runtime.html#syntax-externaddr}{\mathsf{func}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{funcs}}{}[x]) \}\end{array}\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{global}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+</li>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{global}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-externidx}{\mathsf{global}}~x)\)</span> be <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-exportinst}{\mathsf{name}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}},\; \href{../exec/runtime.html#syntax-exportinst}{\mathsf{addr}}~(\href{../exec/runtime.html#syntax-externaddr}{\mathsf{global}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}}{}[x]) \}\end{array}\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{table}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+</li>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{table}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-externidx}{\mathsf{table}}~x)\)</span> be <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-exportinst}{\mathsf{name}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}},\; \href{../exec/runtime.html#syntax-exportinst}{\mathsf{addr}}~(\href{../exec/runtime.html#syntax-externaddr}{\mathsf{table}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tables}}{}[x]) \}\end{array}\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{memory}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+</li>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{memory}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-externidx}{\mathsf{memory}}~x)\)</span> be <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-exportinst}{\mathsf{name}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}},\; \href{../exec/runtime.html#syntax-exportinst}{\mathsf{addr}}~(\href{../exec/runtime.html#syntax-externaddr}{\mathsf{mem}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{mems}}{}[x]) \}\end{array}\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-externidx}{\mathsf{tag}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-externidx}{\mathsf{tag}}~x)\)</span> be <span class="math notranslate nohighlight">\({\mathit{xx}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-exportinst}{\mathsf{name}}~{\href{../syntax/values.html#syntax-name}{\mathit{name}}},\; \href{../exec/runtime.html#syntax-exportinst}{\mathsf{addr}}~(\href{../exec/runtime.html#syntax-externaddr}{\mathsf{tag}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tags}}{}[x]) \}\end{array}\)</span>.</p></li>
@@ -685,40 +668,30 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 <section id="xref-exec-modules-exec-instantiation-mathrm-instantiate-s-xref-syntax-modules-syntax-module-mathit-module-xref-exec-runtime-syntax-externaddr-mathit-externaddr-ast">
 <h3><span class="math notranslate nohighlight">\({\href{../exec/modules.html#exec-instantiation}{\mathrm{instantiate}}}(s, {\href{../syntax/modules.html#syntax-module}{\mathit{module}}}, {{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast})\)</span><a class="headerlink" href="#xref-exec-modules-exec-instantiation-mathrm-instantiate-s-xref-syntax-modules-syntax-module-mathit-module-xref-exec-runtime-syntax-externaddr-mathit-externaddr-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-module}{\mathit{module}}}\)</span> is not <a class="reference internal" href="../valid/modules.html#valid-module"><span class="std std-ref">valid</span></a>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-module}{\mathit{module}}}\)</span> is not <a class="reference internal" href="../valid/modules.html#valid-module"><span class="std std-ref">valid</span></a>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Fail.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{i}}^\ast}~\mathrel{\href{../valid/modules.html#syntax-moduletype}{\rightarrow}}~{{\mathit{xt}}_{\mathsf{e}}^\ast}\)</span> be the type of <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-module}{\mathit{module}}}\)</span>.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-module}{\mathit{module}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-module}{\mathsf{module}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-module}{\mathsf{module}}~{{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}~{{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}~{{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}~{{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}~{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}~{{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}~{{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}~{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}~{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}~{{\href{../syntax/modules.html#syntax-start}{\mathit{start}}}^?}~{{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-module}{\mathit{module}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast}|} \neq {|{{\mathit{xt}}_{\mathsf{i}}^\ast}|}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast}|} \neq {|{{\mathit{xt}}_{\mathsf{i}}^\ast}|}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Fail.</p></li>
 </ol>
-</div></blockquote>
+</li>
+<li><p>For all <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span>, and <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span> in <span class="math notranslate nohighlight">\({({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}, {\mathit{xt}}_{\mathsf{i}})^\ast}\)</span>:</p>
+<ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span> is not <a class="reference internal" href="values.html#valid-val"><span class="std std-ref">valid</span></a> with type <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span>, then:</p>
 <ol class="arabic simple">
-<li><p>For all <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span>, and <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span> in <span class="math notranslate nohighlight">\({({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}, {\mathit{xt}}_{\mathsf{i}})^\ast}\)</span>:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span> is not <a class="reference internal" href="values.html#valid-val"><span class="std std-ref">valid</span></a> with type <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="arabic simple">
 <li><p>Fail.</p></li>
 </ol>
-</div></blockquote>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {{{\href{../exec/modules.html#aux-rundata}{\mathrm{rundata}}}}_{i_{\mathsf{d}}}({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}{}[i_{\mathsf{d}}])^{i_{\mathsf{d}}&lt;{|{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}|}}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {{{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{i_{\mathsf{e}}}({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}{}[i_{\mathsf{e}}])^{i_{\mathsf{e}}&lt;{|{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}|}}}\)</span>.</p></li>
+</li>
+</ol>
+</li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast}\)</span> be the concatenation of <span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#aux-rundata}{\mathrm{rundata}}}}_{i_{\mathsf{d}}}({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}{}[i_{\mathsf{d}}])^{i_{\mathsf{d}}&lt;{|{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}|}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast}\)</span> be the concatenation of <span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{i_{\mathsf{e}}}({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}{}[i_{\mathsf{e}}])^{i_{\mathsf{e}}&lt;{|{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}|}}}\)</span>.</p></li>
 <li><p>Assert: Due to validation, for all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-start}{\mathit{start}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-start}{\mathit{start}}}^?}\)</span>, <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-start}{\mathit{start}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-start}{\mathsf{start}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({(\href{../syntax/modules.html#syntax-start}{\mathsf{start}}~x)^?}\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-start}{\mathit{start}}}^?}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}_0\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{types}}~{{{\href{../exec/modules.html#alloc-type}{\mathrm{alloctype}}}^\ast}}{({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast})},\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{funcs}}~{\href{../exec/runtime.html#syntax-externaddr}{\mathrm{funcs}}}({{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast})~{({|s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}|} + i_{\mathsf{f}})^{i_{\mathsf{f}}&lt;{|{{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}|}}},\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}}~{\href{../exec/runtime.html#syntax-externaddr}{\mathrm{globals}}}({{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast}),\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tables}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{mems}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tags}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{elems}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{datas}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{exports}}~\epsilon \}\end{array}\)</span>.</p></li>
@@ -730,23 +703,23 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 <li><p>Assert: Due to validation, for all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}\)</span>, <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({(\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}~{\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}~{{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{e}}^\ast}~{\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}})^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{s}}^?}\)</span> be <span class="math notranslate nohighlight">\({(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call}}~x)^?}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-frame}{\mathsf{locals}}~\epsilon,\; \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}_0 \}\end{array}\)</span>.</p></li>
-<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~z~\})\)</span> to the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be <span class="math notranslate nohighlight">\((s, \{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-frame}{\mathsf{locals}}~\epsilon,\; \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}_0 \}\end{array})\)</span>.</p></li>
+<li><p>Push the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{frame}}~\})\)</span> to the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_{\mathsf{g}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, {{\href{../syntax/types.html#syntax-globaltype}{\mathit{globaltype}}}^\ast}, {{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{g}}^\ast})}\)</span>.</p></li>
-<li><p>Pop the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~{z'}~\})\)</span> from the stack.</p></li>
-<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~{z'}~\})\)</span> to the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\mathrm{eval}}_{\mathit{expr}}({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{t}})^\ast}\)</span>.</p></li>
-<li><p>Pop the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
-<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~{z'}~\})\)</span> to the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}}^\ast}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{\mathrm{eval}}_{\mathit{expr}}({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{e}})^\ast}^\ast}\)</span>.</p></li>
-<li><p>Pop the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
+<li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
+<li><p>Push the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> to the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}}^\ast}\)</span> be the result of <a class="reference internal" href="instructions.html#exec-expr"><span class="std std-ref">evaluating</span></a> <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{t}}^\ast}\)</span> with state <span class="math notranslate nohighlight">\(z\)</span>.</p></li>
+<li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
+<li><p>Push the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> to the stack.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}}^\ast}^\ast}\)</span> be the result of <a class="reference internal" href="instructions.html#exec-expr"><span class="std std-ref">evaluating</span></a> <span class="math notranslate nohighlight">\({{{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}_{\mathsf{e}}^\ast}^\ast}\)</span> with state <span class="math notranslate nohighlight">\(z\)</span>.</p></li>
+<li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-module}{\mathrm{allocmodule}}}(s, {\href{../syntax/modules.html#syntax-module}{\mathit{module}}}, {{\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}^\ast}, {{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_{\mathsf{g}}^\ast}, {{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{t}}^\ast}, {{{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}_{\mathsf{e}}^\ast}^\ast})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(f\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-frame}{\mathsf{locals}}~\epsilon,\; \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~{\href{../exec/runtime.html#syntax-moduleinst}{\mathit{moduleinst}}} \}\end{array}\)</span>.</p></li>
-<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> to the stack.</p></li>
+<li><p>Push the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> to the stack.</p></li>
 <li><p>Execute the sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{e}}^\ast}\)</span>.</p></li>
 <li><p>Execute the sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{d}}^\ast}\)</span>.</p></li>
 <li><p>Execute the sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathsf{s}}^?}\)</span>.</p></li>
-<li><p>Pop the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
+<li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{0}\,\{~f~\})\)</span> from the stack.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\(f{.}\mathsf{module}\)</span>.</p></li>
 </ol>
 <div class="admonition-todo admonition" id="id11">
@@ -893,24 +866,20 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 <section id="xref-exec-modules-eval-globals-mathrm-evalglobal-ast-z-mathit-gt-mathit-u-kern-0-1em-scriptstyle-1-ast-e-mathit-u-kern-0-1em-scriptstyle-1-ast">
 <span id="eval-globals"></span><h3><span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, {{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}, {e_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast})}\)</span><a class="headerlink" href="#xref-exec-modules-eval-globals-mathrm-evalglobal-ast-z-mathit-gt-mathit-u-kern-0-1em-scriptstyle-1-ast-e-mathit-u-kern-0-1em-scriptstyle-1-ast" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{}\,\{~z~\})\)</span> be the current <span class="math notranslate nohighlight">\(\mathsf{frame}\)</span> context.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span> and <span class="math notranslate nohighlight">\({e_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span> and <span class="math notranslate nohighlight">\({e_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast} = \epsilon\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Return <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{e_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}|} \geq 1\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}~{{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({e_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span>.</p></li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({|{{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}|} \geq 1\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{gt}}~{{\mathit{gt}'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{gt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(f\)</span> be <span class="math notranslate nohighlight">\(z\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> be <span class="math notranslate nohighlight">\({\mathrm{eval}}_{\mathit{expr}}({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}})\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((s, f)\)</span> be <span class="math notranslate nohighlight">\(z\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> be the result of <a class="reference internal" href="instructions.html#exec-expr"><span class="std std-ref">evaluating</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}}\)</span> with state <span class="math notranslate nohighlight">\(z\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(a\)</span> be <span class="math notranslate nohighlight">\({\href{../exec/modules.html#alloc-global}{\mathrm{allocglobal}}}(s, {\mathit{gt}}, {\href{../exec/runtime.html#syntax-val}{\mathit{val}}})\)</span>.</p></li>
 <li><p>Append <span class="math notranslate nohighlight">\(a\)</span> to <span class="math notranslate nohighlight">\(f{.}\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}{.}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{(z, {{\mathit{gt}'}^\ast}, {{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}'}^\ast})}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> be <span class="math notranslate nohighlight">\({{{\href{../exec/modules.html#eval-globals}{\mathrm{evalglobal}}}^\ast}}{((s, f), {{\mathit{gt}'}^\ast}, {{\href{../syntax/instructions.html#syntax-expr}{\mathit{expr}}'}^\ast})}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}~{{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span>.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
@@ -929,40 +898,31 @@ It is up to the <a class="reference internal" href="../intro/overview.html#embed
 \end{array}\end{split}\]</div>
 </section>
 <section id="xref-exec-modules-aux-runelem-mathrm-runelem-x-xref-syntax-modules-syntax-elem-mathsf-elem-mathit-rt-e-n-xref-syntax-modules-syntax-elemmode-mathit-elemmode-mathit-u-kern-0-1em-scriptstyle-1">
-<span id="aux-rundata"></span><span id="aux-runelem"></span><h3><span class="math notranslate nohighlight">\({{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{x}((\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}~{\mathit{rt}}~{e^{n}}~{\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}))\)</span><a class="headerlink" href="#xref-exec-modules-aux-runelem-mathrm-runelem-x-xref-syntax-modules-syntax-elem-mathsf-elem-mathit-rt-e-n-xref-syntax-modules-syntax-elemmode-mathit-elemmode-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
+<span id="aux-rundata"></span><span id="aux-runelem"></span><h3><span class="math notranslate nohighlight">\({{\href{../exec/modules.html#aux-runelem}{\mathrm{runelem}}}}_{x}(\href{../syntax/modules.html#syntax-elem}{\mathsf{elem}}~{\mathit{rt}}~{e^{n}}~{\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}})\)</span><a class="headerlink" href="#xref-exec-modules-aux-runelem-mathrm-runelem-x-xref-syntax-modules-syntax-elem-mathsf-elem-mathit-rt-e-n-xref-syntax-modules-syntax-elemmode-mathit-elemmode-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-elemmode}{\mathsf{passive}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-elemmode}{\mathsf{passive}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Return <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-elemmode}{\mathsf{declare}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+</li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-elemmode}{\mathsf{declare}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Return <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{elem{.}drop}}~x)\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-elemmode}{\mathsf{active}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-elemmode}{\mathsf{active}}~y~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elemmode}{\mathit{elemmode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}~(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~0)~(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)~(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{table{.}init}}~y~x)~(\href{../syntax/instructions.html#syntax-instr-table}{\mathsf{elem{.}drop}}~x)\)</span>.</p></li>
 </ol>
 </section>
 <section id="xref-exec-modules-aux-rundata-mathrm-rundata-x-xref-syntax-modules-syntax-data-mathsf-data-b-n-xref-syntax-modules-syntax-datamode-mathit-datamode-mathit-u-kern-0-1em-scriptstyle-1">
-<h3><span class="math notranslate nohighlight">\({{\href{../exec/modules.html#aux-rundata}{\mathrm{rundata}}}}_{x}((\href{../syntax/modules.html#syntax-data}{\mathsf{data}}~{b^{n}}~{\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}))\)</span><a class="headerlink" href="#xref-exec-modules-aux-rundata-mathrm-rundata-x-xref-syntax-modules-syntax-data-mathsf-data-b-n-xref-syntax-modules-syntax-datamode-mathit-datamode-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
+<h3><span class="math notranslate nohighlight">\({{\href{../exec/modules.html#aux-rundata}{\mathrm{rundata}}}}_{x}(\href{../syntax/modules.html#syntax-data}{\mathsf{data}}~{b^{n}}~{\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}})\)</span><a class="headerlink" href="#xref-exec-modules-aux-rundata-mathrm-rundata-x-xref-syntax-modules-syntax-data-mathsf-data-b-n-xref-syntax-modules-syntax-datamode-mathit-datamode-mathit-u-kern-0-1em-scriptstyle-1" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-datamode}{\mathsf{passive}}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = \href{../syntax/modules.html#syntax-datamode}{\mathsf{passive}}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Return <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ol>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
 <li><p>Assert: Due to validation, <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is of the case <span class="math notranslate nohighlight">\(\href{../syntax/modules.html#syntax-datamode}{\mathsf{active}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-datamode}{\mathsf{active}}~y~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-datamode}{\mathit{datamode}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}~(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~0)~(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~n)~(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{memory{.}init}}~y~x)~(\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{data{.}drop}}~x)\)</span>.</p></li>
@@ -1010,34 +970,27 @@ it happens in individual steps that may be interleaved with other threads.</p>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{\href{../syntax/types.html#syntax-functype}{\mathit{functype}}}_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[{\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}}}]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}})\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({t_1^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^\ast}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-functype}{\mathit{functype}}}_0\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(f\)</span> be <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-frame}{\mathsf{locals}}~\epsilon,\; \href{../exec/runtime.html#syntax-frame}{\mathsf{module}}~\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../exec/runtime.html#syntax-moduleinst}{\mathsf{types}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{funcs}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{globals}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tables}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{mems}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{tags}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{elems}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{datas}}~\epsilon,\; \href{../exec/runtime.html#syntax-moduleinst}{\mathsf{exports}}~\epsilon \}\end{array} \}\end{array}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{t_1^\ast}|} \neq {|{{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}|}\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({|{t_1^\ast}|} \neq {|{{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}|}\)</span>, then:</p>
+<ol class="loweralpha simple">
 <li><p>Fail.</p></li>
 </ol>
-</div></blockquote>
+</li>
+<li><p>For all <span class="math notranslate nohighlight">\(t_1\)</span>, and <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> in <span class="math notranslate nohighlight">\({(t_1, {\href{../exec/runtime.html#syntax-val}{\mathit{val}}})^\ast}\)</span>:</p>
+<ol class="loweralpha simple">
+<li><p>If <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> is not <a class="reference internal" href="values.html#valid-val"><span class="std std-ref">valid</span></a> with type <span class="math notranslate nohighlight">\(t_1\)</span>, then:</p>
 <ol class="arabic simple">
-<li><p>For all <span class="math notranslate nohighlight">\(t_1\)</span>, and <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> in <span class="math notranslate nohighlight">\({(t_1, {\href{../exec/runtime.html#syntax-val}{\mathit{val}}})^\ast}\)</span>:</p></li>
-</ol>
-<blockquote>
-<div><ol class="loweralpha simple">
-<li><p>If <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> is not <a class="reference internal" href="values.html#valid-val"><span class="std std-ref">valid</span></a> with type <span class="math notranslate nohighlight">\(t_1\)</span>, then:</p></li>
-</ol>
-<blockquote>
-<div><ol class="arabic simple">
 <li><p>Fail.</p></li>
 </ol>
-</div></blockquote>
-</div></blockquote>
-<ol class="arabic simple">
+</li>
+</ol>
+</li>
 <li><p>Let <span class="math notranslate nohighlight">\(k\)</span> be <span class="math notranslate nohighlight">\({|{t_2^\ast}|}\)</span>.</p></li>
-<li><p>Push the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{k}\,\{~f~\})\)</span> to the stack.</p></li>
+<li><p>Push the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{k}\,\{~f~\})\)</span> to the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~{\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}}})\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[{\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}}}]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}})\)</span>.</p></li>
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the evaluation context <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{k}\,\{~f~\})\)</span> from the stack.</p></li>
+<li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{k}\,\{~f~\})\)</span> from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{k}}\)</span> from the stack.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{k}}\)</span>.</p></li>
