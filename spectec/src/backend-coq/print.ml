@@ -5,13 +5,30 @@ let square_parens s = "[" ^ s ^ "]"
 let parens s = "(" ^ s ^ ")"
 let curly_parens s = "{" ^ s ^ "}"
 
+let comment_parens s = "(* " ^ s ^ " *)"
+
 let family_type_suffix = "entry"
 let is_inductive (d : coq_def) = 
-  match d with
+  match d.it with
     | (InductiveRelationD _ | InductiveD _) -> true
     | _ -> false
 let lst_update = "list_update"
 let lst_extend = "list_extend"
+
+let comment_desc_def (def: coq_def): string = 
+  match def.it with
+    | TypeAliasD _ -> "Type Alias Definition"
+    | RecordD _ -> "Record Creation Definition"
+    | InductiveD _ -> "Inductive Type Definition"
+    | NotationD _ -> "Notation Definition"
+    | MutualRecD _ -> "Mutual Recursion"
+    | DefinitionD _ -> "Auxiliary Definition"
+    | InductiveRelationD _ -> "Inductive Relations Definition"
+    | AxiomD _ -> "Axiom Definition"
+    | InductiveFamilyD _ -> "Family Type Definition"
+    | CoercionD _ -> "Type Coercion Definition"
+    | UnsupportedD _ -> ""
+
 
 let rec string_of_terms (term : coq_term) =
   match term with
@@ -72,7 +89,7 @@ let rec string_of_terms (term : coq_term) =
     | T_app_infix (infix_op, term1, term2) -> parens (string_of_terms term1 ^ string_of_terms infix_op ^ string_of_terms term2)
     | T_tuple types -> parens (String.concat " * " (List.map string_of_terms types))
     | T_cast (term, typ) -> parens (string_of_terms term ^ " : " ^ string_of_terms typ)
-    | T_unsupported str -> "(* Unsupported Term: " ^ str ^ " *)"
+    | T_unsupported str -> comment_parens ("Unsupported term: " ^ str)
 
 and string_of_ident_terms (term : coq_term) =
   match term with
@@ -197,7 +214,7 @@ let rec string_of_premise (prem : coq_premise) =
       | [v; s] -> "List.Forall2 " ^ parens ("fun " ^ v ^ " " ^ s ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s)
       | _ -> assert false (* Should not happen *)
     )
-    | P_unsupported str -> "(* Unsupported premise: " ^ str ^ " *)"
+    | P_unsupported str -> comment_parens ("Unsupported premise: " ^ str)
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
   "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
@@ -268,7 +285,8 @@ let string_of_coercion (func_name : func_name) (typ1 : ident) (typ2 : ident) =
   "Coercion " ^ list_func ^ " : list__" ^ typ1 ^ " >-> " ^ "list__" ^ typ2
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
-  match def with
+  comment_parens (comment_desc_def def ^ " at: " ^ Util.Source.string_of_region (def.at)) ^ "\n" ^ 
+  match def.it with
     | TypeAliasD (id, binds, typ) -> string_of_typealias id binds typ
     | RecordD (id, entries) -> string_of_record id entries
     | InductiveD (id, args, entries) -> string_of_inductive_def id args entries
@@ -286,7 +304,7 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
     | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type
     | InductiveFamilyD (id, entries) -> string_of_family_types id entries 
     | CoercionD (func_name, typ1, typ2) -> string_of_coercion func_name typ1 typ2
-    | UnsupportedD str -> "(* Unsupported Definition: " ^ str ^ "*)"
+    | UnsupportedD str -> comment_parens ("Unsupported Definition: " ^ str)
 
 let exported_string = 
   "(* Exported Code *)\n" ^

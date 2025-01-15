@@ -18,12 +18,12 @@ let function_type_var = "v_func_type"
 let inst_var = "v_minst"
 
 let create_mapping (map : (name, coq_def) Hashtbl.t) (def : coq_def) : unit = 
-  match def with
+  match def.it with
     | InductiveRelationD (id, _, _) -> Hashtbl.add map id def
     | _ -> ()
   
 let get_inductive_relation (def : coq_def) = 
-  match def with
+  match def.it with
     | InductiveRelationD (id, args, entries) -> (id, args, entries)
     | _ -> error_gen "Not a inductive relation"
 

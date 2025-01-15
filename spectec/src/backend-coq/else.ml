@@ -97,7 +97,7 @@ let unarize ((r_id, binds), prems, terms) =
 let not_apart lhs (_, _, lhs2) = not (apart lhs lhs2)
 
 
-let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def list = function
+let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list = function
   | [] -> [ InductiveRelationD (id, args, List.rev prev_rules) ]
   | ((r_id, binds), prems, terms) as r :: rules -> 
       if List.exists is_else prems
@@ -119,11 +119,11 @@ let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def list = 
       else
         go id args typ1 (r :: prev_rules) rules
 
-let rec t_def (def : coq_def) : coq_def list = match def with
-  | MutualRecD defs -> [ MutualRecD (List.concat_map t_def defs) ]
+let rec t_def (def : coq_def) : coq_def list = match def.it with
+  | MutualRecD defs -> [ MutualRecD (List.concat_map t_def defs) $ def.at ]
   | InductiveRelationD (id, args, r_entry) -> begin match args with
     | [t1 ; _t2] ->
-      go id args t1 [] r_entry
+      List.map (fun d -> d $ def.at) (go id args t1 [] r_entry)
     | _ -> [def]
     end
   | _ -> [ def ]

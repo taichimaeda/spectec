@@ -1,4 +1,7 @@
 open Case
+open Util.Source 
+
+
 type nat = Z.t
 
 type ident = string
@@ -110,7 +113,8 @@ and family_deftype =
 
 and family_entry = ident * family_deftype
 
-and coq_def =
+and coq_def = coq_def' phrase
+and coq_def' =
   | TypeAliasD of (ident * binders * coq_term)
   | NotationD of (ident * coq_term)
   | RecordD of (ident * record_entry list)

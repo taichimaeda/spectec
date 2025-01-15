@@ -483,8 +483,8 @@ let transform_inst (id : id) (i : inst) =
     )
 
 let rec transform_def (d : def) : coq_def =
-  match d.it with
-    | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp
+  (match d.it with
+    | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp 
     | TypD (id, _, insts) -> InductiveFamilyD (transform_id id, List.map (transform_inst id) insts)
     | RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
@@ -503,7 +503,7 @@ let rec transform_def (d : def) : coq_def =
         DefinitionD (transform_fun_id id, binds, return_type, (List.map (transform_clause base_return_type) clauses) @ new_clause)
       )
     | RecD defs -> MutualRecD (List.map transform_def defs)
-    | HintD _ -> UnsupportedD ""
+    | HintD _ -> UnsupportedD "") $ d.at
 
 let is_not_hintdef (d : def) : bool =
   match d.it with
@@ -601,8 +601,8 @@ let transform_sub_types (at : region) (t1_id : id) (t2_id : id) (t1_cases : sub_
           (T_app (T_ident [transform_id id; transform_mixop m1], var_list),
           T_app (T_ident [transform_id id2; transform_mixop m2], var_list))
         | None -> (T_ident [""], T_ident [""])
-    ) t1_cases)); 
-  Right (CoercionD (func_name, transform_id t1_id, transform_id t2_id))]
+    ) t1_cases) $ at  ); 
+  Right (CoercionD (func_name, transform_id t1_id, transform_id t2_id) $ at )]
 
 (* TODO can be extended to other defs if necessary *)
 let rec transform_sub_def (env : env) (d : def) = 
