@@ -2055,7 +2055,501 @@ $${rule: Step_read/throw_ref-*}
 
 $${rule-prose: Step_read/try_table}
 
+<<<<<<< HEAD
 $${rule: Step_read/try_table}
+=======
+1. Assert: due to :ref:`validation <valid-blocktype>`, :math:`\fblocktype_{S;F}(\blocktype)` is defined.
+
+2. Let :math:`[t_1^m] \to [t_2^n]` be the :ref:`instruction type <syntax-instrtype>` :math:`\fblocktype_{S;F}(\blocktype)`.
+
+3. Assert: due to :ref:`validation <valid-try_table>`, there are at least :math:`m` values on the top of the stack.
+
+4. Pop the values :math:`\val^m` from the stack.
+
+5. Let :math:`L` be the label whose arity is :math:`n` and whose continuation is the end of the |TRYTABLE| instruction.
+
+6. :ref:`Enter <exec-handler-enter>` the block :math:`\val^m~\instr_1^\ast` with label :math:`L` and exception handler :math:`\HANDLER_n\{\catch^\ast\}`.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{r}
+   F; \val^m~(\TRYTABLE~\X{bt}~\catch^\ast~\instr^\ast~\END
+   \quad \stepto \quad
+   F; \HANDLER_n\{\catch^\ast\}~(\LABEL_n\{\epsilon\}~\val^m~\instr^\ast~\END)~\END \\ \qquad\qquad
+   (\iff \fblocktype_{S;F}(\X{bt}) = [t_1^m] \to [t_2^n] \land (F.\AMODULE.\MITAGS[x]=a_x)^\ast)
+   \end{array}
+
+
+.. _exec-br:
+
+:math:`\BR~l`
+.............
+
+1. Assert: due to :ref:`validation <valid-br>`, the stack contains at least :math:`l+1` labels.
+
+2. Let :math:`L` be the :math:`l`-th label appearing on the stack, starting from the top and counting from zero.
+
+3. Let :math:`n` be the arity of :math:`L`.
+
+4. Assert: due to :ref:`validation <valid-br>`, there are at least :math:`n` values on the top of the stack.
+
+5. Pop the values :math:`\val^n` from the stack.
+
+6. Repeat :math:`l+1` times:
+
+   a. While the top of the stack is a value or a :ref:`handler <syntax-handler>`, do:
+
+      i. Pop the value or handler from the stack.
+
+   b. Assert: due to :ref:`validation <valid-br>`, the top of the stack now is a label.
+
+   c. Pop the label from the stack.
+
+7. Push the values :math:`\val^n` to the stack.
+
+8. Jump to the continuation of :math:`L`.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{lcl@{\qquad}l}
+   \LABEL_n\{\instr^\ast\}~\XB^l[\val^n~(\BR~l)]~\END &\stepto& \val^n~\instr^\ast
+   \end{array}
+
+
+.. _exec-br_if:
+
+:math:`\BRIF~l`
+...............
+
+1. Assert: due to :ref:`validation <valid-br_if>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+
+2. Pop the value :math:`\I32.\CONST~c` from the stack.
+
+3. If :math:`c` is non-zero, then:
+
+   a. :ref:`Execute <exec-br>` the instruction :math:`\BR~l`.
+
+4. Else:
+
+   a. Do nothing.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{lcl@{\qquad}l}
+   (\I32.\CONST~c)~(\BRIF~l) &\stepto& (\BR~l)
+     & (\iff c \neq 0) \\
+   (\I32.\CONST~c)~(\BRIF~l) &\stepto& \epsilon
+     & (\iff c = 0) \\
+   \end{array}
+
+
+.. _exec-br_table:
+
+:math:`\BRTABLE~l^\ast~l_N`
+...........................
+
+1. Assert: due to :ref:`validation <valid-br_table>`, a value of :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+
+2. Pop the value :math:`\I32.\CONST~i` from the stack.
+
+3. If :math:`i` is smaller than the length of :math:`l^\ast`, then:
+
+   a. Let :math:`l_i` be the label :math:`l^\ast[i]`.
+
+   b. :ref:`Execute <exec-br>` the instruction :math:`\BR~l_i`.
+
+4. Else:
+
+   a. :ref:`Execute <exec-br>` the instruction :math:`\BR~l_N`.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{lcl@{\qquad}l}
+   (\I32.\CONST~i)~(\BRTABLE~l^\ast~l_N) &\stepto& (\BR~l_i)
+     & (\iff l^\ast[i] = l_i) \\
+   (\I32.\CONST~i)~(\BRTABLE~l^\ast~l_N) &\stepto& (\BR~l_N)
+     & (\iff |l^\ast| \leq i) \\
+   \end{array}
+
+
+.. _exec-br_on_null:
+
+:math:`\BRONNULL~l`
+...................
+
+1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
+
+2. Pop the value :math:`\reff` from the stack.
+
+3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
+
+   a. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
+
+4. Else:
+
+   a. Push the value :math:`\reff` back to the stack.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   \reff~(\BRONNULL~l) &\stepto& (\BR~l)
+     & (\iff \reff = \REFNULL~\X{ht}) \\
+   \reff~(\BRONNULL~l) &\stepto& \reff
+     & (\otherwise) \\
+   \end{array}
+
+
+.. _exec-br_on_non_null:
+
+:math:`\BRONNONNULL~l`
+......................
+
+1. Assert: due to :ref:`validation <valid-ref.is_null>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
+
+2. Pop the value :math:`\reff` from the stack.
+
+3. If :math:`\reff` is :math:`\REFNULL~\X{ht}`, then:
+
+   a. Do nothing.
+
+4. Else:
+
+   a. Push the value :math:`\reff` back to the stack.
+
+   b. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   \reff~(\BRONNONNULL~l) &\stepto& \epsilon
+     & (\iff \reff = \REFNULL~\X{ht}) \\
+   \reff~(\BRONNONNULL~l) &\stepto& \reff~(\BR~l)
+     & (\otherwise) \\
+   \end{array}
+
+
+.. _exec-br_on_cast:
+
+:math:`\BRONCAST~l~\X{rt}_1~\X{rt}_2`
+.....................................
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Let :math:`\X{rt}'_2` be the :ref:`reference type <syntax-reftype>` :math:`\insttype_{F.\AMODULE}(\X{rt}_2)`.
+
+3. Assert: due to :ref:`validation <valid-ref.test>`, :math:`\X{rt}'_2` is :ref:`closed <type-closed>`.
+
+4. Assert: due to :ref:`validation <valid-ref.test>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
+
+5. Pop the value :math:`\reff` from the stack.
+
+6. Assert: due to validation, the :ref:`reference value <syntax-ref>` is :ref:`valid <valid-ref>` with some :ref:`reference type <syntax-reftype>`.
+
+7. Let :math:`\X{rt}` be the :ref:`reference type <syntax-reftype>` of :math:`\reff`.
+
+8. Push the value :math:`\reff` back to the stack.
+
+9. If the :ref:`reference type <syntax-reftype>` :math:`\X{rt}` :ref:`matches <match-reftype>` :math:`\X{rt}'_2`, then:
+
+   a. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   S; F; \reff~(\BRONCAST~l~\X{rt}_1~\X{rt}_2) &\stepto& \reff~(\BR~l)
+     & (\iff S \vdashval \reff : \X{rt}
+        \land {} \vdashreftypematch \X{rt} \matchesreftype \insttype_{F.\AMODULE}(\X{rt}_2)) \\
+   S; F; \reff~(\BRONCAST~l~\X{rt}_1~\X{rt}_2) &\stepto& \reff
+     & (\otherwise) \\
+   \end{array}
+
+
+.. _exec-br_on_cast_fail:
+
+:math:`\BRONCASTFAIL~l~\X{rt}_1~\X{rt}_2`
+.........................................
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Let :math:`\X{rt}'_2` be the :ref:`reference type <syntax-reftype>` :math:`\insttype_{F.\AMODULE}(\X{rt}_2)`.
+
+3. Assert: due to :ref:`validation <valid-ref.test>`, :math:`\X{rt}'_2` is :ref:`closed <type-closed>`.
+
+4. Assert: due to :ref:`validation <valid-ref.test>`, a :ref:`reference value <syntax-ref>` is on the top of the stack.
+
+5. Pop the value :math:`\reff` from the stack.
+
+6. Assert: due to validation, the :ref:`reference value <syntax-ref>` is :ref:`valid <valid-ref>` with some :ref:`reference type <syntax-reftype>`.
+
+7. Let :math:`\X{rt}` be the :ref:`reference type <syntax-reftype>` of :math:`\reff`.
+
+8. Push the value :math:`\reff` back to the stack.
+
+9. If the :ref:`reference type <syntax-reftype>` :math:`\X{rt}` does not :ref:`match <match-reftype>` :math:`\X{rt}'_2`, then:
+
+   a. :ref:`Execute <exec-br>` the instruction :math:`(\BR~l)`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   S; F; \reff~(\BRONCASTFAIL~l~\X{rt}_1~\X{rt}_2) &\stepto& \reff
+     & (\iff S \vdashval \reff : \X{rt}
+        \land {} \vdashreftypematch \X{rt} \matchesreftype \insttype_{F.\AMODULE}(\X{rt}_2)) \\
+   S; F; \reff~(\BRONCASTFAIL~l~\X{rt}_1~\X{rt}_2) &\stepto& \reff~(\BR~l)
+     & (\otherwise) \\
+   \end{array}
+
+
+.. _exec-return:
+
+:math:`\RETURN`
+...............
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Let :math:`n` be the arity of :math:`F`.
+
+3. Assert: due to :ref:`validation <valid-return>`, there are at least :math:`n` values on the top of the stack.
+
+4. Pop the results :math:`\val^n` from the stack.
+
+5. Assert: due to :ref:`validation <valid-return>`, the stack contains at least one :ref:`frame <syntax-frame>`.
+
+6. While the top of the stack is not a frame, do:
+
+   a. Pop the top element from the stack.
+
+7. Assert: the top of the stack is the frame :math:`F`.
+
+8. Pop the frame from the stack.
+
+9. Push :math:`\val^n` to the stack.
+
+10. Jump to the instruction after the original call that pushed the frame.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{lcl@{\qquad}l}
+   \FRAME_n\{F\}~B^\ast[\val^n~\RETURN]~\END &\stepto& \val^n
+   \end{array}
+
+
+.. _exec-call:
+
+:math:`\CALL~x`
+...............
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Assert: due to :ref:`validation <valid-call>`, :math:`F.\AMODULE.\MIFUNCS[x]` exists.
+
+3. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`F.\AMODULE.\MIFUNCS[x]`.
+
+4. :ref:`Invoke <exec-invoke>` the function instance at address :math:`a`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   F; (\CALL~x) &\stepto& F; (\INVOKE~a)
+     & (\iff F.\AMODULE.\MIFUNCS[x] = a)
+   \end{array}
+
+
+.. _exec-call_ref:
+
+:math:`\CALLREF~x`
+..................
+
+1. Assert: due to :ref:`validation <valid-call_ref>`, a null or :ref:`function reference <syntax-ref>` is on the top of the stack.
+
+2. Pop the reference value :math:`r` from the stack.
+
+3. If :math:`r` is :math:`\REFNULL~\X{ht}`, then:
+
+    a. Trap.
+
+4. Assert: due to :ref:`validation <valid-call_ref>`, :math:`r` is a :ref:`function reference <syntax-ref>`.
+
+5. Let :math:`\REFFUNCADDR~a` be the reference :math:`r`.
+
+6. :ref:`Invoke <exec-invoke>` the function instance at address :math:`a`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   F; (\REFFUNCADDR~a)~(\CALLREF~x) &\stepto& F; (\INVOKE~a) \\
+   F; (\REFNULL~\X{ht})~(\CALLREF~x) &\stepto& F; \TRAP \\
+   \end{array}
+
+
+.. _exec-call_indirect:
+
+:math:`\CALLINDIRECT~x~y`
+.........................
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
+
+3. Let :math:`\X{ta}` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
+
+4. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`S.\STABLES[\X{ta}]` exists.
+
+5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}]`.
+
+6. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`F.\AMODULE.\MITYPES[y]` is defined.
+
+7. Let :math:`\X{dt}_{\F{expect}}` be the :ref:`defined type <syntax-deftype>` :math:`F.\AMODULE.\MITYPES[y]`.
+
+8. Assert: due to :ref:`validation <valid-call_indirect>`, a value with :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+
+9. Pop the value :math:`\I32.\CONST~i` from the stack.
+
+10. If :math:`i` is not smaller than the length of :math:`\X{tab}.\TIELEM`, then:
+
+    a. Trap.
+
+11. Let :math:`r` be the :ref:`reference <syntax-ref>` :math:`\X{tab}.\TIELEM[i]`.
+
+12. If :math:`r` is :math:`\REFNULL~\X{ht}`, then:
+
+    a. Trap.
+
+13. Assert: due to :ref:`validation of table mutation <valid-table.set>`, :math:`r` is a :ref:`function reference <syntax-ref.func>`.
+
+14. Let :math:`\REFFUNCADDR~a` be the :ref:`function reference <syntax-ref.func>` :math:`r`.
+
+15. Assert: due to :ref:`validation of table mutation <valid-table.set>`, :math:`S.\SFUNCS[a]` exists.
+
+16. Let :math:`\X{f}` be the :ref:`function instance <syntax-funcinst>` :math:`S.\SFUNCS[a]`.
+
+17. Let :math:`\X{dt}_{\F{actual}}` be the :ref:`defined type <syntax-deftype>` :math:`\X{f}.\FITYPE`.
+
+18. If :math:`\X{dt}_{\F{actual}}` does not :ref:`match <match-deftype>` :math:`\X{dt}_{\F{expect}}`, then:
+
+    a. Trap.
+
+19. :ref:`Invoke <exec-invoke>` the function instance at address :math:`a`.
+
+.. math::
+   ~\\[-1ex]
+   \begin{array}{l}
+   \begin{array}{lcl@{\qquad}l}
+   S; F; (\I32.\CONST~i)~(\CALLINDIRECT~x~y) &\stepto& S; F; (\INVOKE~a)
+   \end{array}
+   \\ \qquad
+     \begin{array}[t]{@{}r@{~}l@{}}
+     (\iff & S.\STABLES[F.\AMODULE.\MITABLES[x]].\TIELEM[i] = \REFFUNCADDR~a \\
+     \wedge & S.\SFUNCS[a] = f \\
+     \wedge & S \vdashdeftypematch f.\FITYPE \matchesdeftype F.\AMODULE.\MITYPES[y])
+     \end{array}
+   \\[1ex]
+   \begin{array}{lcl@{\qquad}l}
+   S; F; (\I32.\CONST~i)~(\CALLINDIRECT~x~y) &\stepto& S; F; \TRAP
+   \end{array}
+   \\ \qquad
+     (\otherwise)
+   \end{array}
+
+
+.. _exec-return_call:
+
+:math:`\RETURNCALL~x`
+.....................
+
+.. todo: find a way to reuse call/call_indirect prose for tail call versions
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Assert: due to :ref:`validation <valid-call>`, :math:`F.\AMODULE.\MIFUNCS[x]` exists.
+
+3. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`F.\AMODULE.\MIFUNCS[x]`.
+
+4. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   (\RETURNCALL~x) &\stepto& (\RETURNINVOKE~a)
+     & (\iff (\CALL~x) \stepto (\INVOKE~a))
+   \end{array}
+
+
+.. _exec-return_call_ref:
+
+:math:`\RETURNCALLREF~x`
+........................
+
+1. Assert: due to :ref:`validation <valid-return_call_ref>`, a :ref:`function reference <syntax-ref>` is on the top of the stack.
+
+2. Pop the reference value :math:`r` from the stack.
+
+3. If :math:`r` is :math:`\REFNULL~\X{ht}`, then:
+
+    a. Trap.
+
+4. Assert: due to :ref:`validation <valid-call_ref>`, :math:`r` is a :ref:`function reference <syntax-ref>`.
+
+5. Let :math:`\REFFUNCADDR~a` be the reference :math:`r`.
+
+6. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   \val~(\RETURNCALLREF~x) &\stepto& (\RETURNINVOKE~a)
+     & (\iff \val~(\CALLREF~x) \stepto (\INVOKE~a)) \\
+   \val~(\RETURNCALLREF~x) &\stepto& \TRAP
+     & (\iff \val~(\CALLREF~x) \stepto \TRAP) \\
+   \end{array}
+
+
+.. _exec-return_call_indirect:
+
+:math:`\RETURNCALLINDIRECT~x~y`
+...............................
+
+1. Let :math:`F` be the :ref:`current <exec-notation-textual>` :ref:`frame <syntax-frame>`.
+
+2. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`F.\AMODULE.\MITABLES[x]` exists.
+
+3. Let :math:`\X{ta}` be the :ref:`table address <syntax-tableaddr>` :math:`F.\AMODULE.\MITABLES[x]`.
+
+4. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`S.\STABLES[\X{ta}]` exists.
+
+5. Let :math:`\X{tab}` be the :ref:`table instance <syntax-tableinst>` :math:`S.\STABLES[\X{ta}]`.
+
+6. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`F.\AMODULE.\MITYPES[y]` exists.
+
+7. Let :math:`\X{dt}_{\F{expect}}` be the :ref:`defined type <syntax-deftype>` :math:`F.\AMODULE.\MITYPES[y]`.
+
+8. Assert: due to :ref:`validation <valid-call_indirect>`, a value with :ref:`value type <syntax-valtype>` |I32| is on the top of the stack.
+
+9. Pop the value :math:`\I32.\CONST~i` from the stack.
+
+10. If :math:`i` is not smaller than the length of :math:`\X{tab}.\TIELEM`, then:
+
+    a. Trap.
+
+11. If :math:`\X{tab}.\TIELEM[i]` is uninitialized, then:
+
+    a. Trap.
+
+12. Let :math:`a` be the :ref:`function address <syntax-funcaddr>` :math:`\X{tab}.\TIELEM[i]`.
+
+13. Assert: due to :ref:`validation <valid-call_indirect>`, :math:`S.\SFUNCS[a]` exists.
+
+14. Let :math:`\X{f}` be the :ref:`function instance <syntax-funcinst>` :math:`S.\SFUNCS[a]`.
+
+15. Let :math:`\X{dt}_{\F{actual}}` be the :ref:`defined type <syntax-functype>` :math:`\X{f}.\FITYPE`.
+
+16. If :math:`\X{dt}_{\F{actual}}` does not :ref:`match <match-functype>` :math:`\X{dt}_{\F{expect}}`, then:
+
+    a. Trap.
+
+17. :ref:`Tail-invoke <exec-return-invoke>` the function instance at address :math:`a`.
+
+.. math::
+   \begin{array}{lcl@{\qquad}l}
+   \val~(\RETURNCALLINDIRECT~x~y) &\stepto& (\RETURNINVOKE~a)
+     & (\iff \val~(\CALLINDIRECT~x~y) \stepto (\INVOKE~a)) \\
+   \val~(\RETURNCALLINDIRECT~x~y) &\stepto& \TRAP
+     & (\iff \val~(\CALLINDIRECT~x~y) \stepto \TRAP) \\
+   \end{array}
+>>>>>>> upstream
 
 
 .. index:: instruction, instruction sequence, block, exception, trap
