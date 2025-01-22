@@ -1,19 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Index of Instructions &#8212; WebAssembly 3.0 (Draft 2025-01-14)</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <title>Index of Instructions &#8212; WebAssembly 3.0 (Draft 2025-01-22)</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
+    <script src="../_static/documentation_options.js?v=7b9ca617"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,10 +28,10 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/webassembly.png" alt="Logo"/>
+              <img class="logo" src="../_static/webassembly.png" alt="Logo of WebAssembly"/>
             </a></p><h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intro/index.html">Introduction</a></li>
@@ -60,7 +58,7 @@
     
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -68,7 +66,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -79,7 +77,7 @@
           <div class="body" role="main">
             
   <section id="index-of-instructions">
-<span id="index-instr"></span><span id="index-0"></span><h1>Index of Instructions<a class="headerlink" href="#index-of-instructions" title="Permalink to this heading">¶</a></h1>
+<span id="index-instr"></span><span id="index-0"></span><h1>Index of Instructions<a class="headerlink" href="#index-of-instructions" title="Link to this heading">¶</a></h1>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Instruction</p></th>
@@ -1634,7 +1632,7 @@
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new}}~x\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef616#1{\mathtt{0x#1}}\mathdef616{FB}~\def\mathdef617#1{\mathtt{0x#1}}\mathdef617{06}\)</span></p></td>
-<td><p><span class="math notranslate nohighlight">\([t] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\([t~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~x)]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-array-new"><span class="std std-ref">validation</span></a></p></td>
 <td><p><a class="reference internal" href="../exec/instructions.html#exec-array-new"><span class="std std-ref">execution</span></a></p></td>
 </tr>
@@ -1984,13 +1982,13 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef732#1{\mathtt{0x#1}}\mathdef732{FD}~~\def\mathdef733#1{\mathtt{0x#1}}\mathdef733{0D}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vshuffle"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vshuffle"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vshuffle"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivshuffle"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{swizzle}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef734#1{\mathtt{0x#1}}\mathdef734{FD}~~\def\mathdef735#1{\mathtt{0x#1}}\mathdef735{0E}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vswizzlop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vswizzlop"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vswizzlop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivswizzle"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{splat}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef736#1{\mathtt{0x#1}}\mathdef736{FD}~~\def\mathdef737#1{\mathtt{0x#1}}\mathdef737{0F}\)</span></p></td>
@@ -2506,19 +2504,19 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef906#1{\mathtt{0x#1}}\mathdef906{FD}~~\def\mathdef907#1{\mathtt{0x#1}}\mathdef907{64}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbitmask"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivbitmask"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}\mathsf{\_i16x8\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef908#1{\mathtt{0x#1}}\mathdef908{FD}~~\def\mathdef909#1{\mathtt{0x#1}}\mathdef909{65}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vnarrow"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle8}x\scriptstyle16}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}\mathsf{\_i16x8\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef910#1{\mathtt{0x#1}}\mathdef910{FD}~~\def\mathdef911#1{\mathtt{0x#1}}\mathdef911{66}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vnarrow"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{f{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{ceil}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef912#1{\mathtt{0x#1}}\mathdef912{FD}~~\def\mathdef913#1{\mathtt{0x#1}}\mathdef913{67}\)</span></p></td>
@@ -2650,25 +2648,25 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef954#1{\mathtt{0x#1}}\mathdef954{FD}~~\def\mathdef955#1{\mathtt{0x#1}}\mathdef955{7C}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextunop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextadd-pairwise"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextunop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextunop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extadd\_pairwise}}\mathsf{\_i8x16\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef956#1{\mathtt{0x#1}}\mathdef956{FD}~~\def\mathdef957#1{\mathtt{0x#1}}\mathdef957{7D}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextunop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextadd-pairwise"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextunop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextunop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extadd\_pairwise}}\mathsf{\_i16x8\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef958#1{\mathtt{0x#1}}\mathdef958{FD}~~\def\mathdef959#1{\mathtt{0x#1}}\mathdef959{7E}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextunop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextadd-pairwise"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextunop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextunop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extadd\_pairwise}}\mathsf{\_i16x8\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef960#1{\mathtt{0x#1}}\mathdef960{FD}~~\def\mathdef961#1{\mathtt{0x#1}}\mathdef961{7F}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextunop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextadd-pairwise"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextunop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextunop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{abs}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef962#1{\mathtt{0x#1}}\mathdef962{FD}~~\def\mathdef963#1{\mathtt{0x#1}}\mathdef963{80}~~\def\mathdef964#1{\mathtt{0x#1}}\mathdef964{01}\)</span></p></td>
@@ -2698,19 +2696,19 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef974#1{\mathtt{0x#1}}\mathdef974{FD}~~\def\mathdef975#1{\mathtt{0x#1}}\mathdef975{84}~~\def\mathdef976#1{\mathtt{0x#1}}\mathdef976{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbitmask"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivbitmask"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}\mathsf{\_i32x4\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef977#1{\mathtt{0x#1}}\mathdef977{FD}~~\def\mathdef978#1{\mathtt{0x#1}}\mathdef978{85}~~\def\mathdef979#1{\mathtt{0x#1}}\mathdef979{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vnarrow"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{narrow}}\mathsf{\_i32x4\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef980#1{\mathtt{0x#1}}\mathdef980{FD}~~\def\mathdef981#1{\mathtt{0x#1}}\mathdef981{86}~~\def\mathdef982#1{\mathtt{0x#1}}\mathdef982{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vnarrow"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vnarrow"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extend}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{low}}\mathsf{\_i8x16\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef983#1{\mathtt{0x#1}}\mathdef983{FD}~~\def\mathdef984#1{\mathtt{0x#1}}\mathdef984{87}~~\def\mathdef985#1{\mathtt{0x#1}}\mathdef985{01}\)</span></p></td>
@@ -2842,25 +2840,25 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1046#1{\mathtt{0x#1}}\mathdef1046{FD}~~\def\mathdef1047#1{\mathtt{0x#1}}\mathdef1047{9C}~~\def\mathdef1048#1{\mathtt{0x#1}}\mathdef1048{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i8x16\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1049#1{\mathtt{0x#1}}\mathdef1049{FD}~~\def\mathdef1050#1{\mathtt{0x#1}}\mathdef1050{9D}~~\def\mathdef1051#1{\mathtt{0x#1}}\mathdef1051{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{low}}\mathsf{\_i8x16\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1052#1{\mathtt{0x#1}}\mathdef1052{FD}~~\def\mathdef1053#1{\mathtt{0x#1}}\mathdef1053{9E}~~\def\mathdef1054#1{\mathtt{0x#1}}\mathdef1054{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i8x16\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1055#1{\mathtt{0x#1}}\mathdef1055{FD}~~\def\mathdef1056#1{\mathtt{0x#1}}\mathdef1056{9F}~~\def\mathdef1057#1{\mathtt{0x#1}}\mathdef1057{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{abs}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1058#1{\mathtt{0x#1}}\mathdef1058{FD}~~\def\mathdef1059#1{\mathtt{0x#1}}\mathdef1059{A0}~~\def\mathdef1060#1{\mathtt{0x#1}}\mathdef1060{01}\)</span></p></td>
@@ -2890,7 +2888,7 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1070#1{\mathtt{0x#1}}\mathdef1070{FD}~~\def\mathdef1071#1{\mathtt{0x#1}}\mathdef1071{A4}~~\def\mathdef1072#1{\mathtt{0x#1}}\mathdef1072{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbitmask"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivbitmask"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p>(reserved)</p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1073#1{\mathtt{0x#1}}\mathdef1073{FD}~\def\mathdef1074#1{\mathtt{0x#1}}\mathdef1074{A5}~\def\mathdef1075#1{\mathtt{0x#1}}\mathdef1075{01}\)</span></p></td>
@@ -3022,31 +3020,31 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1136#1{\mathtt{0x#1}}\mathdef1136{FD}~~\def\mathdef1137#1{\mathtt{0x#1}}\mathdef1137{BA}~~\def\mathdef1138#1{\mathtt{0x#1}}\mathdef1138{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vdot"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{low}}\mathsf{\_i16x8\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1139#1{\mathtt{0x#1}}\mathdef1139{FD}~~\def\mathdef1140#1{\mathtt{0x#1}}\mathdef1140{BC}~~\def\mathdef1141#1{\mathtt{0x#1}}\mathdef1141{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i16x8\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1142#1{\mathtt{0x#1}}\mathdef1142{FD}~~\def\mathdef1143#1{\mathtt{0x#1}}\mathdef1143{BD}~~\def\mathdef1144#1{\mathtt{0x#1}}\mathdef1144{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{low}}\mathsf{\_i16x8\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1145#1{\mathtt{0x#1}}\mathdef1145{FD}~~\def\mathdef1146#1{\mathtt{0x#1}}\mathdef1146{BE}~~\def\mathdef1147#1{\mathtt{0x#1}}\mathdef1147{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i16x8\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1148#1{\mathtt{0x#1}}\mathdef1148{FD}~~\def\mathdef1149#1{\mathtt{0x#1}}\mathdef1149{BF}~~\def\mathdef1150#1{\mathtt{0x#1}}\mathdef1150{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle64}x\scriptstyle2}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{abs}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1151#1{\mathtt{0x#1}}\mathdef1151{FD}~~\def\mathdef1152#1{\mathtt{0x#1}}\mathdef1152{C0}~~\def\mathdef1153#1{\mathtt{0x#1}}\mathdef1153{01}\)</span></p></td>
@@ -3076,7 +3074,7 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1163#1{\mathtt{0x#1}}\mathdef1163{FD}~~\def\mathdef1164#1{\mathtt{0x#1}}\mathdef1164{C4}~~\def\mathdef1165#1{\mathtt{0x#1}}\mathdef1165{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vbitmask"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vbitmask"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivbitmask"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p>(reserved)</p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1166#1{\mathtt{0x#1}}\mathdef1166{FD}~\def\mathdef1167#1{\mathtt{0x#1}}\mathdef1167{C5}~\def\mathdef1168#1{\mathtt{0x#1}}\mathdef1168{01}\)</span></p></td>
@@ -3220,25 +3218,25 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1235#1{\mathtt{0x#1}}\mathdef1235{FD}~~\def\mathdef1236#1{\mathtt{0x#1}}\mathdef1236{DC}~~\def\mathdef1237#1{\mathtt{0x#1}}\mathdef1237{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle64}x\scriptstyle2}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i32x4\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1238#1{\mathtt{0x#1}}\mathdef1238{FD}~~\def\mathdef1239#1{\mathtt{0x#1}}\mathdef1239{DD}~~\def\mathdef1240#1{\mathtt{0x#1}}\mathdef1240{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle64}x\scriptstyle2}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{low}}\mathsf{\_i32x4\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1241#1{\mathtt{0x#1}}\mathdef1241{FD}~~\def\mathdef1242#1{\mathtt{0x#1}}\mathdef1242{DE}~~\def\mathdef1243#1{\mathtt{0x#1}}\mathdef1243{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle64}x\scriptstyle2}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extmul}}\mathsf{\_}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{high}}\mathsf{\_i32x4\_u}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1244#1{\mathtt{0x#1}}\mathdef1244{FD}~~\def\mathdef1245#1{\mathtt{0x#1}}\mathdef1245{DF}~~\def\mathdef1246#1{\mathtt{0x#1}}\mathdef1246{01}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextmul"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{f{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{abs}}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1247#1{\mathtt{0x#1}}\mathdef1247{FD}~~\def\mathdef1248#1{\mathtt{0x#1}}\mathdef1248{E0}~~\def\mathdef1249#1{\mathtt{0x#1}}\mathdef1249{01}\)</span></p></td>
@@ -3430,7 +3428,7 @@
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1340#1{\mathtt{0x#1}}\mathdef1340{FD}~~\def\mathdef1341#1{\mathtt{0x#1}}\mathdef1341{80}~~\def\mathdef1342#1{\mathtt{0x#1}}\mathdef1342{02}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
 <td><p><a class="reference internal" href="../valid/instructions.html#valid-vswizzlop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vswizzlop"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vswizzlop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-ivrelaxed-swizzle"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_trunc}}\mathsf{\_f32x4\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1343#1{\mathtt{0x#1}}\mathdef1343{FD}~~\def\mathdef1344#1{\mathtt{0x#1}}\mathdef1344{81}~~\def\mathdef1345#1{\mathtt{0x#1}}\mathdef1345{02}\)</span></p></td>
@@ -3537,14 +3535,14 @@
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle16}x\scriptstyle8}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_dot}}\mathsf{\_i8x16\_i7x16\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1394#1{\mathtt{0x#1}}\mathdef1394{FD}~~\def\mathdef1395#1{\mathtt{0x#1}}\mathdef1395{92}~~\def\mathdef1396#1{\mathtt{0x#1}}\mathdef1396{02}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
-<td><p><a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vrelaxed-dot"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../valid/instructions.html#valid-vextbinop"><span class="std std-ref">validation</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextbinop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextbinop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-shape}{\mathsf{i{\scriptstyle32}x\scriptstyle4}}.\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{relaxed\_dot}}\mathsf{\_i8x16\_i7x16\_add\_s}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1397#1{\mathtt{0x#1}}\mathdef1397{FD}~~\def\mathdef1398#1{\mathtt{0x#1}}\mathdef1398{93}~~\def\mathdef1399#1{\mathtt{0x#1}}\mathdef1399{02}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\([\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}~\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}] \mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}} [\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}]\)</span></p></td>
-<td><p><a class="reference internal" href="../valid/instructions.html#valid-vternop"><span class="std std-ref">validation</span></a></p></td>
-<td><p><a class="reference internal" href="../exec/instructions.html#exec-vrelaxed-dot-add"><span class="std std-ref">execution</span></a></p></td>
+<td><p><a class="reference internal" href="../valid/instructions.html#valid-vextternop"><span class="std std-ref">validation</span></a></p></td>
+<td><p><a class="reference internal" href="../exec/instructions.html#exec-vextternop"><span class="std std-ref">execution</span></a> (<a class="reference internal" href="../exec/numerics.html#op-vextternop"><span class="std std-ref">operator</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p>(reserved)</p></td>
 <td><p><span class="math notranslate nohighlight">\(\def\mathdef1400#1{\mathtt{0x#1}}\mathdef1400{FD}~\def\mathdef1401#1{\mathtt{0x#1}}\mathdef1401{94}~\def\mathdef1402#1{\mathtt{0x#1}}\mathdef1402{02} \dots\)</span></p></td>

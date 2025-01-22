@@ -1,19 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Change History &#8212; WebAssembly 3.0 (Draft 2025-01-14)</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <title>Change History &#8212; WebAssembly 3.0 (Draft 2025-01-22)</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
+    <script src="../_static/documentation_options.js?v=7b9ca617"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,10 +28,10 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/webassembly.png" alt="Logo"/>
+              <img class="logo" src="../_static/webassembly.png" alt="Logo of WebAssembly"/>
             </a></p><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro/index.html">Introduction</a></li>
@@ -73,7 +71,7 @@
     
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -81,7 +79,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -92,13 +90,13 @@
           <div class="body" role="main">
             
   <section id="change-history">
-<span id="changes"></span><span id="index-0"></span><h1>Change History<a class="headerlink" href="#change-history" title="Permalink to this heading">¶</a></h1>
+<span id="changes"></span><span id="index-0"></span><h1>Change History<a class="headerlink" href="#change-history" title="Link to this heading">¶</a></h1>
 <p>Since the original release 1.0 of the WebAssembly specification, a number of proposals for extensions have been integrated.
 The following sections provide an overview of what has changed.</p>
 <section id="release-2-0">
-<h2>Release 2.0<a class="headerlink" href="#release-2-0" title="Permalink to this heading">¶</a></h2>
+<h2>Release 2.0<a class="headerlink" href="#release-2-0" title="Link to this heading">¶</a></h2>
 <section id="sign-extension-instructions">
-<span id="index-1"></span><h3>Sign Extension Instructions<a class="headerlink" href="#sign-extension-instructions" title="Permalink to this heading">¶</a></h3>
+<span id="index-1"></span><h3>Sign Extension Instructions<a class="headerlink" href="#sign-extension-instructions" title="Link to this heading">¶</a></h3>
 <p>Added new numeric instructions for performing sign extension within integer representations. <a class="footnote-reference brackets" href="#proposal-signext" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New <a class="reference internal" href="../syntax/instructions.html#syntax-instr-numeric"><span class="std std-ref">numeric instructions</span></a>:</p>
@@ -109,7 +107,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="non-trapping-float-to-int-conversions">
-<span id="index-2"></span><h3>Non-trapping Float-to-Int Conversions<a class="headerlink" href="#non-trapping-float-to-int-conversions" title="Permalink to this heading">¶</a></h3>
+<span id="index-2"></span><h3>Non-trapping Float-to-Int Conversions<a class="headerlink" href="#non-trapping-float-to-int-conversions" title="Link to this heading">¶</a></h3>
 <p>Added new conversion instructions that avoid trapping when converting a floating-point number to an integer. <a class="footnote-reference brackets" href="#proposal-cvtsat" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New <a class="reference internal" href="../syntax/instructions.html#syntax-instr-numeric"><span class="std std-ref">numeric instructions</span></a>:</p>
@@ -120,7 +118,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="multiple-values">
-<span id="index-3"></span><h3>Multiple Values<a class="headerlink" href="#multiple-values" title="Permalink to this heading">¶</a></h3>
+<span id="index-3"></span><h3>Multiple Values<a class="headerlink" href="#multiple-values" title="Link to this heading">¶</a></h3>
 <p>Generalized the result type of blocks and functions to allow for multiple values; in addition, introduced the ability to have block parameters. <a class="footnote-reference brackets" href="#proposal-multivalue" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/types.html#syntax-functype"><span class="std std-ref">Function types</span></a> allow more than one result</p></li>
@@ -128,7 +126,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="reference-types">
-<span id="index-4"></span><h3>Reference Types<a class="headerlink" href="#reference-types" title="Permalink to this heading">¶</a></h3>
+<span id="index-4"></span><h3>Reference Types<a class="headerlink" href="#reference-types" title="Link to this heading">¶</a></h3>
 <p>Added <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{funcref}}\)</span> and <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-reftype}{\mathsf{externref}}\)</span> as new value types and respective instructions. <a class="footnote-reference brackets" href="#proposal-reftype" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference</span></a> <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value types</span></a>:</p>
@@ -153,7 +151,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="table-instructions">
-<span id="index-5"></span><h3>Table Instructions<a class="headerlink" href="#table-instructions" title="Permalink to this heading">¶</a></h3>
+<span id="index-5"></span><h3>Table Instructions<a class="headerlink" href="#table-instructions" title="Link to this heading">¶</a></h3>
 <p>Added instructions to directly access and modify tables. <a class="footnote-reference brackets" href="#proposal-reftype" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/types.html#syntax-tabletype"><span class="std std-ref">Table types</span></a> allow any <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> as element type</p></li>
@@ -168,7 +166,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="multiple-tables">
-<span id="index-6"></span><h3>Multiple Tables<a class="headerlink" href="#multiple-tables" title="Permalink to this heading">¶</a></h3>
+<span id="index-6"></span><h3>Multiple Tables<a class="headerlink" href="#multiple-tables" title="Link to this heading">¶</a></h3>
 <p>Added the ability to use multiple tables per module. <a class="footnote-reference brackets" href="#proposal-reftype" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/modules.html#syntax-module"><span class="std std-ref">Modules</span></a> may</p>
@@ -191,7 +189,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="bulk-memory-and-table-instructions">
-<span id="index-7"></span><h3>Bulk Memory and Table Instructions<a class="headerlink" href="#bulk-memory-and-table-instructions" title="Permalink to this heading">¶</a></h3>
+<span id="index-7"></span><h3>Bulk Memory and Table Instructions<a class="headerlink" href="#bulk-memory-and-table-instructions" title="Link to this heading">¶</a></h3>
 <p>Added instructions that modify ranges of memory or table entries. <a class="footnote-reference brackets" href="#proposal-reftype" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#proposal-bulk" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New <a class="reference internal" href="../syntax/instructions.html#syntax-instr-memory"><span class="std std-ref">memory instructions</span></a>:</p>
@@ -217,7 +215,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="vector-instructions">
-<span id="index-8"></span><h3>Vector Instructions<a class="headerlink" href="#vector-instructions" title="Permalink to this heading">¶</a></h3>
+<span id="index-8"></span><h3>Vector Instructions<a class="headerlink" href="#vector-instructions" title="Link to this heading">¶</a></h3>
 <p>Added vector type and instructions that manipulate multiple numeric values in parallel
 (also known as <em>SIMD</em>, single instruction multiple data) <a class="footnote-reference brackets" href="#proposal-vectype" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
@@ -356,28 +354,28 @@ The following sections provide an overview of what has changed.</p>
 </li>
 </ul>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="proposal-signext" role="note">
+<aside class="footnote brackets" id="proposal-signext" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/sign-extension-ops/">https://github.com/WebAssembly/spec/tree/main/proposals/sign-extension-ops/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-cvtsat" role="note">
+<aside class="footnote brackets" id="proposal-cvtsat" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/nontrapping-float-to-int-conversion/">https://github.com/WebAssembly/spec/tree/main/proposals/nontrapping-float-to-int-conversion/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-multivalue" role="note">
+<aside class="footnote brackets" id="proposal-multivalue" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/multi-value/">https://github.com/WebAssembly/spec/tree/main/proposals/multi-value/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-reftype" role="note">
+<aside class="footnote brackets" id="proposal-reftype" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id7">4</a>)</span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/reference-types/">https://github.com/WebAssembly/spec/tree/main/proposals/reference-types/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-bulk" role="note">
+<aside class="footnote brackets" id="proposal-bulk" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">5</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/bulk-memory-operations/">https://github.com/WebAssembly/spec/tree/main/proposals/bulk-memory-operations/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-vectype" role="note">
+<aside class="footnote brackets" id="proposal-vectype" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">6</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/simd/">https://github.com/WebAssembly/spec/tree/main/proposals/simd/</a></p>
 </aside>
@@ -385,9 +383,9 @@ The following sections provide an overview of what has changed.</p>
 </section>
 </section>
 <section id="release-3-0">
-<h2>Release 3.0<a class="headerlink" href="#release-3-0" title="Permalink to this heading">¶</a></h2>
+<h2>Release 3.0<a class="headerlink" href="#release-3-0" title="Link to this heading">¶</a></h2>
 <section id="extended-constant-expressions">
-<span id="index-9"></span><h3>Extended Constant Expressions<a class="headerlink" href="#extended-constant-expressions" title="Permalink to this heading">¶</a></h3>
+<span id="index-9"></span><h3>Extended Constant Expressions<a class="headerlink" href="#extended-constant-expressions" title="Link to this heading">¶</a></h3>
 <p>Allowed basic numeric computations in constant expressions. <a class="footnote-reference brackets" href="#proposal-extconst" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>Extended set of <a class="reference internal" href="../valid/instructions.html#valid-const"><span class="std std-ref">constant instructions</span></a> with:</p>
@@ -401,11 +399,11 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <a class="reference internal" href="#extension-gc"><span class="std std-ref">garbage collection</span></a> added further constant instructions.</p>
+<p>The <a class="reference internal" href="#extension-gc"><span class="std std-ref">garbage collection</span></a> extension added further constant instructions.</p>
 </div>
 </section>
 <section id="tail-calls">
-<span id="index-10"></span><h3>Tail Calls<a class="headerlink" href="#tail-calls" title="Permalink to this heading">¶</a></h3>
+<span id="index-10"></span><h3>Tail Calls<a class="headerlink" href="#tail-calls" title="Link to this heading">¶</a></h3>
 <p>Added instructions to perform tail calls. <a class="footnote-reference brackets" href="#proposal-tailcall" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New <a class="reference internal" href="../syntax/instructions.html#syntax-instr-control"><span class="std std-ref">control instructions</span></a>:</p>
@@ -417,7 +415,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="exception-handling">
-<span id="index-11"></span><h3>Exception Handling<a class="headerlink" href="#exception-handling" title="Permalink to this heading">¶</a></h3>
+<span id="index-11"></span><h3>Exception Handling<a class="headerlink" href="#exception-handling" title="Link to this heading">¶</a></h3>
 <p>Added tag definitions, imports, and exports, and instructions to throw and catch exceptions <a class="footnote-reference brackets" href="#proposal-exn" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/modules.html#syntax-module"><span class="std std-ref">Modules</span></a> may</p>
@@ -450,7 +448,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="multiple-memories">
-<span id="index-12"></span><h3>Multiple Memories<a class="headerlink" href="#multiple-memories" title="Permalink to this heading">¶</a></h3>
+<span id="index-12"></span><h3>Multiple Memories<a class="headerlink" href="#multiple-memories" title="Link to this heading">¶</a></h3>
 <p>Added the ability to use multiple memories per module. <a class="footnote-reference brackets" href="#proposal-multimem" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/modules.html#syntax-module"><span class="std std-ref">Modules</span></a> may</p>
@@ -482,7 +480,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="bit-address-space">
-<span id="index-13"></span><h3>64-bit Address Space<a class="headerlink" href="#bit-address-space" title="Permalink to this heading">¶</a></h3>
+<span id="index-13"></span><h3>64-bit Address Space<a class="headerlink" href="#bit-address-space" title="Link to this heading">¶</a></h3>
 <p>Added the ability to declare an <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle64}}\)</span> <a class="reference internal" href="../syntax/types.html#syntax-addrtype"><span class="std std-ref">address type</span></a> for <a class="reference internal" href="../syntax/types.html#syntax-tabletype"><span class="std std-ref">tables</span></a> and <a class="reference internal" href="../syntax/types.html#syntax-memtype"><span class="std std-ref">memories</span></a>. <a class="footnote-reference brackets" href="#proposal-addr64" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../syntax/types.html#syntax-addrtype"><span class="std std-ref">Address types</span></a> denote a subset of the integral <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number types</span></a></p></li>
@@ -516,7 +514,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="typeful-references">
-<span id="index-14"></span><h3>Typeful References<a class="headerlink" href="#typeful-references" title="Permalink to this heading">¶</a></h3>
+<span id="index-14"></span><h3>Typeful References<a class="headerlink" href="#typeful-references" title="Link to this heading">¶</a></h3>
 <p>Added more precise types for references. <a class="footnote-reference brackets" href="#proposal-typedref" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New generalised form of <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference types</span></a>:</p>
@@ -550,11 +548,12 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </li>
 <li><p>Refined typing of <a class="reference internal" href="../valid/instructions.html#valid-instr-variable"><span class="std std-ref">local instructions</span></a> and <a class="reference internal" href="../valid/instructions.html#valid-instrs"><span class="std std-ref">instruction sequences</span></a> to track the <a class="reference internal" href="../valid/conventions.html#syntax-init"><span class="std std-ref">initialization status</span></a> of <a class="reference internal" href="../syntax/modules.html#syntax-local"><span class="std std-ref">locals</span></a> with non-defaultable type</p></li>
+<li><p>Refined decoding of <a class="reference internal" href="../syntax/modules.html#syntax-elemmode"><span class="std std-ref">active</span></a> <a class="reference internal" href="../binary/modules.html#binary-elem"><span class="std std-ref">element segments</span></a> with implicit element type and plain function indices (opcode <span class="math notranslate nohighlight">\(0\)</span>) to produce <a class="reference internal" href="../syntax/types.html#syntax-nullable"><span class="std std-ref">non-nullable</span></a> <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a>.</p></li>
 <li><p>Extended <a class="reference internal" href="../syntax/modules.html#syntax-table"><span class="std std-ref">table definitions</span></a> with optional initializer expression</p></li>
 </ul>
 </section>
 <section id="garbage-collection">
-<span id="extension-gc"></span><span id="index-15"></span><h3>Garbage Collection<a class="headerlink" href="#garbage-collection" title="Permalink to this heading">¶</a></h3>
+<span id="extension-gc"></span><span id="index-15"></span><h3>Garbage Collection<a class="headerlink" href="#garbage-collection" title="Link to this heading">¶</a></h3>
 <p>Added managed reference types. <a class="footnote-reference brackets" href="#proposal-gc" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>13<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
 <li><p>New forms of <a class="reference internal" href="../syntax/types.html#syntax-heaptype"><span class="std std-ref">heap types</span></a>:</p>
@@ -650,7 +649,7 @@ The following sections provide an overview of what has changed.</p>
 </ul>
 </section>
 <section id="relaxed-vector-instructions">
-<span id="index-16"></span><h3>Relaxed Vector Instructions<a class="headerlink" href="#relaxed-vector-instructions" title="Permalink to this heading">¶</a></h3>
+<span id="index-16"></span><h3>Relaxed Vector Instructions<a class="headerlink" href="#relaxed-vector-instructions" title="Link to this heading">¶</a></h3>
 <p>Added new <em>relaxed</em> vector instructions,
 whose behaviour is non-deterministic and implementation-dependent. <a class="footnote-reference brackets" href="#proposal-relaxed" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>14<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
@@ -684,14 +683,14 @@ whose behaviour is non-deterministic and implementation-dependent. <a class="foo
 </ul>
 </section>
 <section id="profiles">
-<span id="index-17"></span><h3>Profiles<a class="headerlink" href="#profiles" title="Permalink to this heading">¶</a></h3>
+<span id="index-17"></span><h3>Profiles<a class="headerlink" href="#profiles" title="Link to this heading">¶</a></h3>
 <p>Introduced the concept of <a class="reference internal" href="profiles.html#profiles"><span class="std std-ref">profile</span></a> for specifying language subsets.</p>
 <ul class="simple">
 <li><p>A new profile defining a <a class="reference internal" href="profiles.html#profile-deterministic"><span class="std std-ref">deterministic</span></a> mode of execution.</p></li>
 </ul>
 </section>
 <section id="custom-annotations">
-<span id="index-18"></span><h3>Custom Annotations<a class="headerlink" href="#custom-annotations" title="Permalink to this heading">¶</a></h3>
+<span id="index-18"></span><h3>Custom Annotations<a class="headerlink" href="#custom-annotations" title="Link to this heading">¶</a></h3>
 <p>Added generic syntax for custom annotations in the text format,
 mirroring the role of custom sections in the binary format. <a class="footnote-reference brackets" href="#proposal-annot" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>15<span class="fn-bracket">]</span></a></p>
 <ul class="simple">
@@ -709,41 +708,41 @@ mirroring the role of custom sections in the binary format. <a class="footnote-r
 <li><p>Defined <a class="reference internal" href="custom.html#text-customannot"><span class="std std-ref">custom annotation</span></a> <span class="math notranslate nohighlight">\(\def\mathdef92#1{\mbox{‘}\mathtt{#1}\mbox{’}}\mathdef92{(&#64;custom~&quot;\dots&quot;)}\)</span> to represent arbitrary <a class="reference internal" href="../binary/modules.html#binary-customsec"><span class="std std-ref">custom sections</span></a> in the text format</p></li>
 </ul>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="proposal-extconst" role="note">
+<aside class="footnote brackets" id="proposal-extconst" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">7</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/WebAssembly/spec/blob/main/proposals/extended-const/">https://github.com/WebAssembly/spec/blob/main/proposals/extended-const/</a></p>
+<p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/extended-const/">https://github.com/WebAssembly/spec/tree/main/proposals/extended-const/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-tailcall" role="note">
+<aside class="footnote brackets" id="proposal-tailcall" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">8</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/tail-call/">https://github.com/WebAssembly/spec/tree/main/proposals/tail-call/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-exn" role="note">
+<aside class="footnote brackets" id="proposal-exn" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">9</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/exception-handling/">https://github.com/WebAssembly/spec/tree/main/proposals/exception-handling/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-multimem" role="note">
+<aside class="footnote brackets" id="proposal-multimem" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">10</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/WebAssembly/spec/blob/main/proposals/multi-memory/">https://github.com/WebAssembly/spec/blob/main/proposals/multi-memory/</a></p>
+<p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/multi-memory/">https://github.com/WebAssembly/spec/tree/main/proposals/multi-memory/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-addr64" role="note">
+<aside class="footnote brackets" id="proposal-addr64" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">11</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/WebAssembly/spec/blob/main/proposals/memory64/">https://github.com/WebAssembly/spec/blob/main/proposals/memory64/</a></p>
+<p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/memory64/">https://github.com/WebAssembly/spec/tree/main/proposals/memory64/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-typedref" role="note">
+<aside class="footnote brackets" id="proposal-typedref" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id15">12</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/function-references/">https://github.com/WebAssembly/spec/tree/main/proposals/function-references/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-gc" role="note">
+<aside class="footnote brackets" id="proposal-gc" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id16">13</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/gc/">https://github.com/WebAssembly/spec/tree/main/proposals/gc/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-relaxed" role="note">
+<aside class="footnote brackets" id="proposal-relaxed" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">14</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/relaxed-simd/">https://github.com/WebAssembly/spec/tree/main/proposals/relaxed-simd/</a></p>
 </aside>
-<aside class="footnote brackets" id="proposal-annot" role="note">
+<aside class="footnote brackets" id="proposal-annot" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id18">15</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/WebAssembly/annotations/tree/main/proposals/annotations/">https://github.com/WebAssembly/annotations/tree/main/proposals/annotations/</a></p>
+<p><a class="reference external" href="https://github.com/WebAssembly/spec/tree/main/proposals/annotations/">https://github.com/WebAssembly/spec/tree/main/proposals/annotations/</a></p>
 </aside>
 </aside>
 </section>

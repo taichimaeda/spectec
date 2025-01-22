@@ -1,19 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Modules &#8212; WebAssembly 3.0 (Draft 2025-01-14)</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <title>Modules &#8212; WebAssembly 3.0 (Draft 2025-01-22)</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
+    <script src="../_static/documentation_options.js?v=7b9ca617"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,10 +28,10 @@
   </head><body>
   <div class="document">
     
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="../index.html">
-              <img class="logo" src="../_static/webassembly.png" alt="Logo"/>
+              <img class="logo" src="../_static/webassembly.png" alt="Logo of WebAssembly"/>
             </a></p><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro/index.html">Introduction</a></li>
@@ -67,7 +65,7 @@
     
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -75,7 +73,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -86,7 +84,7 @@
           <div class="body" role="main">
             
   <section id="modules">
-<span id="syntax-module"></span><span id="index-0"></span><h1>Modules<a class="headerlink" href="#modules" title="Permalink to this heading">¶</a></h1>
+<span id="syntax-module"></span><span id="index-0"></span><h1>Modules<a class="headerlink" href="#modules" title="Link to this heading">¶</a></h1>
 <p>WebAssembly programs are organized into <em>modules</em>,
 which are the unit of deployment, loading, and compilation.
 A module collects definitions for
@@ -107,7 +105,7 @@ or a <a class="reference internal" href="#syntax-start"><span class="std std-ref
 \end{array}\end{split}\]</div>
 <p>Each of the lists — and thus the entire module — may be empty.</p>
 <section id="indices">
-<span id="syntax-index"></span><span id="syntax-fieldidx"></span><span id="syntax-labelidx"></span><span id="syntax-localidx"></span><span id="syntax-dataidx"></span><span id="syntax-elemidx"></span><span id="syntax-tagidx"></span><span id="syntax-globalidx"></span><span id="syntax-memidx"></span><span id="syntax-tableidx"></span><span id="syntax-funcidx"></span><span id="syntax-typeidx"></span><span id="syntax-idx"></span><span id="index-1"></span><h2>Indices<a class="headerlink" href="#indices" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-index"></span><span id="syntax-fieldidx"></span><span id="syntax-labelidx"></span><span id="syntax-localidx"></span><span id="syntax-dataidx"></span><span id="syntax-elemidx"></span><span id="syntax-tagidx"></span><span id="syntax-globalidx"></span><span id="syntax-memidx"></span><span id="syntax-tableidx"></span><span id="syntax-funcidx"></span><span id="syntax-typeidx"></span><span id="syntax-idx"></span><span id="index-1"></span><h2>Indices<a class="headerlink" href="#indices" title="Link to this heading">¶</a></h2>
 <p>Definitions are referenced with zero-based <em>indices</em>.
 Each class of definition has its own <em>index space</em>, as distinguished by the following classes.</p>
 <div class="math notranslate nohighlight">
@@ -137,7 +135,7 @@ The indices of these imports precede the indices of other definitions in the sam
 <p>Label indices reference <a class="reference internal" href="instructions.html#syntax-instr-control"><span class="std std-ref">structured control instructions</span></a> inside an instruction sequence.</p>
 <p>Each <a class="reference internal" href="types.html#syntax-aggrtype"><span class="std std-ref">aggregate type</span></a> provides an index space for its <a class="reference internal" href="types.html#syntax-fieldtype"><span class="std std-ref">fields</span></a>.</p>
 <section id="conventions">
-<h3>Conventions<a class="headerlink" href="#conventions" title="Permalink to this heading">¶</a></h3>
+<h3>Conventions<a class="headerlink" href="#conventions" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The meta variable <span class="math notranslate nohighlight">\(l\)</span> ranges over label indices.</p></li>
 <li><p>The meta variables <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span> range over indices in any of the other index spaces.</p></li>
@@ -152,7 +150,7 @@ The indices of these imports precede the indices of other definitions in the sam
 </section>
 </section>
 <section id="types">
-<span id="syntax-typedef"></span><span id="syntax-type"></span><span id="index-2"></span><h2>Types<a class="headerlink" href="#types" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-typedef"></span><span id="syntax-type"></span><span id="index-2"></span><h2>Types<a class="headerlink" href="#types" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}\)</span> section of a module defines a list of <a class="reference internal" href="types.html#syntax-rectype"><span class="std std-ref">recursive types</span></a>, each consisting of a list of <a class="reference internal" href="types.html#syntax-subtype"><span class="std std-ref">sub types</span></a> referenced by individual <a class="reference internal" href="#syntax-typeidx"><span class="std std-ref">type indices</span></a>.
 All <a class="reference internal" href="types.html#syntax-functype"><span class="std std-ref">function</span></a> or <a class="reference internal" href="types.html#syntax-aggrtype"><span class="std std-ref">aggregate</span></a> types used in a module must be defined in this section.</p>
 <div class="math notranslate nohighlight">
@@ -161,7 +159,7 @@ All <a class="reference internal" href="types.html#syntax-functype"><span class=
 \end{array}\end{split}\]</div>
 </section>
 <section id="functions">
-<span id="syntax-func"></span><span id="syntax-local"></span><span id="index-3"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-func"></span><span id="syntax-local"></span><span id="index-3"></span><h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-func}{\mathit{func}}}\)</span> section of a module defines a list of <em>functions</em> with the following structure:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -179,7 +177,7 @@ Upon termination it must produce a stack matching the function type’s <a class
 starting with the smallest index not referencing a function <a class="reference internal" href="#syntax-import"><span class="std std-ref">import</span></a>.</p>
 </section>
 <section id="tables">
-<span id="syntax-table"></span><span id="index-4"></span><h2>Tables<a class="headerlink" href="#tables" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-table"></span><span id="index-4"></span><h2>Tables<a class="headerlink" href="#tables" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-table}{\mathit{table}}}\)</span> section of a module defines a list of <em>tables</em> described by their <a class="reference internal" href="types.html#syntax-tabletype"><span class="std std-ref">table type</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -194,7 +192,7 @@ starting with the smallest index not referencing a table <a class="reference int
 Most constructs implicitly reference table index <span class="math notranslate nohighlight">\(0\)</span>.</p>
 </section>
 <section id="memories">
-<span id="syntax-mem"></span><span id="index-5"></span><h2>Memories<a class="headerlink" href="#memories" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-mem"></span><span id="index-5"></span><h2>Memories<a class="headerlink" href="#memories" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}\)</span> section of a module defines a list of <em>linear memories</em> (or <em>memories</em> for short) as described by their <a class="reference internal" href="types.html#syntax-memtype"><span class="std std-ref">memory type</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -209,7 +207,7 @@ starting with the smallest index not referencing a memory <a class="reference in
 Most constructs implicitly reference memory index <span class="math notranslate nohighlight">\(0\)</span>.</p>
 </section>
 <section id="globals">
-<span id="syntax-global"></span><span id="index-6"></span><h2>Globals<a class="headerlink" href="#globals" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-global"></span><span id="index-6"></span><h2>Globals<a class="headerlink" href="#globals" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-global}{\mathit{global}}}\)</span> section of a module defines a list of <em>global variables</em> (or <em>globals</em> for short):</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -222,18 +220,18 @@ Moreover, each global is initialized with a value given by a <a class="reference
 starting with the smallest index not referencing a global <a class="reference internal" href="#syntax-import"><span class="std std-ref">import</span></a>.</p>
 </section>
 <section id="tags">
-<span id="syntax-tag"></span><span id="index-7"></span><h2>Tags<a class="headerlink" href="#tags" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-tag"></span><span id="index-7"></span><h2>Tags<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}\)</span> section of a module defines a list of <em>tags</em>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
 &amp; {\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}} &amp; ::= &amp; \href{../syntax/modules.html#syntax-tag}{\mathsf{tag}}~{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}} \\
 \end{array}\end{split}\]</div>
-<p>The <a class="reference internal" href="#syntax-typeidx"><span class="std std-ref">type index</span></a> of a tag must refer to a <a class="reference internal" href="types.html#syntax-functype"><span class="std std-ref">function type</span></a> that declares its <a class="reference internal" href="types.html#syntax-tagtype"><span class="std std-ref">tag type</span></a>.</p>
+<p>The <a class="reference internal" href="#syntax-typeidx"><span class="std std-ref">type index</span></a> of a tag must refer to a <a class="reference internal" href="types.html#syntax-functype"><span class="std std-ref">function type</span></a> that declares its <a class="reference internal" href="../valid/conventions.html#syntax-tagtype"><span class="std std-ref">tag type</span></a>.</p>
 <p>Tags are referenced through <a class="reference internal" href="#syntax-tagidx"><span class="std std-ref">tag indices</span></a>,
 starting with the smallest index not referencing a tag <a class="reference internal" href="#syntax-import"><span class="std std-ref">import</span></a>.</p>
 </section>
 <section id="element-segments">
-<span id="syntax-elemmode"></span><span id="syntax-elem"></span><span id="index-8"></span><h2>Element Segments<a class="headerlink" href="#element-segments" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-elemmode"></span><span id="syntax-elem"></span><span id="index-8"></span><h2>Element Segments<a class="headerlink" href="#element-segments" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> section of a module defines a list of <em>element segments</em>,
 which can be used to initialize a subrange of a table from a static <a class="reference internal" href="conventions.html#syntax-list"><span class="std std-ref">list</span></a> of elements.</p>
 <div class="math notranslate nohighlight">
@@ -250,7 +248,7 @@ The offset is given by another <a class="reference internal" href="../valid/inst
 <p>Element segments are referenced through <a class="reference internal" href="#syntax-elemidx"><span class="std std-ref">element indices</span></a>.</p>
 </section>
 <section id="data-segments">
-<span id="syntax-datamode"></span><span id="syntax-data"></span><span id="index-9"></span><h2>Data Segments<a class="headerlink" href="#data-segments" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-datamode"></span><span id="syntax-data"></span><span id="index-9"></span><h2>Data Segments<a class="headerlink" href="#data-segments" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-data}{\mathit{data}}}\)</span> section of a module defines a list of <em>data segments</em>,
 which can be used to initialize a range of memory from a static <a class="reference internal" href="conventions.html#syntax-list"><span class="std std-ref">list</span></a> of <a class="reference internal" href="values.html#syntax-byte"><span class="std std-ref">bytes</span></a>.</p>
 <div class="math notranslate nohighlight">
@@ -264,7 +262,7 @@ An active data segment copies its contents into a memory during <a class="refere
 <p>Data segments are referenced through <a class="reference internal" href="#syntax-dataidx"><span class="std std-ref">data indices</span></a>.</p>
 </section>
 <section id="start-function">
-<span id="syntax-start"></span><span id="index-10"></span><h2>Start Function<a class="headerlink" href="#start-function" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-start"></span><span id="index-10"></span><h2>Start Function<a class="headerlink" href="#start-function" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-start}{\mathit{start}}}\)</span> section of a module declares the <a class="reference internal" href="#syntax-funcidx"><span class="std std-ref">function index</span></a> of a <em>start function</em> that is automatically invoked when the module is <a class="reference internal" href="../exec/modules.html#exec-instantiation"><span class="std std-ref">instantiated</span></a>, after <a class="reference internal" href="#syntax-table"><span class="std std-ref">tables</span></a> and <a class="reference internal" href="#syntax-mem"><span class="std std-ref">memories</span></a> have been initialized.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -277,7 +275,7 @@ The module and its exports are not accessible externally before this initializat
 </div>
 </section>
 <section id="exports">
-<span id="syntax-externidx"></span><span id="syntax-export"></span><span id="syntax-exportdesc"></span><span id="index-11"></span><h2>Exports<a class="headerlink" href="#exports" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-externidx"></span><span id="syntax-export"></span><span id="syntax-exportdesc"></span><span id="index-11"></span><h2>Exports<a class="headerlink" href="#exports" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-export}{\mathit{export}}}\)</span> section of a module defines a set of <em>exports</em> that become accessible to the host environment once the module has been <a class="reference internal" href="../exec/modules.html#exec-instantiation"><span class="std std-ref">instantiated</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
@@ -293,7 +291,7 @@ Exportable definitions are
 <a class="reference internal" href="#syntax-tag"><span class="std std-ref">tags</span></a>,
 which are referenced through a respective index.</p>
 <section id="id1">
-<h3>Conventions<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<h3>Conventions<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
 <p>The following auxiliary notation is defined for sequences of exports, filtering out indices of a specific kind in an order-preserving fashion:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}lcl&#64;{}l&#64;{}}
@@ -316,7 +314,7 @@ which are referenced through a respective index.</p>
 </section>
 </section>
 <section id="imports">
-<span id="syntax-import"></span><span id="syntax-importdesc"></span><span id="index-12"></span><h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">¶</a></h2>
+<span id="syntax-import"></span><span id="syntax-importdesc"></span><span id="index-12"></span><h2>Imports<a class="headerlink" href="#imports" title="Link to this heading">¶</a></h2>
 <p>The <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-import}{\mathit{import}}}\)</span> section of a module defines a set of <em>imports</em> that are required for <a class="reference internal" href="../exec/modules.html#exec-instantiation"><span class="std std-ref">instantiation</span></a>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rrl&#64;{}l&#64;{}}
