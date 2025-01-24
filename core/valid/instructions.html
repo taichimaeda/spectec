@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-01-23)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-01-24)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
-    <script src="../_static/documentation_options.js?v=0a49ec4e"></script>
+    <script src="../_static/documentation_options.js?v=84121d80"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
@@ -342,7 +342,6 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{funcs}}{}[x]\)</span> exists.</p></li>
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{funcs}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
-<li><p>The index <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{refs}}{}[0]\)</span> exists.</p></li>
 <li><p><span class="math notranslate nohighlight">\(x\)</span> is contained in <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{refs}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -495,7 +494,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{zt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{zt}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>A <a class="reference internal" href="../exec/runtime.html#aux-default"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
+<li><p>A <a class="reference internal" href="../exec/runtime.html#aux-default"><span class="std std-ref">default value</span></a> for the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -591,7 +590,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <div><ul class="simple">
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}}))\)</span>.</p></li>
-<li><p>A <a class="reference internal" href="../exec/runtime.html#aux-default"><span class="std std-ref">default value</span></a> for value type the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
+<li><p>A <a class="reference internal" href="../exec/runtime.html#aux-default"><span class="std std-ref">default value</span></a> for the value type <span class="math notranslate nohighlight">\({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}})\)</span> is defined.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
@@ -1844,7 +1843,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{block}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
+<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid as the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the result type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{labels}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 </ul>
@@ -1872,7 +1871,7 @@ The same applies to all other block instructions.</p>
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{loop}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
+<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid as the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the result type sequence <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{labels}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 </ul>
@@ -1895,7 +1894,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{if}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast}~\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{else}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
+<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid as the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the result type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{labels}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_2^\ast}}\,{t_2^\ast}\)</span>.</p></li>
@@ -1922,7 +1921,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <p>The instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{try\_table}}~{\mathit{bt}}~{{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast})\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul>
-<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
+<li><p>The block type <span class="math notranslate nohighlight">\({\mathit{bt}}\)</span> is valid as the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the result type sequence <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> prepended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{labels}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x^\ast}}\,{t_2^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}\)</span>:</p>
@@ -2497,8 +2496,8 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_2^\ast}\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-instrtype}{\mathit{instrtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is equal to <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}~{x_2^\ast}}\,{t_3^\ast}\)</span>.</p></li>
 <li><p>The instruction <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~{\mathrel{\href{../valid/conventions.html#syntax-instrtype}{\rightarrow}}}_{{x_1^\ast}}\,{t_2^\ast}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{\mathit{t*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{init*}}|}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|x_{\mathit{{\scriptstyle 1}*}}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{\mathit{init*}}|}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\({|{{\href{../valid/conventions.html#syntax-init}{\mathit{init}}}^\ast}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{t^\ast}|}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\({|{{\href{../valid/conventions.html#syntax-init}{\mathit{init}}}^\ast}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{x_1^\ast}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x_1\)</span> in <span class="math notranslate nohighlight">\({x_1^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -2617,19 +2616,19 @@ C \href{../valid/instructions.html#valid-expr}{\vdash} {{\href{../syntax/instruc
 <section id="constant-expressions">
 <span id="valid-constant"></span><span id="index-14"></span><h3>Constant Expressions<a class="headerlink" href="#constant-expressions" title="Link to this heading">¶</a></h3>
 <p>In a <em>constant</em> expression, all instructions must be constant.</p>
-<p><span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is const if:</p>
+<p><span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is constant if:</p>
 <blockquote>
 <div><ul>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is const.</p></li>
+<li><p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is constant.</p></li>
 </ul>
 </div></blockquote>
 </li>
 </ul>
 </div></blockquote>
-<p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is const if:</p>
+<p><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is constant if:</p>
 <blockquote>
 <div><ul>
 <li><p>Either:</p>
