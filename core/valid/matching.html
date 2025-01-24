@@ -739,7 +739,7 @@ C \href{../valid/matching.html#match-packtype}{\vdash} {\href{../syntax/types.ht
 <div><ul class="simple">
 <li><p>The sub type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-unroll-deftype}{\mathrm{unroll}}}({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1)\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~{\href{../syntax/types.html#syntax-subtype}{\mathsf{final}}^?}~{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}~{\mathit{ct}})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}|}\)</span> is greater than <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
-<li><p>The type use <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}{}[i]\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
+<li><p>The type use <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-typeuse}{\mathit{typeuse}}}^\ast}{}[i]\)</span> matches the heap type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -880,8 +880,8 @@ C \href{../valid/matching.html#match-globaltype}{\vdash} \mathsf{mut}~{\href{../
 <p>The tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span> matches the tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span> matches the tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
-<li><p>The tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span> matches the tag type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span>.</p></li>
+<li><p>The defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span>.</p></li>
+<li><p>The defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_2\)</span> matches the defined type <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#syntax-deftype}{\mathit{deftype}}}_1\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">

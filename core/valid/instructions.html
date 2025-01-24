@@ -633,7 +633,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <li><p>The defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{array}}~({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{rt}}))\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> exists.</p></li>
-<li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
+<li><p>The reference type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
@@ -1424,7 +1424,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> exists.</p></li>
 <li><p>The table type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tables}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\(({\mathit{at}}~{\mathit{lim}}~{\mathit{rt}}_1)\)</span>.</p></li>
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> exists.</p></li>
-<li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span>.</p></li>
+<li><p>The reference type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[y]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span>.</p></li>
 <li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_2\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}_1\)</span>.</p></li>
 </ul>
 </div></blockquote>
@@ -1448,7 +1448,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[x]\)</span> exists.</p></li>
-<li><p>The element type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
+<li><p>The reference type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{elems}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
@@ -1954,7 +1954,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
 <li><p>The result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span> exists.</p></li>
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t^\ast}\)</span> matches the result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span>.</p></li>
 </ul>
@@ -1977,7 +1977,7 @@ C \href{../valid/instructions.html#valid-catch}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
 <li><p>The result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span> exists.</p></li>
 <li><p>The value type sequence <span class="math notranslate nohighlight">\({t^\ast}~(\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{exn}})\)</span> matches the result type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{labels}}{}[l]\)</span>.</p></li>
 </ul>
@@ -2431,7 +2431,7 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 <blockquote>
 <div><ul class="simple">
 <li><p>The tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the tag type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the defined type <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{tags}}{}[x]\)</span> is the composite type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~\epsilon)\)</span>.</p></li>
 <li><p>The instruction type <span class="math notranslate nohighlight">\({t_1^\ast}~\rightarrow~{t_2^\ast}\)</span> is valid.</p></li>
 </ul>
 </div></blockquote>
@@ -2601,7 +2601,7 @@ The subsumption rule allows to weaken the type of <span class="math notranslate 
 <p>The expression <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the result type <span class="math notranslate nohighlight">\({t^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The expression <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(\epsilon~\rightarrow~{t^\ast}\)</span>.</p></li>
+<li><p>The instruction sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> is valid with the instruction type <span class="math notranslate nohighlight">\(\epsilon~\rightarrow~{t^\ast}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
