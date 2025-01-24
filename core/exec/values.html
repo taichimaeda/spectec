@@ -94,9 +94,12 @@ values are classified by <a class="reference internal" href="../syntax/types.htm
 The following auxiliary typing rules specify this typing relation relative to a <a class="reference internal" href="runtime.html#syntax-store"><span class="std std-ref">store</span></a> <span class="math notranslate nohighlight">\(S\)</span> in which possibly referenced <a class="reference internal" href="runtime.html#syntax-addr"><span class="std std-ref">addresses</span></a> live.</p>
 <section id="numeric-values">
 <span id="valid-num"></span><h3>Numeric Values<a class="headerlink" href="#numeric-values" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p>The number value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> is valid with the number type <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span>.</p>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The value is valid with <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
@@ -112,9 +115,10 @@ s \vdash {\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}
 </section>
 <section id="vector-values">
 <span id="valid-vec"></span><h3>Vector Values<a class="headerlink" href="#vector-values" title="Link to this heading">¶</a></h3>
+<p>The vector value <span class="math notranslate nohighlight">\(({\mathit{vt}}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{const}}~c)\)</span> is valid with the vector type <span class="math notranslate nohighlight">\({\mathit{vt}}\)</span>.</p>
 <div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The value is valid with <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
@@ -130,9 +134,15 @@ s \vdash {\mathit{vt}}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\ma
 </section>
 <section id="null-references">
 <span id="valid-ref"></span><h3>Null References<a class="headerlink" href="#null-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~{\mathit{ht}})\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\mathsf{null}~{\mathit{ht}'})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The heap type <span class="math notranslate nohighlight">\({\mathit{ht}'}\)</span> matches the heap type <span class="math notranslate nohighlight">\({\mathit{ht}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-heaptype"><span class="std std-ref">heap type</span></a> must be <a class="reference internal" href="../valid/types.html#valid-heaptype"><span class="std std-ref">valid</span></a> under the empty <a class="reference internal" href="../valid/conventions.html#context"><span class="std std-ref">context</span></a>.</p></li>
@@ -157,9 +167,10 @@ That ensures that the value is compatible with any nullable type in that hierarc
 </section>
 <section id="scalar-references">
 <span id="valid-ref-i31num"></span><h3>Scalar References<a class="headerlink" href="#scalar-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~i)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{i\scriptstyle31}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id4">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The value is valid with <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{i\scriptstyle31}})\)</span>.</p></li>
@@ -175,9 +186,16 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~
 </section>
 <section id="structure-references">
 <span id="valid-ref-struct"></span><h3>Structure References<a class="headerlink" href="#structure-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The structure instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]\)</span> exists.</p></li>
+<li><p>The defined type <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]{.}\href{../exec/runtime.html#syntax-structinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id5">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-structaddr"><span class="std std-ref">structure address</span></a> <span class="math notranslate nohighlight">\(a\)</span> must exist in the store.</p></li>
@@ -198,9 +216,16 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a : (\hre
 </section>
 <section id="array-references">
 <span id="valid-ref-array"></span><h3>Array References<a class="headerlink" href="#array-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The array instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]\)</span> exists.</p></li>
+<li><p>The defined type <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id6">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-arrayaddr"><span class="std std-ref">array address</span></a> <span class="math notranslate nohighlight">\(a\)</span> must exist in the store.</p></li>
@@ -221,9 +246,10 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a : (\href
 </section>
 <section id="exception-references">
 <span id="valid-ref-exn"></span><h3>Exception References<a class="headerlink" href="#exception-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{exn}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id7">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{exns}}[a]\)</span> must exist.</p></li>
@@ -240,9 +266,16 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a : (\href{.
 </section>
 <section id="function-references">
 <h3>Function References<a class="headerlink" href="#function-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The function instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> exists.</p></li>
+<li><p>The defined type <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id8">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-funcaddr"><span class="std std-ref">function address</span></a> <span class="math notranslate nohighlight">\(a\)</span> must exist in the store.</p></li>
@@ -263,9 +296,10 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a : (\href{
 </section>
 <section id="host-references">
 <h3>Host References<a class="headerlink" href="#host-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}host}}~a)\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id9">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The value is valid with <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}})\)</span>.</p></li>
@@ -285,9 +319,10 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}host}}~a : (\href{
 </section>
 <section id="external-references">
 <h3>External References<a class="headerlink" href="#external-references" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> is valid with the reference type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id10">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The reference value <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}\)</span> must be valid with some <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-reftype}{\mathsf{null}}^?~t)\)</span>.</p></li>
@@ -305,9 +340,16 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{..
 </section>
 <section id="subsumption">
 <h3>Subsumption<a class="headerlink" href="#subsumption" title="Link to this heading">¶</a></h3>
+<p>The reference value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> is valid with the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Under the context <span class="math notranslate nohighlight">\(s\)</span>, the reference value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> is valid with the reference type <span class="math notranslate nohighlight">\({\mathit{rt}'}\)</span>.</p></li>
+<li><p>The reference type <span class="math notranslate nohighlight">\({\mathit{rt}'}\)</span> matches the reference type <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id11">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The value must be valid with some value type <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
@@ -335,9 +377,16 @@ such values are classified by <a class="reference internal" href="../syntax/type
 The following auxiliary typing rules specify this typing relation relative to a <a class="reference internal" href="runtime.html#syntax-store"><span class="std std-ref">store</span></a> <span class="math notranslate nohighlight">\(S\)</span> in which the referenced instances live.</p>
 <section id="functions">
 <span id="valid-externaddr-func"></span><span id="index-3"></span><h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-externaddr}{\mathsf{func}}~a)\)</span> is valid with the external type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-externtype}{\mathsf{func}}~{\href{../exec/runtime.html#syntax-funcinst}{\mathit{funcinst}}}{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The function instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> exists.</p></li>
+<li><p>The function instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-funcinst}{\mathit{funcinst}}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id12">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}[a]\)</span> must exist.</p></li>
@@ -355,9 +404,16 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{func}}~a : \href{
 </section>
 <section id="tables">
 <span id="valid-externaddr-table"></span><span id="index-4"></span><h3>Tables<a class="headerlink" href="#tables" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-externaddr}{\mathsf{table}}~a)\)</span> is valid with the external type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-externtype}{\mathsf{table}}~{\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}{.}\href{../exec/runtime.html#syntax-tableinst}{\mathsf{type}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The table instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[a]\)</span> exists.</p></li>
+<li><p>The table instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id13">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}[a]\)</span> must exist.</p></li>
@@ -375,9 +431,16 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{table}}~a : \href
 </section>
 <section id="memories">
 <span id="valid-externaddr-mem"></span><span id="index-5"></span><h3>Memories<a class="headerlink" href="#memories" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-externaddr}{\mathsf{mem}}~a)\)</span> is valid with the external type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-externtype}{\mathsf{mem}}~{\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{type}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The memory instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[a]\)</span> exists.</p></li>
+<li><p>The memory instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id14">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}[a]\)</span> must exist.</p></li>
@@ -395,9 +458,16 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{mem}}~a : \href{.
 </section>
 <section id="globals">
 <span id="valid-externaddr-global"></span><span id="index-6"></span><h3>Globals<a class="headerlink" href="#globals" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-externaddr}{\mathsf{global}}~a)\)</span> is valid with the external type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-externtype}{\mathsf{global}}~{\href{../exec/runtime.html#syntax-globalinst}{\mathit{globalinst}}}{.}\href{../exec/runtime.html#syntax-globalinst}{\mathsf{type}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The global instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}{}[a]\)</span> exists.</p></li>
+<li><p>The global instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-globalinst}{\mathit{globalinst}}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id15">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}[a]\)</span> must exist.</p></li>
@@ -415,9 +485,16 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{global}}~a : \hre
 </section>
 <section id="tags">
 <span id="valid-externaddr-tag"></span><span id="index-7"></span><h3>Tags<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-externaddr}{\mathsf{tag}}~a)\)</span> is valid with the external type <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-externtype}{\mathsf{tag}}~{\href{../exec/runtime.html#syntax-taginst}{\mathit{taginst}}}{.}\href{../exec/runtime.html#syntax-taginst}{\mathsf{type}})\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The tag instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[a]\)</span> exists.</p></li>
+<li><p>The tag instance <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-taginst}{\mathit{taginst}}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id16">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The store entry <span class="math notranslate nohighlight">\(S.\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}[a]\)</span> must exist.</p></li>
@@ -436,9 +513,16 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{tag}}~a : \href{.
 </section>
 <section id="id17">
 <h3>Subsumption<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<p>The external address <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span> is valid with the external type <span class="math notranslate nohighlight">\({\mathit{xt}}\)</span> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Under the context <span class="math notranslate nohighlight">\(s\)</span>, the external address <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-externaddr}{\mathit{externaddr}}}\)</span> is valid with the external type <span class="math notranslate nohighlight">\({\mathit{xt}'}\)</span>.</p></li>
+<li><p>The external type <span class="math notranslate nohighlight">\({\mathit{xt}'}\)</span> matches the external type <span class="math notranslate nohighlight">\({\mathit{xt}}\)</span>.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition-todo admonition" id="id18">
 <p class="admonition-title">Todo</p>
-<p>use generated prose</p>
+<p>below is the official specification</p>
 </div>
 <ul class="simple">
 <li><p>The external address must be valid with some external type <span class="math notranslate nohighlight">\(\mathit{et}\)</span>.</p></li>
