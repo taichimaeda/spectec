@@ -859,9 +859,9 @@ it happens in individual steps that may be interleaved with other threads.</p>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~{\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}}})\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{call\_ref}}~s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[{\href{../exec/runtime.html#syntax-funcaddr}{\mathit{funcaddr}}}]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}})\)</span>.</p></li>
-<li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
+<li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_0^\ast}\)</span> from the top of the stack.</p></li>
 <li><p>Pop the <a class="reference internal" href="runtime.html#syntax-frame"><span class="std std-ref">frame</span></a> <span class="math notranslate nohighlight">\(({\mathsf{frame}}_{k}\,\{~f~\})\)</span> from the stack.</p></li>
-<li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
+<li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}_0^\ast}\)</span> to the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{k}}\)</span> from the stack.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{k}}\)</span>.</p></li>
 </ol>
