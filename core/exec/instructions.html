@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-01-31)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-02-02)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
-    <script src="../_static/documentation_options.js?v=fb2544e6"></script>
+    <script src="../_static/documentation_options.js?v=24a665cc"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
@@ -1704,7 +1704,7 @@ Below is the actual prose.</p>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}})\)</span> to the stack.</p></li>
 </ol>
 </li>
-<li><p>If the type of <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is address value, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is address value, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> to the stack.</p></li>
@@ -2000,7 +2000,7 @@ respectively.</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-vextract-lane"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined and the type of <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is number type, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined and <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is number type, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i &lt; {|{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)|}\)</span>, then:</p>
@@ -2011,7 +2011,7 @@ respectively.</p>
 </li>
 </ol>
 </li>
-<li><p>If the type of <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is packed type, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is packed type, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{pt}}\)</span> be <span class="math notranslate nohighlight">\({\mathit{lt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
@@ -2506,7 +2506,7 @@ However, it may be substantially slower on some hardware.</p>
 <li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 </li>
-<li><p>If the type of <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is Inn, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-loadop}{\mathit{loadop}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
@@ -2861,7 +2861,7 @@ S; F; (\mathit{at}.\href{../syntax/instructions.html#syntax-instr-numeric}{\math
 <li><p>Perform <span class="math notranslate nohighlight">\(z{}[{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : {|{\mathit{nt}}|} / 8] = {b^\ast}]\)</span>.</p></li>
 </ol>
 </li>
-<li><p>If the type of <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span> is Inn, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> be <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\({\mathit{nt}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = {\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> and <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-storeop}{\mathit{storeop}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
