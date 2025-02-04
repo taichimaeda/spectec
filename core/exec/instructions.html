@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-02-03)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-02-04)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
-    <script src="../_static/documentation_options.js?v=55732f95"></script>
+    <script src="../_static/documentation_options.js?v=db28de5b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
@@ -913,9 +913,8 @@ Below is the actual prose.</p>
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-new-data"><span class="std std-ref">validation</span></a>, the length of <span class="math notranslate nohighlight">\(({\mathit{fresh}}_1)\)</span> for which <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {\mathit{fresh}}_1\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}{}[i : n \cdot {|{\mathit{zt}}|} / 8]\)</span> is <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({{{\href{../syntax/values.html#syntax-byte}{\mathit{byte}}}^\ast}^\ast}\)</span> be the result for which <span class="math notranslate nohighlight">\({\href{../syntax/conventions.html#notation-concat}{\bigoplus}}\, {{{\href{../syntax/values.html#syntax-byte}{\mathit{byte}}}^\ast}^\ast}\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{datas}}{}[y]{.}\href{../exec/runtime.html#syntax-datainst}{\mathsf{bytes}}{}[i : n \cdot {|{\mathit{zt}}|} / 8]\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({c^\ast}\)</span> be the result for which <span class="math notranslate nohighlight">\({({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\mathit{zt}}}({c^\ast}) = {{\href{../syntax/values.html#syntax-byte}{\mathit{byte}}}^\ast})^\ast}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({c^{n}}\)</span> be the result for which <span class="math notranslate nohighlight">\({({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\mathit{zt}}}({c^{n}}) = {{\href{../syntax/values.html#syntax-byte}{\mathit{byte}}}^\ast})^\ast}\)</span>.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\mathit{zt}}){.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{{\href{../exec/numerics.html#aux-unpacknum}{\mathrm{unpack}}}}_{{\mathit{zt}}}(c)^{n}}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_fixed}}~x~n)\)</span>.</p></li>
 </ol>
@@ -988,8 +987,7 @@ Below is the actual prose.</p>
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-new-elem"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\({|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{elems}}{}[y]{.}\href{../exec/runtime.html#syntax-eleminst}{\mathsf{elem}}{}[i : n]|} = n\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}^\ast}\)</span> be <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{elems}}{}[y]{.}\href{../exec/runtime.html#syntax-eleminst}{\mathsf{elem}}{}[i : n]\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}^{n}}\)</span> be <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{elems}}{}[y]{.}\href{../exec/runtime.html#syntax-eleminst}{\mathsf{elem}}{}[i : n]\)</span>.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}^{n}}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-array}{\mathsf{array{.}new\_fixed}}~x~n)\)</span>.</p></li>
 </ol>
