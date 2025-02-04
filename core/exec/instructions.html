@@ -3253,7 +3253,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> from the top of the stack.</p></li>
 <li><p>Pop the current <span class="math notranslate nohighlight">\(\mathsf{label}\)</span> context from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> to the stack.</p></li>
-<li><p>Execute the instruction <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}'}^\ast}\)</span>.</p></li>
+<li><p>Execute the sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}'}^\ast}\)</span>.</p></li>
 </ol>
 </li>
 <li><p>Else:</p>
@@ -3969,7 +3969,7 @@ However, the effects of any such call are subsumed by the non-deterministic beha
 <section id="mathsf-eval-expr-xref-syntax-instructions-syntax-instr-mathit-instr-ast">
 <h3><span class="math notranslate nohighlight">\(\mathsf{eval\_expr}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span><a class="headerlink" href="#mathsf-eval-expr-xref-syntax-instructions-syntax-instr-mathit-instr-ast" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>Execute the instruction <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.</p></li>
+<li><p>Execute the sequence <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span>.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
 <li><p>Return <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span>.</p></li>
 </ol>
