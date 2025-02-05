@@ -193,21 +193,21 @@ C \href{../valid/instructions.html#valid-instr}{\vdash} \href{../syntax/instruct
 </section>
 <section id="xref-syntax-instructions-syntax-instr-parametric-mathsf-select-t-ast">
 <span id="valid-select"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~(t^\ast)^?\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-parametric-mathsf-select-t-ast" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~{t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?})\)</span> is <a class="reference internal" href="#valid-instr"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction type</span></a> <span class="math notranslate nohighlight">\(t~t~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\rightarrow~t\)</span> if:</p>
+<p>The <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-parametric}{\mathsf{select}}~{{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?})\)</span> is <a class="reference internal" href="#valid-instr"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="conventions.html#syntax-instrtype"><span class="std std-ref">instruction type</span></a> <span class="math notranslate nohighlight">\(t~t~\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}~\rightarrow~t\)</span> if:</p>
 <blockquote>
 <div><ul>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(t\)</span> is <a class="reference internal" href="types.html#valid-valtype"><span class="std std-ref">valid</span></a>.</p></li>
 <li><p>Either:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is equal to <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
+<li><p>The value type sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is equal to <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p>Or:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The value type sequence <span class="math notranslate nohighlight">\({t_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is absent.</p></li>
+<li><p>The value type sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is absent.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\(t\)</span> <a class="reference internal" href="matching.html#match-valtype"><span class="std std-ref">matches</span></a> the <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({t'}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({t'}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> or <span class="math notranslate nohighlight">\({t'}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 </ul>
