@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-02-04)</title>
+    <title>Instructions &#8212; WebAssembly 3.0 (Draft 2025-02-05)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
-    <script src="../_static/documentation_options.js?v=db28de5b"></script>
+    <script src="../_static/documentation_options.js?v=aafd9402"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
@@ -3396,14 +3396,14 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-br-on-cast"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> is <a class="reference internal" href="values.html#valid-ref"><span class="std std-ref">valid</span></a>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> be the type of <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-ref}{\mathit{ref}}}\)</span> to the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> does not match <span class="math notranslate nohighlight">\({{\href{../exec/types.html#type-inst}{\mathrm{clos}}}}_{f{.}\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}}({\mathit{rt}}_2)\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> matches <span class="math notranslate nohighlight">\({{\href{../exec/types.html#type-inst}{\mathrm{clos}}}}_{f{.}\href{../exec/runtime.html#syntax-frame}{\mathsf{module}}}({\mathit{rt}}_2)\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Do nothing.</p></li>
+<li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br}}~l)\)</span>.</p></li>
 </ol>
 </li>
 <li><p>Else:</p>
 <ol class="loweralpha simple">
-<li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br}}~l)\)</span>.</p></li>
+<li><p>Do nothing.</p></li>
 </ol>
 </li>
 </ol>
