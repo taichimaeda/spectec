@@ -536,15 +536,15 @@ Below is the actual prose.</p>
 <span id="exec-i31-get"></span><h3><span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr-i31}{\mathsf{i{\scriptstyle31}{.}get}}}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-i31-mathsf-i-scriptstyle31-get-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-i31-get"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~i)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~i)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{31, 32}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{(i)})\)</span> to the stack.</p></li>
 </ol>
 </li>
@@ -671,15 +671,15 @@ Below is the actual prose.</p>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-struct-get"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]{.}\href{../exec/runtime.html#syntax-structinst}{\mathsf{fields}}|}\)</span> and <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-struct-get"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}\)</span>.</p></li>
@@ -734,15 +734,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-struct-set"><span class="std std-ref">validation</span></a>, a value is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-val}{\mathit{val}}}\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-struct-set"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-struct-set"><span class="std std-ref">validation</span></a>, <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{struct}}~{\href{../syntax/types.html#syntax-structtype}{\mathit{structtype}}}_0)\)</span> be <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-expand-deftype}{\mathrm{expand}}}(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{types}}{}[x])\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({({\href{../syntax/types.html#syntax-mut}{\mathsf{mut}}^?}~{\mathit{zt}})^\ast}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-structtype}{\mathit{structtype}}}_0\)</span>.</p></li>
@@ -1007,15 +1007,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-get"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-get"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span> and <span class="math notranslate nohighlight">\(i \geq {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Trap.</p></li>
@@ -1086,15 +1086,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-set"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-set"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span> and <span class="math notranslate nohighlight">\(i \geq {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Trap.</p></li>
@@ -1158,15 +1158,15 @@ Below is the actual prose.</p>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-len"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}|})\)</span> to the stack.</p></li>
@@ -1198,15 +1198,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-fill"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-fill"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a \geq {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Do nothing.</p></li>
@@ -1421,15 +1421,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-init-data"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-init-data"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span> and <span class="math notranslate nohighlight">\(i + n &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Trap.</p></li>
@@ -1579,15 +1579,15 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-init-elem"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-numtype}{\mathsf{i\scriptstyle32}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-array-init-elem"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(a &lt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}|}\)</span> and <span class="math notranslate nohighlight">\(i + n &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{fields}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Trap.</p></li>
@@ -1659,15 +1659,15 @@ Below is the actual prose.</p>
 <span id="exec-any-convert-extern"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{any{.}convert\_extern}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-extern-mathsf-any-convert-extern" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-any-convert-extern"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}})\)</span> to the stack.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}}\)</span> to the stack.</p></li>
 </ol>
 </li>
@@ -1688,15 +1688,15 @@ Below is the actual prose.</p>
 <span id="exec-extern-convert-any"></span><h3><span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-extern}{\mathsf{extern{.}convert\_any}}\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-instr-extern-mathsf-extern-convert-any" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-extern-convert-any"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="../syntax/instructions.html#syntax-instr"><span class="std std-ref">instruction</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
+<li><p>Pop the value <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> from the stack.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-ref}{\mathsf{ref{.}null}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}})\)</span> to the stack.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is address value, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span> is address value, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}_1\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> to the stack.</p></li>
 </ol>
 </li>
@@ -1985,14 +1985,14 @@ respectively.</p>
 &amp; ({\href{../syntax/types.html#aux-unpack}{\mathrm{unpack}}}({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}){.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)~({{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{splat}}) &amp; \href{../exec/conventions.html#exec-notation}{\hookrightarrow} &amp; (\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c) &amp; \quad \mbox{if}~ c = {{{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}^{{-1}}}}{({{{\href{../exec/numerics.html#aux-packnum}{\mathrm{pack}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}}(c_1)^{M}})} \\
 \end{array}\end{split}\]</div>
 </section>
-<section id="xref-syntax-instructions-syntax-lanetype-mathit-lanetype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathit-u-kern-0-1em-scriptstyle-1-i">
-<span id="exec-vextract-lane"></span><h3><span class="math notranslate nohighlight">\({{{\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extract\_lane}}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}}~i\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-lanetype-mathit-lanetype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-mathit-u-kern-0-1em-scriptstyle-1-i" title="Link to this heading">¶</a></h3>
+<section id="xref-syntax-instructions-syntax-lanetype-mathit-lanetype-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-1-i">
+<span id="exec-vextract-lane"></span><h3><span class="math notranslate nohighlight">\({{{\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_1}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}{.}\href{../syntax/instructions.html#syntax-instr-vec}{\mathsf{extract\_lane}}}{\mathsf{\_}}{{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_1^?}}~i\)</span><a class="headerlink" href="#xref-syntax-instructions-syntax-lanetype-mathit-lanetype-1-xref-syntax-instructions-syntax-shape-mathsf-x-m-xref-syntax-instructions-syntax-instr-vec-mathsf-extract-lane-mathsf-xref-syntax-instructions-syntax-sx-mathit-sx-1-i" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-vextract-lane"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined and <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is number type, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_1^?}\)</span> is not defined and <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_1\)</span> is number type, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i &lt; {|{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(c_2\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{nt}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1){}[i]\)</span>.</p></li>
@@ -2001,12 +2001,12 @@ respectively.</p>
 </li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is packed type, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_1\)</span> is packed type, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{pt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{pt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-lanetype}{\mathit{lanetype}}}_1\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_1^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}_1^?}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i &lt; {|{{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{pt}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1)|}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\(c_2\)</span> be <span class="math notranslate nohighlight">\({{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{{|{\mathit{pt}}|}, 32}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{({{\href{../exec/numerics.html#aux-lanes}{\mathrm{lanes}}}}_{{{\mathit{pt}}}{\href{../syntax/instructions.html#syntax-shape}{\mathsf{x}}}{M}}(c_1){}[i])}\)</span>.</p></li>
@@ -2478,15 +2478,15 @@ A WebAssembly implementation can use this hint to optimize for the intended use.
 Unaligned access violating that property is still allowed and must succeed regardless of the annotation.
 However, it may be substantially slower on some hardware.</p>
 </div>
-<section id="xref-syntax-types-syntax-numtype-mathit-numtype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-instr-memory-mathsf-load-mathit-loadop-u-kern-0-1em-scriptstyle-1-x-mathit-ao">
-<span id="exec-vload-val"></span><span id="exec-load-pack"></span><span id="exec-load-val"></span><h3><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-numtype-mathit-numtype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-instr-memory-mathsf-load-mathit-loadop-u-kern-0-1em-scriptstyle-1-x-mathit-ao" title="Link to this heading">¶</a></h3>
+<section id="xref-syntax-types-syntax-numtype-mathit-numtype-1-xref-syntax-instructions-syntax-instr-memory-mathsf-load-mathit-loadop-scriptstyle-1-x-mathit-ao">
+<span id="exec-vload-val"></span><span id="exec-load-pack"></span><span id="exec-load-val"></span><h3><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{load}}}{{{\mathit{loadop\_{\scriptstyle 1}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-numtype-mathit-numtype-1-xref-syntax-instructions-syntax-instr-memory-mathsf-load-mathit-loadop-scriptstyle-1-x-mathit-ao" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
 <li><p>Assert: Due to validation, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\mathit{at}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{at}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_{\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + {|{\mathit{nt}}|} / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Trap.</p></li>
@@ -2496,11 +2496,11 @@ However, it may be substantially slower on some hardware.</p>
 <li><p>Push the value <span class="math notranslate nohighlight">\(({\mathit{nt}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> to the stack.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_{\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loadop\_{\scriptstyle 1}}}^?}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({n}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + n / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
@@ -2509,10 +2509,10 @@ However, it may be substantially slower on some hardware.</p>
 </li>
 </ol>
 </li>
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({{\mathit{loadop\_{\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loadop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span> be <span class="math notranslate nohighlight">\({{\mathit{loadop\_{\scriptstyle 1}}}^?}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({n}{\mathsf{\_}}{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}\)</span> be <span class="math notranslate nohighlight">\({\mathit{loadop\_{\scriptstyle 0}}}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\(c\)</span> be the result for which <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{n}}(c)\)</span> <span class="math notranslate nohighlight">\(=\)</span> <span class="math notranslate nohighlight">\(z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : n / 8]\)</span>.</p></li>
 <li><p>Push the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~{{{{\href{../exec/numerics.html#op-ext}{\mathrm{extend}}}}_{n, {|{\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}|}}^{{\href{../syntax/instructions.html#syntax-sx}{\mathit{sx}}}}}}{(c)})\)</span> to the stack.</p></li>
@@ -2831,32 +2831,32 @@ S; F; (\mathit{at}.\href{../syntax/instructions.html#syntax-instr-numeric}{\math
 } \\
 \end{array}\end{split}\]</div>
 </section>
-<section id="xref-syntax-types-syntax-numtype-mathit-numtype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-instr-memory-mathsf-store-mathit-storeop-u-kern-0-1em-scriptstyle-1-x-mathit-ao">
-<span id="exec-vstore"></span><span id="exec-store-pack"></span><span id="exec-store-val"></span><h3><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{{\mathit{storeop\_u{\kern-0.1em\scriptstyle 1}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-numtype-mathit-numtype-mathit-u-kern-0-1em-scriptstyle-1-xref-syntax-instructions-syntax-instr-memory-mathsf-store-mathit-storeop-u-kern-0-1em-scriptstyle-1-x-mathit-ao" title="Link to this heading">¶</a></h3>
+<section id="xref-syntax-types-syntax-numtype-mathit-numtype-1-xref-syntax-instructions-syntax-instr-memory-mathsf-store-mathit-storeop-scriptstyle-1-x-mathit-ao">
+<span id="exec-vstore"></span><span id="exec-store-pack"></span><span id="exec-store-val"></span><h3><span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{store}}}{{{\mathit{storeop\_{\scriptstyle 1}}}^?}}~x~{\mathit{ao}}\)</span><a class="headerlink" href="#xref-syntax-types-syntax-numtype-mathit-numtype-1-xref-syntax-instructions-syntax-instr-memory-mathsf-store-mathit-storeop-scriptstyle-1-x-mathit-ao" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Let <span class="math notranslate nohighlight">\(z\)</span> be the current state.</p></li>
-<li><p>Assert: Due to <a class="reference internal" href="../appendix/properties.html#valid-store"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span> is on the top of the stack.</p></li>
-<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
+<li><p>Assert: Due to <a class="reference internal" href="../appendix/properties.html#valid-store"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_3\)</span> is on the top of the stack.</p></li>
+<li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_3{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../appendix/properties.html#valid-store"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\mathit{at}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\mathit{at}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~i)\)</span> from the stack.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + {|{\mathit{nt}}|} / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span> and <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = {\mathit{nt}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
+<li><p>Let <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_3\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + {|{\mathit{nt}}|} / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span> and <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1 = {\mathit{nt}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_{\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = {\mathit{nt}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1 = {\mathit{nt}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_{\scriptstyle 1}}}^?}\)</span> is not defined, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let <span class="math notranslate nohighlight">\({b^\ast}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/numerics.html#aux-bytes}{\mathrm{bytes}}}}_{{\mathit{nt}}}(c)\)</span>.</p></li>
 <li><p>Perform <span class="math notranslate nohighlight">\(z{}[{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}{}[i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} : {|{\mathit{nt}}|} / 8] = {b^\ast}]\)</span>.</p></li>
 </ol>
 </li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_3\)</span> is <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 3}}}\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_{\mathit{u{\kern-0.1em\scriptstyle 1}}} = {\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
+<li><p>Let <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> be <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_3\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_1 = {\href{../syntax/types.html#syntax-numtype}{\mathsf{i}}}{{\href{../syntax/types.html#syntax-numtype}{\scriptstyle\kern-0.1emN}}}\)</span> and <span class="math notranslate nohighlight">\({{\mathit{storeop\_{\scriptstyle 1}}}^?}\)</span> is defined, then:</p>
 <ol class="arabic simple">
-<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be <span class="math notranslate nohighlight">\({{\mathit{storeop\_u{\kern-0.1em\scriptstyle 1}}}^?}\)</span>.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be <span class="math notranslate nohighlight">\({{\mathit{storeop\_{\scriptstyle 1}}}^?}\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i + {\mathit{ao}}{.}\href{../syntax/instructions.html#syntax-instr-memory}{\mathsf{offset}} + n / 8 &gt; {|z{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[x]{.}\href{../exec/runtime.html#syntax-meminst}{\mathsf{bytes}}|}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
