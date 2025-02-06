@@ -584,7 +584,7 @@ C \href{../valid/types.html#valid-deftype}{\vdash} {\href{../syntax/types.html#s
 <section id="limits">
 <span id="valid-limits"></span><span id="index-13"></span><h2>Limits<a class="headerlink" href="#limits" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">Limits</span></a> must have meaningful bounds that are within a given range.</p>
-<p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits</span></a> <span class="math notranslate nohighlight">\({}[~n~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m~]\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\(k\)</span> if:</p>
+<p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits range</span></a> <span class="math notranslate nohighlight">\({}[~n~\href{../syntax/types.html#syntax-limits}{\,{..}\,}~m~]\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\(k\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(n\)</span> is less than or equal to <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
@@ -606,7 +606,7 @@ C \href{../valid/types.html#valid-limits}{\vdash} {}[ n \href{../syntax/types.ht
 <p>The <a class="reference internal" href="../syntax/types.html#syntax-tabletype"><span class="std std-ref">table type</span></a> <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}~{\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}~{\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}})\)</span> is <a class="reference internal" href="#valid-tabletype"><span class="std std-ref">valid</span></a> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\({2^{32}} - 1\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits range</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\({2^{32}} - 1\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span> is <a class="reference internal" href="#valid-reftype"><span class="std std-ref">valid</span></a>.</p></li>
 </ul>
 </div></blockquote>
@@ -627,7 +627,7 @@ C \href{../valid/types.html#valid-tabletype}{\vdash} {\href{../syntax/types.html
 <p>The <a class="reference internal" href="../syntax/types.html#syntax-memtype"><span class="std std-ref">memory type</span></a> <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-addrtype}{\mathit{addrtype}}}~{\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}~\href{../syntax/types.html#syntax-memtype}{\mathsf{page}})\)</span> is <a class="reference internal" href="#valid-memtype"><span class="std std-ref">valid</span></a> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\({2^{16}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-limits"><span class="std std-ref">limits range</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-limits}{\mathit{limits}}}\)</span> is <a class="reference internal" href="#valid-limits"><span class="std std-ref">valid</span></a> within <span class="math notranslate nohighlight">\({2^{16}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
