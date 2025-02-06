@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Matching &#8212; WebAssembly 3.0 (Draft 2025-02-05)</title>
+    <title>Matching &#8212; WebAssembly 3.0 (Draft 2025-02-06)</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=057308f9" />
-    <script src="../_static/documentation_options.js?v=aafd9402"></script>
+    <script src="../_static/documentation_options.js?v=38824ae9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"maxBuffer": 30720, "macros": {"multicolumn": ["", 2]}}}</script>
@@ -88,7 +88,7 @@
 <p>On most types, a notion of <em>subtyping</em> is defined that is applicable in <a class="reference internal" href="index.html#valid"><span class="std std-ref">validation</span></a> rules, during <a class="reference internal" href="../exec/modules.html#exec-instantiation"><span class="std std-ref">module instantiation</span></a> when checking the types of imports, or during <a class="reference internal" href="../exec/index.html#exec"><span class="std std-ref">execution</span></a>, when performing casts.</p>
 <section id="number-types">
 <span id="match-numtype"></span><span id="index-1"></span><h2>Number Types<a class="headerlink" href="#number-types" title="Link to this heading">¶</a></h2>
-<p>The <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> <a class="reference internal" href="#match-numtype"><span class="std std-ref">matches</span></a> itself.</p>
+<p>The <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> <a class="reference internal" href="#match-numtype"><span class="std std-ref">matches</span></a> only itself.</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
@@ -100,7 +100,7 @@ C \href{../valid/matching.html#match-numtype}{\vdash} {\href{../syntax/types.htm
 </section>
 <section id="vector-types">
 <span id="match-vectype"></span><span id="index-2"></span><h2>Vector Types<a class="headerlink" href="#vector-types" title="Link to this heading">¶</a></h2>
-<p>The <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span> <a class="reference internal" href="#match-vectype"><span class="std std-ref">matches</span></a> itself.</p>
+<p>The <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span> <a class="reference internal" href="#match-vectype"><span class="std std-ref">matches</span></a> only itself.</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
@@ -712,7 +712,7 @@ C \href{../valid/matching.html#match-fieldtype}{\vdash} \mathsf{mut}~{\mathit{zt
 </li>
 </ul>
 </div></blockquote>
-<p>The <a class="reference internal" href="../syntax/types.html#syntax-packtype"><span class="std std-ref">packed type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}\)</span> <a class="reference internal" href="#match-packtype"><span class="std std-ref">matches</span></a> itself.</p>
+<p>The <a class="reference internal" href="../syntax/types.html#syntax-packtype"><span class="std std-ref">packed type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-packtype}{\mathit{packtype}}}\)</span> <a class="reference internal" href="#match-packtype"><span class="std std-ref">matches</span></a> only itself.</p>
 <div class="math notranslate nohighlight">
 \[\begin{array}{&#64;{}c&#64;{}}\displaystyle
 \frac{
