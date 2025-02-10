@@ -3247,7 +3247,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>If the first non-value entry of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let L be the topmost <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be arity of L</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be the arity of L</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(l = 0\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-br"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
@@ -3497,7 +3497,7 @@ Below is the actual prose.</p>
 <li><p>If the first non-value entry of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Let F be the topmost <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}\)</span>.</p></li>
-<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be arity of F</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(n\)</span> be the arity of F</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-return"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> from the stack.</p></li>
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> from the top of the stack.</p></li>
