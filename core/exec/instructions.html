@@ -3196,7 +3196,8 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Let <span class="math notranslate nohighlight">\({t_1^{m}}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^{n}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#aux-blocktype}{\mathrm{instrtype}}}}_{z}({\mathit{bt}})\)</span>.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-block"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with label L whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
+<li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
+<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3210,7 +3211,8 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Let <span class="math notranslate nohighlight">\({t_1^{m}}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^{n}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#aux-blocktype}{\mathrm{instrtype}}}}_{z}({\mathit{bt}})\)</span>.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-loop"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with label L whose arity is <span class="math notranslate nohighlight">\(m\)</span> and whose continuation is the start of the block.</p></li>
+<li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(m\)</span> and whose continuation is the start of the block.</p></li>
+<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3251,7 +3253,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-br"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> from the stack.</p></li>
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the label L from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> to the stack.</p></li>
 <li><p>Jump to the continuation of L.</p></li>
 </ol>
@@ -3261,7 +3263,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(l &gt; 0\)</span>, then:</p>
 <ol class="loweralpha simple">
-<li><p>Pop the label L from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br}}~l - 1)\)</span>.</p></li>
 </ol>
@@ -3273,7 +3275,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Else if the first non-value entry of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the handler H from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> H from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\((\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{br}}~l)\)</span>.</p></li>
 </ol>
@@ -3499,14 +3501,14 @@ Below is the actual prose.</p>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-return"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(n\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> from the stack.</p></li>
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}'}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the frame F from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-frame}{\mathsf{frame}}\)</span> F from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{n}}\)</span> to the stack.</p></li>
 </ol>
 </li>
 <li><p>Else if the first non-value entry of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span>, then:</p>
 <ol class="loweralpha simple">
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the label L from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return}}\)</span>.</p></li>
 </ol>
@@ -3516,7 +3518,7 @@ Below is the actual prose.</p>
 <li><p>If the first non-value entry of the stack is a <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span>, then:</p>
 <ol class="arabic simple">
 <li><p>Pop all values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> from the top of the stack.</p></li>
-<li><p>Pop the handler H from the stack.</p></li>
+<li><p>Pop the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> H from the stack.</p></li>
 <li><p>Push the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^\ast}\)</span> to the stack.</p></li>
 <li><p>Execute the instruction <span class="math notranslate nohighlight">\(\href{../syntax/instructions.html#syntax-instr-control}{\mathsf{return}}\)</span>.</p></li>
 </ol>
@@ -3778,8 +3780,10 @@ Below is the actual prose.</p>
 <li><p>Let <span class="math notranslate nohighlight">\({t_1^{m}}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^{n}}\)</span> be <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#aux-blocktype}{\mathrm{instrtype}}}}_{z}({\mathit{bt}})\)</span>.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-try-table"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
-<li><p>Push the handler H whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose catch handler is <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}\)</span> to the stack.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with label L whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
+<li><p>Let H be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose catch handler is <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}\)</span>.</p></li>
+<li><p>Push the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> H.</p></li>
+<li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
+<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
