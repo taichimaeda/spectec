@@ -167,7 +167,7 @@ That ensures that the value is compatible with any nullable type in that hierarc
 </section>
 <section id="scalar-references">
 <span id="valid-ref-i31num"></span><h3>Scalar References<a class="headerlink" href="#scalar-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~i)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{i\scriptstyle31}})\)</span>.</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~i)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{i\scriptstyle31}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id4">
 <p class="admonition-title">Todo</p>
 <p>below is the official specification</p>
@@ -186,7 +186,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~
 </section>
 <section id="structure-references">
 <span id="valid-ref-struct"></span><h3>Structure References<a class="headerlink" href="#structure-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~{\mathit{dt}})\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-structinst"><span class="std std-ref">structure instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]\)</span> exists.</p></li>
@@ -216,7 +216,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a : (\hre
 </section>
 <section id="array-references">
 <span id="valid-ref-array"></span><h3>Array References<a class="headerlink" href="#array-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~{\mathit{dt}})\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-arrayinst"><span class="std std-ref">array instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]\)</span> exists.</p></li>
@@ -246,7 +246,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}array}}~a : (\href
 </section>
 <section id="exception-references">
 <span id="valid-ref-exn"></span><h3>Exception References<a class="headerlink" href="#exception-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{exn}})\)</span>.</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{exn}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id7">
 <p class="admonition-title">Todo</p>
 <p>below is the official specification</p>
@@ -266,7 +266,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a : (\href{.
 </section>
 <section id="function-references">
 <h3>Function References<a class="headerlink" href="#function-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~{\mathit{dt}})\)</span> if:</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~{\mathit{dt}})\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> exists.</p></li>
@@ -296,7 +296,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}func}}~a : (\href{
 </section>
 <section id="host-references">
 <h3>Host References<a class="headerlink" href="#host-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}host}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}})\)</span>.</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}host}}~a)\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{any}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id9">
 <p class="admonition-title">Todo</p>
 <p>below is the official specification</p>
@@ -319,7 +319,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}host}}~a : (\href{
 </section>
 <section id="external-references">
 <h3>External References<a class="headerlink" href="#external-references" title="Link to this heading">¶</a></h3>
-<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\epsilon~\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}})\)</span>.</p>
+<p>The <a class="reference internal" href="runtime.html#syntax-ref"><span class="std std-ref">reference value</span></a> <span class="math notranslate nohighlight">\((\href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}extern}}~{\href{../exec/runtime.html#syntax-addrref}{\mathit{addrref}}})\)</span> is <a class="reference internal" href="#valid-ref"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-reftype}{\mathsf{ref}}~\href{../syntax/types.html#syntax-heaptype}{\mathsf{extern}})\)</span>.</p>
 <div class="admonition-todo admonition" id="id10">
 <p class="admonition-title">Todo</p>
 <p>below is the official specification</p>
