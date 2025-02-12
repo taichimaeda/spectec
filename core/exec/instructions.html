@@ -3197,7 +3197,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-block"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
 <li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
+<li><p>Enter the block <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3212,7 +3212,7 @@ In practice, the choice depends on the <a class="reference internal" href="../ap
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-loop"><span class="std std-ref">validation</span></a>, there are at least <span class="math notranslate nohighlight">\(m\)</span> values on the top of the stack.</p></li>
 <li><p>Pop the values <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}\)</span> from the stack.</p></li>
 <li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(m\)</span> and whose continuation is the start of the block.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
+<li><p>Enter the block <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
@@ -3783,7 +3783,7 @@ Below is the actual prose.</p>
 <li><p>Let H be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose catch handler is <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-catch}{\mathit{catch}}}^\ast}\)</span>.</p></li>
 <li><p>Push the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-handler}{\mathsf{handler}}\)</span> H.</p></li>
 <li><p>Let L be the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> whose arity is <span class="math notranslate nohighlight">\(n\)</span> and whose continuation is the end of the block.</p></li>
-<li><p>Enter <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
+<li><p>Enter the block <span class="math notranslate nohighlight">\({{\href{../exec/runtime.html#syntax-val}{\mathit{val}}}^{m}}~{{\href{../syntax/instructions.html#syntax-instr}{\mathit{instr}}}^\ast}\)</span> with the <span class="math notranslate nohighlight">\(\href{../exec/runtime.html#syntax-label}{\mathsf{label}}\)</span> L.</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{array}[t]{&#64;{}l&#64;{}rcl&#64;{}l&#64;{}}
