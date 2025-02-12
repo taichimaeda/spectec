@@ -93,7 +93,7 @@ To verify this, most definitions are themselves classified with a suitable type.
 <p>The <a class="reference internal" href="../syntax/modules.html#syntax-type"><span class="std std-ref">type definition</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/modules.html#syntax-type}{\mathsf{type}}~{\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}})\)</span> is <a class="reference internal" href="#valid-type"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> if:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\({|C{.}\href{../valid/conventions.html#context}{\mathsf{types}}|}\)</span> is of the form <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}\)</span> is equal to <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> is of the form <span class="math notranslate nohighlight">\({{{{\href{../valid/conventions.html#aux-roll-deftype}{\mathrm{roll}}}}_{x}^\ast}}{({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}})}\)</span>.</p></li>
 <li><p>Let <span class="math notranslate nohighlight">\({C'}\)</span> be the same context as <span class="math notranslate nohighlight">\(C\)</span>, but with the <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> appended to the field <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#context}{\mathsf{types}}\)</span>.</p></li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the <a class="reference internal" href="../syntax/types.html#syntax-rectype"><span class="std std-ref">recursive type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}}\)</span> is <a class="reference internal" href="types.html#valid-rectype"><span class="std std-ref">valid</span></a> for <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x)})\)</span>.</p></li>
@@ -163,7 +163,7 @@ C \href{../valid/modules.html#valid-types}{\vdash} {\href{../syntax/types.html#s
 <div><ul>
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> exists.</p></li>
 <li><p>The <a class="reference internal" href="conventions.html#aux-expand-deftype"><span class="std std-ref">expansion</span></a> of the <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x]\)</span> is the <a class="reference internal" href="../syntax/types.html#syntax-comptype"><span class="std std-ref">composite type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-comptype}{\mathsf{func}}~{t_1^\ast}~\href{../syntax/types.html#syntax-functype}{\rightarrow}~{t_2^\ast})\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{{\mathit{lt}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-local}{\mathit{local}}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-local}{\mathit{local}}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span> in <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-local}{\mathit{local}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-local}{\mathit{local}}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -699,7 +699,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 <blockquote>
 <div><ul>
 <li><p>Under the context <span class="math notranslate nohighlight">\(\{ \begin{array}[t]{&#64;{}l&#64;{}}\href{../valid/conventions.html#context}{\mathsf{return}}~\epsilon \}\end{array}\)</span>, the <a class="reference internal" href="../syntax/modules.html#syntax-type"><span class="std std-ref">type definition sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-rectype}{\mathit{type}}}^\ast}\)</span> is <a class="reference internal" href="../exec/values.html#valid-val"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\mathit{dt}'}^\ast}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{xt}}_{\mathsf{i}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{i}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-import}{\mathit{import}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-import}{\mathit{import}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{i}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{i}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -708,7 +708,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </div></blockquote>
 </li>
 <li><p>Under the context <span class="math notranslate nohighlight">\({C'}\)</span>, the <a class="reference internal" href="../syntax/modules.html#syntax-global"><span class="std std-ref">global sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-global}{\mathit{global}}}^\ast}\)</span> is <a class="reference internal" href="../exec/values.html#valid-val"><span class="std std-ref">valid</span></a> with the <a class="reference internal" href="../syntax/types.html#syntax-globaltype"><span class="std std-ref">global type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\mathit{gt}}^\ast}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{tt}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{tt}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-table}{\mathit{table}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-table}{\mathit{table}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{tt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{tt}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -716,7 +716,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{mt}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{mt}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-mem}{\mathit{mem}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{mt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{mt}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -724,7 +724,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\mathit{jt}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\mathit{jt}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{jt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{jt}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-tag}{\mathit{tag}}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -732,7 +732,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\mathit{dt}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{dt}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-func}{\mathit{func}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-func}{\mathit{func}}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -740,7 +740,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{rt}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{rt}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-elem}{\mathit{elem}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{rt}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{rt}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -748,7 +748,7 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{ok}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{ok}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-data}{\mathit{data}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-data}{\mathit{data}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{ok}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{ok}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -763,8 +763,8 @@ Instead, the <a class="reference internal" href="conventions.html#context"><span
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{nm}}^\ast}|}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{\mathit{xt}}_{\mathsf{e}}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{nm}}^\ast}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{e}}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/modules.html#syntax-export}{\mathit{export}}}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/modules.html#syntax-export}{\mathit{export}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{nm}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{nm}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{xt}}_{\mathsf{e}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{xt}}_{\mathsf{e}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">

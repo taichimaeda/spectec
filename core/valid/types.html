@@ -269,7 +269,7 @@ C \href{../valid/types.html#valid-resulttype}{\vdash} {t^\ast} : \href{../valid/
 <div><ul>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> is <a class="reference internal" href="#valid-resulttype"><span class="std std-ref">valid</span></a>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> is <a class="reference internal" href="#valid-resulttype"><span class="std std-ref">valid</span></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{{\mathit{lt}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({x^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -477,7 +477,7 @@ C \href{../valid/types.html#valid-rectype}{\vdash} \href{../syntax/types.html#sy
 <p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~{\mathsf{final}^?}~{x^\ast}~{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}})\)</span> is <a class="reference internal" href="#valid-subtype"><span class="std std-ref">valid</span></a> with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x_0)})\)</span> if:</p>
 <blockquote>
 <div><ul>
-<li><p><span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(1\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({x^\ast}\)</span> is less than or equal to <span class="math notranslate nohighlight">\(1\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -485,8 +485,8 @@ C \href{../valid/types.html#valid-rectype}{\vdash} \href{../syntax/types.html#sy
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{{x'}^\ast}^\ast}|}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({x^\ast}\)</span>.</p></li>
+<li><p>The length of <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}\)</span> is equal to the length of <span class="math notranslate nohighlight">\({{{x'}^\ast}^\ast}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
