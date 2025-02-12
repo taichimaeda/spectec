@@ -190,7 +190,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}i\scriptstyle31}}~
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-structinst"><span class="std std-ref">structure instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]{.}\href{../exec/runtime.html#syntax-structinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{structs}}{}[a]{.}\href{../exec/runtime.html#syntax-structinst}{\mathsf{type}}\)</span> is of the form <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id5">
@@ -220,7 +220,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}struct}}~a : (\hre
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-arrayinst"><span class="std std-ref">array instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{arrays}}{}[a]{.}\href{../exec/runtime.html#syntax-arrayinst}{\mathsf{type}}\)</span> is of the form <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id6">
@@ -270,7 +270,7 @@ s \vdash \href{../exec/runtime.html#syntax-ref}{\mathsf{ref{.}exn}}~a : (\href{.
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}}\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../valid/conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]{.}\href{../exec/runtime.html#syntax-funcinst}{\mathsf{type}}\)</span> is of the form <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id8">
@@ -381,7 +381,7 @@ The following auxiliary typing rules specify this typing relation relative to a 
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-funcinst}{\mathit{funcinst}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="runtime.html#syntax-funcinst"><span class="std std-ref">function instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{funcs}}{}[a]\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-funcinst}{\mathit{funcinst}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id12">
@@ -408,7 +408,7 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{func}}~a : \href{
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-tableinst"><span class="std std-ref">table instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="runtime.html#syntax-tableinst"><span class="std std-ref">table instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="runtime.html#syntax-tableinst"><span class="std std-ref">table instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tables}}{}[a]\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-tableinst}{\mathit{tableinst}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id13">
@@ -435,7 +435,7 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{table}}~a : \href
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-meminst"><span class="std std-ref">memory instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="runtime.html#syntax-meminst"><span class="std std-ref">memory instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="runtime.html#syntax-meminst"><span class="std std-ref">memory instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{mems}}{}[a]\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-meminst}{\mathit{meminst}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id14">
@@ -462,7 +462,7 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{mem}}~a : \href{.
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-globalinst"><span class="std std-ref">global instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="runtime.html#syntax-globalinst"><span class="std std-ref">global instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-globalinst}{\mathit{globalinst}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="runtime.html#syntax-globalinst"><span class="std std-ref">global instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{globals}}{}[a]\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-globalinst}{\mathit{globalinst}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id15">
@@ -489,7 +489,7 @@ s \vdash \href{../exec/runtime.html#syntax-externaddr}{\mathsf{global}}~a : \hre
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="runtime.html#syntax-taginst"><span class="std std-ref">tag instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[a]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="runtime.html#syntax-taginst"><span class="std std-ref">tag instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[a]\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-taginst}{\mathit{taginst}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="runtime.html#syntax-taginst"><span class="std std-ref">tag instance</span></a> <span class="math notranslate nohighlight">\(s{.}\href{../exec/runtime.html#syntax-store}{\mathsf{tags}}{}[a]\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../exec/runtime.html#syntax-taginst}{\mathit{taginst}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition-todo admonition" id="id16">

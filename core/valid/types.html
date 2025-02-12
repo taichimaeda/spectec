@@ -127,7 +127,7 @@ C \href{../valid/types.html#valid-heaptype}{\vdash} {\href{../syntax/types.html#
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> exists.</p></li>
-<li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> is equal to <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#syntax-deftype"><span class="std std-ref">defined type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[{\href{../syntax/modules.html#syntax-typeidx}{\mathit{typeidx}}}]\)</span> is of the form <span class="math notranslate nohighlight">\({\mathit{dt}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 <div class="math notranslate nohighlight">
@@ -166,7 +166,7 @@ C \href{../valid/types.html#valid-reftype}{\vdash} \href{../syntax/types.html#sy
 <li><p>Either:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}\)</span> is <a class="reference internal" href="#valid-numtype"><span class="std std-ref">valid</span></a>.</p></li>
 </ul>
 </div></blockquote>
@@ -174,7 +174,7 @@ C \href{../valid/types.html#valid-reftype}{\vdash} \href{../syntax/types.html#sy
 <li><p>Or:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-vectype}{\mathit{vectype}}}\)</span> is <a class="reference internal" href="#valid-vectype"><span class="std std-ref">valid</span></a>.</p></li>
 </ul>
 </div></blockquote>
@@ -182,7 +182,7 @@ C \href{../valid/types.html#valid-reftype}{\vdash} \href{../syntax/types.html#sy
 <li><p>Or:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-reftype"><span class="std std-ref">reference type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-reftype}{\mathit{reftype}}}\)</span> is <a class="reference internal" href="#valid-reftype"><span class="std std-ref">valid</span></a>.</p></li>
 </ul>
 </div></blockquote>
@@ -190,7 +190,7 @@ C \href{../valid/types.html#valid-reftype}{\vdash} \href{../syntax/types.html#sy
 <li><p>Or:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is equal to <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-valtype-ext}{\mathsf{bot}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-valtype"><span class="std std-ref">value type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-valtype}{\mathit{valtype}}}\)</span> is of the form <span class="math notranslate nohighlight">\(\href{../valid/conventions.html#syntax-valtype-ext}{\mathsf{bot}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -269,7 +269,7 @@ C \href{../valid/types.html#valid-resulttype}{\vdash} {t^\ast} : \href{../valid/
 <div><ul>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({t_1^\ast}\)</span> is <a class="reference internal" href="#valid-resulttype"><span class="std std-ref">valid</span></a>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-resulttype"><span class="std std-ref">result type</span></a> <span class="math notranslate nohighlight">\({t_2^\ast}\)</span> is <a class="reference internal" href="#valid-resulttype"><span class="std std-ref">valid</span></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{{\mathit{lt}}}^\ast}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\({|{{{\mathit{lt}}}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -280,7 +280,7 @@ C \href{../valid/types.html#valid-resulttype}{\vdash} {t^\ast} : \href{../valid/
 <li><p>For all <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span> in <span class="math notranslate nohighlight">\({{{\mathit{lt}}}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="conventions.html#syntax-localtype"><span class="std std-ref">local type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is equal to <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="conventions.html#syntax-localtype"><span class="std std-ref">local type</span></a> <span class="math notranslate nohighlight">\(C{.}\href{../valid/conventions.html#context}{\mathsf{locals}}{}[x]\)</span> is of the form <span class="math notranslate nohighlight">\({{\mathit{lt}}}\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -426,14 +426,14 @@ C \href{../valid/types.html#valid-packtype}{\vdash} {\href{../syntax/types.html#
 <li><p>Either:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}'}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}'}^\ast}\)</span> is of the form <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
 <li><p>Or:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}'}^\ast}\)</span> is equal to <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}_1~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast}\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type sequence</span></a> sequence <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}'}^\ast}\)</span> is of the form <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}_1~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast}\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}_1\)</span> is <a class="reference internal" href="#valid-subtype"><span class="std std-ref">valid</span></a> with <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x)})\)</span>.</p></li>
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-rectype"><span class="std std-ref">recursive type</span></a> <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^\ast})\)</span> is <a class="reference internal" href="#valid-rectype"><span class="std std-ref">valid</span></a> for <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x + 1)})\)</span>.</p></li>
 </ul>
@@ -485,8 +485,8 @@ C \href{../valid/types.html#valid-rectype}{\vdash} \href{../syntax/types.html#sy
 </ul>
 </div></blockquote>
 </li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is equal to <span class="math notranslate nohighlight">\({|{{{x'}^\ast}^\ast}|}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{x^\ast}|}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\({|{{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}|}\)</span> is of the form <span class="math notranslate nohighlight">\({|{{{x'}^\ast}^\ast}|}\)</span>.</p></li>
 <li><p>For all <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
@@ -497,7 +497,7 @@ C \href{../valid/types.html#valid-rectype}{\vdash} \href{../syntax/types.html#sy
 <li><p>For all <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}\)</span> in <span class="math notranslate nohighlight">\({{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'}^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\(x\)</span> in <span class="math notranslate nohighlight">\({x^\ast}\)</span>, and corresponding <span class="math notranslate nohighlight">\({\mathit{x'*}}\)</span> in <span class="math notranslate nohighlight">\({{\mathit{x'*}}^\ast}\)</span>:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type</span></a> <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-unroll-deftype}{\mathrm{unroll}}}(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x])\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~\epsilon~{{x'}^\ast}~{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'})\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-subtype"><span class="std std-ref">sub type</span></a> <span class="math notranslate nohighlight">\({\href{../valid/conventions.html#aux-unroll-deftype}{\mathrm{unroll}}}(C{.}\href{../valid/conventions.html#context}{\mathsf{types}}{}[x])\)</span> is of the form <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-subtype}{\mathsf{sub}}~\epsilon~{{x'}^\ast}~{\href{../syntax/types.html#syntax-comptype}{\mathit{comptype}}'})\)</span>.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -563,7 +563,7 @@ preventing cyclic subtype hierarchies.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The <a class="reference internal" href="../syntax/types.html#syntax-rectype"><span class="std std-ref">recursive type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}}\)</span> is <a class="reference internal" href="#valid-rectype"><span class="std std-ref">valid</span></a> for <span class="math notranslate nohighlight">\(({\href{../valid/types.html#valid-subtype}{\mathsf{ok}}}{(x)})\)</span>.</p></li>
-<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-rectype"><span class="std std-ref">recursive type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}}\)</span> is equal to <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^{n}})\)</span>.</p></li>
+<li><p>The <a class="reference internal" href="../syntax/types.html#syntax-rectype"><span class="std std-ref">recursive type</span></a> <span class="math notranslate nohighlight">\({\href{../syntax/types.html#syntax-rectype}{\mathit{rectype}}}\)</span> is of the form <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-rectype}{\mathsf{rec}}~{{\href{../syntax/types.html#syntax-subtype}{\mathit{subtype}}}^{n}})\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(i\)</span> is less than <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
 </ul>
 </div></blockquote>
