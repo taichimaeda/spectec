@@ -198,7 +198,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-unop"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\mathit{nt}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-unop}{\mathit{unop}}}}{{}_{{\mathit{nt}}}(c_1)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-unop}{\mathit{unop}}}}{{}_{{\mathit{nt}}}(c_1)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
@@ -219,7 +219,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-binop"><span class="std std-ref">validation</span></a>, a <a class="reference internal" href="runtime.html#syntax-num"><span class="std std-ref">number value</span></a> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-binop}{\mathit{binop}}}}{{}_{{\mathit{nt}}}(c_1, c_2)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-binop}{\mathit{binop}}}}{{}_{{\mathit{nt}}}(c_1, c_2)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
@@ -266,7 +266,7 @@ which maps to the generic <span class="math notranslate nohighlight">\(\href{../
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-cvtop"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-numtype"><span class="std std-ref">number type</span></a> <span class="math notranslate nohighlight">\({\mathit{nt}}_1\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\(({\href{../syntax/types.html#syntax-numtype}{\mathit{numtype}}}_0{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-cvtop}{\mathit{cvtop}}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-cvtop}{\mathit{cvtop}}}}{{}_{{\mathit{nt}}_1, {\mathit{nt}}_2}(c_1)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
@@ -1826,7 +1826,7 @@ respectively.</p>
 <ol class="arabic simple">
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-vunop"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vunop}{\mathit{vunop}}}}{{}_{{\mathit{sh}}}(c_1)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vunop}{\mathit{vunop}}}}{{}_{{\mathit{sh}}}(c_1)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
@@ -1847,7 +1847,7 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-vbinop"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vbinop}{\mathit{vbinop}}}}{{}_{{\mathit{sh}}}(c_1, c_2)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vbinop}{\mathit{vbinop}}}}{{}_{{\mathit{sh}}}(c_1, c_2)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
@@ -1870,7 +1870,7 @@ respectively.</p>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_2)\)</span> from the stack.</p></li>
 <li><p>Assert: Due to <a class="reference internal" href="../valid/instructions.html#valid-vternop"><span class="std std-ref">validation</span></a>, a value of <a class="reference internal" href="../syntax/types.html#syntax-vectype"><span class="std std-ref">vector type</span></a> <span class="math notranslate nohighlight">\(\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}\)</span> is on the top of the stack.</p></li>
 <li><p>Pop the value <span class="math notranslate nohighlight">\((\href{../syntax/types.html#syntax-vectype}{\mathsf{v\scriptstyle128}}{.}\href{../syntax/instructions.html#syntax-instr-numeric}{\mathsf{const}}~c_1)\)</span> from the stack.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\({|{{\href{../syntax/instructions.html#syntax-vternop}{\mathit{vternop}}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)}|} \leq 0\)</span>, then:</p>
+<li><p>If <span class="math notranslate nohighlight">\({{\href{../syntax/instructions.html#syntax-vternop}{\mathit{vternop}}}}{{}_{{\mathit{sh}}}(c_1, c_2, c_3)}\)</span> is empty, then:</p>
 <ol class="loweralpha simple">
 <li><p>Trap.</p></li>
 </ol>
