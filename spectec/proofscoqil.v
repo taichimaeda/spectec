@@ -3108,7 +3108,7 @@ Proof.
 	- (* IF *) inversion H; subst; try discriminate.
 		destruct H4.
 		exists [].
-		simpl. injection Eadmininstr__IFELSE0 as H10. subst. 
+		simpl. injection H3 as H10. subst. 
 		repeat split => //. 
 	- (* Weakening *) edestruct IHHType as [? [? [? ?]]]=> //=; subst.
 	exists (v_t ++ x). 
@@ -4503,15 +4503,11 @@ Proof.
 	apply Admin_instrs_ok__frame.
 	rewrite <- admin_instrs_ok_eq.
 	apply Admin_instr_ok__call_addr.
-	destruct v_C.
-	destruct v_S.
-	destruct r_v_f.
-	destruct frame__MODULE0.
 	unfold fun_table in H4.
 	unfold fun_type in H5.
 	unfold fun_table in H2.
 	simpl in *.
-	assert ((functype__ tn tm) = funcinst__TYPE (lookup_total store__FUNCS0 v_a)) as HFType; first by eapply tc_func_reference2; eauto.
+	assert ((functype__ tn tm) = funcinst__TYPE (lookup_total (store__FUNCS v_S) v_a)) as HFType; first by eapply tc_func_reference2; eauto.
 	rewrite -> HFType.
 	eapply store_typed_exterval_types; eauto.
 Qed.
@@ -4780,7 +4776,7 @@ Proof.
 	move => t.
 	induction t => //.
 	apply Forall2_cons_iff. split.
-	- induction a. induction tableinst__TYPE0. apply Table_extension__ => //.
+	- destruct a as [type refs]. destruct type. apply Table_extension__ => //.
 	- apply IHt.
 Qed.
 
@@ -4790,7 +4786,7 @@ Proof.
 	move => m.
 	induction m => //.
 	apply Forall2_cons_iff. split.
-	- induction a. induction meminst__TYPE0. apply Mem_extension__ => //.
+	- destruct a as [type bytes]. destruct type. apply Mem_extension__ => //.
 	- apply IHm.
 Qed.
 
@@ -4853,9 +4849,9 @@ Lemma Forall2_global: forall v_S v_globaltype v_idx v_val_0 v_valtype v_val_,
 		(fun g => g <| globalinst__VALUE := (val__CONST v_valtype v_val_) |> )).
 Proof.
 	move => v_S v_globaltype v_idx v_val0 v_valtype v_val_.
-	destruct v_S; simpl.
+	destruct v_S as [funcs globals tables mems]; simpl.
 	move: v_idx v_globaltype.
-	induction store__GLOBALS0; move => v_idx v_globaltype HGlobalInstOk H H2 => //=.
+	induction globals; move => v_idx v_globaltype HGlobalInstOk H H2 => //=.
 	destruct v_idx => //=.
 	
 	apply Forall2_cons_iff. unfold lookup_total in H2; simpl in H2; subst. split.
@@ -4872,7 +4868,7 @@ Proof.
 			apply Global_extension__. right => //.
 		- unfold lookup_total in H2. simpl in H2. 
 			destruct v_globaltype; inversion HGlobalInstOk.
-			eapply IHstore__GLOBALS0 => //=.
+			eapply IHglobals => //=.
 			- 
 				apply Forall2_length in H6.
 				apply Forall2_forall2; split => //=.
@@ -5191,10 +5187,10 @@ Lemma global_instance_fine: forall s s' v_globaltype v_f v_x v_valtype v_val_,
 Proof.
 	move => s s' v_globaltype v_f v_x v_valtype v_val_ HGlobalInstOk HGlobExt HFEq HTab HMems HGlob.
 
-	destruct s. destruct s'.
-	simpl in *. subst store__FUNCS0. subst store__TABLES0. subst store__MEMS0.
+	destruct s as [funcs1 globals1 tables1 mems1]. destruct s' as [funcs2 globals2 tables2 mems2].
+	simpl in *. subst funcs1. subst tables1. subst mems1.
 	generalize dependent v_globaltype.
-	induction store__GLOBALS0; move => v_globaltype HGlobalInstOk; apply Forall2_length in HGlobalInstOk as H'.
+	induction globals1; move => v_globaltype HGlobalInstOk; apply Forall2_length in HGlobalInstOk as H'.
 	- symmetry in H'. 
 		apply List.length_zero_iff_nil in H'. 
 		subst. 
@@ -5240,7 +5236,7 @@ Proof.
 	move => s s' f C v_valtype v_val_ v_x v_mut v_valtype0 v_val_0 HSOK Hext HIT HITS' HUpdate HGlobInst HLGlobal HFeq HTeq HMeq HLength.
 	inversion HSOK; decomp.
 	inversion Hext; decomp; subst.
-	destruct s'.
+	destruct s' as [funcs2 globals2 tables2 mems2].
 	apply f_equal with (f := fun t => List.length t) in HMeq as ?.
 	apply f_equal with (f := fun t => List.length t) in HTeq as ?.
 	apply f_equal with (f := fun t => List.length t) in HFeq as ?.
@@ -5252,7 +5248,7 @@ Proof.
 	eapply Store_ok__OK with (v_funcinst := v_funcinst) (v_functype := v_functype)
 		(v_tableinst := v_tableinst) (v_tabletype := v_tabletype)
 		(v_meminst := v_meminst) (v_memtype := v_memtype)
-		(v_globalinst := store__GLOBALS0) (v_globaltype := v_globaltype); subst; repeat split => //=.
+		(v_globalinst := globals2) (v_globaltype := v_globaltype); subst; repeat split => //=.
 	- rewrite HLGlobal in H1 => //=. 
 	- f_equal => //=.
 	- apply Forall2_forall2; split => //=. move => x y HIn.
@@ -5261,10 +5257,10 @@ Proof.
 		eapply module_inst_typing_extension; eauto.
 	- eapply Forall2_list_update_func; eauto.
 		- remember ({|
-				store__FUNCS := store__FUNCS0;
+				store__FUNCS := funcs2;
 				store__GLOBALS := v_globalinst;
-				store__TABLES := store__TABLES0;
-				store__MEMS := store__MEMS0
+				store__TABLES := tables2;
+				store__MEMS := mems2
 			|}) as s.
 			assert (v_globalinst = (store__GLOBALS s)). {by subst. }
 			rewrite H11.
@@ -5979,8 +5975,8 @@ Theorem t_preservation: forall c1 ts c2,
 	Config_ok c2 ts.
 Proof.
 	move => c1 ts c2 HReduce HType.
-	induction c1; induction v_state.
-	induction c2. induction v_state.
+	destruct c1; destruct v_state as [store1 frame1].
+	destruct c2; destruct v_state as [store2 frame2].
 	inversion HType; destruct H3.
 	inversion H4; destruct H5.
 	rewrite <- upd_return_is_same_as_append in H11.
@@ -5989,26 +5985,26 @@ Proof.
 	subst.
 	rewrite <- upd_local_return_is_same_as_append in H11.
 	apply upd_label_unchanged_typing in H11.
-	assert (Store_extension v_store v_store0 /\ Store_ok v_store0).
+	assert (Store_extension store1 store2 /\ Store_ok store2).
 	{
 		apply (store_extension_reduce 
-			v_store  
+			store1  
 			{|frame__LOCALS := v_val;frame__MODULE := v_moduleinst|} 
-			v__ v_store0 v_frame0 v__0 v_C0 (functype__ [::] ts) 
+			v__ store2 frame2 v__0 v_C0 (functype__ [::] ts) 
 			(_append v_t1 (context__LOCALS v_C0)) 
 			(context__LABELS (upd_local_return v_C0 (_append v_t1 (context__LOCALS v_C0)) (_append (option_map [eta Some] None) (context__RETURN v_C0))))
 			(_append (Some None) (context__RETURN v_C0))) => //.
 	}
 	destruct H.
 	apply reduce_inst_unchanged in HReduce as HModuleInst.
-	induction v_frame0.
+	destruct frame2 as [locals2 module2].
 	simpl in HModuleInst.
 	remember {|frame__LOCALS := v_val;frame__MODULE := v_moduleinst|} as f.
-	assert (Module_instance_ok v_store0 v_moduleinst v_C0). { apply (module_inst_typing_extension v_store); eauto. }
+	assert (Module_instance_ok store2 v_moduleinst v_C0). { apply (module_inst_typing_extension store1); eauto. }
 	apply Config_ok__; split => //=.
 	eapply Thread_ok__; split => //=.
 	rewrite <- HModuleInst.
-	eapply (Frame_ok__ v_store0 frame__LOCALS0 v_moduleinst v_C0 v_t1); eauto.
+	eapply (Frame_ok__ store2 locals2 v_moduleinst v_C0 v_t1); eauto.
 	apply (t_preservation_vs_type) with (v_t1 := v_t1) (C := v_C0) (C' := v_C0) 
 		(lab:= (context__LABELS (upd_local_return v_C0 (_append v_t1 (context__LOCALS v_C0)) (_append (option_map [eta Some] None) (context__RETURN v_C0))))) 
 		(ret:= (_append (Some None) (context__RETURN v_C0))) (t1s := []) (t2s := ts) in HReduce as H10; try destruct H10; try apply Forall2_length in H10; repeat split => //.

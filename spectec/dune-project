@@ -1,3 +1,5 @@
 (lang dune 3.0)
 (using menhir 2.0)
+(using coq 0.3)
+(implicit_transitive_deps true)
 (using mdx 0.2)

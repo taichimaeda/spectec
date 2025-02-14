@@ -1,0 +1,5 @@
+(coq.theory
+  (name WasmSpectec)
+  (package test-coq)
+  (flags -w -notation-overridden -w -abstract-large-number))
+
