@@ -441,7 +441,7 @@ let rec transform_premise (p : prem) =
   match p.it with
     | IfPr exp -> P_if (transform_exp exp)
     | ElsePr -> P_else
-    | LetPr _ -> P_unsupported ("LetPr: " ^ string_of_prem p)
+    | LetPr (exp1, exp2, _) -> P_if (T_app_infix (T_exp_basic T_eq, transform_exp exp1, transform_exp exp2))
     | IterPr (p, (iter, id_types)) -> let t_iter = if iter = Opt then I_option else I_list in
       P_listforall (t_iter, transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
     | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp transform_exp exp)
