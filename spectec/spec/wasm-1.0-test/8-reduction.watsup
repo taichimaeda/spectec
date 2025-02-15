@@ -8,12 +8,12 @@ relation Step_read: config ~> admininstr*       hint(show "E")
 relation Steps: config ~>* config               hint(show "E")
 
 rule Step/pure:
-  z; instr*  ~>  z; instr'*
-  -- Step_pure: instr* ~> instr'*
+  z; admininstr*  ~>  z; admininstr'*
+  -- Step_pure: admininstr* ~> admininstr'*
 
 rule Step/read:
-  z; instr*  ~>  z; instr'*
-  -- Step_read: z; instr* ~> instr'*
+  z; admininstr*  ~>  z; admininstr'*
+  -- Step_read: z; admininstr* ~> admininstr'*
 
 rule Steps/refl:
   z; admininstr* ~>* z; admininstr*
@@ -65,7 +65,8 @@ rule Step_read/block:
   -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
 
 rule Step_read/loop:
-  z; (LOOP t? instr*)  ~>  (LABEL_ 0 `{LOOP t? instr*} instr*)
+  z; (LOOP t? instr*)  ~>  (LABEL_ n `{LOOP t? instr*} instr*)
+  -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
 
 rule Step_pure/if-true:
   (CONST (INN I32) c) (IF t? instr_1* ELSE instr_2*)  ~>  (BLOCK t? instr_1*)
@@ -84,11 +85,11 @@ rule Step_pure/label-vals:
 
 ;; TODO: may want a label context instead of bubbling up
 rule Step_pure/br-zero:
-  (LABEL_ n `{instr'*} val'* val^n (BR 0) instr*)  ~>  val^n instr'*
+  (LABEL_ n `{instr*} val'* val^n (BR 0) admininstr*)  ~>  val^n instr*
   -- if |val^n| = n
 
 rule Step_pure/br-succ:
-  (LABEL_ n `{instr'*} val* (BR $(l+1)) instr*)  ~>  val* (BR l)
+  (LABEL_ n `{instr*} val* (BR $(l+1)) admininstr*)  ~>  val* (BR l)
 
 
 rule Step_pure/br_if-true:
@@ -136,20 +137,20 @@ rule Step_pure/frame-vals:
   (FRAME_ n `{f} val^n)  ~>  val^n
 
 rule Step_pure/return-frame:
-  (FRAME_ n `{f} val'* val^n RETURN instr*)  ~>  val^n
+  (FRAME_ n `{f} val'* val^n RETURN admininstr*)  ~>  val^n
   -- if |val^n| = n
 
 rule Step_pure/return-label:
-  (LABEL_ n `{instr'*} val* RETURN instr*)  ~>  val* RETURN
+  (LABEL_ n `{instr*} val* RETURN admininstr*)  ~>  val* RETURN
 
 ;; Traps
 
 rule Step_pure/trap-vals:
-  val* TRAP instr*  ~>  TRAP
-  -- if val* =/= eps \/ instr* =/= eps
+  val* TRAP admininstr*  ~>  TRAP
+  -- if val* =/= eps \/ admininstr* =/= eps
 
 rule Step_pure/trap-label:
-  (LABEL_ n `{instr'*} TRAP)  ~>  TRAP
+  (LABEL_ n `{instr*} TRAP)  ~>  TRAP
 
 rule Step_pure/trap-frame:
   (FRAME_ n `{f} TRAP)  ~>  TRAP
@@ -157,13 +158,17 @@ rule Step_pure/trap-frame:
 
 ;; Context
 
+rule Step/ctxt-seq:
+  z; val* admininstr* admininstr''* ~>  z'; val* admininstr'* admininstr''*
+  -- Step: z; admininstr* ~> z'; admininstr'*
+
 rule Step/ctxt-label:
-  z; (LABEL_ n `{instr_0*} instr*)  ~>  z'; (LABEL_ n `{instr_0*} instr'*)
-  -- Step: z; instr* ~> z'; instr'*
+  z; (LABEL_ n `{instr*} admininstr*)  ~>  z'; (LABEL_ n `{instr*} admininstr'*)
+  -- Step: z; admininstr* ~> z'; admininstr'*
 
 rule Step/ctxt-frame:
-  s; f; (FRAME_ n `{f'} instr*)  ~>  s'; f; (FRAME_ n `{f'} instr'*)
-  -- Step: s; f'; instr* ~> s'; f'; instr'*
+  s; f; (FRAME_ n `{f'} admininstr*)  ~>  s'; f; (FRAME_ n `{f'} admininstr'*)
+  -- Step: s; f'; admininstr* ~> s'; f'; admininstr'*
 
 ;; Numeric instructions
 
