@@ -773,13 +773,13 @@ Proof.
 
 	gen_ind_subst HType => //.
 	- (* Instr *) inversion H; subst; try discriminate.
-	- (* Call Addr *) inversion H; destruct H4. subst. rewrite H5 in H3. injection H3 as ?. subst. inversion HST; decomp.
+	- (* Call Addr *) inversion H; destruct H4. subst. rewrite -H5 in H3. injection H3 as ?. subst. inversion HST; decomp.
 		apply Forall2_lookup in H8; destruct H8.
 		rewrite H7 in H4. simpl in H4.
 		apply H12 in H4.
 		rewrite  H7 in H5.
 		simpl in H5.
-		rewrite H5 in H4.
+		rewrite -H5 in H4.
 		inversion H4; destruct H15 as [? [? ?]].
 		inversion H20; destruct H23 as [? [? ?]].
 		inversion H29.
@@ -826,11 +826,10 @@ Lemma Load_typing: forall v_S v_C t v_memop v_ww_sx t1s t2s,
 Proof.
 	move => v_S v_C t v_memop v_ww_sx t1s t2s HType.
 	gen_ind_subst HType => //=.
-	- (* Load *) inversion H; subst; try discriminate; destruct H4 as [? [? [? [? [? ?]]]]].
-		injection H3 as ?. exists [], v_n, v_sx, v_inn, v_mt. subst. repeat split => //=.
-		destruct H6. 
-		- left => //=. 
-		- right. f_equal. apply H2.
+	- (* Load *) inversion H; subst; try discriminate; destruct H4 as [? [? [? [? [? ?]]]]]; 
+		injection H3 as ?; exists [], v_n, v_sx, v_inn, v_mt; subst; repeat split => //=.
+		- (* Load 0 *) by left.
+		- (* Load 1 *) by right.
 	- (* Weakening *) edestruct IHHType as [ts [v_n [v_sx [v_inn [v_mt [? [? [? [? [? [? [? [? ?]]]]]]]]]]]]] => //=.
 	exists (v_t ++ ts), v_n, v_sx, v_inn, v_mt. subst. repeat split => //=; try repeat rewrite <- app_assoc; eauto.
 Qed.
@@ -848,8 +847,10 @@ Lemma Store_typing: forall v_S v_C t v_ww v_memop t1s t2s,
 Proof.
 	move => v_S v_C t v_ww v_memop t1s t2s HType.
 	gen_ind_subst HType => //=.
-	- (* Store *) inversion H; subst; try discriminate. destruct H4 as [? [? [? [? ?]]]].
-		injection H3 as ?. exists v_n, v_mt, v_inn. subst. repeat split => //=.
+	- (* Store *) inversion H; subst; try discriminate; destruct H4 as [? [? [? [? ?]]]];
+		injection H3 as ?; exists v_n, v_mt, v_inn; subst; repeat split => //=.
+		- by left.
+		- by right.
 	- (* Weakening *) edestruct IHHType as [v_n [v_mt [v_inn [? [? [? [? [? ?]]]]]]]] => //=.
 	exists v_n, v_mt, v_inn. subst. repeat split => //=; try repeat rewrite <- app_assoc; eauto.
 Qed.
