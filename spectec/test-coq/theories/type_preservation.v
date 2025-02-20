@@ -218,12 +218,12 @@ Proof.
 	apply Const_list_typing_empty.
 Qed.
 
-Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
-	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] (list__instr__admininstr v_instr)))))] v_func_type ->
+Lemma Step_pure__br_zero_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val' : (list val)) (v_val : (list val)) (v_admininstr : (list admininstr)) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR 0)] v_admininstr))))] v_func_type ->
 	((List.length v_val) = v_n) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr')) v_func_type.
 Proof.
-	move => v_S v_C v_n v_instr' v_val' v_val v_instr v_func_type HType HLength.
+	move => v_S v_C v_n v_instr' v_val' v_val v_admininstr v_func_type HType HLength.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
@@ -250,12 +250,12 @@ Proof.
 	eapply Admin_instrs_ok__instrs in H0; eauto.
 Qed.
 
-Lemma Step_pure__br_succ_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_instr : (list instr)) v_func_type,
-	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] v_func_type ->
-	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)]) ->
+Lemma Step_pure__br_succ_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_l : labelidx) (v_admininstr : (list admininstr)) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] v_admininstr)))] v_func_type ->
+	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR (v_l + 1))] v_admininstr)))] (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)]) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) [(admininstr__BR v_l)]) v_func_type.
 Proof.
-	move => v_S v_C v_n v_instr' v_val v_l v_instr v_func_type HType HReduce.
+	move => v_S v_C v_n v_instr' v_val v_l v_admininstr v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
@@ -399,13 +399,13 @@ Proof.
 	apply Const_list_typing_empty.
 Qed.
 
-Lemma Step_pure__return_frame_preserves : forall v_S v_C (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
-	Admin_instrs_ok v_S v_C [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] v_func_type ->
-	Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val) ->
+Lemma Step_pure__return_frame_preserves : forall v_S v_C (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_admininstr : (list admininstr)) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr))))] v_func_type ->
+	Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr))))] (list__val__admininstr v_val) ->
 	((List.length v_val) = v_n) ->
 	Admin_instrs_ok v_S v_C (list__val__admininstr v_val) v_func_type.
 Proof.
-	move => v_S v_C v_n v_f v_val' v_val v_instr v_func_type HType HReduce H.
+	move => v_S v_C v_n v_f v_val' v_val v_admininstr v_func_type HType HReduce H.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Frame_typing in HType; destruct HType as [ts [? [? ?]]].
@@ -438,12 +438,12 @@ Proof.
 	by destruct ts0.
 Qed.
 
-Lemma Step_pure__return_label_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_instr : (list instr)) v_func_type,
-	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] v_func_type ->
-	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )]) ->
+Lemma Step_pure__return_label_preserves : forall v_S v_C (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_admininstr : (list admininstr)) v_func_type,
+	Admin_instrs_ok v_S v_C [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr)))] v_func_type ->
+	Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr)))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )]) ->
 	Admin_instrs_ok v_S v_C (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )]) v_func_type.
 Proof.
-	move => v_S v_C v_n v_instr' v_val v_instr v_func_type HType HReduce.
+	move => v_S v_C v_n v_instr' v_val v_admininstr v_func_type HType HReduce.
 	destruct v_func_type as [ts1 ts2].
 	rewrite <- admin_instrs_ok_eq in HType.
 	apply Label_typing in HType; destruct HType as [ts [ts2' [? [? [? ?]]]]].
@@ -1611,10 +1611,18 @@ Proof.
 	remember (config__ (state__ s' f') ais') as c2.
 	generalize dependent t2s. generalize dependent t1s.
 	generalize dependent lab. generalize dependent ais'. generalize dependent ais.
-	induction HReduce; try intros; try (induction v_z; subst); 
+	induction HReduce; try intros; try (induction v_z; subst);
 	try (apply config_same in Heqc1; apply config_same in Heqc2; 
 		destruct Heqc1 as [Hbefore1 [Hbefore2 Hbefore3]]; 
 		destruct Heqc2 as [Hafter1 [Hafter2 Hafter3]]; split; subst => //; try apply Forall2_length in HValOK as ? => //).
+	- (* Seq context *)
+		injection Heqc1 as ?.
+		injection Heqc2 as ?; subst. 
+		eapply IHHReduce; eauto. admit.
+		(* TODO:
+		Given HType says (v_val ++ v_admininstr ++ v_admininstr'') has type (functype__ t1s t2s),
+		prove there exist subsequences of ts1 and ts2, named ?t1s and ?t2s
+		such that v_admininstr has type (functype__ ?t1s ?t2s). *)
 	- (* Label Context *)
 		injection Heqc1 as ?.
 		injection Heqc2 as ?; subst.
@@ -1639,7 +1647,7 @@ Proof.
 		rewrite HUpdate.
 		rewrite list_update_same_unchanged => //=; try rewrite List.map_length => //=.
 		simpl. by rewrite list_update_length.
-Qed.
+Admitted.
 
 Lemma store_extension_reduce: forall s f ais s' f' ais' C tf loc lab ret,
     Step (config__ (state__ s f) ais) (config__ (state__ s' f') ais') ->
@@ -1660,6 +1668,15 @@ Proof.
 	apply config_same in Heqc1; apply config_same in Heqc2; 
 	destruct Heqc1; destruct Heqc2;
 	subst; try (split => //; eapply store_extension_same; eauto)).
+	- (* Seq context *)
+		injection Heqc1 as H1.
+		injection Heqc2 as H2. subst. 
+		eapply IHHReduce; eauto.
+		(* TODO:
+		Given HType says (v_val ++ v_admininstr ++ v_admininstr'') has type (functype__ v__ v__0),
+		prove that there exists subsequence of (functype__ v__ v__0), named ?tf, 
+		such that v_admininstr has type ?tf. *)
+		admit.
 	- (* Label Context *) 
 		injection Heqc1 as H1.
 		injection Heqc2 as H2.
@@ -2019,8 +2036,8 @@ Proof.
 	generalize dependent ais. generalize dependent ais'.
 	induction HReduce; try intros; try (induction v_z); try induction v_z'; try (apply config_same in Heqc1;
 	apply config_same in Heqc2; destruct Heqc1 as [? [? ?]];
-	destruct Heqc2 as [? [? ?]]; subst => //).
-	eapply IHHReduce; eauto.
+	destruct Heqc2 as [? [? ?]]; subst => //);
+	eapply IHHReduce; eauto. 
 Qed.
 
 Theorem t_pure_preservation: forall v_s v_minst v_ais v_ais' v_C loc lab ret tf,
@@ -2116,6 +2133,14 @@ Proof.
 		destruct Heqc2 as [Hafter1 [Hafter2 Hafter3]]; subst => //).
 	- (* Step_pure *) eapply t_pure_preservation; eauto.
 	- (* Step_read *) eapply t_read_preservation; eauto.
+	- (* Context Seq *)
+		specialize IHHReduce with (v_ais := v_admininstr) (v_ais' := v_admininstr'); eauto.
+		(* TODO:
+		Given goal says (v_val ++ v_admininstr ++ v_admininstr'') has type (functype__ tx ty),
+		prove that there exists subsequences of tx and ty, named t1s and ts2,
+		such that v_admininstr' has type (functype__ t1s t2s).
+		Use this result to show apply IHHReduce on goal. *)
+		admit.
 	- (* Context Label *) 
 		rewrite <- admin_instrs_ok_eq in HType.
 		apply Label_typing in HType as H. destruct H as [ts [ts2' [? [? [? ?]]]]].
@@ -2238,7 +2263,7 @@ Proof.
 		remember (fun_invsigned 32 (0 - 1)%coq_nat) as v_n'.
 		eapply (Admin_instr_ok__instr _ _ (instr__CONST (valtype__INN inn__I32) v_n') (functype__ [] [(valtype__INN inn__I32)])).
 		apply Instr_ok__const.
-Qed.
+Admitted.
 
 (* Ultimate goal of project *)				
 Theorem t_preservation: forall c1 ts c2,

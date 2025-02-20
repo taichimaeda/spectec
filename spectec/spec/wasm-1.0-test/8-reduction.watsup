@@ -65,8 +65,7 @@ rule Step_read/block:
   -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
 
 rule Step_read/loop:
-  z; (LOOP t? instr*)  ~>  (LABEL_ n `{LOOP t? instr*} instr*)
-  -- if t? = eps /\ n = 0 \/ t? =/= eps /\ n = 1  ;; TODO: allow |t?|
+  z; (LOOP t? instr*)  ~>  (LABEL_ 0 `{LOOP t? instr*} instr*)
 
 rule Step_pure/if-true:
   (CONST (INN I32) c) (IF t? instr_1* ELSE instr_2*)  ~>  (BLOCK t? instr_1*)
