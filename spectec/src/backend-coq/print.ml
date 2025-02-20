@@ -224,7 +224,7 @@ let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) =
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
   prefix ^ id ^ ": " ^ string_of_relation_args args ^ " -> Prop :=\n\t" ^
   String.concat "\n\t" (List.map (fun ((case_id, binds), premises, end_terms) ->
-    let string_prems = String.concat " /\\ " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
+    let string_prems = String.concat " -> " (List.map string_of_premise premises) ^ (if premises <> [] then " -> " else "") in
     let forall_quantifiers = if binds <> [] then "forall " ^ string_of_binders binds ^ ", " else ""in
     "| " ^ case_id ^ " : " ^ forall_quantifiers ^ string_prems ^ id ^ " " ^ String.concat " " (List.map string_of_terms end_terms)
   ) relations)
