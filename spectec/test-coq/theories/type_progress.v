@@ -374,7 +374,8 @@ Proof.
 Admitted.
 
 (* NOTE: Mutual induction principle used in t_progress_e *)
-Scheme Admin_instrs_ok_ind' := Induction for Admin_instrs_ok Sort Prop
+Scheme Admin_instr_ok_ind' := Induction for Admin_instr_ok Sort Prop
+  with Admin_instrs_ok_ind' := Induction for Admin_instrs_ok Sort Prop
   with Thread_ok_ind' := Induction for Thread_ok Sort Prop.
 
 (* MEMO: AI_local -> Admininstr__FRAME_ *)
@@ -387,7 +388,7 @@ Scheme Admin_instrs_ok_ind' := Induction for Admin_instrs_ok Sort Prop
 Lemma t_progress_e: forall s C C' f vcs es tf ts1 ts2 lab ret,
   Admin_instrs_ok s C es tf ->
   tf = functype__ ts1 ts2 ->
-  C = (upd_label (upd_local_return C' (map typeof f.(frame__LOCALS)) ret) lab) ->
+  C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
   Module_instance_ok s f.(frame__MODULE) C' ->
   map typeof vcs = ts1 ->
   Store_ok s ->
@@ -396,7 +397,49 @@ Lemma t_progress_e: forall s C C' f vcs es tf ts1 ts2 lab ret,
   terminal_form (list__val__admininstr vcs ++ es) \/
   exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ es)) (config__ (state__ s' f') es').
 Proof.
-  move => s C C' f vcs es tf ts1 ts2 lab ret.
+  move => s C C' f vcs es tf ts1 ts2 lab ret Hadmin.
+  move: f C' vcs ts1 ts2 lab ret.
+  Check Admin_instr_ok_ind'.
+  induction Hadmin using Admin_instrs_ok_ind' with 
+    (P := fun s C e tf (Hadmin : Admin_instr_ok s C e tf) => 
+      forall f C' vcs ts1 ts2 lab ret,
+      tf = functype__ ts1 ts2 ->
+      C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
+      Module_instance_ok s f.(frame__MODULE) C' ->
+      map typeof vcs = ts1 ->
+      Store_ok s ->
+      (* not_lf_br_outside [:: e] -> *)
+      (* not_lf_return [:: e] -> *)
+      terminal_form (list__val__admininstr vcs ++ [:: e]) \/
+      exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ [:: e])) (config__ (state__ s' f') es'))
+    (P0 := fun s C es tf (Hadmin : Admin_instrs_ok s C es tf) => 
+      forall f C' vcs ts1 ts2 lab ret,
+      tf = functype__ ts1 ts2 ->
+      C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
+      Module_instance_ok s f.(frame__MODULE) C' ->
+      map typeof vcs = ts1 ->
+      Store_ok s ->
+      (* not_lf_br_outside es -> *)
+      (* not_lf_return es -> *)
+      terminal_form (list__val__admininstr vcs ++ es) \/
+      exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ es)) (config__ (state__ s' f') es'))
+    (P1 := fun s rs f es ts (Hthread : Thread_ok s rs f es ts) =>
+      Store_ok s ->
+      (* not_lf_br_outside es -> *)
+      (* not_lf_return es -> *)
+      (const_list es /\ length es = length ts) \/
+      es = [::admininstr__TRAP] \/
+      exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es')).
+  Print Admin_instrs_ok.
+  - (* TODO:
+    Given vcs : seq val, prove vcs is terminal *)
+    by admit.
+  - (* TODO:
+    Given  *) 
+    by admit.
+  - by admit.
+  - by admit.
+  - by admit.
 Admitted.
 
 Theorem t_progress: forall s f es ts,
@@ -415,7 +458,7 @@ Proof.
     unfold _append, Append_Option, option_append in Hadmin.
     suff Heqc:
       (upd_return C (Some None)) =
-      (upd_label (upd_local_return C' (map typeof (frame__LOCALS f)) (Some None)) [::]).
+      (upd_local_label_return C' (map typeof (frame__LOCALS f)) [::] (Some None)).
     + by rewrite -Heqc {Heqc}.
     + have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
       { (* TODO:
@@ -433,7 +476,7 @@ Proof.
         vm_compute. destruct v_C.
         (* TODO:
         Given Module_instance_ok s v_moduleinst v_C,
-        prove context__LABELS v_C = [::]. *)
+        prove context__LABELS v_C = None. *)
         by admit. }
       destruct C' eqn:HeqC'. inversion HeqC'. subst.
       rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
