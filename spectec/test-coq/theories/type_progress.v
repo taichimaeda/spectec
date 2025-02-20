@@ -1,4 +1,4 @@
-(* From Coq Require Import String List Unicode.Utf8.
+From Coq Require Import String List Unicode.Utf8.
 From RecordUpdate Require Import RecordSet.
 Require Import NArith.
 Require Import Arith.
@@ -105,7 +105,7 @@ Lemma reduce_trap_left: forall vs,
 Proof.
   move => vs HConst H.
   apply const_es_exists in HConst as [vcs ->].
-  eapply Step_pure__trap_vals with (v_val := vcs) (v_instr := [::]) => //=.
+  eapply Step_pure__trap_vals with (v_val := vcs) (v_admininstr := [::]) => //=.
   rewrite /list__val__admininstr in H.
   left. by apply/map_nonempty: H.
 Qed.
@@ -353,8 +353,8 @@ Lemma t_progress_be: forall C bes ts1 ts2 vcs lab ret s f,
     Module_instance_ok s f.(frame__MODULE) C ->
     Instrs_ok (upd_label (upd_local_return C (map typeof f.(frame__LOCALS)) ret) lab) bes (functype__ ts1 ts2) ->
     map typeof vcs = ts1 ->
-    not_lf_br (list__instr__admininstr bes) ->
-    not_lf_return (list__instr__admininstr bes) ->
+    (* not_lf_br (list__instr__admininstr bes) -> *)
+    (* not_lf_return (list__instr__admininstr bes) -> *)
     const_list (list__instr__admininstr bes) \/
     exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es').
 Proof.
@@ -391,11 +391,12 @@ Lemma t_progress_e: forall s C C' f vcs es tf ts1 ts2 lab ret,
   Module_instance_ok s f.(frame__MODULE) C' ->
   map typeof vcs = ts1 ->
   Store_ok s ->
-  not_lf_br_outside es ->
-  not_lf_return es ->
+  (* not_lf_br_outside es -> *)
+  (* not_lf_return es -> *)
   terminal_form (list__val__admininstr vcs ++ es) \/
   exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ es)) (config__ (state__ s' f') es').
 Proof.
+  move => s C C' f vcs es tf ts1 ts2 lab ret.
 Admitted.
 
 Theorem t_progress: forall s f es ts,
@@ -403,4 +404,63 @@ Theorem t_progress: forall s f es ts,
   terminal_form es \/
   exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es').
 Proof.
-Admitted. *)
+  move => s f es ts Hconfig.
+  inversion Hconfig as [? ? ? ? [Hstore Hthread]]. subst.
+  inversion Hthread as [? ? ? ? ? C [Hframe Hadmin]]. subst.
+  pose C' := upd_local_label_return C [::] [::] None.
+  eapply t_progress_e with
+    (vcs := [::]) (lab := [::]) (ret := Some None)
+    (ts2 := ts) (C' := C') => //=.
+  - rewrite -upd_return_is_same_as_append in Hadmin.
+    unfold _append, Append_Option, option_append in Hadmin.
+    suff Heqc:
+      (upd_return C (Some None)) =
+      (upd_label (upd_local_return C' (map typeof (frame__LOCALS f)) (Some None)) [::]).
+    + by rewrite -Heqc {Heqc}.
+    + have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
+      { (* TODO:
+        Given Frame_ok s f C,
+        prove context__LABELS C = map typeof (frame__LOCALS f). *)
+        by admit. }
+      have Heq2 : context__LABELS C = [::].
+      { inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=.
+        (* TODO:
+        Given Module_instance_ok s v_moduleinst v_C,
+        prove context__LABELS v_C = [::]. *)
+        by admit. }
+      have Heq3 : context__RETURN C = None.
+      { inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=.
+        vm_compute. destruct v_C.
+        (* TODO:
+        Given Module_instance_ok s v_moduleinst v_C,
+        prove context__LABELS v_C = [::]. *)
+        by admit. }
+      destruct C' eqn:HeqC'. inversion HeqC'. subst.
+      rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
+      by unfold upd_local_return, upd_local, upd_return.
+  - clear Hstore Hthread Hadmin.
+    inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=. subst.
+    unfold _append, Append_context, _append_context in C'. simpl in C'.
+    suff Heqc : C' = v_C.
+    + by rewrite Heqc.
+    + (* Check inst_t_context_local_empty.  *)
+      have Heq1 : context__LOCALS v_C = [::].
+      { (* TODO:
+        Given Module_instance_ok s v_moduleinst v_C, 
+        prove context__LOCALS v_C = [::] *)
+        by admit. }
+      (* Check inst_t_context_label_empty. *)
+      have Heq2 : context__LABELS v_C = [::].
+      { (* TODO:
+        Given Module_instance_ok s v_moduleinst v_C, 
+        prove context__LABELS v_C = [::] *)
+        by admit. }
+      have Heq3 : context__RETURN v_C = None.
+      { (* TODO:
+        Given Module_instance_ok s v_moduleinst v_C, 
+        prove context__RETURN v_C = None *)
+        by admit. }
+      destruct C' eqn:HeqC'. inversion HeqC'. subst.
+      rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
+      by destruct v_C.
+Admitted.
