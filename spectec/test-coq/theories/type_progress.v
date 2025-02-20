@@ -448,8 +448,8 @@ Theorem t_progress: forall s f es ts,
   exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es').
 Proof.
   move => s f es ts Hconfig.
-  inversion Hconfig as [? ? ? ? [Hstore Hthread]]. subst.
-  inversion Hthread as [? ? ? ? ? C [Hframe Hadmin]]. subst.
+  inversion Hconfig as [? ? ? ? Hstore Hthread]. subst.
+  inversion Hthread as [? ? ? ? ? C Hframe Hadmin]. subst.
   pose C' := upd_local_label_return C [::] [::] None.
   eapply t_progress_e with
     (vcs := [::]) (lab := [::]) (ret := Some None)
@@ -466,24 +466,18 @@ Proof.
         prove context__LABELS C = map typeof (frame__LOCALS f). *)
         by admit. }
       have Heq2 : context__LABELS C = [::].
-      { inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=.
-        (* TODO:
-        Given Module_instance_ok s v_moduleinst v_C,
-        prove context__LABELS v_C = [::]. *)
-        by admit. }
+      { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
+        by inversion Hmod => //=. }
       have Heq3 : context__RETURN C = None.
-      { inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=.
-        vm_compute. destruct v_C.
-        (* TODO:
-        Given Module_instance_ok s v_moduleinst v_C,
-        prove context__LABELS v_C = None. *)
-        by admit. }
+      { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
+        by inversion Hmod => //=. }
       destruct C' eqn:HeqC'. inversion HeqC'. subst.
       rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
       by unfold upd_local_return, upd_local, upd_return.
   - clear Hstore Hthread Hadmin.
-    inversion Hframe as [? ? ? ? ? [Hlen [Hmod Hval]]] => {Hframe} //=. subst.
-    unfold _append, Append_context, _append_context in C'. simpl in C'.
+    inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
+    destruct v_C. inversion Hmod => //=.
+    (* unfold _append, Append_context, _append_context in C'. simpl in C'.
     suff Heqc : C' = v_C.
     + by rewrite Heqc.
     + (* Check inst_t_context_local_empty.  *)
@@ -505,5 +499,5 @@ Proof.
         by admit. }
       destruct C' eqn:HeqC'. inversion HeqC'. subst.
       rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-      by destruct v_C.
+      by destruct v_C. *)
 Admitted.

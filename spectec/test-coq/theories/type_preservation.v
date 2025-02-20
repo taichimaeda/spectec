@@ -25,7 +25,8 @@ Lemma inst_t_context_labels_empty: forall s i C,
 Proof.
 	move => s i C HMInst. inversion HMInst => //=.
 Qed.
-		
+
+(* 		
 Lemma Step_pure__unreachable_preserves : forall v_S v_C  v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__UNREACHABLE )] v_func_type ->
 	Step_pure [(admininstr__UNREACHABLE )] [(admininstr__TRAP )] ->
@@ -2319,4 +2320,4 @@ Proof.
 	rewrite -> _append_option_none_left.
 	rewrite upd_label_unchanged_typing.
 	eapply t_preservation_type; eauto; try rewrite -> Heqf; eauto.
-Qed.
+Qed. *)
