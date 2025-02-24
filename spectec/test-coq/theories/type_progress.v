@@ -455,49 +455,25 @@ Proof.
     (vcs := [::]) (lab := [::]) (ret := Some None)
     (ts2 := ts) (C' := C') => //=.
   - rewrite -upd_return_is_same_as_append in Hadmin.
-    unfold _append, Append_Option, option_append in Hadmin.
+    rewrite /_append /Append_Option /option_append in Hadmin.
     suff Heqc:
       (upd_return C (Some None)) =
       (upd_local_label_return C' (map typeof (frame__LOCALS f)) [::] (Some None)).
-    + by rewrite -Heqc {Heqc}.
+    + by rewrite -Heqc.
     + have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
-      { (* TODO:
-        Given Frame_ok s f C,
-        prove context__LABELS C = map typeof (frame__LOCALS f). *)
-        by admit. }
+      { inversion Hframe as [? ? ? ? ? ? Hmod Hval] => {Hframe} //=.
+        inversion Hmod => //=. rewrite List.app_nil_r.
+        by apply Forall2_Val_ok_is_same_as_map in Hval. }
       have Heq2 : context__LABELS C = [::].
       { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
         by inversion Hmod => //=. }
       have Heq3 : context__RETURN C = None.
       { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
         by inversion Hmod => //=. }
-      destruct C' eqn:HeqC'. inversion HeqC'. subst.
+      case HeqC': C'. inversion HeqC'. subst.
       rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-      by unfold upd_local_return, upd_local, upd_return.
+      by rewrite /upd_local_return /upd_local /upd_return.
   - clear Hstore Hthread Hadmin.
     inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
-    destruct v_C. inversion Hmod => //=.
-    (* unfold _append, Append_context, _append_context in C'. simpl in C'.
-    suff Heqc : C' = v_C.
-    + by rewrite Heqc.
-    + (* Check inst_t_context_local_empty.  *)
-      have Heq1 : context__LOCALS v_C = [::].
-      { (* TODO:
-        Given Module_instance_ok s v_moduleinst v_C, 
-        prove context__LOCALS v_C = [::] *)
-        by admit. }
-      (* Check inst_t_context_label_empty. *)
-      have Heq2 : context__LABELS v_C = [::].
-      { (* TODO:
-        Given Module_instance_ok s v_moduleinst v_C, 
-        prove context__LABELS v_C = [::] *)
-        by admit. }
-      have Heq3 : context__RETURN v_C = None.
-      { (* TODO:
-        Given Module_instance_ok s v_moduleinst v_C, 
-        prove context__RETURN v_C = None *)
-        by admit. }
-      destruct C' eqn:HeqC'. inversion HeqC'. subst.
-      rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-      by destruct v_C. *)
-Admitted.
+    case v_C in *. inversion Hmod => //=.
+Qed.
