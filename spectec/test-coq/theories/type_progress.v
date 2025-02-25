@@ -469,12 +469,18 @@ Proof.
     case: Hprog => Hprog.
     + left. rewrite /terminal_form.
       left. case be in *; inversion Hprog.
-      apply const_list_concat => //=.
-      by apply v_to_e_const.
+      apply: const_list_concat => //=.
+      by apply: v_to_e_const.
     + by right. 
   - (* Admin_instr_ok__trap *)
-    move => s C es tf Hadmin.
-    by admit.
+    move => s C ts1 ts2.
+    move => f C' vcs ts1' ts2' lab ret *.
+    case vcs in * => //=.
+    + left. rewrite /terminal_form. by right.
+    + right. exists s, f, [:: admininstr__TRAP].
+      apply: Step__pure.
+      apply Step_pure__trap_vals with (v_val := v :: vcs).
+      by left. 
   - (* Admin_instr_ok__call_addr *)
     by admit.
   - (* Admin_instr_ok__label *)
