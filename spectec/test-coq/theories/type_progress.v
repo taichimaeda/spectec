@@ -52,6 +52,14 @@ Definition is_const (e : admininstr) : bool :=
 Definition const_list (es : list admininstr) : bool :=
   List.forallb is_const es.
 
+Lemma v_to_e_const: forall vs,
+    const_list (list__val__admininstr vs).
+Proof.
+  move => vs. elim: vs => //=.
+  move => v vs Hconst.
+  by case v => //=.
+Qed.
+
 (* NOTE: const_list es is coerced into proposition by is_true *)
 Definition terminal_form (es : list admininstr) :=
   const_list es \/ es = [:: admininstr__TRAP].
@@ -61,8 +69,18 @@ Lemma const_list_cat: forall vs1 vs2,
 Proof.
   move => vs1 vs2.
   repeat rewrite cat_app.
-  unfold const_list.
+  rewrite /const_list.
   by rewrite List.forallb_app.
+Qed.
+
+Lemma const_list_concat: forall vs1 vs2,
+    const_list vs1 ->
+    const_list vs2 ->
+    const_list (vs1 ++ vs2).
+Proof.
+  move => vs1 vs2 Hconst1 Hconst2.
+  rewrite const_list_cat.
+  apply/andP => //=.
 Qed.
 
 Lemma const_list_split: forall vs1 vs2,
@@ -351,13 +369,14 @@ Ltac solve_progress :=
 Lemma t_progress_be: forall C bes ts1 ts2 vcs lab ret s f,
     Store_ok s ->
     Module_instance_ok s f.(frame__MODULE) C ->
-    Instrs_ok (upd_label (upd_local_return C (map typeof f.(frame__LOCALS)) ret) lab) bes (functype__ ts1 ts2) ->
+    Instrs_ok (upd_local_label_return C (map typeof f.(frame__LOCALS)) lab ret) bes (functype__ ts1 ts2) ->
     map typeof vcs = ts1 ->
     (* not_lf_br (list__instr__admininstr bes) -> *)
     (* not_lf_return (list__instr__admininstr bes) -> *)
     const_list (list__instr__admininstr bes) \/
     exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es').
 Proof.
+Admitted.
 
 (* MEMO: s_typing -> Thread_ok *)
 Lemma s_typing_lf_br: forall s rs f es ts,
@@ -372,6 +391,17 @@ Lemma s_typing_lf_return: forall s f es ts,
   not_lf_return es.
 Proof.
 Admitted.
+
+Lemma instr_ok_instrs_ok: forall C be tf,
+  Instr_ok C be tf -> Instrs_ok C [:: be] tf.
+Proof.
+  move => C be tf Hinstr.
+  rewrite -[[:: be]]cat0s.
+  case: tf Hinstr => [ts1 ts2] Hinstr.
+  apply Instrs_ok__seq with (v_t_2 := ts1) => //=.
+  apply: instrs_weakening_empty_both.
+  by apply: Instrs_ok__empty.
+Qed.
 
 (* NOTE: Mutual induction principle used in t_progress_e *)
 Scheme Admin_instr_ok_ind' := Induction for Admin_instr_ok Sort Prop
@@ -399,8 +429,7 @@ Lemma t_progress_e: forall s C C' f vcs es tf ts1 ts2 lab ret,
 Proof.
   move => s C C' f vcs es tf ts1 ts2 lab ret Hadmin.
   move: f C' vcs ts1 ts2 lab ret.
-  Check Admin_instr_ok_ind'.
-  induction Hadmin using Admin_instrs_ok_ind' with 
+  apply Admin_instrs_ok_ind' with 
     (P := fun s C e tf (Hadmin : Admin_instr_ok s C e tf) => 
       forall f C' vcs ts1 ts2 lab ret,
       tf = functype__ ts1 ts2 ->
@@ -429,17 +458,39 @@ Proof.
       (* not_lf_return es -> *)
       (const_list es /\ length es = length ts) \/
       es = [::admininstr__TRAP] \/
-      exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es')).
-  Print Admin_instrs_ok.
-  - (* TODO:
-    Given vcs : seq val, prove vcs is terminal *)
+      exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es')) 
+    => //= {s C es tf Hadmin}.
+  - (* Admin_instr_ok__instr *)
+    move => s C be tf Hinstr.
+    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hconst Hstore.
+    have Hinstrs: Instrs_ok C [:: be] tf by apply instr_ok_instrs_ok.
+    rewrite Htf Hcontext in Hinstrs.
+    pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hconst.
+    case: Hprog => Hprog.
+    + left. rewrite /terminal_form.
+      left. case be in *; inversion Hprog.
+      apply const_list_concat => //=.
+      by apply v_to_e_const.
+    + by right. 
+  - (* Admin_instr_ok__trap *)
+    move => s C es tf Hadmin.
     by admit.
-  - (* TODO:
-    Given  *) 
+  - (* Admin_instr_ok__call_addr *)
     by admit.
-  - by admit.
-  - by admit.
-  - by admit.
+  - (* Admin_instr_ok__label *)
+    by admit.
+  - (* Admin_instr_ok__frame *)
+    by admit.
+  - (* Admin_instr_ok__weakening *)
+    by admit.
+  - (* Admin_instrs_ok__empty *)
+    by admit.
+  - (* Admin_instrs_ok__seq *)
+    by admit.
+  - (* Admin_instrs_ok__frame *)
+    by admit.
+  - (* Thread_ok__ *)
+    by admit.
 Admitted.
 
 Theorem t_progress: forall s f es ts,
@@ -449,6 +500,8 @@ Theorem t_progress: forall s f es ts,
 Proof.
   move => s f es ts Hconfig.
   inversion Hconfig as [? ? ? ? Hstore Hthread]. subst.
+  
+  Print Thread_ok.
   inversion Hthread as [? ? ? ? ? C Hframe Hadmin]. subst.
   pose C' := upd_local_label_return C [::] [::] None.
   eapply t_progress_e with
