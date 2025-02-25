@@ -151,8 +151,8 @@ rule Admin_instr_ok/trap:
   S; C |- TRAP : t_1* -> t_2*
 
 rule Admin_instr_ok/call_addr:
-  S; C |- CALL_ADDR funcaddr : t_1* -> t_2*
-  -- Externvals_ok: S |- FUNC funcaddr: FUNC (t_1* -> t_2*)
+  S; C |- CALL_ADDR funcaddr : t_1* -> t_2?
+  -- Externvals_ok: S |- FUNC funcaddr: FUNC (t_1* -> t_2?)
 
 rule Admin_instr_ok/label:
   S; C |- LABEL_ n `{instr*} admininstr* : eps -> t_2?
