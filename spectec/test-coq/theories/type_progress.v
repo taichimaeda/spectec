@@ -462,10 +462,10 @@ Proof.
     => //= {s C es tf Hadmin}.
   - (* Admin_instr_ok__instr *)
     move => s C be tf Hinstr.
-    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hconst Hstore.
+    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     have Hinstrs: Instrs_ok C [:: be] tf by apply instr_ok_instrs_ok.
     rewrite Htf Hcontext in Hinstrs.
-    pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hconst.
+    pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => Hprog.
     + left. rewrite /terminal_form.
       left. case be in *; inversion Hprog.
@@ -482,9 +482,60 @@ Proof.
       apply Step_pure__trap_vals with (v_val := v :: vcs).
       by left. 
   - (* Admin_instr_ok__call_addr *)
-    by admit.
+    (* NOTE: admininstr__CALL_ADDR corresponds to invoke instruction *)
+    move => s C addr ts1 ts2 Hext.
+    move => f C' vcs ts1' ts2' lab ret *.
+    right. exists s, f. eexists ?[es'].
+    apply: Step__read.
+    Set Printing Coercions.
+    Check Step_read__call_addr.
+    Check Admin_instr_ok__call_addr.
+    Check Externvals_ok__func.
+    eapply Step_read__call_addr with 
+      (v_t_1 := ts1)
+      (* TODO: This fails because Step_read__call_addr in DSL expects ts2? rather than ts2* *)
+      (* (v_t_2 := ts2) *)
+      (v_t_2 := ?[v_t_2])
+      (v_mm := ?[v_mm])
+      (v_x := ?[v_x])
+      (v_t := ?[v_t])
+      (v_instr := ?[v_instr])
+       => //=.
+    inversion Hext as [? ? ? ? ? Haddr Hlookup | | | ] => //=.
+    - by admit.
+    - by admit.
   - (* Admin_instr_ok__label *)
-    by admit.
+    move => s C n bes es t1 t2 Hinstrs Hadmin IH Hn.
+    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+    have Heqc : _append {|
+      context__TYPES := [::];
+      context__FUNCS := [::];
+      context__GLOBALS := [::];
+      context__TABLES := [::];
+      context__MEMS := [::];
+      context__LOCALS := [::];
+      context__LABELS := [:: t2];
+      context__RETURN := None
+      |} C = upd_local_label_return C' [seq typeof i  | i <- frame__LOCALS f] [:: t2] None
+      by admit.
+    Check Admin_instr_ok__label.
+    Check Step__ctxt_seq.
+    Check Step__ctxt_label.
+    have Heqtf : functype__ [::] (option_to_list t1) = functype__ [::] (option_to_list t1) by [].
+    have Heqts : map typeof [::] = [::] by [].
+    move: (IH f C' [::] [::] (option_to_list t1) [:: t2] None Heqtf Heqc Hmod Heqts Hstore) 
+      => {Heqtf Heqc Hmod Heqts Hstore} {}IH.
+    simpl in IH.
+    case: IH => IH.
+    + left. by admit.
+    + right. case: IH => [s' [f' [es' IH]]].
+      exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
+      eapply Step__ctxt_seq with 
+        (v_val := vcs)
+        (v_admininstr := [:: admininstr__LABEL_ n bes es])
+        (v_admininstr' := [:: admininstr__LABEL_ n bes es'])
+        (v_admininstr'' := [::]).
+      by eapply Step__ctxt_label.
   - (* Admin_instr_ok__frame *)
     by admit.
   - (* Admin_instr_ok__weakening *)
@@ -506,8 +557,6 @@ Theorem t_progress: forall s f es ts,
 Proof.
   move => s f es ts Hconfig.
   inversion Hconfig as [? ? ? ? Hstore Hthread]. subst.
-  
-  Print Thread_ok.
   inversion Hthread as [? ? ? ? ? C Hframe Hadmin]. subst.
   pose C' := upd_local_label_return C [::] [::] None.
   eapply t_progress_e with
@@ -517,22 +566,21 @@ Proof.
     rewrite /_append /Append_Option /option_append in Hadmin.
     suff Heqc:
       (upd_return C (Some None)) =
-      (upd_local_label_return C' (map typeof (frame__LOCALS f)) [::] (Some None)).
-    + by rewrite -Heqc.
-    + have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
-      { inversion Hframe as [? ? ? ? ? ? Hmod Hval] => {Hframe} //=.
-        inversion Hmod => //=. rewrite List.app_nil_r.
-        by apply Forall2_Val_ok_is_same_as_map in Hval. }
-      have Heq2 : context__LABELS C = [::].
-      { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
-        by inversion Hmod => //=. }
-      have Heq3 : context__RETURN C = None.
-      { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
-        by inversion Hmod => //=. }
-      case HeqC': C'. inversion HeqC'. subst.
-      rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-      by rewrite /upd_local_return /upd_local /upd_return.
-  - clear Hstore Hthread Hadmin.
-    inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
+      (upd_local_label_return C' (map typeof (frame__LOCALS f)) [::] (Some None));
+    first by rewrite -Heqc.
+    have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
+    { inversion Hframe as [? ? ? ? ? ? Hmod Hval] => {Hframe} //=.
+      inversion Hmod => //=. rewrite List.app_nil_r.
+      by apply Forall2_Val_ok_is_same_as_map in Hval. }
+    have Heq2 : context__LABELS C = [::].
+    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
+      by inversion Hmod => //=. }
+    have Heq3 : context__RETURN C = None.
+    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
+      by inversion Hmod => //=. }
+    case HeqC': C'. inversion HeqC'. subst.
+    rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
+    by rewrite /upd_local_return /upd_local /upd_return.
+  - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
     case v_C in *. inversion Hmod => //=.
 Qed.
