@@ -525,7 +525,7 @@ Proof.
       rewrite -[list__val__admininstr vcs ++ _]cats0.
       rewrite -[list__val__admininstr vcs ++ es]cats0.
       rewrite -2!catA.
-      eapply Step__ctxt_seq with
+      apply Step__ctxt_seq with
         (v_admininstr := [:: admininstr__LABEL_ n bes es])
         (v_admininstr' := es).
       case: IH => IH.
@@ -537,10 +537,10 @@ Proof.
         by apply: Step_pure__trap_label.
     + right. case: IH => [s' [f' [es' IH]]].
       exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
-      eapply Step__ctxt_seq with 
+      apply Step__ctxt_seq with 
         (v_admininstr := [:: admininstr__LABEL_ n bes es])
         (v_admininstr' := [:: admininstr__LABEL_ n bes es']).
-      by eapply Step__ctxt_label.
+      by apply: Step__ctxt_label.
   - (* Admin_instr_ok__frame *)
     move => s C n f es t Hthread IH Hsize.
     move => f' C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
@@ -552,42 +552,67 @@ Proof.
       rewrite -[list__val__admininstr vcs ++ _]cats0.
       rewrite -[list__val__admininstr vcs ++ es]cats0.
       rewrite -2!catA.
-      eapply Step__ctxt_seq with 
+      apply Step__ctxt_seq with 
         (v_admininstr := [:: admininstr__FRAME_ n f es])
         (v_admininstr' := es).
       move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
-      apply Step__pure.
-      by apply Step_pure__frame_vals.
+      apply: Step__pure.
+      by apply: Step_pure__frame_vals.
     + right. case: IH => [Htrap | Hprog].
       * rewrite Htrap.
         exists s, f', (list__val__admininstr vcs ++ [:: admininstr__TRAP]).
-        eapply Step__ctxt_seq with
+        apply Step__ctxt_seq with
           (v_admininstr := [:: admininstr__FRAME_ n f [:: admininstr__TRAP]])
           (v_admininstr' := [:: admininstr__TRAP]).
         apply: Step__pure.
         by apply: Step_pure__trap_frame.
       * case: Hprog => [s' [f'' [es' Hprog]]].
         exists s', f', (list__val__admininstr vcs ++ [:: admininstr__FRAME_ n f'' es']).
-        eapply Step__ctxt_seq with
+        apply Step__ctxt_seq with
           (v_admininstr := [:: admininstr__FRAME_ n f es])
           (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
         (* TODO: Step/ctxt-frame is likely wrong *)
         by admit.
         (* apply: Step__ctxt_frame. *)
-
-    Check Admin_instr_ok__frame.
-    Check Step__ctxt_frame.
-    (* move => s C n bes es t1 t2 Hinstrs Hadmin IH Hn. *)
-    by admit.
   - (* Admin_instr_ok__weakening *)
-    by admit.
+    move => s C es ts ts1 ts2 Hadmin IH.
+    move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+    have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
+    have Heqts : map typeof (drop (length ts) vcs) = ts1 by admit.
+    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    case: IH => IH.
+    + left.
+      by admit.
+    + right.
+      by admit.
   - (* Admin_instrs_ok__empty *)
-    by admit.
+    move => s C.
+    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+    left. rewrite cats0 /terminal_form.
+    left. 
+    (* TODO: Find lemma that says const_list (list__val__admininstr vcs) = true *)
+    elim vcs => [| v l Hl ] //=. apply/andP.
+    split => //=. by case v.
   - (* Admin_instrs_ok__seq *)
+    move => s C es1 es2 ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
+    move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+    Check Admin_instrs_ok__seq.
     by admit.
   - (* Admin_instrs_ok__frame *)
+    (* NOTE: This is equivalent to Admin_instr_ok__weakening but for Admin_instrs_ok *)
+    move => s C es ts1 ts2 ts3 Hadmin IH.
+    move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+    Check Admin_instrs_ok__frame.
+    by admit.
+  - (* Admin_instrs_ok__instrs *)
+    move => s C bes tf Hinstrs.
+    move => f C' vcs ts1 ts2 lab ret.
+    Check Admin_instrs_ok__instrs.
     by admit.
   - (* Thread_ok__ *)
+    move => s t1 f es t2 C.
+    move => Hframe Hadmin IH Hstore.
+    Check Thread_ok__.
     by admit.
 Admitted.
 
