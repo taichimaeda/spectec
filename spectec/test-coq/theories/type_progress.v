@@ -487,10 +487,6 @@ Proof.
     move => f C' vcs ts1' ts2' lab ret *.
     right. exists s, f. eexists ?[es'].
     apply: Step__read.
-    Set Printing Coercions.
-    Check Step_read__call_addr.
-    Check Admin_instr_ok__call_addr.
-    Check Externvals_ok__func.
     eapply Step_read__call_addr with 
       (v_t_1 := ts1)
       (* TODO: This fails because Step_read__call_addr in DSL expects ts2? rather than ts2* *)
@@ -505,7 +501,7 @@ Proof.
     - by admit.
     - by admit.
   - (* Admin_instr_ok__label *)
-    move => s C n bes es t1 t2 Hinstrs Hadmin IH Hn.
+    move => s C n bes es t1 t2 Hinstrs Hadmin IH Hsize.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     have Heqc : _append {|
       context__TYPES := [::];
@@ -522,18 +518,66 @@ Proof.
     have Heqts : map typeof [::] = [::] by [].
     move: (IH f C' [::] [::] (option_to_list t1) (t2 :: lab) ret Heqtf Heqc Hmod Heqts Hstore) 
       => {Heqtf Heqc Hmod Heqts Hstore} {}IH.
-    simpl in IH.
     case: IH => IH.
-    + left. by admit.
+    + right. simpl in IH.
+      exists s, f, (list__val__admininstr vcs ++ es).
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs ++ _]cats0.
+      rewrite -[list__val__admininstr vcs ++ es]cats0.
+      rewrite -2!catA.
+      eapply Step__ctxt_seq with
+        (v_admininstr := [:: admininstr__LABEL_ n bes es])
+        (v_admininstr' := es).
+      case: IH => IH.
+      * move: (const_es_exists _ IH) => [vs Hvs]. rewrite Hvs.
+        apply: Step__pure.
+        by apply: Step_pure__label_vals.
+      * rewrite IH.
+        apply: Step__pure.
+        by apply: Step_pure__trap_label.
     + right. case: IH => [s' [f' [es' IH]]].
       exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
       eapply Step__ctxt_seq with 
-        (v_val := vcs)
         (v_admininstr := [:: admininstr__LABEL_ n bes es])
-        (v_admininstr' := [:: admininstr__LABEL_ n bes es'])
-        (v_admininstr'' := [::]).
+        (v_admininstr' := [:: admininstr__LABEL_ n bes es']).
       by eapply Step__ctxt_label.
   - (* Admin_instr_ok__frame *)
+    move => s C n f es t Hthread IH Hsize.
+    move => f' C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+    move: (IH Hstore) => {Hstore} {}IH.
+    case: IH => IH.
+    + right. case: IH => [Hconst Hlen].
+      exists s, f', (list__val__admininstr vcs ++ es).
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs ++ _]cats0.
+      rewrite -[list__val__admininstr vcs ++ es]cats0.
+      rewrite -2!catA.
+      eapply Step__ctxt_seq with 
+        (v_admininstr := [:: admininstr__FRAME_ n f es])
+        (v_admininstr' := es).
+      move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
+      apply Step__pure.
+      by apply Step_pure__frame_vals.
+    + right. case: IH => [Htrap | Hprog].
+      * rewrite Htrap.
+        exists s, f', (list__val__admininstr vcs ++ [:: admininstr__TRAP]).
+        eapply Step__ctxt_seq with
+          (v_admininstr := [:: admininstr__FRAME_ n f [:: admininstr__TRAP]])
+          (v_admininstr' := [:: admininstr__TRAP]).
+        apply: Step__pure.
+        by apply: Step_pure__trap_frame.
+      * case: Hprog => [s' [f'' [es' Hprog]]].
+        exists s', f', (list__val__admininstr vcs ++ [:: admininstr__FRAME_ n f'' es']).
+        eapply Step__ctxt_seq with
+          (v_admininstr := [:: admininstr__FRAME_ n f es])
+          (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
+        (* TODO: Step/ctxt-frame is likely wrong *)
+        by admit.
+        (* apply: Step__ctxt_frame. *)
+
+    Check Admin_instr_ok__frame.
+    Check Step__ctxt_frame.
+    (* move => s C n bes es t1 t2 Hinstrs Hadmin IH Hn. *)
     by admit.
   - (* Admin_instr_ok__weakening *)
     by admit.
