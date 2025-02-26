@@ -516,14 +516,11 @@ Proof.
       context__LOCALS := [::];
       context__LABELS := [:: t2];
       context__RETURN := None
-      |} C = upd_local_label_return C' [seq typeof i  | i <- frame__LOCALS f] [:: t2] None
-      by admit.
-    Check Admin_instr_ok__label.
-    Check Step__ctxt_seq.
-    Check Step__ctxt_label.
+      |} C = upd_local_label_return C' [seq typeof i  | i <- frame__LOCALS f] (t2 :: lab) ret.
+      by rewrite Hcontext.
     have Heqtf : functype__ [::] (option_to_list t1) = functype__ [::] (option_to_list t1) by [].
     have Heqts : map typeof [::] = [::] by [].
-    move: (IH f C' [::] [::] (option_to_list t1) [:: t2] None Heqtf Heqc Hmod Heqts Hstore) 
+    move: (IH f C' [::] [::] (option_to_list t1) (t2 :: lab) ret Heqtf Heqc Hmod Heqts Hstore) 
       => {Heqtf Heqc Hmod Heqts Hstore} {}IH.
     simpl in IH.
     case: IH => IH.
@@ -562,12 +559,7 @@ Proof.
   eapply t_progress_e with
     (vcs := [::]) (lab := [::]) (ret := Some None)
     (ts2 := ts) (C' := C') => //=.
-  - rewrite -upd_return_is_same_as_append in Hadmin.
-    rewrite /_append /Append_Option /option_append in Hadmin.
-    suff Heqc:
-      (upd_return C (Some None)) =
-      (upd_local_label_return C' (map typeof (frame__LOCALS f)) [::] (Some None));
-    first by rewrite -Heqc.
+  - rewrite /C' {C'}.
     have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
     { inversion Hframe as [? ? ? ? ? ? Hmod Hval] => {Hframe} //=.
       inversion Hmod => //=. rewrite List.app_nil_r.
@@ -578,9 +570,7 @@ Proof.
     have Heq3 : context__RETURN C = None.
     { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
       by inversion Hmod => //=. }
-    case HeqC': C'. inversion HeqC'. subst.
-    rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-    by rewrite /upd_local_return /upd_local /upd_return.
+    by rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
   - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
     case v_C in *. inversion Hmod => //=.
 Qed.
