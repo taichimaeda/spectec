@@ -577,14 +577,16 @@ Proof.
   - (* Admin_instr_ok__weakening *)
     move => s C e ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
-    have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
-    have Heqts : map typeof (drop (length ts) vcs) = ts1 by admit.
-    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
-    have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
     (* TODO: Use SSReflect seq operations in generated coercions *)
-    have Hcat : forall s1 s2, app s1 s2 = cat s1 s2 by [].
     have Hmap : forall f s, List.map f s = map f s by [].
     have Hlength : forall s, Datatypes.length s = size s by [].
+    have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
+    have Heqts : map typeof (drop (length ts) vcs) = ts1.
+    { rewrite map_drop.
+      inversion Htf as [[Htf1 Htf2]].
+      rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat Hlength ltnn subnn drop0. }
+    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
     rewrite {}Hlength in IH.
     set vcs1 := take (size ts) vcs in IH *.
     set vcs2 := drop (size ts) vcs in IH *.
@@ -612,7 +614,6 @@ Proof.
       rewrite /list__val__admininstr Hmap map_cat -catA.
       move: IH => [s' [f' [es' IH]]].
       exists s', f', (list__val__admininstr vcs1 ++ es').
-      Set Printing Coercions.
       (* TODO: Can we get rid of these rewrites? *)
       rewrite -[list__val__admininstr vcs2 ++ _]cats0.
       rewrite -[list__val__admininstr vcs1 ++ _]cats0.
@@ -627,13 +628,19 @@ Proof.
     left. rewrite cats0 /terminal_form.
     left. by apply: v_to_e_const.
   - (* Admin_instrs_ok__seq *)
-    move => s C es e ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
+    move => s C es1 e2 ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
-    case es in *. simpl in *.
-    + (* IH1 *)
+    case: es1 Hadmin1 IH1 => [| e1 es1] Hadmin1 IH1.
+    + move => {IH1} //=.
+      have Heqtf : functype__ ts3 ts2 = functype__ ts3 ts2 by [].
+      (* have Heqts : map typeof (drop (length ts) vcs) = ts1 by admit. *)
+      move: (IH2 f C' vcs ts3 ts2 lab ret Heqtf Hcontext Hmod) => {}IH2.
+      (* TODO: Show that ts1' = ts1 = ts3 *)
+      (* IH2 *)
       (* apply: Step__ctxt_seq. *)
       by admit.
-    + (* IH2 *)
+    + move => {IH2} //=.
+      (* IH1 *)
       (* apply: Step__ctxt_seq. *)
       by admit.
     Check Admin_instrs_ok__seq.
@@ -680,5 +687,5 @@ Proof.
       by inversion Hmod => //=. }
     by rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
   - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
-    case v_C in *. inversion Hmod => //=.
+    case v_C in *. by inversion Hmod => //=.
 Qed.
