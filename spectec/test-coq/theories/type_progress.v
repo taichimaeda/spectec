@@ -572,32 +572,71 @@ Proof.
           (v_admininstr := [:: admininstr__FRAME_ n f es])
           (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
         (* TODO: Step/ctxt-frame is likely wrong *)
-        by admit.
         (* apply: Step__ctxt_frame. *)
+        by admit.
   - (* Admin_instr_ok__weakening *)
-    move => s C es ts ts1 ts2 Hadmin IH.
+    move => s C e ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
     have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
     have Heqts : map typeof (drop (length ts) vcs) = ts1 by admit.
     move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
+    (* TODO: Use SSReflect seq operations in generated coercions *)
+    have Hcat : forall s1 s2, app s1 s2 = cat s1 s2 by [].
+    have Hmap : forall f s, List.map f s = map f s by [].
+    have Hlength : forall s, Datatypes.length s = size s by [].
+    rewrite {}Hlength in IH.
+    set vcs1 := take (size ts) vcs in IH *.
+    set vcs2 := drop (size ts) vcs in IH *.
     case: IH => IH.
-    + left.
-      by admit.
+    + (* TODO: Rewrite the rest of case tactics explicitly like this *)
+      case: vcs1 Hts Heqts => [| vc1 vcs1] Hts Heqts;
+      case: vcs2 Hts Heqts IH => [| vc2 vcs2] Hts Heqts IH; try by left.
+      * case: IH => IH.
+        -- left. left. 
+           rewrite cat0s cats0 in IH *.
+           apply: const_list_concat => //=.
+           by apply: v_to_e_const (vc1 :: vcs1).
+        -- right. simpl in IH. rewrite IH cats0.
+           exists s, f, ([:: admininstr__TRAP]).
+           apply: Step__pure.
+           apply Step_pure__trap_vals with (v_val := (vc1 :: vcs1)).
+           by left.
+      * case: IH => IH.
+        -- left. left.
+           rewrite /list__val__admininstr Hmap map_cat -catA.
+           apply: const_list_concat => //.
+           by apply: v_to_e_const (vc1 :: vcs1).
+        -- by case: vcs2 IH => //=.
     + right.
-      by admit.
+      rewrite /list__val__admininstr Hmap map_cat -catA.
+      move: IH => [s' [f' [es' IH]]].
+      exists s', f', (list__val__admininstr vcs1 ++ es').
+      Set Printing Coercions.
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs2 ++ _]cats0.
+      rewrite -[list__val__admininstr vcs1 ++ _]cats0.
+      rewrite -[(list__val__admininstr vcs1 ++ es') ++ [::]]catA.
+      by apply Step__ctxt_seq with
+        (v_admininstr := list__val__admininstr vcs2 ++ [:: e])
+        (v_admininstr' := es')
+        (v_admininstr'' := [::]).
   - (* Admin_instrs_ok__empty *)
     move => s C.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     left. rewrite cats0 /terminal_form.
-    left. 
-    (* TODO: Find lemma that says const_list (list__val__admininstr vcs) = true *)
-    elim vcs => [| v l Hl ] //=. apply/andP.
-    split => //=. by case v.
+    left. by apply: v_to_e_const.
   - (* Admin_instrs_ok__seq *)
-    move => s C es1 es2 ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
+    move => s C es e ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+    case es in *. simpl in *.
+    + (* IH1 *)
+      (* apply: Step__ctxt_seq. *)
+      by admit.
+    + (* IH2 *)
+      (* apply: Step__ctxt_seq. *)
+      by admit.
     Check Admin_instrs_ok__seq.
-    by admit.
   - (* Admin_instrs_ok__frame *)
     (* NOTE: This is equivalent to Admin_instr_ok__weakening but for Admin_instrs_ok *)
     move => s C es ts1 ts2 ts3 Hadmin IH.
