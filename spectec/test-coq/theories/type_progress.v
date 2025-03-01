@@ -263,72 +263,10 @@ Proof.
   unfold terminal_form. by right.
 Qed.
 
-(* NOTE: This lemma will not be useful since admininstr does not contain instr *)
-(* Lemma e_b_inverse: forall es,
-    es_is_basic es ->
-    to_e_list (to_b_list es) = es.
-Proof.
-  move => es HAI_basic.
-  by erewrite e_b_elim; eauto.
-Qed. *)
-
-Lemma typeof_append: forall ts t vs,
-    map typeof vs = ts ++ [::t] ->
-    exists v,
-      vs = take (size ts) vs ++ [::v] /\
-      map typeof (take (size ts) vs) = ts /\
-      typeof v = t.
-Proof.
-  move => ts t vs HMapType.
-  apply cat_split in HMapType.
-  destruct HMapType.
-  rewrite -map_take in H.
-  rewrite -map_drop in H0.
-  destruct (drop (size ts) vs) eqn:HDrop => //=.
-  destruct l => //=.
-  inversion H0. subst.
-  exists v.
-  split => //.
-  rewrite -HDrop.
-  (* TODO: For some reason this rewrite fails *)
-  (* by rewrite cat_take_drop. *)
-  symmetry. apply cat_take_drop.
-Qed.
-
 (* TODO: This hint for auto might not work as expected *)
 Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
 (* Hint Constructors opsem.reduce_simple : core. *)
-
-Ltac invert_typeof_vcs :=
-  lazymatch goal with
-  | H: map typeof ?vcs = [::_; _; _] |- _ =>
-    destruct vcs => //=; destruct vcs => //=; destruct vcs => //=; destruct vcs => //=;
-    simpl in H; inversion H; subst; clear H
-  | H: map typeof ?vcs = [::_; _] |- _ =>
-    destruct vcs => //=; destruct vcs => //=; destruct vcs => //=;
-    simpl in H; inversion H; subst; clear H
-  | H: map typeof ?vcs = [::_] |- _ =>
-    destruct vcs => //=; destruct vcs => //=;
-    simpl in H; inversion H; subst; clear H
-  | H: map typeof ?vcs = [::] |- _ =>
-    destruct vcs => //=;
-    simpl in H; inversion H; subst; clear H
-  end.
-
-Lemma nth_error_map: forall {X Y:Type} (l: seq X) n f {fx: Y},
-    List.nth_error (map f l) n = Some fx ->
-    exists x, List.nth_error l n = Some x /\
-    f x = fx.
-Proof.
-  move => X Y l n.
-  generalize dependent l.
-  induction n => //; move => l f fx HN.
-  - destruct l => //=.
-    simpl in HN. inversion HN. subst. by eauto.
-  - destruct l => //=.
-    simpl in HN. by apply IHn.
-Qed.
 
 Definition not_lf_br (es : list admininstr) :=
   forall k (lh: E), lfill lh [:: admininstr__BR k] <> es.
@@ -340,81 +278,6 @@ Definition not_lf_br_outside (es : list admininstr) :=
 
 Definition not_lf_return (es: list admininstr) :=
   forall (lh : E), lfill lh [:: admininstr__RETURN] <> es.
-
-(* 
-Lemma nlfbr_right: forall es es',
-    not_lf_br (es ++ list__instr__admininstr es') ->
-    not_lf_br es.
-Proof.
-  unfold not_lf_br.
-  move => es es' HNLF k lh HContra.
-  subst es.
-  Set Printing Coercions.
-  (* TODO: Why does this rewrite fail? *)
-  (* rewrite -(lfill_push_back_es lh [:: admininstr__BR k] es') in HNLF. *)
-  rewrite -lfill_push_back_es in HNLF.
-  by eapply HNLF.
-Qed.
-
-Lemma nlfret_right: forall es n es',
-    not_lf_return (es ++ es') n ->
-    not_lf_return es n.
-Proof.
-  unfold not_lf_return.
-  move => es n es' HNLF lh HContra.
-  subst es.
-  rewrite -lfill_push_back_es in HNLF.
-  by eapply HNLF.
-Qed.
-
-Lemma nlfbr_left: forall es n cs vcs,
-    cs = v_to_e_list vcs ->
-    not_lf_br (cs ++ es) n ->
-    not_lf_br es n.
-Proof.
-  unfold not_lf_br.
-  move => es n vcs cs -> IH k lh ?.
-  subst es.
-  erewrite <- lfill_push_front_vs in IH; eauto.
-  by eapply IH.
-Qed.
-
-Lemma nlfret_left: forall es n cs vcs,
-    cs = v_to_e_list vcs ->
-    not_lf_return (cs ++ es) n ->
-    not_lf_return es n.
-Proof.
-  unfold not_lf_return.
-  move => es n vcs cs -> IH lh ?.
-  subst es.
-  erewrite <- lfill_push_front_vs in IH; eauto.
-  by eapply IH.
-Qed.
-
-Ltac auto_basic :=
-  repeat lazymatch goal with
-  | |- es_is_basic [::AI_basic _; AI_basic _; AI_basic _; AI_basic _] =>
-    simpl; repeat split
-  | |- es_is_basic [::AI_basic _; AI_basic _; AI_basic _] =>
-    simpl; repeat split
-  | |- es_is_basic [::AI_basic _; AI_basic _] =>
-    simpl; repeat split
-  | |- es_is_basic [::AI_basic _] =>
-    simpl; repeat split
-  | |- e_is_basic (AI_basic ?e) =>
-    by unfold e_is_basic; exists e
-  end.
-
-(** A common scheme in the progress proof, with a continuation. **)
-Ltac solve_progress_cont cont :=
-  repeat eexists;
-  solve [
-      apply r_simple; solve [ eauto | constructor; eauto | cont; eauto ]
-    | cont ].
-
-(** The same, but without continuation. **)
-Ltac solve_progress :=
-  solve_progress_cont ltac:(fail). *)
 
 (* MEMO: be_typing -> Instrs_ok *)
 (* MEMO: f.(f_inst) -> f.(frame__MODULE) *)
@@ -809,7 +672,8 @@ Proof.
     (lab := [::]) (ret := Some None)
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
     (C' := upd_local_label_return C [::] [::] None) => //=.
-  - have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
+  - (* TODO: Name these lemmas explicitly *)
+    have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
     { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
       inversion Hmod => //=. rewrite cat_app cats0.
       by apply Forall2_Val_ok_is_same_as_map in Hval. }
