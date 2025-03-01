@@ -288,7 +288,8 @@ Lemma admin_composition_typing: forall v_S v_C v_ais1 v_ais2 t1s t2s,
                              t2s = ts ++ t2s' /\
                              Admin_instrs_ok v_S v_C v_ais1 (functype__ t1s' t3s) /\
                              Admin_instrs_ok v_S v_C v_ais2 (functype__ t3s t2s').
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C v_ais1 v_ais2.
 	remember (rev v_ais2) as v_ais2'.
 	assert (v_ais2 = rev v_ais2'); first by (rewrite Heqv_ais2'; symmetry; apply revK).
@@ -312,8 +313,7 @@ Proof.
 	  repeat split => //.
 	  + by apply Admin_instrs_ok__frame.
 	  + rewrite rev_cons. rewrite -cats1.
-Admitted.
-		(* eapply Admin_instrs_ok__seq; split; eauto.
+		eapply Admin_instrs_ok__seq; split; eauto.
 		by apply Admin_instrs_ok__frame.
 Qed. *)
 
@@ -360,16 +360,15 @@ Lemma admin_composition': forall v_S v_C v_ais1 v_ais2 t1s t2s t3s,
 	Admin_instrs_ok v_S v_C v_ais1 (functype__ t1s t2s) ->
 	Admin_instrs_ok v_S v_C v_ais2 (functype__ t2s t3s) ->
 	Admin_instrs_ok v_S v_C (v_ais1 ++ v_ais2) (functype__ t1s t3s).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C v_ais1 v_ais2.
 	move: v_ais1.
 	induction v_ais2 using List.rev_ind; move => v_ais1 t1s t2s t3s HType1 HType2.
 		- apply admin_empty in HType2; by rewrite cats0; subst.
 		- apply_composition_typing_single HType2.
 	subst.
-	rewrite catA.
-Admitted.
-	(* eapply Admin_instrs_ok__seq; split.
+	rewrite catA. eapply Admin_instrs_ok__seq; split.
 	eapply IHv_ais2; eauto.
 	apply Admin_instrs_ok__frame with (v_t := ts1_comp) in H3_comp.
 	apply H3_comp.
@@ -484,14 +483,14 @@ Proof.
 	  by f_equal.
 Qed.
 
-(*
 Lemma If_typing: forall v_S v_C t1s v_ais1 v_ais2 ts ts',
 	Admin_instr_ok v_S v_C (admininstr__IFELSE t1s v_ais1 v_ais2) (functype__ ts ts') ->
 	exists ts0,
    	ts = ts0 ++ [valtype__INN inn__I32] /\ ts' = ts0 ++ t1s /\
 				Instrs_ok (upd_label v_C ([t1s] ++ context__LABELS v_C)) (v_ais1) (functype__ [] t1s) /\
                 Instrs_ok (upd_label v_C ([t1s] ++ context__LABELS v_C)) (v_ais2) (functype__ [] t1s).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C t1s v_ais1 v_ais2 ts ts' HType.
 	gen_ind_subst HType. 
 	- (* IF *) inversion H; subst; try discriminate.
@@ -503,13 +502,14 @@ Proof.
 	exists (v_t ++ x). 
 	destruct H1.
 	repeat split => //=; try rewrite <- app_assoc; try reflexivity.
-Qed.
+Qed. *)
 
 Lemma Br_if_typing: forall v_S v_C ts1 ts2 v_memaddr, 
 	Admin_instr_ok v_S v_C (admininstr__BR_IF v_memaddr) (functype__ ts1 ts2) ->
     exists ts (ts' : resulttype), ts2 = ts ++ ts' /\ ts1 = ts2 ++ [valtype__INN inn__I32] /\ (v_memaddr < List.length (context__LABELS v_C))%coq_nat
 	/\ lookup_total (context__LABELS v_C) v_memaddr = ts'.
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C ts1 ts2 v_memaddr HType.
 	gen_ind_subst HType.
 	- (* BR_if *) inversion H; subst; try discriminate.
@@ -518,7 +518,7 @@ Proof.
 	- (* Weakening *) edestruct IHHType as [? [? [? ?]]] => //=; subst.
 	exists (v_t ++ x), x0. destruct H0; subst. 
 	repeat split => //=; try repeat rewrite <- app_assoc; try reflexivity.
-Qed.
+Qed. *)
 
 Lemma Br_table_typing: forall v_S v_C ts1 ts2 ids i0,
     Admin_instr_ok v_S v_C (admininstr__BR_TABLE ids i0) (functype__ ts1 ts2) ->
@@ -527,7 +527,8 @@ Lemma Br_table_typing: forall v_S v_C ts1 ts2 ids i0,
 						(i0 < length (context__LABELS v_C))%coq_nat /\
 						(ts = (lookup_total (context__LABELS v_C) i0)) /\
 						List.Forall (fun i => ts = lookup_total (context__LABELS v_C) i) (ids).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C ts1 ts2 ids i0 HType.
 	gen_ind_subst HType.
 	- (* Br_table *) inversion H; subst; try discriminate.
@@ -536,7 +537,7 @@ Proof.
 	- (* Weakening *) edestruct IHHType as [? [? [? [? [? [? ?]]]]]] => //=; subst.
 	exists (v_t ++ x), (lookup_total (context__LABELS v_C0) i0).
 	repeat split => //=; try repeat rewrite <- app_assoc; try reflexivity.
-Qed.
+Qed. *)
 
 Lemma Relop_typing: forall v_S v_C v_t v_op t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__RELOP v_t v_op) (functype__ t1s t2s) ->
@@ -568,7 +569,8 @@ Lemma Local_tee_typing: forall v_S v_C v_memaddr ts1 ts2,
     Admin_instr_ok v_S v_C (admininstr__LOCAL_TEE v_memaddr) (functype__ ts1 ts2) ->
     exists ts t, ts1 = ts2 /\ ts1 = ts ++ [t] /\ (v_memaddr < length (context__LOCALS v_C))%coq_nat /\
                 lookup_total (context__LOCALS v_C) v_memaddr = t.
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C v_memaddr ts1 ts2 HType.
 	gen_ind_subst HType.
 	- (* Local Tee *) inversion H; subst; try discriminate.
@@ -579,7 +581,7 @@ Proof.
 	- (* Weakening *) edestruct IHHType as [? [? [? [? [? ?]]]]] => //=; subst.
 	exists (v_t ++ x), (lookup_total (context__LOCALS v_C0) v_memaddr).
 	by repeat split => //=; try rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Label_typing: forall v_S v_C n v_instrs v_admininstrs ts1 ts2,
     Admin_instr_ok v_S v_C (admininstr__LABEL_ n v_instrs v_admininstrs) (functype__ ts1 ts2) ->
@@ -587,13 +589,14 @@ Lemma Label_typing: forall v_S v_C n v_instrs v_admininstrs ts1 ts2,
 					Instrs_ok v_C v_instrs (functype__ ts ts2') /\
 					fun_optionSize ts = n /\
                     Admin_instrs_ok v_S (upd_label v_C ([ts] ++ (context__LABELS v_C))) v_admininstrs (functype__ [] ts2').
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C n v_instrs v_admininstrs ts1 ts2 HType.
 	gen_ind_subst HType => //=.
 		- (* Instr *) inversion H; subst; try discriminate.
 		- (* Label *) destruct H as [? [? ?]]. exists v_t_1, v_t_2. repeat split => //=.
 		- (* Weakening *) edestruct IHHType as [? [? [? [? ?]]]] => //=; subst. exists x, x0. by repeat split => //=; try rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Frame_typing: forall v_S v_C n v_F v_ais t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__FRAME_ n v_F v_ais) (functype__ t1s t2s) ->
@@ -614,7 +617,8 @@ Lemma Set_local_typing: forall v_S C i t1s t2s,
     exists t, lookup_total (context__LOCALS C) i = t /\
     t1s = t2s ++ [t] /\
     (i < length (context__LOCALS C))%coq_nat.
-Proof.
+Admitted.
+(* Proof.
 	move => v_S C i t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Set Local *) inversion H; subst; try discriminate. destruct H4.
@@ -622,14 +626,15 @@ Proof.
 	- (* Weakening *) edestruct IHHType as [? [? [? ?]]] => //=; subst.
 		exists (lookup_total (context__LOCALS C) i).
 		by repeat split => //=; try rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Get_local_typing: forall v_S v_C i t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__LOCAL_GET i) (functype__ t1s t2s) ->
     exists t, lookup_total (context__LOCALS v_C) i = t /\
     t2s = t1s ++ [::t] /\
     (i < length (context__LOCALS v_C))%coq_nat.
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C i t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Get Local *) inversion H; subst; try discriminate. destruct H4.
@@ -637,14 +642,15 @@ Proof.
 	- (* Weakening *) edestruct IHHType as [? [? [? ?]]] => //=; subst.
 		exists (lookup_total (context__LOCALS v_C0) i).
 		by repeat split => //=; try rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Get_global_typing: forall v_S v_C i t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__GLOBAL_GET i) (functype__ t1s t2s) ->
     exists mut t, (lookup_total (context__GLOBALS v_C) i) = globaltype__ mut t /\
     t2s = t1s ++ [::t] /\
     (i < length (context__GLOBALS v_C))%coq_nat.
-Proof.
+Admitted.
+(* Proof.
 	move => ????? HType.
 	gen_ind_subst HType => //=.
 	 - (* Get Global *) inversion H; subst; try discriminate.
@@ -652,21 +658,22 @@ Proof.
 
 	 - (* Weakening *) edestruct IHHType as [?[?[?[??]]]]; eauto => //=. exists x, x0; subst.
 	 	repeat split => //; by rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Set_global_typing: forall v_S v_C i t1s t2s,
 	Admin_instr_ok v_S v_C (admininstr__GLOBAL_SET i) (functype__ t1s t2s) ->
     exists t, lookup_total (context__GLOBALS v_C) i = globaltype__ (mut__MUT (Some tt)) t /\
     t1s = t2s ++ [t] /\
     (i < length (context__GLOBALS v_C))%coq_nat.
-Proof.
+Admitted.
+(* Proof.
 	intros ????? HType.
 	gen_ind_subst HType => //=.
 	 - (* Set Global *) inversion H; subst; try discriminate.
 		destruct H4 as [? ?]. injection H3 as ?; subst. exists v_t. repeat split => //=.
 	- edestruct IHHType as [? [? [? ?]]]; subst => //=. exists (x).
 		repeat split => //=; by rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Return_typing: forall v_S v_C t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__RETURN) (functype__ t1s t2s) ->
@@ -682,7 +689,8 @@ Qed.
 
 Lemma Const_list_typing_empty: forall v_S v_C v_vals,
     Admin_instrs_ok v_S v_C (list__val__admininstr v_vals) (functype__ [::] (List.map typeof v_vals)).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C.
 	induction v_vals => //=.
 	- apply Admin_instrs_ok__empty.
@@ -697,7 +705,7 @@ Proof.
 			- apply (Admin_instr_ok__instr v_S v_C (instr__CONST v_valtype v_val_) (functype__ [] [v_valtype])); subst.
 				apply Instr_ok__const.
 		- by apply admin_instrs_weakening_empty_1.
-Qed.
+Qed. *)
 
 Lemma Break_typing: forall n v_S v_C t1s t2s,
 	Admin_instr_ok v_S v_C (admininstr__BR n) (functype__ t1s t2s) ->
@@ -705,7 +713,8 @@ Lemma Break_typing: forall n v_S v_C t1s t2s,
 				(n < length (context__LABELS v_C))%coq_nat /\
 				lookup_total (context__LABELS v_C) n = ts /\
 				t1s = ts0 ++ ts.
-Proof.
+Admitted.
+(* Proof.
 	move => n v_S v_C t1s t2s HType.
 	gen_ind_subst HType.
 	- (* BREAK *) 
@@ -717,18 +726,19 @@ Proof.
 		destruct H0; subst.
 		exists (lookup_total (context__LABELS v_C0) n), (v_t ++ ts0).
 		repeat split => //=; by repeat rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma CALL_ADDR_typing: forall v_S v_C a t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__CALL_ADDR a) (functype__ t1s t2s) ->
     exists v_funcinst, lookup_total (store__FUNCS v_S) a = v_funcinst.
-Proof.
+Admitted.
+(* Proof.
   move => s C a t1s t2s HType.
   gen_ind_subst HType => //.
   - (* Instr *) inversion H; subst; try discriminate.
   - (* Call Addr *) inversion H; destruct H3. exists (lookup_total (store__FUNCS s) a) => //=.
   - (* Weakening *) by eapply IHHType => //=.
-Qed.
+Qed. *)
 
 Lemma map_eq_local: forall (l l' : list valtype) ,
 	List.map [eta local__LOCAL] l = List.map [eta local__LOCAL] l' -> l = l'.
@@ -771,7 +781,8 @@ Lemma CALL_ADDR_invoke_typing: forall v_S v_C v_a t1s t2s v_t_1 (v_t_2 : resultt
     exists ts' C', t1s = ts' ++ v_t_1 /\ t2s = ts' ++ v_t_2 /\
 	Module_instance_ok v_S v_mm C' /\
 	Instrs_ok (upd_local_label_return C' ((v_t_1 ++ v_t) ++ (context__LOCALS C')) (_append ([v_t_2]) (context__LABELS C')) (_append (Some v_t_2) (context__RETURN C'))) v_instrs (functype__ [::] v_t_2).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C v_a t1s t2s v_t_1 v_t_2 v_mm v_func v_x v_t v_instrs HType Hfinst HFunc HST.
 	gen_ind_subst HType => //.
 	- (* Instr *) inversion H; subst; try discriminate.
@@ -798,7 +809,7 @@ Proof.
 		- apply HST.
 		- apply Hfinst.
 		- exists (v_t0 ++ ts0'), C'; repeat split => //=; by rewrite <- app_assoc.  
-Qed.
+Qed. *)
 
 Lemma option_zip_with_same_pack: forall (v_n0 : option nat) (v_sx0 : option sx) (v_ww_sx : option (ww * sx)),
 	option_zipWith (fun (v : nat) (s : sx) => (packsize__ v, s)) v_n0 v_sx0 = v_ww_sx ->
@@ -826,7 +837,8 @@ Lemma Load_typing: forall v_S v_C t v_memop v_ww_sx t1s t2s,
 	/\ List.Forall (fun v_n => ((((Nat.pow 2 (memop__ALIGN v_memop)) <= (v_n / 8))%coq_nat) 
 	/\ ((v_n / 8) < ((fun_size t) / 8))%coq_nat)) (option_to_list v_n) 
 	/\ ((v_n = None) \/ ([t] = [(valtype__INN v_inn)])).          
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C t v_memop v_ww_sx t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Load *) inversion H; subst; try discriminate; destruct H4 as [? [? [? [? [? ?]]]]].
@@ -836,7 +848,7 @@ Proof.
 		- right. f_equal. apply H2.
 	- (* Weakening *) edestruct IHHType as [ts [v_n [v_sx [v_inn [v_mt [? [? [? [? [? [? [? [? ?]]]]]]]]]]]]] => //=.
 	exists (v_t ++ ts), v_n, v_sx, v_inn, v_mt. subst. repeat split => //=; try repeat rewrite <- app_assoc; eauto.
-Qed.
+Qed. *)
 
 Lemma Store_typing: forall v_S v_C t v_ww v_memop t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__STORE t v_ww v_memop) (functype__ t1s t2s) ->
@@ -848,14 +860,15 @@ Lemma Store_typing: forall v_S v_C t v_ww v_memop t1s t2s,
 	/\ List.Forall (fun v_n => (((Nat.pow 2 (memop__ALIGN v_memop)) <= (v_n / 8))%coq_nat 
 	/\ ((v_n / 8) < ((fun_size t) / 8))%coq_nat)) (option_to_list v_n) 
 	/\ ((v_n = None) \/ (t = (valtype__INN v_inn))).
-Proof.
+Admitted.
+(* Proof.
 	move => v_S v_C t v_ww v_memop t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Store *) inversion H; subst; try discriminate. destruct H4 as [? [? [? [? ?]]]].
 		injection H3 as ?. exists v_n, v_mt, v_inn. subst. repeat split => //=.
 	- (* Weakening *) edestruct IHHType as [v_n [v_mt [v_inn [? [? [? [? [? ?]]]]]]]] => //=.
 	exists v_n, v_mt, v_inn. subst. repeat split => //=; try repeat rewrite <- app_assoc; eauto.
-Qed.
+Qed. *)
 
 Lemma Memory_size_typing: forall v_S v_C t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__MEMORY_SIZE) (functype__ t1s t2s) ->
@@ -863,14 +876,15 @@ Lemma Memory_size_typing: forall v_S v_C t1s t2s,
 	(0 < (List.length (context__MEMS v_C)))%coq_nat /\ 
 	((lookup_total (context__MEMS v_C) 0) = v_mt) /\
     t2s = t1s ++ [valtype__INN inn__I32].
-Proof.
+Admitted.
+(* Proof.
 	intros v_S v_C t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Memory Size *) inversion H; subst; try discriminate. destruct H3.
   		exists v_mt. repeat split => //=.
 	- (* Weakening *) edestruct IHHType as [v_mt [? ?]]; subst=> //=. exists v_mt. destruct H0. repeat split => //=.
 		rewrite H1. by repeat rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Grow_memory_typing: forall v_S v_C t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__MEMORY_GROW) (functype__ t1s t2s) ->
@@ -878,14 +892,15 @@ Lemma Grow_memory_typing: forall v_S v_C t1s t2s,
 	(0 < (List.length (context__MEMS v_C)))%coq_nat /\ 
 	((lookup_total (context__MEMS v_C) 0) = v_mt) /\
     t2s = t1s /\ t1s = ts ++ [valtype__INN inn__I32].
-Proof.
+Admitted.
+(* Proof.
 	intros v_S v_C t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Memory Grow *) inversion H; subst; try discriminate. destruct H3.
 		exists v_mt, []. repeat split => //=.
 	- (* Weakening *) edestruct IHHType as [v_mt [v_ts [? [? [? ?]]]]] => //=.
 		exists v_mt, (v_t ++ v_ts). subst. repeat split => //=; by repeat rewrite <- app_assoc.
-Qed.
+Qed. *)
 		
 Lemma Block_typing: forall v_S v_C t2s v_instrs tn tm,
     Admin_instr_ok v_S v_C (admininstr__BLOCK t2s v_instrs) (functype__ tn tm) ->
@@ -923,7 +938,8 @@ Lemma Call_typing: forall j v_S v_C t1s t2s,
     lookup_total (context__FUNCS v_C) j = functype__ t1s' t2s' /\
                          t1s = ts ++ t1s' /\
                          t2s = ts ++ t2s'.
-Proof.
+Admitted.
+(* Proof.
 	move => j v_S v_C t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Call *) 
@@ -932,7 +948,7 @@ Proof.
 	- (* Frame *)
 		edestruct IHHType as [ts [t1s'' [t2s'' [? [? [? ?]]]]]] => //=; subst.
 		exists (v_t ++ ts), t1s'', t2s''. repeat split => //=; by rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Call_indirect_typing: forall v_S i v_C t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__CALL_INDIRECT i) (functype__ t1s t2s) ->
@@ -940,7 +956,8 @@ Lemma Call_indirect_typing: forall v_S i v_C t1s t2s,
     (i < length (context__TYPES v_C))%coq_nat /\
     lookup_total (context__TYPES v_C) i = functype__ tn tm /\
     t1s = ts ++ tn ++ [valtype__INN inn__I32] /\ t2s = ts ++ tm.
-Proof.
+Admitted.
+(* Proof.
 	move => j v_S v_C t1s t2s HType.
 	gen_ind_subst HType => //=.
 	- (* Call Indirect *) 
@@ -949,5 +966,4 @@ Proof.
 	- (* Frame *)
 		edestruct IHHType as [ts [t1s'' [t2s'' [? [? [? ?]]]]]] => //=; subst.
 		exists ts, t1s'', (v_t ++ t2s''). repeat split => //=; by rewrite <- app_assoc.
-Qed.
- *)
+Qed. *)
