@@ -31,6 +31,9 @@ Proof. by []. Qed.
 Lemma length_size {A : Type} (s : seq A) : Datatypes.length s = size s.
 Proof. by []. Qed.
 
+Lemma cat_app {A : Type} (s1 s2 : seq A) : List.app s1 s2 = cat s1 s2.
+Proof. by []. Qed.
+
 (* TODO: Get rid of coercion functions *)
 Fixpoint lfill (lh : E) (es : list admininstr) : list admininstr :=
   match lh with
@@ -551,6 +554,7 @@ Proof.
   - (* Admin_instr_ok__label *)
     move => s C n bes es t1 t2 Hinstrs Hadmin IH Hsize.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+    (* TODO: Can we simplify this? *)
     have Heqc : _append {|
       context__TYPES := [::];
       context__FUNCS := [::];
@@ -636,10 +640,9 @@ Proof.
     + case: Hterm => [Hconst | Htrap].
       * left. left.
         rewrite -v_to_e_cat -catA.
-        apply const_list_concat => //=.
-        by apply v_to_e_const.
-      * move: (extract_list1 _ _ _ Htrap) => {Htrap} [Hvcs2 He].
-        rewrite -v_to_e_cat He Hvcs2 cats0.
+        apply: const_list_concat => //=.
+        by apply: v_to_e_const.
+      * rewrite -v_to_e_cat -catA Htrap.
         case: vcs1 => [| vc1 vcs1] //=.
         -- left. by right.
         -- right. exists s, f, [:: admininstr__TRAP].
@@ -701,22 +704,97 @@ Proof.
       rewrite catA.
       by apply Step__ctxt_seq with (v_val := [::]).
   - (* Admin_instrs_ok__frame *)
-    (* NOTE: This is equivalent to Admin_instr_ok__weakening but for Admin_instrs_ok *)
-    move => s C es ts1 ts2 ts3 Hadmin IH.
+    move => s C es ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
-    Check Admin_instrs_ok__frame.
-    by admit.
+    (* NOTE: This is equivalent to Admin_instr_ok__weakening but for Admin_instrs_ok *)
+    (* TODO: Get rid of duplicate proof *)
+    have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
+    have Heqts : map typeof (drop (length ts) vcs) = ts1.
+    { rewrite map_drop.
+      inversion Htf as [[Htf1 Htf2]].
+      rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
+    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
+    rewrite {}length_size in IH.
+    set vcs1 := take (size ts) vcs in IH *.
+    set vcs2 := drop (size ts) vcs in IH *.
+    case: IH => [Hterm | Hprog].
+    + case: Hterm => [Hconst | Htrap].
+      * left. left.
+        rewrite -v_to_e_cat -catA.
+        apply const_list_concat => //=.
+        by apply v_to_e_const.
+      * rewrite -v_to_e_cat -catA Htrap.
+        case: vcs1 => /= [| vc1 vcs1].
+        -- left. by right.
+        -- right. exists s, f, [:: admininstr__TRAP].
+           apply: Step__pure.
+           apply Step_pure__trap_vals with (v_val := (vc1 :: vcs1)).
+           by left.
+    + right. move: Hprog => [s' [f' [es' IH]]].
+      exists s', f', (list__val__admininstr vcs1 ++ es').
+      rewrite -v_to_e_cat -catA.
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs2 ++ _]cats0.
+      rewrite -[list__val__admininstr vcs1 ++ es']cats0.
+      rewrite -[(list__val__admininstr vcs1 ++ es') ++ [::]]catA.
+      by apply Step__ctxt_seq with
+        (v_admininstr := list__val__admininstr vcs2 ++ es)
+        (v_admininstr' := es')
+        (v_admininstr'' := [::]).
   - (* Admin_instrs_ok__instrs *)
     (* NOTE: This is equivalent to Admin_instr_ok__instr but for Admin_instrs_ok *)
+    (* TODO: Get rid of duplicate proof *)
     move => s C bes tf Hinstrs.
-    move => f C' vcs ts1 ts2 lab ret.
-    Check Admin_instrs_ok__instrs.
-    by admit.
+    move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+    rewrite Htf Hcontext in Hinstrs.
+    pose Hprog := t_progress_be C' bes ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
+    case: Hprog => [Hconst | Hprog].
+    + left. rewrite /terminal_form.
+      left. apply: const_list_concat => //=.
+      by apply: v_to_e_const.
+    + by right. 
   - (* Thread_ok__ *)
-    move => s t1 f es t2 C.
+    move => s rs f es ts C.
     move => Hframe Hadmin IH Hstore.
-    Check Thread_ok__.
-    by admit.
+    have Heqtf : functype__ [::] ts = functype__ [::] ts by [].
+    have Heqts : map typeof [::] = [::] by [].
+    (* TODO: Remove duplicate proof *)
+    have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
+    { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
+      inversion Hmod => //=. rewrite cat_app cats0.
+      by apply Forall2_Val_ok_is_same_as_map in Hval. }
+    have Heq2 : context__LABELS C = [::].
+    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+    have Heq3 : context__RETURN C = None.
+    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+    (* TODO: Can we simplify this? *)
+    have Heqc : _append {|
+        context__TYPES := [::];
+        context__FUNCS := [::];
+        context__GLOBALS := [::];
+        context__TABLES := [::];
+        context__MEMS := [::];
+        context__LOCALS := [::];
+        context__LABELS := [::];
+        context__RETURN := Some rs
+      |} C = upd_local_label_return (upd_local C [::]) [seq typeof i  | i <- frame__LOCALS f] [::] (Some rs).
+    { move => {IH Hframe Hadmin}.
+      case: C Heq1 Heq2 Heq3 => //= ? ? ? ? ? ? ? ? Heq1 Heq2 Heq3.
+      by rewrite -Heq1 Heq2 Heq3. }
+    have Hmod : Module_instance_ok s (frame__MODULE f) (upd_local C [::]).
+    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
+      by inversion Hmod. }
+    move: (IH f (upd_local C [::]) [::] [::] ts [::] (Some rs) Heqtf Heqc Hmod Heqts Hstore) => {}IH {Heqtf Heqc}.
+    case: IH => /= [Hterm | Hprog].
+    + case: Hterm => [Hconst | Htrap].
+      * left. split => //=.
+        move/const_es_exists: Hconst => [vs Hvs].
+        rewrite Hvs in Hadmin *.
+        move/Val_Const_list_typing: Hadmin => /= ->.
+        by rewrite 2!map_length.
+      * right. left. by rewrite Htrap.
+    + right. by right.
 Admitted.
 
 Theorem t_progress: forall s f es ts,
@@ -732,17 +810,14 @@ Proof.
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
     (C' := upd_local_label_return C [::] [::] None) => //=.
   - have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
-    { inversion Hframe as [? ? ? ? ? ? Hmod Hval] => {Hframe} //=.
-      inversion Hmod => //=. rewrite List.app_nil_r.
+    { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
+      inversion Hmod => //=. rewrite cat_app cats0.
       by apply Forall2_Val_ok_is_same_as_map in Hval. }
     have Heq2 : context__LABELS C = [::].
-    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
-      by inversion Hmod => //=. }
+    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
     have Heq3 : context__RETURN C = None.
-    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
-      by inversion Hmod => //=. }
+    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
     by rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
-  - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=. subst.
-    case: v_C Hadmin Hmod => ? ? ? ? ? ? ? ? Hadmin Hmod. 
-    by inversion Hmod => //=.
+  - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe}.
+    by inversion Hmod.
 Qed.
