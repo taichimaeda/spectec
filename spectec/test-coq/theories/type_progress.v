@@ -34,28 +34,6 @@ Proof. by []. Qed.
 Lemma cat_app {A : Type} (s1 s2 : seq A) : List.app s1 s2 = cat s1 s2.
 Proof. by []. Qed.
 
-(* TODO: Get rid of coercion functions *)
-Fixpoint lfill (lh : E) (es : list admininstr) : list admininstr :=
-  match lh with
-  | E___HOLE_ => es
-  | E___SEQ vs lh' es' => (list__val__admininstr vs) ++ (lfill lh' es) ++ (list__instr__admininstr es')
-  | E__LABEL_ n es' lh' => [admininstr__LABEL_ n es' (lfill lh' es)]
-  end.
-
-Definition lh_push_back_es (es0 : list instr) (lh: E): E :=
-  match lh with
-  | E___HOLE_ => E___HOLE_
-  | E___SEQ vs lh' es => E___SEQ vs lh' (es ++ es0)
-  | E__LABEL_ n es lh' => E__LABEL_ n es lh'
-  end.
-
-Lemma lfill_push_back_es : forall (lh: E) (es : list admininstr) (es0 : list instr),
-    lfill (lh_push_back_es es0 lh) es = lfill lh es ++ list__instr__admininstr es0.
-Proof.
-  (* move => lh es es0.
-  destruct lh; simpl in * => //; by repeat rewrite -catA => //. *)
-Admitted.
-
 Definition is_const (e : admininstr) : bool :=
   if e is admininstr__CONST _ _ then true else false.
 
@@ -268,17 +246,6 @@ Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
 (* Hint Constructors opsem.reduce_simple : core. *)
 
-Definition not_lf_br (es : list admininstr) :=
-  forall k (lh: E), lfill lh [:: admininstr__BR k] <> es.
-
-Definition not_lf_br_outside (es : list admininstr) :=
-  (* TODO: How should we express this with E? *)
-  (* (forall n (lh: lholed n) k, lfill lh [:: admininstr__BR k] = es -> k < n) -> *)
-  forall (lh : E) k, lfill lh [:: admininstr__BR k] = es -> k < 999.
-
-Definition not_lf_return (es: list admininstr) :=
-  forall (lh : E), lfill lh [:: admininstr__RETURN] <> es.
-
 (* MEMO: be_typing -> Instrs_ok *)
 (* MEMO: f.(f_inst) -> f.(frame__MODULE) *)
 Lemma t_progress_be: forall C bes ts1 ts2 vcs lab ret s f,
@@ -293,21 +260,7 @@ Lemma t_progress_be: forall C bes ts1 ts2 vcs lab ret s f,
 Proof.
 Admitted.
 
-(* MEMO: s_typing -> Thread_ok *)
-Lemma s_typing_lf_br: forall s rs f es ts,
-  Thread_ok s rs f es ts ->
-  not_lf_br_outside es.
-Proof.
-Admitted.
-
-(* MEMO: s_typing -> Thread_ok *)
-Lemma s_typing_lf_return: forall s f es ts,
-  Thread_ok s None f es ts ->
-  not_lf_return es.
-Proof.
-Admitted.
-
-Lemma instr_ok_instrs_ok: forall C be tf,
+Lemma Instr_ok_Instrs_ok: forall C be tf,
   Instr_ok C be tf -> Instrs_ok C [:: be] tf.
 Proof.
   move => C be tf Hinstr.
@@ -378,7 +331,7 @@ Proof.
   - (* Admin_instr_ok__instr *)
     move => s C be tf Hinstr.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
-    have Hinstrs: Instrs_ok C [:: be] tf by apply instr_ok_instrs_ok.
+    have Hinstrs: Instrs_ok C [:: be] tf by apply Instr_ok_Instrs_ok.
     rewrite Htf Hcontext in Hinstrs.
     pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => [Hconst | Hprog].
@@ -398,22 +351,27 @@ Proof.
   - (* Admin_instr_ok__call_addr *)
     (* NOTE: admininstr__CALL_ADDR corresponds to invoke instruction *)
     move => s C addr ts1 ts2 Hext.
-    move => f C' vcs ts1' ts2' lab ret *.
-    right. exists s, f. eexists ?[es'].
-    inversion Hext as [? ? ? ? ? Haddr Hlookup | | | ] => //=.
+    move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+    right.
+    injection Htf => _ Htf1. rewrite -{}Htf1 in Hts.
+    inversion Hext as [? ? ? inst func Haddr Hlookup Hs Ha Htf' | | | ] => //=.
+    case Hfunc: func Hlookup => [x ls es] Hlookup.
+    pose ts := map (fun '(local__LOCAL t) => t) ls.
+    pose f' := (mkframe (vcs ++ (map fun_default_ ts)) inst).
+    exists s, f, [:: admininstr__FRAME_ (size ts2) f' [:: admininstr__LABEL_ (size ts2) [::] (list__instr__admininstr es)]].
     apply: Step__read.
     eapply Step_read__call_addr with 
-      (v_t_1 := ts1)
-      (* TODO: This fails because Step_read__call_addr in DSL expects ts2? rather than ts2* *)
-      (* (v_t_2 := ts2) *)
-      (v_t_2 := ?[v_t_2])
-      (v_mm := ?[v_mm])
-      (v_x := ?[v_x])
-      (v_t := ?[v_t])
-      (v_instr := ?[v_instr])
-       => //=.
-    - by admit.
-    - by admit.
+      (v_t_1 := ts1) (v_t_2 := ts2)
+      (v_mm := inst) (v_func := func) => //=.
+    - by rewrite Hfunc.
+    - by rewrite -Hts 2!length_size size_map. 
+    - by case: ts2 Hext Htf Htf' Hlookup.
+    - rewrite Hfunc. congr func__FUNC.
+      rewrite /ts {ts f'} map_map.
+      (* TODO: Extract this into a separate lemma *)
+      elim: ls {Hfunc Hlookup} => [| l ls IH] => //=.
+      rewrite -IH. congr cons.
+      by case: l.
   - (* Admin_instr_ok__label *)
     move => s C n bes es t1 t2 Hinstrs Hadmin IH Hsize.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
@@ -483,20 +441,18 @@ Proof.
       apply Step__ctxt_seq with
         (v_admininstr := [:: admininstr__FRAME_ n f es])
         (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
-      (* TODO: Step/ctxt-frame is likely wrong *)
-      (* apply: Step__ctxt_frame. *)
-      by admit.
+      by apply: Step__ctxt_frame.
   - (* Admin_instr_ok__weakening *)
     move => s C e ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
     have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
     have Heqts : map typeof (drop (length ts) vcs) = ts1.
     { rewrite map_drop.
-      inversion Htf as [[Htf1 Htf2]].
+      injection Htf => Htf2 Htf1.
       rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
     move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
     have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
-    rewrite {}length_size in IH.
+    rewrite length_size in IH.
     set vcs1 := take (size ts) vcs in IH *.
     set vcs2 := drop (size ts) vcs in IH *.
     case: IH => [Hterm | Hprog].
@@ -574,7 +530,7 @@ Proof.
     have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
     have Heqts : map typeof (drop (length ts) vcs) = ts1.
     { rewrite map_drop.
-      inversion Htf as [[Htf1 Htf2]].
+      injection Htf => Htf2 Htf1.
       rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
     move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
     have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
@@ -655,10 +611,10 @@ Proof.
         move/const_es_exists: Hconst => [vs Hvs].
         rewrite Hvs in Hadmin *.
         move/Val_Const_list_typing: Hadmin => /= ->.
-        by rewrite 2!map_length.
+        by rewrite 2!length_size map_map 2!size_map.
       * right. left. by rewrite Htrap.
     + right. by right.
-Admitted.
+Qed.
 
 Theorem t_progress: forall s f es ts,
   Config_ok (config__ (state__ s f) es) ts ->
@@ -666,8 +622,8 @@ Theorem t_progress: forall s f es ts,
   exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es').
 Proof.
   move => s f es ts Hconfig.
-  inversion Hconfig as [? ? ? ? Hstore Hthread]. subst.
-  inversion Hthread as [? ? ? ? ? C Hframe Hadmin]. subst.
+  inversion Hconfig as [? ? ? ? Hstore Hthread]; subst.
+  inversion Hthread as [? ? ? ? ? C Hframe Hadmin]; subst.
   eapply t_progress_e with
     (lab := [::]) (ret := Some None)
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
