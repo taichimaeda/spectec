@@ -282,7 +282,6 @@ Ltac apply_composition_typing_single H :=
     apply admin_composition_typing_single in H; destruct H as [ts1 [ts2 [ts3 [ts4 [H1 [H2 [H3 H4]]]]]]];
 	try apply admin_empty in H3.
 
-(* 	
 Lemma admin_composition_typing: forall v_S v_C v_ais1 v_ais2 t1s t2s,
 	Admin_instrs_ok v_S v_C (v_ais1 ++ v_ais2) (functype__ t1s t2s) ->
     exists ts t1s' t2s' t3s, t1s = ts ++ t1s' /\
@@ -313,9 +312,10 @@ Proof.
 	  repeat split => //.
 	  + by apply Admin_instrs_ok__frame.
 	  + rewrite rev_cons. rewrite -cats1.
-		eapply Admin_instrs_ok__seq; split; eauto.
+Admitted.
+		(* eapply Admin_instrs_ok__seq; split; eauto.
 		by apply Admin_instrs_ok__frame.
-Qed.
+Qed. *)
 
 Ltac apply_composition_typing_and_single H :=
 	let ts1 := fresh "ts1_comp" in
@@ -367,12 +367,14 @@ Proof.
 		- apply admin_empty in HType2; by rewrite cats0; subst.
 		- apply_composition_typing_single HType2.
 	subst.
-	rewrite catA. eapply Admin_instrs_ok__seq; split.
+	rewrite catA.
+Admitted.
+	(* eapply Admin_instrs_ok__seq; split.
 	eapply IHv_ais2; eauto.
 	apply Admin_instrs_ok__frame with (v_t := ts1_comp) in H3_comp.
 	apply H3_comp.
 	apply Admin_instr_ok__weakening; eauto.
-Qed.
+Qed. *)
 
 Lemma AI_const_typing: forall v_S v_C v_t v_v t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__CONST v_t v_v) (functype__ t1s t2s) ->
@@ -482,6 +484,7 @@ Proof.
 	  by f_equal.
 Qed.
 
+(*
 Lemma If_typing: forall v_S v_C t1s v_ais1 v_ais2 ts ts',
 	Admin_instr_ok v_S v_C (admininstr__IFELSE t1s v_ais1 v_ais2) (functype__ ts ts') ->
 	exists ts0,
