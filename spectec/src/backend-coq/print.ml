@@ -70,6 +70,7 @@ let rec string_of_terms (term : coq_term) =
     | T_type_basic T_bool -> "bool"
     | T_type_basic T_nat -> "nat"
     | T_type_basic T_int -> "Z"
+    | T_type_basic T_real -> "R"
     | T_type_basic T_string -> "string"
     | T_type_basic T_list -> "list"
     | T_type_basic T_opt -> "option"
@@ -308,7 +309,7 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
 
 let exported_string = 
   "(* Exported Code *)\n" ^
-  "From Coq Require Import String List Unicode.Utf8.\n" ^
+  "From Coq Require Import String List Unicode.Utf8 Reals.\n" ^
   "From RecordUpdate Require Import RecordSet.\n" ^
   "Require Import NArith.\n" ^
   "Require Import Arith.\n" ^

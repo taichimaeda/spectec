@@ -183,7 +183,7 @@ let transform_numtyp (typ : numtyp) =
     | NatT -> T_type_basic T_nat
     | IntT -> T_type_basic T_nat
     | RatT -> T_type_basic T_nat (*T_unsupported "rat"*)
-    | RealT -> T_type_basic T_nat (*T_unsupported "real"*)
+    | RealT -> T_type_basic T_real (*T_unsupported "real"*)
 
 let rec transform_type (typ : typ) =
   match typ.it with
