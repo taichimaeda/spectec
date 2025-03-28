@@ -246,18 +246,132 @@ Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
 (* Hint Constructors opsem.reduce_simple : core. *)
 
+(* NOTE: Mutual induction principle used in t_progress_be *)
+Scheme Instr_ok_ind' := Induction for Instr_ok Sort Prop
+  with Instrs_ok_ind' := Induction for Instrs_ok Sort Prop.
+
 (* MEMO: be_typing -> Instrs_ok *)
 (* MEMO: f.(f_inst) -> f.(frame__MODULE) *)
-Lemma t_progress_be: forall C bes ts1 ts2 vcs lab ret s f,
-    Store_ok s ->
-    Module_instance_ok s f.(frame__MODULE) C ->
-    Instrs_ok (upd_local_label_return C (map typeof f.(frame__LOCALS)) lab ret) bes (functype__ ts1 ts2) ->
-    map typeof vcs = ts1 ->
-    (* not_lf_br (list__instr__admininstr bes) -> *)
-    (* not_lf_return (list__instr__admininstr bes) -> *)
-    const_list (list__instr__admininstr bes) \/
-    exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es').
+(* TODO: Reorder premises in consistent order *)
+Lemma t_progress_be: forall s C C' f vcs bes tf ts1 ts2 lab ret,
+  Instrs_ok C bes tf ->
+  tf = functype__ ts1 ts2 ->
+  C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
+  Module_instance_ok s f.(frame__MODULE) C' ->
+  map typeof vcs = ts1 ->
+  Store_ok s ->
+  (* not_lf_br (list__instr__admininstr bes) -> *)
+  (* not_lf_return (list__instr__admininstr bes) -> *)
+  const_list (list__instr__admininstr bes) \/
+  exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es').
 Proof.
+  move => s C C' f vcs bes tf ts1 ts2 lab ret Hinstrs.
+  move: s f C' vcs ts1 ts2 lab ret.
+  apply Instrs_ok_ind' with 
+    (P := fun C be tf (Hinstr : Instr_ok C be tf) => 
+      forall s f C' vcs ts1 ts2 lab ret,
+      tf = functype__ ts1 ts2 ->
+      C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
+      Module_instance_ok s f.(frame__MODULE) C' ->
+      map typeof vcs = ts1 ->
+      Store_ok s ->
+      (* not_lf_br (list__instr__admininstr [:: be]) -> *)
+      (* not_lf_return (list__instr__admininstr [:: be]) -> *)
+      const_list (list__instr__admininstr [:: be]) \/
+      exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr [:: be])) (config__ (state__ s' f') es'))
+    (P0 := fun C bes tf (Hinstrs : Instrs_ok C bes tf) =>
+      forall s f C' vcs ts1 ts2 lab ret,
+      tf = functype__ ts1 ts2 ->
+      C = (upd_local_label_return C' (map typeof f.(frame__LOCALS)) lab ret) ->
+      Module_instance_ok s f.(frame__MODULE) C' ->
+      map typeof vcs = ts1 ->
+      Store_ok s ->
+      (* not_lf_br (list__instr__admininstr bes) -> *)
+      (* not_lf_return (list__instr__admininstr bes) -> *)
+      const_list (list__instr__admininstr bes) \/
+      exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es'))
+      => //= {C bes tf Hinstrs}.
+    - (* Instr_ok__nop *)
+      move => C.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      exists s, f, (list__val__admininstr vcs).
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs ++ _]cats0.
+      rewrite -2!{2}[list__val__admininstr vcs]cats0.
+      rewrite -2!catA.
+      apply Step__ctxt_seq with
+        (v_admininstr := [:: admininstr__NOP]).
+      by apply: Step__pure Step_pure__nop.
+    - (* Instr_ok__unreachable *)
+      by admit.
+    - (* Instr_ok__drop *)
+      by admit.
+    - (* Instr_ok__select *)
+      by admit.
+    - (* Instr_ok__block *)
+      by admit.
+    - (* Instr_ok__loop *)
+      by admit.
+    - (* Instr_ok__if *)
+      by admit.
+    - (* Instr_ok__br *)
+      by admit.
+    - (* Instr_ok__br_if *)
+      by admit.
+    - (* Instr_ok__br_table *)
+      by admit.
+    - (* Instr_ok__call *)
+      by admit.
+    - (* Instr_ok__call_indirect *)
+      by admit.
+    - (* Instr_ok__return *)
+      (* NOTE: Need to discard this case by not_lf_return *)
+      by admit.
+    - (* Instr_ok__const *)
+      by admit.
+    - (* Instr_ok__unop *)
+      by admit.
+    - (* Instr_ok__binop *)
+      by admit.
+    - (* Instr_ok__testop *)
+      by admit.
+    - (* Instr_ok__relop *)
+      by admit.
+    - (* Instr_ok__cvtop_reinterpret *)
+      by admit.
+    - (* Instr_ok__cvtop_convert_i *)
+      by admit.
+    - (* Instr_ok__cvtop_convert_f *)
+      by admit.
+    - (* Instr_ok__local_get *)
+      (* TODO: Figure out how to make use of lookup_total (context__LOCALS v_C) v_x = v_t *)
+      by admit.
+    - (* Instr_ok__local_set *)
+      by admit.
+    - (* Instr_ok__local_tee *)
+      by admit.
+    - (* Instr_ok__global_get *)
+      (* TODO: Instructions accessing store will require special lemmas like glob_context_store *)
+      by admit.
+    - (* Instr_ok__global_set *)
+      by admit.
+    - (* Instr_ok__memory_size *)
+      by admit.
+    - (* Instr_ok__memory_grow *)
+      by admit.
+    - (* Instr_ok__load *)
+      (* TODO: These load/store instructions may be tricky *)
+      by admit.
+    - (* Instr_ok__store *)
+      by admit.
+    - (* Instrs_ok__empty *)
+      by admit.
+    - (* Instrs_ok__seq *)
+      by admit.
+    - (* Instrs_ok__frame *)
+      (* NOTE: This should be named as Instrs_ok__weakening *)
+      by admit.
 Admitted.
 
 Lemma Instr_ok_Instrs_ok: forall C be tf,
@@ -283,6 +397,7 @@ Scheme Admin_instr_ok_ind' := Induction for Admin_instr_ok Sort Prop
 (* MEMO: reduce -> Step_read *)
 (* NOTE: lholed is no longer used in specifying opsem
          Use evaluation context E directly *)
+(* TODO: Reorder premises in consistent order *)
 Lemma t_progress_e: forall s C C' f vcs es tf ts1 ts2 lab ret,
   Admin_instrs_ok s C es tf ->
   tf = functype__ ts1 ts2 ->
@@ -333,12 +448,13 @@ Proof.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     have Hinstrs: Instrs_ok C [:: be] tf by apply Instr_ok_Instrs_ok.
     rewrite Htf Hcontext in Hinstrs.
-    pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
+    admit.
+    (* pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right. 
+    + by right.  *)
   - (* Admin_instr_ok__trap *)
     move => s C ts1 ts2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
@@ -567,12 +683,13 @@ Proof.
     move => s C bes tf Hinstrs.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     rewrite Htf Hcontext in Hinstrs.
-    pose Hprog := t_progress_be C' bes ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
+    admit.
+    (* pose Hprog := t_progress_be C' bes ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right. 
+    + by right.  *)
   - (* Thread_ok__ *)
     move => s rs f es ts C.
     move => Hframe Hadmin IH Hstore.
