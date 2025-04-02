@@ -12,7 +12,7 @@ Import RecordSetNotations.
 From WasmSpectec Require Import generatedcode.
 From WasmSpectec Require Import helper_lemmas helper_tactics typing_lemmas.
 (* From WasmSpectec Require Import type_preservation. *)
-From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq.
+From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype.
 
 (* NOTE: Naming conventions:
          1. type for types
@@ -241,6 +241,111 @@ Proof.
   unfold terminal_form. by right.
 Qed.
 
+Lemma typeof_append: forall ts t vs,
+    map typeof vs = ts ++ [::t] ->
+    exists v,
+      vs = take (size ts) vs ++ [::v] /\
+      map typeof (take (size ts) vs) = ts /\
+      typeof v = t.
+Proof.
+  move => ts t vs HMapType.
+  apply cat_split in HMapType.
+  destruct HMapType.
+  rewrite -map_take in H.
+  rewrite -map_drop in H0.
+  destruct (drop (size ts) vs) eqn:HDrop => //=.
+  destruct l => //=.
+  inversion H0. subst.
+  exists v.
+  split => //.
+  rewrite -HDrop. by rewrite cat_take_drop.
+Qed.
+
+(* NOTE: Given Hts : [seq typeof i  | i <- vcs] = [:: t],
+         generates equalities on elements of vcs like [:: v1] = [:: t] and typeof v1 = t *)
+Ltac invert_typeof_vcs :=
+  lazymatch goal with
+  | H: map typeof ?vcs = [:: _; _; _] |- _ =>
+    let v1 := fresh "v1" in
+    let v2 := fresh "v2" in 
+    let v3 := fresh "v3" in 
+    let v4 := fresh "v4" in 
+    let vcs1 := fresh "vcs1" in
+    let vcs2 := fresh "vcs2" in
+    let vcs3 := fresh "vcs3" in
+    let vcs4 := fresh "vcs4" in 
+    let Ht1 := fresh "Ht1" in
+    let Ht2 := fresh "Ht2" in
+    let Ht3 := fresh "Ht3" in
+    case: vcs H => [| v1 vcs1] H //=;
+    case: vcs1 H => [| v2 vcs2] H //=;
+    case: vcs2 H => [| v3 vcs3] H //=;
+    case: vcs3 H => [| v4 vcs4] H //=;
+    case: H => Ht1 Ht2 Ht3
+  | H: map typeof ?vcs = [:: _; _] |- _ =>
+    let v1 := fresh "v1" in
+    let v2 := fresh "v2" in 
+    let v3 := fresh "v3" in 
+    let vcs1 := fresh "vcs1" in
+    let vcs2 := fresh "vcs2" in
+    let vcs3 := fresh "vcs3" in
+    let Ht1 := fresh "Ht1" in
+    let Ht2 := fresh "Ht2" in
+    case: vcs H => [| v1 vcs1] H //=;
+    case: vcs1 H => [| v2 vcs2] H //=;
+    case: vcs2 H => [| v3 vcs3] H //=;
+    case: H => Ht1 Ht2
+  | H: map typeof ?vcs = [:: _] |- _ =>
+    let v1 := fresh "v1" in
+    let v2 := fresh "v2" in 
+    let vcs1 := fresh "vcs1" in
+    let vcs2 := fresh "vcs2" in
+    let Ht1 := fresh "Ht1" in
+    case: vcs H => [| v1 vcs1] H //=;
+    case: vcs1 H => [| v2 vcs2] H //=;
+    case: H => Ht1
+  | H: map typeof ?vcs = [::] |- _ =>
+    let v1 := fresh "v1" in 
+    let vcs1 := fresh "vcs1" in
+    case: vcs H => [| v1 vcs1] H //=
+  end.
+
+Ltac decidable_equality_step :=
+  first [
+      by apply: eq_comparable
+    | apply: List.list_eq_dec
+    (* | apply: Coqlib.option_eq *)
+    | apply: PeanoNat.Nat.eq_dec
+    | by eauto
+    | intros; apply: decP; by (exact _ || eauto)
+    | decide equality ].
+
+(** Solve a goal of the form [forall a1 a2, {a1 = a2} + {a1 <> a2}]. **)
+Ltac decidable_equality :=
+  repeat decidable_equality_step.
+
+(* TODO: Auto-generate these instances for each type *)
+Definition functype_eq_dec : forall tf1 tf2 : functype,
+  {tf1 = tf2} + {tf1 <> tf2}.
+Proof. decidable_equality. Defined.
+
+Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),
+  let eqb v1 v2 := is_left (eq_dec v1 v2) in
+  Equality.axiom eqb.
+Proof.
+  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).
+  - move=> E. by apply/ReflectT.
+  - move=> E. by apply/ReflectF.
+Qed.
+
+Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
+Definition eqfunctypeP : Equality.axiom functype_eqb :=
+  eq_dec_Equality_axiom functype functype_eq_dec.
+
+Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
+Canonical Structure functype_eqType :=
+  Eval hnf in EqType functype functype_eqMixin.
+
 (* TODO: This hint for auto might not work as expected *)
 Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
@@ -294,43 +399,175 @@ Proof.
     - (* Instr_ok__nop *)
       move => C.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
-      right.
-      exists s, f, (list__val__admininstr vcs).
-      (* TODO: Can we get rid of these rewrites? *)
-      rewrite -[list__val__admininstr vcs ++ _]cats0.
-      rewrite -2!{2}[list__val__admininstr vcs]cats0.
-      rewrite -2!catA.
+      (* TODO: Can we get rid of ++ [::] in exists? *)
+      right. exists s, f, (list__val__admininstr vcs ++ [::] ++ [::]).
       apply Step__ctxt_seq with
         (v_admininstr := [:: admininstr__NOP]).
       by apply: Step__pure Step_pure__nop.
     - (* Instr_ok__unreachable *)
-      by admit.
+      move => C ts1 ts2.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      (* TODO: Can we get rid of ++ [::] in exists? *)
+      right. exists s, f, (list__val__admininstr vcs ++ [:: admininstr__TRAP] ++ [::]).
+      apply Step__ctxt_seq with
+        (v_admininstr := [:: admininstr__UNREACHABLE]).
+      by apply: Step__pure Step_pure__unreachable.
     - (* Instr_ok__drop *)
-      by admit.
+      move => C t.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      (* TODO: Replace injection in other places with case
+               e.g. injection Htf => _ Htf1. rewrite -{}Htf1 in Hts. *)
+      (* TODO: Use invert_typeof_vcs in t_progress_e too. *)
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      exists s, f, [::].
+      apply: Step__pure.
+      by apply: Step_pure__drop.
     - (* Instr_ok__select *)
-      by admit.
+      move => C t.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      case: v3 Ht3 => [t3 v3] /= Ht3. rewrite Ht3.
+      (* Set Printing Coercions.
+      Print val.
+      Print val_.
+      Print Instr_ok.
+      Print Admin_instr_ok.
+      Print admininstr__CONST. *)
+      (* TODO: There is no check that ensures valtype and val_ matches 
+               and thus we cannot tell v3 is inn from typeof (val__CONST t3 v3) = valtype__INN inn__I32 *)
+      case: v3 => [v3 | ?]; last by admit. (* This last goal should be rejected *)
+      case: v3 => [| v3'].
+      - exists s, f, (list__val__admininstr [:: v2]).
+        apply: Step__pure.
+        by apply: Step_pure__select_false.
+      - exists s, f, (list__val__admininstr [:: v1]).
+        apply: Step__pure.
+        by apply: Step_pure__select_true.
     - (* Instr_ok__block *)
-      by admit.
+      move => C bt bes _ _.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right. exists s, f, [:: admininstr__LABEL_ (fun_optionSize bt) [::] (list__instr__admininstr bes)].
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      apply: Step__read. apply: Step_read__block.
+      case: bt => [bt |] //=; by [right | left].
     - (* Instr_ok__loop *)
-      by admit.
+      move => C bt bes _ _.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right. exists s, f, [:: admininstr__LABEL_ (fun_optionSize bt) [:: instr__LOOP bt bes] (list__instr__admininstr bes)].
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      apply: Step__read. apply: Step_read__loop.
+      case: bt => [bt |] //=; by [right | left].
     - (* Instr_ok__if *)
-      by admit.
+      move => C bt bes1 bes2 _ _ _ _.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
+      (* TODO: Same problem as Instr_ok__select *)
+      case: v1 => [v1 | ?]; last by admit. (* This last goal should be rejected *)
+      case: v1 => [| v1'].
+      - exists s, f, [:: admininstr__BLOCK bt bes2].
+        apply: Step__pure.
+        by apply: Step_pure__if_false.
+      - exists s, f, [:: admininstr__BLOCK bt bes1].
+        apply: Step__pure.
+        by apply: Step_pure__if_true.
     - (* Instr_ok__br *)
+      (* TODO: This case should be discarded by not_lf_br *)
       by admit.
     - (* Instr_ok__br_if *)
+      (* TODO: This case should be discarded by not_lf_br *)
       by admit.
     - (* Instr_ok__br_table *)
+      (* TODO: This case should be discarded by not_lf_br *)
       by admit.
     - (* Instr_ok__call *)
-      by admit.
+      move => C x ts1 ts2 Haddr Hlookup.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      (* TODO: Can we get rid of ++ [::] in exists? *)
+      right. exists s, f, (list__val__admininstr vcs ++ [:: admininstr__CALL_ADDR (lookup_total (fun_funcaddr (state__ s f)) x)] ++ [::]).
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs ++ _]cats0 -catA.
+      apply Step__ctxt_seq with
+        (v_admininstr := [:: admininstr__CALL x]).
+      apply: Step__read. apply: Step_read__call.
+      rewrite !length_size in Haddr *.
+      (* TODO: Extract this into a separate lemma *)
+      have H1 : context__FUNCS C = context__FUNCS C'.
+      { move => {Haddr Hlookup}.
+        case: C Hcontext => ? ? ? ? ? ? ? ? Hcontext.
+        case: C' Hcontext Hmod => ? ? ? ? ? ? ? ? Hcontext Hmod.
+        inversion Hmod => /=. inversion Hcontext => /=. by []. }
+      rewrite {}H1 in Haddr.
+      (* TODO: Extract this into a separate lemma *)
+      have H2 : size (context__FUNCS C') = size (fun_funcaddr (state__ s f)).
+      { move => {Hcontext Haddr}.
+        case: C' Hmod => ? ? ? ? ? ? ? ? Hmod.
+        inversion Hmod as [? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? Hs Hf] => //=.
+        by rewrite -Hf => //=. }
+      by rewrite -{}H2.
     - (* Instr_ok__call_indirect *)
+      move => C x ts1 ts2 Haddr Hlookup.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
+      (* TODO: Make use of typeof_append in t_progress_e too *)
+      move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]].
+      rewrite {}Hvcs.
+      case: v1 Ht1 => [t1 v1] /= Ht1. rewrite {}Ht1.
+      (* TODO: Same problem as Instr_ok__select *)
+      case: v1 => [v1 | ?]; last by admit.  (* This last goal should be rejected *)
+      case E1: (lookup_total (tableinst__REFS (fun_table (state__ s f) 0)) v1) => [a |].
+      case E2: (fun_type (state__ s f) x == funcinst__TYPE (lookup_total (fun_funcinst (state__ s f)) a)).
+      case E3: (v1 < Datatypes.length (tableinst__REFS (fun_table (state__ s f) 0))).
+      case E4: (a < Datatypes.length (store__FUNCS s)).
+      move/eqP: E2 => E2.
+      move/ltP: E3 => E3.
+      move/ltP: E4 => E4.
+      exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__CALL_ADDR a]).
+      (* TODO: Can we get rid of these rewrites? *)
+      have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      rewrite -[[:: admininstr__CALL_ADDR a]]cats0.
+      apply Step__ctxt_seq with
+        (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]%list).
+      apply: Step__read.
+      apply: Step_read__call_indirect_call => //=.
+
+      by admit.
+
+      (* TODO: Can we get rid of duplication here *)
+      move/eqP: E2 => E2.
+      move/ltP: E3 => E3.
+      (* move/ltP: E4 => E4. *)
+      exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
+      (* TODO: Can we get rid of these rewrites? *)
+      have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      rewrite -[[:: admininstr__TRAP]]cats0.
+      apply Step__ctxt_seq with
+        (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
+      apply: Step__read.
+      apply: Step_read__call_indirect_trap.
+      move => Hcontra.
+      case: Hcontra => * //=.
+      Print Step_read_before_Step_read__call_indirect_trap.
+
+
+
+      Check Step_read__call.
+      Check Step_read__call_indirect_trap.
       by admit.
     - (* Instr_ok__return *)
-      (* NOTE: Need to discard this case by not_lf_return *)
+      (* TODO: This case should be discarded by not_lf_return *)
       by admit.
     - (* Instr_ok__const *)
       by admit.
     - (* Instr_ok__unop *)
+      Check Step_pure__unop_val.
+      Print fun_unop.
       by admit.
     - (* Instr_ok__binop *)
       by admit.
@@ -448,7 +685,8 @@ Proof.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     have Hinstrs: Instrs_ok C [:: be] tf by apply Instr_ok_Instrs_ok.
     rewrite Htf Hcontext in Hinstrs.
-    admit.
+    (* TODO: This fails because statement of t_progress_be has been modified *)
+    by admit.
     (* pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
@@ -683,7 +921,8 @@ Proof.
     move => s C bes tf Hinstrs.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     rewrite Htf Hcontext in Hinstrs.
-    admit.
+    (* TODO: This fails because statement of t_progress_be has been modified *)
+    by admit.
     (* pose Hprog := t_progress_be C' bes ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
@@ -731,7 +970,7 @@ Proof.
         by rewrite 2!length_size map_map 2!size_map.
       * right. left. by rewrite Htrap.
     + right. by right.
-Qed.
+Admitted.
 
 Theorem t_progress: forall s f es ts,
   Config_ok (config__ (state__ s f) es) ts ->
