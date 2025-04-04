@@ -704,8 +704,10 @@ Proof.
       move => C x t Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Check Step__local_set.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      case Econfig: (fun_with_local (state__ s f) x v1) => [s' f'].
+      exists s', f', [::]. rewrite -Econfig.
+      by apply: Step__local_set.
     - (* Instr_ok__local_tee *)
       by admit.
     - (* Instr_ok__global_get *)
