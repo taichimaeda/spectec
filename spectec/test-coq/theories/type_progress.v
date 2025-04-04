@@ -688,9 +688,23 @@ Proof.
           (* MEMO: Same issue as Instr_ok__unop *)
           by admit.
     - (* Instr_ok__local_get *)
-      (* TODO: Figure out how to make use of lookup_total (context__LOCALS v_C) v_x = v_t *)
-      by admit.
+      move => C x t Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      exists s, f, (list__val__admininstr vcs ++ list__val__admininstr [:: fun_local (state__ s f) x]).
+      (* TODO: Can we get rid of these rewrites? *)
+      rewrite -[list__val__admininstr vcs ++ _]cats0.
+      rewrite -[list__val__admininstr vcs ++ list__val__admininstr [:: fun_local (state__ s f) x]]cats0.
+      rewrite -2!catA.
+      apply Step__ctxt_seq with
+        (v_admininstr := [:: admininstr__LOCAL_GET x]).
+      apply: Step__read.
+      by apply: Step_read__local_get.
     - (* Instr_ok__local_set *)
+      move => C x t Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step__local_set.
       by admit.
     - (* Instr_ok__local_tee *)
       by admit.
