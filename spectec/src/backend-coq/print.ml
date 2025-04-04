@@ -138,6 +138,9 @@ let string_of_list_type (id : ident) (args : binders) =
 
   "Definition " ^ "list__" ^ id ^ " " ^ string_of_binders args ^  " := " ^ parens ("list " ^ parens (id ^ " " ^ string_of_binders_ids args))
   
+let string_of_option_type (id : ident) (args : binders) =
+  "Definition " ^ "option__" ^ id ^ " " ^ string_of_binders args ^  " := " ^ parens ("option " ^ parens (id ^ " " ^ string_of_binders_ids args))
+
 let string_of_match_binders (binds : binders) =
   parens (String.concat ", " (List.map (fun (id, _) -> id) binds))
 
@@ -162,6 +165,7 @@ let string_of_record (id: ident) (entries : record_entry list) =
         record_id ^ " := default_val") entries) ^ "|} }.\n\n" ^
 
   string_of_list_type id [] ^ ".\n\n" ^
+  string_of_option_type id [] ^ ".\n\n" ^
   (* Record Append proof (TODO might need information on type to improve this) *)
   "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
   "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
@@ -183,6 +187,7 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
   )  entries) ^ ".\n\n" ^
 
   string_of_list_type id args ^ ".\n\n" ^
+  string_of_option_type id args ^ ".\n\n" ^
   (* Inhabitance proof for default values *)
   let inhabitance_binders = string_of_binders args in 
   let binders = if args <> [] then " " ^ string_of_binders_ids args else "" in 
@@ -219,7 +224,8 @@ let rec string_of_premise (prem : coq_premise) =
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
   "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
-  string_of_list_type id binds
+  string_of_list_type id binds ^ ".\n\n" ^
+  string_of_option_type id binds
 
 
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
@@ -260,12 +266,16 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
   
   (* Coercions (TODO make this work better (only really works for T_ident terms and constant dependent types)) *)
   string_of_list_type id [] ^ ".\n\n" ^
+  string_of_option_type id [] ^ ".\n\n" ^
   String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
   | TypeAliasT term -> 
     let (typealias_id, args) = string_of_ident_terms term in
+    let opt_func = "option__" ^ typealias_id ^ "__" ^ id in
     "Coercion " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ typealias_id ^ " >-> " ^ id ^ ".\n\n" ^
-    "Definition list__" ^ typealias_id ^ "_" ^ id ^ " : " ^ "list__" ^ typealias_id ^ " " ^ args ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
-    "Coercion list__" ^ typealias_id ^ "_" ^ id ^ " : list__" ^ typealias_id ^ " >-> " ^ "list__" ^ id 
+    "Definition list__" ^ typealias_id ^ "__" ^ id ^ " : " ^ "list__" ^ typealias_id ^ " " ^ args ^ " -> " ^ "list__" ^ id ^ " := map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
+    "Coercion list__" ^ typealias_id ^ "__" ^ id ^ " : list__" ^ typealias_id ^ " >-> " ^ "list__" ^ id ^ ".\n\n" ^
+    "Definition " ^ opt_func ^ " : option__" ^ typealias_id ^ " -> " ^ "option__" ^ id ^ " := option_map " ^ entry_id ^ "__" ^ family_type_suffix ^ ".\n\n" ^
+    "Coercion " ^ opt_func ^ " : option__" ^ typealias_id ^ " >-> " ^ "option__" ^ id
   | _ -> ""
 ) entries)
   else
@@ -277,13 +287,17 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
 
 let string_of_notation (id : ident) (term : coq_term) = 
   "Notation " ^ id ^ " := " ^ string_of_terms term ^ ".\n\n" ^
-  string_of_list_type id []
+  string_of_list_type id [] ^ ".\n\n" ^
+  string_of_option_type id []
 
 let string_of_coercion (func_name : func_name) (typ1 : ident) (typ2 : ident) =
   let list_func = "list__" ^ typ1 ^ "__" ^ typ2 in
+  let opt_func = "option__" ^ typ1 ^ "__" ^ typ2 in
   "Coercion " ^ func_name ^ " : " ^ typ1 ^ " >-> " ^ typ2 ^ ".\n\n" ^
   "Definition " ^ list_func ^ " : list__" ^ typ1 ^ " -> " ^ "list__" ^ typ2 ^ " := map " ^ func_name ^ ".\n\n" ^
-  "Coercion " ^ list_func ^ " : list__" ^ typ1 ^ " >-> " ^ "list__" ^ typ2
+  "Coercion " ^ list_func ^ " : list__" ^ typ1 ^ " >-> " ^ "list__" ^ typ2 ^ ".\n\n" ^
+  "Definition " ^ opt_func ^ " : option__" ^ typ1 ^ " -> " ^ "option__" ^ typ2 ^ " := option_map " ^ func_name ^ ".\n\n" ^
+  "Coercion " ^ opt_func ^ " : option__" ^ typ1 ^ " >-> " ^ "option__" ^ typ2
 
 let rec string_of_def (recursive : bool) (def : coq_def) = 
   comment_parens (comment_desc_def def ^ " at: " ^ Util.Source.string_of_region (def.at)) ^ "\n" ^ 

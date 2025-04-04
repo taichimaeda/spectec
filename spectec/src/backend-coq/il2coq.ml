@@ -217,11 +217,12 @@ and transform_return_type (typ : typ) =
   match typ.it with
     (* Only works for 1-dimensional lists. 
     (Which is fine since type coercing for higher dimensional lists is too much anyways)*)
-    | IterT ({it = VarT (id, args); _}, _) -> 
-      let inferred_opt = Hashtbl.mem family_helper (transform_id id) in      
+    | IterT ({it = VarT (id, args); _}, iter) -> 
+      let inferred_opt = Hashtbl.mem family_helper (transform_id id) in
+      let str = if iter = Opt then "option" else "list" in 
       if inferred_opt 
-      then T_ident ["list"; transform_id id] 
-      else T_app (T_ident ["list"; transform_id id], List.map transform_arg args)
+      then T_ident [str; transform_id id] 
+      else T_app (T_ident [str; transform_id id], List.map transform_arg args)
     | IterT (typ, iter) -> T_app (transform_itertyp iter, [transform_return_type typ])
     | _ -> erase_dependent_type typ
 
@@ -274,11 +275,12 @@ and transform_exp (exp : exp) =
     | IterE (exp, (iter, ids)) ->  
         let exp1 = transform_exp exp in
         let t_iter = if iter = Opt then I_option else I_list in
+        let iter_str = if iter = Opt then "option" else "list" in
         (match iter, ids, exp.it with
         | (List | List1 | ListN _), [], _ -> T_list [exp1] 
         | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
-        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
-        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> T_app (T_ident ["list"; gen_typ_name typ1; gen_typ_name typ2], [T_map (t_iter, transform_var_id v, transform_exp e)])
+        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) -> T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
+        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_map (t_iter, transform_var_id v, transform_exp e)])
         | Opt, [(_, _)], OptE (Some e) -> T_app (T_exp_basic T_some, [transform_exp e])
         | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_map (t_iter, transform_var_id v, exp1)
         | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_zipwith (t_iter, transform_var_id v, transform_var_id s, transform_exp exp)
@@ -322,6 +324,7 @@ and transform_return_exp (r_typ : typ option) (exp : exp) =
     | None -> transform_exp exp
     | Some typ -> (match exp.it with
       | ListE exps -> T_list (List.map (fun e -> T_cast ((transform_exp e), erase_dependent_type (remove_iter_typ typ))) exps)
+      | OptE (Some e) -> T_app (T_exp_basic T_some, [T_cast (transform_exp e, erase_dependent_type (remove_iter_typ typ))])
       | _ -> transform_exp exp
     )
 
