@@ -525,43 +525,70 @@ Proof.
       case E2: (fun_type (state__ s f) x == funcinst__TYPE (lookup_total (fun_funcinst (state__ s f)) a)).
       case E3: (v1 < Datatypes.length (tableinst__REFS (fun_table (state__ s f) 0))).
       case E4: (a < Datatypes.length (store__FUNCS s)).
-      move/eqP: E2 => E2.
-      move/ltP: E3 => E3.
-      move/ltP: E4 => E4.
-      exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__CALL_ADDR a]).
-      (* TODO: Can we get rid of these rewrites? *)
-      have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
-      rewrite -[[:: admininstr__CALL_ADDR a]]cats0.
-      apply Step__ctxt_seq with
-        (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]%list).
-      apply: Step__read.
-      apply: Step_read__call_indirect_call => //=.
-      (* TODO: Can we get rid of duplication here *)
-      move/eqP: E2 => E2.
-      move/ltP: E3 => E3.
-      move/ltP: E4 => E4.
-      exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
-      (* TODO: Can we get rid of these rewrites? *)
-      have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
-      rewrite -[[:: admininstr__TRAP]]cats0.
-      apply Step__ctxt_seq with
-        (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
-      apply: Step__read.
-      apply: Step_read__call_indirect_trap.
-      move => Hcontra.
-      case: Hcontra => * //=.
-      (* MEMO: Negation of the premise for 'otherwise' is mishandled here
-               Quantification of 'a' for exmaple is inside the negation
-               which prevents us from deriving contradictions *)
-      Print Step_read_before_Step_read__call_indirect_trap.
-      Check Step_read__call.
-      Check Step_read__call_indirect_trap.
-      by admit.
-      by admit.
-      by admit.
-      by admit.
+      all: try move/eqP: E2 => E2;
+           try move/ltP: E3 => E3;
+           try move/ltP: E4 => E4.
+      + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__CALL_ADDR a]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+        { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+        rewrite -[[:: admininstr__CALL_ADDR a]]cats0.
+        apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]%list).
+        apply: Step__read.
+        apply: Step_read__call_indirect_call => //=.
+      + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+        { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+        rewrite -[[:: admininstr__TRAP]]cats0.
+        apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
+        apply: Step__read.
+        apply: Step_read__call_indirect_trap.
+        move => Hcontra.
+        inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
+        rewrite E1 in E1'. inversion E1' as [E1''].
+        rewrite -E1'' in E4'.
+        by move/E4: E4' => E4''.
+      + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+        { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+        rewrite -[[:: admininstr__TRAP]]cats0.
+        apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
+        apply: Step__read.
+        apply: Step_read__call_indirect_trap.
+        move => Hcontra.
+        inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
+        by move/E3: E3' => E3''.
+      + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+        { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+        rewrite -[[:: admininstr__TRAP]]cats0.
+        apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
+        apply: Step__read.
+        apply: Step_read__call_indirect_trap.
+        move => Hcontra.
+        inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
+        rewrite E1 in E1'. inversion E1' as [E1''].
+        rewrite -E1'' in E2'.
+        by move/E2: E2' => E2''.
+      + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
+        { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+        rewrite -[[:: admininstr__TRAP]]cats0.
+        apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
+        apply: Step__read.
+        apply: Step_read__call_indirect_trap.
+        move => Hcontra.
+        inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
+        by rewrite E1 in E1'.
     - (* Instr_ok__return *)
       (* TODO: This case should be discarded by not_lf_return *)
       by admit.
