@@ -718,13 +718,8 @@ Proof.
       move => C x t Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      exists s, f, (list__val__admininstr vcs ++ list__val__admininstr [:: fun_local (state__ s f) x]).
-      (* TODO: Can we get rid of these rewrites? *)
-      rewrite -[list__val__admininstr vcs ++ _]cats0.
-      rewrite -[list__val__admininstr vcs ++ list__val__admininstr [:: fun_local (state__ s f) x]]cats0.
-      rewrite -2!catA.
-      apply Step__ctxt_seq with
-        (v_admininstr := [:: admininstr__LOCAL_GET x]).
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      exists s, f, (list__val__admininstr [:: fun_local (state__ s f) x]).
       apply: Step__read.
       by apply: Step_read__local_get.
     - (* Instr_ok__local_set *)
@@ -748,22 +743,49 @@ Proof.
       move => C x t mut Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Check Step_read__global_get.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      exists s, f, (list__val__admininstr [:: globalinst__VALUE (fun_global (state__ s f) x)]).
+      apply: Step__read.
+      by apply: Step_read__global_get.
     - (* Instr_ok__global_set *)
       move => C x t Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Check Step__global_set.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      case Econfig: (fun_with_global (state__ s f) x v1) => [s' f'].
+      exists s', f', [::].
+      rewrite -Econfig.
+      by apply: Step__global_set.
     - (* Instr_ok__memory_size *)
+      move => C mt Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      Check Step_read__memory_size.
+      right.
       by admit.
     - (* Instr_ok__memory_grow *)
+      move => C mt Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step__memory_grow_succeed.
+      Check Step__memory_grow_fail.
       by admit.
     - (* Instr_ok__load *)
-      (* TODO: These load/store instructions may be tricky *)
+      move => C nt n sx memop mt inn Hlen Hsx Hlookup Halign1 Halign2 Hinn.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step_read__load_num_val.
+      Check Step_read__load_num_trap.
+      Check Step_read__load_pack_val.
+      Check Step_read__load_pack_trap.
       by admit.
     - (* Instr_ok__store *)
+      move => C nt n memop mt inn Hlen Hlookup Halign1 Halign2 Hinn.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step__store_num_val.
+      Check Step__store_num_trap.
+      Check Step__store_pack_val.
+      Check Step__store_pack_trap.
       by admit.
     - (* Instrs_ok__empty *)
       by admit.
