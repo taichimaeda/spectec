@@ -706,14 +706,28 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case Econfig: (fun_with_local (state__ s f) x v1) => [s' f'].
-      exists s', f', [::]. rewrite -Econfig.
+      exists s', f', [::].
+      rewrite -Econfig.
       by apply: Step__local_set.
     - (* Instr_ok__local_tee *)
-      by admit.
+      move => C x t Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      exists s, f, [:: fun_coec_val__admininstr v1; fun_coec_val__admininstr v1; admininstr__LOCAL_SET x].
+      apply: Step__pure.
+      by apply: Step_pure__local_tee.
     - (* Instr_ok__global_get *)
-      (* TODO: Instructions accessing store will require special lemmas like glob_context_store *)
+      move => C x t mut Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step_read__global_get.
       by admit.
     - (* Instr_ok__global_set *)
+      move => C x t Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      Check Step__global_set.
       by admit.
     - (* Instr_ok__memory_size *)
       by admit.
