@@ -1,5 +1,5 @@
 (* Exported Code *)
-From Coq Require Import String List Unicode.Utf8.
+From Coq Require Import String List Unicode.Utf8 Reals.
 From RecordUpdate Require Import RecordSet.
 Require Import NArith.
 Require Import Arith.
@@ -113,20 +113,28 @@ Notation reserved__N := nat.
 
 Definition list__reserved__N  := (list (reserved__N )).
 
+Definition option__reserved__N  := (option (reserved__N )).
+
 (* Notation Definition at: spec/wasm-1.0-test/0-aux.watsup:12.1-12.15 *)
 Notation M := nat.
 
 Definition list__M  := (list (M )).
+
+Definition option__M  := (option (M )).
 
 (* Notation Definition at: spec/wasm-1.0-test/0-aux.watsup:13.1-13.15 *)
 Notation n := nat.
 
 Definition list__n  := (list (n )).
 
+Definition option__n  := (option (n )).
+
 (* Notation Definition at: spec/wasm-1.0-test/0-aux.watsup:14.1-14.15 *)
 Notation m := nat.
 
 Definition list__m  := (list (m )).
+
+Definition option__m  := (option (m )).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/0-aux.watsup:21.1-21.14 *)
 Definition fun_Ki : nat := 1024.
@@ -162,6 +170,8 @@ Inductive reserved__list (X : Type) : Type :=
 
 Definition list__reserved__list (X : Type) := (list (reserved__list X)).
 
+Definition option__reserved__list (X : Type) := (option (reserved__list X)).
+
 Global Instance Inhabited__reserved__list(X : Type) : Inhabited (reserved__list X) := { default_val := reserved__list__ X default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:15.1-15.50 *)
@@ -170,6 +180,8 @@ Inductive byte  : Type :=
 
 Definition list__byte  := (list (byte )).
 
+Definition option__byte  := (option (byte )).
+
 Global Instance Inhabited__byte : Inhabited (byte) := { default_val := byte__ default_val }.
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:17.1-17.61 *)
@@ -177,30 +189,42 @@ Notation uN := nat.
 
 Definition list__uN  := (list (uN )).
 
+Definition option__uN  := (option (uN )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:18.1-18.59 *)
 Notation sN := nat.
 
 Definition list__sN  := (list (sN )).
+
+Definition option__sN  := (option (sN )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:19.1-19.51 *)
 Notation iN := uN.
 
 Definition list__iN  := (list (iN )).
 
+Definition option__iN  := (option (iN )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:20.1-20.16 *)
 Notation u31 := uN.
 
 Definition list__u31  := (list (u31 )).
+
+Definition option__u31  := (option (u31 )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:21.1-21.16 *)
 Notation u32 := uN.
 
 Definition list__u32  := (list (u32 )).
 
+Definition option__u32  := (option (u32 )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:22.1-22.16 *)
 Notation u64 := uN.
 
 Definition list__u64  := (list (u64 )).
+
+Definition option__u64  := (option (u64 )).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/1-syntax.watsup:29.1-29.35 *)
 Definition fun_signif (v_reserved__N_0 : reserved__N) : (option nat) :=
@@ -231,19 +255,25 @@ Definition fun_E (v_reserved__N_0 : reserved__N) : nat :=
 	end.
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:43.1-43.67 *)
-Notation fN := nat.
+Notation fN := R.
 
 Definition list__fN  := (list (fN )).
+
+Definition option__fN  := (option (fN )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:45.1-45.16 *)
 Notation f32 := fN.
 
 Definition list__f32  := (list (f32 )).
 
+Definition option__f32  := (option (f32 )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:46.1-46.16 *)
 Notation f64 := fN.
 
 Definition list__f64  := (list (f64 )).
+
+Definition option__f64  := (option (f64 )).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/1-syntax.watsup:48.1-48.36 *)
 Definition fun_fzero (v_reserved__N_0 : reserved__N) : fN :=
@@ -269,6 +299,8 @@ Inductive char  : Type :=
 
 Definition list__char  := (list (char )).
 
+Definition option__char  := (option (char )).
+
 Global Instance Inhabited__char : Inhabited (char) := { default_val := char__ default_val }.
 
 (* Axiom Definition at: spec/wasm-1.0-test/1-syntax.watsup:64.1-64.25 *)
@@ -280,6 +312,8 @@ Inductive name  : Type :=
 
 Definition list__name  := (list (name )).
 
+Definition option__name  := (option (name )).
+
 Global Instance Inhabited__name : Inhabited (name) := { default_val := name__ default_val }.
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:75.1-75.36 *)
@@ -287,40 +321,56 @@ Notation idx := u32.
 
 Definition list__idx  := (list (idx )).
 
+Definition option__idx  := (option (idx )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:77.1-77.45 *)
 Notation typeidx := idx.
 
 Definition list__typeidx  := (list (typeidx )).
+
+Definition option__typeidx  := (option (typeidx )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:78.1-78.49 *)
 Notation funcidx := idx.
 
 Definition list__funcidx  := (list (funcidx )).
 
+Definition option__funcidx  := (option (funcidx )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:79.1-79.49 *)
 Notation globalidx := idx.
 
 Definition list__globalidx  := (list (globalidx )).
+
+Definition option__globalidx  := (option (globalidx )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:80.1-80.47 *)
 Notation tableidx := idx.
 
 Definition list__tableidx  := (list (tableidx )).
 
+Definition option__tableidx  := (option (tableidx )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:81.1-81.46 *)
 Notation memidx := idx.
 
 Definition list__memidx  := (list (memidx )).
+
+Definition option__memidx  := (option (memidx )).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:82.1-82.47 *)
 Notation labelidx := idx.
 
 Definition list__labelidx  := (list (labelidx )).
 
+Definition option__labelidx  := (option (labelidx )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:83.1-83.47 *)
 Notation localidx := idx.
 
 Definition list__localidx  := (list (localidx )).
+
+Definition option__localidx  := (option (localidx )).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:97.1-97.38 *)
 Inductive fnn  : Type :=
@@ -328,6 +378,8 @@ Inductive fnn  : Type :=
 	| fnn__F64  : fnn .
 
 Definition list__fnn  := (list (fnn )).
+
+Definition option__fnn  := (option (fnn )).
 
 Global Instance Inhabited__fnn : Inhabited (fnn) := { default_val := fnn__F32  }.
 
@@ -338,6 +390,8 @@ Inductive inn  : Type :=
 
 Definition list__inn  := (list (inn )).
 
+Definition option__inn  := (option (inn )).
+
 Global Instance Inhabited__inn : Inhabited (inn) := { default_val := inn__I32  }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:92.1-94.12 *)
@@ -346,6 +400,8 @@ Inductive valtype  : Type :=
 	| valtype__FNN (v_fnn : fnn) : valtype .
 
 Definition list__valtype  := (list (valtype )).
+
+Definition option__valtype  := (option (valtype )).
 
 Global Instance Inhabited__valtype : Inhabited (valtype) := { default_val := valtype__INN default_val }.
 
@@ -361,11 +417,15 @@ Definition resulttype  := (option valtype).
 
 Definition list__resulttype  := (list (resulttype )).
 
+Definition option__resulttype  := (option (resulttype )).
+
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:108.1-108.18 *)
 Inductive mut  : Type :=
 	| mut__MUT (v__ : (option unit)) : mut .
 
 Definition list__mut  := (list (mut )).
+
+Definition option__mut  := (option (mut )).
 
 Global Instance Inhabited__mut : Inhabited (mut) := { default_val := mut__MUT default_val }.
 
@@ -375,6 +435,8 @@ Inductive limits  : Type :=
 
 Definition list__limits  := (list (limits )).
 
+Definition option__limits  := (option (limits )).
+
 Global Instance Inhabited__limits : Inhabited (limits) := { default_val := limits__ default_val default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:112.1-113.14 *)
@@ -382,6 +444,8 @@ Inductive globaltype  : Type :=
 	| globaltype__ (v_mut : mut) (v_valtype : valtype) : globaltype .
 
 Definition list__globaltype  := (list (globaltype )).
+
+Definition option__globaltype  := (option (globaltype )).
 
 Global Instance Inhabited__globaltype : Inhabited (globaltype) := { default_val := globaltype__ default_val default_val }.
 
@@ -391,6 +455,8 @@ Inductive functype  : Type :=
 
 Definition list__functype  := (list (functype )).
 
+Definition option__functype  := (option (functype )).
+
 Global Instance Inhabited__functype : Inhabited (functype) := { default_val := functype__ default_val default_val }.
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:116.1-117.9 *)
@@ -398,10 +464,14 @@ Notation tabletype := limits.
 
 Definition list__tabletype  := (list (tabletype )).
 
+Definition option__tabletype  := (option (tabletype )).
+
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:118.1-119.9 *)
 Notation memtype := limits.
 
 Definition list__memtype  := (list (memtype )).
+
+Definition option__memtype  := (option (memtype )).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:120.1-121.70 *)
 Inductive externtype  : Type :=
@@ -411,6 +481,8 @@ Inductive externtype  : Type :=
 	| externtype__MEM (v_memtype : memtype) : externtype .
 
 Definition list__externtype  := (list (externtype )).
+
+Definition option__externtype  := (option (externtype )).
 
 Global Instance Inhabited__externtype : Inhabited (externtype) := { default_val := externtype__FUNC default_val }.
 
@@ -432,17 +504,27 @@ Global Instance Inhabited__val_ : Inhabited val_ := { default_val := val___inn__
 
 Definition list__val_  := (list (val_ )).
 
+Definition option__val_  := (option (val_ )).
+
 Coercion val___inn__entry : iN >-> val_.
 
-Definition list__iN_val_ : list__iN  -> list__val_ := map val___inn__entry.
+Definition list__iN__val_ : list__iN  -> list__val_ := map val___inn__entry.
 
-Coercion list__iN_val_ : list__iN >-> list__val_.
+Coercion list__iN__val_ : list__iN >-> list__val_.
+
+Definition option__iN__val_ : option__iN -> option__val_ := option_map val___inn__entry.
+
+Coercion option__iN__val_ : option__iN >-> option__val_.
 
 Coercion val___fnn__entry : fN >-> val_.
 
-Definition list__fN_val_ : list__fN  -> list__val_ := map val___fnn__entry.
+Definition list__fN__val_ : list__fN  -> list__val_ := map val___fnn__entry.
 
-Coercion list__fN_val_ : list__fN >-> list__val_.
+Coercion list__fN__val_ : list__fN >-> list__val_.
+
+Definition option__fN__val_ : option__fN -> option__val_ := option_map val___fnn__entry.
+
+Coercion option__fN__val_ : option__fN >-> option__val_.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:142.1-142.42 *)
 Inductive sx  : Type :=
@@ -450,6 +532,8 @@ Inductive sx  : Type :=
 	| sx__S  : sx .
 
 Definition list__sx  := (list (sx )).
+
+Definition option__sx  := (option (sx )).
 
 Global Instance Inhabited__sx : Inhabited (sx) := { default_val := sx__U  }.
 
@@ -460,6 +544,8 @@ Inductive unop___inn  : Type :=
 	| unop___inn__POPCNT  : unop___inn .
 
 Definition list__unop___inn  := (list (unop___inn )).
+
+Definition option__unop___inn  := (option (unop___inn )).
 
 Global Instance Inhabited__unop___inn : Inhabited (unop___inn) := { default_val := unop___inn__CLZ  }.
 
@@ -474,6 +560,8 @@ Inductive unop___fnn  : Type :=
 
 Definition list__unop___fnn  := (list (unop___fnn )).
 
+Definition option__unop___fnn  := (option (unop___fnn )).
+
 Global Instance Inhabited__unop___fnn : Inhabited (unop___fnn) := { default_val := unop___fnn__ABS  }.
 
 Inductive unop_  : Type :=
@@ -481,6 +569,8 @@ Inductive unop_  : Type :=
 	| unop___fnn__entry (arg : unop___fnn) : unop_ .
 
 Definition list__unop_  := (list (unop_ )).
+
+Definition option__unop_  := (option (unop_ )).
 
 Global Instance Inhabited__unop_ : Inhabited (unop_) := { default_val := unop___inn__entry default_val }.
 
@@ -501,6 +591,8 @@ Inductive binop___inn  : Type :=
 
 Definition list__binop___inn  := (list (binop___inn )).
 
+Definition option__binop___inn  := (option (binop___inn )).
+
 Global Instance Inhabited__binop___inn : Inhabited (binop___inn) := { default_val := binop___inn__ADD  }.
 
 Inductive binop___fnn  : Type :=
@@ -514,6 +606,8 @@ Inductive binop___fnn  : Type :=
 
 Definition list__binop___fnn  := (list (binop___fnn )).
 
+Definition option__binop___fnn  := (option (binop___fnn )).
+
 Global Instance Inhabited__binop___fnn : Inhabited (binop___fnn) := { default_val := binop___fnn__ADD  }.
 
 Inductive binop_  : Type :=
@@ -521,6 +615,8 @@ Inductive binop_  : Type :=
 	| binop___fnn__entry (arg : binop___fnn) : binop_ .
 
 Definition list__binop_  := (list (binop_ )).
+
+Definition option__binop_  := (option (binop_ )).
 
 Global Instance Inhabited__binop_ : Inhabited (binop_) := { default_val := binop___inn__entry default_val }.
 
@@ -530,12 +626,16 @@ Inductive testop___inn  : Type :=
 
 Definition list__testop___inn  := (list (testop___inn )).
 
+Definition option__testop___inn  := (option (testop___inn )).
+
 Global Instance Inhabited__testop___inn : Inhabited (testop___inn) := { default_val := testop___inn__EQZ  }.
 
 Inductive testop___fnn  : Type :=
 	.
 
 Definition list__testop___fnn  := (list (testop___fnn )).
+
+Definition option__testop___fnn  := (option (testop___fnn )).
 
 Global Instance Inhabited__testop___fnn : Inhabited (testop___fnn)(* FIXME: no inhabitant found! *) .
 	Admitted.
@@ -545,6 +645,8 @@ Inductive testop_  : Type :=
 	| testop___fnn__entry (arg : testop___fnn) : testop_ .
 
 Definition list__testop_  := (list (testop_ )).
+
+Definition option__testop_  := (option (testop_ )).
 
 Global Instance Inhabited__testop_ : Inhabited (testop_) := { default_val := testop___inn__entry default_val }.
 
@@ -559,6 +661,8 @@ Inductive relop___inn  : Type :=
 
 Definition list__relop___inn  := (list (relop___inn )).
 
+Definition option__relop___inn  := (option (relop___inn )).
+
 Global Instance Inhabited__relop___inn : Inhabited (relop___inn) := { default_val := relop___inn__EQ  }.
 
 Inductive relop___fnn  : Type :=
@@ -571,6 +675,8 @@ Inductive relop___fnn  : Type :=
 
 Definition list__relop___fnn  := (list (relop___fnn )).
 
+Definition option__relop___fnn  := (option (relop___fnn )).
+
 Global Instance Inhabited__relop___fnn : Inhabited (relop___fnn) := { default_val := relop___fnn__EQ  }.
 
 Inductive relop_  : Type :=
@@ -578,6 +684,8 @@ Inductive relop_  : Type :=
 	| relop___fnn__entry (arg : relop___fnn) : relop_ .
 
 Definition list__relop_  := (list (relop_ )).
+
+Definition option__relop_  := (option (relop_ )).
 
 Global Instance Inhabited__relop_ : Inhabited (relop_) := { default_val := relop___inn__entry default_val }.
 
@@ -587,6 +695,8 @@ Inductive cvtop  : Type :=
 	| cvtop__REINTERPRET  : cvtop .
 
 Definition list__cvtop  := (list (cvtop )).
+
+Definition option__cvtop  := (option (cvtop )).
 
 Global Instance Inhabited__cvtop : Inhabited (cvtop) := { default_val := cvtop__CONVERT  }.
 
@@ -603,6 +713,8 @@ Global Instance Inhabited_memop : Inhabited memop :=
 
 Definition list__memop  := (list (memop )).
 
+Definition option__memop  := (option (memop )).
+
 Definition _append_memop (arg1 arg2 : memop) :=
 {|
 	memop__ALIGN := arg1.(memop__ALIGN) ++ arg2.(memop__ALIGN);
@@ -618,11 +730,15 @@ Definition blocktype  := (option valtype).
 
 Definition list__blocktype  := (list (blocktype )).
 
+Definition option__blocktype  := (option (blocktype )).
+
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:227.1-227.53 *)
 Inductive packsize  : Type :=
 	| packsize__ (v_i : nat) : packsize .
 
 Definition list__packsize  := (list (packsize )).
+
+Definition option__packsize  := (option (packsize )).
 
 Global Instance Inhabited__packsize : Inhabited (packsize) := { default_val := packsize__ default_val }.
 
@@ -630,6 +746,8 @@ Global Instance Inhabited__packsize : Inhabited (packsize) := { default_val := p
 Notation ww := packsize.
 
 Definition list__ww  := (list (ww )).
+
+Definition option__ww  := (option (ww )).
 
 (* Mutual Recursion at: spec/wasm-1.0-test/1-syntax.watsup:230.1-236.16 *)
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:230.1-236.16 *)
@@ -665,6 +783,8 @@ Inductive instr  : Type :=
 
 Definition list__instr  := (list (instr )).
 
+Definition option__instr  := (option (instr )).
+
 Global Instance Inhabited__instr : Inhabited (instr) := { default_val := instr__NOP  }.
 
 (* Type Alias Definition at: spec/wasm-1.0-test/1-syntax.watsup:238.1-239.9 *)
@@ -672,11 +792,15 @@ Definition expr  := (list instr).
 
 Definition list__expr  := (list (expr )).
 
+Definition option__expr  := (option (expr )).
+
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:249.1-250.16 *)
 Inductive type  : Type :=
 	| type__TYPE (v_functype : functype) : type .
 
 Definition list__type  := (list (type )).
+
+Definition option__type  := (option (type )).
 
 Global Instance Inhabited__type : Inhabited (type) := { default_val := type__TYPE default_val }.
 
@@ -686,6 +810,8 @@ Inductive local  : Type :=
 
 Definition list__local  := (list (local )).
 
+Definition option__local  := (option (local )).
+
 Global Instance Inhabited__local : Inhabited (local) := { default_val := local__LOCAL default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:253.1-254.27 *)
@@ -693,6 +819,8 @@ Inductive func  : Type :=
 	| func__FUNC (v_typeidx : typeidx) (v__ : (list local)) (v_expr : expr) : func .
 
 Definition list__func  := (list (func )).
+
+Definition option__func  := (option (func )).
 
 Global Instance Inhabited__func : Inhabited (func) := { default_val := func__FUNC default_val default_val default_val }.
 
@@ -702,6 +830,8 @@ Inductive global  : Type :=
 
 Definition list__global  := (list (global )).
 
+Definition option__global  := (option (global )).
+
 Global Instance Inhabited__global : Inhabited (global) := { default_val := global__GLOBAL default_val default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:257.1-258.18 *)
@@ -709,6 +839,8 @@ Inductive table  : Type :=
 	| table__TABLE (v_tabletype : tabletype) : table .
 
 Definition list__table  := (list (table )).
+
+Definition option__table  := (option (table )).
 
 Global Instance Inhabited__table : Inhabited (table) := { default_val := table__TABLE default_val }.
 
@@ -718,6 +850,8 @@ Inductive mem  : Type :=
 
 Definition list__mem  := (list (mem )).
 
+Definition option__mem  := (option (mem )).
+
 Global Instance Inhabited__mem : Inhabited (mem) := { default_val := mem__MEMORY default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:261.1-262.21 *)
@@ -725,6 +859,8 @@ Inductive elem  : Type :=
 	| elem__ELEM (v_expr : expr) (v__ : (list funcidx)) : elem .
 
 Definition list__elem  := (list (elem )).
+
+Definition option__elem  := (option (elem )).
 
 Global Instance Inhabited__elem : Inhabited (elem) := { default_val := elem__ELEM default_val default_val }.
 
@@ -734,6 +870,8 @@ Inductive data  : Type :=
 
 Definition list__data  := (list (data )).
 
+Definition option__data  := (option (data )).
+
 Global Instance Inhabited__data : Inhabited (data) := { default_val := data__DATA default_val default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:265.1-266.16 *)
@@ -741,6 +879,8 @@ Inductive start  : Type :=
 	| start__START (v_funcidx : funcidx) : start .
 
 Definition list__start  := (list (start )).
+
+Definition option__start  := (option (start )).
 
 Global Instance Inhabited__start : Inhabited (start) := { default_val := start__START default_val }.
 
@@ -753,6 +893,8 @@ Inductive externidx  : Type :=
 
 Definition list__externidx  := (list (externidx )).
 
+Definition option__externidx  := (option (externidx )).
+
 Global Instance Inhabited__externidx : Inhabited (externidx) := { default_val := externidx__FUNC default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:270.1-271.24 *)
@@ -760,6 +902,8 @@ Inductive export  : Type :=
 	| export__EXPORT (v_name : name) (v_externidx : externidx) : export .
 
 Definition list__export  := (list (export )).
+
+Definition option__export  := (option (export )).
 
 Global Instance Inhabited__export : Inhabited (export) := { default_val := export__EXPORT default_val default_val }.
 
@@ -769,6 +913,8 @@ Inductive import  : Type :=
 
 Definition list__import  := (list (import )).
 
+Definition option__import  := (option (import )).
+
 Global Instance Inhabited__import : Inhabited (import) := { default_val := import__IMPORT default_val default_val default_val }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:275.1-276.76 *)
@@ -776,6 +922,8 @@ Inductive module  : Type :=
 	| module__MODULE (v__ : (list type)) (v__ : (list import)) (v__ : (list func)) (v__ : (list global)) (v__ : (list table)) (v__ : (list mem)) (v__ : (list elem)) (v__ : (list data)) (v__ : (list start)) (v__ : (list export)) : module .
 
 Definition list__module  := (list (module )).
+
+Definition option__module  := (option (module )).
 
 Global Instance Inhabited__module : Inhabited (module) := { default_val := module__MODULE default_val default_val default_val default_val default_val default_val default_val default_val default_val default_val }.
 
@@ -830,7 +978,7 @@ Axiom fun_fabs : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 (* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:77.1-77.58 *)
 Axiom fun_fceil : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-(* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:78.1-78.59 *)
+(* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:78.1-78.58 *)
 Axiom fun_ffloor : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
 (* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:80.1-80.61 *)
@@ -842,7 +990,7 @@ Axiom fun_fneg : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 (* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:76.1-76.58 *)
 Axiom fun_fsqrt : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
-(* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:79.1-79.59 *)
+(* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:79.1-79.58 *)
 Axiom fun_ftrunc : forall (v_reserved__N_0 : reserved__N) (v_fN_1 : fN), fN.
 
 (* Axiom Definition at: spec/wasm-1.0-test/3-numerics.watsup:56.1-56.57 *)
@@ -855,18 +1003,18 @@ Axiom fun_ictz : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 Axiom fun_ipopcnt : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN), iN.
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/3-numerics.watsup:16.1-17.32 *)
-Definition fun_unop (v_valtype_0 : valtype) (v_unop__1 : unop_) (v_val__2 : val_) : list__val_ :=
+Definition fun_unop (v_valtype_0 : valtype) (v_unop__1 : unop_) (v_val__2 : val_) : option__val_ :=
 	match (v_valtype_0, v_unop__1, v_val__2) with
-		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CLZ )), (val___inn__entry v_iN)) => [((fun_iclz (fun_size (valtype__INN v_inn)) v_iN) : val_)]
-		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CTZ )), (val___inn__entry v_iN)) => [((fun_ictz (fun_size (valtype__INN v_inn)) v_iN) : val_)]
-		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__POPCNT )), (val___inn__entry v_iN)) => [((fun_ipopcnt (fun_size (valtype__INN v_inn)) v_iN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__ABS )), (val___fnn__entry v_fN)) => [((fun_fabs (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__NEG )), (val___fnn__entry v_fN)) => [((fun_fneg (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__SQRT )), (val___fnn__entry v_fN)) => [((fun_fsqrt (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__CEIL )), (val___fnn__entry v_fN)) => [((fun_fceil (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__FLOOR )), (val___fnn__entry v_fN)) => [((fun_ffloor (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__TRUNC )), (val___fnn__entry v_fN)) => [((fun_ftrunc (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
-		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__NEAREST )), (val___fnn__entry v_fN)) => [((fun_fnearest (fun_size (valtype__FNN v_fnn)) v_fN) : val_)]
+		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CLZ )), (val___inn__entry v_iN)) => (Some ((fun_iclz (fun_size (valtype__INN v_inn)) v_iN) : val_))
+		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__CTZ )), (val___inn__entry v_iN)) => (Some ((fun_ictz (fun_size (valtype__INN v_inn)) v_iN) : val_))
+		| ((valtype__INN v_inn), (unop___inn__entry (unop___inn__POPCNT )), (val___inn__entry v_iN)) => (Some ((fun_ipopcnt (fun_size (valtype__INN v_inn)) v_iN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__ABS )), (val___fnn__entry v_fN)) => (Some ((fun_fabs (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__NEG )), (val___fnn__entry v_fN)) => (Some ((fun_fneg (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__SQRT )), (val___fnn__entry v_fN)) => (Some ((fun_fsqrt (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__CEIL )), (val___fnn__entry v_fN)) => (Some ((fun_fceil (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__FLOOR )), (val___fnn__entry v_fN)) => (Some ((fun_ffloor (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__TRUNC )), (val___fnn__entry v_fN)) => (Some ((fun_ftrunc (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
+		| ((valtype__FNN v_fnn), (unop___fnn__entry (unop___fnn__NEAREST )), (val___fnn__entry v_fN)) => (Some ((fun_fnearest (fun_size (valtype__FNN v_fnn)) v_fN) : val_))
 		| _ => default_val
 	end.
 
@@ -928,27 +1076,27 @@ Axiom fun_isub : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : 
 Axiom fun_ixor : forall (v_reserved__N_0 : reserved__N) (v_iN_1 : iN) (v_iN_2 : iN), iN.
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/3-numerics.watsup:18.1-19.34 *)
-Definition fun_binop (v_valtype_0 : valtype) (v_binop__1 : binop_) (v_val__2 : val_) (v_val__3 : val_) : list__val_ :=
+Definition fun_binop (v_valtype_0 : valtype) (v_binop__1 : binop_) (v_val__2 : val_) (v_val__3 : val_) : option__val_ :=
 	match (v_valtype_0, v_binop__1, v_val__2, v_val__3) with
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ADD )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_iadd (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SUB )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_isub (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__MUL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_imul (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__DIV v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_idiv (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__REM v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_irem (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__AND )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_iand (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__OR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_ior (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__XOR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_ixor (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SHL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_ishl (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SHR v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_ishr (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ROTL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_irotl (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ROTR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => [((fun_irotr (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__ADD )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fadd (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__SUB )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fsub (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MUL )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fmul (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__DIV )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fdiv (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MIN )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fmin (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MAX )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fmax (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
-		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__COPYSIGN )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => [((fun_fcopysign (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_)]
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ADD )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_iadd (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SUB )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_isub (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__MUL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_imul (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__DIV v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_idiv (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__REM v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_irem (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__AND )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_iand (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__OR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_ior (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__XOR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_ixor (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SHL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_ishl (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__SHR v_sx)), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_ishr (fun_size (valtype__INN v_inn)) v_sx v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ROTL )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_irotl (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__INN v_inn), (binop___inn__entry (binop___inn__ROTR )), (val___inn__entry v_iN_1), (val___inn__entry v_iN_2)) => (Some ((fun_irotr (fun_size (valtype__INN v_inn)) v_iN_1 v_iN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__ADD )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fadd (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__SUB )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fsub (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MUL )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fmul (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__DIV )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fdiv (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MIN )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fmin (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__MAX )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fmax (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
+		| ((valtype__FNN v_fnn), (binop___fnn__entry (binop___fnn__COPYSIGN )), (val___fnn__entry v_fN_1), (val___fnn__entry v_fN_2)) => (Some ((fun_fcopysign (fun_size (valtype__FNN v_fnn)) v_fN_1 v_fN_2) : val_))
 		| _ => default_val
 	end.
 
@@ -1038,16 +1186,16 @@ Axiom fun_trunc : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_sx_2 : s
 Axiom fun_wrap : forall (v_M_0 : M) (v_reserved__N_1 : reserved__N) (v_iN_2 : iN), iN.
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/3-numerics.watsup:24.1-25.42 *)
-Definition fun_cvtop (v_valtype_1_0 : valtype) (v_valtype_2_1 : valtype) (v_cvtop_2 : cvtop) (v___3 : (option sx)) (v_val__4 : val_) : list__val_ :=
+Definition fun_cvtop (v_valtype_1_0 : valtype) (v_valtype_2_1 : valtype) (v_cvtop_2 : cvtop) (v___3 : (option sx)) (v_val__4 : val_) : option__val_ :=
 	match (v_valtype_1_0, v_valtype_2_1, v_cvtop_2, v___3, v_val__4) with
-		| ((valtype__INN (inn__I32 )), (valtype__INN (inn__I64 )), (cvtop__CONVERT ), (Some v_sx), (val___inn__entry v_iN)) => [((fun_ext 32 64 v_sx v_iN) : val_)]
-		| ((valtype__INN (inn__I64 )), (valtype__INN (inn__I32 )), (cvtop__CONVERT ), v_sx, (val___inn__entry v_iN)) => [((fun_wrap 64 32 v_iN) : val_)]
-		| ((valtype__FNN v_fnn), (valtype__INN v_inn), (cvtop__CONVERT ), (Some v_sx), (val___fnn__entry v_fN)) => [((fun_trunc (fun_size (valtype__FNN v_fnn)) (fun_size (valtype__INN v_inn)) v_sx v_fN) : val_)]
-		| ((valtype__FNN (fnn__F32 )), (valtype__FNN (fnn__F64 )), (cvtop__CONVERT ), v_sx, (val___fnn__entry v_fN)) => [((fun_promote 32 64 v_fN) : val_)]
-		| ((valtype__FNN (fnn__F64 )), (valtype__FNN (fnn__F32 )), (cvtop__CONVERT ), v_sx, (val___fnn__entry v_fN)) => [((fun_demote 64 32 v_fN) : val_)]
-		| ((valtype__INN v_inn), (valtype__FNN v_fnn), (cvtop__CONVERT ), (Some v_sx), (val___inn__entry v_iN)) => [((fun_convert (fun_size (valtype__INN v_inn)) (fun_size (valtype__FNN v_fnn)) v_sx v_iN) : val_)]
-		| ((valtype__INN v_inn), (valtype__FNN v_fnn), (cvtop__REINTERPRET ), v_sx, (val___inn__entry v_iN)) => [((fun_reinterpret (valtype__INN v_inn) (valtype__FNN v_fnn) (v_iN : val_)) : val_)]
-		| ((valtype__FNN v_fnn), (valtype__INN v_inn), (cvtop__REINTERPRET ), v_sx, (val___fnn__entry v_fN)) => [((fun_reinterpret (valtype__FNN v_fnn) (valtype__INN v_inn) (v_fN : val_)) : val_)]
+		| ((valtype__INN (inn__I32 )), (valtype__INN (inn__I64 )), (cvtop__CONVERT ), (Some v_sx), (val___inn__entry v_iN)) => (Some ((fun_ext 32 64 v_sx v_iN) : val_))
+		| ((valtype__INN (inn__I64 )), (valtype__INN (inn__I32 )), (cvtop__CONVERT ), v_sx, (val___inn__entry v_iN)) => (Some ((fun_wrap 64 32 v_iN) : val_))
+		| ((valtype__FNN v_fnn), (valtype__INN v_inn), (cvtop__CONVERT ), (Some v_sx), (val___fnn__entry v_fN)) => (Some ((fun_trunc (fun_size (valtype__FNN v_fnn)) (fun_size (valtype__INN v_inn)) v_sx v_fN) : val_))
+		| ((valtype__FNN (fnn__F32 )), (valtype__FNN (fnn__F64 )), (cvtop__CONVERT ), v_sx, (val___fnn__entry v_fN)) => (Some ((fun_promote 32 64 v_fN) : val_))
+		| ((valtype__FNN (fnn__F64 )), (valtype__FNN (fnn__F32 )), (cvtop__CONVERT ), v_sx, (val___fnn__entry v_fN)) => (Some ((fun_demote 64 32 v_fN) : val_))
+		| ((valtype__INN v_inn), (valtype__FNN v_fnn), (cvtop__CONVERT ), (Some v_sx), (val___inn__entry v_iN)) => (Some ((fun_convert (fun_size (valtype__INN v_inn)) (fun_size (valtype__FNN v_fnn)) v_sx v_iN) : val_))
+		| ((valtype__INN v_inn), (valtype__FNN v_fnn), (cvtop__REINTERPRET ), v_sx, (val___inn__entry v_iN)) => (Some ((fun_reinterpret (valtype__INN v_inn) (valtype__FNN v_fnn) (v_iN : val_)) : val_))
+		| ((valtype__FNN v_fnn), (valtype__INN v_inn), (cvtop__REINTERPRET ), v_sx, (val___fnn__entry v_fN)) => (Some ((fun_reinterpret (valtype__FNN v_fnn) (valtype__INN v_inn) (v_fN : val_)) : val_))
 		| _ => default_val
 	end.
 
@@ -1074,31 +1222,43 @@ Notation addr := nat.
 
 Definition list__addr  := (list (addr )).
 
+Definition option__addr  := (option (addr )).
+
 (* Notation Definition at: spec/wasm-1.0-test/4-runtime.watsup:6.1-6.53 *)
 Notation funcaddr := addr.
 
 Definition list__funcaddr  := (list (funcaddr )).
+
+Definition option__funcaddr  := (option (funcaddr )).
 
 (* Notation Definition at: spec/wasm-1.0-test/4-runtime.watsup:7.1-7.53 *)
 Notation globaladdr := addr.
 
 Definition list__globaladdr  := (list (globaladdr )).
 
+Definition option__globaladdr  := (option (globaladdr )).
+
 (* Notation Definition at: spec/wasm-1.0-test/4-runtime.watsup:8.1-8.51 *)
 Notation tableaddr := addr.
 
 Definition list__tableaddr  := (list (tableaddr )).
+
+Definition option__tableaddr  := (option (tableaddr )).
 
 (* Notation Definition at: spec/wasm-1.0-test/4-runtime.watsup:9.1-9.50 *)
 Notation memaddr := addr.
 
 Definition list__memaddr  := (list (memaddr )).
 
+Definition option__memaddr  := (option (memaddr )).
+
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:24.1-25.55 *)
 Inductive val  : Type :=
 	| val__CONST (v_valtype : valtype) (v_val_ : val_) : val .
 
 Definition list__val  := (list (val )).
+
+Definition option__val  := (option (val )).
 
 Global Instance Inhabited__val : Inhabited (val) := { default_val := val__CONST default_val default_val }.
 
@@ -1108,6 +1268,8 @@ Inductive result  : Type :=
 	| result__TRAP  : result .
 
 Definition list__result  := (list (result )).
+
+Definition option__result  := (option (result )).
 
 Global Instance Inhabited__result : Inhabited (result) := { default_val := result___VALS default_val }.
 
@@ -1119,6 +1281,8 @@ Inductive externval  : Type :=
 	| externval__MEM (v_memaddr : memaddr) : externval .
 
 Definition list__externval  := (list (externval )).
+
+Definition option__externval  := (option (externval )).
 
 Global Instance Inhabited__externval : Inhabited (externval) := { default_val := externval__FUNC default_val }.
 
@@ -1134,6 +1298,8 @@ Global Instance Inhabited_exportinst : Inhabited exportinst :=
 	exportinst__VALUE := default_val|} }.
 
 Definition list__exportinst  := (list (exportinst )).
+
+Definition option__exportinst  := (option (exportinst )).
 
 Definition _append_exportinst (arg1 arg2 : exportinst) :=
 {|
@@ -1166,6 +1332,8 @@ Global Instance Inhabited_moduleinst : Inhabited moduleinst :=
 
 Definition list__moduleinst  := (list (moduleinst )).
 
+Definition option__moduleinst  := (option (moduleinst )).
+
 Definition _append_moduleinst (arg1 arg2 : moduleinst) :=
 {|
 	moduleinst__TYPES := arg1.(moduleinst__TYPES) ++ arg2.(moduleinst__TYPES);
@@ -1195,6 +1363,8 @@ Global Instance Inhabited_funcinst : Inhabited funcinst :=
 
 Definition list__funcinst  := (list (funcinst )).
 
+Definition option__funcinst  := (option (funcinst )).
+
 Definition _append_funcinst (arg1 arg2 : funcinst) :=
 {|
 	funcinst__TYPE := arg1.(funcinst__TYPE); (* FIXME: This type does not have a trivial way to append *)
@@ -1219,6 +1389,8 @@ Global Instance Inhabited_globalinst : Inhabited globalinst :=
 
 Definition list__globalinst  := (list (globalinst )).
 
+Definition option__globalinst  := (option (globalinst )).
+
 Definition _append_globalinst (arg1 arg2 : globalinst) :=
 {|
 	globalinst__TYPE := arg1.(globalinst__TYPE); (* FIXME: This type does not have a trivial way to append *)
@@ -1242,6 +1414,8 @@ Global Instance Inhabited_tableinst : Inhabited tableinst :=
 
 Definition list__tableinst  := (list (tableinst )).
 
+Definition option__tableinst  := (option (tableinst )).
+
 Definition _append_tableinst (arg1 arg2 : tableinst) :=
 {|
 	tableinst__TYPE := arg1.(tableinst__TYPE); (* FIXME: This type does not have a trivial way to append *)
@@ -1264,6 +1438,8 @@ Global Instance Inhabited_meminst : Inhabited meminst :=
 	meminst__BYTES := default_val|} }.
 
 Definition list__meminst  := (list (meminst )).
+
+Definition option__meminst  := (option (meminst )).
 
 Definition _append_meminst (arg1 arg2 : meminst) :=
 {|
@@ -1292,6 +1468,8 @@ Global Instance Inhabited_store : Inhabited store :=
 
 Definition list__store  := (list (store )).
 
+Definition option__store  := (option (store )).
+
 Definition _append_store (arg1 arg2 : store) :=
 {|
 	store__FUNCS := arg1.(store__FUNCS) ++ arg2.(store__FUNCS);
@@ -1317,6 +1495,8 @@ Global Instance Inhabited_frame : Inhabited frame :=
 
 Definition list__frame  := (list (frame )).
 
+Definition option__frame  := (option (frame )).
+
 Definition _append_frame (arg1 arg2 : frame) :=
 {|
 	frame__LOCALS := arg1.(frame__LOCALS) ++ arg2.(frame__LOCALS);
@@ -1332,6 +1512,8 @@ Inductive state  : Type :=
 	| state__ (v_store : store) (v_frame : frame) : state .
 
 Definition list__state  := (list (state )).
+
+Definition option__state  := (option (state )).
 
 Global Instance Inhabited__state : Inhabited (state) := { default_val := state__ default_val default_val }.
 
@@ -1373,6 +1555,8 @@ Inductive admininstr  : Type :=
 
 Definition list__admininstr  := (list (admininstr )).
 
+Definition option__admininstr  := (option (admininstr )).
+
 Global Instance Inhabited__admininstr : Inhabited (admininstr) := { default_val := admininstr__NOP  }.
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:94.1-94.62 *)
@@ -1380,6 +1564,8 @@ Inductive config  : Type :=
 	| config__ (v_state : state) (v__ : (list admininstr)) : config .
 
 Definition list__config  := (list (config )).
+
+Definition option__config  := (option (config )).
 
 Global Instance Inhabited__config : Inhabited (config) := { default_val := config__ default_val default_val }.
 
@@ -1391,6 +1577,8 @@ Inductive E  : Type :=
 	| E__LABEL_ (v_n : n) (v__ : (list instr)) (v_E : E) : E .
 
 Definition list__E  := (list (E )).
+
+Definition option__E  := (option (E )).
 
 Global Instance Inhabited__E : Inhabited (E) := { default_val := E___HOLE_  }.
 
@@ -1591,6 +1779,8 @@ Global Instance Inhabited_context : Inhabited context :=
 
 Definition list__context  := (list (context )).
 
+Definition option__context  := (option (context )).
+
 Definition _append_context (arg1 arg2 : context) :=
 {|
 	context__TYPES := arg1.(context__TYPES) ++ arg2.(context__TYPES);
@@ -1784,6 +1974,10 @@ Definition list__val__admininstr : list__val -> list__admininstr := map fun_coec
 
 Coercion list__val__admininstr : list__val >-> list__admininstr.
 
+Definition option__val__admininstr : option__val -> option__admininstr := option_map fun_coec_val__admininstr.
+
+Coercion option__val__admininstr : option__val >-> option__admininstr.
+
 (* Auxiliary Definition at: spec/wasm-1.0-test/8-reduction.watsup:6.1-6.63 *)
 Definition fun_coec_instr__admininstr (v_instr : instr) : admininstr :=
 	match (v_instr) with
@@ -1824,6 +2018,10 @@ Definition list__instr__admininstr : list__instr -> list__admininstr := map fun_
 
 Coercion list__instr__admininstr : list__instr >-> list__admininstr.
 
+Definition option__instr__admininstr : option__instr -> option__admininstr := option_map fun_coec_instr__admininstr.
+
+Coercion option__instr__admininstr : option__instr >-> option__admininstr.
+
 (* Inductive Relations Definition at: spec/wasm-1.0-test/8-reduction.watsup:6.1-6.63 *)
 Inductive Step_pure: (list admininstr) -> (list admininstr) -> Prop :=
 	| Step_pure__unreachable : Step_pure [(admininstr__UNREACHABLE )] [(admininstr__TRAP )]
@@ -1841,19 +2039,19 @@ Inductive Step_pure: (list admininstr) -> (list admininstr) -> Prop :=
 	| Step_pure__br_table_lt : forall (v_i : nat) (v_l : (list labelidx)) (v_l' : labelidx), (v_i < (List.length v_l)) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__BR_TABLE v_l v_l')] [(admininstr__BR (lookup_total v_l v_i))]
 	| Step_pure__br_table_ge : forall (v_i : nat) (v_l : (list labelidx)) (v_l' : labelidx), (v_i >= (List.length v_l)) -> Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));(admininstr__BR_TABLE v_l v_l')] [(admininstr__BR v_l')]
 	| Step_pure__frame_vals : forall (v_n : n) (v_f : frame) (v_val : (list val)), Step_pure [(admininstr__FRAME_ v_n v_f (list__val__admininstr v_val))] (list__val__admininstr v_val)
-	| Step_pure__return_frame : forall (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_instr : (list instr)), ((List.length v_val) = v_n) -> Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr)))))] (list__val__admininstr v_val)
-	| Step_pure__return_label : forall (v_n : n) (v_instr' : (list instr)) (v_val : (list val)) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] (list__instr__admininstr v_instr))))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )])
-	| Step_pure__trap_vals : forall (v_val : (list val)) (v_instr : (list instr)), ((v_val <> []) \/ (v_instr <> [])) -> Step_pure (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] (list__instr__admininstr v_instr))) [(admininstr__TRAP )]
-	| Step_pure__trap_label : forall (v_n : n) (v_instr' : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr' [(admininstr__TRAP )])] [(admininstr__TRAP )]
+	| Step_pure__return_frame : forall (v_n : n) (v_f : frame) (v_val' : (list val)) (v_val : (list val)) (v_admininstr : (list admininstr)), ((List.length v_val) = v_n) -> Step_pure [(admininstr__FRAME_ v_n v_f (@app _ (list__val__admininstr v_val') (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr))))] (list__val__admininstr v_val)
+	| Step_pure__return_label : forall (v_n : n) (v_instr : (list instr)) (v_val : (list val)) (v_admininstr : (list admininstr)), Step_pure [(admininstr__LABEL_ v_n v_instr (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr)))] (@app _ (list__val__admininstr v_val) [(admininstr__RETURN )])
+	| Step_pure__trap_vals : forall (v_val : (list val)) (v_admininstr : (list admininstr)), ((v_val <> []) \/ (v_admininstr <> [])) -> Step_pure (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__TRAP )] v_admininstr)) [(admininstr__TRAP )]
+	| Step_pure__trap_label : forall (v_n : n) (v_instr : (list instr)), Step_pure [(admininstr__LABEL_ v_n v_instr [(admininstr__TRAP )])] [(admininstr__TRAP )]
 	| Step_pure__trap_frame : forall (v_n : n) (v_f : frame), Step_pure [(admininstr__FRAME_ v_n v_f [(admininstr__TRAP )])] [(admininstr__TRAP )]
-	| Step_pure__unop_val : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_) (v_c : val_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = [(v_c : val_)]) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__CONST v_t (v_c : val_))]
-	| Step_pure__unop_trap : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = []) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__TRAP )]
-	| Step_pure__binop_val : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_binop : binop_) (v_c : val_), ((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = [(v_c : val_)]) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__CONST v_t (v_c : val_))]
-	| Step_pure__binop_trap : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_binop : binop_), ((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = []) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__TRAP )]
+	| Step_pure__unop_val : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_) (v_c : val_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = (Some (v_c : val_))) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__CONST v_t (v_c : val_))]
+	| Step_pure__unop_trap : forall (v_t : valtype) (v_c_1 : val_) (v_unop : unop_), ((fun_unop v_t (v_unop : unop_) (v_c_1 : val_)) = None) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__UNOP v_t (v_unop : unop_))] [(admininstr__TRAP )]
+	| Step_pure__binop_val : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_binop : binop_) (v_c : val_), ((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = (Some (v_c : val_))) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__CONST v_t (v_c : val_))]
+	| Step_pure__binop_trap : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_binop : binop_), ((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = None) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__TRAP )]
 	| Step_pure__testop : forall (v_t : valtype) (v_c_1 : val_) (v_testop : testop_) (v_c : iN), ((v_c : val_) = (fun_testop v_t (v_testop : testop_) (v_c_1 : val_))) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__TESTOP v_t (v_testop : testop_))] [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_))]
 	| Step_pure__relop : forall (v_t : valtype) (v_c_1 : val_) (v_c_2 : val_) (v_relop : relop_) (v_c : iN), ((v_c : val_) = (fun_relop v_t (v_relop : relop_) (v_c_1 : val_) (v_c_2 : val_))) -> Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__RELOP v_t (v_relop : relop_))] [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_))]
-	| Step_pure__cvtop_val : forall (v_t_1 : valtype) (v_c_1 : val_) (v_t_2 : valtype) (v_cvtop : cvtop) (v_sx : (option sx)) (v_c : val_), ((fun_cvtop v_t_1 v_t_2 v_cvtop v_sx (v_c_1 : val_)) = [(v_c : val_)]) -> Step_pure [(admininstr__CONST v_t_1 (v_c_1 : val_));(admininstr__CVTOP v_t_2 v_cvtop v_t_1 v_sx)] [(admininstr__CONST v_t_2 (v_c : val_))]
-	| Step_pure__cvtop_trap : forall (v_t_1 : valtype) (v_c_1 : val_) (v_t_2 : valtype) (v_cvtop : cvtop) (v_sx : (option sx)), ((fun_cvtop v_t_1 v_t_2 v_cvtop v_sx (v_c_1 : val_)) = []) -> Step_pure [(admininstr__CONST v_t_1 (v_c_1 : val_));(admininstr__CVTOP v_t_2 v_cvtop v_t_1 v_sx)] [(admininstr__TRAP )]
+	| Step_pure__cvtop_val : forall (v_t_1 : valtype) (v_c_1 : val_) (v_t_2 : valtype) (v_cvtop : cvtop) (v_sx : (option sx)) (v_c : val_), ((fun_cvtop v_t_1 v_t_2 v_cvtop v_sx (v_c_1 : val_)) = (Some (v_c : val_))) -> Step_pure [(admininstr__CONST v_t_1 (v_c_1 : val_));(admininstr__CVTOP v_t_2 v_cvtop v_t_1 v_sx)] [(admininstr__CONST v_t_2 (v_c : val_))]
+	| Step_pure__cvtop_trap : forall (v_t_1 : valtype) (v_c_1 : val_) (v_t_2 : valtype) (v_cvtop : cvtop) (v_sx : (option sx)), ((fun_cvtop v_t_1 v_t_2 v_cvtop v_sx (v_c_1 : val_)) = None) -> Step_pure [(admininstr__CONST v_t_1 (v_c_1 : val_));(admininstr__CVTOP v_t_2 v_cvtop v_t_1 v_sx)] [(admininstr__TRAP )]
 	| Step_pure__local_tee : forall (v_val : val) (v_x : idx), Step_pure [(v_val : admininstr);(admininstr__LOCAL_TEE v_x)] [(v_val : admininstr);(v_val : admininstr);(admininstr__LOCAL_SET v_x)].
 
 (* Inductive Relations Definition at: spec/wasm-1.0-test/8-reduction.watsup:7.1-7.63 *)
@@ -1957,8 +2155,8 @@ Inductive Admin_instr_ok: store -> context -> admininstr -> functype -> Prop :=
 	| Admin_instr_ok__instr : forall (v_S : store) (v_C : context) (v_instr : instr) (v_functype : functype), (Instr_ok v_C v_instr v_functype) -> Admin_instr_ok v_S v_C (v_instr : admininstr) v_functype
 	| Admin_instr_ok__trap : forall (v_S : store) (v_C : context) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), Admin_instr_ok v_S v_C (admininstr__TRAP ) (functype__ v_t_1 v_t_2)
 	| Admin_instr_ok__call_addr : forall (v_S : store) (v_C : context) (v_funcaddr : funcaddr) (v_t_1 : (list valtype)) (v_t_2 : (option valtype)), (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC (functype__ v_t_1 v_t_2))) -> Admin_instr_ok v_S v_C (admininstr__CALL_ADDR v_funcaddr) (functype__ v_t_1 v_t_2)
-	| Admin_instr_ok__label : forall (v_S : store) (v_C : context) (v_n : n) (v_instr : (list instr)) (v_admininstr : (list admininstr)) (v_t_2 : (option valtype)) (v_t_1 : (option valtype)), (Instrs_ok v_C v_instr (functype__ v_t_1 v_t_2)) /\ (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [v_t_1]; context__RETURN := None |} ++ v_C) v_admininstr (functype__ [] v_t_2)) /\ (v_n = (fun_optionSize v_t_1)) -> Admin_instr_ok v_S v_C (admininstr__LABEL_ v_n v_instr v_admininstr) (functype__ [] v_t_2)
-	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S v_t v_F v_admininstr v_t) /\ (v_n = (fun_optionSize v_t)) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
+	| Admin_instr_ok__label : forall (v_S : store) (v_C : context) (v_n : n) (v_instr : (list instr)) (v_admininstr : (list admininstr)) (v_t_2 : (option valtype)) (v_t_1 : (option valtype)), (Instrs_ok v_C v_instr (functype__ v_t_1 v_t_2)) -> (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [v_t_1]; context__RETURN := None |} ++ v_C) v_admininstr (functype__ [] v_t_2)) -> (v_n = (fun_optionSize v_t_1)) -> Admin_instr_ok v_S v_C (admininstr__LABEL_ v_n v_instr v_admininstr) (functype__ [] v_t_2)
+	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S v_t v_F v_admininstr v_t) -> (v_n = (fun_optionSize v_t)) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
 	| Admin_instr_ok__weakening : forall (v_S : store) (v_C : context) (v_admininstr : admininstr) (v_t : (list valtype)) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instr_ok v_S v_C v_admininstr (functype__ v_t_1 v_t_2)) -> Admin_instr_ok v_S v_C v_admininstr (functype__ (@app _ v_t v_t_1) (@app _ v_t v_t_2))
 
 with

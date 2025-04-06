@@ -347,6 +347,66 @@ Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
 Canonical Structure functype_eqType :=
   Eval hnf in EqType functype functype_eqMixin.
 
+(* NOTE: This is a temporary solution to ensure valtype matches corresponding val_
+         There is no check that ensures valtype and val_ matches 
+         and thus we cannot tell e.g. v3 is inn from typeof (val__CONST t3 v3) = valtype__INN inn__I32 *)
+Definition val_wf (c : generatedcode.val): Prop :=
+  match c with
+      | val__CONST (valtype__INN inn) (val___inn__entry n) => True
+      | val__CONST (valtype__FNN fnn) (val___fnn__entry n) => True
+      | _ => False
+  end.
+
+Axiom val_wf_temp: forall (v : generatedcode.val), val_wf v.
+
+Ltac invert_val_wf v :=
+  let H := fresh "H" in
+  have H := val_wf_temp v; rewrite /val_wf in H;
+  let t := fresh "t" in
+  let n := fresh "n" in
+  let f := fresh "f" in
+  let inn := fresh "inn" in
+  let fnn := fresh "fnn" in
+  (* TODO: Rewrite using case tactic somehow *)
+  destruct v as [t v];
+  destruct v as [v | v];
+  destruct t as [inn | fnn] => //= {H}.
+
+Lemma fun_testop_returns_inn_entry : forall t testop v c,
+  fun_testop t testop v = c ->
+  exists c', c = val___inn__entry c'.
+Proof.
+  move => t testop v c H.
+  (* TODO: This is a bit tedious *)
+  case: t H => [nn | nn] H;
+  case: nn H => H;
+  case: testop H => [arg | arg] H;
+  case: arg H => H;
+  case: v H => v' H;
+  try rewrite /fun_testop /= in H;
+  try rewrite /default_val /= in H;
+  by eauto.
+Qed.
+
+Lemma fun_relop_returns_inn_entry : forall t relop v1 v2 c,
+  fun_relop t relop v1 v2 = c ->
+  exists c', c = val___inn__entry c'.
+Proof.
+  move => t relop v1 v2 c H.
+  (* TODO: This is a bit tedious *)
+  Set Printing Coercions.
+  case: t H => [nn | nn] H;
+  case: nn H => H;
+  case: relop H => [arg | arg] H;
+  do [ case: arg H => [ | | sx | sx | sx | sx ] H 
+     | case: arg H => H ];
+  case: v1 H => v1' H;
+  case: v2 H => v2' H;
+  try rewrite /fun_relop /= in H;
+  try rewrite /default_val /= in H;
+  by eauto.
+Qed.
+
 (* TODO: This hint for auto might not work as expected *)
 Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
@@ -429,17 +489,7 @@ Proof.
       move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
-      case: v3 Ht3 => [t3 v3] /= Ht3. rewrite Ht3.
-      (* Set Printing Coercions.
-      Print val.
-      Print val_.
-      Print Instr_ok.
-      Print Admin_instr_ok.
-      Print admininstr__CONST. *)
-      (* MEMO: There is no check that ensures valtype and val_ matches 
-               and thus we cannot tell v3 is inn from typeof (val__CONST t3 v3) = valtype__INN inn__I32 *)
-      (* MEMO: Use well-formedness axiom to reject such case as a temporary solution *)
-      case: v3 => [v3 | ?]; last by admit. (* This last goal should be rejected *)
+      invert_val_wf v3. rewrite /= in Ht3. rewrite Ht3.
       case: v3 => [| v3'].
       - exists s, f, (list__val__admininstr [:: v2]).
         apply: Step__pure.
@@ -466,9 +516,7 @@ Proof.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
-      case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      (* MEMO: Same problem as Instr_ok__select *)
-      case: v1 => [v1 | ?]; last by admit. (* This last goal should be rejected *)
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
       case: v1 => [| v1'].
       - exists s, f, [:: admininstr__BLOCK bt bes2].
         apply: Step__pure.
@@ -516,11 +564,8 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
       (* TODO: Make use of typeof_append in t_progress_e too *)
-      move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]].
-      rewrite {}Hvcs.
-      case: v1 Ht1 => [t1 v1] /= Ht1. rewrite {}Ht1.
-      (* TODO: Same problem as Instr_ok__select *)
-      case: v1 => [v1 | ?]; last by admit. (* This last goal should be rejected *)
+      move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]]. rewrite {}Hvcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
       case E1: (lookup_total (tableinst__REFS (fun_table (state__ s f) 0)) v1) => [a |].
       case E2: (fun_type (state__ s f) x == funcinst__TYPE (lookup_total (fun_funcinst (state__ s f)) a)).
       case E3: (v1 < Datatypes.length (tableinst__REFS (fun_table (state__ s f) 0))).
@@ -602,19 +647,13 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      case Eunop: (fun_unop t unop v1) => [| c1 cs].
+      case Eunop: (fun_unop t unop v1) => [c | ].
+      + exists s, f, [:: admininstr__CONST t c].
+        apply: Step__pure.
+        by apply: Step_pure__unop_val.
       + exists s, f, [:: admininstr__TRAP].
         apply: Step__pure.
         by apply: Step_pure__unop_trap.
-      + case Ecs: cs => [| c2 cs']; rewrite Ecs in Eunop.
-        * exists s, f, [:: admininstr__CONST t c1].
-          apply: Step__pure.
-          by apply: Step_pure__unop_val.
-        * (* MEMO: DSL definition does not take into account the case when
-                   (fun_unop t unop v1) returns more than 1 elements
-                   DSL should probably use option '?' in type declaration of $unop *)
-          Check Step_pure__unop_trap.
-          by admit.
     - (* Instr_ok__binop *)
       move => C t binop.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
@@ -622,32 +661,23 @@ Proof.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
       case: v2 Ht2 => [t2 v2] /= Ht2. rewrite Ht2.
-      case Ebinop: (fun_binop t binop v1 v2) => [| c1 cs].
+      case Ebinop: (fun_binop t binop v1 v2) => [c | ].
+      + exists s, f, [:: admininstr__CONST t c].
+        apply: Step__pure.
+        by apply: Step_pure__binop_val.
       + exists s, f, [:: admininstr__TRAP].
         apply: Step__pure.
         by apply: Step_pure__binop_trap.
-      + case Ecs: cs => [| c2 cs']; rewrite Ecs in Ebinop.
-        * exists s, f, [:: admininstr__CONST t c1].
-          apply: Step__pure.
-          by apply: Step_pure__binop_val.
-        * Check Step_pure__binop_trap.
-          (* MEMO: Same issue as Instr_ok__unop *)
-          by admit.
     - (* Instr_ok__testop *)
       move => C t testop.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      move Etestop: (fun_testop t testop v1) => c1.
-      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) c1].
-      (* MEMO: How can we discard the case in which fun_testop t testop v1
-               returns val___fnn__entry? *)
-      (* Set Printing Coercions.
-      Check Step_pure__testop.
-      Print fun_testop.
-      Print fun_ieqz. *)
-      case: c1 Etestop => [c1 | ?] Etestop; last by admit. (* This last goal should be rejected *)
+      move Etestop: (fun_testop t testop v1) => c.
+      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) c].
+      move/fun_testop_returns_inn_entry: (Etestop) => [c' Hc'].
+      rewrite Hc'. rewrite Hc' in Etestop.
       apply: Step__pure.
       by apply: Step_pure__testop.
     - (* Instr_ok__relop *)
@@ -657,10 +687,10 @@ Proof.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
       case: v2 Ht2 => [t2 v2] /= Ht2. rewrite Ht2.
-      move Erelop: (fun_relop t relop v1 v2) => c1.
-      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) c1].
-      (* MEMO: Same issue as Instr_ok__testop *)
-      case: c1 Erelop => [c1 | ?] Erelop; last by admit. (* This last goal should be rejected *)
+      move Erelop: (fun_relop t relop v1 v2) => c.
+      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) c].
+      move/fun_relop_returns_inn_entry: (Erelop) => [c' Hc'].
+      rewrite Hc'. rewrite Hc' in Erelop.
       apply: Step__pure.
       by apply: Step_pure__relop.
     - (* Instr_ok__cvtop_reinterpret *)
@@ -669,51 +699,39 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      case Ecvtop: (fun_cvtop t1' t2' cvtop__REINTERPRET None v1) => [| c1 cs].
+      case Ecvtop: (fun_cvtop t1' t2' cvtop__REINTERPRET None v1) => [c | ].
+      + exists s, f, [:: admininstr__CONST t2' c].
+        apply: Step__pure.
+        by apply: Step_pure__cvtop_val.
       + exists s, f, [:: admininstr__TRAP].
         apply: Step__pure.
         by apply: Step_pure__cvtop_trap.
-      + case Ecs: cs => [| c2 cs']; rewrite Ecs in Ecvtop.
-        * exists s, f, [:: admininstr__CONST t2' c1].
-          apply: Step__pure.
-          by apply: Step_pure__cvtop_val.
-        * Check Step_pure__cvtop_trap.
-          (* MEMO: Same issue as Instr_ok__unop *)
-          by admit.
     - (* Instr_ok__cvtop_convert_i *)
       move => C inn2 inn1 sx Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      case Ecvtop: (fun_cvtop (valtype__INN inn1) (valtype__INN inn2) cvtop__CONVERT sx v1) => [| c1 cs].
+      case Ecvtop: (fun_cvtop (valtype__INN inn1) (valtype__INN inn2) cvtop__CONVERT sx v1) => [c | ].
+      + exists s, f, [:: admininstr__CONST (valtype__INN inn2) c].
+        apply: Step__pure.
+        by apply: Step_pure__cvtop_val.
       + exists s, f, [:: admininstr__TRAP].
         apply: Step__pure.
         by apply: Step_pure__cvtop_trap.
-      + case Ecs: cs => [| c2 cs']; rewrite Ecs in Ecvtop.
-        * exists s, f, [:: admininstr__CONST (valtype__INN inn2) c1].
-          apply: Step__pure.
-          by apply: Step_pure__cvtop_val.
-        * Check Step_pure__cvtop_trap.
-          (* MEMO: Same issue as Instr_ok__unop *)
-          by admit.
     - (* Instr_ok__cvtop_convert_f *)
       move => C fnn2 fnn1.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       case: v1 Ht1 => [t1 v1] /= Ht1. rewrite Ht1.
-      case Ecvtop: (fun_cvtop (valtype__FNN fnn1) (valtype__FNN fnn2) cvtop__CONVERT None v1) => [| c1 cs].
+      case Ecvtop: (fun_cvtop (valtype__FNN fnn1) (valtype__FNN fnn2) cvtop__CONVERT None v1) => [c | ].
+      + exists s, f, [:: admininstr__CONST (valtype__FNN fnn2) c].
+        apply: Step__pure.
+        by apply: Step_pure__cvtop_val.
       + exists s, f, [:: admininstr__TRAP].
         apply: Step__pure.
         by apply: Step_pure__cvtop_trap.
-      + case Ecs: cs => [| c2 cs']; rewrite Ecs in Ecvtop.
-        * exists s, f, [:: admininstr__CONST (valtype__FNN fnn2) c1].
-          apply: Step__pure.
-          by apply: Step_pure__cvtop_val.
-        * Check Step_pure__cvtop_trap.
-          (* MEMO: Same issue as Instr_ok__unop *)
-          by admit.
     - (* Instr_ok__local_get *)
       move => C x t Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
