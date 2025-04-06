@@ -242,9 +242,9 @@ Proof.
 Qed.
 
 Lemma typeof_append: forall ts t vs,
-    map typeof vs = ts ++ [::t] ->
+    map typeof vs = ts ++ [:: t] ->
     exists v,
-      vs = take (size ts) vs ++ [::v] /\
+      vs = take (size ts) vs ++ [:: v] /\
       map typeof (take (size ts) vs) = ts /\
       typeof v = t.
 Proof.
@@ -394,7 +394,6 @@ Lemma fun_relop_returns_inn_entry : forall t relop v1 v2 c,
 Proof.
   move => t relop v1 v2 c H.
   (* TODO: This is a bit tedious *)
-  Set Printing Coercions.
   case: t H => [nn | nn] H;
   case: nn H => H;
   case: relop H => [arg | arg] H;
@@ -528,11 +527,78 @@ Proof.
       (* TODO: This case should be discarded by not_lf_br *)
       by admit.
     - (* Instr_ok__br_if *)
-      (* TODO: This case should be discarded by not_lf_br *)
-      by admit.
+      move => C l ts Hlen Hlookup.
+      move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      right.
+      case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
+      move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]]. rewrite {}Hvcs.
+      set vcs' := take (size (option_to_list ts)) vcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
+      case: v1 => [| v1'].
+      + exists s, f, (list__val__admininstr vcs').
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
+        { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+        have -> : (list__val__admininstr vcs' ++ list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry 0)]) ++ [:: admininstr__BR_IF l] = list__val__admininstr vcs' ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry 0)] ++ [:: admininstr__BR_IF l]) ++ [::]. { by rewrite -2!catA cats0. }
+        have {2}-> : list__val__admininstr vcs' = list__val__admininstr vcs' ++ [::] ++ [::]. { by rewrite 2!cats0. }
+        (* TODO: This fails while vanilla tactic succeeds *)
+        (* apply: Step__ctxt_seq. *)
+        apply Step__ctxt_seq.
+        apply: Step__pure.
+        by apply: Step_pure__br_if_false.
+      + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR l]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
+        { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+        have -> : (list__val__admininstr vcs' ++ list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1'.+1)]) ++ [:: admininstr__BR_IF l] = list__val__admininstr vcs' ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1'.+1)] ++ [:: admininstr__BR_IF l]) ++ [::]. { by rewrite -2!catA cats0. }
+        have -> : list__val__admininstr vcs' ++ [:: admininstr__BR l] = list__val__admininstr vcs' ++ [:: admininstr__BR l] ++ [::]. { by rewrite !cats0. }
+        (* TODO: This fails while vanilla tactic succeeds *)
+        (* apply: Step__ctxt_seq. *)
+        apply Step__ctxt_seq.
+        apply: Step__pure.
+        by apply: Step_pure__br_if_true.
     - (* Instr_ok__br_table *)
-      (* TODO: This case should be discarded by not_lf_br *)
-      by admit.
+      move => C ls lN ts1 ts ts2 HlenlN Hlenls HlookuplN Hlookupls.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      (* Set Printing Coercions. *)
+      Check Step_pure__br_table_ge.
+      Check Step_pure__br_table_lt.
+      right.
+      case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
+      rewrite cat_app catA in Hts.
+      move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]]. rewrite {}Hvcs.
+      set vcs' := take (size (ts1 ++ option_to_list ts)) vcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
+      case Ev1: (v1 < size ls);
+      move/ltP: Ev1 => Ev1.
+      + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
+        { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+        rewrite -catA.
+        have -> : forall es1 es2 es3, es1 ++ es2 ++ es3 = es1 ++ (es2 ++ es3) ++ [::]. { move => T es1 es2 es3. by rewrite -catA cats0. }
+        have -> : list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)] = list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)] ++ [::]. { by rewrite !cats0. }
+        (* TODO: This fails while vanilla tactic succeeds *)
+        (* apply: Step__ctxt_seq. *)
+        apply Step__ctxt_seq.
+        apply: Step__pure.
+        apply: Step_pure__br_table_lt.
+        by rewrite length_size.
+      + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR lN]).
+        (* TODO: Can we get rid of these rewrites? *)
+        have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
+        { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+        rewrite -catA.
+        have -> : forall es1 es2 es3, es1 ++ es2 ++ es3 = es1 ++ (es2 ++ es3) ++ [::]. { move => T es1 es2 es3. by rewrite -catA cats0. }
+        have -> : list__val__admininstr vcs' ++ [:: admininstr__BR lN] = list__val__admininstr vcs' ++ [:: admininstr__BR lN] ++ [::]. { by rewrite !cats0. }
+        (* TODO: This fails while vanilla tactic succeeds *)
+        (* apply: Step__ctxt_seq. *)
+        apply Step__ctxt_seq.
+        apply: Step__pure.
+        apply: Step_pure__br_table_ge.
+        rewrite length_size.
+        move/ltP: Ev1 => Ev1. apply/leP.
+        by rewrite /ge leqNgt.
     - (* Instr_ok__call *)
       move => C x ts1 ts2 Haddr Hlookup.
       move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
@@ -562,8 +628,8 @@ Proof.
       move => C x ts1 ts2 Haddr Hlookup.
       move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
       (* TODO: Make use of typeof_append in t_progress_e too *)
+      case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
       move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]]. rewrite {}Hvcs.
       invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
       case E1: (lookup_total (tableinst__REFS (fun_table (state__ s f) 0)) v1) => [a |].
