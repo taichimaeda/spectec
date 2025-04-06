@@ -12,7 +12,7 @@ Import RecordSetNotations.
 From WasmSpectec Require Import generatedcode.
 From WasmSpectec Require Import helper_lemmas helper_tactics typing_lemmas.
 (* From WasmSpectec Require Import type_preservation. *)
-From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype.
+From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype div.
 
 (* NOTE: Naming conventions:
          1. type for types
@@ -759,13 +759,25 @@ Proof.
     - (* Instr_ok__memory_size *)
       move => C mt Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
-      Check Step_read__memory_size.
       right.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      pose n := size (meminst__BYTES (fun_mem (state__ s f) 0)).
+      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry ((n %/ fun_Ki) %/ 64)%coq_nat)].
+      apply: Step__read.
+      apply: Step_read__memory_size.
+      (* TODO: Get rid of this rewrite *)
+      rewrite length_size.
+      Print fun_mem.
+      Check Memory_instance_ok__.
+      Check Step_read__memory_size.
+      (* MEMO: There is no guaranteen is a multiple of fun_Ki or 64
+               so n %/ fun_Ki * fun_ki is not equal to n *)
       by admit.
     - (* Instr_ok__memory_grow *)
       move => C mt Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
+      Print growmemory.
       Check Step__memory_grow_succeed.
       Check Step__memory_grow_fail.
       by admit.
