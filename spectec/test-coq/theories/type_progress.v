@@ -837,9 +837,9 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       (* TODO: Does set/pose tactic support destructuring? *)
-      case Econfig: (fun_with_local (state__ s f) x v1) => [s' f'].
+      case Estate: (fun_with_local (state__ s f) x v1) => [s' f'].
       exists s', f', [::].
-      rewrite -Econfig.
+      rewrite -Estate.
       by apply: Step__local_set.
     - (* Instr_ok__local_tee *)
       move => C x t Hlen Hlookup.
@@ -863,9 +863,9 @@ Proof.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       (* TODO: Does set/pose tactic support destructuring? *)
-      case Econfig: (fun_with_global (state__ s f) x v1) => [s' f'].
+      case Estate: (fun_with_global (state__ s f) x v1) => [s' f'].
       exists s', f', [::].
-      rewrite -Econfig.
+      rewrite -Estate.
       by apply: Step__global_set.
     - (* Instr_ok__memory_size *)
       move => C mt Hlen Hlookup.
@@ -925,14 +925,15 @@ Proof.
       + exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (fun_invsigned 32 (0 - 1)%coq_nat))].
         by apply: Step__memory_grow_fail.
     - (* Instr_ok__load *)
+      (* TODO: memop should be name as memarg *)
       move => C t n sx memop mt inn Hlen Hsize Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
       case En: n => [n' |]; case Esx: sx => [sx' |].
-      + case: Hinn => [Hcontra | Hinn] //=; first by rewrite En in Hcontra.
-        rewrite Hinn.
+      + (* NOTE: t of t.load is expected to be inn *)
+        case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
         case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
         * move/ltP: Hcond => Hcond.
           exists s, f, [:: admininstr__TRAP].
@@ -962,14 +963,34 @@ Proof.
           apply: Step__read.
           by apply: Step_read__load_num_val.
     - (* Instr_ok__store *)
+      (* TODO: memop should be name as memarg *)
       move => C t n memop mt inn Hlen Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Check Step__store_num_val.
-      Check Step__store_num_trap.
-      Check Step__store_pack_val.
-      Check Step__store_pack_trap.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
+      invert_val_wf v2. rewrite /= in Ht2. rewrite Ht2.
+      case En: n => [n' |].
+      + (* NOTE: t of t.store is expected to be inn *)
+        case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
+        case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+        * move/ltP: Hcond => Hcond.
+          exists s, f, [:: admininstr__TRAP].
+          by apply: Step__store_pack_trap.
+        * set bs := fun_ibytes n' (fun_wrap (fun_size (valtype__INN inn)) n' v2).
+          case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (n' / 8) bs) => [s' f'].
+          exists s', f', [::].
+          rewrite -Estate.
+          by apply: Step__store_pack_val.
+      + case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+        * move/ltP: Hcond => Hcond.
+          exists s, f, [:: admininstr__TRAP].
+          by apply: Step__store_num_trap.
+        * set bs := fun_bytes t v2.
+          case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
+          exists s', f', [::].
+          rewrite -Estate.
+          by apply: Step__store_num_val.
     - (* Instrs_ok__empty *)
       by admit.
     - (* Instrs_ok__seq *)
