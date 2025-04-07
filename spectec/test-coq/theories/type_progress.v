@@ -406,6 +406,27 @@ Proof.
   by eauto.
 Qed.
 
+Lemma list_slice_size : forall {T : Type} (bs : seq T) i j,
+  i + j <= size bs ->
+  size (list_slice bs i j) = j.
+Proof.
+  move => T bs.
+  elim: bs => [| b bs' IH].
+  + move => /= i j H.
+    have H' := leq_addl i j.
+    move: (leq_trans H' H) => {}H.
+    rewrite (leqn0 j) in H.
+    by move/eqP in H.
+  + move => /= i j H.
+    case: i H => [| i'] H; case: j H => [| j'] H //=.
+    * congr S. by apply: IH.
+    * by admit.
+Admitted.
+
+Axiom fun_bytes_inverse : forall t bs,
+  size bs = fun_size t / 8 ->
+  exists c, fun_bytes t c = bs.
+
 (* TODO: This hint for auto might not work as expected *)
 Hint Constructors Step_pure : core.
 (* Hint Constructors reduce_simple : core. *)
@@ -887,7 +908,7 @@ Proof.
       (* TODO: Does set/pose tactic support destructuring? *)
       case Estate: (fun_with_meminst (state__ s f) 0 meminst2) => [s' f'].
       (* NOTE: We could just use Step__memory_grow_fail but
-               we assume we can always grow memory when it does not exceed predefined maximum size *)
+               we assume we can alway grow memory when it does not exceed predefined maximum size *)
       case Elimm1: (limn1 + v1 <= limm1).
       + exists s', f', [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (size (meminst__BYTES (fun_mem (state__ s f) 0)) / (64 * fun_Ki)%coq_nat))].
         rewrite -length_size -Estate.
@@ -897,16 +918,46 @@ Proof.
       + exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (fun_invsigned 32 (0 - 1)%coq_nat))].
         by apply: Step__memory_grow_fail.
     - (* Instr_ok__load *)
-      move => C nt n sx memop mt inn Hlen Hsx Hlookup Halign1 Halign2 Hinn.
+      move => C t n sx memop mt inn Hlen Hsize Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Check Step_read__load_num_val.
-      Check Step_read__load_num_trap.
-      Check Step_read__load_pack_val.
-      Check Step_read__load_pack_trap.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
+      case En: n => [n' |]; case Esx: sx => [sx' |].
+      + case: Hinn => [Hcontra | Hinn] //=; first by rewrite En in Hcontra.
+        rewrite Hinn.
+        case Efail: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0)));
+        move/ltP: Efail => Efail.
+        * exists s, f, [:: admininstr__TRAP].
+          apply: Step__read.
+          by apply: Step_read__load_pack_trap.
+        * Check Step_read__load_pack_val.
+          by admit.
+      + move/Hsize: Esx => Hcontra.
+        by rewrite En in Hcontra.
+      + move/Hsize: En => Hcontra.
+        by rewrite Esx in Hcontra.
+      + 
+        Set Printing Coercions.
+        simpl.
+        case Efail: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0)));
+        move/ltP: Efail => Efail.
+        * exists s, f, [:: admininstr__TRAP].
+          apply: Step__read.
+          by apply: Step_read__load_num_trap.
+        * move/ltP: Efail => Efail.
+          rewrite -leqNgt in Efail.
+          move/list_slice_size: Efail => Etemp.
+          move/fun_bytes_inverse: Etemp => [c Etemp].
+          Check list_slice_size.
+          Check fun_bytes_inverse.
+          Check Step_read__load_num_val.
+          (* TODO: fun_bytes is an axiom? *)
+          Print fun_bytes.
+          Print list_slice.
+          by admit.
     - (* Instr_ok__store *)
-      move => C nt n memop mt inn Hlen Hlookup Halign1 Halign2 Hinn.
+      move => C t n memop mt inn Hlen Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       Check Step__store_num_val.
