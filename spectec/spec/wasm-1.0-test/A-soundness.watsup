@@ -51,6 +51,7 @@ relation Memory_instance_ok: store |- meminst : memtype
 rule Memory_instance_ok:
   S |- {TYPE mt, BYTES b*} : mt
   -- if mt = `[n .. m]
+  -- if $(|b*| = n * 64 * $Ki)
   -- Memtype_ok : |- mt : OK
 
 ;; Table instance

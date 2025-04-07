@@ -560,9 +560,6 @@ Proof.
     - (* Instr_ok__br_table *)
       move => C ls lN ts1 ts ts2 HlenlN Hlenls HlookuplN Hlookupls.
       move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
-      (* Set Printing Coercions. *)
-      Check Step_pure__br_table_ge.
-      Check Step_pure__br_table_lt.
       right.
       case: Htf => Htf1 _. rewrite -{}Htf1 in Hts.
       rewrite cat_app catA in Hts.
@@ -845,18 +842,36 @@ Proof.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
-      pose n := size (meminst__BYTES (fun_mem (state__ s f) 0)).
-      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry ((n %/ fun_Ki) %/ 64)%coq_nat)].
+      (* TODO: This pose tactic cannot infer Inh_nat for some reason *)
+      (* pose addr := (lookup_total (moduleinst__MEMS (frame__MODULE f)) 0). *)
+      pose addr := (@lookup_total nat Inh_nat (moduleinst__MEMS (frame__MODULE f)) 0).
+      inversion Hstore as [? ? ? ? meminsts _ _ _ memts _ _ _ _ Hs _ _ _ Hmem Hs'] => {Hs'}.
+      have {}Hcontext : context__MEMS C = context__MEMS C'.
+      { rewrite Hcontext. by case: C' Hcontext Hmod => *. }
+      have {}Haddr : addr < size meminsts.
+      { inversion Hmod as [? ? ? ? ? memaddrs ? ? ? ? ? _ _ _ Hmemaddrs _ _ _ _ Hext Hexp Hs' Hf HC'] => {Hexp Hs' HC'}.
+        rewrite /addr -Hf /=.
+        move/Forall2_lookup: Hext => [_ Hext].
+        move/(_ 0): Hext => Hext.
+        rewrite Hmemaddrs in Hext.
+        rewrite Hcontext /= in Hlen.
+        move/Hext: Hlen => {}Hext.
+        inversion Hext as [| | ? ? ? ? ? Hlen' |].
+        rewrite Hs length_size /= in Hlen'.
+        by move/ltP: Hlen' => Hlen'. }
+      have {}Hmem : Memory_instance_ok s (lookup_total meminsts addr) (lookup_total memts addr).
+      { move/Forall2_lookup: Hmem => [_ Hmem].
+        move/(_ addr): Hmem => Hmem.
+        move/ltP: Haddr => Haddr.
+        rewrite length_size in Hmem.
+        by move/(_ Haddr): Hmem => {}Hmem. }
+      inversion Hmem as [? ? ? n _ _ Hlen' _ Hs' Hlookup' Hmt'] => {Hs' Hmt'}.
+      exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry n)].
       apply: Step__read.
       apply: Step_read__memory_size.
-      (* TODO: Get rid of this rewrite *)
-      rewrite length_size.
-      Print fun_mem.
-      Check Memory_instance_ok__.
-      Check Step_read__memory_size.
-      (* MEMO: There is no guaranteen is a multiple of fun_Ki or 64
-               so n %/ fun_Ki * fun_ki is not equal to n *)
-      by admit.
+      rewrite length_size in Hlen'.
+      rewrite /addr in Hlookup'.
+      by rewrite length_size /fun_mem Hs -Hlookup' Hlen'.
     - (* Instr_ok__memory_grow *)
       move => C mt Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
