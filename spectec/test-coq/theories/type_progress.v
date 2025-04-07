@@ -808,6 +808,7 @@ Proof.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      (* TODO: Does set/pose tactic support destructuring? *)
       case Econfig: (fun_with_local (state__ s f) x v1) => [s' f'].
       exists s', f', [::].
       rewrite -Econfig.
@@ -833,6 +834,7 @@ Proof.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      (* TODO: Does set/pose tactic support destructuring? *)
       case Econfig: (fun_with_global (state__ s f) x v1) => [s' f'].
       exists s', f', [::].
       rewrite -Econfig.
@@ -845,16 +847,16 @@ Proof.
       (* TODO: This pose tactic cannot infer Inh_nat for some reason *)
       (* pose addr := (lookup_total (moduleinst__MEMS (frame__MODULE f)) 0). *)
       pose addr := (@lookup_total nat Inh_nat (moduleinst__MEMS (frame__MODULE f)) 0).
-      inversion Hstore as [? ? ? ? meminsts _ _ _ memts _ _ _ _ Hs _ _ _ Hmem Hs'] => {Hs'}.
+      inversion Hstore as [? ? ? ? meminsts ? ? ? memts ? ? ? ? Hs ? ? ? Hmem Hs'] => {Hs'}.
       have {}Hcontext : context__MEMS C = context__MEMS C'.
       { rewrite Hcontext. by case: C' Hcontext Hmod => *. }
       have {}Haddr : addr < size meminsts.
-      { inversion Hmod as [? ? ? ? ? memaddrs ? ? ? ? ? _ _ _ Hmemaddrs _ _ _ _ Hext Hexp Hs' Hf HC'] => {Hexp Hs' HC'}.
+      { inversion Hmod as [? ? ? ? ? memaddrs ? ? ? ? ? ? ? ? Hmemaddrs ? ? ? ? Hext Hexp Hs' Hf HC'] => {Hexp Hs'}.
         rewrite /addr -Hf /=.
         move/Forall2_lookup: Hext => [_ Hext].
         move/(_ 0): Hext => Hext.
         rewrite Hmemaddrs in Hext.
-        rewrite Hcontext /= in Hlen.
+        rewrite Hcontext -HC' /= in Hlen.
         move/Hext: Hlen => {}Hext.
         inversion Hext as [| | ? ? ? ? ? Hlen' |].
         rewrite Hs length_size /= in Hlen'.
@@ -865,7 +867,7 @@ Proof.
         move/ltP: Haddr => Haddr.
         rewrite length_size in Hmem.
         by move/(_ Haddr): Hmem => {}Hmem. }
-      inversion Hmem as [? ? ? n _ _ Hlen' _ Hs' Hlookup' Hmt'] => {Hs' Hmt'}.
+      inversion Hmem as [? ? ? n ? ? Hlen' ? Hs' Hlookup' Hmt'] => {Hs' Hmt'}.
       exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry n)].
       apply: Step__read.
       apply: Step_read__memory_size.
@@ -876,10 +878,24 @@ Proof.
       move => C mt Hlen Hlookup.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
       right.
-      Print growmemory.
-      Check Step__memory_grow_succeed.
-      Check Step__memory_grow_fail.
-      by admit.
+      case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
+      invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
+      set meminst1 := (fun_mem (state__ s f) 0).
+      (* TODO: Does set/pose tactic support destructuring? *)
+      case Ememinst1: meminst1 => [[limn1 limm1] bs1].
+      pose meminst2 := mkmeminst (limits__ (limn1 + v1) limm1) (bs1 ++ [:: byte__ 0]).
+      (* TODO: Does set/pose tactic support destructuring? *)
+      case Estate: (fun_with_meminst (state__ s f) 0 meminst2) => [s' f'].
+      (* NOTE: We could just use Step__memory_grow_fail but
+               we assume we can always grow memory when it does not exceed predefined maximum size *)
+      case Elimm1: (limn1 + v1 <= limm1).
+      + exists s', f', [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (size (meminst__BYTES (fun_mem (state__ s f) 0)) / (64 * fun_Ki)%coq_nat))].
+        rewrite -length_size -Estate.
+        apply: Step__memory_grow_succeed.
+        apply: (growmemory__ meminst1 v1 meminst2 limn1 limm1 bs1 (limn1 + v1)) => //=.
+        by apply/leP.
+      + exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (fun_invsigned 32 (0 - 1)%coq_nat))].
+        by apply: Step__memory_grow_fail.
     - (* Instr_ok__load *)
       move => C nt n sx memop mt inn Hlen Hsx Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
