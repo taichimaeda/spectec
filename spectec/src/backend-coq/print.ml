@@ -371,7 +371,7 @@ let exported_string =
 	"\t\t| x :: l', 0, 0 => nil\n" ^
 	"\t\t| x :: l', S n, 0 => nil\n" ^
 	"\t\t| x :: l', 0, S m => x :: list_slice l' 0 m\n" ^
-	"\t\t| x :: l', S n, S m => list_slice l' n m\n" ^
+	"\t\t| x :: l', S n, m => list_slice l' n m\n" ^
 	"\tend.\n\n" ^
   "Fixpoint list_slice_update {α: Type} (l: list α) (i: nat) (j: nat) (update_l: list α): list α :=\n" ^
 	"\tmatch l, i, j, update_l with\n" ^
@@ -380,7 +380,7 @@ let exported_string =
 	"\t\t| x :: l', 0, 0, _ => nil\n" ^
 	"\t\t| x :: l', S n, 0, _ => nil\n" ^
 	"\t\t| x :: l', 0, S m, y :: u_l' => y :: list_slice_update l' 0 m u_l'\n" ^
-	"\t\t| x :: l', S n, S m, _ => x :: list_slice_update l' n m update_l\n" ^
+	"\t\t| x :: l', S n, m, _ => x :: list_slice_update l' n m update_l\n" ^
 	"\tend.\n\n" ^
   "Definition list_extend {α: Type} (l: list α) (y: α): list α :=\n" ^
   "\ty :: l.\n\n" ^
