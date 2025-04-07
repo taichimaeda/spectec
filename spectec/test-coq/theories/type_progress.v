@@ -420,12 +420,19 @@ Proof.
   + move => /= i j H.
     case: i H => [| i'] H; case: j H => [| j'] H //=.
     * congr S. by apply: IH.
-    * by admit.
-Admitted.
+    * apply: IH.
+      rewrite -[i'.+1]addn1 -[(size bs').+1]addn1 in H.
+      rewrite -addnA -[1 + j'.+1]addnC addnA in H.
+      by rewrite (leq_add2r 1) in H.
+Qed.
 
 Axiom fun_bytes_inverse : forall t bs,
   size bs = fun_size t / 8 ->
   exists c, fun_bytes t c = bs.
+
+Axiom fun_ibytes_inverse : forall n bs,
+  size bs = n / 8 ->
+  exists c, fun_ibytes n c = bs.
 
 (* TODO: This hint for auto might not work as expected *)
 Hint Constructors Step_pure : core.
@@ -587,8 +594,8 @@ Proof.
       move/typeof_append: Hts => [v1 [Hvcs [Hts Ht1]]]. rewrite {}Hvcs.
       set vcs' := take (size (ts1 ++ option_to_list ts)) vcs.
       invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
-      case Ev1: (v1 < size ls);
-      move/ltP: Ev1 => Ev1.
+      case Hv1: (v1 < size ls);
+      move/ltP: Hv1 => Hv1.
       + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)]).
         (* TODO: Can we get rid of these rewrites? *)
         have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
@@ -615,7 +622,7 @@ Proof.
         apply: Step__pure.
         apply: Step_pure__br_table_ge.
         rewrite length_size.
-        move/ltP: Ev1 => Ev1. apply/leP.
+        move/ltP: Hv1 => Hv1. apply/leP.
         by rewrite /ge leqNgt.
     - (* Instr_ok__call *)
       move => C x ts1 ts2 Haddr Hlookup.
@@ -926,36 +933,34 @@ Proof.
       case En: n => [n' |]; case Esx: sx => [sx' |].
       + case: Hinn => [Hcontra | Hinn] //=; first by rewrite En in Hcontra.
         rewrite Hinn.
-        case Efail: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0)));
-        move/ltP: Efail => Efail.
-        * exists s, f, [:: admininstr__TRAP].
+        case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+        * move/ltP: Hcond => Hcond.
+          exists s, f, [:: admininstr__TRAP].
           apply: Step__read.
           by apply: Step_read__load_pack_trap.
-        * Check Step_read__load_pack_val.
-          by admit.
+        * move/negbT: Hcond => Hcond.
+          rewrite -leqNgt in Hcond.
+          move/list_slice_size: Hcond => Hcond.
+          move/fun_ibytes_inverse: Hcond => [c Hcond].
+          exists s, f, [:: admininstr__CONST (valtype__INN inn) (fun_ext n' (fun_size (valtype__INN inn)) sx' c)].
+          apply: Step__read.
+          by apply: Step_read__load_pack_val.
       + move/Hsize: Esx => Hcontra.
         by rewrite En in Hcontra.
       + move/Hsize: En => Hcontra.
         by rewrite Esx in Hcontra.
-      + 
-        Set Printing Coercions.
-        simpl.
-        case Efail: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0)));
-        move/ltP: Efail => Efail.
-        * exists s, f, [:: admininstr__TRAP].
+      + case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+        * move/ltP: Hcond => Hcond.
+          exists s, f, [:: admininstr__TRAP].
           apply: Step__read.
           by apply: Step_read__load_num_trap.
-        * move/ltP: Efail => Efail.
-          rewrite -leqNgt in Efail.
-          move/list_slice_size: Efail => Etemp.
-          move/fun_bytes_inverse: Etemp => [c Etemp].
-          Check list_slice_size.
-          Check fun_bytes_inverse.
-          Check Step_read__load_num_val.
-          (* TODO: fun_bytes is an axiom? *)
-          Print fun_bytes.
-          Print list_slice.
-          by admit.
+        * move/negbT: Hcond => Hcond.
+          rewrite -leqNgt in Hcond.
+          move/list_slice_size: Hcond => Hcond.
+          move/fun_bytes_inverse: Hcond => [c Hcond].
+          exists s, f, [:: admininstr__CONST t c].
+          apply: Step__read.
+          by apply: Step_read__load_num_val.
     - (* Instr_ok__store *)
       move => C t n memop mt inn Hlen Hlookup Halign1 Halign2 Hinn.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
