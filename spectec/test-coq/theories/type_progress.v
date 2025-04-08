@@ -11,8 +11,7 @@ Import RecordSetNotations.
 (* TODO: Is Coercion global? *)
 From WasmSpectec Require Import generatedcode.
 From WasmSpectec Require Import helper_lemmas helper_tactics typing_lemmas.
-(* From WasmSpectec Require Import type_preservation. *)
-From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype div.
+From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype.
 
 (* NOTE: Naming conventions:
          1. type for types
@@ -244,11 +243,6 @@ Proof.
       simpl in H. inversion H. by subst.
 Qed.
 
-Lemma terminal_trap: terminal_form [:: admininstr__TRAP].
-Proof.
-  unfold terminal_form. by right.
-Qed.
-
 Lemma typeof_append: forall ts t vs,
     map typeof vs = ts ++ [:: t] ->
     exists v,
@@ -441,11 +435,6 @@ Axiom fun_bytes_inverse : forall t bs,
 Axiom fun_ibytes_inverse : forall n bs,
   size bs = n / 8 ->
   exists c, fun_ibytes n c = bs.
-
-(* TODO: This hint for auto might not work as expected *)
-Hint Constructors Step_pure : core.
-(* Hint Constructors reduce_simple : core. *)
-(* Hint Constructors opsem.reduce_simple : core. *)
 
 (* NOTE: Mutual induction principle used in t_progress_be *)
 Scheme Instr_ok_ind' := Induction for Instr_ok Sort Prop
