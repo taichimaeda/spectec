@@ -161,6 +161,14 @@ Proof.
   - move => a l IH vs2. by rewrite IH.
 Qed.
 
+Lemma be_to_e_cat: forall bes1 bes2,
+    list__instr__admininstr bes1 ++ list__instr__admininstr bes2 =
+    list__instr__admininstr (bes1 ++ bes2).
+Proof.
+  move => bes1. elim: bes1 => //=.
+  - move => a l IH bes2. by rewrite IH.
+Qed.
+
 Lemma to_e_list_cat: forall bes1 bes2,
     list__instr__admininstr (bes1 ++ bes2) = 
     list__instr__admininstr bes1 ++ list__instr__admininstr bes2.
@@ -483,7 +491,7 @@ Proof.
       (* not_lf_return (list__instr__admininstr bes) -> *)
       const_list (list__instr__admininstr bes) \/
       exists s' f' es', Step (config__ (state__ s f) (list__val__admininstr vcs ++ list__instr__admininstr bes)) (config__ (state__ s' f') es'))
-      => //= {C bes tf Hinstrs}.
+      => // {C bes tf Hinstrs}.
     - (* Instr_ok__nop *)
       move => C.
       move => s f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
@@ -1007,10 +1015,39 @@ Proof.
             rewrite /bs -Ht2 /= in Hcond *.
             by apply: Step__store_num_val. }
     - (* Instrs_ok__empty *)
-      
-      by admit.
+      move => C s.
+      move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
+      by left.
     - (* Instrs_ok__seq *)
-      by admit.
+      move => C bes1 be2 ts1 ts2 ts3 Hinstrs1 IH1 Hinstr2 IH2.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
+      have Heqtf1 : functype__ ts1 ts3 = functype__ ts1 ts3 by [].
+      have Heqts1 : ts1' = ts1 by inversion Htf.
+      rewrite Heqts1 in Hts.
+      move: (IH1 s f C' vcs ts1 ts3 lab ret Heqtf1 Hcontext Hmod Hts Hstore) => {}IH1.
+      case: IH1 => [Hconst1 | Hprog1].
+      + move/const_es_exists: Hconst1 => [vs1 Hvs1].
+        (* NOTE: Maybe we should make a separate lemma rather than reusing Val_Const_list_typing in Heqts2 *)
+        have Hadmin1 : Admin_instrs_ok s C (list__instr__admininstr bes1) (functype__ ts1 ts3).
+        { by apply: Admin_instrs_ok__instrs. }
+        rewrite Hvs1 in Hadmin1 *.
+        have Heqtf2 : functype__ ts3 ts2 = functype__ ts3 ts2 by [].
+        have Heqts2 : map typeof (vcs ++ vs1) = ts3.
+        { move/Val_Const_list_typing: Hadmin1 => Hadmin1.
+          by rewrite Hadmin1 -Hts map_map map_cat. }
+        move: (IH2 s f C' (vcs ++ vs1) ts3 ts2 lab ret Heqtf2 Hcontext Hmod Heqts2 Hstore) => {}IH2.
+        case: IH2 => [Hconst2 | Hprog2].
+        * left. rewrite -be_to_e_cat Hvs1.
+          apply: const_list_concat => //=.
+          by apply: v_to_e_const.
+        * right.
+          Set Printing Coercions.
+          rewrite -v_to_e_cat -Hvs1 in Hprog2.
+          by rewrite -catA be_to_e_cat in Hprog2.
+      + right. move: Hprog1 => [s' [f' [es1' Hprog1]]].
+        exists s', f', (es1' ++ list__instr__admininstr [:: be2]).
+        rewrite -be_to_e_cat catA.
+        by apply Step__ctxt_seq with (v_val := [::]).
     - (* Instrs_ok__frame *)
       (* NOTE: This should be named as Instrs_ok__weakening *)
       by admit.
@@ -1084,7 +1121,7 @@ Proof.
       (const_list es /\ length es = length ts) \/
       es = [::admininstr__TRAP] \/
       exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es')) 
-    => //= {s C es tf Hadmin}.
+    => // {s C es tf Hadmin}.
   - (* Admin_instr_ok__instr *)
     move => s C be tf Hinstr.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
@@ -1217,6 +1254,7 @@ Proof.
     case: IH => [Hterm | Hprog].
     + case: Hterm => [Hconst | Htrap].
       * left. left.
+        (* TODO: v_to_e_cat should be used elsewhere when applying Step__ctxt_seq *)
         rewrite -v_to_e_cat -catA.
         apply: const_list_concat => //=.
         by apply: v_to_e_const.
@@ -1263,14 +1301,11 @@ Proof.
         case: IH2 => [Hterm2 | Hprog2].
         { case: Hterm2 => [Hconst2 | Htrap2].
           - left. left.
-            move/const_list_split: Hconst2 => [Hconst21 Hconst22].
-            rewrite -v_to_e_cat in Hconst21.
-            move/const_list_split: Hconst21 => [Hconst23 Hconst24].
-            apply: const_list_concat => //=.
-            by apply: const_list_concat => //=.
-          - move: (extract_list1 _ _ _ Htrap2) => [Hvcs He].
-            rewrite catA v_to_e_cat Hvcs He /=. left.
-            rewrite /terminal_form. by right. }
+            by rewrite -v_to_e_cat -catA in Hconst2.
+          - left. right.
+            move: (extract_list1 _ _ _ Htrap2) => [Hvcs He].
+            rewrite catA v_to_e_cat Hvcs He /=. 
+            by rewrite /terminal_form. }
         { right. by rewrite catA v_to_e_cat. }
       * right. move: (v_e_trap _ _ (v_to_e_const vcs) Htrap1) => [-> ->] //=.
         exists s, f, [:: admininstr__TRAP].
@@ -1304,11 +1339,11 @@ Proof.
         by apply v_to_e_const.
       * rewrite -v_to_e_cat -catA Htrap.
         case: vcs1 => /= [| vc1 vcs1].
-        -- left. by right.
-        -- right. exists s, f, [:: admininstr__TRAP].
-           apply: Step__pure.
-           apply Step_pure__trap_vals with (v_val := (vc1 :: vcs1)).
-           by left.
+        { left. by right. }
+        { right. exists s, f, [:: admininstr__TRAP].
+          apply: Step__pure.
+          apply Step_pure__trap_vals with (v_val := (vc1 :: vcs1)).
+          by left. }
     + right. move: Hprog => [s' [f' [es' IH]]].
       exists s', f', (list__val__admininstr vcs1 ++ es').
       rewrite -v_to_e_cat -catA.
