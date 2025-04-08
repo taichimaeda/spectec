@@ -361,12 +361,12 @@ Axiom val_wf_temp: forall (v : generatedcode.val), val_wf v.
 
 Ltac invert_val_wf v :=
   let H := fresh "H" in
-  have H := val_wf_temp v; rewrite /val_wf in H;
   let t := fresh "t" in
   let n := fresh "n" in
   let f := fresh "f" in
   let inn := fresh "inn" in
   let fnn := fresh "fnn" in
+  have H := val_wf_temp v; rewrite /val_wf in H;
   (* TODO: Rewrite using case tactic somehow *)
   destruct v as [t v];
   destruct v as [v | v];
@@ -970,28 +970,44 @@ Proof.
       case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
       invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
       invert_val_wf v2. rewrite /= in Ht2. rewrite Ht2.
-      case En: n => [n' |].
-      + (* NOTE: t of t.store is expected to be inn *)
-        case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
-        case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-        * move/ltP: Hcond => Hcond.
-          exists s, f, [:: admininstr__TRAP].
-          by apply: Step__store_pack_trap.
-        * set bs := fun_ibytes n' (fun_wrap (fun_size (valtype__INN inn)) n' v2).
-          case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (n' / 8) bs) => [s' f'].
-          exists s', f', [::].
-          rewrite -Estate.
-          by apply: Step__store_pack_val.
-      + case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-        * move/ltP: Hcond => Hcond.
-          exists s, f, [:: admininstr__TRAP].
-          by apply: Step__store_num_trap.
-        * set bs := fun_bytes t v2.
-          case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
-          exists s', f', [::].
-          rewrite -Estate.
-          by apply: Step__store_num_val.
+      + case En: n => [n' |].
+        * (* NOTE: t of t.store is expected to be inn *)
+          case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
+          case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+          { move/ltP: Hcond => Hcond.
+            exists s, f, [:: admininstr__TRAP].
+            by apply: Step__store_pack_trap. }
+          { set bs := fun_ibytes n' (fun_wrap (fun_size (valtype__INN inn)) n' v2).
+            case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (n' / 8) bs) => [s' f'].
+            exists s', f', [::].
+            rewrite -Estate.
+            by apply: Step__store_pack_val. }
+        * case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+          { move/ltP: Hcond => Hcond.
+            exists s, f, [:: admininstr__TRAP].
+            by apply: Step__store_num_trap. }
+          { set bs := fun_bytes t v2.
+            case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
+            exists s', f', [::].
+            rewrite -Estate.
+            by apply: Step__store_num_val. }
+      + case En: n => [n' |].
+        * (* NOTE: t of t.store is expected to be inn *)
+          case: Hinn => [Hcontra | Hinn] //=; first by rewrite En in Hcontra.
+          by rewrite Hinn /= in Ht2.
+        * case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
+          { move/ltP: Hcond => Hcond.
+            exists s, f, [:: admininstr__TRAP].
+            rewrite -Ht2 /= in Hcond *.
+            by apply: Step__store_num_trap. }
+          { set bs := fun_bytes t v2.
+            case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
+            exists s', f', [::].
+            rewrite -Estate /=.
+            rewrite /bs -Ht2 /= in Hcond *.
+            by apply: Step__store_num_val. }
     - (* Instrs_ok__empty *)
+      
       by admit.
     - (* Instrs_ok__seq *)
       by admit.
