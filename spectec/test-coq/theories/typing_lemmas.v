@@ -281,7 +281,7 @@ Ltac apply_composition_typing_single H :=
 	rewrite -> app_left_single_nil in H;
     apply admin_composition_typing_single in H; destruct H as [ts1 [ts2 [ts3 [ts4 [H1 [H2 [H3 H4]]]]]]];
 	try apply admin_empty in H3.
-
+	
 Lemma admin_composition_typing: forall v_S v_C v_ais1 v_ais2 t1s t2s,
 	Admin_instrs_ok v_S v_C (v_ais1 ++ v_ais2) (functype__ t1s t2s) ->
     exists ts t1s' t2s' t3s, t1s = ts ++ t1s' /\
@@ -967,3 +967,4 @@ Admitted.
 		edestruct IHHType as [ts [t1s'' [t2s'' [? [? [? ?]]]]]] => //=; subst.
 		exists ts, t1s'', (v_t ++ t2s''). repeat split => //=; by rewrite <- app_assoc.
 Qed. *)
+
