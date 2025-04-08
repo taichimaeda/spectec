@@ -1049,8 +1049,33 @@ Proof.
         rewrite -be_to_e_cat catA.
         by apply Step__ctxt_seq with (v_val := [::]).
     - (* Instrs_ok__frame *)
+      move => C bes ts ts1 ts2 Hinstrs IH.
+      move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
       (* NOTE: This should be named as Instrs_ok__weakening *)
-      by admit.
+      (* TODO: Get rid of duplicate proof *)
+      have Heqtf : functype__ ts1 ts2 = functype__ ts1 ts2 by [].
+      have Heqts : map typeof (drop (length ts) vcs) = ts1.
+      { rewrite map_drop.
+        injection Htf => Htf2 Htf1.
+        rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
+      move: (IH s f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+      have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
+      rewrite {}length_size in IH.
+      set vcs1 := take (size ts) vcs in IH *.
+      set vcs2 := drop (size ts) vcs in IH *.
+      case: IH => [Hconst | Hprog].
+      + by left.
+      + right. move: Hprog => [s' [f' [es' IH]]].
+        exists s', f', (list__val__admininstr vcs1 ++ es').
+        rewrite -v_to_e_cat -catA.
+        (* TODO: Can we get rid of these rewrites? *)
+        rewrite -[list__val__admininstr vcs2 ++ _]cats0.
+        rewrite -[list__val__admininstr vcs1 ++ es']cats0.
+        rewrite -[(list__val__admininstr vcs1 ++ es') ++ [::]]catA.
+        by apply Step__ctxt_seq with
+          (v_admininstr := list__val__admininstr vcs2 ++ list__instr__admininstr bes)
+          (v_admininstr' := es')
+          (v_admininstr'' := [::]).
 Admitted.
 
 Lemma Instr_ok_Instrs_ok: forall C be tf,
