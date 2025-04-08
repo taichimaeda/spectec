@@ -1140,15 +1140,12 @@ Proof.
     move => s C be tf Hinstr.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
     have Hinstrs: Instrs_ok C [:: be] tf by apply Instr_ok_Instrs_ok.
-    rewrite Htf Hcontext in Hinstrs.
-    (* TODO: This fails because statement of t_progress_be has been modified *)
-    by admit.
-    (* pose Hprog := t_progress_be C' [:: be] ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
+    pose Hprog := t_progress_be s C C' f vcs [:: be] tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right.  *)
+    + by right. 
   - (* Admin_instr_ok__trap *)
     move => s C ts1 ts2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore.
@@ -1374,15 +1371,12 @@ Proof.
     (* TODO: Get rid of duplicate proof *)
     move => s C bes tf Hinstrs.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore.
-    rewrite Htf Hcontext in Hinstrs.
-    (* TODO: This fails because statement of t_progress_be has been modified *)
-    by admit.
-    (* pose Hprog := t_progress_be C' bes ts1 ts2 vcs lab ret s f Hstore Hmod Hinstrs Hts.
+    pose Hprog := t_progress_be s C C' f vcs bes tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore.
     case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right.  *)
+    + by right. 
   - (* Thread_ok__ *)
     move => s rs f es ts C.
     move => Hframe Hadmin IH Hstore.
@@ -1424,7 +1418,7 @@ Proof.
         by rewrite 2!length_size map_map 2!size_map.
       * right. left. by rewrite Htrap.
     + right. by right.
-Admitted.
+Qed.
 
 Theorem t_progress: forall s f es ts,
   Config_ok (config__ (state__ s f) es) ts ->
