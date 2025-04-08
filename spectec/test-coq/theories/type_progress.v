@@ -198,11 +198,10 @@ Lemma reduce_composition: forall cs st es es0 st' es',
     Step (config__ st (cs ++ es ++ es0)) (config__ st' (cs ++ es' ++ es0)).
 Proof.
   move => cs st es es0 st' es' HConst HReduce.
-  apply const_es_exists in HConst as [vcs Heq].
-  Check Step__ctxt_label.
-  (* TODO: What corresponds to r_label in this case?  *)
-  (* eapply r_label with (lh := LH_base vcs es0) => //=; eauto; by rewrite - Heq => //. *)
-Admitted.
+  move/const_es_exists: HConst => [vcs Heq].
+  rewrite Heq.
+  by apply: Step__ctxt_seq.
+Qed.
 
 Lemma reduce_composition_right: forall st es es0 st' es',
     Step (config__ st es) (config__ st' es') ->
