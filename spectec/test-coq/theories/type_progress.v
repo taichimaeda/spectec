@@ -33,6 +33,14 @@ Proof. by []. Qed.
 Lemma cat_app {A : Type} (s1 s2 : seq A) : List.app s1 s2 = cat s1 s2.
 Proof. by []. Qed.
 
+Lemma cat_nil : forall T (s1 s2 : seq T),
+  (s1 ++ s2) = [::] <-> s1 = [::] /\ s2 = [::].
+Proof.
+  move => T s1 s2. split.
+  - by case: s1; case s2.
+  - by move => [-> ->].
+Qed.
+
 Definition is_const (e : admininstr) : bool :=
   if e is admininstr__CONST _ _ then true else false.
 
@@ -94,6 +102,7 @@ Proof.
     by exists (val__CONST v_valtype v_val_ :: vs).
 Qed.
 
+(* TODO: Rename this lemma more appropriately *)
 (* TODO: There may be an equivalent lemma in ssreflect *)
 Lemma map_eq_nil {A B : Type} (f : A -> B) (l : seq A) :
   map f l = [::] -> l = [::].
@@ -101,6 +110,7 @@ Proof.
   case: l => //=.
 Qed.
 
+(* TODO: Rename this lemma more appropriately *)
 (* TODO: There may be an equivalent lemma in ssreflect *)
 Lemma map_neq_nil {A B : Type} (f: A -> B) (l: seq A) :
   map f l <> [] → l <> [].
@@ -122,6 +132,7 @@ Proof.
   left. by apply/map_neq_nil: H.
 Qed.
 
+(* TODO: Rename this lemma more appropriately *)
 Lemma v_e_trap: forall vs es,
     const_list vs ->
     vs ++ es = [:: admininstr__TRAP] ->
@@ -133,6 +144,7 @@ Proof.
   simpl in H. inversion H. by subst.
 Qed.
 
+(* TODO: Rename this lemma more appropriately *)
 Lemma concat_cancel_last: forall {X:Type} (l1 l2: seq X) (e1 e2:X),
     l1 ++ [::e1] = l2 ++ [::e2] ->
     l1 = l2 /\ e1 = e2.
@@ -143,6 +155,7 @@ Proof.
   rewrite - (revK l1). rewrite H3. split => //. by apply revK.
 Qed.
 
+(* TODO: Rename this lemma more appropriately *)
 Lemma extract_list1 : forall {X:Type} (es: seq X) (e1 e2:X),
     es ++ [::e1] = [::e2] ->
     es = [::] /\ e1 = e2.
@@ -176,6 +189,7 @@ Proof.
   move => bes2. simpl. by f_equal.
 Qed.
 
+(* TODO: Move this to the top of this file *)
 Lemma cat_split: forall {X: Type} (l l1 l2: seq X),
     l = l1 ++ l2 ->
     l1 = take (size l1) l /\
@@ -326,11 +340,6 @@ Ltac decidable_equality_step :=
 Ltac decidable_equality :=
   repeat decidable_equality_step.
 
-(* TODO: Auto-generate these instances for each type *)
-Definition functype_eq_dec : forall tf1 tf2 : functype,
-  {tf1 = tf2} + {tf1 <> tf2}.
-Proof. decidable_equality. Defined.
-
 Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),
   let eqb v1 v2 := is_left (eq_dec v1 v2) in
   Equality.axiom eqb.
@@ -340,6 +349,11 @@ Proof.
   - move=> E. by apply/ReflectF.
 Qed.
 
+(* TODO: Auto-generate these instances for each type *)
+Definition functype_eq_dec : forall tf1 tf2 : functype,
+  {tf1 = tf2} + {tf1 <> tf2}.
+Proof. decidable_equality. Defined.
+
 Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
 Definition eqfunctypeP : Equality.axiom functype_eqb :=
   eq_dec_Equality_axiom functype functype_eq_dec.
@@ -347,6 +361,20 @@ Definition eqfunctypeP : Equality.axiom functype_eqb :=
 Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
 Canonical Structure functype_eqType :=
   Eval hnf in EqType functype functype_eqMixin.
+
+Definition admininstr_eq_dec : forall e1 e2 : admininstr,
+  {e1 = e2} + {e1 <> e2}.
+Admitted.
+(* TODO: This does not terminate for some reason *)
+(* Proof. decidable_equality. Defined. *)
+
+Definition admininstr_eqb v1 v2 : bool := admininstr_eq_dec v1 v2.
+Definition eqadmininstrP : Equality.axiom admininstr_eqb :=
+  eq_dec_Equality_axiom admininstr admininstr_eq_dec.
+
+Canonical Structure admininstr_eqMixin := EqMixin eqadmininstrP.
+Canonical Structure admininstr_eqType :=
+  Eval hnf in EqType admininstr admininstr_eqMixin.
 
 (* NOTE: This is a temporary solution to ensure valtype matches corresponding val_
          There is no check that ensures valtype and val_ matches 
@@ -554,7 +582,7 @@ Proof.
   by move/(_ [::] l [::]): H => H.
 Qed.
 
-Lemma not_fl_return_singleton : forall e,
+Lemma not_lf_return_singleton : forall e,
   not_lf_return [:: e] -> e <> admininstr__RETURN.
 Proof.
   move => e H Hcontra.
@@ -562,45 +590,200 @@ Proof.
   by move/(_ [::] [::]): H => H.
 Qed.
 
-(*
-Definition not_lf_br es := Forall (fun e => forall l, e <> admininstr__BR l) es.
-
-Definition not_lf_return es := Forall (fun e => e <> admininstr__RETURN) es.
-
-Lemma cat_eq_nil : forall A (l1 l2 : seq A),
-  (l1 ++ l2) = [::] -> l1 = [::] /\ l2 = [::].
+(* TODO: Duplicate of composition_typing_single? *)
+Lemma Instrs_ok_rcons : forall C bes be ts1 ts2, 
+  Instrs_ok C (bes ++ [:: be]) (functype__ ts1 ts2) ->
+  exists ts ts1' ts2' ts3,
+    ts1 = ts ++ ts1' /\
+    ts2 = ts ++ ts2' /\
+    Instrs_ok C bes (functype__ ts1' ts3) /\
+    Instr_ok C be (functype__ ts3 ts2').
 Proof.
-  move => A l1 l2.
-  by case: l1; case l2.
+  move => C bes be ts1 ts2 Hinstrs.
+  move Ebes': (bes ++ [:: be]) => bes'.
+  move Etf: (functype__ ts1 ts2) => tf.
+  rewrite Ebes' Etf in Hinstrs.
+  move: bes be ts1 ts2 Ebes' Etf.
+  (* NOTE: This is a type families syntax for elim tactic *)
+  elim: C bes' tf / Hinstrs => [
+    C | 
+    C bes' be' ts1' ts2' ts3' Hinstrs IH Hinstrs' |
+    C bes' ts ts1' ts2' Hinstrs IH ].
+  - move => bes be ts1 ts2 Ebes' Etf.
+    by case: bes Ebes'.
+  - move => bes be ts1 ts2 Ebes' Etf.
+    case: Etf => -> ->.
+    move/(split_append_last _ _ _ _ ): Ebes' => [-> ->].
+    by exists [::], ts1', ts2', ts3'.
+  - move => bes be ts1 ts2 Ebes' Etf.
+    move/(_ bes be ts1' ts2'): IH => IH.
+    case: IH => //= [ts' [ts1'' [ts2'' [ts3'' [E1 [E2 [IH1 IH2]]]]]]].
+    case: Etf => Etf1 Etf2. rewrite E1 E2 in Etf1 Etf2.
+    exists (ts ++ ts'), ts1'', ts2'', ts3''.
+    by rewrite -2!catA.
 Qed.
 
-Lemma Forall_cat : forall A (P : A -> Prop) (l1 l2 : seq A),
-  Forall P (l1 ++ l2) <-> Forall P l1 /\ Forall P l2.
+(* TODO: Duplicate of admin_composition_typing_single? *)
+Lemma Admin_instrs_ok_rcons : forall s C es e ts1 ts2,
+  Admin_instrs_ok s C (es ++ [:: e]) (functype__ ts1 ts2) ->
+  exists ts ts1' ts2' ts3,
+    ts1 = ts ++ ts1' /\
+    ts2 = ts ++ ts2' /\
+    Admin_instrs_ok s C es (functype__ ts1' ts3) /\
+    Admin_instr_ok s C e (functype__ ts3 ts2').
 Proof.
-  move => A P l1 l2. split.
-  - elim: l1 => [|x' l1'] //=.
-    move => IH Hl. inversion Hl.
-    move/IH: H2 => [Hl1' Hl2].
-    split => //=.
-    by apply: Forall_cons => //=.
-  - move => [F1 F2].
-    elim: F1 => [|x l Px Fl IH] //=.
-    by apply: Forall_cons.
+  move => s C es e ts1 ts2 Hadmin.
+  move Ees': (es ++ [:: e]) => es'.
+  move Etf: (functype__ ts1 ts2) => tf.
+  rewrite Ees' Etf in Hadmin.
+  move: es e ts1 ts2 Ees' Etf.
+  (* NOTE: This is a type families syntax for elim tactic *)
+  elim: s C es' tf / Hadmin => [
+    s C |
+    s C es' e' ts1' ts2' ts3' Hadmin IH Hadmin' |
+    s C es' ts ts1' ts2' Hadmin IH |
+    s C es' tf Hinstrs ].
+  - move => es e ts1 ts2 Ees' Etf.
+    by move/cat_nil: Ees' => [Hes He].
+  - move => es e ts1 ts2 Ees' Etf.
+    case: Etf => -> ->.
+    move/(split_append_last _ _ _ _ ): Ees' => [-> ->].
+    by exists [::], ts1', ts2', ts3'.
+  - move => es e ts1 ts2 Ees' Etf.
+    move/(_ es e ts1' ts2'): IH => IH.
+    case: IH => //= [ts' [ts1'' [ts2'' [ts3'' [E1 [E2 [IH1 IH2]]]]]]].
+    case: Etf => Etf1 Etf2. rewrite E1 E2 in Etf1 Etf2.
+    exists (ts ++ ts'), ts1'', ts2'', ts3''.
+    by rewrite -2!catA.
+  - move => es e ts1 ts2 Ees' Etf.
+    rewrite /list__instr__admininstr in Ees'. symmetry in Ees'.
+    (* TODO: View for move tactic doesn't work for some reason here *)
+    (* TODO: Avoid using map_eq_app etc *)
+    move: (map_eq_app _ _ _ _ Ees') => {Ees'} [bes [bes' [Ees' [Ebes Ebes']]]].
+    move: (map_eq_cons _ _ Ebes') => {Ebes'} [be [bes'' [Ebes' [Ebe Ebes'']]]].
+    move: (map_eq_nil _ _ Ebes'') => {}Ebes''.
+    rewrite {}Ebes' {}Ebes'' in Ees'.
+    rewrite -Ebes -Ebe.
+    rewrite -/list__instr__admininstr in Ebes *.
+    rewrite Ees' -Etf in Hinstrs.
+    move: (Instrs_ok_rcons C bes be ts1 ts2 Hinstrs) => [ts' [ts1'' [ts2'' [ts3' [Ets1 [Ets2 [Hinstrs1 Hinstrs2]]]]]]].
+    exists ts', ts1'', ts2'', ts3'.
+    do ! split => //=.
+    + by apply: Admin_instrs_ok__instrs.
+    + by apply: Admin_instr_ok__instr.
+Qed.
+    
+(* TODO: Duplicate ofadmin_composition_typing?  *)
+Lemma Admin_instrs_ok_cat : forall s C es1 es2 ts1 ts2,
+  Admin_instrs_ok s C (es1 ++ es2) (functype__ ts1 ts2) -> 
+  exists ts ts1' ts2' ts3,
+    ts1 = ts ++ ts1' /\
+    ts2 = ts ++ ts2' /\
+    Admin_instrs_ok s C es1 (functype__ ts1' ts3) /\
+    Admin_instrs_ok s C es2 (functype__ ts3 ts2').
+Proof.
+  move => s C es1 es2 ts1 ts2 Hadmin.
+  move: s C es1 ts1 ts2 Hadmin.
+  (* NOTE: Induction on list es2 in reverse direction 
+           which works better with Admin_instrs_ok__seq and Admin_instrs_ok_rcons *)
+  elim/last_ind: es2 => [| es2' e2 IH].
+  - move => s C es1 ts1 ts2 Hadmin.
+    exists [::], ts1, ts2, ts2.
+    do ! split => //=.
+    + by rewrite cats0 in Hadmin.
+    + rewrite -[ts2]cats0.
+      apply: Admin_instrs_ok__frame.
+      by apply: Admin_instrs_ok__empty.
+  - move => s C es1 ts1 ts2 Hadmin.
+    rewrite -cats1 catA in Hadmin *.
+    move/Admin_instrs_ok_rcons: Hadmin => [ts [ts1' [ts2' [ts3 [Ets1 [Ets2 [Hadmin1 Hadmin2]]]]]]].
+    move/(_ s C es1 ts1' ts3 Hadmin1): IH => [ts' [ts1'' [ts2'' [ts3' [Ets1' [Ets2' [Hadmin1' Hadmin2']]]]]]].
+    move/(Admin_instrs_ok__frame _ _ _ ts'): Hadmin1' => Hadmin1'. rewrite 2!cat_app -Ets1' in Hadmin1'.
+    move/(Admin_instrs_ok__frame _ _ _ ts'): Hadmin2' => Hadmin2'. rewrite 2!cat_app -Ets2' in Hadmin2'.
+    move: (Admin_instrs_ok__seq _ _ _ e2 _ ts2' _ Hadmin2' Hadmin2) => {}Hadmin2'.
+    exists ts, ts1', ts2', (ts' ++ ts3').
+    by do ! split => //=.
 Qed.
 
-Lemma not_lf_br_cat : forall es1 es2,
-  not_lf_br (es1 ++ es2) <-> not_lf_br es1 /\ not_lf_br es2.
+Lemma Admin_instrs_ok_all : forall s C es ts1 ts2,
+  Admin_instrs_ok s C es (functype__ ts1 ts2) -> 
+  forall e, e \in es -> exists ts1' ts2', Admin_instr_ok s C e (functype__ ts1' ts2').
 Proof.
-  rewrite /not_lf_br.
-  by apply: Forall_cat.
+  (* TODO: Make use of `+` elsewhere *)
+  move => + + es.
+  elim/last_ind: es => [| es' e'].
+  - move => s C ts1 ts2 Hadmin e Hin.
+    by rewrite in_nil in Hin.
+  - move => IH s C ts1 ts2 Hadmin e Hin.
+    rewrite mem_rcons in_cons in Hin.
+    rewrite -cats1 in Hadmin.
+    move/Admin_instrs_ok_rcons: Hadmin => [ts [ts1' [ts2' [ts3 [Ets1 [Ets2 [Hadmin1 Hadmin2]]]]]]].
+    move/orP: Hin => [Hin1 | Hin2].
+    + move/eqP: Hin1 => Hin1.
+      rewrite Hin1.
+      by exists ts3, ts2'.
+    + move/IH: Hadmin1 => {}IH. 
+      by move/(_ e Hin2): IH => IH.
 Qed.
 
-Lemma not_lf_return_cat : forall es1 es2,
-  not_lf_return (es1 ++ es2) <-> not_lf_return es1 /\ not_lf_return es2.
+Lemma s_typing_lf_br : forall s f es ts l,
+  Thread_ok s None f es ts ->
+  Forall (fun e => e <> admininstr__BR l) es.
 Proof.
-  rewrite /not_lf_return.
-  by apply: Forall_cat.
-Qed. *)
+  move => s f es ts l Hthread.
+  (* TODO: Get rid of subst *)
+  inversion Hthread as [? ? ? ? ? ? Hframe Hadmin Hs Hrs Hf Hes Hts] => {Hthread} //=. subst.
+  move/Admin_instrs_ok_all: Hadmin => Hadmin.
+  elim: es Hadmin => [| e' es' IH] Hadmin;
+  first by apply: Forall_nil.
+  apply: Forall_cons.
+  - move => Hcontra.
+    have Hin : e' \in e' :: es'.
+    { rewrite in_cons. apply/orP. by left. }
+    move/(_ e' Hin): Hadmin => [ts1' [ts2' Hadmin]].
+    rewrite Hcontra in Hadmin.
+    (* TODO: Avoid using destruct/dependent induction *)
+    Require Import Coq.Program.Equality.
+    destruct e'; dependent induction Hadmin => //=.    
+    (* TODO: Both goals generated by above has v_admininstr = admininstr__BR l
+             H2 : Instr_ok in first goal and 
+             H3 : Admin_instr_ok in second goal 
+             to derive contradiction because context__LABELS has to be non empty for branch *)
+    + have Hbr : v_instr = instr__BR l.
+      { destruct v_instr; by inversion x. }
+      rewrite Hbr in H.
+      inversion H => //=.
+      (* TODO: Contradiction in H4 : l < Datatypes.length
+               Need to derive context__LABELS v_C = [::] when performing inversion Hthread,
+               which holds because Frame_ok s f v_C and Module_instance_ok v_S v_moduleinst v_C *)
+      simpl in H4.
+      inversion Hframe.
+      by admit.
+    + apply: IHHadmin => //=.
+      - by apply: Hframe.
+      - by apply: IH.
+  - apply: IH.
+    move => e Hin.
+    have Hin' : e \in e' :: es'.
+    { rewrite in_cons. apply/orP. by right. }
+    by move/(_ e Hin'): Hadmin => Hadmin.
+Admitted.
+
+Lemma s_typing_lf_return : forall s f es ts,
+  Thread_ok s None f es ts ->
+  Forall (fun e => forall l, e <> admininstr__BR l) es.
+Proof.
+Admitted.
+
+(* Lemma br_reduce_extract_vs *)
+(* TODO: Two major facts to be proven:
+         1. v_n in admininstr__LABEL is equal to the length of types in
+            context__LABELS of context used to validate admininstr__BR inside the label
+         2. if vcs ++ admininstr__BR is well-typed then length of vcs must be
+            greater than or equal to the length of types in context__LABELS of context
+            used to validate vcs ++ admininstr__BR *)
+
+(* Lemma return_reduce_extract_vs *)
 
 (* MEMO: be_typing -> Instrs_ok *)
 (* MEMO: f.(f_inst) -> f.(frame__MODULE) *)
@@ -1045,6 +1228,7 @@ Proof.
     have {}Haddr : addr < size meminsts.
     { inversion Hmod as [? ? ? ? ? memaddrs ? ? ? ? ? ? ? ? Hmemaddrs ? ? ? ? Hext Hexp Hs' Hf HC'] => {Hexp Hs'}.
       rewrite /addr -Hf /=.
+      (* TODO: Use all2 instead *)
       move/Forall2_lookup: Hext => [_ Hext].
       move/(_ 0): Hext => Hext.
       rewrite Hmemaddrs in Hext.
@@ -1054,7 +1238,8 @@ Proof.
       rewrite Hs length_size /= in Hlen'.
       by move/ltP: Hlen' => Hlen'. }
     have {}Hmem : Memory_instance_ok s (lookup_total meminsts addr) (lookup_total memts addr).
-    { move/Forall2_lookup: Hmem => [_ Hmem].
+    { (* TODO: Use all2 instead *)
+      move/Forall2_lookup: Hmem => [_ Hmem].
       move/(_ addr): Hmem => Hmem.
       move/ltP: Haddr => Haddr.
       rewrite length_size in Hmem.
@@ -1246,6 +1431,7 @@ Proof.
     by apply: (mkfuncinst functype modinst func).
 Qed.
 
+(* TODO: Similar to admin_instrs_ok_eq *)
 Lemma Instr_ok_Instrs_ok: forall C be tf,
   Instr_ok C be tf -> Instrs_ok C [:: be] tf.
 Proof.
@@ -1565,6 +1751,7 @@ Proof.
     have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
     { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
       inversion Hmod => //=. rewrite cat_app cats0.
+      (* TODO: Use all2 instead *)
       by apply Forall2_Val_ok_is_same_as_map in Hval. }
     have Heq2 : context__LABELS C = [::].
     { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
@@ -1615,6 +1802,7 @@ Proof.
     have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
     { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
       inversion Hmod => //=. rewrite cat_app cats0.
+      (* TODO: Use all2 instead *)
       by apply Forall2_Val_ok_is_same_as_map in Hval. }
     have Heq2 : context__LABELS C = [::].
     { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
