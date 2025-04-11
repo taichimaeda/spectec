@@ -1,6 +1,7 @@
 ;; Store and Frame 
 var S : store
 var F : frame
+var rt : resulttype
 
 ;; Value type ok
 
@@ -120,7 +121,7 @@ rule Store_ok:
 
 relation Admin_instr_ok: store; context |- admininstr : functype
 relation Admin_instrs_ok: store; context |- admininstr* : functype
-relation Thread_ok: store ; resulttype |- frame; admininstr* : resulttype
+relation Thread_ok: store ; resulttype? |- frame; admininstr* : resulttype
 
 
 ;; Administrative instruction sequences
