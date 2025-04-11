@@ -807,7 +807,6 @@ Proof.
       context__LABELS := [::];
       context__RETURN := Some None
       |} C) Hadmin => C' Hadmin.
-    Print Thread_ok.
     move Ee: (admininstr__RETURN) Hadmin => e Hadmin.
     move Etf: (functype__ ts1' ts2') Hadmin => tf Hadmin.
     move: ts1' ts2' Hframe IH Ec Ee Etf.
@@ -836,6 +835,47 @@ Proof.
     { rewrite in_cons. apply/orP. by right. }
     by move/(_ e Hin'): Hadmin.
 Admitted.
+
+Lemma s_typing_not_lf_br : forall s f es ts,
+  Thread_ok s None f es ts ->
+  not_lf_br es.
+Proof.
+  move => s f es ts Hthread.
+  move/s_typing_lf_br: Hthread => Hes.
+  rewrite /not_lf_br. move => vcs l es' Hcontra.
+  move: es es' Hes Hcontra.
+  elim: vcs => /= [| vc vcs' IH].
+  - move => es es' Hes Hcontra. 
+    move/(_ l): Hes => Hes. rewrite Hcontra in Hes.
+    by inversion Hes => //=.
+  - move => es es' Hes Hcontra.
+    case: es Hes Hcontra => // [e' es] Hes Hcontra.
+    move/(_ es es'): IH => IH.
+    apply: IH => //=.
+    + move => l'. move/(_ l'): Hes => Hes.
+      by inversion Hes.
+    + by inversion Hcontra.
+Qed.
+
+Lemma s_typing_not_lf_return : forall s f es ts,
+  Thread_ok s None f es ts ->
+  not_lf_return es.
+Proof.
+  move => s f es ts Hthread.
+  move/s_typing_lf_return: Hthread => Hes.
+  rewrite /not_lf_return. move => vcs es' Hcontra.
+  move: es es' Hes Hcontra.
+  elim: vcs => /= [| vc vcs' IH].
+  - move => es es' Hes Hcontra. 
+    rewrite Hcontra in Hes.
+    by inversion Hes => //=.
+  - move => es es' Hes Hcontra.
+    case: es Hes Hcontra => // [e' es] Hes Hcontra.
+    move/(_ es es'): IH => IH.
+    apply: IH => //=.
+    + by inversion Hes.
+    + by inversion Hcontra.
+Qed.
 
 (* Lemma br_reduce_extract_vs *)
 (* TODO: Two major facts to be proven:
