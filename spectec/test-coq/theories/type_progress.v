@@ -1680,18 +1680,17 @@ Proof.
   - (* Instrs_ok__seq *)
     move => C bes1 be2 ts1 ts2 ts3 Hinstrs1 IH1 Hinstr2 IH2.
     move => s f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
-    have Ets1 : ts1' = ts1 by case: Htf.
-    rewrite Ets1 in Hts.
+    have Ets1 : ts1' = ts1 by case: Htf. rewrite Ets1 in Hts.
     rewrite cat_app -be_to_e_cat in Hnotbr Hnotret.
     case Hconst: (const_list (list__instr__admininstr bes1)).
     + move/const_es_exists: (Hconst) => [vs1 Hvs1].
       (* NOTE: Maybe we should make a separate lemma rather than reusing Val_Const_list_typing in Heqts2 *)
       have Hadmin1 : Admin_instrs_ok s C (list__instr__admininstr bes1) (functype__ ts1 ts3).
       { by apply: Admin_instrs_ok__instrs. }
-      rewrite Hvs1 in Hadmin1 *.
       have Heqtf2 : functype__ ts3 ts2 = functype__ ts3 ts2 by [].
       have Heqts2 : map typeof (vcs ++ vs1) = ts3.
-      { move/Val_Const_list_typing: Hadmin1 => Hadmin1.
+      { rewrite Hvs1 in Hadmin1.
+        move/Val_Const_list_typing: Hadmin1 => Hadmin1.
         by rewrite Hadmin1 -Hts map_map map_cat. }
       move: (not_lf_br_left _ _ Hconst Hnotbr) => Hnotbr2.
       move: (not_lf_return_left _ _ Hconst Hnotret) => Hnotret2.
@@ -1827,13 +1826,12 @@ Proof.
     move => s C be tf Hinstr.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
     have Hinstrs: Instrs_ok C [:: be] tf by apply Instr_ok_Instrs_ok.
-    pose Hprog := t_progress_be s C C' f vcs [:: be] tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore.
-    by admit.
-    (* case: Hprog => [Hconst | Hprog].
+    pose Hprog := t_progress_be s C C' f vcs [:: be] tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
+    case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right.  *)
+    + by right. 
   - (* Admin_instr_ok__trap *)
     move => s C ts1 ts2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
@@ -1947,13 +1945,12 @@ Proof.
     { rewrite map_drop.
       injection Htf => Htf2 Htf1.
       rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
-    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    move/(_ f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore Hnotbr Hnotret): IH => IH.
     have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
     rewrite length_size in IH.
     set vcs1 := take (size ts) vcs in IH *.
     set vcs2 := drop (size ts) vcs in IH *.
-    by admit.
-    (* case: IH => [Hterm | Hprog].
+    case: IH => [Hterm | Hprog].
     + case: Hterm => [Hconst | Htrap].
       * left. left.
         (* TODO: v_to_e_cat should be used elsewhere when applying Step__ctxt_seq *)
@@ -1977,7 +1974,7 @@ Proof.
       by apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr vcs2 ++ [:: e])
         (v_admininstr' := es')
-        (v_admininstr'' := [::]). *)
+        (v_admininstr'' := [::]).
   - (* Admin_instrs_ok__empty *)
     move => s C.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
@@ -1986,39 +1983,44 @@ Proof.
   - (* Admin_instrs_ok__seq *)
     move => s C es1 e2 ts1 ts2 ts3 Hadmin1 IH1 Hadmin2 IH2.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
-    have Heqtf1 : functype__ ts1 ts3 = functype__ ts1 ts3 by [].
-    have Heqts1 : ts1' = ts1 by inversion Htf.
-    rewrite Heqts1 in Hts.
-    move: (IH1 f C' vcs ts1 ts3 lab ret Heqtf1 Hcontext Hmod Hts Hstore) => {}IH1.
-    by admit.
-    (* case: IH1 => [Hterm1 | Hprog1].
-    + case: Hterm1 => [Hconst1 | Htrap1].
-      * move/const_list_split: Hconst1 => [Hconst1 Hconst2].
-        move/const_es_exists: Hconst2 => [vs1 Hvs1].
-        rewrite Hvs1 in Hadmin1 *.
-        have Heqtf2 : functype__ ts3 ts2 = functype__ ts3 ts2 by [].
-        have Heqts2 : map typeof (vcs ++ vs1) = ts3.
-        { move/Val_Const_list_typing: Hadmin1 => Hadmin1.
-          by rewrite Hadmin1 -Hts map_map map_cat. }
-        move: (IH2 f C' (vcs ++ vs1) ts3 ts2 lab ret Heqtf2 Hcontext Hmod Heqts2 Hstore) => {}IH2.
-        case: IH2 => [Hterm2 | Hprog2].
-        { case: Hterm2 => [Hconst2 | Htrap2].
-          - left. left.
-            by rewrite -v_to_e_cat -catA in Hconst2.
-          - left. right.
-            move: (extract_list1 _ _ _ Htrap2) => [Hvcs He].
-            rewrite catA v_to_e_cat Hvcs He /=. 
-            by rewrite /terminal_form. }
-        { right. by rewrite catA v_to_e_cat. }
-      * right. move: (v_e_trap _ _ (v_to_e_const vcs) Htrap1) => [-> ->] //=.
-        exists s, f, [:: admininstr__TRAP].
-        apply: Step__pure.
-        apply Step_pure__trap_vals with (v_val := [::]).
-        by right.
-    + right. move: Hprog1 => [s' [f' [es1' Hprog1]]].
-      exists s', f', (es1' ++ [:: e2]).
-      rewrite catA.
-      by apply Step__ctxt_seq with (v_val := [::]). *)
+    have Ets1 : ts1' = ts1 by case: Htf. rewrite Ets1 in Hts.
+    case Hconst: (const_list es1).
+    + move/const_es_exists: (Hconst) => [vs1 Hvs1].
+      have Heqtf2 : functype__ ts3 ts2 = functype__ ts3 ts2 by [].
+      have Heqts2 : map typeof (vcs ++ vs1) = ts3.
+      { rewrite Hvs1 in Hadmin1.
+        move/Val_Const_list_typing: Hadmin1 => Hadmin1.
+        by rewrite Hadmin1 -Hts map_map map_cat. }
+      move: (not_lf_br_left _ _ Hconst Hnotbr) => Hnotbr2.
+      move: (not_lf_return_left _ _ Hconst Hnotret) => Hnotret2.
+      move/(_ f C' (vcs ++ vs1) ts3 ts2 lab ret Heqtf2 Hcontext Hmod Heqts2 Hstore Hnotbr2 Hnotret2): IH2 => IH2.
+      case: IH2 => [Hterm2 | Hprog2].
+      * case: Hterm2 => [Hconst2 | Htrap2].
+        { left. left.
+          by rewrite catA Hvs1 v_to_e_cat. }
+        { left. right.
+          move: (extract_list1 _ _ _ Htrap2) => [Hvcs He].
+          rewrite catA Hvs1 v_to_e_cat Hvcs He /=. 
+          by rewrite /terminal_form. }
+      * right. by rewrite catA Hvs1 v_to_e_cat.
+    + have Heqtf1 : functype__ ts1 ts3 = functype__ ts1 ts3 by [].
+      have Heqts1 := Ets1.
+      move: (not_lf_br_right _ _ Hnotbr) => Hnotbr1.
+      move: (not_lf_return_right _ _ Hnotret) => Hnotret1.
+      move/(_ f C' vcs ts1 ts3 lab ret Heqtf1 Hcontext Hmod Hts Hstore Hnotbr1 Hnotret1): IH1 => IH1.
+      case: IH1 => [Hterm1 | Hprog1].
+      * case: Hterm1 => [Hconst1 | Htrap1].
+        { rewrite const_list_cat in Hconst1.
+          move/andP: Hconst1 => [Hconst1 Hconst1'].
+          by move/negP: Hconst. }
+        { right. move: (v_e_trap _ _ (v_to_e_const vcs) Htrap1) => [-> ->] //=.
+          exists s, f, [:: admininstr__TRAP].
+          apply: Step__pure.
+          apply Step_pure__trap_vals with (v_val := [::]). by right. }
+      * right. move: Hprog1 => [s' [f' [es1' Hprog1]]].
+        exists s', f', (es1' ++ [:: e2]).
+        rewrite catA.
+        by apply Step__ctxt_seq with (v_val := [::]).
   - (* Admin_instrs_ok__frame *)
     move => s C es ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
@@ -2029,13 +2031,12 @@ Proof.
     { rewrite map_drop.
       injection Htf => Htf2 Htf1.
       rewrite -Hts in Htf1. by rewrite -Htf1 drop_cat length_size ltnn subnn drop0. }
-    move: (IH f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore) => {}IH.
+    move/(_ f C' (drop (length ts) vcs) ts1 ts2 lab ret Heqtf Hcontext Hmod Heqts Hstore Hnotbr Hnotret): IH => IH.
     have -> : vcs = (take (size ts) vcs ++ drop (size ts) vcs) by rewrite cat_take_drop.
     rewrite {}length_size in IH.
     set vcs1 := take (size ts) vcs in IH *.
     set vcs2 := drop (size ts) vcs in IH *.
-    by admit.
-    (* case: IH => [Hterm | Hprog].
+    case: IH => [Hterm | Hprog].
     + case: Hterm => [Hconst | Htrap].
       * left. left.
         rewrite -v_to_e_cat -catA.
@@ -2058,22 +2059,21 @@ Proof.
       by apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr vcs2 ++ es)
         (v_admininstr' := es')
-        (v_admininstr'' := [::]). *)
+        (v_admininstr'' := [::]).
   - (* Admin_instrs_ok__instrs *)
     (* NOTE: This is equivalent to Admin_instr_ok__instr but for Admin_instrs_ok *)
     (* TODO: Get rid of duplicate proof *)
     move => s C bes tf Hinstrs.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
-    pose Hprog := t_progress_be s C C' f vcs bes tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore.
-    by admit.
-    (* case: Hprog => [Hconst | Hprog].
+    pose Hprog := t_progress_be s C C' f vcs bes tf ts1 ts2 lab ret Hinstrs Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
+    case: Hprog => [Hconst | Hprog].
     + left. rewrite /terminal_form.
       left. apply: const_list_concat => //=.
       by apply: v_to_e_const.
-    + by right.  *)
+    + by right. 
   - (* Thread_ok__ *)
     move => s rs f es ts C.
-    move => Hframe Hadmin IH Hstore.
+    move => Hframe Hadmin IH Hstore Hnotbr Hnotret.
     have Heqtf : functype__ [::] ts = functype__ [::] ts by [].
     have Heqts : map typeof [::] = [::] by [].
     (* TODO: Remove duplicate proof *)
@@ -2103,9 +2103,8 @@ Proof.
     have Hmod : Module_instance_ok s (frame__MODULE f) (upd_local C [::]).
     { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
       by inversion Hmod. }
-    move: (IH f (upd_local C [::]) [::] [::] ts [::] (Some rs) Heqtf Heqc Hmod Heqts Hstore) => {}IH {Heqtf Heqc}.
-    by admit.
-    (* case: IH => /= [Hterm | Hprog].
+    move/(_ f (upd_local C [::]) [::] [::] ts [::] (Some rs) Heqtf Heqc Hmod Heqts Hstore Hnotbr Hnotret): IH => IH {Heqtf Heqc}.
+    case: IH => /= [Hterm | Hprog].
     + case: Hterm => [Hconst | Htrap].
       * left. split => //=.
         move/const_es_exists: Hconst => [vs Hvs].
@@ -2113,7 +2112,7 @@ Proof.
         move/Val_Const_list_typing: Hadmin => /= ->.
         by rewrite 2!length_size map_map 2!size_map.
       * right. left. by rewrite Htrap.
-    + right. by right. *)
+    + right. by right.
 Admitted.
 
 Theorem t_progress: forall s f es ts,
