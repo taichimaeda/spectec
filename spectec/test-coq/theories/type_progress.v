@@ -2141,6 +2141,6 @@ Proof.
     by rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
   - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe}.
     by inversion Hmod.
-  - by admit.
-  - by admit.
-Admitted.
+  - by move/s_typing_not_lf_br: Hthread. 
+  - by move/s_typing_not_lf_return: Hthread.
+Qed.
