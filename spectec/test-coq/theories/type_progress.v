@@ -258,6 +258,10 @@ Qed.
 
 Lemma typeof_append: forall ts t vs,
     map typeof vs = ts ++ [:: t] ->
+    (* TODO: Perhaps this might suffice like typeof_cat below *)
+    (* exists vs' v,
+      map typeof vs' = ts /\
+      typeof v = t *)
     exists v,
       vs = take (size ts) vs ++ [:: v] /\
       map typeof (take (size ts) vs) = ts /\
@@ -274,6 +278,30 @@ Proof.
   exists v.
   split => //.
   rewrite -HDrop. by rewrite cat_take_drop.
+Qed.
+
+Lemma typeof_cat: forall ts1 ts2 vs,
+  map typeof vs = ts1 ++ ts2 ->
+  exists vs1 vs2,
+    vs = vs1 ++ vs2 /\
+    map typeof vs1 = ts1 /\
+    map typeof vs2 = ts2.
+Proof.
+  move => + ts2.
+  elim/last_ind: ts2 => [| ts2' t IH].
+  - move => ts1 vs H.
+    exists vs, [::].
+    split; try split => //=.
+    + by rewrite cats0.
+    + by rewrite cats0 in H.
+  - move => ts1 vs H.
+    rewrite -cats1 catA in H *.
+    move/typeof_append: H => [v [Hvs [H1 H2]]].
+    move/(_ ts1 (take (size (ts1 ++ ts2')) vs) H1): IH => [vs1 [vs2 [Hvs' [IH1 IH2]]]].
+    exists vs1, (vs2 ++ [:: v]). 
+    split; try split => //=.
+    - by rewrite catA -Hvs'.
+    - rewrite 2!cats1 map_rcons. by congr rcons.
 Qed.
 
 (* NOTE: Given Hts : [seq typeof i  | i <- vcs] = [:: t],
@@ -504,8 +532,7 @@ Proof.
   - move => vs es' H.
     case: H => Hvs Hes'.
     by rewrite -Hvs -Hes'.
-  - (* TODO: Using case tactic involves introducing constructor parameters of e
-             which is tedious *)
+  - (* TODO: Use case tactic instead *)
     destruct e;
     try (move => vs es'' H;
          case: H => Hvs Hes'';
@@ -544,8 +571,7 @@ Proof.
     rewrite (split_vals_prefix vcs (admininstr__BR l) es''') in Ees; last by [].
     case: Ees => Hvs Hes'.
     by rewrite Ees' in Hes'.
-  - (* TODO: Using case tactic involves introducing constructor parameters of e
-             which is tedious *)
+  - (* TODO: Use case tactic instead *)
     destruct e;
     try (right;
          move => [vcs [l [es''' Hcontra]]];
@@ -877,13 +903,65 @@ Proof.
     + by inversion Hcontra.
 Qed.
 
-(* Lemma br_reduce_extract_vs *)
+Lemma Admin_instrs_ok_br_zero : forall s C ts1 ts2,
+  Admin_instrs_ok s C [:: admininstr__BR 0] (functype__ ts1 ts2) ->
+  exists ts ts1',
+    ts = lookup_total (context__LABELS C) 0 /\ 
+    ts1 = ts1' ++ ts.
+Proof.
+  move => s C ts1 ts2 Hadmin.
+  move/admin_instrs_ok_eq: Hadmin => Hadmin.
+  move Ee: (admininstr__BR 0) => e.
+  move Etf: (functype__ ts1 ts2) => tf.
+  rewrite Ee Etf in Hadmin.
+  move: ts1 ts2 Ee Etf.
+  elim: s C e tf / Hadmin => //= [ | ].
+  - by admit.
+  - by admit. 
+Admitted.
+
 (* TODO: Two major facts to be proven:
          1. v_n in admininstr__LABEL is equal to the length of types in
             context__LABELS of context used to validate admininstr__BR inside the label
          2. if vcs ++ admininstr__BR is well-typed then length of vcs must be
             greater than or equal to the length of types in context__LABELS of context
             used to validate vcs ++ admininstr__BR *)
+Lemma br_reduce_extract_vs : forall s C ts2 ts es,
+  (* TODO: This first premise is equal to br_reduce l
+           We could make br_reduce parameterised by l *)
+  (exists vcs es',
+    es = list__val__admininstr vcs ++ [:: admininstr__BR 0] ++ es') -> 
+  Admin_instrs_ok s C es (functype__ [::] ts2) -> 
+  lookup_total (context__LABELS C) 0 = ts ->
+  (exists vcs1 vcs2 es',
+    es = list__val__admininstr vcs1 ++ list__val__admininstr vcs2 ++ [:: admininstr__BR 0] ++ es' /\
+    size vcs2 = size ts).
+Proof.
+  move => s C ts2 ts es Hbr Hadmin Hlookup.
+  move: Hbr => [vcs [es' Hbr]].
+  rewrite Hbr catA in Hadmin.
+
+  move/Admin_instrs_ok_cat: Hadmin => [ts' [ts1' [ts2' [ts3 [Ets1 [Ets2 [Hadmin1 Hadmin2]]]]]]].
+  symmetry in Ets1. move/cat_nil: Ets1 => [Ets' Ets1'].
+  rewrite ?{}Ets' ?{}Ets1' /= in Ets2 Hadmin1. rewrite -{}Ets2 in Hadmin2.
+  move => {ts' ts1' ts2'}.
+
+  move/Admin_instrs_ok_cat: Hadmin1 => [ts' [ts1' [ts2' [ts3' [Ets1 [Ets2 [Hadmin1 Hadmin1']]]]]]].
+  symmetry in Ets1. move/cat_nil: Ets1 => [Ets' Ets1'].
+  rewrite ?{}Ets' ?{}Ets1' /= in Ets2 Hadmin1. rewrite -{}Ets2 in Hadmin1'.
+  move => {ts' ts1' ts2'}.
+
+  move: Hadmin1 Hadmin1' Hadmin2 => Hadmin1 Hadmin2 Hadmin3.
+  move/Admin_instrs_ok_br_zero: Hadmin2 => [ts' [ts3'' [Hlookup' Ets3']]].
+  rewrite -Hlookup -Hlookup'.
+  rewrite Ets3' in Hadmin1.
+  move/Val_Const_list_typing: Hadmin1 => Hvcs.
+  rewrite map_map /= in Hvcs. symmetry in Hvcs.
+  move/typeof_cat: Hvcs => [vs1 [vs2 [Hvcs [Hvs1 Hvs2]]]].
+  exists vs1, vs2, es'. split => /=.
+  - by rewrite catA v_to_e_cat -Hvcs.
+  - by rewrite -Hvs2 size_map. 
+Qed.
 
 (* Lemma return_reduce_extract_vs *)
 
