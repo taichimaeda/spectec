@@ -205,6 +205,7 @@ Proof.
     by f_equal.
 Qed.
 
+(* TODO: These reduce_composition lemmas are unused *)
 (* MEMO: reduce -> Step *)
 Lemma reduce_composition: forall cs st es es0 st' es',
     const_list cs ->
@@ -584,6 +585,31 @@ Proof.
     by rewrite (split_vals_inverse _ _ _ Ees).
 Qed.
 
+Lemma return_reduce_decidable : forall es,
+  decidable (return_reduce es).
+Proof.
+  rewrite /decidable /return_reduce.
+  move => es.
+  case Ees: (split_vals es) => [vs es'].
+  case Ees': es' => [| e es''].
+  - right. move => [vcs [es''' Hcontra]].
+    rewrite Hcontra in Ees.
+    rewrite (split_vals_prefix vcs (admininstr__RETURN) es''') in Ees; last by [].
+    case: Ees => Hvs Hes'.
+    by rewrite Ees' in Hes'.
+  - (* TODO: Use case tactic instead *)
+    destruct e;
+    try (right;
+         move => [vcs [es''' Hcontra]];
+         rewrite Hcontra in Ees;
+         rewrite (split_vals_prefix vcs (admininstr__RETURN) es''') in Ees; last by [];
+         case: Ees => Hvs Hes';
+         by rewrite Ees' in Hes').
+    left. exists vs, es''.
+    rewrite /= -Ees'.
+    by rewrite (split_vals_inverse _ _ _ Ees).
+Qed.
+
 Lemma not_br_reduce_not_lf_br : forall es,
   ~ (br_reduce es) -> not_lf_br es.
 Proof.
@@ -798,11 +824,14 @@ Proof.
       by move/(_ e Hin2): IH => IH.
 Qed.
 
-Lemma s_typing_lf_br : forall s f es ts l,
-  Thread_ok s None f es ts ->
+Lemma s_typing_lf_br : forall s rs f es ts l,
+  (* NOTE: Here rs should not be None unlike s_typing_lf_return
+           because we not only use s_typing_lf_br in t_progress to reject top-level occurrences of br
+           but also to reject occurrences of br directly within frame t_progress_e *)
+  Thread_ok s rs f es ts ->
   Forall (fun e => e <> admininstr__BR l) es.
 Proof.
-  move => s f es ts l Hthread.
+  move => s rs f es ts l Hthread.
   inversion Hthread as [? ? ? ? ? C Hframe Hadmin Hs Hrs Hf Hes Hts] => {Hthread} //=.
   rewrite ?{}Hs ?{}Hrs ?{}Hf ?{}Hes ?{}Hts in Hframe Hadmin.
   move/Admin_instrs_ok_all: Hadmin => Hadmin.
@@ -821,7 +850,7 @@ Proof.
       context__MEMS := [::];
       context__LOCALS := [::];
       context__LABELS := [::];
-      context__RETURN := Some None
+      context__RETURN := Some rs
       |} C) Hadmin => C' Hadmin.
     move Ee: (admininstr__BR l) Hadmin => e Hadmin.
     move Etf: (functype__ ts1' ts2') Hadmin => tf Hadmin.
@@ -910,11 +939,11 @@ Proof.
     by move/(_ e Hin'): Hadmin.
 Admitted.
 
-Lemma s_typing_not_lf_br : forall s f es ts,
-  Thread_ok s None f es ts ->
+Lemma s_typing_not_lf_br : forall s rs f es ts,
+  Thread_ok s rs f es ts ->
   not_lf_br es.
 Proof.
-  move => s f es ts Hthread.
+  move => s rs f es ts Hthread.
   move/s_typing_lf_br: Hthread => Hes.
   rewrite /not_lf_br. move => vcs l es' Hcontra.
   move: es es' Hes Hcontra.
@@ -1323,6 +1352,9 @@ Proof.
     invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
     case E1: (lookup_total (tableinst__REFS (fun_table (state__ s f) 0)) v1) => [a |].
     case E2: (fun_type (state__ s f) x == funcinst__TYPE (lookup_total (fun_funcinst (state__ s f)) a)).
+    (* TODO: We shouldn't be perofrming case analysis on these E3 and E4
+             When E3 or E4 is false we should reject them by E1 or E2 rather than.
+             using Step_read__call_indirect_trap *)
     case E3: (v1 < Datatypes.length (tableinst__REFS (fun_table (state__ s f) 0))).
     case E4: (a < Datatypes.length (store__FUNCS s)).
     all: try move/eqP: E2 => E2;
@@ -1868,75 +1900,95 @@ Proof.
   - (* Admin_instr_ok__label *)
     move => s C n bes es t1 t2 Hinstrs Hadmin IH Hsize.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
-    (* TODO: Can we simplify this? *)
-    have Heqc : _append {|
-      context__TYPES := [::];
-      context__FUNCS := [::];
-      context__GLOBALS := [::];
-      context__TABLES := [::];
-      context__MEMS := [::];
-      context__LOCALS := [::];
-      context__LABELS := [:: t2];
-      context__RETURN := None
-      |} C = upd_local_label_return C' [seq typeof i  | i <- frame__LOCALS f] (t2 :: lab) ret.
-      by rewrite Hcontext.
-    have Heqtf : functype__ [::] (option_to_list t1) = functype__ [::] (option_to_list t1) by [].
-    have Heqts : map typeof [::] = [::] by [].
-    move: (IH f C' [::] [::] (option_to_list t1) (t2 :: lab) ret Heqtf Heqc Hmod Heqts Hstore) 
-      => {Heqtf Heqc Hmod Heqts Hstore} {}IH.
-    by admit.
-    (* case: IH => [Hterm | Hprog].
-    + right. exists s, f, (list__val__admininstr vcs ++ es).
-      (* TODO: Can we get rid of these rewrites? *)
-      rewrite -[list__val__admininstr vcs ++ _]cats0.
-      rewrite -[list__val__admininstr vcs ++ es]cats0.
-      rewrite -2!catA.
-      apply Step__ctxt_seq with
-        (v_admininstr := [:: admininstr__LABEL_ n bes es])
-        (v_admininstr' := es).
-      case: Hterm => /= [Hconst | Htrap].
-      * move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
-        apply: Step__pure.
-        by apply: Step_pure__label_vals.
-      * rewrite Htrap.
-        apply: Step__pure.
-        by apply: Step_pure__trap_label.
-    + right. move: Hprog => [s' [f' [es' IH]]].
-      exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
-      apply Step__ctxt_seq with 
-        (v_admininstr := [:: admininstr__LABEL_ n bes es])
-        (v_admininstr' := [:: admininstr__LABEL_ n bes es']).
-      by apply: Step__ctxt_label. *)
+    case: (br_reduce_decidable es) => [Hbrred | Hnotbrred].
+    + rewrite /br_reduce in Hbrred.
+      move: Hbrred => [vcs' [l [es' Hes]]].
+      case: l Hes => [| l'] Hes.
+      * Check Step_pure__br_zero.
+        Check br_reduce_extract_vs.
+        Check Hsize.
+        by admit.
+      * Check Step_pure__br_succ.
+        by admit.
+    + case: (return_reduce_decidable es) => [Hretred | Hnotretred].
+      * Check Step_pure__return_label.
+        by admit.
+      * (* TODO: Can we simplify this? *)
+        have Heqc : _append {|
+          context__TYPES := [::];
+          context__FUNCS := [::];
+          context__GLOBALS := [::];
+          context__TABLES := [::];
+          context__MEMS := [::];
+          context__LOCALS := [::];
+          context__LABELS := [:: t2];
+          context__RETURN := None
+          |} C = upd_local_label_return C' [seq typeof i  | i <- frame__LOCALS f] (t2 :: lab) ret.
+          by rewrite Hcontext.
+        have Heqtf : functype__ [::] (option_to_list t1) = functype__ [::] (option_to_list t1) by [].
+        have Heqts : map typeof [::] = [::] by [].
+        move/not_br_reduce_not_lf_br: Hnotbrred => Hnotbr'.
+        move/not_return_reduce_not_lf_return: Hnotretred => Hnotret'.
+        move/(_ f C' [::] [::] (option_to_list t1) (t2 :: lab) ret Heqtf Heqc Hmod Heqts Hstore Hnotbr' Hnotret'): IH => IH.
+        move => {Heqtf Heqc Hmod Heqts Hstore}.
+        case: IH => [Hterm | Hprog].
+        { right. exists s, f, (list__val__admininstr vcs ++ es).
+          (* TODO: Can we get rid of these rewrites? *)
+          rewrite -[list__val__admininstr vcs ++ _]cats0.
+          rewrite -[list__val__admininstr vcs ++ es]cats0.
+          rewrite -2!catA.
+          apply Step__ctxt_seq with
+            (v_admininstr := [:: admininstr__LABEL_ n bes es])
+            (v_admininstr' := es).
+          case: Hterm => /= [Hconst | Htrap].
+          - move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
+            apply: Step__pure.
+            by apply: Step_pure__label_vals.
+          - rewrite Htrap.
+            apply: Step__pure.
+            by apply: Step_pure__trap_label. }
+        { right. move: Hprog => [s' [f' [es' IH]]].
+          exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
+          apply Step__ctxt_seq with 
+            (v_admininstr := [:: admininstr__LABEL_ n bes es])
+            (v_admininstr' := [:: admininstr__LABEL_ n bes es']).
+          by apply: Step__ctxt_label. }
   - (* Admin_instr_ok__frame *)
     move => s C n f es t Hthread IH Hsize.
     move => f' C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
-    move: (IH Hstore) => {Hstore} {}IH.
-    by admit.
-    (* case: IH => [[Hconst Hlen] | [Htrap | Hprog]].
-    + right. exists s, f', (list__val__admininstr vcs ++ es).
-      (* TODO: Can we get rid of these rewrites? *)
-      rewrite -[list__val__admininstr vcs ++ _]cats0.
-      rewrite -[list__val__admininstr vcs ++ es]cats0.
-      rewrite -2!catA.
-      apply Step__ctxt_seq with 
-        (v_admininstr := [:: admininstr__FRAME_ n f es])
-        (v_admininstr' := es).
-      move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
-      apply: Step__pure.
-      by apply: Step_pure__frame_vals.
-    + right. rewrite Htrap.
-      exists s, f', (list__val__admininstr vcs ++ [:: admininstr__TRAP]).
-      apply Step__ctxt_seq with
-        (v_admininstr := [:: admininstr__FRAME_ n f [:: admininstr__TRAP]])
-        (v_admininstr' := [:: admininstr__TRAP]).
-      apply: Step__pure.
-      by apply: Step_pure__trap_frame.
-    + right. move: Hprog => [s' [f'' [es' Hprog]]].
-      exists s', f', (list__val__admininstr vcs ++ [:: admininstr__FRAME_ n f'' es']).
-      apply Step__ctxt_seq with
-        (v_admininstr := [:: admininstr__FRAME_ n f es])
-        (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
-      by apply: Step__ctxt_frame. *)
+    case: (return_reduce_decidable es) => [Hretred | Hnotretred].
+    + rewrite /return_reduce in Hretred.
+      move: Hretred => [vcs' [es' Hes]].
+      Check Step_pure__return_frame.
+      by admit.
+    + move/not_return_reduce_not_lf_return: Hnotretred => Hnotret'.
+      move/s_typing_not_lf_br: Hthread => Hnotbr'.
+      move/(_ Hstore Hnotbr' Hnotret'): IH => IH.
+      case: IH => [[Hconst Hlen] | [Htrap | Hprog]].
+      + right. exists s, f', (list__val__admininstr vcs ++ es).
+        (* TODO: Can we get rid of these rewrites? *)
+        rewrite -[list__val__admininstr vcs ++ _]cats0.
+        rewrite -[list__val__admininstr vcs ++ es]cats0.
+        rewrite -2!catA.
+        apply Step__ctxt_seq with 
+          (v_admininstr := [:: admininstr__FRAME_ n f es])
+          (v_admininstr' := es).
+        move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
+        apply: Step__pure.
+        by apply: Step_pure__frame_vals.
+      + right. rewrite Htrap.
+        exists s, f', (list__val__admininstr vcs ++ [:: admininstr__TRAP]).
+        apply Step__ctxt_seq with
+          (v_admininstr := [:: admininstr__FRAME_ n f [:: admininstr__TRAP]])
+          (v_admininstr' := [:: admininstr__TRAP]).
+        apply: Step__pure.
+        by apply: Step_pure__trap_frame.
+      + right. move: Hprog => [s' [f'' [es' Hprog]]].
+        exists s', f', (list__val__admininstr vcs ++ [:: admininstr__FRAME_ n f'' es']).
+        apply Step__ctxt_seq with
+          (v_admininstr := [:: admininstr__FRAME_ n f es])
+          (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
+        by apply: Step__ctxt_frame.
   - (* Admin_instr_ok__weakening *)
     move => s C e ts ts1 ts2 Hadmin IH.
     move => f C' vcs ts1' ts2' lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
