@@ -688,6 +688,35 @@ Proof.
   by rewrite Hvs1 Hcontra -v_to_e_cat -catA in Hnotret.
 Qed.
 
+Lemma frame_t_context_local_types: forall s f C,
+	Frame_ok s f C ->
+  context__LOCALS C = map typeof (frame__LOCALS f).
+Proof.
+	move => s i C Hframe.
+  inversion Hframe as [? ? ? ? ? ? Hmod Hval].
+  inversion Hmod => //=. rewrite cat_app cats0.
+  (* TODO: Use all2 instead *)
+  by apply Forall2_Val_ok_is_same_as_map in Hval.
+Qed.
+
+Lemma frame_t_context_label_empty: forall s f C,
+	Frame_ok s f C ->
+  context__LABELS C = [::].
+Proof.
+  move => s i C Hframe.
+  inversion Hframe as [? ? ? ? ? ? Hmod Hval].
+  by inversion Hmod.
+Qed.
+
+Lemma frame_t_context_return_empty: forall s f C,
+	Frame_ok s f C ->
+  context__RETURN C = None.
+Proof.
+  move => s i C Hframe.
+  inversion Hframe as [? ? ? ? ? ? Hmod Hval].
+  by inversion Hmod.
+Qed.
+
 (* TODO: Duplicate of composition_typing_single? *)
 Lemma Instrs_ok_rcons : forall C bes be ts1 ts2, 
   Instrs_ok C (bes ++ [:: be]) (functype__ ts1 ts2) ->
@@ -871,9 +900,7 @@ Proof.
       rewrite Hbr in Hinstr.
       inversion Hinstr as [| | | | | | | ? ? ? ? ? Hlen | | | | | | | | | | | | | | | | | | | | | |].
       rewrite -Ec /= in Hlen.
-      (* TODO: Extract this lemma into inst_t_context_label_empty *)
-      have Hlab : context__LABELS C = [::].
-      { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+      move/frame_t_context_label_empty: Hframe => Hlab.
       rewrite Hlab length_size /= in Hlen.
       move/ltP: Hlen => Hlen. by rewrite ltn0 in Hlen.
     + move => ts1' ts2' Hframe IH Ec Ee Etf.
@@ -924,9 +951,7 @@ Proof.
       rewrite Hbr in Hinstr.
       inversion Hinstr as [| | | | | | | | | | | | ? ? ? ? Hsome | | | | | | | | | | | | | | | | |].
       rewrite -Ec /= in Hsome.
-      (* TODO: Extract this lemma into inst_t_context_label_empty *)
-      have Hret : context__RETURN C = None.
-      { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+      move/frame_t_context_return_empty: Hframe => Hret.
       rewrite Hret /= in Hsome.
       (* MEMO: There's likely a translation error in IL2Coq
                context__RETURN := Some None should be context__RETURN := None instead *)
@@ -1352,14 +1377,14 @@ Proof.
     invert_val_wf v1. rewrite /= in Ht1. rewrite Ht1.
     case E1: (lookup_total (tableinst__REFS (fun_table (state__ s f) 0)) v1) => [a |].
     case E2: (fun_type (state__ s f) x == funcinst__TYPE (lookup_total (fun_funcinst (state__ s f)) a)).
-    (* TODO: We shouldn't be perofrming case analysis on these E3 and E4
-             When E3 or E4 is false we should reject them by E1 or E2 rather than.
-             using Step_read__call_indirect_trap *)
+    (* TODO: Ideally we should be able to reject (not E3) or (not E4) from E1 or E2
+             However we cannot tell if lookup_total returned default or not in E2 for example,
+             so we just trap for convenience here *)
     case E3: (v1 < Datatypes.length (tableinst__REFS (fun_table (state__ s f) 0))).
     case E4: (a < Datatypes.length (store__FUNCS s)).
     all: try move/eqP: E2 => E2;
-          try move/ltP: E3 => E3;
-          try move/ltP: E4 => E4.
+         try move/ltP: E3 => E3;
+        try move/ltP: E4 => E4.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__CALL_ADDR a]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
@@ -1900,19 +1925,45 @@ Proof.
   - (* Admin_instr_ok__label *)
     move => s C n bes es t1 t2 Hinstrs Hadmin IH Hsize.
     move => f C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
+    case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
     case: (br_reduce_decidable es) => [Hbrred | Hnotbrred].
     + rewrite /br_reduce in Hbrred.
       move: Hbrred => [vcs' [l [es' Hes]]].
       case: l Hes => [| l'] Hes.
-      * Check Step_pure__br_zero.
-        Check br_reduce_extract_vs.
-        Check Hsize.
-        by admit.
-      * Check Step_pure__br_succ.
-        by admit.
+      * right.
+        have Hexists : exists vcs es', es = list__val__admininstr vcs ++ [:: admininstr__BR 0] ++ es'. 
+        { by exists vcs', es'. }
+        have Hlookup : lookup_total (context__LABELS (_append {|
+          context__TYPES := [::];
+          context__FUNCS := [::];
+          context__GLOBALS := [::];
+          context__TABLES := [::];
+          context__MEMS := [::];
+          context__LOCALS := [::];
+          context__LABELS := [:: t2];
+          context__RETURN := None
+          |} C)) 0 = t2.
+        { move => {Hadmin IH} /=.
+          by rewrite /lookup_total /=. }
+        move: (br_reduce_extract_vs _ _ _ _ _ Hexists Hadmin Hlookup) => Hextract.
+        move: Hextract => [vcs1 [vcs2 [es'' [Hes' Hsize']]]].
+        rewrite Hes'.
+        exists s, f, (list__val__admininstr vcs2 ++ list__instr__admininstr bes).
+        apply: Step__pure.
+        apply: Step_pure__br_zero.
+        rewrite length_size Hsize' Hsize.
+        by case: t2 Hinstrs Hadmin IH Hsize Hsize' Hlookup.
+      * right. exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR l']).
+        rewrite Hes -addn1.
+        apply: Step__pure.
+        by apply: Step_pure__br_succ.
     + case: (return_reduce_decidable es) => [Hretred | Hnotretred].
-      * Check Step_pure__return_label.
-        by admit.
+        rewrite /return_reduce in Hretred.
+        move: Hretred => [vcs' [es' Hes]].
+        right. exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__RETURN]).
+        rewrite Hes.
+        apply: Step__pure.
+        by apply: Step_pure__return_label.
       * (* TODO: Can we simplify this? *)
         have Heqc : _append {|
           context__TYPES := [::];
@@ -1932,14 +1983,7 @@ Proof.
         move/(_ f C' [::] [::] (option_to_list t1) (t2 :: lab) ret Heqtf Heqc Hmod Heqts Hstore Hnotbr' Hnotret'): IH => IH.
         move => {Heqtf Heqc Hmod Heqts Hstore}.
         case: IH => [Hterm | Hprog].
-        { right. exists s, f, (list__val__admininstr vcs ++ es).
-          (* TODO: Can we get rid of these rewrites? *)
-          rewrite -[list__val__admininstr vcs ++ _]cats0.
-          rewrite -[list__val__admininstr vcs ++ es]cats0.
-          rewrite -2!catA.
-          apply Step__ctxt_seq with
-            (v_admininstr := [:: admininstr__LABEL_ n bes es])
-            (v_admininstr' := es).
+        { right. exists s, f, es.
           case: Hterm => /= [Hconst | Htrap].
           - move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
             apply: Step__pure.
@@ -1948,46 +1992,55 @@ Proof.
             apply: Step__pure.
             by apply: Step_pure__trap_label. }
         { right. move: Hprog => [s' [f' [es' IH]]].
-          exists s', f', (list__val__admininstr vcs ++ [:: admininstr__LABEL_ n bes es']).
-          apply Step__ctxt_seq with 
-            (v_admininstr := [:: admininstr__LABEL_ n bes es])
-            (v_admininstr' := [:: admininstr__LABEL_ n bes es']).
+          exists s', f', [:: admininstr__LABEL_ n bes es'].
           by apply: Step__ctxt_label. }
   - (* Admin_instr_ok__frame *)
     move => s C n f es t Hthread IH Hsize.
     move => f' C' vcs ts1 ts2 lab ret Htf Hcontext Hmod Hts Hstore Hnotbr Hnotret.
+    case: Htf => Htf1 _. rewrite -Htf1 in Hts. invert_typeof_vcs.
     case: (return_reduce_decidable es) => [Hretred | Hnotretred].
     + rewrite /return_reduce in Hretred.
       move: Hretred => [vcs' [es' Hes]].
-      Check Step_pure__return_frame.
-      by admit.
+      right.
+      inversion Hthread as [? ? ? ? ? C'' Hframe Hadmin Hs Ht Hf Hes' Ht'].
+      move => {Hs Ht Hf Hes' Ht'}.
+      have Hexists : exists vcs es', es = list__val__admininstr vcs ++ [:: admininstr__RETURN] ++ es'. 
+      { by exists vcs', es'. }
+      have Hlookup : context__RETURN (_append {|
+        context__TYPES := [::];
+        context__FUNCS := [::];
+        context__GLOBALS := [::];
+        context__TABLES := [::];
+        context__MEMS := [::];
+        context__LOCALS := [::];
+        context__LABELS := [::];
+        context__RETURN := Some t
+        |} C'') = Some t.
+      { move => {Hadmin IH} /=.
+        move/frame_t_context_return_empty: Hframe => Hret.
+        by rewrite Hret. }
+      move: (return_reduce_extract_vs _ _ _ _ _ Hexists Hadmin Hlookup) => Hextract.
+      move: Hextract => [vcs1 [vcs2 [es'' [Hes' Hsize']]]].
+      rewrite Hes'.
+      exists s, f', (list__val__admininstr vcs2).
+      apply: Step__pure.
+      apply: Step_pure__return_frame.
+      rewrite length_size Hsize' Hsize.
+      by case: t Hthread IH Hsize Hsize' Hadmin Hlookup.
     + move/not_return_reduce_not_lf_return: Hnotretred => Hnotret'.
       move/s_typing_not_lf_br: Hthread => Hnotbr'.
       move/(_ Hstore Hnotbr' Hnotret'): IH => IH.
       case: IH => [[Hconst Hlen] | [Htrap | Hprog]].
-      + right. exists s, f', (list__val__admininstr vcs ++ es).
-        (* TODO: Can we get rid of these rewrites? *)
-        rewrite -[list__val__admininstr vcs ++ _]cats0.
-        rewrite -[list__val__admininstr vcs ++ es]cats0.
-        rewrite -2!catA.
-        apply Step__ctxt_seq with 
-          (v_admininstr := [:: admininstr__FRAME_ n f es])
-          (v_admininstr' := es).
+      + right. exists s, f', es.
         move: (const_es_exists _ Hconst) => [vs Hvs]. rewrite Hvs.
         apply: Step__pure.
         by apply: Step_pure__frame_vals.
-      + right. rewrite Htrap.
-        exists s, f', (list__val__admininstr vcs ++ [:: admininstr__TRAP]).
-        apply Step__ctxt_seq with
-          (v_admininstr := [:: admininstr__FRAME_ n f [:: admininstr__TRAP]])
-          (v_admininstr' := [:: admininstr__TRAP]).
+      + right. exists s, f', [:: admininstr__TRAP].
+        rewrite Htrap.
         apply: Step__pure.
         by apply: Step_pure__trap_frame.
       + right. move: Hprog => [s' [f'' [es' Hprog]]].
-        exists s', f', (list__val__admininstr vcs ++ [:: admininstr__FRAME_ n f'' es']).
-        apply Step__ctxt_seq with
-          (v_admininstr := [:: admininstr__FRAME_ n f es])
-          (v_admininstr' := [:: admininstr__FRAME_ n f'' es']).
+        exists s', f', [:: admininstr__FRAME_ n f'' es'].
         by apply: Step__ctxt_frame.
   - (* Admin_instr_ok__weakening *)
     move => s C e ts ts1 ts2 Hadmin IH.
@@ -2165,7 +2218,7 @@ Proof.
         by rewrite 2!length_size map_map 2!size_map.
       * right. left. by rewrite Htrap.
     + right. by right.
-Admitted.
+Qed.
 
 Theorem t_progress: forall s f es ts,
   Config_ok (config__ (state__ s f) es) ts ->
@@ -2179,17 +2232,10 @@ Proof.
     (lab := [::]) (ret := Some None)
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
     (C' := upd_local_label_return C [::] [::] None) => //=.
-  - (* TODO: Name these lemmas explicitly *)
-    have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
-    { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
-      inversion Hmod => //=. rewrite cat_app cats0.
-      (* TODO: Use all2 instead *)
-      by apply Forall2_Val_ok_is_same_as_map in Hval. }
-    have Heq2 : context__LABELS C = [::].
-    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
-    have Heq3 : context__RETURN C = None.
-    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
-    by rewrite -Heq1 -Heq2 -Heq3 {Heq1 Heq2 Heq3}.
+  - move/frame_t_context_local_types: (Hframe) => Eloc.
+    move/frame_t_context_label_empty: (Hframe) => Elab.
+    move/frame_t_context_return_empty: (Hframe) => Eret.
+    by rewrite -Eloc -Elab -Eret.
   - inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe}.
     by inversion Hmod.
   - by move/s_typing_not_lf_br: Hthread. 
