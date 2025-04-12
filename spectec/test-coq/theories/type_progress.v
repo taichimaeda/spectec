@@ -391,8 +391,28 @@ Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
 Canonical Structure functype_eqType :=
   Eval hnf in EqType functype functype_eqMixin.
 
+Ltac decide_equality_congr :=
+  lazymatch goal with
+  | |- {?c1 = ?c2} + {_} =>
+    let rec aux c1 c2 next :=
+      lazymatch constr:((c1, c2)) with
+      | (?c, ?c) => next tt
+      | (?c1 ?a1, ?c2 ?a2) =>
+        let H := fresh "decide" in
+        assert (H : {a1 = a2} + {a1 <> a2});
+          [| aux c1 c2 ltac:(fun _ =>
+               destruct H as [H|H];
+                 [ rewrite H; next tt
+                 | right; by inversion 1 ]) ]
+      end in
+    aux c1 c2 ltac:(fun _ => by left)
+  end.
+
 Definition admininstr_eq_dec : forall e1 e2 : admininstr,
   {e1 = e2} + {e1 <> e2}.
+Proof.
+  destruct e1, e2; try by [left | right].
+  decide_equality_congr.
 Admitted.
 (* TODO: This does not terminate for some reason *)
 (* Proof. decidable_equality. Defined. *)
