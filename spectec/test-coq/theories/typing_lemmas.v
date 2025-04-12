@@ -598,7 +598,7 @@ Admitted.
 		- (* Weakening *) edestruct IHHType as [? [? [? [? ?]]]] => //=; subst. exists x, x0. by repeat split => //=; try rewrite <- app_assoc.
 Qed. *)
 
-Lemma Frame_typing: forall v_S v_C n v_F v_ais t1s t2s,
+(* Lemma Frame_typing: forall v_S v_C n v_F v_ais t1s t2s,
     Admin_instr_ok v_S v_C (admininstr__FRAME_ n v_F v_ais) (functype__ t1s t2s) ->
     exists (ts : resulttype), t2s = t1s ++ ts /\
                Thread_ok v_S ts v_F v_ais ts /\ 
@@ -610,7 +610,7 @@ Proof.
 	- (* Frame *)  exists v_t => //=.
 	- (* Weakening *) edestruct IHHType as [ts2 [??]]; eauto. subst.
 		exists ts2. by repeat split => //=; try rewrite <- app_assoc.
-Qed.
+Qed. *)
 
 Lemma Set_local_typing: forall v_S C i t1s t2s,
     Admin_instr_ok v_S C (admininstr__LOCAL_SET i) (functype__ t1s t2s) ->

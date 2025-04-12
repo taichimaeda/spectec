@@ -879,7 +879,7 @@ Proof.
       context__MEMS := [::];
       context__LOCALS := [::];
       context__LABELS := [::];
-      context__RETURN := Some rs
+      context__RETURN := rs
       |} C) Hadmin => C' Hadmin.
     move Ee: (admininstr__BR l) Hadmin => e Hadmin.
     move Etf: (functype__ ts1' ts2') Hadmin => tf Hadmin.
@@ -934,7 +934,7 @@ Proof.
       context__MEMS := [::];
       context__LOCALS := [::];
       context__LABELS := [::];
-      context__RETURN := Some None
+      context__RETURN := None
       |} C) Hadmin => C' Hadmin.
     move Ee: (admininstr__RETURN) Hadmin => e Hadmin.
     move Etf: (functype__ ts1' ts2') Hadmin => tf Hadmin.
@@ -952,17 +952,14 @@ Proof.
       inversion Hinstr as [| | | | | | | | | | | | ? ? ? ? Hsome | | | | | | | | | | | | | | | | |].
       rewrite -Ec /= in Hsome.
       move/frame_t_context_return_empty: Hframe => Hret.
-      rewrite Hret /= in Hsome.
-      (* MEMO: There's likely a translation error in IL2Coq
-               context__RETURN := Some None should be context__RETURN := None instead *)
-      by admit.
+      by rewrite Hret in Hsome.
     + move => ts1' ts2' Hframe IH Ec Ee Etf.
       by apply: IH' => //=.
   - apply: IH. move => e Hin.
     have Hin' : e \in e' :: es'.
     { rewrite in_cons. apply/orP. by right. }
     by move/(_ e Hin'): Hadmin.
-Admitted.
+Qed.
 
 Lemma s_typing_not_lf_br : forall s rs f es ts,
   Thread_ok s rs f es ts ->
@@ -2181,16 +2178,9 @@ Proof.
     move => Hframe Hadmin IH Hstore Hnotbr Hnotret.
     have Heqtf : functype__ [::] ts = functype__ [::] ts by [].
     have Heqts : map typeof [::] = [::] by [].
-    (* TODO: Remove duplicate proof *)
-    have Heq1 : context__LOCALS C = map typeof (frame__LOCALS f).
-    { inversion Hframe as [? ? ? ? ? ? Hmod Hval].
-      inversion Hmod => //=. rewrite cat_app cats0.
-      (* TODO: Use all2 instead *)
-      by apply Forall2_Val_ok_is_same_as_map in Hval. }
-    have Heq2 : context__LABELS C = [::].
-    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
-    have Heq3 : context__RETURN C = None.
-    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+    move/frame_t_context_local_types: (Hframe) => Eloc.
+    move/frame_t_context_label_empty: (Hframe) => Elab.
+    move/frame_t_context_return_empty: (Hframe) => Eret.
     (* TODO: Can we simplify this? *)
     have Heqc : _append {|
         context__TYPES := [::];
@@ -2200,15 +2190,14 @@ Proof.
         context__MEMS := [::];
         context__LOCALS := [::];
         context__LABELS := [::];
-        context__RETURN := Some rs
-      |} C = upd_local_label_return (upd_local C [::]) [seq typeof i  | i <- frame__LOCALS f] [::] (Some rs).
+        context__RETURN := rs
+      |} C = upd_local_label_return (upd_local C [::]) [seq typeof i  | i <- frame__LOCALS f] [::] rs.
     { move => {IH Hframe Hadmin}.
-      case: C Heq1 Heq2 Heq3 => //= ? ? ? ? ? ? ? ? Heq1 Heq2 Heq3.
-      by rewrite -Heq1 Heq2 Heq3. }
+      case: C Eloc Elab Eret => //= ? ? ? ? ? ? ? ? Eloc Elab Eret.
+      rewrite Eloc Elab Eret. by case: rs. }
     have Hmod : Module_instance_ok s (frame__MODULE f) (upd_local C [::]).
-    { inversion Hframe as [? ? ? ? ? ? Hmod] => {Hframe} //=.
-      by inversion Hmod. }
-    move/(_ f (upd_local C [::]) [::] [::] ts [::] (Some rs) Heqtf Heqc Hmod Heqts Hstore Hnotbr Hnotret): IH => IH {Heqtf Heqc}.
+    { inversion Hframe as [? ? ? ? ? ? Hmod]. by inversion Hmod. }
+    move/(_ f (upd_local C [::]) [::] [::] ts [::] (rs) Heqtf Heqc Hmod Heqts Hstore Hnotbr Hnotret): IH => IH {Heqtf Heqc}.
     case: IH => /= [Hterm | Hprog].
     + case: Hterm => [Hconst | Htrap].
       * left. split => //=.
@@ -2229,7 +2218,7 @@ Proof.
   inversion Hconfig as [? ? ? ? Hstore Hthread]; subst.
   inversion Hthread as [? ? ? ? ? C Hframe Hadmin]; subst.
   eapply t_progress_e with
-    (lab := [::]) (ret := Some None)
+    (lab := [::]) (ret := None)
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
     (C' := upd_local_label_return C [::] [::] None) => //=.
   - move/frame_t_context_local_types: (Hframe) => Eloc.

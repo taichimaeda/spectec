@@ -2101,67 +2101,67 @@ Inductive Steps: config -> config -> Prop :=
 Inductive Eval_expr: state -> expr -> state -> (list val) -> Prop :=
 	| Eval_expr__ : forall (v_z : state) (v_instr : (list instr)) (v_z' : state) (v_val : (list val)), (Steps (config__ v_z (list__instr__admininstr v_instr)) (config__ v_z' (list__val__admininstr v_val))) -> Eval_expr v_z v_instr v_z' v_val.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:7.1-7.34 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:8.1-8.34 *)
 Inductive Val_ok: val -> valtype -> Prop :=
 	| Val_ok__ : forall (v_t : valtype) (v_c_t : val_), Val_ok (val__CONST v_t (v_c_t : val_)) v_t.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:15.1-15.41 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:16.1-16.41 *)
 Inductive Result_ok: result -> (list valtype) -> Prop :=
 	| Result_ok__result : forall (v_v : (list val)) (v_t : (list valtype)), ((List.length v_t) = (List.length v_v)) -> List.Forall2 (fun v_t v_v => (Val_ok v_v v_t)) (v_t) (v_v) -> Result_ok (result___VALS v_v) v_t
 	| Result_ok__trap : forall (v_t : (list valtype)), Result_ok (result__TRAP ) v_t.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:26.1-26.56 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:27.1-27.56 *)
 Inductive Externvals_ok: store -> externval -> externtype -> Prop :=
 	| Externvals_ok__func : forall (v_S : store) (v_a : addr) (v_ext : functype) (v_minst : moduleinst) (v_code_func : func), (v_a < (List.length (store__FUNCS v_S))) -> ((lookup_total (store__FUNCS v_S) v_a) = {| funcinst__TYPE := v_ext; funcinst__MODULE := v_minst; funcinst__CODE := v_code_func |}) -> Externvals_ok v_S (externval__FUNC v_a) (externtype__FUNC v_ext)
 	| Externvals_ok__table : forall (v_S : store) (v_a : addr) (v_reserved__tt : tabletype) (v_tt' : tabletype) (v_fa : (list (option funcaddr))), (v_a < (List.length (store__TABLES v_S))) -> ((lookup_total (store__TABLES v_S) v_a) = {| tableinst__TYPE := v_tt'; tableinst__REFS := v_fa |}) -> (Tabletype_sub v_tt' v_reserved__tt) -> Externvals_ok v_S (externval__TABLE v_a) (externtype__TABLE v_reserved__tt)
 	| Externvals_ok__mem : forall (v_S : store) (v_a : addr) (v_mt : memtype) (v_mt' : memtype) (v_b : (list byte)), (v_a < (List.length (store__MEMS v_S))) -> ((lookup_total (store__MEMS v_S) v_a) = {| meminst__TYPE := v_mt'; meminst__BYTES := v_b |}) -> (Memtype_sub v_mt' v_mt) -> Externvals_ok v_S (externval__MEM v_a) (externtype__MEM v_mt)
 	| Externvals_ok__global : forall (v_S : store) (v_a : addr) (v_mut : mut) (v_valtype : valtype) (v_val_ : val_), (v_a < (List.length (store__GLOBALS v_S))) -> ((lookup_total (store__GLOBALS v_S) v_a) = {| globalinst__TYPE := (globaltype__ v_mut v_valtype); globalinst__VALUE := (val__CONST v_valtype (v_val_ : val_)) |}) -> Externvals_ok v_S (externval__GLOBAL v_a) (externtype__GLOBAL (globaltype__ v_mut v_valtype)).
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:48.1-48.56 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:49.1-49.56 *)
 Inductive Memory_instance_ok: store -> meminst -> memtype -> Prop :=
 	| Memory_instance_ok__ : forall (v_S : store) (v_mt : memtype) (v_b : (list byte)) (v_n : n) (v_m : m), (v_mt = (limits__ v_n v_m)) -> ((List.length v_b) = ((v_n * 64) * (fun_Ki ))) -> (Memtype_ok v_mt) -> Memory_instance_ok v_S {| meminst__TYPE := v_mt; meminst__BYTES := v_b |} v_mt.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:58.1-58.59 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:59.1-59.59 *)
 Inductive Table_instance_ok: store -> tableinst -> tabletype -> Prop :=
 	| Table_instance_ok__ : forall (v_S : store) (v_reserved__tt : tabletype) (v_fa : (list (option funcaddr))) (v_n : n) (v_m : m) (v_functype : (list (option functype))), ((List.length v_fa) = (List.length v_functype)) -> List.Forall2 (fun v_fa v_functype => ((v_fa = None) <-> (v_functype = None))) (v_fa) (v_functype) -> (v_reserved__tt = (limits__ v_n v_m)) -> List.Forall2 (fun v_fa v_functype => List.Forall2 (fun v_fa v_functype => (Externvals_ok v_S (externval__FUNC v_fa) (externtype__FUNC v_functype))) (option_to_list v_fa) (option_to_list v_functype)) (v_fa) (v_functype) -> (Tabletype_ok v_reserved__tt) -> Table_instance_ok v_S {| tableinst__TYPE := v_reserved__tt; tableinst__REFS := v_fa |} v_reserved__tt.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:68.1-68.62 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:69.1-69.62 *)
 Inductive Global_instance_ok: store -> globalinst -> globaltype -> Prop :=
 	| Global_instance_ok__ : forall (v_S : store) (v_gt : globaltype) (v_v : val) (v_mut : mut) (v_vt : valtype), (v_gt = (globaltype__ v_mut v_vt)) -> (Globaltype_ok v_gt) -> (Val_ok v_v v_vt) -> Global_instance_ok v_S {| globalinst__TYPE := v_gt; globalinst__VALUE := v_v |} v_gt.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:78.1-78.54 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:79.1-79.54 *)
 Inductive Export_instance_ok: store -> exportinst -> Prop :=
 	| Export_instance_ok__OK : forall (v_S : store) (v_name : name) (v_eval : externval) (v_ext : externtype), (Externvals_ok v_S v_eval v_ext) -> Export_instance_ok v_S {| exportinst__NAME := v_name; exportinst__VALUE := v_eval |}.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:86.1-86.59 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:87.1-87.59 *)
 Inductive Module_instance_ok: store -> moduleinst -> context -> Prop :=
 	| Module_instance_ok__ : forall (v_S : store) (v_functype : (list functype)) (v_funcaddr : (list funcaddr)) (v_globaladdr : (list globaladdr)) (v_tableaddr : (list tableaddr)) (v_memaddr : (list memaddr)) (v_exportinst : (list exportinst)) (v_functype' : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcaddr) = (List.length v_functype')) -> ((List.length v_tableaddr) = (List.length v_tabletype)) -> ((List.length v_globaladdr) = (List.length v_globaltype)) -> ((List.length v_memaddr) = (List.length v_memtype)) -> List.Forall (fun v_functype => (Functype_ok v_functype)) (v_functype) -> List.Forall2 (fun v_funcaddr v_functype' => (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC v_functype'))) (v_funcaddr) (v_functype') -> List.Forall2 (fun v_tableaddr v_tabletype => (Externvals_ok v_S (externval__TABLE v_tableaddr) (externtype__TABLE v_tabletype))) (v_tableaddr) (v_tabletype) -> List.Forall2 (fun v_globaladdr v_globaltype => (Externvals_ok v_S (externval__GLOBAL v_globaladdr) (externtype__GLOBAL v_globaltype))) (v_globaladdr) (v_globaltype) -> List.Forall2 (fun v_memaddr v_memtype => (Externvals_ok v_S (externval__MEM v_memaddr) (externtype__MEM v_memtype))) (v_memaddr) (v_memtype) -> List.Forall (fun v_exportinst => (Export_instance_ok v_S v_exportinst)) (v_exportinst) -> Module_instance_ok v_S {| moduleinst__TYPES := v_functype; moduleinst__FUNCS := v_funcaddr; moduleinst__GLOBALS := v_globaladdr; moduleinst__TABLES := v_tableaddr; moduleinst__MEMS := v_memaddr; moduleinst__EXPORTS := v_exportinst |} {| context__TYPES := v_functype; context__FUNCS := v_functype'; context__GLOBALS := v_globaltype; context__TABLES := v_tabletype; context__MEMS := v_memtype; context__LOCALS := []; context__LABELS := []; context__RETURN := None |}.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:100.1-100.60 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:101.1-101.60 *)
 Inductive Function_instance_ok: store -> funcinst -> functype -> Prop :=
 	| Function_instance_ok__ : forall (v_S : store) (v_functype : functype) (v_moduleinst : moduleinst) (v_func : func) (v_C : context), (Functype_ok v_functype) -> (Module_instance_ok v_S v_moduleinst v_C) -> (Func_ok v_C v_func v_functype) -> Function_instance_ok v_S {| funcinst__TYPE := v_functype; funcinst__MODULE := v_moduleinst; funcinst__CODE := v_func |} v_functype.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:110.1-110.33 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:111.1-111.33 *)
 Inductive Store_ok: store -> Prop :=
 	| Store_ok__OK : forall (v_S : store) (v_funcinst : (list funcinst)) (v_globalinst : (list globalinst)) (v_tableinst : (list tableinst)) (v_meminst : (list meminst)) (v_functype : (list functype)) (v_globaltype : (list globaltype)) (v_tabletype : (list tabletype)) (v_memtype : (list memtype)), ((List.length v_funcinst) = (List.length v_functype)) -> ((List.length v_globalinst) = (List.length v_globaltype)) -> ((List.length v_tableinst) = (List.length v_tabletype)) -> ((List.length v_meminst) = (List.length v_memtype)) -> (v_S = {| store__FUNCS := v_funcinst; store__GLOBALS := v_globalinst; store__TABLES := v_tableinst; store__MEMS := v_meminst |}) -> List.Forall2 (fun v_funcinst v_functype => (Function_instance_ok v_S v_funcinst v_functype)) (v_funcinst) (v_functype) -> List.Forall2 (fun v_globalinst v_globaltype => (Global_instance_ok v_S v_globalinst v_globaltype)) (v_globalinst) (v_globaltype) -> List.Forall2 (fun v_tableinst v_tabletype => (Table_instance_ok v_S v_tableinst v_tabletype)) (v_tableinst) (v_tabletype) -> List.Forall2 (fun v_meminst v_memtype => (Memory_instance_ok v_S v_meminst v_memtype)) (v_meminst) (v_memtype) -> Store_ok v_S.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:175.1-175.44 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:176.1-176.44 *)
 Inductive Frame_ok: store -> frame -> context -> Prop :=
 	| Frame_ok__ : forall (v_S : store) (v_val : (list val)) (v_moduleinst : moduleinst) (v_C : context) (v_t : (list valtype)), ((List.length v_t) = (List.length v_val)) -> (Module_instance_ok v_S v_moduleinst v_C) -> List.Forall2 (fun v_t v_val => (Val_ok v_val v_t)) (v_t) (v_val) -> Frame_ok v_S {| frame__LOCALS := v_val; frame__MODULE := v_moduleinst |} ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := v_t; context__LABELS := []; context__RETURN := None |} ++ v_C).
 
-(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:122.1-124.74 *)
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:122.1-122.65 *)
+(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:123.1-125.75 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:123.1-123.65 *)
 Inductive Admin_instr_ok: store -> context -> admininstr -> functype -> Prop :=
 	| Admin_instr_ok__instr : forall (v_S : store) (v_C : context) (v_instr : instr) (v_functype : functype), (Instr_ok v_C v_instr v_functype) -> Admin_instr_ok v_S v_C (v_instr : admininstr) v_functype
 	| Admin_instr_ok__trap : forall (v_S : store) (v_C : context) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), Admin_instr_ok v_S v_C (admininstr__TRAP ) (functype__ v_t_1 v_t_2)
 	| Admin_instr_ok__call_addr : forall (v_S : store) (v_C : context) (v_funcaddr : funcaddr) (v_t_1 : (list valtype)) (v_t_2 : (option valtype)), (Externvals_ok v_S (externval__FUNC v_funcaddr) (externtype__FUNC (functype__ v_t_1 v_t_2))) -> Admin_instr_ok v_S v_C (admininstr__CALL_ADDR v_funcaddr) (functype__ v_t_1 v_t_2)
 	| Admin_instr_ok__label : forall (v_S : store) (v_C : context) (v_n : n) (v_instr : (list instr)) (v_admininstr : (list admininstr)) (v_t_2 : (option valtype)) (v_t_1 : (option valtype)), (Instrs_ok v_C v_instr (functype__ v_t_1 v_t_2)) -> (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [v_t_1]; context__RETURN := None |} ++ v_C) v_admininstr (functype__ [] v_t_2)) -> (v_n = (fun_optionSize v_t_1)) -> Admin_instr_ok v_S v_C (admininstr__LABEL_ v_n v_instr v_admininstr) (functype__ [] v_t_2)
-	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S v_t v_F v_admininstr v_t) -> (v_n = (fun_optionSize v_t)) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
+	| Admin_instr_ok__frame : forall (v_S : store) (v_C : context) (v_n : n) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Thread_ok v_S (Some v_t) v_F v_admininstr v_t) -> (v_n = (fun_optionSize v_t)) -> Admin_instr_ok v_S v_C (admininstr__FRAME_ v_n v_F v_admininstr) (functype__ [] v_t)
 	| Admin_instr_ok__weakening : forall (v_S : store) (v_C : context) (v_admininstr : admininstr) (v_t : (list valtype)) (v_t_1 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instr_ok v_S v_C v_admininstr (functype__ v_t_1 v_t_2)) -> Admin_instr_ok v_S v_C v_admininstr (functype__ (@app _ v_t v_t_1) (@app _ v_t v_t_2))
 
 with
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:123.1-123.67 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:124.1-124.67 *)
 Admin_instrs_ok: store -> context -> (list admininstr) -> functype -> Prop :=
 	| Admin_instrs_ok__empty : forall (v_S : store) (v_C : context), Admin_instrs_ok v_S v_C [] (functype__ [] [])
 	| Admin_instrs_ok__seq : forall (v_S : store) (v_C : context) (v_admininstr_1 : (list admininstr)) (v_admininstr_2 : admininstr) (v_t_1 : (list valtype)) (v_t_3 : (list valtype)) (v_t_2 : (list valtype)), (Admin_instrs_ok v_S v_C v_admininstr_1 (functype__ v_t_1 v_t_2)) -> (Admin_instr_ok v_S v_C v_admininstr_2 (functype__ v_t_2 v_t_3)) -> Admin_instrs_ok v_S v_C (@app _ v_admininstr_1 [v_admininstr_2]) (functype__ v_t_1 v_t_3)
@@ -2170,31 +2170,31 @@ Admin_instrs_ok: store -> context -> (list admininstr) -> functype -> Prop :=
 
 with
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:124.1-124.74 *)
-Thread_ok: store -> resulttype -> frame -> (list admininstr) -> resulttype -> Prop :=
-	| Thread_ok__ : forall (v_S : store) (v_rt : (option valtype)) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)) (v_C : context), (Frame_ok v_S v_F v_C) -> (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (Some v_rt) |} ++ v_C) v_admininstr (functype__ [] v_t)) -> Thread_ok v_S v_rt v_F v_admininstr v_t.
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:125.1-125.75 *)
+Thread_ok: store -> (option resulttype) -> frame -> (list admininstr) -> resulttype -> Prop :=
+	| Thread_ok__ : forall (v_S : store) (v_rt : (option resulttype)) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)) (v_C : context), (Frame_ok v_S v_F v_C) -> (Admin_instrs_ok v_S ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := v_rt |} ++ v_C) v_admininstr (functype__ [] v_t)) -> Thread_ok v_S v_rt v_F v_admininstr v_t.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:187.1-187.43 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:188.1-188.43 *)
 Inductive Config_ok: config -> resulttype -> Prop :=
 	| Config_ok__ : forall (v_S : store) (v_F : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), (Store_ok v_S) -> (Thread_ok v_S None v_F v_admininstr v_t) -> Config_ok (config__ (state__ v_S v_F) v_admininstr) v_t.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:198.1-198.48 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:199.1-199.48 *)
 Inductive Func_extension: funcinst -> funcinst -> Prop :=
 	| Func_extension__ : forall (v_funcinst : funcinst), Func_extension v_funcinst v_funcinst.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:199.1-199.51 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:200.1-200.51 *)
 Inductive Table_extension: tableinst -> tableinst -> Prop :=
 	| Table_extension__ : forall (v_n1 : u32) (v_m : m) (v_fa_1 : (list (option funcaddr))) (v_n2 : u32) (v_fa_2 : (list (option funcaddr))), (v_n1 <= v_n2) -> Table_extension {| tableinst__TYPE := (limits__ v_n1 v_m); tableinst__REFS := v_fa_1 |} {| tableinst__TYPE := (limits__ v_n2 v_m); tableinst__REFS := v_fa_2 |}.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:200.1-200.45 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:201.1-201.45 *)
 Inductive Mem_extension: meminst -> meminst -> Prop :=
 	| Mem_extension__ : forall (v_n1 : u32) (v_m : m) (v_b_1 : (list byte)) (v_n2 : u32) (v_b_2 : (list byte)), (v_n1 <= v_n2) -> Mem_extension {| meminst__TYPE := (limits__ v_n1 v_m); meminst__BYTES := v_b_1 |} {| meminst__TYPE := (limits__ v_n2 v_m); meminst__BYTES := v_b_2 |}.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:201.1-201.54 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:202.1-202.54 *)
 Inductive Global_extension: globalinst -> globalinst -> Prop :=
 	| Global_extension__ : forall (v_mut : mut) (v_t2 : valtype) (v_c1 : val_) (v_c2 : val_), ((v_mut = (mut__MUT (Some tt))) \/ ((v_c1 : val_) = (v_c2 : val_))) -> Global_extension {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t2 (v_c1 : val_)) |} {| globalinst__TYPE := (globaltype__ v_mut v_t2); globalinst__VALUE := (val__CONST v_t2 (v_c2 : val_)) |}.
 
-(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:202.1-202.43 *)
+(* Inductive Relations Definition at: spec/wasm-1.0-test/A-soundness.watsup:203.1-203.43 *)
 Inductive Store_extension: store -> store -> Prop :=
 	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_1' : (list funcinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_1' : (list tableinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_1' : (list meminst)) (v_meminst_2 : (list meminst)) (v_globalinst_1' : (list globalinst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_1')) -> ((List.length v_tableinst_1) = (List.length v_tableinst_1')) -> ((List.length v_meminst_1) = (List.length v_meminst_1')) -> ((List.length v_globalinst_1) = (List.length v_globalinst_1')) -> ((store__FUNCS v_store_1) = v_funcinst_1) -> ((store__TABLES v_store_1) = v_tableinst_1) -> ((store__MEMS v_store_1) = v_meminst_1) -> ((store__GLOBALS v_store_1) = v_globalinst_1) -> ((store__FUNCS v_store_2) = (@app _ v_funcinst_1' v_funcinst_2)) -> ((store__TABLES v_store_2) = (@app _ v_tableinst_1' v_tableinst_2)) -> ((store__MEMS v_store_2) = (@app _ v_meminst_1' v_meminst_2)) -> ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1' v_globalinst_2)) -> List.Forall2 (fun v_funcinst_1 v_funcinst_1' => (Func_extension v_funcinst_1 v_funcinst_1')) (v_funcinst_1) (v_funcinst_1') -> List.Forall2 (fun v_tableinst_1 v_tableinst_1' => (Table_extension v_tableinst_1 v_tableinst_1')) (v_tableinst_1) (v_tableinst_1') -> List.Forall2 (fun v_meminst_1 v_meminst_1' => (Mem_extension v_meminst_1 v_meminst_1')) (v_meminst_1) (v_meminst_1') -> List.Forall2 (fun v_globalinst_1 v_globalinst_1' => (Global_extension v_globalinst_1 v_globalinst_1')) (v_globalinst_1) (v_globalinst_1') -> Store_extension v_store_1 v_store_2.
 
