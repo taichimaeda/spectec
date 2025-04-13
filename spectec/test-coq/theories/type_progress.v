@@ -355,11 +355,15 @@ Ltac invert_typeof_vcs :=
     case: vcs H => [| v1 vcs1] H //=
   end.
 
+Definition option_eq_dec (A: Type) (eqA: forall (x y: A), {x=y} + {x<>y}):
+  forall (x y: option A), {x=y} + {x<>y}.
+Admitted.
+
 Ltac decidable_equality_step :=
   first [
       by apply: eq_comparable
     | apply: List.list_eq_dec
-    (* | apply: Coqlib.option_eq *)
+    | apply: option_eq_dec
     | apply: PeanoNat.Nat.eq_dec
     | by eauto
     | intros; apply: decP; by (exact _ || eauto)
@@ -391,31 +395,23 @@ Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
 Canonical Structure functype_eqType :=
   Eval hnf in EqType functype functype_eqMixin.
 
-Ltac decide_equality_congr :=
-  lazymatch goal with
-  | |- {?c1 = ?c2} + {_} =>
-    let rec aux c1 c2 next :=
-      lazymatch constr:((c1, c2)) with
-      | (?c, ?c) => next tt
-      | (?c1 ?a1, ?c2 ?a2) =>
-        let H := fresh "decide" in
-        assert (H : {a1 = a2} + {a1 <> a2});
-          [| aux c1 c2 ltac:(fun _ =>
-               destruct H as [H|H];
-                 [ rewrite H; next tt
-                 | right; by inversion 1 ]) ]
-      end in
-    aux c1 c2 ltac:(fun _ => by left)
-  end.
+Definition instr_eq_dec : forall be1 be2 : instr,
+  {be1 = be2} + {be1 <> be2}.
+Proof.
+  destruct be1, be2; try by [left | right].
+  (* TODO: This does not terminate because of mutual recursion
+           between instr and seq instr  *)
+  (* timeout 1 decidable_equality. *)
+Admitted.
 
 Definition admininstr_eq_dec : forall e1 e2 : admininstr,
   {e1 = e2} + {e1 <> e2}.
 Proof.
   destruct e1, e2; try by [left | right].
-  decide_equality_congr.
+  (* TODO: This does not terminate because of mutual recursion
+           between admininstr and seq admininstr  *)
+  (* timeout 1 decidable_equality. *)
 Admitted.
-(* TODO: This does not terminate for some reason *)
-(* Proof. decidable_equality. Defined. *)
 
 Definition admininstr_eqb v1 v2 : bool := admininstr_eq_dec v1 v2.
 Definition eqadmininstrP : Equality.axiom admininstr_eqb :=
