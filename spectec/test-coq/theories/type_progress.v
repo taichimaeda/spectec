@@ -2231,8 +2231,12 @@ Theorem t_progress: forall s f es ts,
   exists s' f' es', Step (config__ (state__ s f) es) (config__ (state__ s' f') es').
 Proof.
   move => s f es ts Hconfig.
+  (* TODO: inversion tactic can be replaced by case tactic
+           by introducing equalities on dependent indices of the premise
+           and rejecting contradictory cases manually *)
   inversion Hconfig as [? ? ? ? Hstore Hthread]; subst.
   inversion Hthread as [? ? ? ? ? C Hframe Hadmin]; subst.
+  (* TODO: apply with tactic can be replaced by apply: tactic *)
   eapply t_progress_e with
     (lab := [::]) (ret := None)
     (vcs := [::]) (ts1 := [::]) (ts2 := ts)
