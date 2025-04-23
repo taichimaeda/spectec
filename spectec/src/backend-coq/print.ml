@@ -105,7 +105,9 @@ and string_of_paths (paths : coq_path_term list) (is_update : bool) (update_term
       parens (string_of_terms term1) ^ " " ^ 
       parens (string_of_terms term2) ^ " " ^ 
       parens (string_of_terms update_term))
-    | [P_recordlookup (ids, name)], true ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_terms update_term ^ "|>")
+    | (* MEMO: coq-record-update allows nested indexing of records via ;
+               For example: x <| b; c; n := n' |>. *)
+      [P_recordlookup (ids, name)], true ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ string_of_terms update_term ^ "|>")
     | [P_recordlookup (ids, name)], false ->  parens ("fun " ^ name ^ " => " ^ name ^ " <|" ^ String.concat ";" ids ^ " := " ^ lst_extend ^ " " ^ gen_projection ids name ^ " " ^ string_of_terms update_term ^ "|>")
     | [P_listlookup (id, term)], true -> parens (lst_update ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms term) ^ " " ^ parens (string_of_terms update_term))
     | [P_listlookup (id, _)], false -> parens (lst_extend ^ " " ^ parens (id) ^ " " ^ parens (string_of_terms update_term))
@@ -247,7 +249,14 @@ let is_typealias_familytype ((_, f_type) : family_entry) =
 (* TODO refactor this function so it is not necessary to look at the head of the list.
 Extend this when necessary for inductive types to also have coercion*)
 let string_of_family_types (id : ident) (entries : family_entry list) = 
+  (* MEMO: Instances of InductiveFamilyD are printed as an individual InductiveD
+           except for when each instance is type alias to another type *)
   if is_typealias_familytype (List.hd entries) then 
+  (* MEMO: Assume all entries are type aliases and print them in a single inductive type definition *)
+  (* TODO: e.g.
+    Inductive val_: Type :=
+    | val___inn__entry : iN -> val_
+    | val___fnn__entry : fN -> val_. *)
   "Inductive " ^ id ^ ": Type :=\n\t" ^  
   String.concat "\n\t" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
     | TypeAliasT term -> "| " ^ entry_id ^ "__" ^ family_type_suffix ^ " : " ^ string_of_terms term ^ " -> " ^ id   
@@ -279,10 +288,16 @@ let string_of_family_types (id : ident) (entries : family_entry list) =
   | _ -> ""
 ) entries)
   else
+  (* MEMO: Otherwise print each instance as a standalone inductive type definition
+           and add another definition to group them all *)
   String.concat ".\n\n" (List.map (fun (entry_id, f_deftyp) -> match f_deftyp with
     | InductiveT i_entry -> string_of_inductive_def entry_id [] i_entry
     | _ -> ""
   ) entries) ^ ".\n\n" ^
+  (* TODO: e.g.
+    Inductive unop_  : Type :=
+    | unop___inn__entry (arg : unop___inn) : unop_ 
+    | unop___fnn__entry (arg : unop___fnn) : unop_ . *)
   string_of_inductive_def id [] (List.map (fun (entry_id, _) -> (entry_id ^ "__" ^ family_type_suffix, [("arg" , T_ident [entry_id])])) entries)
 
 let string_of_notation (id : ident) (term : coq_term) = 
