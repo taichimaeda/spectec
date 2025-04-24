@@ -15,7 +15,6 @@ type coq_basic_types =
   | T_bool
   | T_nat
   | T_int
-  | T_real
   | T_string
   | T_list
   | T_opt

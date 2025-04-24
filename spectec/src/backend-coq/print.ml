@@ -70,7 +70,6 @@ let rec string_of_terms (term : coq_term) =
     | T_type_basic T_bool -> "bool"
     | T_type_basic T_nat -> "nat"
     | T_type_basic T_int -> "Z"
-    | T_type_basic T_real -> "R"
     | T_type_basic T_string -> "string"
     | T_type_basic T_list -> "list"
     | T_type_basic T_opt -> "option"
