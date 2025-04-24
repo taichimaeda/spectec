@@ -191,14 +191,46 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
   string_of_list_type id args ^ ".\n\n" ^
   string_of_option_type id args ^ ".\n\n" ^
   (* Inhabitance proof for default values *)
-  let inhabitance_binders = string_of_binders args in 
-  let binders = if args <> [] then " " ^ string_of_binders_ids args else "" in 
-  "Global Instance Inhabited__" ^ id ^ inhabitance_binders ^ " : Inhabited " ^ parens (id ^ binders) ^
+  let binders = string_of_binders args in 
+  let binder_ids = string_of_binders_ids args in
+  "Global Instance Inhabited__" ^ id ^ " " ^ binders ^ " : Inhabited " ^ parens (id ^ " " ^ binder_ids) ^
   match entries with
     | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
             "\tAdmitted"
-    | (case_id, binds) :: _ -> " := { default_val := " ^ case_id ^ binders ^ 
-      " " ^ (String.concat " " (List.map (fun _ -> "default_val" ) binds)) ^ " }"
+    | (* MEMO: Uses the first constructor as default value *)
+      (case_id, binds) :: _ -> " := { default_val := " ^ case_id ^ " " ^ binder_ids ^ 
+      (* MEMO: Supply default value of arguments to case_id *)
+      " " ^ (String.concat " " (List.map (fun _ -> "default_val" ) binds)) ^ " }.\n\n" ^
+  (* TODO: e.g.
+    Global Instance Inhabited__functype : Inhabited (functype) :=
+      { default_val := functype__ default_val default_val }. *)
+  (* TODO: e.g. 
+    Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }. *)
+
+  (* Decidable equality proof *)
+  "Definition " ^ id ^ "_eq_dec : forall " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ "),\n" ^
+    "{v1 = v2} + {v1 <> v2}.\n" ^
+  "Proof. Admitted.\n\n" ^
+  (* "Proof. decidable_equality. Defined.\n\n" ^ *)
+  "Definition " ^ id ^ "_eqb " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") : bool :=\n" ^
+    id ^ "_eq_dec " ^ binder_ids ^ " v1 v2.\n" ^  
+  "Definition eq" ^ id ^ "P " ^ binders ^ " : Equality.axiom " ^ parens (id ^ "_eqb " ^ binder_ids) ^ " :=\n" ^
+    "eq_dec_Equality_axiom " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eq_dec " ^ binder_ids) ^ ".\n\n" ^
+  "Canonical Structure " ^ id ^ "_eqMixin " ^ binders ^ " := EqMixin " ^ parens ("eq" ^ id ^ "P " ^ binder_ids) ^ ".\n" ^
+  "Canonical Structure " ^ id ^ "_eqType " ^ binders ^ " :=\n" ^
+    "Eval hnf in EqType " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eqMixin " ^ binder_ids)
+  (* TODO: e.g.
+    Definition functype_eq_dec : forall (tf1 tf2 : functype),
+      {tf1 = tf2} + {tf1 <> tf2}.
+    Proof. decidable_equality. Defined.
+
+    Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
+    Definition eqfunctypeP : Equality.axiom functype_eqb :=
+      eq_dec_Equality_axiom functype functype_eq_dec.
+
+    Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
+    Canonical Structure functype_eqType :=
+      Eval hnf in EqType functype functype_eqMixin. *)
 
 let string_of_definition (prefix : string) (id : ident) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
   match clauses with
@@ -325,8 +357,7 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
       | [] -> ""
       | [d] -> string_of_def (not (is_inductive d)) d
       | d :: defs -> let prefix = if is_inductive d then "\n\nwith\n\n" else "\n\n" in
-        string_of_def false d ^ prefix ^ String.concat prefix (List.map (string_of_def true) defs)
-      )
+        string_of_def false d ^ prefix ^ String.concat prefix (List.map (string_of_def true) defs))
     | DefinitionD (id, binds, typ, clauses) -> let prefix = if recursive then "Fixpoint " else "Definition " in
       string_of_definition prefix id binds typ clauses
     | InductiveRelationD (id, args, relations) -> let prefix = if recursive then "" else "Inductive " in
@@ -336,9 +367,12 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
     | CoercionD (func_name, typ1, typ2) -> string_of_coercion func_name typ1 typ2
     | UnsupportedD str -> comment_parens ("Unsupported Definition: " ^ str)
 
+(* TODO: Use multi-line string or read form a template file instead
+         Use spaces for indentation rather than tabs *)
 let exported_string = 
   "(* Exported Code *)\n" ^
   "From Coq Require Import String List Unicode.Utf8 Reals.\n" ^
+  "From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype.\n" ^
   "From RecordUpdate Require Import RecordSet.\n" ^
   "Require Import NArith.\n" ^
   "Require Import Arith.\n" ^
@@ -416,6 +450,35 @@ let exported_string =
   "\t\t| Some a => a :: nil\n" ^ 
 	"\tend.\n\n" ^
   "Coercion option_to_list: option >-> list.\n\n" ^
+  "Definition option_eq_dec (A : Type) (eq_dec : forall (x y : A), {x = y} + {x <> y}):\n" ^
+  "  forall (x y : option A), {x = y} + {x <> y}.\n" ^
+  "Proof.\n" ^
+  "  move=> x y.\n" ^
+  "  case: x; case: y; try by [left | right].\n" ^
+  "  move => x' y'.\n" ^
+  "  case: (eq_dec x' y') => H.\n" ^
+  "  - left. by congr Some.\n" ^
+  "  - right. move => [Hcontra]. by apply: H.\n" ^
+  "Qed.\n\n" ^
+  "Ltac decidable_equality_step :=\n" ^
+  "  first [\n" ^
+  "      by apply: eq_comparable\n" ^
+  "    | apply: List.list_eq_dec\n" ^
+  "    | apply: option_eq_dec\n" ^
+  "    | apply: PeanoNat.Nat.eq_dec\n" ^
+  "    | by eauto\n" ^
+  "    | intros; apply: decP; by (exact _ || eauto)\n" ^
+  "    | decide equality ].\n\n" ^
+  "Ltac decidable_equality :=\n" ^
+  "  repeat decidable_equality_step.\n\n" ^
+  "Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),\n" ^
+  "  let eqb v1 v2 := is_left (eq_dec v1 v2) in\n" ^
+  "  Equality.axiom eqb.\n" ^
+  "Proof.\n" ^
+  "  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).\n" ^
+  "  - move=> E. by apply/ReflectT.\n" ^
+  "  - move=> E. by apply/ReflectF.\n" ^
+  "Qed.\n\n" ^
   "Open Scope wasm_scope.\n" ^
   "Import ListNotations.\n" ^
   "Import RecordSetNotations.\n\n"
