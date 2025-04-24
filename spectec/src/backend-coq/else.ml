@@ -42,6 +42,24 @@ let neg_suffix = "_neg"
 
 (* We assume the expressions to be of the same type; for ill-typed inputs
   no guarantees are made. *)
+(* TODO: e.g. 
+  Step_read__call_indirect_call has the following conclusion:
+  Step_read (config__ v_z 
+  [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_)); 
+   (admininstr__CALL_INDIRECT v_x)]) [(admininstr__CALL_ADDR v_a)] *)
+(* TODO: e.g. 
+  Step_read__call_indirect_trap has the following conclusion:
+  Step_read (config__ v_z 
+  [(admininstr__CONST (valtype__INN (inn__I32 )) (v_i : val_));
+   (admininstr__CALL_INDIRECT v_x)]) [(admininstr__TRAP )] *)
+(* TODO: In this case Step_read is a binary relation
+         For Step_read__call_indirect_trap we want to find Step_read__call_indirect_call
+         which has the same LHS or t1 type *)
+(* MEMO: Returns true if two coq_terms are definitely distinct
+         Returns false if two coq_terms maybe distinct or equivalent *)
+(* MEMO: This behaves in a conservative manner because
+         it is better to return false and include ambiguous rules in the negation
+         rather than missing them entirely *)
 let rec apart (e1 : coq_term) (e2: coq_term) : bool =
   (*
   (fun b -> if not b then Printf.eprintf "apart\n  %s\n  %s\n  %b\n" (Print.string_of_exp e1) (Print.string_of_exp e2) b; b)
@@ -87,6 +105,9 @@ let replace_else aux_name lhs prem = match prem with
   | P_else -> P_neg (P_rule (aux_name, [lhs]))
   | _ -> prem
 
+(* MEMO: r_id is each constructor name of the relation 
+         terms is the arguments ot the relation in the conclusion of this constructor *)
+(* MEMO: Unarises the given binary relation by removing RHS *)
 let unarize ((r_id, binds), prems, terms) = 
     let lhs = match terms with
       | [lhs; _] -> lhs
@@ -96,20 +117,35 @@ let unarize ((r_id, binds), prems, terms) =
 
 let not_apart lhs (_, _, lhs2) = not (apart lhs lhs2)
 
-
+(* MEMO: Produces a list of coq_def for each else clause
+         The generated inductive definition corresponds to a unary relation 
+         on the LHS of the given binary relation that negates all previous constructors
+         whose LHS match the LHS of the conclusion of the current constructor
+         The LHS is sufficient because premises in the constructors of relations like Step_read
+         only imposes conditions on the config parameter, not the contractum after reduction *)
+(* MEMO: Matches against the list of relation_type_entry in Coq IL
+         for each InductiveRelationD *)
 let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list = function
-  | [] -> [ InductiveRelationD (id, args, List.rev prev_rules) ]
-  | ((r_id, binds), prems, terms) as r :: rules -> 
+  | (* MEMO: This is the base case of this function 
+             There are no more rules or entries from this InductiveRelationD *)
+    [] -> [ InductiveRelationD (id, args, List.rev prev_rules) ]
+  | (* MEMO: r_id is each constructor name of the relation 
+             terms is the arguments ot the relation in the conclusion of this constructor *)
+    ((r_id, binds), prems, terms) as r :: rules -> 
       if List.exists is_else prems
       then
         let lhs = match terms with
           | [lhs; _] -> lhs
           | _ -> error no_region "expected manifest pair"
         in
+        (* TODO: e.g. Step_read_before_Step_read__call_indirect_trap *)
         let aux_name = id ^ "_before_" ^ r_id in
+        (* MEMO: If an else clause exists in the premises of this constructor, 
+                 scan the previous constructors and collect those  *)
         let applicable_prev_rules = prev_rules
               |> List.map unarize
               |> List.filter (not_apart lhs)
+              (* TODO: Is neg_suffix appropriate here? *)
               |> List.map (fun ((id', binds'), prems', term') -> ((id' ^ neg_suffix, binds'), prems', [term']))
               |> List.rev in
         [ InductiveRelationD (aux_name, [typ1], List.rev applicable_prev_rules) ] @
@@ -117,12 +153,18 @@ let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list =
         let rule' = ((r_id, binds), prems', terms) in
         go id args typ1 (rule' :: prev_rules) rules
       else
+        (* MEMO: If no else clause exists in the premises of this constructor,
+                 skip to the next rule *)
         go id args typ1 (r :: prev_rules) rules
 
 let rec t_def (def : coq_def) : coq_def list = match def.it with
-  | MutualRecD defs -> [ MutualRecD (List.concat_map t_def defs) $ def.at ]
+  | (* MEMO: MutualRecD groups mutually recursive coq_defs *)
+    MutualRecD defs -> [ MutualRecD (List.concat_map t_def defs) $ def.at ]
   | InductiveRelationD (id, args, r_entry) -> begin match args with
-    | [t1 ; _t2] ->
+    | (* MEMO: This only supports binary relation like Step_read *)
+      (* MEMO: This only passes t1 because the function go generates
+               a unary relation on the LHS of the binary relation *)
+      [t1 ; _t2] ->
       List.map (fun d -> d $ def.at) (go id args t1 [] r_entry)
     | _ -> [def]
     end

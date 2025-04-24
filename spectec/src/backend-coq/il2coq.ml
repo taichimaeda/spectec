@@ -51,8 +51,8 @@ let gen_case_name (env : env) (t : typ) =
     | VarT (id, _) -> get_actual_case_name env id
     | _ -> error t.at "Should not happen"
 
-(* MEMO: Used to retrieve the underlying type of each field 
-         in record defintion which is required to generate auxiliary lemmas *)
+(* MEMO: Used to retrieve the underlying struct_type of each field 
+         in record defintion which is required to generate auxiliary lemmas later *)
 let rec get_struct_type (env : env) (id : id) =
   let (n_id, _, struct_type) = find "Case" env.vars id in
   (match struct_type with 
@@ -648,7 +648,7 @@ let rec transform_def (d : def) : coq_def =
         let base_return_type = if is_family_return_type then Some typ else None in 
         DefinitionD (transform_fun_id id, binds, return_type, (List.map (transform_clause base_return_type) clauses) @ new_clause)
       )
-    | (* MEMO: RecD group mutually recursive defs *)
+    | (* MEMO: RecD groups mutually recursive defs *)
       RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD "") $ d.at
 
@@ -792,7 +792,7 @@ let rec transform_sub_def (env : env) (d : def) =
             Hashtbl.add sub_hastable combined_name combined_name;
             transform_sub_types d.at t1_id t2_id typ1_cases typ2_cases)
         | _ -> []) sub_expressions) [Left d]
-    | (* MEMO: RecD group mutually recursive defs *)
+    | (* MEMO: RecD groups mutually recursive defs *)
       (* MEMO: RecD seems to support grouping of syntax, relation and function definitions
                See elab.ml for more details *)
       RecD defs -> let flat_list = List.concat_map (transform_sub_def env) defs in

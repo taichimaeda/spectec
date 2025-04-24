@@ -94,11 +94,13 @@ and binders = (ident * coq_term) list
 
 and record_entry = (ident * coq_term * struct_type option)
 
-(* MEMO: Denotes each value constructor of the inductive Set type definition in Coq *)
+(* MEMO: Denotes each constructor of the inductive type definition in Coq *)
 and inductive_type_entry = (ident * binders)
 
-(* MEMO: Denotes each evidence constructor of the inductive Prop type definition in Coq
-         In addition to inductive_type_entry this may take premises and auxiliary terms *)
+(* MEMO: Denotes each constructor of the inductive type definition in Coq
+         which may take premises in addition to inductive_type_entry *)
+(* MEMO: The list of coq_term denotes the arguments to the relation
+         in the conclusion of the corresponding constructor *)
 and relation_type_entry = inductive_type_entry * coq_premise list * coq_term list
 
 and inductive_args = binders
