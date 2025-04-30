@@ -222,11 +222,9 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
     Definition functype_eq_dec : forall (tf1 tf2 : functype),
       {tf1 = tf2} + {tf1 <> tf2}.
     Proof. decidable_equality. Defined.
-
     Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
     Definition eqfunctypeP : Equality.axiom functype_eqb :=
       eq_dec_Equality_axiom functype functype_eq_dec.
-
     Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
     Canonical Structure functype_eqType :=
       Eval hnf in EqType functype functype_eqMixin. *)
@@ -475,8 +473,8 @@ let exported_string =
   "  Equality.axiom eqb.\n" ^
   "Proof.\n" ^
   "  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).\n" ^
-  "  - move=> E. by apply/ReflectT.\n" ^
-  "  - move=> E. by apply/ReflectF.\n" ^
+  "  - move=> E /=. by apply/ReflectT.\n" ^
+  "  - move=> E /=. by apply/ReflectF.\n" ^
   "Qed.\n\n" ^
   "Open Scope wasm_scope.\n" ^
   "Import ListNotations.\n" ^

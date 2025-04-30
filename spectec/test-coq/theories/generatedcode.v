@@ -1,5 +1,6 @@
 (* Exported Code *)
 From Coq Require Import String List Unicode.Utf8 Reals.
+From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool seq eqtype.
 From RecordUpdate Require Import RecordSet.
 Require Import NArith.
 Require Import Arith.
@@ -103,6 +104,39 @@ Definition option_to_list {T: Type} (arg : option T) : list T :=
 
 Coercion option_to_list: option >-> list.
 
+Definition option_eq_dec (A : Type) (eq_dec : forall (x y : A), {x = y} + {x <> y}):
+  forall (x y : option A), {x = y} + {x <> y}.
+Proof.
+  move=> x y.
+  case: x; case: y; try by [left | right].
+  move => x' y'.
+  case: (eq_dec x' y') => H.
+  - left. by congr Some.
+  - right. move => [Hcontra]. by apply: H.
+Qed.
+
+Ltac decidable_equality_step :=
+  first [
+      by apply: eq_comparable
+    | apply: List.list_eq_dec
+    | apply: option_eq_dec
+    | apply: PeanoNat.Nat.eq_dec
+    | by eauto
+    | intros; apply: decP; by (exact _ || eauto)
+    | decide equality ].
+
+Ltac decidable_equality :=
+  repeat decidable_equality_step.
+
+Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),
+  let eqb v1 v2 := is_left (eq_dec v1 v2) in
+  Equality.axiom eqb.
+Proof.
+  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).
+  - move=> E /=. by apply/ReflectT.
+  - move=> E /=. by apply/ReflectF.
+Qed.
+
 Open Scope wasm_scope.
 Import ListNotations.
 Import RecordSetNotations.
@@ -172,7 +206,20 @@ Definition list__reserved__list (X : Type) := (list (reserved__list X)).
 
 Definition option__reserved__list (X : Type) := (option (reserved__list X)).
 
-Global Instance Inhabited__reserved__list(X : Type) : Inhabited (reserved__list X) := { default_val := reserved__list__ X default_val }.
+Global Instance Inhabited__reserved__list (X : Type) : Inhabited (reserved__list X) := { default_val := reserved__list__ X default_val }.
+
+Definition reserved__list_eq_dec : forall (X : Type) (v1 v2 : reserved__list X),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition reserved__list_eqb (X : Type) (v1 v2 : reserved__list X) : bool :=
+reserved__list_eq_dec X v1 v2.
+Definition eqreserved__listP (X : Type) : Equality.axiom (reserved__list_eqb X) :=
+eq_dec_Equality_axiom (reserved__list X) (reserved__list_eq_dec X).
+
+Canonical Structure reserved__list_eqMixin (X : Type) := EqMixin (eqreserved__listP X).
+Canonical Structure reserved__list_eqType (X : Type) :=
+Eval hnf in EqType (reserved__list X) (reserved__list_eqMixin X).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:15.1-15.50 *)
 Inductive byte  : Type :=
@@ -182,7 +229,20 @@ Definition list__byte  := (list (byte )).
 
 Definition option__byte  := (option (byte )).
 
-Global Instance Inhabited__byte : Inhabited (byte) := { default_val := byte__ default_val }.
+Global Instance Inhabited__byte  : Inhabited (byte ) := { default_val := byte__  default_val }.
+
+Definition byte_eq_dec : forall  (v1 v2 : byte ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition byte_eqb  (v1 v2 : byte ) : bool :=
+byte_eq_dec  v1 v2.
+Definition eqbyteP  : Equality.axiom (byte_eqb ) :=
+eq_dec_Equality_axiom (byte ) (byte_eq_dec ).
+
+Canonical Structure byte_eqMixin  := EqMixin (eqbyteP ).
+Canonical Structure byte_eqType  :=
+Eval hnf in EqType (byte ) (byte_eqMixin ).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:17.1-17.61 *)
 Notation uN := nat.
@@ -255,7 +315,7 @@ Definition fun_E (v_reserved__N_0 : reserved__N) : nat :=
 	end.
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:43.1-43.67 *)
-Notation fN := R.
+Notation fN := nat.
 
 Definition list__fN  := (list (fN )).
 
@@ -301,7 +361,20 @@ Definition list__char  := (list (char )).
 
 Definition option__char  := (option (char )).
 
-Global Instance Inhabited__char : Inhabited (char) := { default_val := char__ default_val }.
+Global Instance Inhabited__char  : Inhabited (char ) := { default_val := char__  default_val }.
+
+Definition char_eq_dec : forall  (v1 v2 : char ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition char_eqb  (v1 v2 : char ) : bool :=
+char_eq_dec  v1 v2.
+Definition eqcharP  : Equality.axiom (char_eqb ) :=
+eq_dec_Equality_axiom (char ) (char_eq_dec ).
+
+Canonical Structure char_eqMixin  := EqMixin (eqcharP ).
+Canonical Structure char_eqType  :=
+Eval hnf in EqType (char ) (char_eqMixin ).
 
 (* Axiom Definition at: spec/wasm-1.0-test/1-syntax.watsup:64.1-64.25 *)
 Axiom fun_utf8 : forall (v___0 : (list char)), (list__byte ).
@@ -314,7 +387,20 @@ Definition list__name  := (list (name )).
 
 Definition option__name  := (option (name )).
 
-Global Instance Inhabited__name : Inhabited (name) := { default_val := name__ default_val }.
+Global Instance Inhabited__name  : Inhabited (name ) := { default_val := name__  default_val }.
+
+Definition name_eq_dec : forall  (v1 v2 : name ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition name_eqb  (v1 v2 : name ) : bool :=
+name_eq_dec  v1 v2.
+Definition eqnameP  : Equality.axiom (name_eqb ) :=
+eq_dec_Equality_axiom (name ) (name_eq_dec ).
+
+Canonical Structure name_eqMixin  := EqMixin (eqnameP ).
+Canonical Structure name_eqType  :=
+Eval hnf in EqType (name ) (name_eqMixin ).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:75.1-75.36 *)
 Notation idx := u32.
@@ -381,7 +467,20 @@ Definition list__fnn  := (list (fnn )).
 
 Definition option__fnn  := (option (fnn )).
 
-Global Instance Inhabited__fnn : Inhabited (fnn) := { default_val := fnn__F32  }.
+Global Instance Inhabited__fnn  : Inhabited (fnn ) := { default_val := fnn__F32   }.
+
+Definition fnn_eq_dec : forall  (v1 v2 : fnn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition fnn_eqb  (v1 v2 : fnn ) : bool :=
+fnn_eq_dec  v1 v2.
+Definition eqfnnP  : Equality.axiom (fnn_eqb ) :=
+eq_dec_Equality_axiom (fnn ) (fnn_eq_dec ).
+
+Canonical Structure fnn_eqMixin  := EqMixin (eqfnnP ).
+Canonical Structure fnn_eqType  :=
+Eval hnf in EqType (fnn ) (fnn_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:96.1-96.38 *)
 Inductive inn  : Type :=
@@ -392,7 +491,20 @@ Definition list__inn  := (list (inn )).
 
 Definition option__inn  := (option (inn )).
 
-Global Instance Inhabited__inn : Inhabited (inn) := { default_val := inn__I32  }.
+Global Instance Inhabited__inn  : Inhabited (inn ) := { default_val := inn__I32   }.
+
+Definition inn_eq_dec : forall  (v1 v2 : inn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition inn_eqb  (v1 v2 : inn ) : bool :=
+inn_eq_dec  v1 v2.
+Definition eqinnP  : Equality.axiom (inn_eqb ) :=
+eq_dec_Equality_axiom (inn ) (inn_eq_dec ).
+
+Canonical Structure inn_eqMixin  := EqMixin (eqinnP ).
+Canonical Structure inn_eqType  :=
+Eval hnf in EqType (inn ) (inn_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:92.1-94.12 *)
 Inductive valtype  : Type :=
@@ -403,7 +515,20 @@ Definition list__valtype  := (list (valtype )).
 
 Definition option__valtype  := (option (valtype )).
 
-Global Instance Inhabited__valtype : Inhabited (valtype) := { default_val := valtype__INN default_val }.
+Global Instance Inhabited__valtype  : Inhabited (valtype ) := { default_val := valtype__INN  default_val }.
+
+Definition valtype_eq_dec : forall  (v1 v2 : valtype ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition valtype_eqb  (v1 v2 : valtype ) : bool :=
+valtype_eq_dec  v1 v2.
+Definition eqvaltypeP  : Equality.axiom (valtype_eqb ) :=
+eq_dec_Equality_axiom (valtype ) (valtype_eq_dec ).
+
+Canonical Structure valtype_eqMixin  := EqMixin (eqvaltypeP ).
+Canonical Structure valtype_eqType  :=
+Eval hnf in EqType (valtype ) (valtype_eqMixin ).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/1-syntax.watsup:99.1-99.32 *)
 Definition fun_optionSize (v___0 : (option valtype)) : nat :=
@@ -427,7 +552,20 @@ Definition list__mut  := (list (mut )).
 
 Definition option__mut  := (option (mut )).
 
-Global Instance Inhabited__mut : Inhabited (mut) := { default_val := mut__MUT default_val }.
+Global Instance Inhabited__mut  : Inhabited (mut ) := { default_val := mut__MUT  default_val }.
+
+Definition mut_eq_dec : forall  (v1 v2 : mut ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition mut_eqb  (v1 v2 : mut ) : bool :=
+mut_eq_dec  v1 v2.
+Definition eqmutP  : Equality.axiom (mut_eqb ) :=
+eq_dec_Equality_axiom (mut ) (mut_eq_dec ).
+
+Canonical Structure mut_eqMixin  := EqMixin (eqmutP ).
+Canonical Structure mut_eqType  :=
+Eval hnf in EqType (mut ) (mut_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:110.1-111.16 *)
 Inductive limits  : Type :=
@@ -437,7 +575,20 @@ Definition list__limits  := (list (limits )).
 
 Definition option__limits  := (option (limits )).
 
-Global Instance Inhabited__limits : Inhabited (limits) := { default_val := limits__ default_val default_val }.
+Global Instance Inhabited__limits  : Inhabited (limits ) := { default_val := limits__  default_val default_val }.
+
+Definition limits_eq_dec : forall  (v1 v2 : limits ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition limits_eqb  (v1 v2 : limits ) : bool :=
+limits_eq_dec  v1 v2.
+Definition eqlimitsP  : Equality.axiom (limits_eqb ) :=
+eq_dec_Equality_axiom (limits ) (limits_eq_dec ).
+
+Canonical Structure limits_eqMixin  := EqMixin (eqlimitsP ).
+Canonical Structure limits_eqType  :=
+Eval hnf in EqType (limits ) (limits_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:112.1-113.14 *)
 Inductive globaltype  : Type :=
@@ -447,7 +598,20 @@ Definition list__globaltype  := (list (globaltype )).
 
 Definition option__globaltype  := (option (globaltype )).
 
-Global Instance Inhabited__globaltype : Inhabited (globaltype) := { default_val := globaltype__ default_val default_val }.
+Global Instance Inhabited__globaltype  : Inhabited (globaltype ) := { default_val := globaltype__  default_val default_val }.
+
+Definition globaltype_eq_dec : forall  (v1 v2 : globaltype ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition globaltype_eqb  (v1 v2 : globaltype ) : bool :=
+globaltype_eq_dec  v1 v2.
+Definition eqglobaltypeP  : Equality.axiom (globaltype_eqb ) :=
+eq_dec_Equality_axiom (globaltype ) (globaltype_eq_dec ).
+
+Canonical Structure globaltype_eqMixin  := EqMixin (eqglobaltypeP ).
+Canonical Structure globaltype_eqType  :=
+Eval hnf in EqType (globaltype ) (globaltype_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:114.1-115.23 *)
 Inductive functype  : Type :=
@@ -457,7 +621,20 @@ Definition list__functype  := (list (functype )).
 
 Definition option__functype  := (option (functype )).
 
-Global Instance Inhabited__functype : Inhabited (functype) := { default_val := functype__ default_val default_val }.
+Global Instance Inhabited__functype  : Inhabited (functype ) := { default_val := functype__  default_val default_val }.
+
+Definition functype_eq_dec : forall  (v1 v2 : functype ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition functype_eqb  (v1 v2 : functype ) : bool :=
+functype_eq_dec  v1 v2.
+Definition eqfunctypeP  : Equality.axiom (functype_eqb ) :=
+eq_dec_Equality_axiom (functype ) (functype_eq_dec ).
+
+Canonical Structure functype_eqMixin  := EqMixin (eqfunctypeP ).
+Canonical Structure functype_eqType  :=
+Eval hnf in EqType (functype ) (functype_eqMixin ).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:116.1-117.9 *)
 Notation tabletype := limits.
@@ -484,7 +661,20 @@ Definition list__externtype  := (list (externtype )).
 
 Definition option__externtype  := (option (externtype )).
 
-Global Instance Inhabited__externtype : Inhabited (externtype) := { default_val := externtype__FUNC default_val }.
+Global Instance Inhabited__externtype  : Inhabited (externtype ) := { default_val := externtype__FUNC  default_val }.
+
+Definition externtype_eq_dec : forall  (v1 v2 : externtype ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition externtype_eqb  (v1 v2 : externtype ) : bool :=
+externtype_eq_dec  v1 v2.
+Definition eqexterntypeP  : Equality.axiom (externtype_eqb ) :=
+eq_dec_Equality_axiom (externtype ) (externtype_eq_dec ).
+
+Canonical Structure externtype_eqMixin  := EqMixin (eqexterntypeP ).
+Canonical Structure externtype_eqType  :=
+Eval hnf in EqType (externtype ) (externtype_eqMixin ).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/1-syntax.watsup:133.1-133.40 *)
 Definition fun_size (v_valtype_0 : valtype) : nat :=
@@ -535,7 +725,20 @@ Definition list__sx  := (list (sx )).
 
 Definition option__sx  := (option (sx )).
 
-Global Instance Inhabited__sx : Inhabited (sx) := { default_val := sx__U  }.
+Global Instance Inhabited__sx  : Inhabited (sx ) := { default_val := sx__U   }.
+
+Definition sx_eq_dec : forall  (v1 v2 : sx ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition sx_eqb  (v1 v2 : sx ) : bool :=
+sx_eq_dec  v1 v2.
+Definition eqsxP  : Equality.axiom (sx_eqb ) :=
+eq_dec_Equality_axiom (sx ) (sx_eq_dec ).
+
+Canonical Structure sx_eqMixin  := EqMixin (eqsxP ).
+Canonical Structure sx_eqType  :=
+Eval hnf in EqType (sx ) (sx_eqMixin ).
 
 (* Family Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:144.1-144.22 *)
 Inductive unop___inn  : Type :=
@@ -547,7 +750,20 @@ Definition list__unop___inn  := (list (unop___inn )).
 
 Definition option__unop___inn  := (option (unop___inn )).
 
-Global Instance Inhabited__unop___inn : Inhabited (unop___inn) := { default_val := unop___inn__CLZ  }.
+Global Instance Inhabited__unop___inn  : Inhabited (unop___inn ) := { default_val := unop___inn__CLZ   }.
+
+Definition unop___inn_eq_dec : forall  (v1 v2 : unop___inn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition unop___inn_eqb  (v1 v2 : unop___inn ) : bool :=
+unop___inn_eq_dec  v1 v2.
+Definition equnop___innP  : Equality.axiom (unop___inn_eqb ) :=
+eq_dec_Equality_axiom (unop___inn ) (unop___inn_eq_dec ).
+
+Canonical Structure unop___inn_eqMixin  := EqMixin (equnop___innP ).
+Canonical Structure unop___inn_eqType  :=
+Eval hnf in EqType (unop___inn ) (unop___inn_eqMixin ).
 
 Inductive unop___fnn  : Type :=
 	| unop___fnn__ABS  : unop___fnn 
@@ -562,7 +778,20 @@ Definition list__unop___fnn  := (list (unop___fnn )).
 
 Definition option__unop___fnn  := (option (unop___fnn )).
 
-Global Instance Inhabited__unop___fnn : Inhabited (unop___fnn) := { default_val := unop___fnn__ABS  }.
+Global Instance Inhabited__unop___fnn  : Inhabited (unop___fnn ) := { default_val := unop___fnn__ABS   }.
+
+Definition unop___fnn_eq_dec : forall  (v1 v2 : unop___fnn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition unop___fnn_eqb  (v1 v2 : unop___fnn ) : bool :=
+unop___fnn_eq_dec  v1 v2.
+Definition equnop___fnnP  : Equality.axiom (unop___fnn_eqb ) :=
+eq_dec_Equality_axiom (unop___fnn ) (unop___fnn_eq_dec ).
+
+Canonical Structure unop___fnn_eqMixin  := EqMixin (equnop___fnnP ).
+Canonical Structure unop___fnn_eqType  :=
+Eval hnf in EqType (unop___fnn ) (unop___fnn_eqMixin ).
 
 Inductive unop_  : Type :=
 	| unop___inn__entry (arg : unop___inn) : unop_ 
@@ -572,7 +801,20 @@ Definition list__unop_  := (list (unop_ )).
 
 Definition option__unop_  := (option (unop_ )).
 
-Global Instance Inhabited__unop_ : Inhabited (unop_) := { default_val := unop___inn__entry default_val }.
+Global Instance Inhabited__unop_  : Inhabited (unop_ ) := { default_val := unop___inn__entry  default_val }.
+
+Definition unop__eq_dec : forall  (v1 v2 : unop_ ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition unop__eqb  (v1 v2 : unop_ ) : bool :=
+unop__eq_dec  v1 v2.
+Definition equnop_P  : Equality.axiom (unop__eqb ) :=
+eq_dec_Equality_axiom (unop_ ) (unop__eq_dec ).
+
+Canonical Structure unop__eqMixin  := EqMixin (equnop_P ).
+Canonical Structure unop__eqType  :=
+Eval hnf in EqType (unop_ ) (unop__eqMixin ).
 
 (* Family Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:148.1-148.23 *)
 Inductive binop___inn  : Type :=
@@ -593,7 +835,20 @@ Definition list__binop___inn  := (list (binop___inn )).
 
 Definition option__binop___inn  := (option (binop___inn )).
 
-Global Instance Inhabited__binop___inn : Inhabited (binop___inn) := { default_val := binop___inn__ADD  }.
+Global Instance Inhabited__binop___inn  : Inhabited (binop___inn ) := { default_val := binop___inn__ADD   }.
+
+Definition binop___inn_eq_dec : forall  (v1 v2 : binop___inn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition binop___inn_eqb  (v1 v2 : binop___inn ) : bool :=
+binop___inn_eq_dec  v1 v2.
+Definition eqbinop___innP  : Equality.axiom (binop___inn_eqb ) :=
+eq_dec_Equality_axiom (binop___inn ) (binop___inn_eq_dec ).
+
+Canonical Structure binop___inn_eqMixin  := EqMixin (eqbinop___innP ).
+Canonical Structure binop___inn_eqType  :=
+Eval hnf in EqType (binop___inn ) (binop___inn_eqMixin ).
 
 Inductive binop___fnn  : Type :=
 	| binop___fnn__ADD  : binop___fnn 
@@ -608,7 +863,20 @@ Definition list__binop___fnn  := (list (binop___fnn )).
 
 Definition option__binop___fnn  := (option (binop___fnn )).
 
-Global Instance Inhabited__binop___fnn : Inhabited (binop___fnn) := { default_val := binop___fnn__ADD  }.
+Global Instance Inhabited__binop___fnn  : Inhabited (binop___fnn ) := { default_val := binop___fnn__ADD   }.
+
+Definition binop___fnn_eq_dec : forall  (v1 v2 : binop___fnn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition binop___fnn_eqb  (v1 v2 : binop___fnn ) : bool :=
+binop___fnn_eq_dec  v1 v2.
+Definition eqbinop___fnnP  : Equality.axiom (binop___fnn_eqb ) :=
+eq_dec_Equality_axiom (binop___fnn ) (binop___fnn_eq_dec ).
+
+Canonical Structure binop___fnn_eqMixin  := EqMixin (eqbinop___fnnP ).
+Canonical Structure binop___fnn_eqType  :=
+Eval hnf in EqType (binop___fnn ) (binop___fnn_eqMixin ).
 
 Inductive binop_  : Type :=
 	| binop___inn__entry (arg : binop___inn) : binop_ 
@@ -618,7 +886,20 @@ Definition list__binop_  := (list (binop_ )).
 
 Definition option__binop_  := (option (binop_ )).
 
-Global Instance Inhabited__binop_ : Inhabited (binop_) := { default_val := binop___inn__entry default_val }.
+Global Instance Inhabited__binop_  : Inhabited (binop_ ) := { default_val := binop___inn__entry  default_val }.
+
+Definition binop__eq_dec : forall  (v1 v2 : binop_ ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition binop__eqb  (v1 v2 : binop_ ) : bool :=
+binop__eq_dec  v1 v2.
+Definition eqbinop_P  : Equality.axiom (binop__eqb ) :=
+eq_dec_Equality_axiom (binop_ ) (binop__eq_dec ).
+
+Canonical Structure binop__eqMixin  := EqMixin (eqbinop_P ).
+Canonical Structure binop__eqType  :=
+Eval hnf in EqType (binop_ ) (binop__eqMixin ).
 
 (* Family Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:155.1-155.24 *)
 Inductive testop___inn  : Type :=
@@ -628,7 +909,20 @@ Definition list__testop___inn  := (list (testop___inn )).
 
 Definition option__testop___inn  := (option (testop___inn )).
 
-Global Instance Inhabited__testop___inn : Inhabited (testop___inn) := { default_val := testop___inn__EQZ  }.
+Global Instance Inhabited__testop___inn  : Inhabited (testop___inn ) := { default_val := testop___inn__EQZ   }.
+
+Definition testop___inn_eq_dec : forall  (v1 v2 : testop___inn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition testop___inn_eqb  (v1 v2 : testop___inn ) : bool :=
+testop___inn_eq_dec  v1 v2.
+Definition eqtestop___innP  : Equality.axiom (testop___inn_eqb ) :=
+eq_dec_Equality_axiom (testop___inn ) (testop___inn_eq_dec ).
+
+Canonical Structure testop___inn_eqMixin  := EqMixin (eqtestop___innP ).
+Canonical Structure testop___inn_eqType  :=
+Eval hnf in EqType (testop___inn ) (testop___inn_eqMixin ).
 
 Inductive testop___fnn  : Type :=
 	.
@@ -637,7 +931,7 @@ Definition list__testop___fnn  := (list (testop___fnn )).
 
 Definition option__testop___fnn  := (option (testop___fnn )).
 
-Global Instance Inhabited__testop___fnn : Inhabited (testop___fnn)(* FIXME: no inhabitant found! *) .
+Global Instance Inhabited__testop___fnn  : Inhabited (testop___fnn )(* FIXME: no inhabitant found! *) .
 	Admitted.
 
 Inductive testop_  : Type :=
@@ -648,7 +942,20 @@ Definition list__testop_  := (list (testop_ )).
 
 Definition option__testop_  := (option (testop_ )).
 
-Global Instance Inhabited__testop_ : Inhabited (testop_) := { default_val := testop___inn__entry default_val }.
+Global Instance Inhabited__testop_  : Inhabited (testop_ ) := { default_val := testop___inn__entry  default_val }.
+
+Definition testop__eq_dec : forall  (v1 v2 : testop_ ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition testop__eqb  (v1 v2 : testop_ ) : bool :=
+testop__eq_dec  v1 v2.
+Definition eqtestop_P  : Equality.axiom (testop__eqb ) :=
+eq_dec_Equality_axiom (testop_ ) (testop__eq_dec ).
+
+Canonical Structure testop__eqMixin  := EqMixin (eqtestop_P ).
+Canonical Structure testop__eqType  :=
+Eval hnf in EqType (testop_ ) (testop__eqMixin ).
 
 (* Family Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:159.1-159.23 *)
 Inductive relop___inn  : Type :=
@@ -663,7 +970,20 @@ Definition list__relop___inn  := (list (relop___inn )).
 
 Definition option__relop___inn  := (option (relop___inn )).
 
-Global Instance Inhabited__relop___inn : Inhabited (relop___inn) := { default_val := relop___inn__EQ  }.
+Global Instance Inhabited__relop___inn  : Inhabited (relop___inn ) := { default_val := relop___inn__EQ   }.
+
+Definition relop___inn_eq_dec : forall  (v1 v2 : relop___inn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition relop___inn_eqb  (v1 v2 : relop___inn ) : bool :=
+relop___inn_eq_dec  v1 v2.
+Definition eqrelop___innP  : Equality.axiom (relop___inn_eqb ) :=
+eq_dec_Equality_axiom (relop___inn ) (relop___inn_eq_dec ).
+
+Canonical Structure relop___inn_eqMixin  := EqMixin (eqrelop___innP ).
+Canonical Structure relop___inn_eqType  :=
+Eval hnf in EqType (relop___inn ) (relop___inn_eqMixin ).
 
 Inductive relop___fnn  : Type :=
 	| relop___fnn__EQ  : relop___fnn 
@@ -677,7 +997,20 @@ Definition list__relop___fnn  := (list (relop___fnn )).
 
 Definition option__relop___fnn  := (option (relop___fnn )).
 
-Global Instance Inhabited__relop___fnn : Inhabited (relop___fnn) := { default_val := relop___fnn__EQ  }.
+Global Instance Inhabited__relop___fnn  : Inhabited (relop___fnn ) := { default_val := relop___fnn__EQ   }.
+
+Definition relop___fnn_eq_dec : forall  (v1 v2 : relop___fnn ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition relop___fnn_eqb  (v1 v2 : relop___fnn ) : bool :=
+relop___fnn_eq_dec  v1 v2.
+Definition eqrelop___fnnP  : Equality.axiom (relop___fnn_eqb ) :=
+eq_dec_Equality_axiom (relop___fnn ) (relop___fnn_eq_dec ).
+
+Canonical Structure relop___fnn_eqMixin  := EqMixin (eqrelop___fnnP ).
+Canonical Structure relop___fnn_eqType  :=
+Eval hnf in EqType (relop___fnn ) (relop___fnn_eqMixin ).
 
 Inductive relop_  : Type :=
 	| relop___inn__entry (arg : relop___inn) : relop_ 
@@ -687,7 +1020,20 @@ Definition list__relop_  := (list (relop_ )).
 
 Definition option__relop_  := (option (relop_ )).
 
-Global Instance Inhabited__relop_ : Inhabited (relop_) := { default_val := relop___inn__entry default_val }.
+Global Instance Inhabited__relop_  : Inhabited (relop_ ) := { default_val := relop___inn__entry  default_val }.
+
+Definition relop__eq_dec : forall  (v1 v2 : relop_ ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition relop__eqb  (v1 v2 : relop_ ) : bool :=
+relop__eq_dec  v1 v2.
+Definition eqrelop_P  : Equality.axiom (relop__eqb ) :=
+eq_dec_Equality_axiom (relop_ ) (relop__eq_dec ).
+
+Canonical Structure relop__eqMixin  := EqMixin (eqrelop_P ).
+Canonical Structure relop__eqType  :=
+Eval hnf in EqType (relop_ ) (relop__eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:167.1-167.37 *)
 Inductive cvtop  : Type :=
@@ -698,7 +1044,20 @@ Definition list__cvtop  := (list (cvtop )).
 
 Definition option__cvtop  := (option (cvtop )).
 
-Global Instance Inhabited__cvtop : Inhabited (cvtop) := { default_val := cvtop__CONVERT  }.
+Global Instance Inhabited__cvtop  : Inhabited (cvtop ) := { default_val := cvtop__CONVERT   }.
+
+Definition cvtop_eq_dec : forall  (v1 v2 : cvtop ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition cvtop_eqb  (v1 v2 : cvtop ) : bool :=
+cvtop_eq_dec  v1 v2.
+Definition eqcvtopP  : Equality.axiom (cvtop_eqb ) :=
+eq_dec_Equality_axiom (cvtop ) (cvtop_eq_dec ).
+
+Canonical Structure cvtop_eqMixin  := EqMixin (eqcvtopP ).
+Canonical Structure cvtop_eqType  :=
+Eval hnf in EqType (cvtop ) (cvtop_eqMixin ).
 
 (* Record Creation Definition at: spec/wasm-1.0-test/1-syntax.watsup:170.1-170.68 *)
 Record memop := mkmemop
@@ -740,7 +1099,20 @@ Definition list__packsize  := (list (packsize )).
 
 Definition option__packsize  := (option (packsize )).
 
-Global Instance Inhabited__packsize : Inhabited (packsize) := { default_val := packsize__ default_val }.
+Global Instance Inhabited__packsize  : Inhabited (packsize ) := { default_val := packsize__  default_val }.
+
+Definition packsize_eq_dec : forall  (v1 v2 : packsize ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition packsize_eqb  (v1 v2 : packsize ) : bool :=
+packsize_eq_dec  v1 v2.
+Definition eqpacksizeP  : Equality.axiom (packsize_eqb ) :=
+eq_dec_Equality_axiom (packsize ) (packsize_eq_dec ).
+
+Canonical Structure packsize_eqMixin  := EqMixin (eqpacksizeP ).
+Canonical Structure packsize_eqType  :=
+Eval hnf in EqType (packsize ) (packsize_eqMixin ).
 
 (* Notation Definition at: spec/wasm-1.0-test/1-syntax.watsup:228.1-228.34 *)
 Notation ww := packsize.
@@ -785,7 +1157,20 @@ Definition list__instr  := (list (instr )).
 
 Definition option__instr  := (option (instr )).
 
-Global Instance Inhabited__instr : Inhabited (instr) := { default_val := instr__NOP  }.
+Global Instance Inhabited__instr  : Inhabited (instr ) := { default_val := instr__NOP   }.
+
+Definition instr_eq_dec : forall  (v1 v2 : instr ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition instr_eqb  (v1 v2 : instr ) : bool :=
+instr_eq_dec  v1 v2.
+Definition eqinstrP  : Equality.axiom (instr_eqb ) :=
+eq_dec_Equality_axiom (instr ) (instr_eq_dec ).
+
+Canonical Structure instr_eqMixin  := EqMixin (eqinstrP ).
+Canonical Structure instr_eqType  :=
+Eval hnf in EqType (instr ) (instr_eqMixin ).
 
 (* Type Alias Definition at: spec/wasm-1.0-test/1-syntax.watsup:238.1-239.9 *)
 Definition expr  := (list instr).
@@ -802,7 +1187,20 @@ Definition list__type  := (list (type )).
 
 Definition option__type  := (option (type )).
 
-Global Instance Inhabited__type : Inhabited (type) := { default_val := type__TYPE default_val }.
+Global Instance Inhabited__type  : Inhabited (type ) := { default_val := type__TYPE  default_val }.
+
+Definition type_eq_dec : forall  (v1 v2 : type ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition type_eqb  (v1 v2 : type ) : bool :=
+type_eq_dec  v1 v2.
+Definition eqtypeP  : Equality.axiom (type_eqb ) :=
+eq_dec_Equality_axiom (type ) (type_eq_dec ).
+
+Canonical Structure type_eqMixin  := EqMixin (eqtypeP ).
+Canonical Structure type_eqType  :=
+Eval hnf in EqType (type ) (type_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:251.1-252.16 *)
 Inductive local  : Type :=
@@ -812,7 +1210,20 @@ Definition list__local  := (list (local )).
 
 Definition option__local  := (option (local )).
 
-Global Instance Inhabited__local : Inhabited (local) := { default_val := local__LOCAL default_val }.
+Global Instance Inhabited__local  : Inhabited (local ) := { default_val := local__LOCAL  default_val }.
+
+Definition local_eq_dec : forall  (v1 v2 : local ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition local_eqb  (v1 v2 : local ) : bool :=
+local_eq_dec  v1 v2.
+Definition eqlocalP  : Equality.axiom (local_eqb ) :=
+eq_dec_Equality_axiom (local ) (local_eq_dec ).
+
+Canonical Structure local_eqMixin  := EqMixin (eqlocalP ).
+Canonical Structure local_eqType  :=
+Eval hnf in EqType (local ) (local_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:253.1-254.27 *)
 Inductive func  : Type :=
@@ -822,7 +1233,20 @@ Definition list__func  := (list (func )).
 
 Definition option__func  := (option (func )).
 
-Global Instance Inhabited__func : Inhabited (func) := { default_val := func__FUNC default_val default_val default_val }.
+Global Instance Inhabited__func  : Inhabited (func ) := { default_val := func__FUNC  default_val default_val default_val }.
+
+Definition func_eq_dec : forall  (v1 v2 : func ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition func_eqb  (v1 v2 : func ) : bool :=
+func_eq_dec  v1 v2.
+Definition eqfuncP  : Equality.axiom (func_eqb ) :=
+eq_dec_Equality_axiom (func ) (func_eq_dec ).
+
+Canonical Structure func_eqMixin  := EqMixin (eqfuncP ).
+Canonical Structure func_eqType  :=
+Eval hnf in EqType (func ) (func_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:255.1-256.25 *)
 Inductive global  : Type :=
@@ -832,7 +1256,20 @@ Definition list__global  := (list (global )).
 
 Definition option__global  := (option (global )).
 
-Global Instance Inhabited__global : Inhabited (global) := { default_val := global__GLOBAL default_val default_val }.
+Global Instance Inhabited__global  : Inhabited (global ) := { default_val := global__GLOBAL  default_val default_val }.
+
+Definition global_eq_dec : forall  (v1 v2 : global ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition global_eqb  (v1 v2 : global ) : bool :=
+global_eq_dec  v1 v2.
+Definition eqglobalP  : Equality.axiom (global_eqb ) :=
+eq_dec_Equality_axiom (global ) (global_eq_dec ).
+
+Canonical Structure global_eqMixin  := EqMixin (eqglobalP ).
+Canonical Structure global_eqType  :=
+Eval hnf in EqType (global ) (global_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:257.1-258.18 *)
 Inductive table  : Type :=
@@ -842,7 +1279,20 @@ Definition list__table  := (list (table )).
 
 Definition option__table  := (option (table )).
 
-Global Instance Inhabited__table : Inhabited (table) := { default_val := table__TABLE default_val }.
+Global Instance Inhabited__table  : Inhabited (table ) := { default_val := table__TABLE  default_val }.
+
+Definition table_eq_dec : forall  (v1 v2 : table ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition table_eqb  (v1 v2 : table ) : bool :=
+table_eq_dec  v1 v2.
+Definition eqtableP  : Equality.axiom (table_eqb ) :=
+eq_dec_Equality_axiom (table ) (table_eq_dec ).
+
+Canonical Structure table_eqMixin  := EqMixin (eqtableP ).
+Canonical Structure table_eqType  :=
+Eval hnf in EqType (table ) (table_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:259.1-260.17 *)
 Inductive mem  : Type :=
@@ -852,7 +1302,20 @@ Definition list__mem  := (list (mem )).
 
 Definition option__mem  := (option (mem )).
 
-Global Instance Inhabited__mem : Inhabited (mem) := { default_val := mem__MEMORY default_val }.
+Global Instance Inhabited__mem  : Inhabited (mem ) := { default_val := mem__MEMORY  default_val }.
+
+Definition mem_eq_dec : forall  (v1 v2 : mem ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition mem_eqb  (v1 v2 : mem ) : bool :=
+mem_eq_dec  v1 v2.
+Definition eqmemP  : Equality.axiom (mem_eqb ) :=
+eq_dec_Equality_axiom (mem ) (mem_eq_dec ).
+
+Canonical Structure mem_eqMixin  := EqMixin (eqmemP ).
+Canonical Structure mem_eqType  :=
+Eval hnf in EqType (mem ) (mem_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:261.1-262.21 *)
 Inductive elem  : Type :=
@@ -862,7 +1325,20 @@ Definition list__elem  := (list (elem )).
 
 Definition option__elem  := (option (elem )).
 
-Global Instance Inhabited__elem : Inhabited (elem) := { default_val := elem__ELEM default_val default_val }.
+Global Instance Inhabited__elem  : Inhabited (elem ) := { default_val := elem__ELEM  default_val default_val }.
+
+Definition elem_eq_dec : forall  (v1 v2 : elem ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition elem_eqb  (v1 v2 : elem ) : bool :=
+elem_eq_dec  v1 v2.
+Definition eqelemP  : Equality.axiom (elem_eqb ) :=
+eq_dec_Equality_axiom (elem ) (elem_eq_dec ).
+
+Canonical Structure elem_eqMixin  := EqMixin (eqelemP ).
+Canonical Structure elem_eqType  :=
+Eval hnf in EqType (elem ) (elem_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:263.1-264.18 *)
 Inductive data  : Type :=
@@ -872,7 +1348,20 @@ Definition list__data  := (list (data )).
 
 Definition option__data  := (option (data )).
 
-Global Instance Inhabited__data : Inhabited (data) := { default_val := data__DATA default_val default_val }.
+Global Instance Inhabited__data  : Inhabited (data ) := { default_val := data__DATA  default_val default_val }.
+
+Definition data_eq_dec : forall  (v1 v2 : data ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition data_eqb  (v1 v2 : data ) : bool :=
+data_eq_dec  v1 v2.
+Definition eqdataP  : Equality.axiom (data_eqb ) :=
+eq_dec_Equality_axiom (data ) (data_eq_dec ).
+
+Canonical Structure data_eqMixin  := EqMixin (eqdataP ).
+Canonical Structure data_eqType  :=
+Eval hnf in EqType (data ) (data_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:265.1-266.16 *)
 Inductive start  : Type :=
@@ -882,7 +1371,20 @@ Definition list__start  := (list (start )).
 
 Definition option__start  := (option (start )).
 
-Global Instance Inhabited__start : Inhabited (start) := { default_val := start__START default_val }.
+Global Instance Inhabited__start  : Inhabited (start ) := { default_val := start__START  default_val }.
+
+Definition start_eq_dec : forall  (v1 v2 : start ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition start_eqb  (v1 v2 : start ) : bool :=
+start_eq_dec  v1 v2.
+Definition eqstartP  : Equality.axiom (start_eqb ) :=
+eq_dec_Equality_axiom (start ) (start_eq_dec ).
+
+Canonical Structure start_eqMixin  := EqMixin (eqstartP ).
+Canonical Structure start_eqType  :=
+Eval hnf in EqType (start ) (start_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:268.1-269.66 *)
 Inductive externidx  : Type :=
@@ -895,7 +1397,20 @@ Definition list__externidx  := (list (externidx )).
 
 Definition option__externidx  := (option (externidx )).
 
-Global Instance Inhabited__externidx : Inhabited (externidx) := { default_val := externidx__FUNC default_val }.
+Global Instance Inhabited__externidx  : Inhabited (externidx ) := { default_val := externidx__FUNC  default_val }.
+
+Definition externidx_eq_dec : forall  (v1 v2 : externidx ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition externidx_eqb  (v1 v2 : externidx ) : bool :=
+externidx_eq_dec  v1 v2.
+Definition eqexternidxP  : Equality.axiom (externidx_eqb ) :=
+eq_dec_Equality_axiom (externidx ) (externidx_eq_dec ).
+
+Canonical Structure externidx_eqMixin  := EqMixin (eqexternidxP ).
+Canonical Structure externidx_eqType  :=
+Eval hnf in EqType (externidx ) (externidx_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:270.1-271.24 *)
 Inductive export  : Type :=
@@ -905,7 +1420,20 @@ Definition list__export  := (list (export )).
 
 Definition option__export  := (option (export )).
 
-Global Instance Inhabited__export : Inhabited (export) := { default_val := export__EXPORT default_val default_val }.
+Global Instance Inhabited__export  : Inhabited (export ) := { default_val := export__EXPORT  default_val default_val }.
+
+Definition export_eq_dec : forall  (v1 v2 : export ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition export_eqb  (v1 v2 : export ) : bool :=
+export_eq_dec  v1 v2.
+Definition eqexportP  : Equality.axiom (export_eqb ) :=
+eq_dec_Equality_axiom (export ) (export_eq_dec ).
+
+Canonical Structure export_eqMixin  := EqMixin (eqexportP ).
+Canonical Structure export_eqType  :=
+Eval hnf in EqType (export ) (export_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:272.1-273.30 *)
 Inductive import  : Type :=
@@ -915,7 +1443,20 @@ Definition list__import  := (list (import )).
 
 Definition option__import  := (option (import )).
 
-Global Instance Inhabited__import : Inhabited (import) := { default_val := import__IMPORT default_val default_val default_val }.
+Global Instance Inhabited__import  : Inhabited (import ) := { default_val := import__IMPORT  default_val default_val default_val }.
+
+Definition import_eq_dec : forall  (v1 v2 : import ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition import_eqb  (v1 v2 : import ) : bool :=
+import_eq_dec  v1 v2.
+Definition eqimportP  : Equality.axiom (import_eqb ) :=
+eq_dec_Equality_axiom (import ) (import_eq_dec ).
+
+Canonical Structure import_eqMixin  := EqMixin (eqimportP ).
+Canonical Structure import_eqType  :=
+Eval hnf in EqType (import ) (import_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/1-syntax.watsup:275.1-276.76 *)
 Inductive module  : Type :=
@@ -925,7 +1466,20 @@ Definition list__module  := (list (module )).
 
 Definition option__module  := (option (module )).
 
-Global Instance Inhabited__module : Inhabited (module) := { default_val := module__MODULE default_val default_val default_val default_val default_val default_val default_val default_val default_val default_val }.
+Global Instance Inhabited__module  : Inhabited (module ) := { default_val := module__MODULE  default_val default_val default_val default_val default_val default_val default_val default_val default_val default_val }.
+
+Definition module_eq_dec : forall  (v1 v2 : module ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition module_eqb  (v1 v2 : module ) : bool :=
+module_eq_dec  v1 v2.
+Definition eqmoduleP  : Equality.axiom (module_eqb ) :=
+eq_dec_Equality_axiom (module ) (module_eq_dec ).
+
+Canonical Structure module_eqMixin  := EqMixin (eqmoduleP ).
+Canonical Structure module_eqType  :=
+Eval hnf in EqType (module ) (module_eqMixin ).
 
 (* Mutual Recursion at: spec/wasm-1.0-test/2-syntax-aux.watsup:20.1-20.64 *)
 (* Auxiliary Definition at: spec/wasm-1.0-test/2-syntax-aux.watsup:20.1-20.64 *)
@@ -1260,7 +1814,20 @@ Definition list__val  := (list (val )).
 
 Definition option__val  := (option (val )).
 
-Global Instance Inhabited__val : Inhabited (val) := { default_val := val__CONST default_val default_val }.
+Global Instance Inhabited__val  : Inhabited (val ) := { default_val := val__CONST  default_val default_val }.
+
+Definition val_eq_dec : forall  (v1 v2 : val ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition val_eqb  (v1 v2 : val ) : bool :=
+val_eq_dec  v1 v2.
+Definition eqvalP  : Equality.axiom (val_eqb ) :=
+eq_dec_Equality_axiom (val ) (val_eq_dec ).
+
+Canonical Structure val_eqMixin  := EqMixin (eqvalP ).
+Canonical Structure val_eqType  :=
+Eval hnf in EqType (val ) (val_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:27.1-28.22 *)
 Inductive result  : Type :=
@@ -1271,7 +1838,20 @@ Definition list__result  := (list (result )).
 
 Definition option__result  := (option (result )).
 
-Global Instance Inhabited__result : Inhabited (result) := { default_val := result___VALS default_val }.
+Global Instance Inhabited__result  : Inhabited (result ) := { default_val := result___VALS  default_val }.
+
+Definition result_eq_dec : forall  (v1 v2 : result ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition result_eqb  (v1 v2 : result ) : bool :=
+result_eq_dec  v1 v2.
+Definition eqresultP  : Equality.axiom (result_eqb ) :=
+eq_dec_Equality_axiom (result ) (result_eq_dec ).
+
+Canonical Structure result_eqMixin  := EqMixin (eqresultP ).
+Canonical Structure result_eqType  :=
+Eval hnf in EqType (result ) (result_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:36.1-37.70 *)
 Inductive externval  : Type :=
@@ -1284,7 +1864,20 @@ Definition list__externval  := (list (externval )).
 
 Definition option__externval  := (option (externval )).
 
-Global Instance Inhabited__externval : Inhabited (externval) := { default_val := externval__FUNC default_val }.
+Global Instance Inhabited__externval  : Inhabited (externval ) := { default_val := externval__FUNC  default_val }.
+
+Definition externval_eq_dec : forall  (v1 v2 : externval ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition externval_eqb  (v1 v2 : externval ) : bool :=
+externval_eq_dec  v1 v2.
+Definition eqexternvalP  : Equality.axiom (externval_eqb ) :=
+eq_dec_Equality_axiom (externval ) (externval_eq_dec ).
+
+Canonical Structure externval_eqMixin  := EqMixin (eqexternvalP ).
+Canonical Structure externval_eqType  :=
+Eval hnf in EqType (externval ) (externval_eqMixin ).
 
 (* Record Creation Definition at: spec/wasm-1.0-test/4-runtime.watsup:61.1-63.22 *)
 Record exportinst := mkexportinst
@@ -1515,7 +2108,20 @@ Definition list__state  := (list (state )).
 
 Definition option__state  := (option (state )).
 
-Global Instance Inhabited__state : Inhabited (state) := { default_val := state__ default_val default_val }.
+Global Instance Inhabited__state  : Inhabited (state ) := { default_val := state__  default_val default_val }.
+
+Definition state_eq_dec : forall  (v1 v2 : state ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition state_eqb  (v1 v2 : state ) : bool :=
+state_eq_dec  v1 v2.
+Definition eqstateP  : Equality.axiom (state_eqb ) :=
+eq_dec_Equality_axiom (state ) (state_eq_dec ).
+
+Canonical Structure state_eqMixin  := EqMixin (eqstateP ).
+Canonical Structure state_eqType  :=
+Eval hnf in EqType (state ) (state_eqMixin ).
 
 (* Mutual Recursion at: spec/wasm-1.0-test/4-runtime.watsup:105.1-110.9 *)
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:105.1-110.9 *)
@@ -1557,7 +2163,20 @@ Definition list__admininstr  := (list (admininstr )).
 
 Definition option__admininstr  := (option (admininstr )).
 
-Global Instance Inhabited__admininstr : Inhabited (admininstr) := { default_val := admininstr__NOP  }.
+Global Instance Inhabited__admininstr  : Inhabited (admininstr ) := { default_val := admininstr__NOP   }.
+
+Definition admininstr_eq_dec : forall  (v1 v2 : admininstr ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition admininstr_eqb  (v1 v2 : admininstr ) : bool :=
+admininstr_eq_dec  v1 v2.
+Definition eqadmininstrP  : Equality.axiom (admininstr_eqb ) :=
+eq_dec_Equality_axiom (admininstr ) (admininstr_eq_dec ).
+
+Canonical Structure admininstr_eqMixin  := EqMixin (eqadmininstrP ).
+Canonical Structure admininstr_eqType  :=
+Eval hnf in EqType (admininstr ) (admininstr_eqMixin ).
 
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:94.1-94.62 *)
 Inductive config  : Type :=
@@ -1567,7 +2186,20 @@ Definition list__config  := (list (config )).
 
 Definition option__config  := (option (config )).
 
-Global Instance Inhabited__config : Inhabited (config) := { default_val := config__ default_val default_val }.
+Global Instance Inhabited__config  : Inhabited (config ) := { default_val := config__  default_val default_val }.
+
+Definition config_eq_dec : forall  (v1 v2 : config ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition config_eqb  (v1 v2 : config ) : bool :=
+config_eq_dec  v1 v2.
+Definition eqconfigP  : Equality.axiom (config_eqb ) :=
+eq_dec_Equality_axiom (config ) (config_eq_dec ).
+
+Canonical Structure config_eqMixin  := EqMixin (eqconfigP ).
+Canonical Structure config_eqType  :=
+Eval hnf in EqType (config ) (config_eqMixin ).
 
 (* Mutual Recursion at: spec/wasm-1.0-test/4-runtime.watsup:112.1-115.25 *)
 (* Inductive Type Definition at: spec/wasm-1.0-test/4-runtime.watsup:112.1-115.25 *)
@@ -1580,7 +2212,20 @@ Definition list__E  := (list (E )).
 
 Definition option__E  := (option (E )).
 
-Global Instance Inhabited__E : Inhabited (E) := { default_val := E___HOLE_  }.
+Global Instance Inhabited__E  : Inhabited (E ) := { default_val := E___HOLE_   }.
+
+Definition E_eq_dec : forall  (v1 v2 : E ),
+{v1 = v2} + {v1 <> v2}.
+Proof. Admitted.
+
+Definition E_eqb  (v1 v2 : E ) : bool :=
+E_eq_dec  v1 v2.
+Definition eqEP  : Equality.axiom (E_eqb ) :=
+eq_dec_Equality_axiom (E ) (E_eq_dec ).
+
+Canonical Structure E_eqMixin  := EqMixin (eqEP ).
+Canonical Structure E_eqType  :=
+Eval hnf in EqType (E ) (E_eqMixin ).
 
 (* Auxiliary Definition at: spec/wasm-1.0-test/5-runtime-aux.watsup:7.1-7.29 *)
 Definition fun_default_ (v_valtype_0 : valtype) : val :=

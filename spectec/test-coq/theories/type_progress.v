@@ -355,47 +355,7 @@ Ltac invert_typeof_vcs :=
     case: vcs H => [| v1 vcs1] H //=
   end.
 
-Definition option_eq_dec (A: Type) (eqA: forall (x y: A), {x=y} + {x<>y}):
-  forall (x y: option A), {x=y} + {x<>y}.
-Admitted.
-
-Ltac decidable_equality_step :=
-  first [
-      by apply: eq_comparable
-    | apply: List.list_eq_dec
-    | apply: option_eq_dec
-    | apply: PeanoNat.Nat.eq_dec
-    | by eauto
-    | intros; apply: decP; by (exact _ || eauto)
-    | decide equality ].
-
-(** Solve a goal of the form [forall a1 a2, {a1 = a2} + {a1 <> a2}]. **)
-Ltac decidable_equality :=
-  repeat decidable_equality_step.
-
-Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),
-  let eqb v1 v2 := is_left (eq_dec v1 v2) in
-  Equality.axiom eqb.
-Proof.
-  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).
-  - move=> E. by apply/ReflectT.
-  - move=> E. by apply/ReflectF.
-Qed.
-
-(* TODO: Auto-generate these instances for each type *)
-Definition functype_eq_dec : forall tf1 tf2 : functype,
-  {tf1 = tf2} + {tf1 <> tf2}.
-Proof. decidable_equality. Defined.
-
-Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
-Definition eqfunctypeP : Equality.axiom functype_eqb :=
-  eq_dec_Equality_axiom functype functype_eq_dec.
-
-Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
-Canonical Structure functype_eqType :=
-  Eval hnf in EqType functype functype_eqMixin.
-
-Definition instr_eq_dec : forall be1 be2 : instr,
+(* Definition instr_eq_dec : forall be1 be2 : instr,
   {be1 = be2} + {be1 <> be2}.
 Proof.
   destruct be1, be2; try by [left | right].
@@ -403,6 +363,14 @@ Proof.
            between instr and seq instr  *)
   (* timeout 1 decidable_equality. *)
 Admitted.
+
+Definition instr_eqb v1 v2 : bool := instr_eq_dec v1 v2.
+Definition eqinstrP : Equality.axiom instr_eqb :=
+  eq_dec_Equality_axiom instr instr_eq_dec.
+
+Canonical Structure instr_eqMixin := EqMixin eqinstrP.
+Canonical Structure instr_eqType :=
+  Eval hnf in EqType instr instr_eqMixin.
 
 Definition admininstr_eq_dec : forall e1 e2 : admininstr,
   {e1 = e2} + {e1 <> e2}.
@@ -419,7 +387,7 @@ Definition eqadmininstrP : Equality.axiom admininstr_eqb :=
 
 Canonical Structure admininstr_eqMixin := EqMixin eqadmininstrP.
 Canonical Structure admininstr_eqType :=
-  Eval hnf in EqType admininstr admininstr_eqMixin.
+  Eval hnf in EqType admininstr admininstr_eqMixin. *)
 
 (* NOTE: This is a temporary solution to ensure valtype matches corresponding val_
          There is no check that ensures valtype and val_ matches 
@@ -710,7 +678,7 @@ Lemma frame_t_context_local_types: forall s f C,
 Proof.
 	move => s i C Hframe.
   inversion Hframe as [? ? ? ? ? ? Hmod Hval].
-  inversion Hmod => //=. rewrite cat_app cats0.
+  inversion Hmod => //=. rewrite cats0.
   (* TODO: Use all2 instead *)
   by apply Forall2_Val_ok_is_same_as_map in Hval.
 Qed.
@@ -918,7 +886,7 @@ Proof.
       rewrite -Ec /= in Hlen.
       move/frame_t_context_label_empty: Hframe => Hlab.
       rewrite Hlab length_size /= in Hlen.
-      move/ltP: Hlen => Hlen. by rewrite ltn0 in Hlen.
+      by rewrite ltn0 in Hlen.
     + move => ts1' ts2' Hframe IH Ec Ee Etf.
       by apply: IH' => //=.
   - apply: IH. move => e Hin.
@@ -1297,7 +1265,7 @@ Proof.
     + exists s, f, (list__val__admininstr vcs').
       (* TODO: Can we get rid of these rewrites? *)
       have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
-      { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+      { move => vcs1 vcs2. rewrite /list__val__admininstr. by rewrite map_cat. }
       have -> : (list__val__admininstr vcs' ++ list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry 0)]) ++ [:: admininstr__BR_IF l] = list__val__admininstr vcs' ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry 0)] ++ [:: admininstr__BR_IF l]) ++ [::]. { by rewrite -2!catA cats0. }
       have {2}-> : list__val__admininstr vcs' = list__val__admininstr vcs' ++ [::] ++ [::]. { by rewrite 2!cats0. }
       (* TODO: This fails while vanilla tactic succeeds *)
@@ -1308,7 +1276,7 @@ Proof.
     + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR l]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
-      { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+      { move => vcs1 vcs2. rewrite /list__val__admininstr. by rewrite map_cat. }
       have -> : (list__val__admininstr vcs' ++ list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1'.+1)]) ++ [:: admininstr__BR_IF l] = list__val__admininstr vcs' ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1'.+1)] ++ [:: admininstr__BR_IF l]) ++ [::]. { by rewrite -2!catA cats0. }
       have -> : list__val__admininstr vcs' ++ [:: admininstr__BR l] = list__val__admininstr vcs' ++ [:: admininstr__BR l] ++ [::]. { by rewrite !cats0. }
       (* TODO: This fails while vanilla tactic succeeds *)
@@ -1330,7 +1298,7 @@ Proof.
     + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
-      { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+      { move => vcs1 vcs2. rewrite /list__val__admininstr. by rewrite map_cat. }
       rewrite -catA.
       have -> : forall es1 es2 es3, es1 ++ es2 ++ es3 = es1 ++ (es2 ++ es3) ++ [::]. { move => T es1 es2 es3. by rewrite -catA cats0. }
       have -> : list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)] = list__val__admininstr vcs' ++ [:: admininstr__BR (lookup_total ls v1)] ++ [::]. { by rewrite !cats0. }
@@ -1339,11 +1307,11 @@ Proof.
       apply Step__ctxt_seq.
       apply: Step__pure.
       apply: Step_pure__br_table_lt.
-      by rewrite length_size.
+      rewrite length_size. by apply/ltP.
     + exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__BR lN]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : forall vcs1 vcs2, list__val__admininstr (vcs1 ++ vcs2) = list__val__admininstr vcs1 ++ list__val__admininstr vcs2.
-      { move => vcs1 vcs2. rewrite /list__val__admininstr. rewrite !map_map. by rewrite map_cat. }
+      { move => vcs1 vcs2. rewrite /list__val__admininstr. by rewrite map_cat. }
       rewrite -catA.
       have -> : forall es1 es2 es3, es1 ++ es2 ++ es3 = es1 ++ (es2 ++ es3) ++ [::]. { move => T es1 es2 es3. by rewrite -catA cats0. }
       have -> : list__val__admininstr vcs' ++ [:: admininstr__BR lN] = list__val__admininstr vcs' ++ [:: admininstr__BR lN] ++ [::]. { by rewrite !cats0. }
@@ -1353,7 +1321,7 @@ Proof.
       apply: Step__pure.
       apply: Step_pure__br_table_ge.
       rewrite length_size.
-      move/ltP: Hv1 => Hv1. apply/leP.
+      move/ltP: Hv1 => Hv1. 
       by rewrite /ge leqNgt.
   - (* Instr_ok__call *)
     move => C x ts1 ts2 Haddr Hlookup.
@@ -1401,16 +1369,16 @@ Proof.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__CALL_ADDR a]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite map_cat. by []. }
       rewrite -[[:: admininstr__CALL_ADDR a]]cats0.
       apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]%list).
       apply: Step__read.
-      apply: Step_read__call_indirect_call => //=.
+      apply: Step_read__call_indirect_call => //=; by apply/ltP.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite map_cat. by []. }
       rewrite -[[:: admininstr__TRAP]]cats0.
       apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
@@ -1420,11 +1388,12 @@ Proof.
       inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
       rewrite E1 in E1'. inversion E1' as [E1''].
       rewrite -E1'' in E4'.
+      move/ltP: E4' => E4'.
       by move/E4: E4' => E4''.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite map_cat. by []. }
       rewrite -[[:: admininstr__TRAP]]cats0.
       apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
@@ -1432,11 +1401,12 @@ Proof.
       apply: Step_read__call_indirect_trap.
       move => Hcontra.
       inversion Hcontra as [[s' f'] i' x' a' E3' E4' E1' E2' [Hs' Hf' Hi' Hx']].
+      move/ltP: E3' => E3'.
       by move/E3: E3' => E3''.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite map_cat. by []. }
       rewrite -[[:: admininstr__TRAP]]cats0.
       apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
@@ -1450,7 +1420,7 @@ Proof.
     + exists s, f, (list__val__admininstr (take (size ts1) vcs) ++ [:: admininstr__TRAP]).
       (* TODO: Can we get rid of these rewrites? *)
       have -> : (list__val__admininstr (take (size ts1) vcs ++ [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)]) ++ [:: admininstr__CALL_INDIRECT x]) = (list__val__admininstr (take (size ts1) vcs) ++ (list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]) ++ [::]).
-      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite !map_map. rewrite map_cat. by []. }
+      { rewrite cats0 catA. rewrite /list__val__admininstr. rewrite map_cat. by []. }
       rewrite -[[:: admininstr__TRAP]]cats0.
       apply Step__ctxt_seq with
         (v_admininstr := list__val__admininstr [:: val__CONST (valtype__INN inn__I32) (val___inn__entry v1)] ++ [:: admininstr__CALL_INDIRECT x]).
@@ -1621,10 +1591,10 @@ Proof.
       move/(_ 0): Hext => Hext.
       rewrite Hmemaddrs in Hext.
       rewrite Hcontext -HC' /= in Hlen.
+      move/ltP: Hlen => Hlen.
       move/Hext: Hlen => {}Hext.
       inversion Hext as [| | ? ? ? ? ? Hlen' |].
-      rewrite Hs length_size /= in Hlen'.
-      by move/ltP: Hlen' => Hlen'. }
+      by rewrite Hs length_size /= in Hlen'. }
     have {}Hmem : Memory_instance_ok s (lookup_total meminsts addr) (lookup_total memts addr).
     { (* TODO: Use all2 instead *)
       move/Forall2_lookup: Hmem => [_ Hmem].
@@ -1657,8 +1627,7 @@ Proof.
     + exists s', f', [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (size (meminst__BYTES (fun_mem (state__ s f) 0)) / (64 * fun_Ki)%coq_nat))].
       rewrite -length_size -Estate.
       apply: Step__memory_grow_succeed.
-      apply: (growmemory__ meminst1 v1 meminst2 limn1 limm1 bs1 (limn1 + v1)) => //=.
-      by apply/leP.
+      by apply: (growmemory__ meminst1 v1 meminst2 limn1 limm1 bs1 (limn1 + v1)) => //=.
     + exists s, f, [:: admininstr__CONST (valtype__INN inn__I32) (val___inn__entry (fun_invsigned 32 (0 - 1)%coq_nat))].
       by apply: Step__memory_grow_fail.
   - (* Instr_ok__load *)
@@ -1672,8 +1641,7 @@ Proof.
     + (* NOTE: t of t.load is expected to be inn *)
       case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
       case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-      * move/ltP: Hcond => Hcond.
-        exists s, f, [:: admininstr__TRAP].
+      * exists s, f, [:: admininstr__TRAP].
         apply: Step__read.
         by apply: Step_read__load_pack_trap.
       * move/negbT: Hcond => Hcond.
@@ -1688,8 +1656,7 @@ Proof.
     + move/Hsize: En => Hcontra.
       by rewrite Esx in Hcontra.
     + case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-      * move/ltP: Hcond => Hcond.
-        exists s, f, [:: admininstr__TRAP].
+      * exists s, f, [:: admininstr__TRAP].
         apply: Step__read.
         by apply: Step_read__load_num_trap.
       * move/negbT: Hcond => Hcond.
@@ -1711,8 +1678,7 @@ Proof.
       * (* NOTE: t of t.store is expected to be inn *)
         case: Hinn => [Hcontra | ->] //=; first by rewrite En in Hcontra.
         case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + n' / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-        { move/ltP: Hcond => Hcond.
-          exists s, f, [:: admininstr__TRAP].
+        { exists s, f, [:: admininstr__TRAP].
           by apply: Step__store_pack_trap. }
         { set bs := fun_ibytes n' (fun_wrap (fun_size (valtype__INN inn)) n' v2).
           case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (n' / 8) bs) => [s' f'].
@@ -1720,8 +1686,7 @@ Proof.
           rewrite -Estate.
           by apply: Step__store_pack_val. }
       * case Hcond: (((v1 + memop__OFFSET memop)%coq_nat + fun_size t / 8)%coq_nat > size (meminst__BYTES (fun_mem (state__ s f) 0))).
-        { move/ltP: Hcond => Hcond.
-          exists s, f, [:: admininstr__TRAP].
+        { exists s, f, [:: admininstr__TRAP].
           by apply: Step__store_num_trap. }
         { set bs := fun_bytes t v2.
           case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
@@ -1736,8 +1701,9 @@ Proof.
         { move/ltP: Hcond => Hcond.
           exists s, f, [:: admininstr__TRAP].
           rewrite -Ht2 /= in Hcond *.
-          by apply: Step__store_num_trap. }
-        { set bs := fun_bytes t v2.
+          apply: Step__store_num_trap.
+          by move/ltP: Hcond => Hcond. }
+        { set bs := fun_bytes t (val___fnn__entry v2).
           case Estate: (fun_with_mem (state__ s f) 0 (v1 + memop__OFFSET memop)%coq_nat (fun_size t / 8) bs) => [s' f'].
           exists s', f', [::].
           rewrite -Estate /=.
