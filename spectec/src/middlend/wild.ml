@@ -173,6 +173,8 @@ and t_exp' env e : bind list * exp' =
     let iterexp', binds1' = under_iterexp iterexp binds1 in
     let binds2, iterexp'' = t_iterexp env iterexp' in
     binds1' @ binds2, IterE (e', iterexp'')
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_field env ((a, e) : expfield) =
   unary t_exp env e (fun e' -> (a, e'))

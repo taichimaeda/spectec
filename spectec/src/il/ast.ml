@@ -87,6 +87,9 @@ and exp' =
   | UnE of unop * exp            (* unop exp *)
   | BinE of binop * exp * exp    (* exp binop exp *)
   | CmpE of cmpop * exp * exp    (* exp cmpop exp *)
+  | RuleE of id * exp            (* relid : exp *)
+  | ForallE of arg list * exp    (* forall `(` arg* `)` exp *)
+  | ExistsE of arg list * exp    (* exists `(` arg* `)` exp *)
   | TupE of exp list             (* ( exp* ) *)
   | ProjE of exp * int           (* exp.i *)
   | CaseE of mixop * exp         (* atom exp? *)
@@ -141,6 +144,8 @@ and def' =
   | TypD of id * param list * inst list               (* syntax type (family) *)
   | RelD of id * mixop * typ * rule list              (* relation *)
   | DecD of id * param list * typ * clause list       (* definition *)
+  | ThmD of id * bind list * mixop * exp              (* theorem *)
+  | LemD of id * bind list * mixop * exp              (* lemma *)
   | RecD of def list                                  (* recursive *)
   | HintD of hintdef
 
@@ -169,6 +174,8 @@ and hintdef' =
   | TypH of id * hint list
   | RelH of id * hint list
   | DecH of id * hint list
+  | ThmH of id * hint list
+  | LemH of id * hint list
 
 and hint = {hintid : id; hintexp : string list}       (* hint *)
 

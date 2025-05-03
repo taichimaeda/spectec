@@ -161,6 +161,8 @@ and t_exp' env = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | CaseE (mixop, e) -> CaseE (mixop, t_exp env e)
   | SubE (e, t1, t2) -> SubE (e, t1, t2)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_iter env = function
   | ListN (e, id_opt) -> ListN (t_exp env e, id_opt)
@@ -240,6 +242,8 @@ let rec t_def' env = function
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, t_typ env typ, List.map (t_rule env) rules)
   | HintD _ as def -> def
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_def env (def : def) = { def with it = t_def' env def.it }
 

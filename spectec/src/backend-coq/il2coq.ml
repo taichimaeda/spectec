@@ -356,6 +356,8 @@ and transform_exp (exp : exp) =
         | _ -> exp1
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
+    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+    | _ -> failwith "unimplemented (lemmagen)"
 
 (* MEMO: This produces terms to be pattern matched against in match expressions
          which requires special handling in addition to transform_exp *)
@@ -650,7 +652,9 @@ let rec transform_def (d : def) : coq_def =
       )
     | (* MEMO: RecD groups mutually recursive defs *)
       RecD defs -> MutualRecD (List.map transform_def defs)
-    | HintD _ -> UnsupportedD "") $ d.at
+    | HintD _ -> UnsupportedD ""
+    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+    | _ -> failwith "unimplemented (lemmagen)") $ d.at
 
 let is_not_hintdef (d : def) : bool =
   match d.it with

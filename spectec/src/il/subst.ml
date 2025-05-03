@@ -122,6 +122,8 @@ and subst_exp s e =
   | CatE (e1, e2) -> CatE (subst_exp s e1, subst_exp s e2)
   | CaseE (op, e1) -> CaseE (op, subst_exp s e1)
   | SubE (e1, t1, t2) -> SubE (subst_exp s e1, subst_typ s t1, subst_typ s t2)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $$ e.at % subst_typ s e.note
 
 and subst_expfield s (atom, e) = (atom, subst_exp s e)

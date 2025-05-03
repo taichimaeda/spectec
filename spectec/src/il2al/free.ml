@@ -37,6 +37,8 @@ let rec free_exp ignore_listN e =
     let free1 = f e1 in
     let bound, free2 = fi iter in
     diff (union free1 free2) bound
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_expfield ignore_listN (_, e) = free_exp ignore_listN e
 

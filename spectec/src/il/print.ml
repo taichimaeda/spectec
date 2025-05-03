@@ -149,6 +149,8 @@ and string_of_exp e =
     string_of_mixop op ^ "_" ^ string_of_typ_name e.note ^ string_of_exp_args e1
   | SubE (e1, t1, t2) ->
     "(" ^ string_of_exp e1 ^ " : " ^ string_of_typ t1 ^ " <: " ^ string_of_typ t2 ^ ")"
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and string_of_exp_args e =
   match e.it with
@@ -274,6 +276,8 @@ let rec string_of_def ?(suppress_pos = false) d =
     pre ^ "rec {\n" ^ concat "" (List.map string_of_def ds) ^ "}" ^ "\n"
   | HintD _ ->
     ""
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 
 (* Scripts *)

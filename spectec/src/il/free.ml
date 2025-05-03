@@ -118,6 +118,8 @@ and free_exp e =
   | CallE (id, as1) -> free_defid id + free_args as1
   | IterE (e1, iter) -> free_exp e1 + free_iterexp iter
   | SubE (e1, t1, t2) -> free_exp e1 + free_typ t1 + free_typ t2
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_expfield (_, e) = free_exp e
 
@@ -199,6 +201,8 @@ let free_hintdef hd =
   | TypH (id, _) -> free_typid id
   | RelH (id, _) -> free_relid id
   | DecH (id, _) -> free_defid id
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let rec free_def d =
   match d.it with
@@ -209,6 +213,8 @@ let rec free_def d =
       + free_list free_clause clauses
   | RecD ds -> free_list free_def ds
   | HintD hd -> free_hintdef hd
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let rec bound_def d =
   match d.it with
@@ -217,3 +223,5 @@ let rec bound_def d =
   | DecD (id, _, _, _) -> free_defid id
   | RecD ds -> free_list bound_def ds
   | HintD _ -> empty
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"

@@ -106,6 +106,8 @@ let rec t_exp env e : prem list =
     t_iterexp env iterexp @
     let env' = env_under_iter env iterexp in
     List.map (fun pr -> IterPr (pr, iterexp) $ e.at) (t_exp env' e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_iterexp env (iter, _) = t_iter env iter
 

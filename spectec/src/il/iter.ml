@@ -133,6 +133,8 @@ and exp e =
   | CallE (x, as_) -> defid x; args as_
   | IterE (e1, it) -> exp e1; iterexp it
   | SubE (e1, t1, t2) -> exp e1; typ t1; typ t2
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and expfield (at, e) = atom at; exp e
 
@@ -187,6 +189,8 @@ let hintdef d =
   | TypH (x, hs) -> typid x; hints hs
   | RelH (x, hs) -> relid x; hints hs
   | DecH (x, hs) -> defid x; hints hs
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let inst i =
   match i.it with
@@ -208,4 +212,6 @@ let rec def d =
   | DecD (x, ps, t, clauses) -> defid x; params ps; typ t; list clause clauses
   | RecD ds -> list def ds
   | HintD hd -> hintdef hd
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 end
