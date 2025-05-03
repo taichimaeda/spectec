@@ -78,6 +78,7 @@ let atomid = upid
 let typid = loid
 let expid = loid
 let defid = id
+let thmid = id
 let metaid = id
 
 let symbol =
@@ -216,6 +217,7 @@ and token = parse
   | "rat" { RAT }
   | "real" { REAL }
   | "text" { TEXT }
+  | "prop" { PROP }
 
   | "syntax" { SYNTAX }
   | "grammar" { GRAMMAR }
@@ -223,6 +225,11 @@ and token = parse
   | "rule" { RULE }
   | "var" { VAR }
   | "def" { DEF }
+  | "theorem" { THEOREM }
+  | "lemma" { LEMMA }
+
+  | "forall (" { FORALL_SPACE_LPAREN }
+  | "exists (" { EXISTS_SPACE_LPAREN }
 
   | "if" { IF }
   | "otherwise" { OTHERWISE }

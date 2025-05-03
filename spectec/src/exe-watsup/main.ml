@@ -171,6 +171,10 @@ let () =
       Printf.printf "%s\n%!" (El.Print.string_of_script el);
     log "Elaboration...";
     let il, elab_env = Frontend.Elab.elab el in
+
+    (* TODO: (lemmagen) Remove the following line *)
+    let () = failwith "Successfully parsed DSL (lemmagen)" in
+
     if !print_elab_il || !print_all_il then print_il il;
     log "IL Validation...";
     Il.Valid.valid il;

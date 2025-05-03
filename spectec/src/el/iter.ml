@@ -108,6 +108,8 @@ and typ t =
   | SeqT ts -> list typ ts
   | InfixT (t1, at, t2) -> typ t1; atom at; typ t2
   | BrackT (at1, t1, at2) -> atom at1; typ t1; atom at2
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and typfield (at, (t, prs), hs) = atom at; typ t; prems prs; hints hs
 and typcase (at, (t, prs), hs) = atom at; typ t; prems prs; hints hs
@@ -143,6 +145,8 @@ and exp e =
   | AtomE at -> atom at
   | InfixE (e1, at1, e2) -> exp e1; atom at1; exp e2
   | BrackE (at1, e1, at2) -> atom at1; exp e1; atom at2
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and expfield (at, e) = atom at; exp e
 
@@ -220,6 +224,8 @@ let hintdef d =
   | RelH (x, hs) -> relid x; hints hs
   | VarH (x, hs) -> varid x; hints hs
   | DecH (x, hs) -> defid x; hints hs
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let def d =
   visit_def d;
@@ -234,6 +240,8 @@ let def d =
   | DecD (x, ps, t, hs) -> defid x; params ps; typ t; hints hs
   | DefD (x, as_, e, prs) -> defid x; args as_; exp e; prems prs
   | HintD hd -> hintdef hd
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 end
 
 
@@ -258,6 +266,8 @@ and clone_typ t =
   | InfixT (t1, atom, t2) -> InfixT (clone_typ t1, clone_atom atom, clone_typ t2)
   | BrackT (atom1, t1, atom2) -> BrackT (clone_atom atom1, clone_typ t1, clone_atom atom2)
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ t.at
 
 and clone_typcase (atom, (t, prs), hints) =
@@ -290,6 +300,8 @@ and clone_exp e =
   | TypE (e1, t) -> TypE (clone_exp e1, clone_typ t)
   | FuseE (e1, e2) -> FuseE (clone_exp e1, clone_exp e2)
   | UnparenE e1 -> UnparenE (clone_exp e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and clone_expfield (atom, e) = (clone_atom atom, clone_exp e)

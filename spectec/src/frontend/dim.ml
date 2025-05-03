@@ -121,6 +121,8 @@ and check_typ env ctx t =
   | InfixT (t1, _, t2) ->
     check_typ env ctx t1;
     check_typ env ctx t2
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_exp env ctx e =
   match e.it with
@@ -166,6 +168,8 @@ and check_exp env ctx e =
   | HoleE _
   | FuseE _
   | UnparenE _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_path env ctx p =
   match p.it with
@@ -277,6 +281,8 @@ let check_def d : env =
     iter_nl_list (check_prem env []) prems;
     check_env env
   | SepD | HintD _ -> Env.empty
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let check_typdef t prems : env =
   let env = ref Env.empty in

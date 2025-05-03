@@ -159,6 +159,8 @@ let env_hintdef env hd =
   | DecH (id, hints) ->
     env_hints "macro" env.macro_def id hints;
     env_hints "show" env.show_def id hints
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let env_atom env tid atom hints =
   env_hintdef env (AtomH (tid, atom, hints) $ atom.at)
@@ -266,6 +268,8 @@ let env_def env d : (id * typ list) list =
     env_hintdef env hd;
     []
   | RuleD _ | DefD _ | SepD -> []
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let env_hints_inherit env map tid tid' =
   List.iter (fun atom ->
@@ -556,6 +560,8 @@ and expand_exp env templ args i e =
     let e2' = expand_exp env templ args i e2 in
     FuseE (e1', e2')
   | UnparenE e1 -> UnparenE (expand_exp env templ args i e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and expand_expfield env templ args i (atom, e) =
@@ -1045,6 +1051,8 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | UnparenE ({it = ParenE (e1, _); _} | e1) -> render_exp env e1
   | HoleE `None -> ""
   | HoleE _ -> error e.at "misplaced hole"
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and render_exps sep env es =
   concat sep (List.filter ((<>) "") (List.map (render_exp env) es))
@@ -1382,6 +1390,8 @@ let rec render_defs env = function
       render_defs env ds'
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       failwith "render_defs"
+    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+    | _ -> failwith "unimplemented (lemmagen)"
 
 let render_def env d = render_defs env [d]
 
@@ -1451,3 +1461,5 @@ let rec render_script env = function
       render_script env ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       render_script env ds
+    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+    | _ -> failwith "unimplemented (lemmagen)"

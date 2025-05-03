@@ -619,6 +619,8 @@ and elab_typ env t : Il.typ =
     )
   | StrT _ | CaseT _ | ConT _ | RangeT _ | AtomT _ | SeqT _ | InfixT _ | BrackT _ ->
     error t.at "this type is only allowed in type definitions"
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and elab_typ_definition env tid t : Il.deftyp =
   assert (valid_tid tid);
@@ -1003,6 +1005,8 @@ and infer_exp' env e : Il.exp' * typ =
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 
 and elab_exp env e t : Il.exp =
@@ -1160,6 +1164,8 @@ and elab_exp' env e t : Il.exp' =
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and elab_expfields env tid efs tfs t0 at : Il.expfield list =
   Debug.(log_in_at "el.elab_expfields" at
@@ -1869,6 +1875,8 @@ let elab_hintdef _env hd : Il.def list =
     let _ = elab_atom atom id in []
   | GramH _ | VarH _ ->
     []
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 
 let infer_binds env env' dims dims' d : Il.bind list =
@@ -1993,6 +2001,8 @@ let elab_def env d : Il.def list =
     []
   | HintD hd ->
     elab_hintdef env hd
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let elab_gramdef env d =
   match d.it with

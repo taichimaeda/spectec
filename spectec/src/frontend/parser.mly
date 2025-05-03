@@ -64,11 +64,11 @@ type prec = Op | Seq | Post | Prim
 
 let prec_of_exp = function  (* as far as iteration is concerned *)
   | VarE _ | BoolE _ | NatE _ | TextE _ | EpsE | StrE _
-  | ParenE _ | TupE _ | BrackE _ | CallE _ | HoleE _ -> Prim
+  | ParenE _ | TupE _ | BrackE _ | CallE _ | HoleE _ | RuleE _   -> Prim
   | AtomE _ | IdxE _ | SliceE _ | UpdE _ | ExtE _ | DotE _ | IterE _ -> Post
   | SeqE _ -> Seq
   | UnE _ | BinE _ | CmpE _ | InfixE _ | LenE _ | SizeE _
-  | CommaE _ | CompE _ | TypE _ | FuseE _ | UnparenE _ -> Op
+  | CommaE _ | CompE _ | TypE _ | FuseE _ | UnparenE _ | ForallE _ | ExistsE _ -> Op
 
 (* Extra parentheses can be inserted to disambiguate the role of elements of
  * an iteration. For example, `( x* )` will be interpreted differently from `x*`
@@ -100,14 +100,14 @@ let is_typcase t =
   match t.it with
   | AtomT _ | InfixT _ | BrackT _ -> true
   | SeqT ({it = AtomT _; _}::_) -> true
-  | VarT _ | BoolT | NumT _ | TextT | TupT _ | SeqT _
+  | VarT _ | BoolT | NumT _ | TextT | PropT | TupT _ | SeqT _
   | ParenT _ | IterT _ -> false
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
 
 let rec is_typcon t =
   match t.it with
   | AtomT _ | InfixT _ | BrackT _ | SeqT _ -> true
-  | VarT _ | BoolT | NumT _ | TextT | TupT _ -> false
+  | VarT _ | BoolT | NumT _ | TextT | PropT | TupT _ -> false
   | ParenT t1 | IterT (t1, _) -> is_typcon t1
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
 
@@ -125,9 +125,10 @@ let rec is_typcon t =
 %token BOT TOP
 %token HOLE MULTIHOLE NOTHING FUSE FUSEFUSE
 %token<int> HOLEN
-%token BOOL NAT INT RAT REAL TEXT
-%token SYNTAX GRAMMAR RELATION RULE VAR DEF
+%token BOOL NAT INT RAT REAL TEXT PROP
+%token SYNTAX GRAMMAR RELATION RULE VAR DEF THEOREM LEMMA
 %token IF OTHERWISE HINT_LPAREN
+%token FORALL_SPACE_LPAREN EXISTS_SPACE_LPAREN
 %token EPS INFINITY
 %token<bool> BOOLLIT
 %token<Z.t> NATLIT HEXLIT CHARLIT
@@ -221,6 +222,7 @@ varid : LOID { $1 $ $sloc }
 defid : id { $1 $ $sloc } | IF { "if" $ $sloc }
 relid : id { $1 $ $sloc }
 gramid : id { $1 $ $sloc }
+thmid : id { $1 $ $sloc }
 hintid : id { $1 }
 fieldid : atomid_ { Il.Atom.Atom $1 $$ $sloc } | atom_escape { $1 $$ $sloc }
 dotid : DOTID { Il.Atom.Atom $1 $$ $sloc }
@@ -368,6 +370,7 @@ typ_prim_ :
   | RAT { NumT RatT }
   | REAL { NumT RealT }
   | TEXT { TextT }
+  | PROP { PropT }
 
 typ_post : typ_post_ { $1 $ $sloc }
 typ_post_ :
@@ -536,6 +539,8 @@ exp_prim_ :
     { BrackE (Il.Atom.LBrace $$ $loc($2), $3, Il.Atom.RBrace $$ $loc($4)) }
   | DOLLAR LPAREN arith RPAREN { $3.it }
   | FUSEFUSE exp_prim { UnparenE $2 }
+  // TODO: (lemmagen) Use thmid_lparen and RPAREN if this is ambiguous
+  | thmid COLON exp { RuleE ($1, $3) }
 
 exp_post : exp_post_ { $1 $ $sloc }
 exp_post_ :
@@ -570,6 +575,10 @@ exp_un_ :
   | BARBAR gramid BARBAR { SizeE $2 }
   | unop exp_un { UnE ($1, $2) }
   | infixop exp_un { InfixE (SeqE [] $ $loc($1), $1, $2) }
+  // TODO: (lemmagen) 
+  // forall/exists should probably have the same precedence as unop
+  | FORALL_SPACE_LPAREN comma_list(arg) RPAREN exp { ForallE ($2, $4)}
+  | EXISTS_SPACE_LPAREN comma_list(arg) RPAREN exp { ExistsE ($2, $4)}
 
 exp_bin : exp_bin_ { $1 $ $sloc }
 exp_bin_ :
@@ -798,6 +807,10 @@ def_ :
     { DefD ($3, [], $5, $6) }
   | DEF DOLLAR defid_lparen enter_scope comma_list(arg) RPAREN EQ exp prem_list exit_scope
     { DefD ($3, $5, $8, $9) }
+  | THEOREM thmid COLON exp hint*
+    { ThmD ($2, $4, $5) }
+  | LEMMA thmid COLON exp hint*
+    { LemD ($2, $4, $5) }
   | NL_NL_NL
     { SepD }
   | SYNTAX varid_bind ruleid_list hint*
@@ -820,6 +833,10 @@ def_ :
     { HintD (VarH ($2, $3) $ $sloc) }
   | DEF DOLLAR defid hint*
     { HintD (DecH ($3, $4) $ $sloc) }
+  | THEOREM thmid hint*
+    { HintD (ThmH ($2, $3) $ $sloc) }
+  | LEMMA thmid hint*
+    { HintD (LemH ($2, $3) $ $sloc) }
 
 ruleid_list :
   | (* empty *) { "" }

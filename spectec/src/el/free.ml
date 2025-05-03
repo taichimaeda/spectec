@@ -103,6 +103,8 @@ and free_typ t =
   | SeqT ts -> free_list free_typ ts
   | InfixT (t1, _, t2) -> free_typ t1 + free_typ t2
   | BrackT (_, t1, _) -> free_typ t1
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_typfield (_, (t, prems), _) = free_typ t + free_prems prems
 and free_typcase (_, (t, prems), _) = free_typ t + free_prems prems
@@ -139,6 +141,8 @@ and free_exp e =
   | CallE (id, as_) -> free_defid id + free_list free_arg as_
   | IterE (e1, iter) -> free_exp e1 + free_iter iter
   | TypE (e1, t) -> free_exp e1 + free_typ t
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_expfield (_, e) = free_exp e
 
@@ -174,6 +178,8 @@ and det_exp e =
   | IdxE _ | SliceE _ | UpdE _ | ExtE _ | CommaE _ | CompE _
   | DotE _ | LenE _ | SizeE _ -> idx_exp e
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and det_expfield (_, e) = det_exp e
 
@@ -329,6 +335,8 @@ let free_def d =
   | DefD (id, as_, e, prems) ->
     free_defid id + free_args as_ + free_exp e + free_prems prems
   | HintD _ -> empty
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let det_def d =
   match d.it with
@@ -336,3 +344,5 @@ let det_def d =
   | TypD (_id1, _id2, as_, _t, _hints) -> det_args as_
   | RuleD (_id1, _id2, e, prems) -> det_exp e + det_prems prems
   | DefD (_id, as_, e, prems) -> det_args as_ + idx_exp e + det_prems prems
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"

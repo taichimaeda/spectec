@@ -93,6 +93,8 @@ and subst_typ s t =
   | SeqT ts -> SeqT (subst_list subst_typ s ts)
   | InfixT (t1, op, t2) -> InfixT (subst_typ s t1, op, subst_typ s t2)
   | BrackT (l, t1, r) -> BrackT (l, subst_typ s t1, r)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ t.at
 
 and subst_typfield s (atom, (t, prems), hints) =
@@ -140,6 +142,8 @@ and subst_exp s e =
   | HoleE h -> HoleE h
   | FuseE (e1, e2) -> FuseE (subst_exp s e1, subst_exp s e2)
   | UnparenE e1 -> UnparenE (subst_exp s e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and subst_expfield s (atom, e) = (atom, subst_exp s e)

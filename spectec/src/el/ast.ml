@@ -43,6 +43,7 @@ and typ' =
   | BoolT                        (* `bool` *)
   | NumT of numtyp               (* numtyp *)
   | TextT                        (* `text` *)
+  | PropT                        (* `prop` *)
   | ParenT of typ                (* `(` typ `)` *)
   | TupT of typ list             (* `(` list2(typ, `,`) `)` *)
   | IterT of typ * iter          (* typ iter *)
@@ -107,6 +108,10 @@ and exp' =
   | UnE of unop * exp            (* unop exp *)
   | BinE of exp * binop * exp    (* exp binop exp *)
   | CmpE of exp * cmpop * exp    (* exp cmpop exp *)
+  (* TODO: (lemmagen) Does this conflict with TypE? *)
+  | RuleE of id * exp            (* relid : exp *)
+  | ForallE of arg list * exp    (* forall `(` arg* `)` exp *)
+  | ExistsE of arg list * exp    (* exists `(` arg* `)` exp *)
   | EpsE                         (* `eps` *)
   | SeqE of exp list             (* exp exp *)
   | IdxE of exp * exp            (* exp `[` exp `]` *)
@@ -190,12 +195,16 @@ and def' =
   | VarD of id * typ * hint list                   (* `var` varid `:` typ *)
   | DecD of id * param list * typ * hint list      (* `def` `$` defid params `:` typ hint* *)
   | DefD of id * arg list * exp * prem nl_list     (* `def` `$` defid args `=` exp (`--` prem)* *)
+  | ThmD of id * exp * hint list                   (* `theorem` thmid `:` exp hint* *)
+  | LemD of id * exp * hint list                   (* `lemma` thmid `:` exp hint* *)
   | SepD                                           (* separator *)
   | HintD of hintdef
 
 and prem = prem' phrase
 and prem' =
   | VarPr of id * typ                        (* `var` id `:` typ *)
+  (* TODO: (lemmagen) 
+     RulePr will likely be redundant with RuleE in exp *)
   | RulePr of id * exp                       (* ruleid `:` exp *)
   | IfPr of exp                              (* `if` exp *)
   | ElsePr                                   (* `otherwise` *)
@@ -209,6 +218,8 @@ and hintdef' =
   | RelH of id * hint list
   | VarH of id * hint list
   | DecH of id * hint list
+  | ThmH of id * hint list
+  | LemH of id * hint list
 
 and hint = {hintid : id; hintexp : exp}      (* `(` `hint` hintid exp `)` *)
 

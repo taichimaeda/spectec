@@ -19,6 +19,7 @@ let string_of_relid id = id.it
 let string_of_ruleid id = if id.it = "" then "" else "/" ^ id.it
 let string_of_defid id = "$" ^ id.it
 let string_of_gramid id = id.it
+let string_of_thmid id = id.it
 
 
 (* Operators *)
@@ -82,6 +83,7 @@ and string_of_typ t =
   | BoolT -> "bool"
   | NumT t -> string_of_numtyp t
   | TextT -> "text"
+  | PropT -> "prop"
   | ParenT t -> "(" ^ string_of_typ t ^ ")"
   | TupT ts -> "(" ^ string_of_typs ", " ts ^ ")"
   | IterT (t1, iter) -> string_of_typ t1 ^ string_of_iter iter
@@ -126,7 +128,7 @@ and string_of_typenum (e, eo) =
 
 and string_of_exp e =
   match e.it with
-  | VarE (id, args) -> string_of_varid id ^ string_of_args args
+  | VarE (id, args) -> "var" ^ string_of_varid id ^ string_of_args args
   | AtomE atom -> string_of_atom atom
   | BoolE b -> string_of_bool b
   | NatE (DecOp, n) -> Z.to_string n
@@ -139,6 +141,10 @@ and string_of_exp e =
     string_of_exp e1 ^ space string_of_binop op ^ string_of_exp e2
   | CmpE (e1, op, e2) ->
     string_of_exp e1 ^ space string_of_cmpop op ^ string_of_exp e2
+  | RuleE (id, e1) -> string_of_relid id ^ ":" ^ string_of_exp e1
+  (* TODO: (lemmagen) Get rid of parentheses surrounding e1 later *)
+  | ForallE (args, e1) -> "forall " ^ string_of_args args ^ " (" ^ string_of_exp e1 ^ ")"
+  | ExistsE (args, e1) -> "exists " ^ string_of_args args ^ " (" ^ string_of_exp e1 ^ ")"
   | EpsE -> "eps"
   | SeqE es -> "{" ^ string_of_exps " " es ^ "}"
   | IdxE (e1, e2) -> string_of_exp e1 ^ "[" ^ string_of_exp e2 ^ "]"
@@ -285,6 +291,10 @@ let string_of_def d =
     "def " ^ string_of_defid id ^ string_of_args args ^ " = " ^
       string_of_exp e ^
       concat "" (map_filter_nl_list (prefix "\n  -- " string_of_prem) prems)
+  | ThmD (id, e, _hints) ->
+    "theorem " ^ string_of_thmid id ^ ": " ^ string_of_exp e
+  | LemD (id, e, _hints) -> 
+    "lemma " ^ string_of_thmid id ^ ": " ^ string_of_exp e
   | SepD ->
     "\n\n"
   | HintD _ -> ""
