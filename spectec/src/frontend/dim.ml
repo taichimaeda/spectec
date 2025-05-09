@@ -87,6 +87,7 @@ and check_typ env ctx t =
   | BoolT
   | NumT _
   | TextT
+  | PropT
   | AtomT _ -> ()
   | ParenT t1
   | BrackT (_, t1, _) -> check_typ env ctx t1
@@ -121,8 +122,6 @@ and check_typ env ctx t =
   | InfixT (t1, _, t2) ->
     check_typ env ctx t1;
     check_typ env ctx t2
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_exp env ctx e =
   match e.it with
@@ -165,11 +164,14 @@ and check_exp env ctx e =
   | IterE (e1, iter) ->
     check_iter env ctx iter;
     check_exp env (strip_index iter::ctx) e1
+  | RuleE (_id, e) -> check_exp env ctx e
+  | ForallE (args, e) 
+  | ExistsE (args, e) ->
+    List.iter (check_arg env ctx) args;
+    check_exp env ctx e
   | HoleE _
   | FuseE _
   | UnparenE _ -> assert false
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_path env ctx p =
   match p.it with
@@ -280,9 +282,16 @@ let check_def d : env =
     check_exp env [] e;
     iter_nl_list (check_prem env []) prems;
     check_env env
+  | ThmD (_id, e, _hints) 
+  | LemD (_id, e, _hints) ->
+    check_exp env [] e;
+    check_env env
   | SepD | HintD _ -> Env.empty
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+
+let check_exp e : env =
+  let env = ref Env.empty in 
+  check_exp env [] e;
+  check_env env
 
 let check_typdef t prems : env =
   let env = ref Env.empty in
@@ -414,8 +423,17 @@ and annot_exp env e : Il.Ast.exp * occur =
     | SubE (e1, t1, t2) ->
       let e1', occur1 = annot_exp env e1 in
       SubE (e1', t1, t2), occur1
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)"
+    | RuleE (id, atom, e1) ->
+      let e1', occur1 = annot_exp env e1 in
+      RuleE (id, atom, e1'), occur1
+    | ForallE (bs1, as1, e1) -> 
+      let as1', occurs = List.split (List.map (annot_arg env) as1) in
+      let e1', occur1 = annot_exp env e1 in
+      ForallE (bs1, as1', e1'), List.fold_left union Env.empty (occur1::occurs)
+    | ExistsE (bs1, as1, e1) ->
+      let as1', occurs = List.split (List.map (annot_arg env) as1) in
+      let e1', occur1 = annot_exp env e1 in
+      ExistsE (bs1, as1', e1'), List.fold_left union Env.empty (occur1::occurs)
   in {e with it}, occur
 
 and annot_expfield env (atom, e) : Il.Ast.expfield * occur =

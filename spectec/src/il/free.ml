@@ -6,16 +6,17 @@ open Ast
 
 module Set = Set.Make(String)
 
-type sets = {typid : Set.t; relid : Set.t; varid : Set.t; defid : Set.t}
+type sets = {typid : Set.t; relid : Set.t; varid : Set.t; defid : Set.t; thmid : Set.t}
 
 let empty =
-  {typid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty}
+  {typid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty; thmid = Set.empty}
 
 let union sets1 sets2 =
   { typid = Set.union sets1.typid sets2.typid;
     relid = Set.union sets1.relid sets2.relid;
     varid = Set.union sets1.varid sets2.varid;
     defid = Set.union sets1.defid sets2.defid;
+    thmid = Set.union sets1.thmid sets2.defid;
   }
 
 let diff sets1 sets2 =
@@ -23,6 +24,7 @@ let diff sets1 sets2 =
     relid = Set.diff sets1.relid sets2.relid;
     varid = Set.diff sets1.varid sets2.varid;
     defid = Set.diff sets1.defid sets2.defid;
+    thmid = Set.diff sets1.thmid sets2.defid;
   }
 
 let (+) = union
@@ -56,6 +58,7 @@ let free_typid id = {empty with typid = Set.singleton id.it}
 let free_relid id = {empty with relid = Set.singleton id.it}
 let free_varid id = {empty with varid = Set.singleton id.it}
 let free_defid id = {empty with defid = Set.singleton id.it}
+let free_thmid id = {empty with thmid = Set.singleton id.it}
 
 let bound_typid id = if id.it = "_" then empty else free_typid id
 let bound_varid id = if id.it = "_" then empty else free_varid id
@@ -74,13 +77,13 @@ let rec free_iter iter =
 and free_typ t =
   match t.it with
   | VarT (id, as_) -> free_typid id + free_args as_
-  | BoolT | NumT _ | TextT -> empty
+  | BoolT | NumT _ | TextT | PropT -> empty
   | TupT ets -> free_typbinds ets
   | IterT (t1, iter) -> free_typ t1 + free_iter iter
 
 and bound_typ t =
   match t.it with
-  | VarT _ | BoolT | NumT _ | TextT -> empty
+  | VarT _ | BoolT | NumT _ | TextT | PropT -> empty
   | TupT ets -> bound_list bound_typbind ets
   | IterT (t1, _iter) -> bound_typ t1
   
@@ -118,8 +121,9 @@ and free_exp e =
   | CallE (id, as1) -> free_defid id + free_args as1
   | IterE (e1, iter) -> free_exp e1 + free_iterexp iter
   | SubE (e1, t1, t2) -> free_exp e1 + free_typ t1 + free_typ t2
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, _, e) -> free_thmid id + free_exp e
+  | ForallE (bs, as_, e) | ExistsE (bs, as_, e) -> free_binds bs + free_args as_ + free_exp e
 
 and free_expfield (_, e) = free_exp e
 
@@ -201,8 +205,7 @@ let free_hintdef hd =
   | TypH (id, _) -> free_typid id
   | RelH (id, _) -> free_relid id
   | DecH (id, _) -> free_defid id
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | ThmH (id, _) | LemH (id, _) -> free_thmid id
 
 let rec free_def d =
   match d.it with
@@ -212,9 +215,10 @@ let rec free_def d =
     free_params ps + (free_typ t - bound_params ps)
       + free_list free_clause clauses
   | RecD ds -> free_list free_def ds
+  | ThmD (_id, bs, e) | LemD (_id, bs, e) -> 
+    (* TODO: (lemmagen) Is this correct? *)
+    free_binds bs + free_exp e
   | HintD hd -> free_hintdef hd
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let rec bound_def d =
   match d.it with
@@ -222,6 +226,6 @@ let rec bound_def d =
   | RelD (id, _, _, _) -> free_relid id
   | DecD (id, _, _, _) -> free_defid id
   | RecD ds -> free_list bound_def ds
+  (* TODO: (lemmagen) Is this correct? *)
+  | ThmD (id, _, _) | LemD (id, _, _) -> free_thmid id
   | HintD _ -> empty
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"

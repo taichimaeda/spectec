@@ -247,45 +247,48 @@ def $const_list(admininstr admininstr'*) = $is_const(admininstr) /\ $const_list(
 def $not_lf_br(admininstr*) : prop
 def $not_lf_br(admininstr*) =
   forall (val*, l, admininstr'*)
-  admininstr* =/= val* (admininstr__BR l) admininstr'*
+  admininstr* =/= val* (BR l) admininstr'*
 
 def $not_lf_return(admininstr*) : prop
 def $not_lf_return(admininstr*) =
   forall (val*, l, admininstr'*)
-  admininstr* =/= val* (admininstr__RETURN) admininstr'*
+  admininstr* =/= val* (RETURN) admininstr'*
 
 def $terminal_form(admininstr*) : prop
 def $terminal_form(admininstr*) = 
  $const_list(admininstr) \/ admininstr* = TRAP
 
 theorem t_progress : forall (s, f, admininstr*, t?)
-  (Config_ok: |- (s; f); admininstr* : t?) =>
+  @(Config_ok: |- (s; f); admininstr* : t?) =>
   $terminal_form(admininstr*) \/
   exists (s', f', admininstr'*)
-  (Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
+  @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
 
-lemma t_progress_be : forall (s, C, C', f, val*, instr*, ft, valtype1*, valtype2*, lab, ret)
-  (Instrs_ok: C |- instr* : (valtype1* -> valtype2*)) =>
-  ft = (valtype1* -> valtype2*) =>
-  C = C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret =>
-  (Module_instance_ok: s |- f.MODULE : C) =>
-  $types_of(val*) = valtype1* =>
-  (Store_ok: |- s : OK) =>
+var lab : valtype
+var ret : valtype
+
+lemma t_progress_e : forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+  @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
+  ft = (valtype_1* -> valtype_2*) =>
+  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  $types_of(val*) = valtype_1* =>
+  @(Store_ok: |- s : OK) =>
+  $not_lf_br(admininstr*) =>
+  $not_lf_return(admininstr*) =>
+  $terminal_form(val* admininstr*) \/
+  exists (s', f', admininstr'*)
+  @(Step: (s; f); val* admininstr* ~> (s'; f'); admininstr'*)
+
+lemma t_progress_be : forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+  @(Instrs_ok: C |- instr* : ft) =>
+  ft = (valtype_1* -> valtype_2*) =>
+  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  $types_of(val*) = valtype_1* =>
+  @(Store_ok: |- s : OK) =>
   $not_lf_br(instr*) =>
   $not_lf_return(instr*) =>
   $const_list(instr*) \/
   exists (s', f', admininstr*)
-  (Step: (s; f); (val* instr*) ~> (s'; f'); admininstr*)
-
-lemma t_progress_e : forall (s, C, C', f, val*, admininstr*, ft, valtype1*, valtype2*, lab, ret)
-  (Admin_instrs_ok: s; C |- admininstr* ft) => 
-  ft = (valtype1* -> valtype2*) ->
-  C = C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret ->
-  (Module_instance_ok: s |- f.MODULE : C) ->
-  $types_of(val*) = valtype1* ->
-  (Store_ok: |- s : OK) ->
-  $not_lf_br(admininstr*) ->
-  $not_lf_return(admininstr*) ->
-  $terminal_form(val* instr*) \/
-  exists (s', f', admininstr'*)
-  (Step: (s; f); (val* admininstr*) ~> (s'; f'); admininstr'*)
+  @(Step: (s; f); val* instr* ~> (s'; f'); admininstr*)

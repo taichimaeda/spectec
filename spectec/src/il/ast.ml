@@ -36,6 +36,9 @@ and typ' =
   | BoolT                        (* `bool` *)
   | NumT of numtyp               (* numtyp *)
   | TextT                        (* `text` *)
+  (* TODO: (lemmagen) 
+     Maybe better to PropD in def' instead *)
+  | PropT                        (* `prop` *)
   | TupT of (exp * typ) list     (* typ * ... * typ *)
   | IterT of typ * iter          (* typ iter *)
 
@@ -87,9 +90,6 @@ and exp' =
   | UnE of unop * exp            (* unop exp *)
   | BinE of binop * exp * exp    (* exp binop exp *)
   | CmpE of cmpop * exp * exp    (* exp cmpop exp *)
-  | RuleE of id * exp            (* relid : exp *)
-  | ForallE of arg list * exp    (* forall `(` arg* `)` exp *)
-  | ExistsE of arg list * exp    (* exists `(` arg* `)` exp *)
   | TupE of exp list             (* ( exp* ) *)
   | ProjE of exp * int           (* exp.i *)
   | CaseE of mixop * exp         (* atom exp? *)
@@ -109,6 +109,9 @@ and exp' =
   | CallE of id * arg list       (* defid( arg* ) *)
   | IterE of exp * iterexp       (* exp iter *)
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
+  | RuleE of id * mixop * exp    (* relid : exp *)
+  | ForallE of bind list * arg list * exp    (* forall `(` arg* `)` exp *)
+  | ExistsE of bind list * arg list * exp    (* exists `(` arg* `)` exp *)
 
 and expfield = atom * exp        (* atom exp *)
 
@@ -144,8 +147,8 @@ and def' =
   | TypD of id * param list * inst list               (* syntax type (family) *)
   | RelD of id * mixop * typ * rule list              (* relation *)
   | DecD of id * param list * typ * clause list       (* definition *)
-  | ThmD of id * bind list * mixop * exp              (* theorem *)
-  | LemD of id * bind list * mixop * exp              (* lemma *)
+  | ThmD of id * bind list * exp                      (* theorem *)
+  | LemD of id * bind list * exp                      (* lemma *)
   | RecD of def list                                  (* recursive *)
   | HintD of hintdef
 

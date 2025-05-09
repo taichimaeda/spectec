@@ -91,6 +91,7 @@ type typ_typ = param list * kind
 type gram_typ = param list * typ * gram option
 type rel_typ = typ * Il.rule list
 type def_typ = param list * typ * (def * Il.clause) list
+type thm_typ = unit
 
 type 'a env' = (region * 'a) Map.t
 type env =
@@ -100,6 +101,7 @@ type env =
     mutable syms : gram_typ env';
     mutable rels : rel_typ env';
     mutable defs : def_typ env';
+    mutable thms : thm_typ env';
   }
 
 let new_env () =
@@ -109,12 +111,14 @@ let new_env () =
       |> Map.add "int" (no_region, NumT IntT $ no_region)
       |> Map.add "rat" (no_region, NumT RatT $ no_region)
       |> Map.add "real" (no_region, NumT RealT $ no_region)
-      |> Map.add "text" (no_region, TextT $ no_region);
+      |> Map.add "text" (no_region, TextT $ no_region)
+      |> Map.add "prop" (no_region, PropT $ no_region);
     vars = Map.empty;
     typs = Map.empty;
     syms = Map.empty;
     rels = Map.empty;
     defs = Map.empty;
+    thms = Map.empty;
   }
 
 let local_env env =
@@ -166,6 +170,7 @@ let bound_env env =
     relid = bound_env' env.rels;
     defid = bound_env' env.defs;
     gramid = bound_env' env.syms;
+    thmid = bound_env' env.thms;
   }
 
 let to_eval_var (_at, t) = t
@@ -496,17 +501,20 @@ let infer_numop fop' ts =
   List.map (fun t -> fop' (elab_numtyp t), NumT t) ts
 
 let infer_unop' = function
-  | NotOp -> [Il.NotOp, BoolT]
+  (* TODO: (lemmagen)
+     Could add prop versions of the operators rather than 
+     overloading them for PropT *)
+  | NotOp -> [Il.NotOp, BoolT; Il.NotOp, PropT]
   | PlusOp -> infer_numop (fun t -> Il.PlusOp t) (List.tl numtyps)
   | MinusOp -> infer_numop (fun t -> Il.MinusOp t) (List.tl numtyps)
   | PlusMinusOp -> infer_numop (fun t -> Il.PlusMinusOp t) (List.tl numtyps)
   | MinusPlusOp -> infer_numop (fun t -> Il.MinusPlusOp t) (List.tl numtyps)
 
 let infer_binop' = function
-  | AndOp -> [Il.AndOp, BoolT]
-  | OrOp -> [Il.OrOp, BoolT]
-  | ImplOp -> [Il.ImplOp, BoolT]
-  | EquivOp -> [Il.EquivOp, BoolT]
+  | AndOp -> [Il.AndOp, BoolT; Il.AndOp, PropT]
+  | OrOp -> [Il.OrOp, BoolT; Il.OrOp, PropT]
+  | ImplOp -> [Il.ImplOp, BoolT; Il.ImplOp, PropT]
+  | EquivOp -> [Il.EquivOp, BoolT; Il.EquivOp, PropT]
   | AddOp -> infer_numop (fun t -> Il.AddOp t) numtyps
   | SubOp -> infer_numop (fun t -> Il.SubOp t) numtyps
   | MulOp -> infer_numop (fun t -> Il.MulOp t) numtyps
@@ -609,6 +617,7 @@ and elab_typ env t : Il.typ =
   | BoolT -> Il.BoolT $ t.at
   | NumT t' -> Il.NumT (elab_numtyp t') $ t.at
   | TextT -> Il.TextT $ t.at
+  | PropT -> Il.PropT $ t.at
   | ParenT {it = SeqT []; _} -> Il.TupT [] $ t.at
   | ParenT t1 -> elab_typ env t1
   | TupT ts -> tup_typ' (List.map (elab_typ env) ts) t.at
@@ -619,8 +628,6 @@ and elab_typ env t : Il.typ =
     )
   | StrT _ | CaseT _ | ConT _ | RangeT _ | AtomT _ | SeqT _ | InfixT _ | BrackT _ ->
     error t.at "this type is only allowed in type definitions"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and elab_typ_definition env tid t : Il.deftyp =
   assert (valid_tid tid);
@@ -1002,12 +1009,47 @@ and infer_exp' env e : Il.exp' * typ =
   | TypE (e1, t) ->
     let _t' = elab_typ env t in
     (elab_exp env e1 t).it, t
+  | RuleE (id, e1) -> 
+    let t, _ = find "relation" env.rels id in
+    let mixop, _, _ = elab_typ_notation env id t in
+    let es', _s = elab_exp_notation' env id e1 t in
+    Il.RuleE (id, mixop, tup_exp' es' e.at), PropT $ e1.at
+  | ForallE (as_, e1) ->
+    let env' = local_env env in
+    let dims = Dim.check_exp e in
+    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
+    let as' = elab_quant_args env' as_ in
+    (* TODO: (lemmagen) 
+       Dim.annot_exp should only be called once from elab_def *)
+    (* let e1' = Dim.annot_exp dims' (elab_exp env' e1 (PropT $ e.at)) in *)
+    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let bs' = infer_exp_binds env env' dims dims' e in
+    Il.ForallE (bs', as', e1'), PropT $ e1.at
+  | ExistsE (as_, e1) -> 
+    (* TODO: (lemmagen) Get rid of duplicate code *)
+    let env' = local_env env in
+    let dims = Dim.check_exp e in
+    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
+    let as' = elab_quant_args env' as_ in
+    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let bs' = infer_exp_binds env env' dims dims' e in
+    Il.ExistsE (bs', as', e1'), PropT $ e1.at
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
+(* TODO: (lemmagen)
+   Move infer_binds and infer_no_bind over here *)
+and infer_exp_binds env env' dims dims' e : Il.bind list = 
+  let det = Free.det_exp e in
+  let free = Free.(diff (free_exp e) (union det (bound_env env))) in
+  if free <> Free.empty then 
+    error e.at ("quantified expression contains indeterminate variable(s) `" ^
+      String.concat "`, `" (Free.Set.elements free.varid) ^ "`");
+  let acc_bs', (module Arg : Iter.Arg) = make_binds_iter_arg env' det dims dims' in
+  let module Acc = Iter.Make(Arg) in
+  Acc.exp e;
+  !acc_bs'
 
 and elab_exp env e t : Il.exp =
   try
@@ -1161,11 +1203,33 @@ and elab_exp' env e t : Il.exp' =
   | TypE _ ->
     let e', t' = infer_exp env e in
     cast_exp' "type annotation" env e' t' t
+  | RuleE (id, e1) -> 
+    (* TODO: (lemmagen) Duplicate of infer_exp' *)
+    let t, _ = find "relation" env.rels id in
+    let mixop, _, _ = elab_typ_notation env id t in
+    let es', _s = elab_exp_notation' env id e1 t in
+    Il.RuleE (id, mixop, tup_exp' es' e.at)
+  | ForallE (as_, e1) ->
+    (* TODO: (lemmagen) Duplicate of infer_exp' *)
+    let env' = local_env env in
+    let dims = Dim.check_exp e in
+    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
+    let as' = elab_quant_args env' as_ in
+    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let bs' = infer_exp_binds env env' dims dims' e in
+    Il.ForallE (bs', as', e1')
+  | ExistsE (as_, e1) -> 
+    (* TODO: (lemmagen) Duplicate of infer_exp' *)
+    let env' = local_env env in
+    let dims = Dim.check_exp e in
+    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
+    let as' = elab_quant_args env' as_ in
+    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let bs' = infer_exp_binds env env' dims dims' e in
+    Il.ExistsE (bs', as', e1')
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and elab_expfields env tid efs tfs t0 at : Il.expfield list =
   Debug.(log_in_at "el.elab_expfields" at
@@ -1753,6 +1817,19 @@ and elab_args' in_lhs env as_ ps aos' s at : Il.arg list * Subst.subst =
     let ao', s' = elab_arg in_lhs env a p s in
     elab_args' in_lhs env as1 ps1 (ao'::aos') s' at
 
+and elab_quant_arg env a : Il.arg = 
+  match !(a.it) with 
+  | ExpA e -> 
+    let e', _t' = infer_exp env e in
+    Il.ExpA e' $ a.at
+  | TypA t ->
+    let t' = elab_typ env t in
+    Il.TypA t' $ a.at
+  | _ -> error a.at "invalid quantifier argument"
+
+and elab_quant_args env as_ : Il.arg list = 
+  List.map (elab_quant_arg env) as_
+
 and subst_implicit env s t t' : Subst.subst =
   let free = Free.(Set.filter (fun id -> not (Map.mem id env.typs)) (free_typ t).typid) in
   let rec inst s t t' =
@@ -1871,12 +1948,13 @@ let elab_hintdef _env hd : Il.def list =
   | DecH (id, hints) ->
     if hints = [] then [] else
     [Il.HintD (Il.DecH (id, elab_hints id [] hints) $ hd.at) $ hd.at]
+  | ThmH (id, hints) | LemH (id, hints) ->
+    if hints = [] then [] else
+    [Il.HintD (Il.ThmH (id, elab_hints id [] hints) $ hd.at) $ hd.at]
   | AtomH (id, atom, _hints) ->
     let _ = elab_atom atom id in []
   | GramH _ | VarH _ ->
     []
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 
 let infer_binds env env' dims dims' d : Il.bind list =
@@ -1997,12 +2075,19 @@ let elab_def env d : Il.def list =
     let clause' = Il.DefD (bs', as', e', prems') $ d.at in
     env.defs <- rebind "definition" env.defs id (ps, t, clauses' @ [(d, clause')]);
     []
+  | ThmD (id, e, hints) | LemD (id, e, hints) ->
+    let env' = local_env env in
+    let dims = Dim.check_def d in
+    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
+    let e' = Dim.annot_exp dims' (elab_exp env' e (PropT $ e.at)) in
+    let bs' = infer_binds env env' dims dims' d in
+    env.thms <- bind "theorem" env.thms id ();
+    [Il.ThmD (id, bs', e') $ d.at]
+      @ elab_hintdef env (ThmH (id, hints) $ d.at)
   | SepD ->
     []
   | HintD hd ->
     elab_hintdef env hd
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let elab_gramdef env d =
   match d.it with
@@ -2073,7 +2158,7 @@ let populate_def env d' : Il.def =
   | Il.DecD (id, ps', t', []) ->
     let _, _, clauses' = find "definition" env.defs id in
     Il.DecD (id, ps', t', List.map snd clauses') $ d'.at
-  | Il.HintD _ -> d'
+  | Il.ThmD _ | Il.LemD _ | Il.HintD _ -> d'
   | _ ->
     assert false
 
@@ -2093,6 +2178,9 @@ let check_recursion ds' =
   List.iter (fun d' ->
     match d'.it, (List.hd ds').it with
     | Il.HintD _, _ | _, Il.HintD _
+    (* TODO: (lemmagen) Theorems cannot refer to each other *)
+    | Il.ThmD _, _ | _, Il.ThmD _
+    | Il.LemD _, _ | _, Il.LemD _
     | Il.TypD _, Il.TypD _
     | Il.RelD _, Il.RelD _
     | Il.DecD _, Il.DecD _ -> ()

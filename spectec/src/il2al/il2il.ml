@@ -103,6 +103,8 @@ let rec type_to_id ty = match ty.it with
 | TextT -> "s"
 | TupT tys -> List.map type_to_id (List.map snd tys) |> String.concat "_"
 | IterT (t, _) -> type_to_id t
+(* TODO: (lemmagen) Non-exhaustive pattern matching *)
+| _ -> failwith "unimplemented (lemmagen)"
 
 let unified_prefix = "u"
 let _unified_idx = ref 0

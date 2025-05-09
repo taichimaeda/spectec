@@ -80,7 +80,7 @@ and subst_typ s t =
         Util.Error.error id.at "syntax" "identifer suffix encountered during substitution";
       assert (args = []); t'.it  (* We do not support higher-order substitutions yet *)
     )
-  | BoolT | NumT _ | TextT | AtomT _ -> t.it
+  | BoolT | NumT _ | TextT | PropT | AtomT _ -> t.it
   | ParenT t1 -> ParenT (subst_typ s t1)
   | TupT ts -> TupT (subst_list subst_typ s ts)
   | IterT (t1, iter) -> IterT (subst_typ s t1, subst_iter s iter)
@@ -93,8 +93,6 @@ and subst_typ s t =
   | SeqT ts -> SeqT (subst_list subst_typ s ts)
   | InfixT (t1, op, t2) -> InfixT (subst_typ s t1, op, subst_typ s t2)
   | BrackT (l, t1, r) -> BrackT (l, subst_typ s t1, r)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
   ) $ t.at
 
 and subst_typfield s (atom, (t, prems), hints) =
@@ -142,8 +140,9 @@ and subst_exp s e =
   | HoleE h -> HoleE h
   | FuseE (e1, e2) -> FuseE (subst_exp s e1, subst_exp s e2)
   | UnparenE e1 -> UnparenE (subst_exp s e1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleE (id, e1) -> RuleE (id, subst_exp s e1)
+  | ForallE (args, e1) -> ForallE (List.map (subst_arg s) args, subst_exp s e1)
+  | ExistsE (args, e1) -> ExistsE (List.map (subst_arg s) args, subst_exp s e1)
   ) $ e.at
 
 and subst_expfield s (atom, e) = (atom, subst_exp s e)

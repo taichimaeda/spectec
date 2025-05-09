@@ -12,6 +12,7 @@ type sets =
     relid : Set.t;
     varid : Set.t;
     defid : Set.t;
+    thmid : Set.t;
   }
 
 let empty =
@@ -20,6 +21,7 @@ let empty =
     relid = Set.empty;
     varid = Set.empty;
     defid = Set.empty;
+    thmid = Set.empty;
   }
 
 let union sets1 sets2 =
@@ -28,6 +30,7 @@ let union sets1 sets2 =
     relid = Set.union sets1.relid sets2.relid;
     varid = Set.union sets1.varid sets2.varid;
     defid = Set.union sets1.defid sets2.defid;
+    thmid = Set.union sets1.thmid sets2.thmid;
   }
 
 let inter sets1 sets2 =
@@ -36,6 +39,7 @@ let inter sets1 sets2 =
     relid = Set.inter sets1.relid sets2.relid;
     varid = Set.inter sets1.varid sets2.varid;
     defid = Set.inter sets1.defid sets2.defid;
+    thmid = Set.inter sets1.thmid sets2.thmid;
   }
 
 let diff sets1 sets2 =
@@ -44,6 +48,7 @@ let diff sets1 sets2 =
     relid = Set.diff sets1.relid sets2.relid;
     varid = Set.diff sets1.varid sets2.varid;
     defid = Set.diff sets1.defid sets2.defid;
+    thmid = Set.diff sets1.thmid sets2.thmid;
   }
 
 let (+) = union
@@ -72,6 +77,7 @@ let free_defid id = {empty with defid = Set.singleton id.it}
 
 let bound_typid id = if id.it = "_" then empty else free_typid id
 let bound_gramid id = if id.it = "_" then empty else free_gramid id
+let bound_relid id = if id.it = "_" then empty else free_relid id
 let bound_varid id = if id.it = "_" then empty else free_varid id
 
 
@@ -88,7 +94,7 @@ let rec free_iter iter =
 and free_typ t =
   match t.it with
   | VarT (id, as_) -> free_typid id + free_args as_
-  | BoolT | NumT _ | TextT -> empty
+  | BoolT | NumT _ | TextT | PropT -> empty
   | ParenT t1 -> free_typ t1
   | TupT ts -> free_list free_typ ts
   | IterT (t1, iter) -> free_typ t1 + free_iter iter
@@ -103,8 +109,6 @@ and free_typ t =
   | SeqT ts -> free_list free_typ ts
   | InfixT (t1, _, t2) -> free_typ t1 + free_typ t2
   | BrackT (_, t1, _) -> free_typ t1
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_typfield (_, (t, prems), _) = free_typ t + free_prems prems
 and free_typcase (_, (t, prems), _) = free_typ t + free_prems prems
@@ -141,8 +145,9 @@ and free_exp e =
   | CallE (id, as_) -> free_defid id + free_list free_arg as_
   | IterE (e1, iter) -> free_exp e1 + free_iter iter
   | TypE (e1, t) -> free_exp e1 + free_typ t
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, e1) -> free_relid id + free_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> free_args as_ + free_exp e1 - det_args as_
 
 and free_expfield (_, e) = free_exp e
 
@@ -177,9 +182,10 @@ and det_exp e =
   | UnE _ | BinE _ | CmpE _
   | IdxE _ | SliceE _ | UpdE _ | ExtE _ | CommaE _ | CompE _
   | DotE _ | LenE _ | SizeE _ -> idx_exp e
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, e1) -> bound_relid id + det_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> det_args as_ + det_exp e1
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and det_expfield (_, e) = det_exp e
 
@@ -199,6 +205,9 @@ and idx_exp e =
   | CallE (_, as_) -> free_list idx_arg as_
   | TypE (e1, _) -> idx_exp e1
   | IdxE (_, e2) -> det_exp e2
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (_, e1) -> idx_exp e1
+  | ForallE (_, e1) | ExistsE (_, e1) -> idx_exp e1
   | _ -> empty
 
 and idx_expfield (_, e) = idx_exp e
@@ -334,15 +343,19 @@ let free_def d =
     free_params ps + free_typ t - bound_params ps
   | DefD (id, as_, e, prems) ->
     free_defid id + free_args as_ + free_exp e + free_prems prems
+  | ThmD (_id, e, _hints)
+  | LemD (_id, e, _hints) -> 
+    (* TODO: (lemmagen) Is this correct? *)
+    (* TODO: (lemmagen) 
+       No free_thmid because theorems do not have declarations like def/rel *)
+    free_exp e
   | HintD _ -> empty
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let det_def d =
   match d.it with
   | FamD _ | GramD _ | VarD _ | SepD | RelD _ | DecD _ | HintD _ -> empty
   | TypD (_id1, _id2, as_, _t, _hints) -> det_args as_
   | RuleD (_id1, _id2, e, prems) -> det_exp e + det_prems prems
+  (* TODO: (lemmagen) Why is idx_exp used here? *)
   | DefD (_id, as_, e, prems) -> det_args as_ + idx_exp e + det_prems prems
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | ThmD (_id, e, _hints) | LemD (_id, e, _hints) -> det_exp e

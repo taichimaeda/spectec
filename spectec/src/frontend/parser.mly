@@ -121,7 +121,7 @@ let rec is_typcon t =
 %token QUEST PLUS MINUS STAR SLASH BACKSLASH UP COMPOSE PLUSMINUS MINUSPLUS
 %token ARROW ARROW2 ARROWSUB ARROW2SUB DARROW2 SQARROW SQARROWSTAR
 %token IN PREC SUCC TURNSTILE TILESTURN
-%token DOLLAR TICK
+%token DOLLAR ATMARK TICK
 %token BOT TOP
 %token HOLE MULTIHOLE NOTHING FUSE FUSEFUSE
 %token<int> HOLEN
@@ -539,8 +539,7 @@ exp_prim_ :
     { BrackE (Il.Atom.LBrace $$ $loc($2), $3, Il.Atom.RBrace $$ $loc($4)) }
   | DOLLAR LPAREN arith RPAREN { $3.it }
   | FUSEFUSE exp_prim { UnparenE $2 }
-  // TODO: (lemmagen) Use thmid_lparen and RPAREN if this is ambiguous
-  | thmid COLON exp { RuleE ($1, $3) }
+  | ATMARK LPAREN thmid COLON exp RPAREN { RuleE ($3, $5) }
 
 exp_post : exp_post_ { $1 $ $sloc }
 exp_post_ :
@@ -575,8 +574,6 @@ exp_un_ :
   | BARBAR gramid BARBAR { SizeE $2 }
   | unop exp_un { UnE ($1, $2) }
   | infixop exp_un { InfixE (SeqE [] $ $loc($1), $1, $2) }
-  // TODO: (lemmagen) 
-  // forall/exists should probably have the same precedence as unop
   | FORALL_SPACE_LPAREN comma_list(arg) RPAREN exp { ForallE ($2, $4)}
   | EXISTS_SPACE_LPAREN comma_list(arg) RPAREN exp { ExistsE ($2, $4)}
 

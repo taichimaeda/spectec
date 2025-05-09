@@ -67,6 +67,7 @@ and string_of_typ t =
   | BoolT -> "bool"
   | NumT t -> string_of_numtyp t
   | TextT -> "text"
+  | PropT -> "prop"
   | TupT ets -> "(" ^ concat ", " (List.map string_of_typbind ets) ^ ")"
   | IterT (t1, iter) -> string_of_typ t1 ^ string_of_iter iter
 
@@ -149,8 +150,13 @@ and string_of_exp e =
     string_of_mixop op ^ "_" ^ string_of_typ_name e.note ^ string_of_exp_args e1
   | SubE (e1, t1, t2) ->
     "(" ^ string_of_exp e1 ^ " : " ^ string_of_typ t1 ^ " <: " ^ string_of_typ t2 ^ ")"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleE (id, mixop, e1) -> 
+    "@(" ^ id.it ^ ": " ^ string_of_mixop mixop ^ string_of_exp_args e1 ^ ")"
+  | ForallE (bs, as_, e1) -> 
+    "forall " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ string_of_exp e1 ^ " "
+  | ExistsE (bs, as_, e1) -> 
+    "exists " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ string_of_exp e1 ^ " "
+
 
 and string_of_exp_args e =
   match e.it with
@@ -274,10 +280,12 @@ let rec string_of_def ?(suppress_pos = false) d =
       concat "" (List.map (string_of_clause ~suppress_pos id) clauses) ^ "\n"
   | RecD ds ->
     pre ^ "rec {\n" ^ concat "" (List.map string_of_def ds) ^ "}" ^ "\n"
+  | ThmD (id, bs, e) ->
+    pre ^ "theorem " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
+  | LemD (id, bs, e) ->
+    pre ^ "lemma " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
   | HintD _ ->
     ""
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 
 (* Scripts *)

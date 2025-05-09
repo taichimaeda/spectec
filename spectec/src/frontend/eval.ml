@@ -690,6 +690,8 @@ and sub_typ env t1 t2 =
   let t1 = reduce_typ env t1 in
   let t2 = reduce_typ env t2 in
   match t1.it, t2.it with
+  (* Booleans are convertible to propositions *)
+  | BoolT, PropT -> true
   | NumT t1', NumT t2' -> t1' <= t2'
   | StrT tfs1, StrT tfs2 ->
     El.Convert.forall_nl_list (fun (atom, (t2, prems2), _) ->

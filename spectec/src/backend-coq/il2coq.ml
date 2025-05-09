@@ -227,6 +227,8 @@ let rec transform_type (typ : typ) =
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> transform_type t) typs)
     | IterT (typ, iter) -> T_app (transform_itertyp iter, [transform_type typ])
+    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+    | _ -> failwith "unimplemented (lemmagen)"
 
 (* Erases the dependent type for inductive families *)
 (* MEMO: This is the same as transform_type except that it erases the dependent indices

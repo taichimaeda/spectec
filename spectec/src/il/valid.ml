@@ -213,9 +213,11 @@ and valid_typ env t =
     let env' = local_env env in
     List.iter (valid_typbind env') ets
   | IterT (t1, iter) ->
-    match iter with
+    (match iter with
     | ListN (e, _) -> error e.at "definite iterator not allowed in type"
-    | _ -> valid_iter env iter; valid_typ env t1
+    | _ -> valid_iter env iter; valid_typ env t1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and valid_typbind env (e, t) =
   valid_typ env t;

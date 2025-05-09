@@ -8,6 +8,7 @@ type sets =
     relid : Set.t;
     varid : Set.t;
     defid : Set.t;
+    thmid : Set.t;
   }
 
 val empty : sets

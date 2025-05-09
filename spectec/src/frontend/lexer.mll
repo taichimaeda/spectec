@@ -199,6 +199,7 @@ and token = parse
   | "-|" { TILESTURN }
 
   | "$" { DOLLAR }
+  | "@" { ATMARK }
 
   | "_|_" { BOT }
   | "^|^" { TOP }
