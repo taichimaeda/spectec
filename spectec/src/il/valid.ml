@@ -216,8 +216,6 @@ and valid_typ env t =
     (match iter with
     | ListN (e, _) -> error e.at "definite iterator not allowed in type"
     | _ -> valid_iter env iter; valid_typ env t1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and valid_typbind env (e, t) =
   valid_typ env t;

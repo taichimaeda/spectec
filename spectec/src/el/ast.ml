@@ -43,7 +43,6 @@ and typ' =
   | BoolT                        (* `bool` *)
   | NumT of numtyp               (* numtyp *)
   | TextT                        (* `text` *)
-  | PropT                        (* `prop` *)
   | ParenT of typ                (* `(` typ `)` *)
   | TupT of typ list             (* `(` list2(typ, `,`) `)` *)
   | IterT of typ * iter          (* typ iter *)

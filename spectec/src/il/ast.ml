@@ -36,9 +36,6 @@ and typ' =
   | BoolT                        (* `bool` *)
   | NumT of numtyp               (* numtyp *)
   | TextT                        (* `text` *)
-  (* TODO: (lemmagen) 
-     Maybe better to PropD in def' instead *)
-  | PropT                        (* `prop` *)
   | TupT of (exp * typ) list     (* typ * ... * typ *)
   | IterT of typ * iter          (* typ iter *)
 

@@ -92,7 +92,7 @@ and typ t =
   visit_typ t;
   match t.it with
   | VarT (x, as_) -> typid x; args as_
-  | BoolT | TextT | PropT -> ()
+  | BoolT | TextT -> ()
   | NumT nt -> numtyp nt
   | TupT ets -> list (pair exp typ) ets
   | IterT (t1, it) -> typ t1; iter it

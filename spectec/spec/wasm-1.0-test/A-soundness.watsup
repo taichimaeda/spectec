@@ -244,17 +244,17 @@ def $const_list(admininstr*) : bool
 def $const_list(eps) = true
 def $const_list(admininstr admininstr'*) = $is_const(admininstr) /\ $const_list(admininstr'*)
 
-def $not_lf_br(admininstr*) : prop
+def $not_lf_br(admininstr*) : bool
 def $not_lf_br(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (BR l) admininstr'*
 
-def $not_lf_return(admininstr*) : prop
+def $not_lf_return(admininstr*) : bool
 def $not_lf_return(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (RETURN) admininstr'*
 
-def $terminal_form(admininstr*) : prop
+def $terminal_form(admininstr*) : bool
 def $terminal_form(admininstr*) = 
  $const_list(admininstr) \/ admininstr* = TRAP
 

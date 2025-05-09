@@ -87,7 +87,6 @@ and check_typ env ctx t =
   | BoolT
   | NumT _
   | TextT
-  | PropT
   | AtomT _ -> ()
   | ParenT t1
   | BrackT (_, t1, _) -> check_typ env ctx t1

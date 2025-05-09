@@ -111,8 +111,7 @@ let new_env () =
       |> Map.add "int" (no_region, NumT IntT $ no_region)
       |> Map.add "rat" (no_region, NumT RatT $ no_region)
       |> Map.add "real" (no_region, NumT RealT $ no_region)
-      |> Map.add "text" (no_region, TextT $ no_region)
-      |> Map.add "prop" (no_region, PropT $ no_region);
+      |> Map.add "text" (no_region, TextT $ no_region);
     vars = Map.empty;
     typs = Map.empty;
     syms = Map.empty;
@@ -501,20 +500,17 @@ let infer_numop fop' ts =
   List.map (fun t -> fop' (elab_numtyp t), NumT t) ts
 
 let infer_unop' = function
-  (* TODO: (lemmagen)
-     Could add prop versions of the operators rather than 
-     overloading them for PropT *)
-  | NotOp -> [Il.NotOp, BoolT; Il.NotOp, PropT]
+  | NotOp -> [Il.NotOp, BoolT]
   | PlusOp -> infer_numop (fun t -> Il.PlusOp t) (List.tl numtyps)
   | MinusOp -> infer_numop (fun t -> Il.MinusOp t) (List.tl numtyps)
   | PlusMinusOp -> infer_numop (fun t -> Il.PlusMinusOp t) (List.tl numtyps)
   | MinusPlusOp -> infer_numop (fun t -> Il.MinusPlusOp t) (List.tl numtyps)
 
 let infer_binop' = function
-  | AndOp -> [Il.AndOp, BoolT; Il.AndOp, PropT]
-  | OrOp -> [Il.OrOp, BoolT; Il.OrOp, PropT]
-  | ImplOp -> [Il.ImplOp, BoolT; Il.ImplOp, PropT]
-  | EquivOp -> [Il.EquivOp, BoolT; Il.EquivOp, PropT]
+  | AndOp -> [Il.AndOp, BoolT]
+  | OrOp -> [Il.OrOp, BoolT]
+  | ImplOp -> [Il.ImplOp, BoolT]
+  | EquivOp -> [Il.EquivOp, BoolT]
   | AddOp -> infer_numop (fun t -> Il.AddOp t) numtyps
   | SubOp -> infer_numop (fun t -> Il.SubOp t) numtyps
   | MulOp -> infer_numop (fun t -> Il.MulOp t) numtyps
@@ -617,7 +613,6 @@ and elab_typ env t : Il.typ =
   | BoolT -> Il.BoolT $ t.at
   | NumT t' -> Il.NumT (elab_numtyp t') $ t.at
   | TextT -> Il.TextT $ t.at
-  | PropT -> Il.PropT $ t.at
   | ParenT {it = SeqT []; _} -> Il.TupT [] $ t.at
   | ParenT t1 -> elab_typ env t1
   | TupT ts -> tup_typ' (List.map (elab_typ env) ts) t.at
@@ -1013,7 +1008,7 @@ and infer_exp' env e : Il.exp' * typ =
     let t, _ = find "relation" env.rels id in
     let mixop, _, _ = elab_typ_notation env id t in
     let es', _s = elab_exp_notation' env id e1 t in
-    Il.RuleE (id, mixop, tup_exp' es' e.at), PropT $ e1.at
+    Il.RuleE (id, mixop, tup_exp' es' e.at), BoolT $ e1.at
   | ForallE (as_, e1) ->
     let env' = local_env env in
     let dims = Dim.check_exp e in
@@ -1022,18 +1017,18 @@ and infer_exp' env e : Il.exp' * typ =
     (* TODO: (lemmagen) 
        Dim.annot_exp should only be called once from elab_def *)
     (* let e1' = Dim.annot_exp dims' (elab_exp env' e1 (PropT $ e.at)) in *)
-    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ForallE (bs', as', e1'), PropT $ e1.at
+    Il.ForallE (bs', as', e1'), BoolT $ e1.at
   | ExistsE (as_, e1) -> 
     (* TODO: (lemmagen) Get rid of duplicate code *)
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let as' = elab_quant_args env' as_ in
-    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ExistsE (bs', as', e1'), PropT $ e1.at
+    Il.ExistsE (bs', as', e1'), BoolT $ e1.at
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
@@ -1215,7 +1210,7 @@ and elab_exp' env e t : Il.exp' =
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let as' = elab_quant_args env' as_ in
-    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_exp_binds env env' dims dims' e in
     Il.ForallE (bs', as', e1')
   | ExistsE (as_, e1) -> 
@@ -1224,7 +1219,7 @@ and elab_exp' env e t : Il.exp' =
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let as' = elab_quant_args env' as_ in
-    let e1' = elab_exp env' e1 (PropT $ e.at) in
+    let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_exp_binds env env' dims dims' e in
     Il.ExistsE (bs', as', e1')
   | HoleE _ -> error e.at "misplaced hole"
@@ -2079,7 +2074,7 @@ let elab_def env d : Il.def list =
     let env' = local_env env in
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let e' = Dim.annot_exp dims' (elab_exp env' e (PropT $ e.at)) in
+    let e' = Dim.annot_exp dims' (elab_exp env' e (BoolT $ e.at)) in
     let bs' = infer_binds env env' dims dims' d in
     env.thms <- bind "theorem" env.thms id ();
     [Il.ThmD (id, bs', e') $ d.at]

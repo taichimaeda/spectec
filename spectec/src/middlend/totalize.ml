@@ -59,8 +59,6 @@ and t_typ' env = function
   | (BoolT | NumT _ | TextT) as t -> t
   | TupT xts -> TupT (List.map (fun (id, t) -> (id, t_typ env t)) xts)
   | IterT (t, iter) -> IterT (t_typ env t, t_iter env iter)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_deftyp env x = { x with it = t_deftyp' env x.it }
 

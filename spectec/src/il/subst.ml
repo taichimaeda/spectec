@@ -69,8 +69,6 @@ and subst_typ s t =
   | BoolT | NumT _ | TextT -> t.it
   | TupT ets -> TupT (fst (subst_list_dep subst_typbind Free.bound_typbind s ets))
   | IterT (t1, iter) -> IterT (subst_typ s t1, subst_iter s iter)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
   ) $ t.at
 
 and subst_typbind s (e, t) =

@@ -94,7 +94,7 @@ let rec free_iter iter =
 and free_typ t =
   match t.it with
   | VarT (id, as_) -> free_typid id + free_args as_
-  | BoolT | NumT _ | TextT | PropT -> empty
+  | BoolT | NumT _ | TextT -> empty
   | ParenT t1 -> free_typ t1
   | TupT ts -> free_list free_typ ts
   | IterT (t1, iter) -> free_typ t1 + free_iter iter

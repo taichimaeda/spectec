@@ -100,14 +100,14 @@ let is_typcase t =
   match t.it with
   | AtomT _ | InfixT _ | BrackT _ -> true
   | SeqT ({it = AtomT _; _}::_) -> true
-  | VarT _ | BoolT | NumT _ | TextT | PropT | TupT _ | SeqT _
+  | VarT _ | BoolT | NumT _ | TextT | TupT _ | SeqT _
   | ParenT _ | IterT _ -> false
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
 
 let rec is_typcon t =
   match t.it with
   | AtomT _ | InfixT _ | BrackT _ | SeqT _ -> true
-  | VarT _ | BoolT | NumT _ | TextT | PropT | TupT _ -> false
+  | VarT _ | BoolT | NumT _ | TextT | TupT _ -> false
   | ParenT t1 | IterT (t1, _) -> is_typcon t1
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
 
@@ -125,7 +125,7 @@ let rec is_typcon t =
 %token BOT TOP
 %token HOLE MULTIHOLE NOTHING FUSE FUSEFUSE
 %token<int> HOLEN
-%token BOOL NAT INT RAT REAL TEXT PROP
+%token BOOL NAT INT RAT REAL TEXT
 %token SYNTAX GRAMMAR RELATION RULE VAR DEF THEOREM LEMMA
 %token IF OTHERWISE HINT_LPAREN
 %token FORALL_SPACE_LPAREN EXISTS_SPACE_LPAREN
@@ -370,7 +370,6 @@ typ_prim_ :
   | RAT { NumT RatT }
   | REAL { NumT RealT }
   | TEXT { TextT }
-  | PROP { PropT }
 
 typ_post : typ_post_ { $1 $ $sloc }
 typ_post_ :

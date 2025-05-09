@@ -218,7 +218,6 @@ and token = parse
   | "rat" { RAT }
   | "real" { REAL }
   | "text" { TEXT }
-  | "prop" { PROP }
 
   | "syntax" { SYNTAX }
   | "grammar" { GRAMMAR }

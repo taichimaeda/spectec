@@ -97,7 +97,7 @@ and typ t =
   visit_typ t;
   match t.it with
   | VarT (x, as_) -> typid x; args as_
-  | BoolT | TextT | PropT -> ()
+  | BoolT | TextT -> ()
   | NumT nt -> numtyp nt
   | ParenT t1 -> typ t1
   | TupT ts -> list typ ts
@@ -256,7 +256,7 @@ let rec clone_iter = function
 and clone_typ t =
   (match t.it with
   | VarT (id, args) -> VarT (id, List.map clone_arg args)
-  | (BoolT | NumT _ | TextT | PropT) as t' -> t'
+  | (BoolT | NumT _ | TextT) as t' -> t'
   | ParenT t1 -> ParenT (clone_typ t1)
   | TupT ts -> TupT (List.map clone_typ ts)
   | IterT (t1, iter) -> IterT (clone_typ t1, clone_iter iter) 

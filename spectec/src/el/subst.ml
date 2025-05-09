@@ -80,7 +80,7 @@ and subst_typ s t =
         Util.Error.error id.at "syntax" "identifer suffix encountered during substitution";
       assert (args = []); t'.it  (* We do not support higher-order substitutions yet *)
     )
-  | BoolT | NumT _ | TextT | PropT | AtomT _ -> t.it
+  | BoolT | NumT _ | TextT | AtomT _ -> t.it
   | ParenT t1 -> ParenT (subst_typ s t1)
   | TupT ts -> TupT (subst_list subst_typ s ts)
   | IterT (t1, iter) -> IterT (subst_typ s t1, subst_iter s iter)

@@ -67,7 +67,6 @@ and string_of_typ t =
   | BoolT -> "bool"
   | NumT t -> string_of_numtyp t
   | TextT -> "text"
-  | PropT -> "prop"
   | TupT ets -> "(" ^ concat ", " (List.map string_of_typbind ets) ^ ")"
   | IterT (t1, iter) -> string_of_typ t1 ^ string_of_iter iter
 

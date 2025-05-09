@@ -83,7 +83,6 @@ and string_of_typ t =
   | BoolT -> "bool"
   | NumT t -> string_of_numtyp t
   | TextT -> "text"
-  | PropT -> "prop"
   | ParenT t -> "(" ^ string_of_typ t ^ ")"
   | TupT ts -> "(" ^ string_of_typs ", " ts ^ ")"
   | IterT (t1, iter) -> string_of_typ t1 ^ string_of_iter iter

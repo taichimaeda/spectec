@@ -90,8 +90,6 @@ let rec exp_of_typ t =
   | InfixT (t1, atom, t2) -> InfixE (exp_of_typ t1, atom, exp_of_typ t2)
   | BrackT (l, t1, r) -> BrackE (l, exp_of_typ t1, r)
   | CaseT _ | ConT _ | RangeT _ -> error t.at "malformed expression"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
   ) $ t.at
 
 and expfield_of_typfield (atom, (t, _prems), _) =

@@ -77,13 +77,13 @@ let rec free_iter iter =
 and free_typ t =
   match t.it with
   | VarT (id, as_) -> free_typid id + free_args as_
-  | BoolT | NumT _ | TextT | PropT -> empty
+  | BoolT | NumT _ | TextT -> empty
   | TupT ets -> free_typbinds ets
   | IterT (t1, iter) -> free_typ t1 + free_iter iter
 
 and bound_typ t =
   match t.it with
-  | VarT _ | BoolT | NumT _ | TextT | PropT -> empty
+  | VarT _ | BoolT | NumT _ | TextT -> empty
   | TupT ets -> bound_list bound_typbind ets
   | IterT (t1, _iter) -> bound_typ t1
   
