@@ -106,8 +106,11 @@ let rec t_exp env e : prem list =
     t_iterexp env iterexp @
     let env' = env_under_iter env iterexp in
     List.map (fun pr -> IterPr (pr, iterexp) $ e.at) (t_exp env' e1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (_, _, exp) 
+  -> t_exp env exp
+  | ForallE (_, args, exp) | ExistsE (_, args, exp)
+  -> t_args env args @ t_exp env exp
 
 and t_iterexp env (iter, _) = t_iter env iter
 
@@ -125,6 +128,7 @@ and t_arg env arg = match arg.it with
   | ExpA exp -> t_exp env exp
   | TypA _ -> []
 
+and t_args env = List.concat_map (t_arg env)
 
 let rec t_prem env prem = match prem.it with
   | RulePr (_, _, exp) -> t_exp env exp
@@ -177,6 +181,7 @@ let rec t_def' = function
   | RecD defs -> RecD (List.map t_def defs)
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, typ, t_rules rules)
+  (* TODO: (lemmagen) No need to handle other defs? *)
   | def -> def
 
 and t_def x = { x with it = t_def' x.it }

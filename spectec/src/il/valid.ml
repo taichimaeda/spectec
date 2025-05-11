@@ -17,12 +17,14 @@ type var_typ = typ * iter list
 type typ_typ = param list * inst list
 type rel_typ = mixop * typ
 type def_typ = param list * typ * clause list
+type thm_typ = unit
 
 type env =
   { mutable vars : var_typ Env.t;
     mutable typs : typ_typ Env.t;
     mutable rels : rel_typ Env.t;
     mutable defs : def_typ Env.t;
+    mutable thms : thm_typ Env.t;
   }
 
 let new_env () =
@@ -30,6 +32,7 @@ let new_env () =
     typs = Env.empty;
     rels = Env.empty;
     defs = Env.empty;
+    thms = Env.empty;
   }
 
 let local_env env = {env with vars = env.vars; typs = env.typs}
@@ -320,11 +323,10 @@ and infer_exp env e : typ =
   | CatE _ -> error e.at "cannot infer type of concatenation"
   | CaseE _ -> error e.at "cannot infer type of case constructor"
   | SubE _ -> error e.at "cannot infer type of subsumption"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleE _ | ForallE _ | ExistsE _ -> BoolT $ e.at
 
 
-and valid_exp env e t =
+and valid_exp ?(decidable = true) env e t =
   Debug.(log_at "il.valid_exp" e.at
     (fun _ -> fmt "%s : %s == %s" (il_exp e) (il_typ e.note) (il_typ t))
     (Fun.const "ok")
@@ -344,12 +346,12 @@ try
     equiv_typ env t' t e.at
   | UnE (op, e1) ->
     let t1, t' = infer_unop op in
-    valid_exp env e1 (t1 $ e.at);
+    valid_exp ~decidable env e1 (t1 $ e.at);
     equiv_typ env (t' $ e.at) t e.at
   | BinE (op, e1, e2) ->
     let t1, t2, t' = infer_binop op in
-    valid_exp env e1 (t1 $ e.at);
-    valid_exp env e2 (t2 $ e.at);
+    valid_exp ~decidable env e1 (t1 $ e.at);
+    valid_exp ~decidable env e2 (t2 $ e.at);
     equiv_typ env (t' $ e.at) t e.at
   | CmpE (op, e1, e2) ->
     let t' =
@@ -451,8 +453,18 @@ try
     valid_exp env e1 t1;
     equiv_typ env t2 t e.at;
     sub_typ env t1 t2 e.at
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleE _ | ForallE _ | ExistsE _ when decidable ->
+    assert (t.it = BoolT);
+    error e.at "unexpected rule or quantifier expression"
+  | RuleE (id, mixop, e1) -> 
+    valid_expmix env mixop e1 (find "relation" env.rels id) e.at;
+    equiv_typ env (BoolT $ e.at) t e.at
+  | ForallE (bs, _as_, e1) | ExistsE (bs, _as_, e1) -> 
+    List.iter (valid_bind env) bs;
+    (* TODO: (lemmagen) How should I implement this? *)
+    (* List.iter (infer_arg env) as_; *)
+    valid_exp ~decidable env e1 (BoolT $ e.at);
+    equiv_typ env (BoolT $ e.at) t e.at
 with exn ->
   let bt = Printexc.get_raw_backtrace () in
   Printf.eprintf "[valid_exp] %s\n%!" (Debug.il_exp e);
@@ -472,7 +484,7 @@ and valid_tup_exp env s es ets =
   | e1::es', (e2, t)::ets' ->
     valid_exp env e1 (Subst.subst_typ s t);
     (match Eval.match_exp (to_eval_env env) s e1 e2 with
-    | Some s' -> valid_tup_exp env s' es' ets'
+    | Some s' -> valid_tup_exp env s' es' ets' 
     | None -> false
     | exception Eval.Irred -> false
     )
@@ -625,7 +637,8 @@ let valid_clause env ps t clause =
     let env' = local_env env in
     List.iter (valid_bind env') bs;
     let s = valid_args env' as_ ps Subst.empty clause.at in
-    valid_exp env' e (Subst.subst_typ s t);
+    (* TODO: (lemmagen) Definitions can contain formulas *)
+    valid_exp ~decidable:false env' e (Subst.subst_typ s t);
     List.iter (valid_prem env') prems
 
 let infer_def env d =
@@ -679,10 +692,13 @@ let rec valid_def {bind} env d =
         error (List.hd ds).at (" " ^ string_of_region d.at ^
           ": invalid recursion between definitions of different sort")
     ) ds
+  | ThmD (id, bs, e) | LemD (id, bs, e) -> 
+    let env' = local_env env in
+    List.iter (valid_bind env') bs;
+    valid_exp ~decidable:false env' e (BoolT $ e.at);
+    env.thms <- bind "theorem" env.thms id ()
   | HintD _ ->
     ()
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 
 (* Scripts *)

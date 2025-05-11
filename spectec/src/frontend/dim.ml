@@ -425,14 +425,13 @@ and annot_exp env e : Il.Ast.exp * occur =
     | RuleE (id, atom, e1) ->
       let e1', occur1 = annot_exp env e1 in
       RuleE (id, atom, e1'), occur1
-    | ForallE (bs1, as1, e1) -> 
+    | ForallE (bs1, as1, e1) | ExistsE (bs1, as1, e1) -> 
       let as1', occurs = List.split (List.map (annot_arg env) as1) in
       let e1', occur1 = annot_exp env e1 in
-      ForallE (bs1, as1', e1'), List.fold_left union Env.empty (occur1::occurs)
-    | ExistsE (bs1, as1, e1) ->
-      let as1', occurs = List.split (List.map (annot_arg env) as1) in
-      let e1', occur1 = annot_exp env e1 in
-      ExistsE (bs1, as1', e1'), List.fold_left union Env.empty (occur1::occurs)
+      (match e.it with
+      | ForallE _ -> ForallE (bs1, as1', e1')
+      | ExistsE _ -> ExistsE (bs1, as1', e1')
+      | _ -> assert false), List.fold_left union Env.empty (occur1::occurs)
   in {e with it}, occur
 
 and annot_expfield env (atom, e) : Il.Ast.expfield * occur =

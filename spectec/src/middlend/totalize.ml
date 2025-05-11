@@ -102,8 +102,10 @@ and t_exp' env = function
   | CatE (exp1, exp2) -> CatE (t_exp env exp1, t_exp env exp2)
   | CaseE (mixop, e) -> CaseE (mixop, t_exp env e)
   | SubE (exp, t1, t2) -> SubE (t_exp env exp, t_typ env t1, t_typ env t2)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, mixop, e) -> RuleE (id, mixop, t_exp env e)
+  | ForallE (binds, args, e) -> ForallE (t_binds env binds, t_args env args, t_exp env e)
+  | ExistsE (binds, args, e) -> ExistsE (t_binds env binds, t_args env args, t_exp env e)
 
 and t_iter env = function
   | ListN (e, id_opt) -> ListN (t_exp env e, id_opt)
@@ -200,9 +202,12 @@ let rec t_def' env = function
     TypD (id, t_params env params, t_insts env insts)
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, t_typ env typ, List.map (t_rule env) rules)
+  (* TODO: (lemmagen) Is this correct? *)
+  | ThmD (id, bs, e) ->
+    ThmD (id, t_binds env bs, t_exp env e)
+  | LemD (id, bs, e) ->
+    LemD (id, t_binds env bs, t_exp env e)
   | HintD _ as def -> def
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_def env x = { x with it = t_def' env x.it }
 

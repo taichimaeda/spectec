@@ -130,6 +130,12 @@ and t_exp' n e : eqns * exp' =
   | TheE exp -> t_e n exp (fun exp' -> TheE exp')
   | CaseE (mixop, exp) -> t_e n exp (fun exp' -> CaseE (mixop, exp'))
   | SubE (exp, a, b) -> t_e n exp (fun exp' -> SubE (exp', a, b))
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, mixop, exp) -> t_e n exp (fun exp' -> RuleE (id, mixop, exp'))
+  | ForallE (binds, args, exp) -> 
+    binary t_args t_exp n (args, exp) (fun (args', exp') -> ForallE (binds, args', exp'))
+  | ExistsE (binds, args, exp) ->
+    binary t_args t_exp n (args, exp) (fun (args', exp') -> ExistsE (binds, args', exp'))
 
   | BinE (bo, exp1, exp2) -> t_ee n (exp1, exp2) (fun (e1', e2') -> BinE (bo, e1', e2'))
   | CmpE (co, exp1, exp2) -> t_ee n (exp1, exp2) (fun (e1', e2') -> CmpE (co, e1', e2'))
@@ -152,8 +158,6 @@ and t_exp' n e : eqns * exp' =
     let eqns2, iterexp'' = t_iterexp n iterexp' in
     let iterexp''' = update_iterexp_vars (Il.Free.free_exp e') iterexp'' in
     eqns1' @ eqns2, IterE (e', iterexp''')
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_field n ((a, e) : expfield) =
   unary t_exp n e (fun e' -> (a, e'))
@@ -178,6 +182,8 @@ and t_arg n = phrase t_arg' n
 and t_arg' n arg = match arg with
   | ExpA exp -> unary t_exp n exp (fun exp' -> ExpA exp')
   | TypA _ -> [], arg
+
+and t_args n k = t_list t_arg n k (fun x -> x)
 
 let rec t_prem n : prem -> eqns * prem = phrase t_prem' n
 
@@ -210,6 +216,7 @@ let t_rule x = { x with it = t_rule' x.it }
 let rec t_def' = function
   | RecD defs -> RecD (List.map t_def defs)
   | RelD (id, mixop, typ, rules) -> RelD (id, mixop, typ, List.map t_rule rules)
+  (* TODO: (lemmagen) No need to handle other defs? *)
   | def -> def
 
 and t_def x = { x with it = t_def' x.it }

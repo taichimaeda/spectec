@@ -170,13 +170,7 @@ let () =
     if !print_el then
       Printf.printf "%s\n%!" (El.Print.string_of_script el);
     log "Elaboration...";
-    let il, elab_env = Frontend.Elab.elab el in
-
-    Printf.printf "%s\n%!" (El.Print.string_of_script el);
-    (* print_il il; *)
-
-    (* TODO: (lemmagen) Remove the following line *)
-    let () = failwith "Successfully parsed DSL (lemmagen)" in
+    let il, elab_env = Frontend.Elab.elab el in    
 
     if !print_elab_il || !print_all_il then print_il il;
     log "IL Validation...";
@@ -286,6 +280,10 @@ let () =
       Backend_interpreter.Runner.run args
     | Coq ->
       log "Coq generation...";
+
+       (* TODO: (lemmagen) Remove this line *)
+      let () = failwith "Success (lemmagen)" in
+
       let coq_il = Backend_coq.Else.transform (Backend_coq.Il2coq.transform il) in 
       let lemmas = "" (*Backend_coq.Lemmagen.lemma_gen coq_il*) in
       (match !odsts with

@@ -1009,42 +1009,52 @@ and infer_exp' env e : Il.exp' * typ =
     let mixop, _, _ = elab_typ_notation env id t in
     let es', _s = elab_exp_notation' env id e1 t in
     Il.RuleE (id, mixop, tup_exp' es' e.at), BoolT $ e1.at
-  | ForallE (as_, e1) ->
+  | ForallE (as_, e1) | ExistsE (as_, e1) ->
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = elab_quant_args env' as_ in
-    (* TODO: (lemmagen) 
-       Dim.annot_exp should only be called once from elab_def *)
-    (* let e1' = Dim.annot_exp dims' (elab_exp env' e1 (PropT $ e.at)) in *)
+    let as' = List.map (infer_arg env') as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
+    (* TODO: (lemmagen) exp is only annotated once from top-level *)
+    (* let e1' = Dim.annot_exp dims' e1' in *)
     let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ForallE (bs', as', e1'), BoolT $ e1.at
-  | ExistsE (as_, e1) -> 
-    (* TODO: (lemmagen) Get rid of duplicate code *)
-    let env' = local_env env in
-    let dims = Dim.check_exp e in
-    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = elab_quant_args env' as_ in
-    let e1' = elab_exp env' e1 (BoolT $ e.at) in
-    let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ExistsE (bs', as', e1'), BoolT $ e1.at
+    let e' = (match e.it with
+      | ForallE _ -> Il.ForallE (bs', as', e1')
+      | ExistsE _ -> Il.ExistsE (bs', as', e1')
+      | _ -> assert false) in
+    e', BoolT $ e1.at
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
 
-(* TODO: (lemmagen)
-   Move infer_binds and infer_no_bind over here *)
+and infer_def_binds env env' dims dims' d : Il.bind list =
+  let det = Free.det_def d in
+  let free = Free.(diff (free_def d) (union det (bound_env env))) in
+  if free <> Free.empty then
+    error d.at ("definition contains indeterminate variable(s) `" ^
+      String.concat "`, `" (Free.Set.elements free.varid) ^ "`");
+  let acc_bs', (module Arg : Iter.Arg) = make_binds_iter_arg env' det dims dims' in
+  let module Acc = Iter.Make(Arg) in
+  Acc.def d;
+  !acc_bs'
+
 and infer_exp_binds env env' dims dims' e : Il.bind list = 
   let det = Free.det_exp e in
   let free = Free.(diff (free_exp e) (union det (bound_env env))) in
   if free <> Free.empty then 
-    error e.at ("quantified expression contains indeterminate variable(s) `" ^
+    error e.at ("expression contains indeterminate variable(s) `" ^
       String.concat "`, `" (Free.Set.elements free.varid) ^ "`");
   let acc_bs', (module Arg : Iter.Arg) = make_binds_iter_arg env' det dims dims' in
   let module Acc = Iter.Make(Arg) in
   Acc.exp e;
   !acc_bs'
+
+and infer_def_no_binds env d =
+  let dims = Dim.check_def d in
+  let dims' = Dim.Env.map (List.map (elab_iter env)) dims in
+  let bs' = infer_def_binds env env dims dims' d in
+  assert (bs' = [])
+
 
 and elab_exp env e t : Il.exp =
   try
@@ -1204,24 +1214,18 @@ and elab_exp' env e t : Il.exp' =
     let mixop, _, _ = elab_typ_notation env id t in
     let es', _s = elab_exp_notation' env id e1 t in
     Il.RuleE (id, mixop, tup_exp' es' e.at)
-  | ForallE (as_, e1) ->
+  | ForallE (as_, e1) | ExistsE (as_, e1) ->
     (* TODO: (lemmagen) Duplicate of infer_exp' *)
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = elab_quant_args env' as_ in
+    let as' = List.map (infer_arg env') as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ForallE (bs', as', e1')
-  | ExistsE (as_, e1) -> 
-    (* TODO: (lemmagen) Duplicate of infer_exp' *)
-    let env' = local_env env in
-    let dims = Dim.check_exp e in
-    let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = elab_quant_args env' as_ in
-    let e1' = elab_exp env' e1 (BoolT $ e.at) in
-    let bs' = infer_exp_binds env env' dims dims' e in
-    Il.ExistsE (bs', as', e1')
+    (match e.it with
+      | ForallE _ -> Il.ForallE (bs', as', e1')
+      | ExistsE _ -> Il.ExistsE (bs', as', e1')
+      | _ -> assert false)
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
@@ -1812,7 +1816,8 @@ and elab_args' in_lhs env as_ ps aos' s at : Il.arg list * Subst.subst =
     let ao', s' = elab_arg in_lhs env a p s in
     elab_args' in_lhs env as1 ps1 (ao'::aos') s' at
 
-and elab_quant_arg env a : Il.arg = 
+(* TODO: (lemmagen) This implementation suffices for now *)
+and infer_arg env a : Il.arg = 
   match !(a.it) with 
   | ExpA e -> 
     let e', _t' = infer_exp env e in
@@ -1820,10 +1825,8 @@ and elab_quant_arg env a : Il.arg =
   | TypA t ->
     let t' = elab_typ env t in
     Il.TypA t' $ a.at
-  | _ -> error a.at "invalid quantifier argument"
+  | _ -> error a.at "invalid argument"
 
-and elab_quant_args env as_ : Il.arg list = 
-  List.map (elab_quant_arg env) as_
 
 and subst_implicit env s t t' : Subst.subst =
   let free = Free.(Set.filter (fun id -> not (Map.mem id env.typs)) (free_typ t).typid) in
@@ -1952,31 +1955,13 @@ let elab_hintdef _env hd : Il.def list =
     []
 
 
-let infer_binds env env' dims dims' d : Il.bind list =
-  let det = Free.det_def d in
-  let free = Free.(diff (free_def d) (union det (bound_env env))) in
-  if free <> Free.empty then
-    error d.at ("definition contains indeterminate variable(s) `" ^
-      String.concat "`, `" (Free.Set.elements free.varid) ^ "`");
-  let acc_bs', (module Arg : Iter.Arg) = make_binds_iter_arg env' det dims dims' in
-  let module Acc = Iter.Make(Arg) in
-  Acc.def d;
-  !acc_bs'
-
-let infer_no_binds env d =
-  let dims = Dim.check_def d in
-  let dims' = Dim.Env.map (List.map (elab_iter env)) dims in
-  let bs' = infer_binds env env dims dims' d in
-  assert (bs' = [])
-
-
 let elab_def env d : Il.def list =
   Debug.(log_in "el.elab_def" line);
   Debug.(log_in_at "el.elab_def" d.at (fun _ -> el_def d));
   match d.it with
   | FamD (id, ps, hints) ->
     let ps' = elab_params (local_env env) ps in
-    infer_no_binds env d;
+    infer_def_no_binds env d;
     env.typs <- rebind "syntax type" env.typs id (ps, Family []);
     [Il.TypD (id, ps', []) $ d.at]
       @ elab_hintdef env (TypH (id, "" $ id.at, hints) $ d.at)
@@ -1987,7 +1972,7 @@ let elab_def env d : Il.def list =
     let dt' = elab_typ_definition env' id1 t in
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let bs' = infer_binds env env' dims dims' d in
+    let bs' = infer_def_binds env env' dims dims' d in
     let inst' = Il.InstD (bs', as', dt') $ d.at in
     let k1', closed =
       match k1, t.it with
@@ -2026,7 +2011,7 @@ let elab_def env d : Il.def list =
   | GramD _ -> []
   | RelD (id, t, hints) ->
     let mixop, ts', _ts = elab_typ_notation env id t in
-    infer_no_binds env d;
+    infer_def_no_binds env d;
     env.rels <- bind "relation" env.rels id (t, []);
     [Il.RelD (id, mixop, tup_typ' ts' t.at, []) $ d.at]
       @ elab_hintdef env (RelH (id, hints) $ d.at)
@@ -2039,20 +2024,20 @@ let elab_def env d : Il.def list =
     let es' = List.map (Dim.annot_exp dims') (fst (elab_exp_notation' env' id1 e t)) in
     let prems' = List.map (Dim.annot_prem dims')
       (concat_map_filter_nl_list (elab_prem env') prems) in
-    let bs' = infer_binds env env' dims dims' d in
+    let bs' = infer_def_binds env env' dims dims' d in
     let rule' = Il.RuleD (id2, bs', mixop, tup_exp' es' e.at, prems') $ d.at in
     env.rels <- rebind "relation" env.rels id1 (t, rules' @ [rule']);
     []
   | VarD (id, t, _hints) ->
     let _t' = elab_typ env t in
-    infer_no_binds env d;
+    infer_def_no_binds env d;
     env.gvars <- rebind "variable" env.gvars id t;
     []
   | DecD (id, ps, t, hints) ->
     let env' = local_env env in
     let ps' = elab_params env' ps in
     let t' = elab_typ env' t in
-    infer_no_binds env d;
+    infer_def_no_binds env d;
     env.defs <- bind "definition" env.defs id (ps, t, []);
     [Il.DecD (id, ps', t', []) $ d.at]
       @ elab_hintdef env (DecH (id, hints) $ d.at)
@@ -2066,7 +2051,7 @@ let elab_def env d : Il.def list =
     let e' = Dim.annot_exp dims' (elab_exp env' e (Subst.subst_typ s t)) in
     let prems' = List.map (Dim.annot_prem dims')
       (concat_map_filter_nl_list (elab_prem env') prems) in
-    let bs' = infer_binds env env' dims dims' d in
+    let bs' = infer_def_binds env env' dims dims' d in
     let clause' = Il.DefD (bs', as', e', prems') $ d.at in
     env.defs <- rebind "definition" env.defs id (ps, t, clauses' @ [(d, clause')]);
     []
@@ -2075,10 +2060,13 @@ let elab_def env d : Il.def list =
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let e' = Dim.annot_exp dims' (elab_exp env' e (BoolT $ e.at)) in
-    let bs' = infer_binds env env' dims dims' d in
+    let bs' = infer_def_binds env env' dims dims' d in
     env.thms <- bind "theorem" env.thms id ();
-    [Il.ThmD (id, bs', e') $ d.at]
-      @ elab_hintdef env (ThmH (id, hints) $ d.at)
+    let d' = (match d.it with
+      | ThmD _ -> Il.ThmD (id, bs', e') $ d.at
+      | LemD _ -> Il.LemD (id, bs', e') $ d.at
+      | _ -> assert false) in
+    [d'] @ elab_hintdef env (ThmH (id, hints) $ d.at)
   | SepD ->
     []
   | HintD hd ->
@@ -2093,7 +2081,7 @@ let elab_gramdef env d =
     let _ps' = elab_params env' ps in
     let _t' = elab_typ env' t in
     elab_gram env' gram t;
-    infer_no_binds env' d;
+    infer_def_no_binds env' d;
     let ps1, t1, gram1_opt = find "grammar" env.syms id1 in
     let gram' =
       match gram1_opt, gram.it with

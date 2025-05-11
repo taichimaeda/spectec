@@ -107,7 +107,6 @@ and exp' =
   | UnE of unop * exp            (* unop exp *)
   | BinE of exp * binop * exp    (* exp binop exp *)
   | CmpE of exp * cmpop * exp    (* exp cmpop exp *)
-  (* TODO: (lemmagen) Does this conflict with TypE? *)
   | RuleE of id * exp            (* relid : exp *)
   | ForallE of arg list * exp    (* forall `(` arg* `)` exp *)
   | ExistsE of arg list * exp    (* exists `(` arg* `)` exp *)
@@ -202,8 +201,7 @@ and def' =
 and prem = prem' phrase
 and prem' =
   | VarPr of id * typ                        (* `var` id `:` typ *)
-  (* TODO: (lemmagen) 
-     RulePr will likely be redundant with RuleE in exp *)
+  (* TODO: (lemmagen) RulePr is now redundant with RuleE *)
   | RulePr of id * exp                       (* ruleid `:` exp *)
   | IfPr of exp                              (* `if` exp *)
   | ElsePr                                   (* `otherwise` *)

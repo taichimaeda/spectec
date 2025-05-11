@@ -152,6 +152,12 @@ and t_exp' env e : bind list * exp' =
   | TheE exp -> t_e env exp (fun exp' -> TheE exp')
   | CaseE (mixop, exp) -> t_e env exp (fun exp' -> CaseE (mixop, exp'))
   | SubE (exp, a, b) -> t_e env exp (fun exp' -> SubE (exp', a, b))
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, mixop, exp) -> t_e env exp (fun exp' -> RuleE (id, mixop, exp'))
+  | ForallE (binds, args, exp) -> 
+    binary t_args t_exp env (args, exp) (fun (args', exp') -> ForallE (binds, args', exp'))
+  | ExistsE (binds, args, exp) ->
+    binary t_args t_exp env (args, exp) (fun (args', exp') -> ExistsE (binds, args', exp'))
 
   | BinE (bo, exp1, exp2) -> t_ee env (exp1, exp2) (fun (e1', e2') -> BinE (bo, e1', e2'))
   | CmpE (co, exp1, exp2) -> t_ee env (exp1, exp2) (fun (e1', e2') -> CmpE (co, e1', e2'))
@@ -173,8 +179,6 @@ and t_exp' env e : bind list * exp' =
     let iterexp', binds1' = under_iterexp iterexp binds1 in
     let binds2, iterexp'' = t_iterexp env iterexp' in
     binds1' @ binds2, IterE (e', iterexp'')
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and t_field env ((a, e) : expfield) =
   unary t_exp env e (fun e' -> (a, e'))
@@ -199,6 +203,8 @@ and t_arg env = phrase t_arg' env
 and t_arg' env arg = match arg with
   | ExpA exp -> unary t_exp env exp (fun exp' -> ExpA exp')
   | TypA _ -> [], arg
+
+and t_args env k = t_list t_arg env k (fun x -> x)
 
 let rec t_prem env : prem -> bind list * prem = phrase t_prem' env
 
@@ -235,6 +241,7 @@ let rec t_def' env = function
   | RecD defs -> RecD (t_defs env defs)
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, typ, t_rules env rules)
+  (* TODO: (lemmagen) No need to handle other defs? *)
   | def -> def
 
 and t_def env x = { x with it = t_def' env x.it }

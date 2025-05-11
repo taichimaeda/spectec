@@ -264,6 +264,8 @@ theorem t_progress : forall (s, f, admininstr*, t?)
   exists (s', f', admininstr'*)
   @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
 
+(; TODO: With the latest version of SpecTec which supports TypE
+         these variable declarations could be replaced by lab* : resulttype* etc. ;)
 var lab : valtype
 var ret : valtype
 
