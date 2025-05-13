@@ -12,6 +12,7 @@ sig
   val visit_ruleid : id -> unit
   val visit_varid : id -> unit
   val visit_defid : id -> unit
+  val visit_thmid : id -> unit
 
   val visit_typ : typ -> unit
   val visit_deftyp : deftyp -> unit
@@ -32,6 +33,8 @@ struct
   let visit_ruleid _ = ()
   let visit_varid _ = ()
   let visit_defid _ = ()
+  let visit_gramid _ = ()
+  let visit_thmid _ = ()
 
   let visit_typ _ = ()
   let visit_deftyp _ = ()
@@ -66,6 +69,7 @@ let relid x = visit_relid x
 let ruleid x = visit_ruleid x
 let varid x = visit_varid x
 let defid x = visit_defid x
+let thmid x = visit_thmid x
 
 let unop _op = ()
 let binop _op = ()
@@ -133,8 +137,8 @@ and exp e =
   | CallE (x, as_) -> defid x; args as_
   | IterE (e1, it) -> exp e1; iterexp it
   | SubE (e1, t1, t2) -> exp e1; typ t1; typ t2
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleE (x, op, e1) -> relid x; mixop op; exp e1
+  | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> binds bs; args as_; exp e1
 
 and expfield (at, e) = atom at; exp e
 
@@ -189,8 +193,8 @@ let hintdef d =
   | TypH (x, hs) -> typid x; hints hs
   | RelH (x, hs) -> relid x; hints hs
   | DecH (x, hs) -> defid x; hints hs
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | ThmH (x, hs) -> thmid x; hints hs
+  | LemH (x, hs) -> thmid x; hints hs
 
 let inst i =
   match i.it with
@@ -211,7 +215,7 @@ let rec def d =
   | RelD (x, op, t, rules) -> relid x; mixop op; typ t; list rule rules
   | DecD (x, ps, t, clauses) -> defid x; params ps; typ t; list clause clauses
   | RecD ds -> list def ds
+  | ThmD (x, bs, e) -> thmid x; binds bs; exp e
+  | LemD (x, bs, e) -> thmid x; binds bs; exp e
   | HintD hd -> hintdef hd
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 end

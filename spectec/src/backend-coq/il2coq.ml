@@ -255,6 +255,20 @@ and check_family_dependent_type (typ : typ) =
       VarT (id, _) -> Hashtbl.mem family_helper (transform_id id)
     | _ -> false
 
+and check_formula (exp : exp) = 
+  let module Arg =
+    struct
+      include Il.Iter.Skip
+      let flag = ref false
+      let visit_exp exp' = 
+        match exp'.it with
+        | RuleE _ | ForallE _ | ExistsE _ -> flag := true
+        | _ -> ()  
+    end in
+  let module Acc = Il.Iter.Make(Arg) in
+  Acc.exp exp;
+  !Arg.flag
+
 and transform_return_type (typ : typ) =
   match typ.it with
     (* Only works for 1-dimensional lists. 
@@ -285,6 +299,7 @@ and transform_tuple_to_relation_args (t : typ) =
     | _ -> [erase_dependent_type t]
 
 (* Expression functions *)
+(* TODO: Resolve inconsistent variable names in patterns *)
 and transform_exp (exp : exp) =
   match exp.it with 
     | VarE id -> 
@@ -297,7 +312,9 @@ and transform_exp (exp : exp) =
     | BoolE b -> T_exp_basic (T_bool b)
     | NatE n -> T_exp_basic (T_nat n)
     | TextE txt -> T_exp_basic (T_string txt)
-    | UnE (unop, exp) -> transform_unop unop exp
+    | UnE (NotOp as unop, exp) -> T_app (transform_unop unop, [transform_exp exp])
+    | UnE ((PlusOp _ | MinusOp _) as unop, exp) -> T_app_infix (transform_unop unop, T_exp_basic (T_nat Z.zero), transform_exp exp)
+    | UnE ((MinusPlusOp _ | PlusMinusOp _) as unop, exp) -> T_app (transform_unop unop, [transform_exp exp])
     | BinE (binop, exp1, exp2) -> T_app_infix (transform_binop binop, transform_exp exp1, transform_exp exp2)
     | CmpE (cmpop, exp1, exp2) -> T_app_infix (transform_cmpop cmpop, transform_exp exp1, transform_exp exp2)
     | TupE [] -> T_exp_basic T_exp_unit
@@ -356,8 +373,10 @@ and transform_exp (exp : exp) =
         | _ -> exp1
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)"
+    | RuleE _ | ForallE _ | ExistsE _ -> 
+      (* TODO: (lemmagen) Come up with a better error message *)
+      error exp.at "expected decidable boolean expressions"
+
 
 (* MEMO: This produces terms to be pattern matched against in match expressions
          which requires special handling in addition to transform_exp *)
@@ -369,7 +388,8 @@ and transform_match_exp (exp : exp) =
     (* MEMO: If there is a match then we want to pattern match against the inner value instead *)
     (match (infer_match_name (get_typ_args exp.note) (gen_typ_name exp.note)) with
     | Some new_id -> T_app (T_ident [new_id; family_type_suffix], [T_ident [transform_var_id id]])
-    | _ -> transform_exp exp)
+    (* TODO: (lemmagen) Cannot apply T_cast in match pattern unlike transform_exp *)
+    | _ -> T_ident [transform_var_id id])
   | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp exp1, transform_match_exp exp2)
   | IterE (exp, _) -> transform_match_exp exp
   | ListE exps -> (match exps with
@@ -384,7 +404,10 @@ and transform_match_exp (exp : exp) =
     (* MEMO: If there is a match then we want to pattern match against the inner value instead *)
     (match (infer_match_name (get_typ_args exp.note) (gen_typ_name exp.note)) with 
     | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], transform_tuple_exp transform_match_exp e)])
-    | _ -> transform_exp exp)
+    | _ -> 
+      (* TODO: (lemmagen) Duplicate of transform_exp *)
+      let actual_id, num_args = gen_case_name !env_ref exp.note in 
+      T_app (T_ident [transform_id actual_id; transform_mixop m], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp transform_match_exp e)))
   | (* MEMO: Allows matching against the addition of natural numbers n1 + n2
              if n2 is a natural number literal
              Prepends successor constructor S of nat repeatedly n2 times *)
@@ -399,11 +422,26 @@ and transform_tuple_exp (transform_func : exp -> coq_term) (exp : exp) =
     | TupE exps -> List.map transform_func exps
     | _ -> [transform_func exp]
 
+and transform_formula_exp (exp : exp) = 
+  match exp.it with
+    | UnE (NotOp as unop, exp) -> T_app (transform_formula_unop unop, [transform_formula_exp exp])
+    | BinE (binop, exp1, exp2) -> T_app_infix (transform_formula_binop binop, transform_formula_exp exp1, transform_formula_exp exp2)
+    | CmpE (cmpop, exp1, exp2) -> T_app_infix (transform_formula_cmpop cmpop, transform_formula_exp exp1, transform_formula_exp exp2)
+    | RuleE (id, _, e1) -> 
+      T_rule (transform_id id, transform_tuple_exp transform_exp e1)
+    | ForallE (bs, _, e1) -> 
+      T_forall (List.map transform_bind bs, transform_formula_exp e1)
+    | ExistsE (bs, _, e1) ->
+      T_forall (List.map transform_bind bs, transform_formula_exp e1)
+    | _ -> transform_exp exp
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
 (* This could be extended for other list expressions (and option), but for 1.0 this is fine *)
 and transform_return_exp (r_typ : typ option) (exp : exp) = 
-  match r_typ with
+  if check_formula exp then 
+    transform_formula_exp exp
+  else 
+    match r_typ with
     | None -> transform_exp exp
     | Some typ -> (match exp.it with
       | ListE exps -> T_list (List.map (fun e -> T_cast ((transform_exp e), erase_dependent_type (remove_iter_typ typ))) exps)
@@ -411,13 +449,13 @@ and transform_return_exp (r_typ : typ option) (exp : exp) =
       | _ -> transform_exp exp
     )
 
-and transform_unop (u : unop) (exp : exp) = 
+and transform_unop (u : unop)= 
   match u with
-    | NotOp ->  T_app (T_exp_basic T_sub, [transform_exp exp])
-    | PlusOp _ -> T_app_infix (T_exp_basic T_add, T_exp_basic (T_nat Z.zero), transform_exp exp)
-    | MinusOp _ -> T_app_infix (T_exp_basic T_sub, T_exp_basic (T_nat Z.zero), transform_exp exp)
-    | MinusPlusOp _ -> T_app (T_exp_basic T_minusplus, [transform_exp exp])
-    | PlusMinusOp _ -> T_app (T_exp_basic T_plusminus, [transform_exp exp])
+    | NotOp -> T_exp_basic T_not
+    | PlusOp _ -> T_exp_basic T_add
+    | MinusOp _ -> T_exp_basic T_sub
+    | MinusPlusOp _ -> T_exp_basic T_minusplus
+    | PlusMinusOp _ -> T_exp_basic T_plusminus
 
 and transform_binop (b : binop) = 
   match b with
@@ -440,6 +478,25 @@ and transform_cmpop (c : cmpop) =
     | GtOp _ -> T_exp_basic T_gt
     | LeOp _ -> T_exp_basic T_le
     | GeOp _ -> T_exp_basic T_ge
+
+and transform_formula_unop (u : unop) = 
+  match u with
+    | NotOp ->  T_exp_basic T_not_prop
+    | _ -> transform_unop u
+
+and transform_formula_binop (b : binop) = 
+  match b with
+    | AndOp -> T_exp_basic T_and_prop
+    | OrOp -> T_exp_basic T_or_prop
+    | ImplOp -> T_exp_basic T_impl_prop
+    | EquivOp -> T_exp_basic T_equiv_prop
+    | _ -> transform_binop b
+
+and transform_formula_cmpop (c : cmpop) =
+  match c with
+    | EqOp -> T_exp_basic T_eq_prop
+    | NeOp -> T_exp_basic T_neq_prop
+    | _ -> transform_cmpop c
 
 (* Binds, args, and params functions *)
 and transform_arg (arg : arg) =
@@ -558,7 +615,7 @@ let rec transform_premise (p : prem) =
   match p.it with
     | (* MEMO: This boolean expression is printed as a Coq term literally
                which gets coerced by is_true *)
-      IfPr exp -> P_if (transform_exp exp)
+      IfPr exp -> P_if (transform_formula_exp exp)
     | (* MEMO: P_else is handled by else removal pass later *)
       ElsePr -> P_else
     | LetPr (exp1, exp2, _) -> P_if (T_app_infix (T_exp_basic T_eq, transform_exp exp1, transform_exp exp2))
@@ -633,10 +690,10 @@ let rec transform_def (d : def) : coq_def =
       RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
       let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
-      if (clauses == []) 
+      if (clauses == []) then
         (* MEMO: If the function declaration has no corresponding definitions
                  then print it as an axiom in Coq *)
-        then AxiomD (transform_fun_id id, binds, transform_return_type typ)
+        AxiomD (transform_fun_id id, binds, transform_return_type typ)
       else (
         (* MEMO: If any parameter in this function delcaration conains a type family
                  then add an extra clause returning default_val when there is no match *)
@@ -645,16 +702,20 @@ let rec transform_def (d : def) : coq_def =
           | TypP _ -> false 
         )) false params in
         let new_clause = if family_type_exists then [(T_ident ["_"], T_ident ["default_val"])] else [] in
-        let is_family_return_type = check_family_dependent_type typ in 
-        let return_type = if is_family_return_type then transform_return_type typ else erase_dependent_type typ in 
-        let base_return_type = if is_family_return_type then Some typ else None in 
+        let return_type = 
+          let DefD (_, _, exp, _) = (List.hd clauses).it in
+          if check_formula exp then T_type_basic T_prop else
+          if check_family_dependent_type typ then transform_return_type typ else erase_dependent_type typ in 
+        let base_return_type = if check_family_dependent_type typ then Some typ else None in 
         DefinitionD (transform_fun_id id, binds, return_type, (List.map (transform_clause base_return_type) clauses) @ new_clause)
       )
     | (* MEMO: RecD groups mutually recursive defs *)
       RecD defs -> MutualRecD (List.map transform_def defs)
     | HintD _ -> UnsupportedD ""
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)") $ d.at
+    | ThmD (id, bs, e1) -> 
+      TheoremD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+    | LemD (id, bs, e1) -> 
+      LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)) $ d.at
 
 let is_not_hintdef (d : def) : bool =
   match d.it with

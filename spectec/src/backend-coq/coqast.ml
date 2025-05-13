@@ -18,6 +18,7 @@ type coq_basic_types =
   | T_string
   | T_list
   | T_opt
+  | T_prop
 
 type coq_basic_term = 
   | T_bool of bool
@@ -25,6 +26,14 @@ type coq_basic_term =
   | T_int of int
   | T_string of string
   | T_exp_unit
+  (* TODO: (lemmagen) Can we name these better? *)
+  | T_not_prop
+  | T_and_prop
+  | T_or_prop
+  | T_impl_prop
+  | T_equiv_prop
+  | T_eq_prop
+  | T_neq_prop
   | T_not
   | T_plusminus
   | T_minusplus
@@ -79,6 +88,9 @@ and coq_term =
   | T_app_infix of (coq_term * coq_term * coq_term) (* Same as above but first coq_term is placed in the middle *)
   | T_tuple of (coq_term list) 
   | T_cast of (coq_term * coq_term)
+  | T_forall of (binders * coq_term)
+  | T_exists of (binders * coq_term)
+  | T_rule of (ident * coq_term list)
   | T_unsupported of string
 
 and coq_premise =
@@ -128,6 +140,8 @@ and coq_def' =
   | DefinitionD of (ident * binders * return_type * clause_entry list)
   | InductiveRelationD of (ident * relation_args * relation_type_entry list)
   | AxiomD of (ident * binders * return_type)
+  | TheoremD of (ident * binders * coq_term)
+  | LemmaD of (ident * binders * coq_term)
   | InductiveFamilyD of (ident * family_entry list)
   | CoercionD of (func_name * ident * ident)
   | UnsupportedD of string

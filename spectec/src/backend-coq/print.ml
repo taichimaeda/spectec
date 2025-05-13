@@ -25,11 +25,13 @@ let comment_desc_def (def: coq_def): string =
     | DefinitionD _ -> "Auxiliary Definition"
     | InductiveRelationD _ -> "Inductive Relations Definition"
     | AxiomD _ -> "Axiom Definition"
+    | TheoremD _ -> "Theorem Definition"
+    | LemmaD _ -> "Lemma Definition"
     | InductiveFamilyD _ -> "Family Type Definition"
     | CoercionD _ -> "Type Coercion Definition"
     | UnsupportedD _ -> ""
 
-
+(* TODO: Type for string_of_term? *)
 let rec string_of_terms (term : coq_term) =
   match term with
     | T_exp_basic (T_bool b) -> string_of_bool b
@@ -37,21 +39,28 @@ let rec string_of_terms (term : coq_term) =
     | T_exp_basic (T_int _i) -> "" (* TODO Manage ints well *)
     | T_exp_basic (T_string s) -> "\"" ^ String.escaped s ^ "\""
     | T_exp_basic T_exp_unit -> "tt"
-    | T_exp_basic T_not -> "~"
+    | T_exp_basic T_not_prop -> "~"
+    | T_exp_basic T_and_prop -> " /\\ "
+    | T_exp_basic T_or_prop -> " \\/ "
+    | T_exp_basic T_impl_prop -> " -> "
+    | T_exp_basic T_equiv_prop -> " <-> "
+    | T_exp_basic T_eq_prop -> " = "
+    | T_exp_basic T_neq_prop -> " <> "
+    | T_exp_basic T_not -> "~~"
     | T_exp_basic T_plusminus -> "" (* TODO *)
     | T_exp_basic T_minusplus -> "" (* TODO *)
-    | T_exp_basic T_and -> " /\\ "
-    | T_exp_basic T_or -> " \\/ "
-    | T_exp_basic T_impl -> " -> "
-    | T_exp_basic T_equiv -> " <-> "
+    | T_exp_basic T_and -> " && "
+    | T_exp_basic T_or -> " || "
+    | T_exp_basic T_impl -> " ==> "
+    | T_exp_basic T_equiv -> " == "
     | T_exp_basic T_add -> " + "
     | T_exp_basic T_sub -> " - "
     | T_exp_basic T_mul -> " * "
     | T_exp_basic T_div -> " / "
     | T_exp_basic T_exp -> " ^ "
     | T_exp_basic T_mod -> " mod "
-    | T_exp_basic T_eq -> " = "
-    | T_exp_basic T_neq -> " <> "
+    | T_exp_basic T_eq -> " == "
+    | T_exp_basic T_neq -> " != "
     | T_exp_basic T_lt -> " < "
     | T_exp_basic T_gt -> " > "
     | T_exp_basic T_le -> " <= "
@@ -73,6 +82,7 @@ let rec string_of_terms (term : coq_term) =
     | T_type_basic T_string -> "string"
     | T_type_basic T_list -> "list"
     | T_type_basic T_opt -> "option"
+    | T_type_basic T_prop -> "Prop"
     | T_ident ids -> String.concat "__" ids
     | T_update (paths, term1, term2) -> string_of_paths_start paths term1 true term2
     | T_extend (paths, term1, term2) -> string_of_paths_start paths term1 false term2
@@ -89,6 +99,9 @@ let rec string_of_terms (term : coq_term) =
     | T_app_infix (infix_op, term1, term2) -> parens (string_of_terms term1 ^ string_of_terms infix_op ^ string_of_terms term2)
     | T_tuple types -> parens (String.concat " * " (List.map string_of_terms types))
     | T_cast (term, typ) -> parens (string_of_terms term ^ " : " ^ string_of_terms typ)
+    | T_forall (binds, term) -> "forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term
+    | T_exists (binds, term) -> "exists " ^ string_of_binders binds ^ ", " ^ string_of_terms term
+    | T_rule (id, terms) -> parens (id ^ " " ^ String.concat " " (List.map string_of_terms terms))
     | T_unsupported str -> comment_parens ("Unsupported term: " ^ str)
 
 and string_of_ident_terms (term : coq_term) =
@@ -127,12 +140,12 @@ and string_of_paths_start (paths : coq_path_term list) (start_term : coq_term) (
 
   
 
-let string_of_binders (binds : binders) = 
+and string_of_binders (binds : binders) = 
   String.concat " " (List.map (fun (id, typ) -> 
     parens (id ^ " : " ^ string_of_terms typ)
   ) binds)
 
-let string_of_binders_ids (binds : binders) = 
+and string_of_binders_ids (binds : binders) = 
   String.concat " " (List.map (fun (id, _) -> id) binds)
 
 let string_of_list_type (id : ident) (args : binders) =
@@ -270,6 +283,13 @@ let string_of_inductive_relation (prefix : string) (id : ident) (args : relation
 let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =
   "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms r_type
 
+let string_of_theorem (id : ident) (binds : binders) (term : coq_term) = 
+  "Theorem " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\n Proof. Admitted"
+
+
+let string_of_lemma (id : ident) (binds : binders) (term : coq_term) = 
+  "Lemma " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\n Proof. Admitted"
+
 let is_typealias_familytype ((_, f_type) : family_entry) = 
   match f_type with
     | TypeAliasT _ -> true
@@ -360,6 +380,8 @@ let rec string_of_def (recursive : bool) (def : coq_def) =
     | InductiveRelationD (id, args, relations) -> let prefix = if recursive then "" else "Inductive " in
       string_of_inductive_relation prefix id args relations
     | AxiomD (id, binds, r_type) -> string_of_axiom id binds r_type
+    | TheoremD (id, binds, term) -> string_of_theorem id binds term
+    | LemmaD (id, binds, term) -> string_of_lemma id binds term
     | InductiveFamilyD (id, entries) -> string_of_family_types id entries 
     | CoercionD (func_name, typ1, typ2) -> string_of_coercion func_name typ1 typ2
     | UnsupportedD str -> comment_parens ("Unsupported Definition: " ^ str)
