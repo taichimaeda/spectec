@@ -1017,7 +1017,7 @@ and infer_exp' env e : Il.exp' * typ =
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
     (* TODO: (lemmagen) exp is only annotated once from top-level *)
     (* let e1' = Dim.annot_exp dims' e1' in *)
-    let bs' = infer_exp_binds env env' dims dims' e in
+    let bs' = infer_arg_binds env env' dims dims' as_ in
     let e' = (match e.it with
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
@@ -1038,15 +1038,15 @@ and infer_def_binds env env' dims dims' d : Il.bind list =
   Acc.def d;
   !acc_bs'
 
-and infer_exp_binds env env' dims dims' e : Il.bind list = 
-  let det = Free.det_exp e in
-  let free = Free.(diff (free_exp e) (union det (bound_env env))) in
+and infer_arg_binds env env' dims dims' as_ : Il.bind list = 
+  let det = Free.det_args as_ in
+  let free = Free.(diff (free_args as_) (union det (bound_env env))) in
   if free <> Free.empty then 
-    error e.at ("expression contains indeterminate variable(s) `" ^
+    error (List.hd as_).at ("arguments contain indeterminate variable(s) `" ^
       String.concat "`, `" (Free.Set.elements free.varid) ^ "`");
   let acc_bs', (module Arg : Iter.Arg) = make_binds_iter_arg env' det dims dims' in
   let module Acc = Iter.Make(Arg) in
-  Acc.exp e;
+  Acc.args as_;
   !acc_bs'
 
 and infer_def_no_binds env d =
@@ -1221,7 +1221,7 @@ and elab_exp' env e t : Il.exp' =
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let as' = List.map (infer_arg env') as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
-    let bs' = infer_exp_binds env env' dims dims' e in
+    let bs' = infer_arg_binds env env' dims dims' as_ in
     (match e.it with
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
@@ -2056,12 +2056,13 @@ let elab_def env d : Il.def list =
     env.defs <- rebind "definition" env.defs id (ps, t, clauses' @ [(d, clause')]);
     []
   | ThmD (id, e, hints) | LemD (id, e, hints) ->
+    (* TODO: (lemmagen) Declares theorems before its definition body *)
+    env.thms <- bind "theorem" env.thms id ();
     let env' = local_env env in
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let e' = Dim.annot_exp dims' (elab_exp env' e (BoolT $ e.at)) in
     let bs' = infer_def_binds env env' dims dims' d in
-    env.thms <- bind "theorem" env.thms id ();
     let d' = (match d.it with
       | ThmD _ -> Il.ThmD (id, bs', e') $ d.at
       | LemD _ -> Il.LemD (id, bs', e') $ d.at

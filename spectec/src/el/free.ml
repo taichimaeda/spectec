@@ -74,6 +74,7 @@ let free_gramid id = {empty with gramid = Set.singleton id.it}
 let free_relid id = {empty with relid = Set.singleton id.it}
 let free_varid id = {empty with varid = Set.singleton id.it}
 let free_defid id = {empty with defid = Set.singleton id.it}
+let free_thmid id = {empty with thmid = Set.singleton id.it}
 
 let bound_typid id = if id.it = "_" then empty else free_typid id
 let bound_gramid id = if id.it = "_" then empty else free_gramid id
@@ -146,7 +147,7 @@ and free_exp e =
   | TypE (e1, t) -> free_exp e1 + free_typ t
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, e1) -> free_relid id + free_exp e1
-  | ForallE (as_, e1) | ExistsE (as_, e1) -> free_args as_ + idx_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> free_exp e1 - free_args as_
 
 and free_expfield (_, e) = free_exp e
 
@@ -183,7 +184,7 @@ and det_exp e =
   | DotE _ | LenE _ | SizeE _ -> idx_exp e
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (_, e1) -> det_exp e1
-  | ForallE (as_, e1) | ExistsE (as_, e1) -> det_args as_ + det_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> det_exp e1 - det_args as_
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
 
 and det_expfield (_, e) = det_exp e
@@ -206,7 +207,7 @@ and idx_exp e =
   | IdxE (_, e2) -> det_exp e2
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (_, e1) -> idx_exp e1
-  | ForallE (as_, e1) | ExistsE (as_, e1) -> det_args as_ + idx_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> idx_exp e1 - det_args as_
   | _ -> empty
 
 and idx_expfield (_, e) = idx_exp e
@@ -342,11 +343,11 @@ let free_def d =
     free_params ps + free_typ t - bound_params ps
   | DefD (id, as_, e, prems) ->
     free_defid id + free_args as_ + free_exp e + free_prems prems
-  | ThmD (_id, e, _hints)
-  | LemD (_id, e, _hints) -> 
+  | ThmD (id, e, _hints)
+  | LemD (id, e, _hints) -> 
     (* TODO: (lemmagen) Is this correct? *)
     (* TODO: (lemmagen) No free_thmid because theorems have no declarations *)
-    free_exp e
+    free_thmid id + free_exp e
   | HintD _ -> empty
 
 let det_def d =

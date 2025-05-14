@@ -456,7 +456,7 @@ and transform_formula_exp (exp : exp) =
       (* TODO: (lemmagen) Change transform_relation_bind to a more generic name *)
       T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
     | ExistsE (bs, _, e1) ->
-      T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
+      T_exists (List.map transform_relation_bind bs, transform_formula_exp e1)
     | _ -> transform_exp exp
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
@@ -714,14 +714,17 @@ let rec transform_def (d : def) : coq_def =
     | DecD (id, params, typ, clauses) -> 
       let hinttyp = check_hintdef d in
       if (hinttyp = `Theorem || hinttyp = `Lemma) then
+        (* TODO: (lemmagen) Extract this into another function *)
         (if params <> [] then 
           error d.at "theorem takes no arguments";
         if List.length clauses <> 1 then
           error d.at "theorem takes exactly one clause";
-        let _as, ret = transform_clause None (List.hd clauses) in
+        let clause = List.hd clauses in
+        let DefD (bs, _, _, _) = clause.it in
+        let _as, ret = transform_clause None clause in
         match hinttyp with
-        | `Theorem -> TheoremD (transform_id id, [], ret)
-        | `Lemma -> LemmaD (transform_id id, [], ret)
+        | `Theorem -> TheoremD (transform_id id, List.map transform_bind bs, ret)
+        | `Lemma -> LemmaD (transform_id id, List.map transform_bind bs, ret)
         | _ -> assert false)
       else if (clauses = []) then
         (* MEMO: If the function declaration has no corresponding definitions
