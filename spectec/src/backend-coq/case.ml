@@ -60,7 +60,7 @@ let string_of_struct_type (t : struct_type) = match t with
   | Terminal -> "Terminal"
   | TypeAlias -> "Type Alias"
 
-let print_env (env: env) = 
+let _print_env (env: env) = 
   Env.iter (fun id (n_id , num_args, str_typ) -> print_endline (
     "Type Alias(Key): " ^ id ^ "\n" ^
     "Actual Type: " ^ n_id.it ^ "\n" ^
@@ -119,9 +119,3 @@ let rec case_def (e : env) (d : def) =
     | (* MEMO: RecD group mutually recursive defs *)
       RecD defs -> List.iter (case_def e) defs
     | _ -> ()
-
-let get_case_env (il : script) =
-  let env = new_env () in 
-  List.iter (case_def env) il;
-  env
-

@@ -1,5 +1,4 @@
 (library
-  (name backend_coq)
-  (libraries util il)
-  (modules case coqast il2coq print else)
-)
+ (name backend_coq)
+ (libraries util il)
+ (modules case coqast il2coq print else hint))

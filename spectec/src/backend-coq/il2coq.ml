@@ -33,7 +33,9 @@ let rec partition_eitherlist (xs : ('a, 'b) Either.t list) =
 let family_helper = Hashtbl.create 30
 
 (* Case functions that handles case expressions and record appending*)
-let env_ref = ref (Case.new_env())
+let caseenv_ref = ref (Case.new_env())
+
+let hintenv_ref = ref (Hint.new_env())
 
 (* MEMO: Returns the newly aliased type name for type alias
          and the number of parameters used in the syntax definition *)
@@ -269,6 +271,27 @@ and check_formula (exp : exp) =
   Acc.exp exp;
   !Arg.flag
 
+and check_hintdef (d : def) = 
+  match d.it with 
+  | DecD (id, _, _, _) -> 
+    let env = !hintenv_ref in
+    let env' = !(env.proof_def) in
+    if not (Hint.bound env' id) then
+      `Other
+    else
+      let hes = Hint.find "definition" !(env.proof_def) id in
+      let hts = List.filter_map (fun ss -> 
+        if List.length ss <> 1 then
+          error d.at "proof hint takes exactly one expression";
+        match List.hd ss with
+        | "\"theorem\"" -> Some `Theorem
+        | "\"lemma\"" -> Some `Lemma
+        | _ -> None) hes in
+      if List.length hts <> 1 then
+        error d.at "definition takes at most one proof hint";
+      List.hd hts
+  | _ -> `Other
+
 and transform_return_type (typ : typ) =
   match typ.it with
     (* Only works for 1-dimensional lists. 
@@ -325,7 +348,7 @@ and transform_exp (exp : exp) =
       (* MEMO: num_args is required to supply enough arguments
                to the constructor of the inductive definition in Coq *)
       (* MEMO: actual_id is the name of the newly aliased type for type alias *)
-      let actual_id, num_args = gen_case_name !env_ref exp.note in 
+      let actual_id, num_args = gen_case_name !caseenv_ref exp.note in 
       T_app (T_ident [transform_id actual_id; transform_mixop mixop], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp transform_exp e))
     | UncaseE (_e, _mixop) -> T_unsupported ("Uncase: " ^ string_of_exp exp)
     | OptE (Some e) -> T_app (T_exp_basic T_some, [transform_exp e])
@@ -406,7 +429,7 @@ and transform_match_exp (exp : exp) =
     | Some a -> T_app (T_ident [a; family_type_suffix], [T_app (T_ident [a; transform_mixop m], transform_tuple_exp transform_match_exp e)])
     | _ -> 
       (* TODO: (lemmagen) Duplicate of transform_exp *)
-      let actual_id, num_args = gen_case_name !env_ref exp.note in 
+      let actual_id, num_args = gen_case_name !caseenv_ref exp.note in 
       T_app (T_ident [transform_id actual_id; transform_mixop m], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp transform_match_exp e)))
   | (* MEMO: Allows matching against the addition of natural numbers n1 + n2
              if n2 is a natural number literal
@@ -635,7 +658,7 @@ let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
         else TypeAliasD (transform_id id, List.map transform_bind binds, erase_dependent_type typ)
     | (* MEMO: Struct types are printed with Record *)
       StructT typfields -> RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> 
-      (transform_id id ^ "__" ^ transform_atom a, erase_dependent_type t, Option.map (get_struct_type !env_ref) (get_typ_name t))
+      (transform_id id ^ "__" ^ transform_atom a, erase_dependent_type t, Option.map (get_struct_type !caseenv_ref) (get_typ_name t))
       ) typfields)
     | (* MEMO: Variant types are printed with Inductive *)
       VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (_, t, _), _) ->
@@ -689,14 +712,26 @@ let rec transform_def (d : def) : coq_def =
                typ is a tuple of types to be interspersed in the mixop which is ignored here *)
       RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
-      let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
-      if (clauses == []) then
+      let hinttyp = check_hintdef d in
+      if (hinttyp = `Theorem || hinttyp = `Lemma) then
+        (if params <> [] then 
+          error d.at "theorem takes no arguments";
+        if List.length clauses <> 1 then
+          error d.at "theorem takes exactly one clause";
+        let _as, ret = transform_clause None (List.hd clauses) in
+        match hinttyp with
+        | `Theorem -> TheoremD (transform_id id, [], ret)
+        | `Lemma -> LemmaD (transform_id id, [], ret)
+        | _ -> assert false)
+      else if (clauses = []) then
         (* MEMO: If the function declaration has no corresponding definitions
                  then print it as an axiom in Coq *)
+        let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
         AxiomD (transform_fun_id id, binds, transform_return_type typ)
       else (
         (* MEMO: If any parameter in this function delcaration conains a type family
                  then add an extra clause returning default_val when there is no match *)
+        let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
         let family_type_exists = List.fold_left (fun acc param -> acc || (match param.it with
           | ExpP (_, typ') -> check_family_dependent_type typ'
           | TypP _ -> false 
@@ -709,13 +744,12 @@ let rec transform_def (d : def) : coq_def =
         let base_return_type = if check_family_dependent_type typ then Some typ else None in 
         DefinitionD (transform_fun_id id, binds, return_type, (List.map (transform_clause base_return_type) clauses) @ new_clause)
       )
-    | (* MEMO: RecD groups mutually recursive defs *)
-      RecD defs -> MutualRecD (List.map transform_def defs)
-    | HintD _ -> UnsupportedD ""
+    | RecD defs -> MutualRecD (List.map transform_def defs)
     | ThmD (id, bs, e1) -> 
       TheoremD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
     | LemD (id, bs, e1) -> 
-      LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)) $ d.at
+        LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+    | HintD _ -> UnsupportedD "") $ d.at
 
 let is_not_hintdef (d : def) : bool =
   match d.it with
@@ -833,7 +867,7 @@ let transform_sub_types (at : region) (t1_id : id) (t2_id : id) (t1_cases : sub_
 (* MEMO: Produces additional Coq constructs to model subtyping in Right *)
 (* MEMO: This returns list of either def in IL or coq_def in Coq IL for each def in IL
          coq_def is prepended to the list if extra Coq constructs are generated *)
-let rec transform_sub_def (env : env) (d : def) = 
+let rec transform_sub_def (d : def) = 
   match d.it with
     | RelD (_, _, _, rules) -> 
       (* MEMO: First get subsumption expressions from rules *)
@@ -852,28 +886,26 @@ let rec transform_sub_def (env : env) (d : def) =
             (* MEMO: Looks up sub_typ values for each type from the environment *)
             (* MEMO: sub_typ contains a list of case expressions for that syntax definition
                      which corresponds to the constructors of the equivalent inductive type in Coq *)
+            let env = !caseenv_ref in
             let typ1_cases = find "Sub pass" env.subs t1_id in
             let typ2_cases = find "Sub pass" env.subs t2_id in
             Hashtbl.add sub_hastable combined_name combined_name;
             transform_sub_types d.at t1_id t2_id typ1_cases typ2_cases)
         | _ -> []) sub_expressions) [Left d]
-    | (* MEMO: RecD groups mutually recursive defs *)
-      (* MEMO: RecD seems to support grouping of syntax, relation and function definitions
-               See elab.ml for more details *)
-      RecD defs -> let flat_list = List.concat_map (transform_sub_def env) defs in
+    | RecD defs -> let flat_list = List.concat_map transform_sub_def defs in
       let (defs, coq_defs) = partition_eitherlist flat_list in
       (* TODO: Why not just @ [Left d]? *)
       (List.map Either.right coq_defs) @ [Left (RecD defs $ d.at)]
     | _ -> [Left d]
 
-let transform_sub (e : env) (il : script) =
-  List.concat_map (transform_sub_def e) il
+let transform_sub (il : script) =
+  List.concat_map transform_sub_def il
 
 (* Main transformation function *)
-let transform (il : script) : coq_script =
-  (* MEMO:  *)
-  env_ref := Case.get_case_env il;
-  let sub_transformed = transform_sub !env_ref il in
+let transform (il : script) : coq_script = 
+  List.iter (Case.case_def !caseenv_ref) il;
+  List.iter (Hint.env_def !hintenv_ref) il;
+  let sub_transformed = transform_sub il in
   (* MEMO: Right stores additional Coq constructs produced by the subpass
            Left stores original IL constructs to be transformed by the main pass *)
   (* TODO: Why not just append the additional Coq constructs from the subpass? *)

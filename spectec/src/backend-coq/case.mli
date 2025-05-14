@@ -16,8 +16,6 @@ type env =
     mutable subs : sub_typ Env.t
 }
 
-val get_case_env : Il.Ast.script -> env
-val print_env : env -> unit
 val find : text -> 'a Env.t -> id -> 'a
-val string_of_struct_type : struct_type -> text
 val new_env : unit -> env
+val case_def : env -> def -> unit

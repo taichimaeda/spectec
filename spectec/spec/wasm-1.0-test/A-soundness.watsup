@@ -294,3 +294,41 @@ lemma t_progress_be : forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype
   $const_list(instr*) \/
   exists (s', f', admininstr*)
   @(Step: (s; f); val* instr* ~> (s'; f'); admininstr*)
+
+def $t_progress' : bool 
+  hint(proof "theorem")
+def $t_progress' = forall (s, f, admininstr*, t?)
+  @(Config_ok: |- (s; f); admininstr* : t?) =>
+  $terminal_form(admininstr*) \/
+  exists (s', f', admininstr'*)
+  @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
+
+def $t_progress_e' : bool 
+  hint(proof "lemma")
+def $t_progress_e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+  @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
+  ft = (valtype_1* -> valtype_2*) =>
+  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  $types_of(val*) = valtype_1* =>
+  @(Store_ok: |- s : OK) =>
+  $not_lf_br(admininstr*) =>
+  $not_lf_return(admininstr*) =>
+  $terminal_form(val* admininstr*) \/
+  exists (s', f', admininstr'*)
+  @(Step: (s; f); val* admininstr* ~> (s'; f'); admininstr'*)
+
+def $t_progress_be' : bool 
+  hint(proof "lemma")
+def $t_progress_be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+  @(Instrs_ok: C |- instr* : ft) =>
+  ft = (valtype_1* -> valtype_2*) =>
+  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  $types_of(val*) = valtype_1* =>
+  @(Store_ok: |- s : OK) =>
+  $not_lf_br(instr*) =>
+  $not_lf_return(instr*) =>
+  $const_list(instr*) \/
+  exists (s', f', admininstr*)
+  @(Step: (s; f); val* instr* ~> (s'; f'); admininstr*)
