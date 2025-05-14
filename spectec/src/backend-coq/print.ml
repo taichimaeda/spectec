@@ -284,11 +284,11 @@ let string_of_axiom (id : ident) (binds : binders) (r_type: return_type) =
   "Axiom " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms r_type
 
 let string_of_theorem (id : ident) (binds : binders) (term : coq_term) = 
-  "Theorem " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\n Proof. Admitted"
+  "Theorem " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\nProof. Admitted"
 
 
 let string_of_lemma (id : ident) (binds : binders) (term : coq_term) = 
-  "Lemma " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\n Proof. Admitted"
+  "Lemma " ^ id ^ " : forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term ^ ".\nProof. Admitted"
 
 let is_typealias_familytype ((_, f_type) : family_entry) = 
   match f_type with

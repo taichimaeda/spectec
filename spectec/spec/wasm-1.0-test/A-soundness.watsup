@@ -256,7 +256,7 @@ def $not_lf_return(admininstr*) =
 
 def $terminal_form(admininstr*) : bool
 def $terminal_form(admininstr*) = 
- $const_list(admininstr) \/ admininstr* = TRAP
+  $const_list(admininstr*) \/ admininstr* = TRAP
 
 theorem t_progress : forall (s, f, admininstr*, t?)
   @(Config_ok: |- (s; f); admininstr* : t?) =>

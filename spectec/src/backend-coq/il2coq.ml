@@ -430,9 +430,10 @@ and transform_formula_exp (exp : exp) =
     | RuleE (id, _, e1) -> 
       T_rule (transform_id id, transform_tuple_exp transform_exp e1)
     | ForallE (bs, _, e1) -> 
-      T_forall (List.map transform_bind bs, transform_formula_exp e1)
+      (* TODO: (lemmagen) Change transform_relation_bind to a more generic name *)
+      T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
     | ExistsE (bs, _, e1) ->
-      T_forall (List.map transform_bind bs, transform_formula_exp e1)
+      T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
     | _ -> transform_exp exp
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
@@ -644,7 +645,6 @@ let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
 let transform_rule (id : id) (r : rule) = 
   match r.it with
     | RuleD (rule_id, binds, mixop, exp, premises) -> 
-      (* TODO: Why nested tuple here? *)
       ((transform_id id ^ "__" ^ transform_id rule_id ^ transform_mixop mixop, List.map transform_relation_bind binds), 
       List.map transform_premise premises, transform_tuple_exp transform_exp exp)
 

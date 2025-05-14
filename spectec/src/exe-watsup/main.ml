@@ -280,7 +280,6 @@ let () =
       Backend_interpreter.Runner.run args
     | Coq ->
       log "Coq generation...";
-      (* print_il il; *)
       let coq_il = Backend_coq.Else.transform (Backend_coq.Il2coq.transform il) in 
       let lemmas = "" (*Backend_coq.Lemmagen.lemma_gen coq_il*) in
       (match !odsts with
