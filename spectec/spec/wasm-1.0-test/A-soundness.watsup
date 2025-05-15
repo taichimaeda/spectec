@@ -258,7 +258,8 @@ def $terminal_form(admininstr*) : bool
 def $terminal_form(admininstr*) = 
   $const_list(admininstr*) \/ admininstr* = TRAP
 
-theorem t_progress : forall (s, f, admininstr*, t?)
+theorem t_progress : hint(desc "Progress")
+  forall (s, f, admininstr*, t?)
   @(Config_ok: |- (s; f); admininstr* : t?) =>
   $terminal_form(admininstr*) \/
   exists (s', f', admininstr'*)
@@ -269,7 +270,8 @@ theorem t_progress : forall (s, f, admininstr*, t?)
 var lab : valtype
 var ret : valtype
 
-lemma t_progress_e : forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+lemma t_progress_e : hint(desc "Administrative fragment progress")
+  forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
   C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
@@ -282,7 +284,8 @@ lemma t_progress_e : forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, val
   exists (s', f', admininstr'*)
   @(Step: (s; f); val* admininstr* ~> (s'; f'); admininstr'*)
 
-lemma t_progress_be : forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+lemma t_progress_be : hint(desc "Basic fragment progress")
+  forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
   C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
@@ -297,6 +300,7 @@ lemma t_progress_be : forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype
 
 def $t_progress' : bool 
   hint(proof "theorem")
+  hint(desc "Progress")
 def $t_progress' = forall (s, f, admininstr*, t?)
   @(Config_ok: |- (s; f); admininstr* : t?) =>
   $terminal_form(admininstr*) \/
@@ -305,6 +309,7 @@ def $t_progress' = forall (s, f, admininstr*, t?)
 
 def $t_progress_e' : bool 
   hint(proof "lemma")
+  hint(desc "Administrative fragment progress")
 def $t_progress_e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
@@ -320,6 +325,7 @@ def $t_progress_e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, val
 
 def $t_progress_be' : bool 
   hint(proof "lemma")
+  hint(desc "Basic fragment progress")
 def $t_progress_be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>

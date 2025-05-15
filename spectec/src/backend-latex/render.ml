@@ -37,15 +37,21 @@ type env =
     show_var : exp list Map.t ref;
     show_rel : exp list Map.t ref;
     show_def : exp list Map.t ref;
+    show_thm : exp list Map.t ref;
     show_atom : exp list Map.t ref;
     macro_typ : exp list Map.t ref;
     macro_gram : exp list Map.t ref;
     macro_var : exp list Map.t ref;
     macro_rel : exp list Map.t ref;
     macro_def : exp list Map.t ref;
+    macro_thm : exp list Map.t ref;
     macro_atom : exp list Map.t ref;
+    proof_def : exp list Map.t ref;
     desc_typ : exp list Map.t ref;
+    (* TODO: (lemmagen) Desc is only used for theorem defs *)
+    desc_def : exp list Map.t ref;
     desc_gram : exp list Map.t ref;
+    desc_thm : exp list Map.t ref;
     deco_typ : bool;
     deco_rule : bool;
   }
@@ -59,15 +65,20 @@ let new_env config =
     show_var = ref Map.empty;
     show_rel = ref Map.empty;
     show_def = ref Map.empty;
+    show_thm = ref Map.empty;
     show_atom = ref Map.empty;
     macro_typ = ref Map.empty;
     macro_gram = ref Map.empty;
     macro_var = ref Map.empty;
     macro_rel = ref Map.empty;
     macro_def = ref Map.empty;
+    macro_thm = ref Map.empty;
     macro_atom = ref Map.empty;
+    proof_def = ref Map.empty;
     desc_typ = ref Map.empty;
+    desc_def = ref Map.empty;
     desc_gram = ref Map.empty;
+    desc_thm = ref Map.empty;
     deco_typ = false;
     deco_rule = false;
   }
@@ -91,6 +102,7 @@ let local_env env =
     macro_def = ref !(env.macro_def);
     macro_rel = ref !(env.macro_rel);
     macro_gram = ref !(env.macro_gram);
+    macro_thm = ref !(env.macro_thm);
     macro_atom = ref !(env.macro_atom);
   }
 
@@ -157,10 +169,14 @@ let env_hintdef env hd =
     env_hints "macro" env.macro_var id hints;
     env_hints "show" env.show_var id hints
   | DecH (id, hints) ->
+    env_hints "proof" env.proof_def id hints;
+    env_hints "desc" env.desc_def id hints;
     env_hints "macro" env.macro_def id hints;
     env_hints "show" env.show_def id hints
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | ThmH (id, hints) | LemH (id, hints) ->
+    env_hints "desc" env.desc_thm id hints;
+    env_hints "macro" env.macro_thm id hints;
+    env_hints "show" env.show_thm id hints
 
 let env_atom env tid atom hints =
   env_hintdef env (AtomH (tid, atom, hints) $ atom.at)
@@ -264,12 +280,14 @@ let env_def env d : (id * typ list) list =
     env_macro env.macro_def id;
     env_hintdef env (DecH (id, hints) $ d.at);
     []
+  | ThmD (id, _e, hints) | LemD (id, _e, hints) ->
+    env_macro env.macro_thm id;
+    env_hintdef env (ThmH (id, hints) $ d.at);
+    []
   | HintD hd ->
     env_hintdef env hd;
     []
   | RuleD _ | DefD _ | SepD -> []
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let env_hints_inherit env map tid tid' =
   List.iter (fun atom ->
@@ -538,6 +556,13 @@ and expand_exp env templ args i e =
     let iter' = expand_iter env templ args i iter in
     IterE (e1', iter')
   | TypE (e1, t) -> TypE (expand_exp env templ args i e1, t)
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (id, e1) -> 
+    RuleE (expand_id env.macro_rel templ id, expand_exp env templ args i e1)
+  | ForallE (args', e1) -> 
+    ForallE (List.map (expand_arg env templ args i) args', expand_exp env templ args i e1)
+  | ExistsE (args', e1) -> 
+    ExistsE (List.map (expand_arg env templ args i) args', expand_exp env templ args i e1)
   | HoleE (`Num j) ->
     (match List.nth_opt args j with
     | None -> raise Arity_mismatch
@@ -560,8 +585,6 @@ and expand_exp env templ args i e =
     let e2' = expand_exp env templ args i e2 in
     FuseE (e1', e2')
   | UnparenE e1 -> UnparenE (expand_exp env templ args i e1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and expand_expfield env templ args i (atom, e) =
@@ -747,6 +770,16 @@ let render_gramid env id = render_id `Token env.show_gram env.macro_gram env
   (* TODO: HACK for now: if first char is upper, remove *)
   (let len = String.length id.it in
   if len > 1 && is_upper id.it.[0] then String.sub id.it 1 (len - 1) $ id.at else id)
+
+let string_of_desc = function
+  | Some ({it = TextE s; _}::_) -> Some s
+  | Some ({at; _}::_) -> error at "malformed description hint"
+  | _ -> None
+
+let render_thmid env id =
+  match string_of_desc (Map.find_opt id.it !(env.desc_thm)) with
+  | Some s -> "\\text{" ^ s ^ "}"
+  | _ -> id.it
 
 let render_ruleid env id1 id2 =
   let id1' =
@@ -1043,6 +1076,11 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
      * with arg_of_param, for use in render_apply. *)
     render_typ env t
   | TypE (e1, _) -> render_exp env e1
+  | RuleE (_id, e1) -> render_exp env e1
+  | ForallE (args, e1) -> 
+    "\\forall " ^ render_quants env args ^ ".\\;" ^ render_exp env e1
+  | ExistsE (args, e1) -> 
+    "\\exists " ^ render_quants env args ^ ".\\;" ^ render_exp env e1
   | FuseE (e1, e2) ->
     (* TODO: HACK for printing t.LOADn_sx (replace with invisible parens) *)
     let e2' = as_paren_exp (fuse_exp e2 true) in
@@ -1051,8 +1089,6 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | UnparenE ({it = ParenE (e1, _); _} | e1) -> render_exp env e1
   | HoleE `None -> ""
   | HoleE _ -> error e.at "misplaced hole"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and render_exps sep env es =
   concat sep (List.filter ((<>) "") (List.map (render_exp env) es))
@@ -1220,6 +1256,17 @@ and render_args env args =
   | [] -> ""
   | ss -> "(" ^ concat ", " ss ^ ")"
 
+and render_quant env arg =
+  match !(arg.it) with
+  | ExpA e -> render_exp env e
+  | TypA t -> render_typ env t
+  | GramA g -> render_sym env g
+
+and render_quants env args = 
+  match List.map (render_quant env) args with
+  | [] -> ""
+  | ss -> concat ", " ss
+
 let render_param env p =
   match p.it with
   | ExpP (id, t) -> if id.it = "_" then render_typ env t else render_varid env id
@@ -1264,11 +1311,6 @@ let rec merge_gramdefs = function
     merge_gramdefs (d'::ds)
   | d::ds ->
     d :: merge_gramdefs ds
-
-let string_of_desc = function
-  | Some ({it = TextE s; _}::_) -> Some s
-  | Some ({at; _}::_) -> error at "malformed description hint"
-  | _ -> None
 
 let render_typdeco env id =
   match env.deco_typ, string_of_desc (Map.find_opt id.it !(env.desc_typ)) with
@@ -1331,6 +1373,23 @@ let render_funcdef env d =
       render_conditions env (render_exp env e) "&&" prems
   | _ -> failwith "render_funcdef"
 
+let render_thmdef env d = 
+  match d.it with 
+  | ThmD (id, e, _) ->
+    "\\begin{theorem}[$" ^ render_thmid env id ^ "$]\n" ^
+      (* TODO: (lemmagen) Hack to not deal with line breaks for now *)
+      "\\begin{dmath}\n" ^
+        render_exp env e ^ 
+      "\n\\end{dmath}\n" ^
+    "\\end{theorem}"
+  | LemD (id, e, _) ->
+    "\\begin{lemma}[$" ^ render_thmid env id ^ "$]\n" ^
+      "\\begin{dmath}\n" ^
+        render_exp env e ^ 
+      "\n\\end{dmath}\n" ^
+    "\\end{lemma}"
+  | _ -> failwith "render_thmdef"
+
 let rec render_sep_defs ?(sep = " \\\\\n") ?(br = " \\\\[0.8ex]\n") f = function
   | [] -> ""
   | {it = SepD; _}::ds -> "{} \\\\[-2ex]\n" ^ render_sep_defs ~sep ~br f ds
@@ -1388,10 +1447,10 @@ let rec render_defs env = function
     | SepD ->
       " \\\\\n" ^
       render_defs env ds'
+    | ThmD _ | LemD _ ->
+      render_sep_defs ~sep:"\n\n" ~br:"\n\n" (render_thmdef env) ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       failwith "render_defs"
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)"
 
 let render_def env d = render_defs env [d]
 
@@ -1452,14 +1511,32 @@ let rec render_script env = function
         "$$\n" ^ render_defs env reddefs ^ "\n$$\n\n" ^
         render_script env ds'
       )
-    | DefD (id, _, _, _) ->
-      let funcdefs, ds' = split_funcdefs id.it [d] ds in
-      "$$\n" ^ render_defs env funcdefs ^ "\n$$\n\n" ^
-      render_script env ds'
+    | DefD (id, _, e, _) ->
+      (* TODO: (lemmagen) Extract this into another function *)
+      let style =
+        match Map.find_opt id.it !(env.proof_def) with
+        | Some ({it = TextE s; _}::_) -> Some s
+        | _ -> None in 
+      let descs = Map.find_opt id.it !(env.desc_def)
+        |> Option.to_list
+        |> List.flatten in
+      let hints = List.map 
+        (fun desc -> {hintid = "desc" $ d.at; hintexp = desc}) descs in
+      (match style with
+      | Some "\"theorem\"" -> 
+        render_script env ((ThmD (id, e, hints) $ d.at) :: ds)
+      | Some "\"lemma\"" ->
+        render_script env ((LemD (id, e, hints) $ d.at) :: ds)
+      | None -> 
+        let funcdefs, ds' = split_funcdefs id.it [d] ds in
+        "$$\n" ^ render_defs env funcdefs ^ "\n$$\n\n" ^
+        render_script env ds'
+      | _ -> "")
     | SepD ->
       "\\vspace{1ex}\n\n" ^
       render_script env ds
+    | ThmD _ | LemD _ ->
+      render_def env d ^ "\n\n" ^
+      render_script env ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       render_script env ds
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)"

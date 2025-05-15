@@ -257,6 +257,7 @@ and check_family_dependent_type (typ : typ) =
       VarT (id, _) -> Hashtbl.mem family_helper (transform_id id)
     | _ -> false
 
+(* TODO: (lemmagen) Refactor this function *)
 and check_formula (exp : exp) = 
   let module Arg =
     struct
@@ -271,6 +272,7 @@ and check_formula (exp : exp) =
   Acc.exp exp;
   !Arg.flag
 
+(* TODO: (lemmagen) Refactor this function *)
 and check_hintdef (d : def) = 
   match d.it with 
   | DecD (id, _, _, _) -> 
@@ -279,17 +281,17 @@ and check_hintdef (d : def) =
     if not (Hint.bound env' id) then
       `Other
     else
-      let hes = Hint.find "definition" !(env.proof_def) id in
-      let hts = List.filter_map (fun ss -> 
+      let exps = Hint.find "definition" !(env.proof_def) id in
+      let styles = List.filter_map (fun ss -> 
         if List.length ss <> 1 then
           error d.at "proof hint takes exactly one expression";
         match List.hd ss with
         | "\"theorem\"" -> Some `Theorem
         | "\"lemma\"" -> Some `Lemma
-        | _ -> None) hes in
-      if List.length hts <> 1 then
+        | _ -> None) exps in
+      if List.length styles > 1 then
         error d.at "definition takes at most one proof hint";
-      List.hd hts
+      List.hd styles
   | _ -> `Other
 
 and transform_return_type (typ : typ) =
@@ -712,8 +714,8 @@ let rec transform_def (d : def) : coq_def =
                typ is a tuple of types to be interspersed in the mixop which is ignored here *)
       RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
-      let hinttyp = check_hintdef d in
-      if (hinttyp = `Theorem || hinttyp = `Lemma) then
+      let hintstyle = check_hintdef d in
+      if (hintstyle = `Theorem || hintstyle = `Lemma) then
         (* TODO: (lemmagen) Extract this into another function *)
         (if params <> [] then 
           error d.at "theorem takes no arguments";
@@ -722,7 +724,7 @@ let rec transform_def (d : def) : coq_def =
         let clause = List.hd clauses in
         let DefD (bs, _, _, _) = clause.it in
         let _as, ret = transform_clause None clause in
-        match hinttyp with
+        match hintstyle with
         | `Theorem -> TheoremD (transform_id id, List.map transform_bind bs, ret)
         | `Lemma -> LemmaD (transform_id id, List.map transform_bind bs, ret)
         | _ -> assert false)
