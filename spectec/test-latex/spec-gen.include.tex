@@ -1,0 +1,626 @@
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{test}}_{{\mathit{sub}}_{{\mathsf{atom}}_{22}}}(n_{1_{{\mathit{xyz}}_y}}) &=& 0 \\
+{\mathrm{test}}_{{\mathit{sub}}_{{\mathsf{atom}}_{22}}}(n_{2_{{\mathsf{xyz}}_y}}) &=& 0 \\
+{\mathrm{test}}_{{\mathit{sub}}_{{\mathsf{atom}}_{22}}}(n_{3_{{\mathsf{atom}}_y}}) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{curried}}}_{n_1}(n_2) &=& n_1 + n_2 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{testfuse}} &::=& {\mathsf{ab}}_{\mathbb{N}}\,\mathbb{N}~\mathbb{N} \\ &&|&
+{\mathsf{cd}}_{\mathbb{N}}\,\mathbb{N}~\mathbb{N} \\ &&|&
+{\mathsf{ef}}{\mathbb{N}}~\mathbb{N}~\mathbb{N} \\ &&|&
+{{\mathsf{gh}}_{\mathbb{N}}}{\mathbb{N}}~\mathbb{N} \\ &&|&
+{{\mathsf{ij}}{\mathsf{\_}}~\mathbb{N}}{\mathsf{ab}}{\mathbb{N}}~\mathbb{N} \\ &&|&
+{\mathsf{kl\_ab}}{\mathbb{N}}~\mathbb{N}~\mathbb{N} \\ &&|&
+{\mathsf{mn}}{\mathsf{ab}}~\mathbb{N}~\mathbb{N}~\mathbb{N} \\ &&|&
+{\mathsf{op}}{\mathsf{ab}}{\mathbb{N}}~\mathbb{N}~\mathbb{N} \\ &&|&
+{{\mathsf{qr}}_{\mathbb{N}}}{\mathsf{ab}}~\mathbb{N}~\mathbb{N} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{fii}} &::=& \mathsf{fii} \\
+& {\mathit{faa}} &::=& \mathsf{faa} \\
+& {\mathit{foo}} &::=& \mathsf{foo} \\
+& {\mathit{fuu}} &::=& \mathsf{fuu} \\
+& {\mathit{foobar}} &::=& \mathsf{bar} \\
+& {\mathit{fooboo}} &::=& \mathsf{boo} \\
+& {\mathit{fob}} &::=& \mathsf{baz} \\
+& {\mathit{fib}} &::=& \mathsf{boi} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{macros{\kern-0.1em\scriptstyle 1}}} &=& 0
+  &\qquad \mbox{if}~{\mathit{fii}} = \mathsf{fii} \\
+  &&&\qquad {\land}~{\mathit{faa}} = \mathsf{faa} \\
+  &&&\qquad {\land}~{\mathit{foo}} = \mathsf{foo} \\
+  &&&\qquad {\land}~{\mathit{fuu}} = \mathsf{fuu} \\
+  &&&\qquad {\land}~{\mathit{foobar}} = \mathsf{bar} \\
+  &&&\qquad {\land}~{\mathit{fooboo}} = \mathsf{boo} \\
+  &&&\qquad {\land}~{\mathit{fob}} = \mathsf{baz} \\
+  &&&\qquad {\land}~{\mathit{fib}} = \mathsf{boi} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {{\mathit{ufii}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2) &::=& \mathsf{ufii} \\
+& {{\mathit{ufaa}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2) &::=& \mathsf{ufaa} \\
+& {{\mathit{ufoo}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2) &::=& \mathsf{ufoo} \\
+& {{\mathit{ufuu}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2) &::=& \mathsf{ufuu} \\
+& {{\mathit{ufoobar}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2, z) &::=& \mathsf{ubar} \\
+& {{\mathit{ufooboo}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2, z) &::=& \mathsf{uboo} \\
+& {{\mathit{ufob}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2, z) &::=& \mathsf{ubaz} \\
+& {{\mathit{ufib}}}_{{\mathit{nat}}_1}({\mathit{nat}}_2, z) &::=& \mathsf{uboi} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{macros{\kern-0.1em\scriptstyle 2}}} &=& 0
+  &\qquad \mbox{if}~{\mathit{ufii}} = \mathsf{ufii} \\
+  &&&\qquad {\land}~{\mathit{ufaa}} = \mathsf{ufaa} \\
+  &&&\qquad {\land}~{\mathit{ufoo}} = \mathsf{ufoo} \\
+  &&&\qquad {\land}~{\mathit{ufuu}} = \mathsf{ufuu} \\
+  &&&\qquad {\land}~{\mathit{ubar}} = \mathsf{ubar} \\
+  &&&\qquad {\land}~{\mathit{uboo}} = \mathsf{uboo} \\
+  &&&\qquad {\land}~{\mathit{ubaz}} = \mathsf{ubaz} \\
+  &&&\qquad {\land}~{\mathit{uboi}} = \mathsf{uboi} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{fii}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{faa}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{foo}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{fuu}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathit{foobar}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathit{fooboo}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathit{fob}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathit{fib}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufii}}}_{x}(y) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufaa}}}_{x}(y) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufoo}}}_{x}(y) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufuu}}}_{x}(y) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathit{ufoobar}}}_{x}(y, z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathit{ufooboo}}}_{x}(y, z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathit{ufob}}}_{x}(y, z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathit{ufib}}}_{x}(y, z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{foo\_bar}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{foo\_boo}} &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufoo\_bar}}}_{x}(y) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{{\mathrm{ufoo\_boo}}}_{x}(y, z) &=& 0 \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{parent}} &::=& \mathsf{aa} \\ &&|&
+\mathsf{aax} \\ &&|&
+\mathsf{aay} \\ &&|&
+\mathsf{aaz} \\ &&|&
+\mathsf{bbb} \\ &&|&
+\mathsf{bbbx} \\ &&|&
+\mathsf{bbby} \\ &&|&
+\mathsf{bbbz} \\ &&|&
+\mathsf{cc}~\mathbb{N}~\mathsf{cccc} \\ &&|&
+\mathsf{ccx}~\mathbb{N}~\mathsf{ccxx} \\ &&|&
+\mathsf{ccy}~\mathbb{N}~\mathsf{ccyy} \\ &&|&
+\mathsf{ccz}~\mathbb{N}~\mathsf{cczz} \\ &&|&
+\mathsf{ddd}~\mathbb{N}~{\mathit{child}}~{\mathrm{foo}}~{\mathrm{fuu}}~{\mathrm{fiz}} \\ &&|&
+\mathsf{dddx}~\mathbb{N}~{\mathit{child}} \\ &&|&
+\mathsf{dddy}~\mathbb{N}~{\mathit{child}} \\ &&|&
+\mathsf{dddz}~\mathbb{N}~{\mathit{child}} \\ &&|&
+{\mathbb{N}}{\mathsf{\_}}{\mathsf{ea}}{\mathsf{ee}}~z \\ &&|&
+{\mathbb{N}}{\mathsf{\_}}{\mathsf{eb}}{\mathsf{eex}}~z \\ &&|&
+{\mathbb{N}}{\mathsf{\_}}{\mathsf{ec}}{\mathsf{eey}}~z \\ &&|&
+{\mathbb{N}}{\mathsf{\_}}{\mathsf{ed}}{\mathsf{eez}}~z \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{parent}}(\mathsf{aa}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{aax}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{aay}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{aaz}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{bbb}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{bbbx}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{bbby}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{bbbz}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{cc}~n~\mathsf{cccc}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{ccx}~n~\mathsf{ccxx}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{ccy}~n~\mathsf{ccyy}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{ccz}~n~\mathsf{cczz}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{ddd}~n~{\mathit{child}}~{\mathrm{foo}}~{\mathrm{fuu}}~{\mathrm{fiz}}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{dddx}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{dddy}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{parent}}(\mathsf{dddz}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{parent}}({n}{\mathsf{\_}}{\mathsf{ea}}{\mathsf{ee}}~z) &=& 0 \\
+{\mathrm{parent}}({n}{\mathsf{\_}}{\mathsf{eb}}{\mathsf{eex}}~z) &=& 0 \\
+{\mathrm{parent}}({n}{\mathsf{\_}}{\mathsf{ec}}{\mathsf{eey}}~z) &=& 0 \\
+{\mathrm{parent}}({n}{\mathsf{\_}}{\mathsf{ed}}{\mathsf{eez}}~z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{parentimplicit}}(t) &::=& \mathsf{pp} \\ &&|&
+\mathsf{ppx} \\ &&|&
+\mathsf{ppy} \\ &&|&
+\mathsf{ppz} \\ &&|&
+\mathsf{qqq} \\ &&|&
+\mathsf{qqqx} \\ &&|&
+\mathsf{qqqy} \\ &&|&
+\mathsf{qqqz} \\ &&|&
+{t}{\mathsf{\_}}{\mathsf{ra}}{\mathsf{rr}}~z \\ &&|&
+{t}{\mathsf{\_}}{\mathsf{rb}}{\mathsf{rrx}}~z \\ &&|&
+{t}{\mathsf{\_}}{\mathsf{rc}}{\mathsf{rry}}~z \\ &&|&
+{t}{\mathsf{\_}}{\mathsf{rd}}{\mathsf{rrz}}~z \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{parentimpl}}(\mathsf{pp}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{ppx}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{ppy}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{ppz}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{qqq}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{qqqx}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{qqqy}) &=& 0 \\
+{\mathrm{parentimpl}}(\mathsf{qqqz}) &=& 0 \\
+{\mathrm{parentimpl}}({n}{\mathsf{\_}}{\mathsf{ra}}{\mathsf{rr}}~z) &=& 0 \\
+{\mathrm{parentimpl}}({n}{\mathsf{\_}}{\mathsf{rb}}{\mathsf{rrx}}~z) &=& 0 \\
+{\mathrm{parentimpl}}({n}{\mathsf{\_}}{\mathsf{rc}}{\mathsf{rry}}~z) &=& 0 \\
+{\mathrm{parentimpl}}({n}{\mathsf{\_}}{\mathsf{rd}}{\mathsf{rrz}}~z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{indirect}} &::=& {\mathit{parentimplicit}}(\mathbb{N}) \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{indirect}}(\mathsf{pp}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{ppx}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{ppy}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{ppz}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{qqq}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{qqqx}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{qqqy}) &=& 0 \\
+{\mathrm{indirect}}(\mathsf{qqqz}) &=& 0 \\
+{\mathrm{indirect}}({n}{\mathsf{\_}}{\mathsf{ra}}{\mathsf{rr}}~z) &=& 0 \\
+{\mathrm{indirect}}({n}{\mathsf{\_}}{\mathsf{rb}}{\mathsf{rrx}}~z) &=& 0 \\
+{\mathrm{indirect}}({n}{\mathsf{\_}}{\mathsf{rc}}{\mathsf{rry}}~z) &=& 0 \\
+{\mathrm{indirect}}({n}{\mathsf{\_}}{\mathsf{rd}}{\mathsf{rrz}}~z) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{family}}(0) &::=& \mathsf{ff} \\
+& {\mathit{family}}(1) &::=& \mathsf{gg} \\
+& {\mathit{family}}(2) &::=& \mathsf{hh} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{family}}(0, \mathsf{ff}) &=& 0 \\
+{\mathrm{family}}(1, \mathsf{gg}) &=& 0 \\
+{\mathrm{family}}(2, \mathsf{hh}) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{child}} &::=& {\mathit{parent}} ~|~ {\mathit{family}}(0) ~|~ {\mathit{indirect}} ~|~ \mathsf{zzz} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{child}}(\mathsf{aa}) &=& 0 \\
+{\mathrm{child}}(\mathsf{aax}) &=& 0 \\
+{\mathrm{child}}(\mathsf{aay}) &=& 0 \\
+{\mathrm{child}}(\mathsf{aaz}) &=& 0 \\
+{\mathrm{child}}(\mathsf{bbb}) &=& 0 \\
+{\mathrm{child}}(\mathsf{bbbx}) &=& 0 \\
+{\mathrm{child}}(\mathsf{bbby}) &=& 0 \\
+{\mathrm{child}}(\mathsf{bbbz}) &=& 0 \\
+{\mathrm{child}}(\mathsf{cc}~n~\mathsf{cccc}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ccx}~n~\mathsf{ccxx}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ccy}~n~\mathsf{ccyy}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ccz}~n~\mathsf{cczz}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ddd}~n~{\mathit{child}}~{\mathrm{foo}}~{\mathrm{fuu}}~{\mathrm{fiz}}) &=& 0 \\
+{\mathrm{child}}(\mathsf{dddx}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{child}}(\mathsf{dddy}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{child}}(\mathsf{dddz}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{ea}}{\mathsf{ee}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{eb}}{\mathsf{eex}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{ec}}{\mathsf{eey}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{ed}}{\mathsf{eez}}~z) &=& 0 \\
+{\mathrm{child}}(\mathsf{ff}) &=& 0 \\
+{\mathrm{child}}(\mathsf{pp}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ppx}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ppy}) &=& 0 \\
+{\mathrm{child}}(\mathsf{ppz}) &=& 0 \\
+{\mathrm{child}}(\mathsf{qqq}) &=& 0 \\
+{\mathrm{child}}(\mathsf{qqqx}) &=& 0 \\
+{\mathrm{child}}(\mathsf{qqqy}) &=& 0 \\
+{\mathrm{child}}(\mathsf{qqqz}) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{ra}}{\mathsf{rr}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{rb}}{\mathsf{rrx}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{rc}}{\mathsf{rry}}~z) &=& 0 \\
+{\mathrm{child}}({n}{\mathsf{\_}}{\mathsf{rd}}{\mathsf{rrz}}~z) &=& 0 \\
+{\mathrm{child}}(\mathsf{zzz}) &=& 0 \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{grandchild}} &::=& {\mathit{child}} ~|~ \mathsf{zzzz} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{grandchild}}(\mathsf{aa}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{aax}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{aay}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{aaz}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{bbb}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{bbbx}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{bbby}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{bbbz}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{cc}~n~\mathsf{cccc}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ccx}~n~\mathsf{ccxx}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ccy}~n~\mathsf{ccyy}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ccz}~n~\mathsf{cczz}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ddd}~n~{\mathit{child}}~{\mathrm{foo}}~{\mathrm{fuu}}~{\mathrm{fiz}}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{dddx}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{dddy}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{dddz}~n~{\mathit{child}}) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{ea}}{\mathsf{ee}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{eb}}{\mathsf{eex}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{ec}}{\mathsf{eey}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{ed}}{\mathsf{eez}}~z) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ff}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{pp}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ppx}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ppy}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{ppz}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{qqq}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{qqqx}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{qqqy}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{qqqz}) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{ra}}{\mathsf{rr}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{rb}}{\mathsf{rrx}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{rc}}{\mathsf{rry}}~z) &=& 0 \\
+{\mathrm{grandchild}}({n}{\mathsf{\_}}{\mathsf{rd}}{\mathsf{rrz}}~z) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{zzz}) &=& 0 \\
+{\mathrm{grandchild}}(\mathsf{zzzz}) &=& 0 \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{rec}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{fa}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fb}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fc}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fd}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fee}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fff}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fgg}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fhh}~{\mathbb{N}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{proj}}(r, 0) &=& r{.}\mathsf{fa} \\
+{\mathrm{proj}}(r, 1) &=& r{.}\mathsf{fb} \\
+{\mathrm{proj}}(r, 2) &=& r{.}\mathsf{fc} \\
+{\mathrm{proj}}(r, 3) &=& r{.}\mathsf{fd} \\
+{\mathrm{proj}}(r, 4) &=& r{.}\mathsf{fee} \\
+{\mathrm{proj}}(r, 5) &=& r{.}\mathsf{fff} \\
+{\mathrm{proj}}(r, 6) &=& r{.}\mathsf{fgg} \\
+{\mathrm{proj}}(r, 7) &=& r{.}\mathsf{fhh} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{upd}}(r, 0) &=& r{}[{.}\mathsf{fa} = 0] \\
+{\mathrm{upd}}(r, 1) &=& r{}[{.}\mathsf{fb} = 0] \\
+{\mathrm{upd}}(r, 2) &=& r{}[{.}\mathsf{fc} = 0] \\
+{\mathrm{upd}}(r, 3) &=& r{}[{.}\mathsf{fd} = 0] \\
+{\mathrm{upd}}(r, 4) &=& r{}[{.}\mathsf{fee} = 0] \\
+{\mathrm{upd}}(r, 5) &=& r{}[{.}\mathsf{fff} = 0] \\
+{\mathrm{upd}}(r, 6) &=& r{}[{.}\mathsf{fgg} = 0] \\
+{\mathrm{upd}}(r, 7) &=& r{}[{.}\mathsf{fhh} = 0] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{ext}}(r, 0) &=& r{}[{.}\mathsf{fa} = ..0] \\
+{\mathrm{ext}}(r, 1) &=& r{}[{.}\mathsf{fb} = ..0] \\
+{\mathrm{ext}}(r, 2) &=& r{}[{.}\mathsf{fc} = ..0] \\
+{\mathrm{ext}}(r, 3) &=& r{}[{.}\mathsf{fd} = ..0] \\
+{\mathrm{ext}}(r, 4) &=& r{}[{.}\mathsf{fee} = ..0] \\
+{\mathrm{ext}}(r, 5) &=& r{}[{.}\mathsf{fff} = ..0] \\
+{\mathrm{ext}}(r, 6) &=& r{}[{.}\mathsf{fgg} = ..0] \\
+{\mathrm{ext}}(r, 7) &=& r{}[{.}\mathsf{fhh} = ..0] \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{recimpl}} &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+\mathsf{fia}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fib}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fic}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fid}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fiee}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fiff}~{\mathbb{N}^\ast},\; \\
+  \mathsf{figg}~{\mathbb{N}^\ast},\; \\
+  \mathsf{fihh}~{\mathbb{N}^\ast} \}\end{array} \\
+\end{array}
+$$
+
+$$
+\begin{array}{@{}lcl@{}l@{}}
+{\mathrm{rproj}}(r, 0) &=& r{.}\mathsf{fia} \\
+{\mathrm{rproj}}(r, 1) &=& r{.}\mathsf{fib} \\
+{\mathrm{rproj}}(r, 2) &=& r{.}\mathsf{fic} \\
+{\mathrm{rproj}}(r, 3) &=& r{.}\mathsf{fid} \\
+{\mathrm{rproj}}(r, 4) &=& r{.}\mathsf{fiee} \\
+{\mathrm{rproj}}(r, 5) &=& r{.}\mathsf{fiff} \\
+{\mathrm{rproj}}(r, 6) &=& r{.}\mathsf{figg} \\
+{\mathrm{rproj}}(r, 7) &=& r{.}\mathsf{fihh} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& {\mathit{cona}} &::=& \mathbb{N}~\mathsf{coa}~\mathbb{N} \\
+& {\mathit{conb}} &::=& \mathbb{N}~\mathsf{cob}~\mathbb{N} \\
+& {\mathit{conc}} &::=& \mathbb{N}~\mathsf{coc}~\mathbb{N} \\
+& {\mathit{cond}} &::=& \mathbb{N}~\mathsf{cod}~\mathbb{N} \\
+& {\mathit{cone}} &::=& \mathbb{N}~\mathsf{coe}~\mathbb{N} \\
+& {\mathit{conf}} &::=& \mathbb{N}~\mathsf{cof}~\mathbb{N} \\
+& {\mathit{cong}} &::=& \mathbb{N}~\mathsf{cog}~\mathbb{N} \\
+& {\mathit{conh}} &::=& \mathbb{N}~\mathsf{coh}~\mathbb{N} \\
+\end{array}
+$$
+
+\vspace{1ex}
+
+$$
+\begin{array}{@{}lrrl@{}l@{}}
+& C &::=& \{ \begin{array}[t]{@{}l@{}l@{}}
+ \}\end{array} \\
+\end{array}
+$$
+
+$\boxed{C \vdash {\mathit{parent}} : \mathsf{ok}}$
+
+$\boxed{C \vdash {\mathit{parent}} \leq {\mathit{parent}}}$
+
+$\boxed{{\mathit{parent}} ; {\mathit{child}} \hookrightarrow {\mathit{parent}} ; {\mathit{child}}}$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash \mathsf{aa} : \mathsf{ok}
+} \, {[\textsc{\scriptsize Rok}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash {\mathit{parent}} \leq \mathsf{aa}
+} \, {[\textsc{\scriptsize Rsub}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}rcl@{}l@{}}
+{[\textsc{\scriptsize Reval}]} \quad & {\mathit{parent}} ; {\mathit{child}} &\hookrightarrow& \mathsf{aa} ; \mathsf{bbb} \\
+\end{array}
+$$
+
+$\boxed{C \vdash {\mathit{parent}} : \mathsf{ok}}$
+
+$\boxed{C \vdash {\mathit{parent}} \leq {\mathit{parent}}}$
+
+$\boxed{{\mathit{parent}} ; {\mathit{child}} \hookrightarrow {\mathit{parent}} ; {\mathit{child}}}$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash \mathsf{aa} : \mathsf{ok}
+} \, {[\textsc{\scriptsize Rok\_macro}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash {\mathit{parent}} \leq \mathsf{aa}
+} \, {[\textsc{\scriptsize Rsub\_macro}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}rcl@{}l@{}}
+{[\textsc{\scriptsize Reval\_macro}]} \quad & {\mathit{parent}} ; {\mathit{child}} &\hookrightarrow& \mathsf{aa} ; \mathsf{bbb} \\
+\end{array}
+$$
+
+$\boxed{C \vdash {\mathit{parent}} : \mathsf{ok}}$
+
+$\boxed{C \vdash {\mathit{parent}} \leq {\mathit{parent}}}$
+
+$\boxed{{\mathit{parent}} ; {\mathit{child}} \hookrightarrow {\mathit{parent}} ; {\mathit{child}}}$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash \mathsf{aa} : \mathsf{ok}
+} \, {[\textsc{\scriptsize Rok\_nomacro}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}c@{}}\displaystyle
+\frac{
+}{
+C \vdash {\mathit{parent}} \leq \mathsf{aa}
+} \, {[\textsc{\scriptsize Rsub\_nomacro}]}
+\qquad
+\end{array}
+$$
+
+$$
+\begin{array}{@{}l@{}rcl@{}l@{}}
+{[\textsc{\scriptsize Reval\_nomacro}]} \quad & {\mathit{parent}} ; {\mathit{child}} &\hookrightarrow& \mathsf{aa} ; \mathsf{bbb} \\
+\end{array}
+$$
+

@@ -970,7 +970,7 @@ and flatten_fuse_exp_rev e =
   | FuseE (e1, e2) -> e2 :: flatten_fuse_exp_rev e1
   | _ -> [e]
 
-and render_exp env e =
+and render_exp ?(br = "") env e =
   (*
   Printf.eprintf "[render_exp %s] %s\n%!"
     (string_of_region e.at) (El.Print.string_of_exp e);
@@ -1004,7 +1004,9 @@ and render_exp env e =
       ({it = VarE _ | CallE (_, []) | ParenE _; _ } as e2)) ->
     render_exp env e1 ^ " \\, " ^ render_exp env e2
   | BinE (e1, op, e2) ->
-    render_exp env e1 ^ space render_binop op ^ render_exp env e2
+    (* TODO: (lemmagen) Line break after some logical operators *)
+    let br' = match op with ImplOp | EquivOp -> br | _ -> "" in
+    render_exp ~br env e1 ^ space render_binop op ^ br' ^ render_exp ~br env e2
   | CmpE (e1, op, e2) ->
     render_exp env e1 ^ space render_cmpop op ^ render_exp env e2
   | EpsE -> "\\epsilon"
@@ -1045,7 +1047,7 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
     when render_atom env atom = "" ->
     render_exp env e1
   | ParenE (e1, _) -> "(" ^ render_exp env e1 ^ ")"
-  | TupE es -> "(" ^ render_exps ",\\, " env es ^ ")"
+  | TupE es -> "(" ^ render_exps ~sep:",\\, " env es ^ ")"
   | InfixE (e1, atom, e2) ->
     let id = typed_id atom in
     let e = AtomE atom $ atom.at in
@@ -1078,9 +1080,10 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | TypE (e1, _) -> render_exp env e1
   | RuleE (_id, e1) -> render_exp env e1
   | ForallE (args, e1) -> 
-    "\\forall " ^ render_quants env args ^ ".\\;" ^ render_exp env e1
+    (* TODO: (lemmagen) Line break after quantifier *)
+    "\\forall " ^ render_quants env args ^ "." ^ br ^ render_exp ~br env e1
   | ExistsE (args, e1) -> 
-    "\\exists " ^ render_quants env args ^ ".\\;" ^ render_exp env e1
+    "\\exists " ^ render_quants env args ^ ".\\;" ^ br ^ render_exp ~br env e1
   | FuseE (e1, e2) ->
     (* TODO: HACK for printing t.LOADn_sx (replace with invisible parens) *)
     let e2' = as_paren_exp (fuse_exp e2 true) in
@@ -1090,8 +1093,8 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | HoleE `None -> ""
   | HoleE _ -> error e.at "misplaced hole"
 
-and render_exps sep env es =
-  concat sep (List.filter ((<>) "") (List.map (render_exp env) es))
+and render_exps ?(sep = ",") ?(br = "\\\\[0.8ex]") env es =
+  concat sep (List.filter ((<>) "") (List.map (render_exp ~br env) es))
 
 and render_exp_seq env = function
   | [] -> ""
@@ -1105,7 +1108,7 @@ and render_exp_seq' env = function
     (* Handle subscripting *)
     let s1 =
       "{" ^ render_exp env e1 ^ "}_{" ^
-        render_exps "," env (as_tup_exp e2) ^ "}"
+        render_exps ~sep:"," env (as_tup_exp e2) ^ "}"
     in
     let s2 = render_exp_seq' env es in
     if s1 <> "" && s2 <> "" then s1 ^ "\\," ^ s2 else s1 ^ s2
@@ -1377,16 +1380,20 @@ let render_thmdef env d =
   match d.it with 
   | ThmD (id, e, _) ->
     "\\begin{theorem}[$" ^ render_thmid env id ^ "$]\n" ^
-      (* TODO: (lemmagen) Hack to not deal with line breaks for now *)
-      "\\begin{dmath}\n" ^
-        render_exp env e ^ 
-      "\n\\end{dmath}\n" ^
+      "$$\n" ^
+      "\\begin{array}{@{}l@{}}\n" ^ 
+        render_exp ~br:" \\\\[0.8ex]\n" env e ^ 
+      "\\end{array}\n" ^
+      "$$\n" ^
     "\\end{theorem}"
   | LemD (id, e, _) ->
+    (* TODO: (lemmagen) Duplicate code *)
     "\\begin{lemma}[$" ^ render_thmid env id ^ "$]\n" ^
-      "\\begin{dmath}\n" ^
-        render_exp env e ^ 
-      "\n\\end{dmath}\n" ^
+      "$$\n" ^
+      "\\begin{array}{@{}l@{}}\n" ^ 
+        render_exp ~br:" \\\\[0.8ex]\n" env e ^
+      "\\end{array}" ^
+      "$$\n" ^
     "\\end{lemma}"
   | _ -> failwith "render_thmdef"
 
@@ -1540,3 +1547,9 @@ let rec render_script env = function
       render_script env ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       render_script env ds
+
+(* Exports *)
+
+let render_exp env es = 
+  (* TODO: (lemmagen) Using default optional argument *)
+  render_exp env es
