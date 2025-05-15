@@ -2843,68 +2843,68 @@ Inductive Global_extension: globalinst -> globalinst -> Prop :=
 Inductive Store_extension: store -> store -> Prop :=
 	| Store_extension__ : forall (v_store_1 : store) (v_store_2 : store) (v_funcinst_1 : (list funcinst)) (v_tableinst_1 : (list tableinst)) (v_meminst_1 : (list meminst)) (v_globalinst_1 : (list globalinst)) (v_funcinst_1' : (list funcinst)) (v_funcinst_2 : (list funcinst)) (v_tableinst_1' : (list tableinst)) (v_tableinst_2 : (list tableinst)) (v_meminst_1' : (list meminst)) (v_meminst_2 : (list meminst)) (v_globalinst_1' : (list globalinst)) (v_globalinst_2 : (list globalinst)), ((List.length v_funcinst_1) = (List.length v_funcinst_1')) -> ((List.length v_tableinst_1) = (List.length v_tableinst_1')) -> ((List.length v_meminst_1) = (List.length v_meminst_1')) -> ((List.length v_globalinst_1) = (List.length v_globalinst_1')) -> ((store__FUNCS v_store_1) = v_funcinst_1) -> ((store__TABLES v_store_1) = v_tableinst_1) -> ((store__MEMS v_store_1) = v_meminst_1) -> ((store__GLOBALS v_store_1) = v_globalinst_1) -> ((store__FUNCS v_store_2) = (@app _ v_funcinst_1' v_funcinst_2)) -> ((store__TABLES v_store_2) = (@app _ v_tableinst_1' v_tableinst_2)) -> ((store__MEMS v_store_2) = (@app _ v_meminst_1' v_meminst_2)) -> ((store__GLOBALS v_store_2) = (@app _ v_globalinst_1' v_globalinst_2)) -> List.Forall2 (fun v_funcinst_1 v_funcinst_1' => (Func_extension v_funcinst_1 v_funcinst_1')) (v_funcinst_1) (v_funcinst_1') -> List.Forall2 (fun v_tableinst_1 v_tableinst_1' => (Table_extension v_tableinst_1 v_tableinst_1')) (v_tableinst_1) (v_tableinst_1') -> List.Forall2 (fun v_meminst_1 v_meminst_1' => (Mem_extension v_meminst_1 v_meminst_1')) (v_meminst_1) (v_meminst_1') -> List.Forall2 (fun v_globalinst_1 v_globalinst_1' => (Global_extension v_globalinst_1 v_globalinst_1')) (v_globalinst_1) (v_globalinst_1') -> Store_extension v_store_1 v_store_2.
 
-(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:235.1-235.31 *)
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:235.1-235.31 *)
+(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:235.1-235.32 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:235.1-235.32 *)
 Fixpoint fun_types_of (v___0 : (list val)) : (list valtype) :=
 	match (v___0) with
 		| ([]) => []
 		| (((val__CONST v_valtype v_val_) :: v_val')) => (@app _ [v_valtype] (fun_types_of v_val'))
 	end.
 
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:239.1-239.33 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:239.1-239.34 *)
 Definition fun_is_const (v_admininstr_0 : admininstr) : bool :=
 	match (v_admininstr_0) with
 		| ((admininstr__CONST v_valtype v_val_)) => true
 		| (v_admininstr) => false
 	end.
 
-(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:243.1-243.36 *)
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:243.1-243.36 *)
+(* Mutual Recursion at: spec/wasm-1.0-test/A-soundness.watsup:243.1-243.37 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:243.1-243.37 *)
 Fixpoint fun_const_list (v___0 : (list admininstr)) : bool :=
 	match (v___0) with
 		| ([]) => true
 		| ((v_admininstr :: v_admininstr')) => ((fun_is_const v_admininstr) && (fun_const_list v_admininstr'))
 	end.
 
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:247.1-247.35 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:247.1-247.37 *)
 Definition fun_not_lf_br (v___0 : (list admininstr)) : Prop :=
 	match (v___0) with
 		| (v_admininstr) => forall (v_val : (list val)) (v_l : labelidx) (v_admininstr' : (list admininstr)), (v_admininstr <> (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__BR v_l)] v_admininstr')))
 	end.
 
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:252.1-252.39 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:252.1-252.41 *)
 Definition fun_not_lf_return (v___0 : (list admininstr)) : Prop :=
 	match (v___0) with
 		| (v_admininstr) => forall (v_val : (list val)) (v_l : labelidx) (v_admininstr' : (list admininstr)), (v_admininstr <> (@app _ (list__val__admininstr v_val) (@app _ [(admininstr__RETURN )] v_admininstr')))
 	end.
 
-(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:257.1-257.39 *)
+(* Auxiliary Definition at: spec/wasm-1.0-test/A-soundness.watsup:257.1-257.40 *)
 Definition fun_terminal_form (v___0 : (list admininstr)) : bool :=
 	match (v___0) with
 		| (v_admininstr) => ((fun_const_list v_admininstr) || (v_admininstr == [(admininstr__TRAP )]))
 	end.
 
-(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:261.1-265.57 *)
+(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:266.1-271.57 *)
 Theorem t_progress : forall (v_s : store) (v_f : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), ((Config_ok (config__ (state__ v_s v_f) v_admininstr) v_t) -> ((fun_terminal_form v_admininstr) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)), (Step (config__ (state__ v_s v_f) v_admininstr) (config__ (state__ v_s' v_f') v_admininstr')))).
 Proof. Admitted.
 
-(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:272.1-283.62 *)
+(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:273.1-285.62 *)
 Lemma t_progress_e : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_admininstr : (list admininstr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : valtype) (v_ret : valtype), ((Admin_instrs_ok v_s v_C v_admininstr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (Some (Some v_ret)) |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [(Some v_lab)]; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br v_admininstr) -> ((fun_not_lf_return v_admininstr) -> ((fun_terminal_form (@app _ (list__val__admininstr v_val) v_admininstr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) v_admininstr)) (config__ (state__ v_s' v_f') v_admininstr'))))))))))).
 Proof. Admitted.
 
-(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:285.1-296.56 *)
+(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:287.1-299.56 *)
 Lemma t_progress_be : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_instr : (list instr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : valtype) (v_ret : valtype), ((Instrs_ok v_C v_instr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (Some (Some v_ret)) |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [(Some v_lab)]; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br (list__instr__admininstr v_instr)) -> ((fun_not_lf_return (list__instr__admininstr v_instr)) -> ((fun_const_list (list__instr__admininstr v_instr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr))) (config__ (state__ v_s' v_f') v_admininstr))))))))))).
 Proof. Admitted.
 
-(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:298.1-299.24 *)
+(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:301.1-303.24 *)
 Theorem t_progress' : forall (v_s : store) (v_f : frame) (v_admininstr : (list admininstr)) (v_t : (option valtype)), ((Config_ok (config__ (state__ v_s v_f) v_admininstr) v_t) -> ((fun_terminal_form v_admininstr) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)), (Step (config__ (state__ v_s v_f) v_admininstr) (config__ (state__ v_s' v_f') v_admininstr')))).
 Proof. Admitted.
 
-(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:306.1-307.22 *)
+(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:310.1-312.48 *)
 Lemma t_progress_e' : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_admininstr : (list admininstr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : valtype) (v_ret : valtype), ((Admin_instrs_ok v_s v_C v_admininstr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (Some (Some v_ret)) |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [(Some v_lab)]; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br v_admininstr) -> ((fun_not_lf_return v_admininstr) -> ((fun_terminal_form (@app _ (list__val__admininstr v_val) v_admininstr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) v_admininstr)) (config__ (state__ v_s' v_f') v_admininstr'))))))))))).
 Proof. Admitted.
 
-(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:321.1-322.22 *)
+(* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:326.1-328.39 *)
 Lemma t_progress_be' : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_instr : (list instr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : valtype) (v_ret : valtype), ((Instrs_ok v_C v_instr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := (Some (Some v_ret)) |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := [(Some v_lab)]; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br (list__instr__admininstr v_instr)) -> ((fun_not_lf_return (list__instr__admininstr v_instr)) -> ((fun_const_list (list__instr__admininstr v_instr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr))) (config__ (state__ v_s' v_f') v_admininstr))))))))))).
 Proof. Admitted.
 

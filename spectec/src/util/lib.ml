@@ -64,4 +64,17 @@ struct
     let cs = ref [] in
     for i = String.length s - 1 downto 0 do cs := s.[i] :: !cs done;
     !cs
+
+  let replace p t s =
+    let len = String.length p in
+    if len = 0 then s else
+    let rec aux i acc =
+      if i > String.length s - len then
+        acc ^ String.sub s i (String.length s - i)
+      else if String.sub s i len = p then
+        aux (i + len) (acc ^ t)
+      else
+        aux (i + 1) (acc ^ String.make 1 s.[i])
+    in
+    aux 0 ""
 end

@@ -232,55 +232,55 @@ rule Store_extension:
   -- (Mem_extension: |- meminst_1: meminst_1')*
   -- (Global_extension: |- globalinst_1: globalinst_1')*
 
-def $types_of(val*) : valtype*
-def $types_of(eps) = eps
-def $types_of((CONST valtype val_) val'*) = valtype $types_of(val'*)
+def $types__of(val*) : valtype*
+def $types__of(eps) = eps
+def $types__of((CONST valtype val_) val'*) = valtype $types__of(val'*)
 
-def $is_const(admininstr) : bool
-def $is_const(CONST valtype val_) = true
-def $is_const(admininstr) = false
+def $is__const(admininstr) : bool
+def $is__const(CONST valtype val_) = true
+def $is__const(admininstr) = false
 
-def $const_list(admininstr*) : bool
-def $const_list(eps) = true
-def $const_list(admininstr admininstr'*) = $is_const(admininstr) /\ $const_list(admininstr'*)
+def $const__list(admininstr*) : bool
+def $const__list(eps) = true
+def $const__list(admininstr admininstr'*) = $is__const(admininstr) /\ $const__list(admininstr'*)
 
-def $not_lf_br(admininstr*) : bool
-def $not_lf_br(admininstr*) =
+def $not__lf__br(admininstr*) : bool
+def $not__lf__br(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (BR l) admininstr'*
 
-def $not_lf_return(admininstr*) : bool
-def $not_lf_return(admininstr*) =
+def $not__lf__return(admininstr*) : bool
+def $not__lf__return(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (RETURN) admininstr'*
 
-def $terminal_form(admininstr*) : bool
-def $terminal_form(admininstr*) = 
-  $const_list(admininstr*) \/ admininstr* = TRAP
-
-theorem t_progress : hint(desc "Progress")
-  forall (s, f, admininstr*, t?)
-  @(Config_ok: |- (s; f); admininstr* : t?) =>
-  $terminal_form(admininstr*) \/
-  exists (s', f', admininstr'*)
-  @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
+def $terminal__form(admininstr*) : bool
+def $terminal__form(admininstr*) = 
+  $const__list(admininstr*) \/ admininstr* = TRAP
 
 (; TODO: With the latest version of SpecTec which supports TypE
          these variable declarations could be replaced by lab* : resulttype* etc. ;)
 var lab : valtype
 var ret : valtype
 
+theorem t_progress : hint(desc "Progress")
+  forall (s, f, admininstr*, t?)
+  @(Config_ok: |- (s; f); admininstr* : t?) =>
+  $terminal__form(admininstr*) \/
+  exists (s', f', admininstr'*)
+  @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
+
 lemma t_progress_e : hint(desc "Administrative fragment progress")
   forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
-  $types_of(val*) = valtype_1* =>
+  $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
-  $not_lf_br(admininstr*) =>
-  $not_lf_return(admininstr*) =>
-  $terminal_form(val* admininstr*) \/
+  $not__lf__br(admininstr*) =>
+  $not__lf__return(admininstr*) =>
+  $terminal__form(val* admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: (s; f); val* admininstr* ~> (s'; f'); admininstr'*)
 
@@ -288,53 +288,53 @@ lemma t_progress_be : hint(desc "Basic fragment progress")
   forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
-  $types_of(val*) = valtype_1* =>
+  $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
-  $not_lf_br(instr*) =>
-  $not_lf_return(instr*) =>
-  $const_list(instr*) \/
+  $not__lf__br(instr*) =>
+  $not__lf__return(instr*) =>
+  $const__list(instr*) \/
   exists (s', f', admininstr*)
   @(Step: (s; f); val* instr* ~> (s'; f'); admininstr*)
 
-def $t_progress' : bool 
+def $t__progress' : bool 
   hint(proof "theorem")
   hint(desc "Progress")
-def $t_progress' = forall (s, f, admininstr*, t?)
+def $t__progress' = forall (s, f, admininstr*, t?)
   @(Config_ok: |- (s; f); admininstr* : t?) =>
-  $terminal_form(admininstr*) \/
+  $terminal__form(admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: (s; f); admininstr* ~> (s'; f'); admininstr'*)
 
-def $t_progress_e' : bool 
+def $t__progress__e' : bool 
   hint(proof "lemma")
   hint(desc "Administrative fragment progress")
-def $t_progress_e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
-  $types_of(val*) = valtype_1* =>
+  $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
-  $not_lf_br(admininstr*) =>
-  $not_lf_return(admininstr*) =>
-  $terminal_form(val* admininstr*) \/
+  $not__lf__br(admininstr*) =>
+  $not__lf__return(admininstr*) =>
+  $terminal__form(val* admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: (s; f); val* admininstr* ~> (s'; f'); admininstr'*)
 
-def $t_progress_be' : bool 
+def $t__progress__be' : bool 
   hint(proof "lemma")
   hint(desc "Basic fragment progress")
-def $t_progress_be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
+def $t__progress__be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types_of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
-  $types_of(val*) = valtype_1* =>
+  $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
-  $not_lf_br(instr*) =>
-  $not_lf_return(instr*) =>
-  $const_list(instr*) \/
+  $not__lf__br(instr*) =>
+  $not__lf__return(instr*) =>
+  $const__list(instr*) \/
   exists (s', f', admininstr*)
   @(Step: (s; f); val* instr* ~> (s'; f'); admininstr*)

@@ -112,6 +112,10 @@ let rec extract_vrules def =
   | Ast.RelD (id, _, _, rules) when id.it = "Instr_ok" -> rules
   | _ -> []
 
+(* let extract_theorems def =
+  match def.it with
+  | Ast.ThmD defs *)
+
 let pack_vrule vrule =
   match vrule.it with
   | Ast.RuleD (_, tenv, _, exp, prems) ->
@@ -155,10 +159,16 @@ let gen_execution_prose =
       in
       Prose.Algo algo)
 
+(* let gen_theorem_prose il = 
+  il 
+  |> extract_theorems
+  |> List.map theorem_to_prose  *)
+
 (** Main entry for generating prose **)
 let gen_prose il al =
   let validation_prose = gen_validation_prose il in
   let execution_prose = gen_execution_prose al in
+  (* let theorem_prose = gen_theorem_prose il in *)
   validation_prose @ execution_prose
 
 (** Main entry for generating stringified prose **)

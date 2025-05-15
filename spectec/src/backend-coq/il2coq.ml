@@ -75,9 +75,19 @@ let transform_id' (s : text) = match s with
 
 let transform_id (id : id) = transform_id' id.it
 
-let transform_var_id (id : id) = var_prefix ^ transform_id' id.it
+let transform_var_id (id : id) = 
+  (* TODO: (lemmagen) Double underscores are used for escaping subscript in Latex *)
+  let id' = Lib.String.replace "__" "_" id.it in
+  var_prefix ^ transform_id' id'
 
-let transform_fun_id (id : id) = func_prefix ^ transform_id' id.it 
+let transform_fun_id (id : id) = 
+  let id' = Lib.String.replace "__" "_" id.it in
+  func_prefix ^ transform_id' id'
+
+(* TODO: (lemmagen) This is only used for theorems defined via proof hints on def *)
+let transform_thm_id (id : id) =
+  let id' = Lib.String.replace "__" "_" id.it in
+  transform_id' id'
 
 (* Identifier generation *)
 let gen_typ_name (t : typ) =
@@ -725,8 +735,8 @@ let rec transform_def (d : def) : coq_def =
         let DefD (bs, _, _, _) = clause.it in
         let _as, ret = transform_clause None clause in
         match hintstyle with
-        | `Theorem -> TheoremD (transform_id id, List.map transform_bind bs, ret)
-        | `Lemma -> LemmaD (transform_id id, List.map transform_bind bs, ret)
+        | `Theorem -> TheoremD (transform_thm_id id, List.map transform_bind bs, ret)
+        | `Lemma -> LemmaD (transform_thm_id id, List.map transform_bind bs, ret)
         | _ -> assert false)
       else if (clauses = []) then
         (* MEMO: If the function declaration has no corresponding definitions
