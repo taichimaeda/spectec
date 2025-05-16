@@ -37,6 +37,13 @@ let caseenv_ref = ref (Case.new_env())
 
 let hintenv_ref = ref (Hint.new_env())
 
+let get_proof_hint id = 
+  let env = !hintenv_ref in
+  if not (Hint.bound !(env.proof_def) id) then None else
+  let hints = Hint.find "definition" !(env.proof_def) id in
+  let hexps = List.hd hints in
+  Some (List.hd hexps)
+  
 (* MEMO: Returns the newly aliased type name for type alias
          and the number of parameters used in the syntax definition *)
 let rec get_actual_case_name (env : env) (id : id) =
@@ -282,28 +289,6 @@ and check_formula (exp : exp) =
   Acc.exp exp;
   !Arg.flag
 
-(* TODO: (lemmagen) Refactor this function *)
-and check_hintdef (d : def) = 
-  match d.it with 
-  | DecD (id, _, _, _) -> 
-    let env = !hintenv_ref in
-    let env' = !(env.proof_def) in
-    if not (Hint.bound env' id) then
-      `Other
-    else
-      let exps = Hint.find "definition" !(env.proof_def) id in
-      let styles = List.filter_map (fun ss -> 
-        if List.length ss <> 1 then
-          error d.at "proof hint takes exactly one expression";
-        match List.hd ss with
-        | "\"theorem\"" -> Some `Theorem
-        | "\"lemma\"" -> Some `Lemma
-        | _ -> None) exps in
-      if List.length styles > 1 then
-        error d.at "definition takes at most one proof hint";
-      List.hd styles
-  | _ -> `Other
-
 and transform_return_type (typ : typ) =
   match typ.it with
     (* Only works for 1-dimensional lists. 
@@ -409,8 +394,7 @@ and transform_exp (exp : exp) =
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
     | RuleE _ | ForallE _ | ExistsE _ -> 
-      (* TODO: (lemmagen) Come up with a better error message *)
-      error exp.at "expected decidable boolean expressions"
+      error exp.at "unexpected formula"
 
 
 (* MEMO: This produces terms to be pattern matched against in match expressions
@@ -714,6 +698,22 @@ let transform_inst (id : id) (i : inst) =
         InductiveT (List.map (fun (m, (case_binds, _, _), _) -> (name ^ "__" ^ transform_mixop m, List.map transform_bind case_binds)) typcases))
     )
 
+let transform_defthm (style : text) (d : def) = 
+  match d.it with
+  | DecD (id, params, _, clauses) -> 
+    if params <> [] then 
+      error d.at "theorem takes no arguments";
+    if List.length clauses <> 1 then
+      error d.at "theorem takes exactly one clause";
+    let clause = List.hd clauses in
+    let DefD (bs, _, _, _) = clause.it in
+    let _as, ret = transform_clause None clause in
+    (match style with
+    | "\"theorem\"" -> TheoremD (transform_thm_id id, List.map transform_bind bs, ret)
+    | "\"lemma\"" -> LemmaD (transform_thm_id id, List.map transform_bind bs, ret)
+    | _ -> error d.at "unsupported theorem style")
+  | _ -> assert false
+
 let rec transform_def (d : def) : coq_def =
   (match d.it with
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp 
@@ -724,28 +724,14 @@ let rec transform_def (d : def) : coq_def =
                typ is a tuple of types to be interspersed in the mixop which is ignored here *)
       RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
-      let hintstyle = check_hintdef d in
-      if (hintstyle = `Theorem || hintstyle = `Lemma) then
-        (* TODO: (lemmagen) Extract this into another function *)
-        (if params <> [] then 
-          error d.at "theorem takes no arguments";
-        if List.length clauses <> 1 then
-          error d.at "theorem takes exactly one clause";
-        let clause = List.hd clauses in
-        let DefD (bs, _, _, _) = clause.it in
-        let _as, ret = transform_clause None clause in
-        match hintstyle with
-        | `Theorem -> TheoremD (transform_thm_id id, List.map transform_bind bs, ret)
-        | `Lemma -> LemmaD (transform_thm_id id, List.map transform_bind bs, ret)
-        | _ -> assert false)
-      else if (clauses = []) then
-        (* MEMO: If the function declaration has no corresponding definitions
-                 then print it as an axiom in Coq *)
+      let hint = get_proof_hint id in
+      (match hint with
+      | Some style ->
+        transform_defthm style d
+      | None when clauses = [] ->
         let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
         AxiomD (transform_fun_id id, binds, transform_return_type typ)
-      else (
-        (* MEMO: If any parameter in this function delcaration conains a type family
-                 then add an extra clause returning default_val when there is no match *)
+      | None ->
         let binds = List.map transform_param (List.combine (List.init (List.length params) (fun i -> i)) params) in 
         let family_type_exists = List.fold_left (fun acc param -> acc || (match param.it with
           | ExpP (_, typ') -> check_family_dependent_type typ'
@@ -763,7 +749,7 @@ let rec transform_def (d : def) : coq_def =
     | ThmD (id, bs, e1) -> 
       TheoremD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
     | LemD (id, bs, e1) -> 
-        LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+      LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
     | HintD _ -> UnsupportedD "") $ d.at
 
 let is_not_hintdef (d : def) : bool =

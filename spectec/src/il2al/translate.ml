@@ -256,6 +256,8 @@ and translate_exp exp =
     | _ -> yetE (Il.Print.string_of_exp exp) ~at:at)
   | Il.ProjE (e, 0) -> translate_exp e
   | Il.OptE inner_exp -> optE (Option.map translate_exp inner_exp) ~at:at
+  | Il.RuleE _ | Il.ForallE _ | Il.ExistsE _  ->
+    error exp.at "unexpected formula"
   (* Yet *)
   | _ -> yetE (Il.Print.string_of_exp exp) ~at:at
 
@@ -425,6 +427,8 @@ let rec translate_rhs exp =
     | Il.VarE _ -> push_instrs
     | Il.CallE (f, ae) -> push_instrs @ [ performI (f.it, translate_args ae) ~at:at ]
     | _ -> error_exp se "state expression" )
+  | Il.RuleE _ | Il.ForallE _ | Il.ExistsE _  ->
+    error exp.at "unexpected formula"
   | _ -> error_exp exp "expression on rhs of reduction"
 
 

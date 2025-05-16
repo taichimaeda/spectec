@@ -1,5 +1,6 @@
 open Prose
 open Printf
+open Util
 open Util.Source
 
 
@@ -451,6 +452,78 @@ and render_prose_instrs env depth instrs =
       sinstrs ^ "\n\n" ^ repeat indent depth ^ render_prose_instr env depth i)
     "" instrs
 
+(* Paragraphs *)
+
+let render_cmpop = function
+  | Eq -> "equal to"
+  | Ne -> "not equal to"
+  | Lt -> "less than"
+  | Gt -> "greater than"
+  | Le -> "less than or equal to"
+  | Ge -> "greater than or equal to"
+
+let rec render_para env para = 
+  match para with
+  | CmpP (op, e1, e2) -> 
+    sprintf "%s is %s %s"
+      (render_expr env e1)
+      (render_cmpop op)
+      (render_expr env e2)
+  | IfP (para1, para2) ->
+    sprintf "if (%s) then (%s)"
+      (render_para env para1)
+      (render_para env para2)
+  | IffP (para1, para2) -> 
+    sprintf "(%s) if and only if (%s)"
+      (render_para env para1)
+      (render_para env para2)
+  | NotP (para1) ->
+    sprintf "it is not the case that (%s)"
+      (render_para env para1)
+  | AndP (para1, para2) -> 
+    sprintf "both (%s) and (%s)"
+      (render_para env para1)
+      (render_para env para2)
+  | OrP (para1, para2) -> 
+    sprintf "either (%s) or (%s)"
+      (render_para env para1)
+      (render_para env para2)
+  | ForallP (es, para1) -> 
+    sprintf "for all (%s), (%s)"
+      (es
+        |> List.map (render_expr env)
+        |> String.concat ", ")
+      (render_para env para1)
+  | ExistsP (es, para1) -> 
+    sprintf "there exists (%s) such that (%s)"
+      (es
+        |> List.map (render_expr env)
+        |> String.concat ", ")
+      (render_para env para1)
+  | ExpP (e1) -> 
+    sprintf "(%s) is true"
+      (render_expr env e1)
+  | RelP (id, (ss, es)) ->
+    sprintf "relation %s holds (i.e. %s)"
+      id
+      (es
+        |> List.map (render_expr env)
+        |> Lib.List.interleave ss
+        |> String.concat " ")
+  | PredP (id, es) -> 
+    sprintf "predicate %s(%s) holds"
+      id
+      (es
+        |> List.map (render_expr env)
+        |> String.concat ", ")
+  | CustomP (ss, es) -> 
+    es
+      |> List.map (render_expr env)
+      |> Lib.List.interleave ss
+      |> String.concat ""
+  | YetP s -> 
+    sprintf "unsupported paragraph: %s" s
+
 (* Prefix for stack push/pop operations *)
 let render_stack_prefix expr =
   match expr.it with
@@ -608,6 +681,8 @@ let render_func env fname params instrs =
   render_al_instrs env fname 0 instrs
 
 let render_def env = function
+  | Thrm (id, para) ->
+    "\n" ^ id ^ "\n" ^ render_para env para ^ "\n\n"
   | Pred (name, params, instrs) ->
     "\n" ^ render_pred env name params instrs ^ "\n\n"
   | Algo algo -> (match algo with

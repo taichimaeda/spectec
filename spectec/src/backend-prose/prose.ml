@@ -15,8 +15,24 @@ type instr =
 | EquivI of Al.Ast.expr * Al.Ast.expr
 | YetI of string
 
+type para =
+| CmpP of cmpop * Al.Ast.expr * Al.Ast.expr
+| IfP of para * para
+| IffP of para * para
+| NotP of para
+| AndP of para * para
+| OrP of para * para
+| ForallP of Al.Ast.expr list * para
+| ExistsP of Al.Ast.expr list * para
+| ExpP of Al.Ast.expr
+| RelP of Al.Ast.id * (string list * Al.Ast.expr list)
+| PredP of Al.Ast.id * Al.Ast.expr list
+| CustomP of string list * Al.Ast.expr list
+| YetP of string
+
 (* TODO: perhaps rename to avoid name clash *)
 type def =
+| Thrm of Al.Ast.id * para
 | Pred of Al.Ast.atom * Al.Ast.expr list * instr list
 | Algo of Al.Ast.algorithm
 

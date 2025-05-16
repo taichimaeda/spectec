@@ -1004,7 +1004,6 @@ and render_exp ?(br = "") env e =
       ({it = VarE _ | CallE (_, []) | ParenE _; _ } as e2)) ->
     render_exp env e1 ^ " \\, " ^ render_exp env e2
   | BinE (e1, op, e2) ->
-    (* TODO: (lemmagen) Line break after some logical operators *)
     let br' = match op with ImplOp | EquivOp -> br | _ -> "" in
     render_exp ~br env e1 ^ space render_binop op ^ br' ^ render_exp ~br env e2
   | CmpE (e1, op, e2) ->
@@ -1080,8 +1079,11 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | TypE (e1, _) -> render_exp env e1
   | RuleE (_id, e1) -> render_exp env e1
   | ForallE (args, e1) -> 
-    (* TODO: (lemmagen) Line break after quantifier *)
-    "\\forall " ^ render_quants env args ^ "." ^ br ^ render_exp ~br env e1
+    let prefix = "\\forall " ^ render_quants env args in
+    let before = br in
+    (* TODO: (lemmagen) Remove magic number *)
+    let after = if String.length prefix > 40 then br else "" in
+    before ^ prefix ^ "." ^ after ^ render_exp ~br env e1
   | ExistsE (args, e1) -> 
     "\\exists " ^ render_quants env args ^ ".\\;" ^ br ^ render_exp ~br env e1
   | FuseE (e1, e2) ->

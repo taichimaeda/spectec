@@ -80,5 +80,7 @@ let string_of_def = function
     ^ string_of_list string_of_expr " " " " "\n" params
     ^ string_of_list string_of_instr "" "\n" "\n" instrs
 | Algo algo -> string_of_algorithm algo
+(* TODO: (lemmagen) Non-exhaustive pattern matching *)
+| _ -> failwith "unimplemented (lemmagen)"
 
 let string_of_prose prose = List.map string_of_def prose |> String.concat "\n"

@@ -125,6 +125,8 @@ let env_prose env prose =
     env.rel_prose <- Map.add exec_id {ralgos} env.rel_prose
   | Algo (Al.Ast.FuncA (id, _, _)) ->
     env.def_prose <- Map.add id {falgo = prose; use = ref 0} env.def_prose
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let env (config : config) pdsts odsts elab el pr : env =
   let latex = Backend_latex.Render.env config.latex el in

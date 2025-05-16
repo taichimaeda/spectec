@@ -237,24 +237,29 @@ def $types__of(eps) = eps
 def $types__of((CONST valtype val_) val'*) = valtype $types__of(val'*)
 
 def $is__const(admininstr) : bool
+  hint(para %#"is a constant")
 def $is__const(CONST valtype val_) = true
 def $is__const(admininstr) = false
 
 def $const__list(admininstr*) : bool
+  hint(para %#"is a list of constants")
 def $const__list(eps) = true
 def $const__list(admininstr admininstr'*) = $is__const(admininstr) /\ $const__list(admininstr'*)
 
 def $not__lf__br(admininstr*) : bool
+  hint(para %#"is not branch-reducidible")
 def $not__lf__br(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (BR l) admininstr'*
 
 def $not__lf__return(admininstr*) : bool
+  hint(para %#"is not return-reducidible")
 def $not__lf__return(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (RETURN) admininstr'*
 
 def $terminal__form(admininstr*) : bool
+  hint(para %#"is in terminal form")
 def $terminal__form(admininstr*) = 
   $const__list(admininstr*) \/ admininstr* = TRAP
 
