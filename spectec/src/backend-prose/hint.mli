@@ -6,7 +6,7 @@ type env =
   { desc_def  : text list list Map.t ref;
     desc_thm  : text list list Map.t ref;
     proof_def : text list list Map.t ref;
-    para_def  : text list list Map.t ref;
+    prose_def : text list list Map.t ref;
   }
 
 val bound : 'a Map.t -> id -> bool

@@ -40,12 +40,6 @@ struct
     | x::xs -> x :: nub pred (List.filter (fun y -> not (pred x y)) xs)
 
   let filter_not pred = List.filter (fun x -> not (pred x))
-
-  let rec interleave xs ys = 
-    match xs, ys with
-    | x::xs', y::ys' -> x::y:: interleave xs' ys'
-    | [], _  -> ys
-    | _, [] -> xs
 end
 
 module Char =

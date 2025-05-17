@@ -2,6 +2,7 @@ let gen_string cfg el =
   let env = Render.env cfg el
     |> Render.with_syntax_decoration true
     |> Render.with_rule_decoration true
+    |> Render.with_theorem_decoration true
   in Render.render_script env el
 
 let gen_file cfg file el =

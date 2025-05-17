@@ -37,7 +37,7 @@ let caseenv_ref = ref (Case.new_env())
 
 let hintenv_ref = ref (Hint.new_env())
 
-let get_proof_hint id = 
+let find_proof_hint id = 
   let env = !hintenv_ref in
   if not (Hint.bound !(env.proof_def) id) then None else
   let hints = Hint.find "definition" !(env.proof_def) id in
@@ -724,7 +724,7 @@ let rec transform_def (d : def) : coq_def =
                typ is a tuple of types to be interspersed in the mixop which is ignored here *)
       RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
-      let hint = get_proof_hint id in
+      let hint = find_proof_hint id in
       (match hint with
       | Some style ->
         transform_defthm style d

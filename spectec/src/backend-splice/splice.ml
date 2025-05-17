@@ -117,7 +117,7 @@ let normalize_id id =
 
 let env_prose env prose =
   match prose with
-  | Stmt (_, id, _) ->
+  | Stmt (_, _, id, _) ->
     env.thm_prose <- Map.add id {tpara = prose; use = ref 0} env.thm_prose
   | Pred ((id, typ), _, _) ->
     let id = Il.Atom.string_of_atom (id $$ (no_region, ref typ)) in

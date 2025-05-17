@@ -12,7 +12,6 @@ sig
   val last : 'a list -> 'a (* raises Failure *)
   val nub : ('a -> 'a -> bool) -> 'a list -> 'a list
   val filter_not : ('a -> bool) -> 'a list -> 'a list
-  val interleave : 'a list -> 'a list -> 'a list
 end
 
 module Char :

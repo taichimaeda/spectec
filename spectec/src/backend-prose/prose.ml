@@ -17,22 +17,27 @@ type instr =
 
 type para =
 | CmpP of cmpop * Al.Ast.expr * Al.Ast.expr
-| IfP of para * para
-| IffP of para * para
 | NotP of para
-| AndP of para * para
-| OrP of para * para
+| AndP of para list
+| OrP of para list
+| IfP of para list * para
+| IffP of para * para
 | ForallP of Al.Ast.expr list * para
 | ExistsP of Al.Ast.expr list * para
 | ExpP of Al.Ast.expr
-| RelP of Al.Ast.id * (string list * Al.Ast.expr list)
+| ValidP of Al.Ast.expr option * Al.Ast.expr option * Al.Ast.expr * Al.Ast.expr option
+| StepP of Al.Ast.expr * Al.Ast.expr
+(* TODO: (lemmagen) Refactor this *)
+(* | RelP of Al.Ast.id * (Il.Ast.mixop list * Al.Ast.expr list) *)
+| RelP of Al.Ast.id * Al.Ast.expr list
 | PredP of Al.Ast.id * Al.Ast.expr list
-| CustomP of string list * Al.Ast.expr list
+| CustomP of string * Al.Ast.expr list
 | YetP of string
 
 (* TODO: perhaps rename to avoid name clash *)
 type def =
-| Stmt of string * Al.Ast.id * para
+(* TODO: (lemmagen) Refactor this *)
+| Stmt of string * string * Al.Ast.id * para
 | Pred of Al.Ast.atom * Al.Ast.expr list * instr list
 | Algo of Al.Ast.algorithm
 

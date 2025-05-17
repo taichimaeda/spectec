@@ -237,29 +237,30 @@ def $types__of(eps) = eps
 def $types__of((CONST valtype val_) val'*) = valtype $types__of(val'*)
 
 def $is__const(admininstr) : bool
-  hint(para %#"is a constant")
+  hint(prose "% is a constant")
 def $is__const(CONST valtype val_) = true
 def $is__const(admininstr) = false
 
 def $const__list(admininstr*) : bool
-  hint(para %#"is a list of constants")
+  hint(prose "% is a list of constants")
 def $const__list(eps) = true
-def $const__list(admininstr admininstr'*) = $is__const(admininstr) /\ $const__list(admininstr'*)
+def $const__list(admininstr admininstr'*) = 
+  $is__const(admininstr) /\ $const__list(admininstr'*)
 
 def $not__lf__br(admininstr*) : bool
-  hint(para %#"is not branch-reducidible")
+  hint(prose "% is not branch-reducidible")
 def $not__lf__br(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (BR l) admininstr'*
 
 def $not__lf__return(admininstr*) : bool
-  hint(para %#"is not return-reducidible")
+  hint(prose "% is not return-reducidible")
 def $not__lf__return(admininstr*) =
   forall (val*, l, admininstr'*)
   admininstr* =/= val* (RETURN) admininstr'*
 
 def $terminal__form(admininstr*) : bool
-  hint(para %#"is in terminal form")
+  hint(prose "% is in terminal form")
 def $terminal__form(admininstr*) = 
   $const__list(admininstr*) \/ admininstr* = TRAP
 
@@ -275,7 +276,7 @@ theorem t_progress =  hint(desc "Progress")
   exists (s', f', admininstr'*)
   @(Step: s; f; admininstr* ~> s'; f'; admininstr'*)
 
-lemma t_progress_e =  hint(desc "Admininstrative Fragment Progress")
+lemma t_progress_e =  hint(desc "Admin Fragment Progress")
   forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
@@ -303,16 +304,18 @@ lemma t_progress_be =  hint(desc "Basic Fragment Progress")
   exists (s', f', admininstr*)
   @(Step: s; f; val* instr* ~> s'; f'; admininstr*)
 
-def $t__progress' : bool  hint(proof "theorem") 
-                          hint(desc "Progress")
+def $t__progress' : bool
+  hint(proof "theorem") 
+  hint(desc "Progress")
 def $t__progress' = forall (s, f, admininstr*, t?)
   @(Config_ok: |- s; f; admininstr* : t?) =>
   $terminal__form(admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: s; f; admininstr* ~> s'; f'; admininstr'*)
 
-def $t__progress__e' : bool  hint(proof "lemma")
-                             hint(desc "Admininstrative Fragment Progress")
+def $t__progress__e' : bool
+  hint(proof "lemma")
+  hint(desc "Admin Fragment Progress")
 def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
@@ -326,8 +329,9 @@ def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, v
   exists (s', f', admininstr'*)
   @(Step: s; f; val* admininstr* ~> s'; f'; admininstr'*)
 
-def $t__progress__be' : bool  hint(proof "lemma")
-                              hint(desc "Basic Fragment Progress")
+def $t__progress__be' : bool
+  hint(proof "lemma")
+  hint(desc "Basic Fragment Progress")
 def $t__progress__be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>

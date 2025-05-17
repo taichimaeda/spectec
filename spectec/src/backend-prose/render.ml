@@ -226,6 +226,20 @@ let render_order index depth =
   | 3 -> alp_idx ^ ")"
   | _ -> assert false
 
+let replace_percent s reps =
+  let rec aux cs rs acc =
+    match cs with
+    | [] -> List.rev acc
+    | '%' :: cs' -> (match rs with
+      | r :: rs ->
+        let r' = List.rev (Lib.String.explode r) in
+        aux cs' rs (r' @ acc)
+      | [] -> 
+        aux cs' [] ('%' :: acc))
+    | c :: cs' -> aux cs' reps (c :: acc) in
+  let s' = aux (Lib.String.explode s) reps [] in
+  Lib.String.implode s'
+
 (* Operators *)
 
 let render_prose_cmpop = function
@@ -469,23 +483,33 @@ let rec render_para env para =
       (render_expr env e1)
       (render_cmpop op)
       (render_expr env e2)
-  | IfP (para1, para2) ->
-    sprintf "if %s, then %s"
-      (render_para env para1)
-      (render_para env para2)
-  | IffP (para1, para2) -> 
-    sprintf "%s if and only if %s"
-      (render_para env para1)
-      (render_para env para2)
   | NotP (para1) ->
     sprintf "it is not the case that (%s)"
       (render_para env para1)
-  | AndP (para1, para2) -> 
-    sprintf "both (%s and %s)"
-      (render_para env para1)
-      (render_para env para2)
-  | OrP (para1, para2) -> 
-    sprintf "either (%s or %s)"
+  | AndP (paras) -> 
+    let paras', para = Lib.List.split_last paras in
+    sprintf "%s and %s"
+      (paras'
+        |> List.map (render_para env)
+        |> String.concat ", ")
+      (render_para env para)
+  | OrP (paras) -> 
+    let paras', para = Lib.List.split_last paras in
+    sprintf "%s or %s"
+      (paras'
+        |> List.map (render_para env)
+        |> String.concat ", ")
+      (render_para env para)
+  | IfP (paras, para) ->
+    let paras', para' = Lib.List.split_last paras in
+    sprintf "if %s and %s, then %s"
+      (paras'
+        |> List.map (render_para env)
+        |> String.concat ", ")
+      (render_para env para')
+      (render_para env para)
+  | IffP (para1, para2) -> 
+    sprintf "%s if and only if %s"
       (render_para env para1)
       (render_para env para2)
   | ForallP (es, para1) -> 
@@ -503,27 +527,29 @@ let rec render_para env para =
   | ExpP (e1) -> 
     sprintf "%s is true"
       (render_expr env e1)
-  | RelP (id, (ss, es)) ->
-    sprintf "relation %s %s holds (i.e. %s)"
-      id
+  | ValidP (e1, e2, e3, e4) ->
+    sprintf "%s is valid%s%s%s"
+      (render_expr env e3)
+      (render_opt " with type " (render_expr env) "" e4)
+      (render_opt " under the context " (render_expr env) "" e2)
+      (render_opt " and the store " (render_expr env) "" e1)
+  | StepP (e1, e2) ->
+    sprintf "%s steps to %s"
+      (render_expr env e1)
+      (render_expr env e2)
+  | RelP (id, es) ->
+    sprintf "relation %s %s holds" id
       (es 
         |> List.map (render_expr env)
         |> String.concat " ")
-      (es
-        |> List.map (render_expr env)
-        |> Lib.List.interleave ss
-        |> String.concat " ")
   | PredP (id, es) -> 
-    sprintf "predicate %s(%s) holds"
-      id
+    sprintf "predicate %s(%s) holds" id
       (es
         |> List.map (render_expr env)
         |> String.concat ", ")
-  | CustomP (ss, es) -> 
-    es
-      |> List.map (render_expr env)
-      |> Lib.List.interleave ss
-      |> String.concat ""
+  | CustomP (fmt, es) -> 
+    print_endline @@ "debugging" ^ (replace_percent fmt (List.map (render_expr env) es));
+    replace_percent fmt (List.map (render_expr env) es)
   | YetP s -> 
     sprintf "unsupported paragraph: %s" s
 
@@ -664,9 +690,8 @@ let render_atom_title env name params =
 let render_funcname_title env fname params =
   render_expr env (Al.Ast.CallE (fname, params) $ no_region)
 
-let render_stmt env name para =
-  name ^ "\n" ^
-  String.make (String.length name) '.' ^ "\n" ^
+let render_stmt env name style para =
+  "**" ^ String.capitalize_ascii style ^ "(" ^ name ^ ")**." ^ "\n" ^
   String.capitalize_ascii (render_para env para)
 
 let render_pred env name params instrs =
@@ -689,8 +714,8 @@ let render_func env fname params instrs =
   render_al_instrs env fname 0 instrs
 
 let render_def env = function
-  | Stmt (name, _, para) ->
-    "\n" ^ render_stmt env name para ^ "\n\n"
+  | Stmt (name, style, _, para) ->
+    "\n" ^ render_stmt env name style para ^ "\n\n"
   | Pred (name, params, instrs) ->
     "\n" ^ render_pred env name params instrs ^ "\n\n"
   | Algo algo -> (match algo with

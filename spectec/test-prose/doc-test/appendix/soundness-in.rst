@@ -16,7 +16,7 @@ $${theorem-prose: t_progress}
 
 .. _appendix-soundness-admin-fragment-progress:
 
-Administrative Fragment Progress
+Admin Fragment Progress
 ~~~~~~~~~~~~
 
 $${theorem: t_progress_e}

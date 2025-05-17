@@ -52,6 +52,7 @@ type env =
     desc_thm : exp list Map.t ref;
     deco_typ : bool;
     deco_rule : bool;
+    deco_thm : bool;
   }
 
 let new_env config =
@@ -78,6 +79,7 @@ let new_env config =
     desc_thm = ref Map.empty;
     deco_typ = false;
     deco_rule = false;
+    deco_thm = false;
   }
 
 let config env : Config.t =
@@ -88,6 +90,7 @@ let env_with_config env config : env =
 
 let with_syntax_decoration b env = {env with deco_typ = b}
 let with_rule_decoration b env = {env with deco_rule = b}
+let with_theorem_decoration b env = {env with deco_thm = b}
 let without_macros b env =
   if not b then env else
   env_with_config env {env.config with macros_for_ids = false}
@@ -995,7 +998,9 @@ and render_exp ?(br = "") env e =
       ({it = VarE _ | CallE (_, []) | ParenE _; _ } as e2)) ->
     render_exp env e1 ^ " \\, " ^ render_exp env e2
   | BinE (e1, op, e2) ->
-    let br' = match op with ImplOp | EquivOp -> br | _ -> "" in
+    let br' = match op with 
+      | ImplOp | EquivOp -> br
+      | _ -> "" in
     render_exp ~br env e1 ^ space render_binop op ^ br' ^ render_exp ~br env e2
   | CmpE (e1, op, e2) ->
     render_exp env e1 ^ space render_cmpop op ^ render_exp env e2
@@ -1075,10 +1080,10 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
       | ExistsE _ -> "\\exists"
       | _ -> assert false in
     let prefix = command ^ " " ^ render_quants env args in
-    let before = br in
     (* TODO: (lemmagen) Remove magic number *)
-    let after = if String.length prefix > 80 then br else "" in
-    before ^ prefix ^ "." ^ after ^ render_exp ~br env e1
+    (* TODO: (lemmagen) This is word count in Latex not rendered math *)
+    let br' = if String.length prefix > 80 then br else "" in
+    br' ^ prefix ^ "." ^ br' ^ render_exp ~br env e1
   | FuseE (e1, e2) ->
     (* TODO: HACK for printing t.LOADn_sx (replace with invisible parens) *)
     let e2' = as_paren_exp (fuse_exp e2 true) in
@@ -1371,11 +1376,18 @@ let render_funcdef env d =
       render_conditions env (render_exp env e) "&&" prems
   | _ -> failwith "render_funcdef"
 
+let render_thmdeco env id =
+  match env.deco_typ, string_of_desc (Map.find_opt id.it !(env.desc_thm)) with
+  | _, Some s -> "\\mbox{(" ^ s ^ ")} & "
+  | _ -> "& "
+
 let render_thmdef env d = 
   match d.it with 
-  | ThmD (_, e, _) | LemD (_, e, _) -> 
-    "\\begin{array}{@{}l@{}}\n" ^ 
-      render_exp ~br:" \\\\[0.8ex]\n" env e ^
+  | ThmD (id, e, _) | LemD (id, e, _) -> 
+    let deco = if env.deco_thm then "l" else "l@{}" in
+    "\\begin{array}{@{}" ^ deco ^ "l@{}}\n" ^ 
+      render_thmdeco env id ^
+      render_exp ~br:"\\\\[0.8ex]\n &" env e ^
     "\\end{array}\n"
   | _ -> failwith "render_thmdef"
 

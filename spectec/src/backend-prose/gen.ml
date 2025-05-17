@@ -87,13 +87,13 @@ let rec prem_to_instrs prem = match prem.it with
     let s = Il.Print.string_of_prem prem in
     print_yet_prem prem "prem_to_instrs"; [ YetI s ]
 
-let get_proof_hint (env : Hint.env) id = 
+let find_proof_hint (env : Hint.env) id = 
   if not (Hint.bound !(env.proof_def) id) then None else
   let hints = Hint.find "definition" !(env.proof_def) id in
   let hexps = List.hd hints in
   Some (Lib.String.unquote (List.hd hexps))
 
-let get_desc_hint (env : Hint.env) id = 
+let find_desc_hint (env : Hint.env) id = 
   if Hint.bound !(env.desc_thm) id then
     let hints = Hint.find "theorem" !(env.desc_thm) id in
     let hexps = List.hd hints in
@@ -105,11 +105,11 @@ let get_desc_hint (env : Hint.env) id =
   else 
     None
 
-let get_para_hint (env : Hint.env) id = 
-  if not (Hint.bound !(env.para_def) id) then None else
-  let hints = Hint.find "definition" !(env.para_def) id in
+let find_prose_hint (env : Hint.env) id = 
+  if not (Hint.bound !(env.prose_def) id) then None else
+  let hints = Hint.find "definition" !(env.prose_def) id in
   let hexps = List.hd hints in
-  Some hexps
+  Some (Lib.String.unquote (List.hd hexps))
 
 let bind_to_exp b = 
   match b.it with
@@ -133,11 +133,23 @@ let rec formula_to_para env e : para =
   | Ast.UnE (Ast.NotOp, e1) -> 
     NotP (formula_to_para env e1)
   | Ast.BinE (Ast.AndOp, e1, e2) -> 
-    AndP (formula_to_para env e1, formula_to_para env e2)
+    let para1 = formula_to_para env e1 in
+    let para2 = formula_to_para env e2 in
+    (match para2 with
+    | AndP paras -> AndP (para1::paras)
+    | _ -> AndP ([para1; para2]))
   | Ast.BinE (Ast.OrOp, e1, e2) -> 
-    OrP (formula_to_para env e1, formula_to_para env e2)
-  | Ast.BinE (Ast.ImplOp, e1, e2) -> 
-    IfP (formula_to_para env e1, formula_to_para env e2)
+    let para1 = formula_to_para env e1 in
+    let para2 = formula_to_para env e2 in
+    (match para2 with
+    | OrP paras -> AndP (para1::paras)
+    | _ -> OrP ([para1; para2]))
+  | Ast.BinE (Ast.ImplOp, e1, e2) ->
+    let para1 = formula_to_para env e1 in
+    let para2 = formula_to_para env e2 in
+    (match para2 with
+    | IfP (paras, para) -> IfP (para1::paras, para)
+    | _ -> IfP ([para1], para2))
   | Ast.BinE (Ast.EquivOp, e1, e2) -> 
     IffP (formula_to_para env e1, formula_to_para env e2)
   | Ast.ForallE (bs, _, e1) -> 
@@ -150,24 +162,36 @@ let rec formula_to_para env e : para =
       |> List.filter_map bind_to_exp
       |> List.map exp_to_expr in
     ExistsP (es, formula_to_para env e1)
-  | Ast.RuleE (id, mixop, e1) ->
-    let ss = List.map (fun atoms -> atoms 
-      |> List.map Il.Print.string_of_atom 
-      |> String.concat " ") mixop in
+  | Ast.RuleE (id, _, e1) when id.it = "Config_ok" ->
+    (* TODO: (lemmagen) This is a hack *)
+    (match exp_to_argexpr e1 with
+    | [{ it = Al.Ast.TupE [{it = Al.Ast.TupE [s; c]; _}; e1']; _}; t] ->
+      ValidP (Some s, Some c, e1', Some t)
+    | _ -> error e.at "unrecognized form of argument in Config_ok")
+  | Ast.RuleE (id, _, e1) when String.ends_with ~suffix:"_ok" id.it ->
+    (match exp_to_argexpr e1 with
+    | [s; c; e1'; t] -> ValidP (Some s, Some c, e1', Some t)
+    | [c; e1'; t] -> ValidP (None, Some c, e1', Some t)
+    | [c; e1'] -> ValidP (None, Some c, e1', None)
+    | [e1'] -> ValidP (None, None, e1', None)
+    | _ -> error e.at "unrecognized form of argument in rule_ok")
+  | Ast.RuleE (id, _, e1) when String.starts_with ~prefix:"Step" id.it ->
+    (match exp_to_argexpr e1 with
+    | [e1'; e1''] -> StepP (e1', e1'')
+    | _ -> error e.at "unrecognized form of argument in Step_rule")
+  | Ast.RuleE (id, _, e1) ->
     let es = match e1.it with
       | Ast.TupE es -> List.map exp_to_expr es
       | _ -> [exp_to_expr e1] in
-    RelP (id.it, (ss, es))
+    RelP (id.it, es)
   | Ast.CallE (id, as_) when e.note.it = Ast.BoolT ->
     let es = as_
       |> List.filter_map arg_to_exp
       |> List.map exp_to_expr in
-    let hint = get_para_hint env id in
+    let hint = find_prose_hint env id in
     (match hint with
-    | Some ss -> 
-      CustomP (ss, es)
-    | None ->
-      PredP (id.it, es))
+    | Some fmt -> CustomP (fmt, es)
+    | None -> PredP (id.it, es))
   | _ when e.note.it = Ast.BoolT ->
     ExpP (exp_to_expr e)
   | _ -> 
@@ -197,15 +221,19 @@ let vrule_group_to_prose ((_name, vrules): vrule_group) =
 let theorem_to_prose env d =
   match d.it with
   | Ast.ThmD (id, bs, e) | Ast.LemD (id, bs, e) ->
-    let hint = get_desc_hint env id in
+    let hint = find_desc_hint env id in
     let name = match hint with
       | Some desc -> desc
       | None -> id.it in
+    let style = match d.it with
+      | Ast.ThmD _ -> "theorem"
+      | Ast.LemD _ -> "lemma"
+      | _ -> assert false in
     let e' = match e.it with 
       | Ast.ForallE (bs', as_, e) -> {e with it = Ast.ForallE (bs @ bs', as_, e)}
       | Ast.ExistsE (bs', as_, e) -> {e with it = Ast.ExistsE (bs @ bs', as_, e)}
       | _ -> e in
-    Stmt (name, id.it, formula_to_para env e')
+    Stmt (name, style, id.it, formula_to_para env e')
   | _ -> assert false
 
 let rec extract_vrules def =
@@ -234,7 +262,7 @@ let extract_theorems env d =
   match d.it with
   | Ast.ThmD _ | Ast.LemD _ -> [d]
   | Ast.DecD (id, _, _, _) -> 
-    let hint = get_proof_hint env id in
+    let hint = find_proof_hint env id in
     (match hint with 
     | Some style -> extract_def_theorems style d
     | None -> [])
