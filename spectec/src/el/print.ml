@@ -290,9 +290,9 @@ let string_of_def d =
       string_of_exp e ^
       concat "" (map_filter_nl_list (prefix "\n  -- " string_of_prem) prems)
   | ThmD (id, e, _hints) ->
-    "theorem " ^ string_of_thmid id ^ ": " ^ string_of_exp e
+    "theorem " ^ string_of_thmid id ^ " = " ^ string_of_exp e
   | LemD (id, e, _hints) -> 
-    "lemma " ^ string_of_thmid id ^ ": " ^ string_of_exp e
+    "lemma " ^ string_of_thmid id ^ " = " ^ string_of_exp e
   | SepD ->
     "\n\n"
   | HintD _ -> ""

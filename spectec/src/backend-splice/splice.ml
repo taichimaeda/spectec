@@ -55,8 +55,10 @@ type syntax = {sdef : El.Ast.def; sfragments : (string * El.Ast.def * use) list}
 type grammar = {gdef : El.Ast.def; gfragments : (string * El.Ast.def * use) list}
 type relation = {rdef : El.Ast.def; rules : (string * El.Ast.def * use) list}
 type definition = {fdef : El.Ast.def; clauses : El.Ast.def list; use : use}
+type theorem = {tdef : El.Ast.def; use : use}
 type relation_prose = {ralgos : (string * Backend_prose.Prose.def * use) list}
 type definition_prose = {falgo : Backend_prose.Prose.def; use : use}
+type theorem_prose = {tpara : Backend_prose.Prose.def; use : use}
 
 type env =
   { elab : Frontend.Elab.env;
@@ -67,8 +69,10 @@ type env =
     mutable gram : grammar Map.t;
     mutable rel : relation Map.t;
     mutable def : definition Map.t;
+    mutable thm : theorem Map.t;
     mutable rel_prose : relation_prose Map.t;
     mutable def_prose : definition_prose Map.t;
+    mutable thm_prose : theorem_prose Map.t;
   }
 
 let env_def env def =
@@ -97,10 +101,10 @@ let env_def env def =
     let definition = Map.find id.it env.def in
     let clauses = definition.clauses @ [def] in
     env.def <- Map.add id.it {definition with clauses} env.def
+  | ThmD (id, _, _) | LemD (id, _, _) ->
+    env.thm <- Map.add id.it {tdef = def; use = ref 0} env.thm
   | FamD _ | VarD _ | SepD | HintD _ ->
     ()
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let valid_id = "valid"
 let exec_id = "exec"
@@ -113,6 +117,8 @@ let normalize_id id =
 
 let env_prose env prose =
   match prose with
+  | Stmt (id, _) ->
+    env.thm_prose <- Map.add id {tpara = prose; use = ref 0} env.thm_prose
   | Pred ((id, typ), _, _) ->
     let id = Il.Atom.string_of_atom (id $$ (no_region, ref typ)) in
     let relation = Map.find valid_id env.rel_prose in
@@ -125,8 +131,6 @@ let env_prose env prose =
     env.rel_prose <- Map.add exec_id {ralgos} env.rel_prose
   | Algo (Al.Ast.FuncA (id, _, _)) ->
     env.def_prose <- Map.add id {falgo = prose; use = ref 0} env.def_prose
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let env (config : config) pdsts odsts elab el pr : env =
   let latex = Backend_latex.Render.env config.latex el in
@@ -137,8 +141,10 @@ let env (config : config) pdsts odsts elab el pr : env =
       gram = Map.empty;
       rel = Map.empty;
       def = Map.empty;
+      thm = Map.empty;
       rel_prose = Map.(add valid_id {ralgos = []} (add exec_id {ralgos = []} empty));
       def_prose = Map.empty;
+      thm_prose = Map.empty;
     }
   in
   List.iter (env_def env) el;
@@ -164,7 +170,10 @@ let warn_math env =
   ) env.rel;
   Map.iter (fun id1 ({use; _} : definition) ->
     warn_use use "definition" id1 ""
-  ) env.def
+  ) env.def;
+  Map.iter (fun id1 ({use; _} : theorem) ->
+    warn_use use "theorem" id1 ""
+  ) env.thm
 
 let warn_prose env =
   Map.iter (fun id1 {ralgos} ->
@@ -234,6 +243,12 @@ let find_def env src id1 id2 =
       error src ("definition `" ^ id1 ^ "` has no clauses");
     incr definition.use; [definition.clauses]
 
+let find_theorem env src id1 id2 = 
+  find_nosub "theorem" src id1 id2;
+  match Map.find_opt id1 env.thm with 
+  | None -> error src ("unknown theorem identifier `" ^ id1 ^ "`")
+  | Some theorem -> [[theorem.tdef]]
+
 let find_rule_prose env src id1 id2 =
   match Map.find_opt id1 env.rel_prose with
   | None -> error src ("unknown prose relation identifier `" ^ id1 ^ "`")
@@ -245,6 +260,11 @@ let find_def_prose env src id1 id2 =
   | None -> error src ("unknown prose definition identifier `" ^ id1 ^ "`")
   | Some definition -> incr definition.use; definition.falgo
 
+let find_theorem_prose env src id1 id2 = 
+  find_nosub "theorem" src id1 id2;
+  match Map.find_opt id1 env.thm_prose with
+  | None -> error src ("unknown theorem definition identifier `" ^ id1 ^ "`")
+  | Some theorem -> incr theorem.use; theorem.tpara
 
 (* Parsing *)
 
@@ -426,6 +446,8 @@ let splice_anchor env src splice_pos anchor buf =
     try_prose_anchor env' src r "definition-prose" "prose definition" "" find_def_prose ||
     try_prose_anchor env' src r "rule-prose-ignore" "prose relation" "rule" find_rule_prose ||
     try_prose_anchor env' src r "definition-prose-ignore" "prose definition" "" find_def_prose ||
+    try_prose_anchor env' src r "theorem-prose" "prose theorem" "" find_theorem_prose ||
+    try_prose_anchor env' src r "theorem-prose-ignore" "prose theorem" "" find_theorem_prose ||
     (prose := false; false) ||
     try_def_anchor env' src r "syntax" "syntax" "fragment" find_syntax ||
     try_def_anchor env' src r "syntax+" "syntax" "fragment" find_syntax ||
@@ -439,6 +461,8 @@ let splice_anchor env src splice_pos anchor buf =
     try_def_anchor env' src r "rule-" "relation" "rule" find_rule ||
     try_def_anchor env' src r "definition" "definition" "" find_def ||
     try_def_anchor env' src r "definition-" "definition" "" find_def ||
+    try_def_anchor env' src r "theorem" "theorem" "" find_theorem ||
+    try_def_anchor env' src r "theorem-" "theorem" "" find_theorem ||
     try_def_anchor env' src r "syntax-ignore" "syntax" "fragment" find_syntax ||
     try_def_anchor env' src r "grammar-ignore" "grammar" "fragment" find_grammar ||
     try_def_anchor env' src r "relation-ignore" "relation" "" find_relation ||

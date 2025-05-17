@@ -256,8 +256,6 @@ and translate_exp exp =
     | _ -> yetE (Il.Print.string_of_exp exp) ~at:at)
   | Il.ProjE (e, 0) -> translate_exp e
   | Il.OptE inner_exp -> optE (Option.map translate_exp inner_exp) ~at:at
-  | Il.RuleE _ | Il.ForallE _ | Il.ExistsE _  ->
-    error exp.at "unexpected formula"
   (* Yet *)
   | _ -> yetE (Il.Print.string_of_exp exp) ~at:at
 
@@ -427,8 +425,7 @@ let rec translate_rhs exp =
     | Il.VarE _ -> push_instrs
     | Il.CallE (f, ae) -> push_instrs @ [ performI (f.it, translate_args ae) ~at:at ]
     | _ -> error_exp se "state expression" )
-  | Il.RuleE _ | Il.ForallE _ | Il.ExistsE _  ->
-    error exp.at "unexpected formula"
+  | Il.RuleE _ | Il.ForallE _ | Il.ExistsE _  -> error_exp exp "formula"
   | _ -> error_exp exp "expression on rhs of reduction"
 
 
@@ -1045,7 +1042,8 @@ let extract_rules def =
   | Il.RelD (id, _, _, rules) when List.mem id.it [ "Step"; "Step_read"; "Step_pure" ] ->
     List.filter_map (fun rule ->
       match rule.it with
-      | Il.RuleD (id', _, _, _, _) when List.mem id'.it [ "pure"; "read" ] ->
+      (* TODO: (lemmagen) Step/ctxt-seq is incompatible with AL interpreter *)
+      | Il.RuleD (id', _, _, _, _) when List.mem id'.it [ "pure"; "read"; "ctxt-seq" ] ->
         None
       | _ -> Some (id, rule)
     ) rules

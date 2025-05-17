@@ -681,7 +681,7 @@ let render_func env fname params instrs =
   render_al_instrs env fname 0 instrs
 
 let render_def env = function
-  | Thrm (id, para) ->
+  | Stmt (id, para) ->
     "\n" ^ id ^ "\n" ^ render_para env para ^ "\n\n"
   | Pred (name, params, instrs) ->
     "\n" ^ render_pred env name params instrs ^ "\n\n"

@@ -48,8 +48,6 @@ type env =
     macro_atom : exp list Map.t ref;
     proof_def : exp list Map.t ref;
     desc_typ : exp list Map.t ref;
-    (* TODO: (lemmagen) Desc is only used for theorem defs *)
-    desc_def : exp list Map.t ref;
     desc_gram : exp list Map.t ref;
     desc_thm : exp list Map.t ref;
     deco_typ : bool;
@@ -76,7 +74,6 @@ let new_env config =
     macro_atom = ref Map.empty;
     proof_def = ref Map.empty;
     desc_typ = ref Map.empty;
-    desc_def = ref Map.empty;
     desc_gram = ref Map.empty;
     desc_thm = ref Map.empty;
     deco_typ = false;
@@ -170,7 +167,6 @@ let env_hintdef env hd =
     env_hints "show" env.show_var id hints
   | DecH (id, hints) ->
     env_hints "proof" env.proof_def id hints;
-    env_hints "desc" env.desc_def id hints;
     env_hints "macro" env.macro_def id hints;
     env_hints "show" env.show_def id hints
   | ThmH (id, hints) | LemH (id, hints) ->
@@ -776,11 +772,6 @@ let string_of_desc = function
   | Some ({at; _}::_) -> error at "malformed description hint"
   | _ -> None
 
-let render_thmid env id =
-  match string_of_desc (Map.find_opt id.it !(env.desc_thm)) with
-  | Some s -> "\\text{" ^ s ^ "}"
-  | _ -> id.it
-
 let render_ruleid env id1 id2 =
   let id1' =
     match Map.find_opt id1.it !(env.show_rel) with
@@ -1078,14 +1069,16 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
     render_typ env t
   | TypE (e1, _) -> render_exp env e1
   | RuleE (_id, e1) -> render_exp env e1
-  | ForallE (args, e1) -> 
-    let prefix = "\\forall " ^ render_quants env args in
+  | ForallE (args, e1) | ExistsE (args, e1) -> 
+    let command = match e.it with
+      | ForallE _ -> "\\forall"
+      | ExistsE _ -> "\\exists"
+      | _ -> assert false in
+    let prefix = command ^ " " ^ render_quants env args in
     let before = br in
     (* TODO: (lemmagen) Remove magic number *)
-    let after = if String.length prefix > 40 then br else "" in
+    let after = if String.length prefix > 80 then br else "" in
     before ^ prefix ^ "." ^ after ^ render_exp ~br env e1
-  | ExistsE (args, e1) -> 
-    "\\exists " ^ render_quants env args ^ ".\\;" ^ br ^ render_exp ~br env e1
   | FuseE (e1, e2) ->
     (* TODO: HACK for printing t.LOADn_sx (replace with invisible parens) *)
     let e2' = as_paren_exp (fuse_exp e2 true) in
@@ -1380,23 +1373,10 @@ let render_funcdef env d =
 
 let render_thmdef env d = 
   match d.it with 
-  | ThmD (id, e, _) ->
-    "\\begin{theorem}[$" ^ render_thmid env id ^ "$]\n" ^
-      "$$\n" ^
-      "\\begin{array}{@{}l@{}}\n" ^ 
-        render_exp ~br:" \\\\[0.8ex]\n" env e ^ 
-      "\\end{array}\n" ^
-      "$$\n" ^
-    "\\end{theorem}"
-  | LemD (id, e, _) ->
-    (* TODO: (lemmagen) Duplicate code *)
-    "\\begin{lemma}[$" ^ render_thmid env id ^ "$]\n" ^
-      "$$\n" ^
-      "\\begin{array}{@{}l@{}}\n" ^ 
-        render_exp ~br:" \\\\[0.8ex]\n" env e ^
-      "\\end{array}" ^
-      "$$\n" ^
-    "\\end{lemma}"
+  | ThmD (_, e, _) | LemD (_, e, _) -> 
+    "\\begin{array}{@{}l@{}}\n" ^ 
+      render_exp ~br:" \\\\[0.8ex]\n" env e ^
+    "\\end{array}\n"
   | _ -> failwith "render_thmdef"
 
 let rec render_sep_defs ?(sep = " \\\\\n") ?(br = " \\\\[0.8ex]\n") f = function
@@ -1521,21 +1501,15 @@ let rec render_script env = function
         render_script env ds'
       )
     | DefD (id, _, e, _) ->
-      (* TODO: (lemmagen) Extract this into another function *)
       let style =
         match Map.find_opt id.it !(env.proof_def) with
         | Some ({it = TextE s; _}::_) -> Some s
         | _ -> None in 
-      let descs = Map.find_opt id.it !(env.desc_def)
-        |> Option.to_list
-        |> List.flatten in
-      let hints = List.map 
-        (fun desc -> {hintid = "desc" $ d.at; hintexp = desc}) descs in
       (match style with
       | Some "\"theorem\"" -> 
-        render_script env ((ThmD (id, e, hints) $ d.at) :: ds)
+        render_script env ((ThmD (id, e, []) $ d.at) :: ds)
       | Some "\"lemma\"" ->
-        render_script env ((LemD (id, e, hints) $ d.at) :: ds)
+        render_script env ((LemD (id, e, []) $ d.at) :: ds)
       | None -> 
         let funcdefs, ds' = split_funcdefs id.it [d] ds in
         "$$\n" ^ render_defs env funcdefs ^ "\n$$\n\n" ^
@@ -1545,7 +1519,7 @@ let rec render_script env = function
       "\\vspace{1ex}\n\n" ^
       render_script env ds
     | ThmD _ | LemD _ ->
-      render_def env d ^ "\n\n" ^
+      "$$\n" ^ render_def env d ^ "\n$$\n\n" ^
       render_script env ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       render_script env ds

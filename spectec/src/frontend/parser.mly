@@ -803,9 +803,9 @@ def_ :
     { DefD ($3, [], $5, $6) }
   | DEF DOLLAR defid_lparen enter_scope comma_list(arg) RPAREN EQ exp prem_list exit_scope
     { DefD ($3, $5, $8, $9) }
-  | THEOREM thmid COLON hint* exp 
+  | THEOREM thmid EQ hint* exp 
     { ThmD ($2, $5, $4) }
-  | LEMMA thmid COLON hint* exp
+  | LEMMA thmid EQ hint* exp
     { LemD ($2, $5, $4) }
   | NL_NL_NL
     { SepD }

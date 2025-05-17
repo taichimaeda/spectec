@@ -143,7 +143,7 @@ let rec formula_to_para env e : para =
       |> String.concat " ") mixop in
     let es = match e1.it with
       | Ast.TupE es -> List.map exp_to_expr es
-      | _ -> assert false in
+      | _ -> [exp_to_expr e1] in
     RelP (id.it, (ss, es))
   | Ast.CallE (id, as_) when e.note.it = Ast.BoolT ->
     let es = as_
@@ -188,7 +188,7 @@ let theorem_to_prose env d =
       | Ast.ForallE (bs', as_, e) -> {e with it = Ast.ForallE (bs @ bs', as_, e)}
       | Ast.ExistsE (bs', as_, e) -> {e with it = Ast.ExistsE (bs @ bs', as_, e)}
       | _ -> e in
-    Thrm (id.it, formula_to_para env e')
+    Stmt (id.it, formula_to_para env e')
   | _ -> assert false
 
 let rec extract_vrules def =
