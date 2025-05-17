@@ -12,12 +12,16 @@ let map_cons x y map =
     (function None -> Some [y] | Some ys' -> Some (y::ys')) !map
 
 type env =
-  { para_def  : text list list Map.t ref;
+  { desc_def  : text list list Map.t ref;
+    desc_thm  : text list list Map.t ref;
     proof_def : text list list Map.t ref;
+    para_def  : text list list Map.t ref;
   }
 
 let new_env () =
-  { para_def  = ref Map.empty;
+  { desc_def  = ref Map.empty;
+    desc_thm  = ref Map.empty;
+    para_def  = ref Map.empty;
     proof_def = ref Map.empty;
   }
 
@@ -35,9 +39,12 @@ let env_hints name map id hints =
 
 let env_hintdef env hd =
   match hd.it with
+  | ThmH (id, hints) | LemH (id, hints) ->
+    env_hints "desc" env.desc_thm id hints;
   | DecH (id, hints) -> 
-    env_hints "para" env.para_def id hints;
-    env_hints "proof" env.proof_def id hints
+    env_hints "desc" env.desc_def id hints;
+    env_hints "proof" env.proof_def id hints;
+    env_hints "para" env.para_def id hints
   | _ -> ()
 
 let env_def env d =

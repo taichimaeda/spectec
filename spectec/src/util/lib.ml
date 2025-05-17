@@ -70,6 +70,12 @@ struct
     for i = String.length s - 1 downto 0 do cs := s.[i] :: !cs done;
     !cs
 
+  let unquote s = 
+    let len = String.length s in
+    let l = if s.[0] = '"' then 1 else 0 in
+    let r = if s.[len - 1] = '"' then len - 1 else len in
+    String.sub s l (r - l)
+
   let replace p t s =
     let len = String.length p in
     if len = 0 then s else

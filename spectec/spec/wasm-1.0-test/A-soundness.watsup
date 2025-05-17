@@ -268,14 +268,14 @@ def $terminal__form(admininstr*) =
 var lab : valtype
 var ret : valtype
 
-theorem t_progress =
+theorem t_progress =  hint(desc "Progress")
   forall (s, f, admininstr*, t?)
   @(Config_ok: |- s; f; admininstr* : t?) =>
   $terminal__form(admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: s; f; admininstr* ~> s'; f'; admininstr'*)
 
-lemma t_progress_e =
+lemma t_progress_e =  hint(desc "Admininstrative Fragment Progress")
   forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
@@ -289,7 +289,7 @@ lemma t_progress_e =
   exists (s', f', admininstr'*)
   @(Step: s; f; val* admininstr* ~> s'; f'; admininstr'*)
 
-lemma t_progress_be =
+lemma t_progress_be =  hint(desc "Basic Fragment Progress")
   forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
@@ -303,7 +303,8 @@ lemma t_progress_be =
   exists (s', f', admininstr*)
   @(Step: s; f; val* instr* ~> s'; f'; admininstr*)
 
-def $t__progress' : bool  hint(proof "theorem")
+def $t__progress' : bool  hint(proof "theorem") 
+                          hint(desc "Progress")
 def $t__progress' = forall (s, f, admininstr*, t?)
   @(Config_ok: |- s; f; admininstr* : t?) =>
   $terminal__form(admininstr*) \/
@@ -311,6 +312,7 @@ def $t__progress' = forall (s, f, admininstr*, t?)
   @(Step: s; f; admininstr* ~> s'; f'; admininstr'*)
 
 def $t__progress__e' : bool  hint(proof "lemma")
+                             hint(desc "Admininstrative Fragment Progress")
 def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
@@ -325,6 +327,7 @@ def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, v
   @(Step: s; f; val* admininstr* ~> s'; f'; admininstr'*)
 
 def $t__progress__be' : bool  hint(proof "lemma")
+                              hint(desc "Basic Fragment Progress")
 def $t__progress__be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>

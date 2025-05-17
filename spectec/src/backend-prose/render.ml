@@ -470,42 +470,45 @@ let rec render_para env para =
       (render_cmpop op)
       (render_expr env e2)
   | IfP (para1, para2) ->
-    sprintf "if (%s) then (%s)"
+    sprintf "if %s, then %s"
       (render_para env para1)
       (render_para env para2)
   | IffP (para1, para2) -> 
-    sprintf "(%s) if and only if (%s)"
+    sprintf "%s if and only if %s"
       (render_para env para1)
       (render_para env para2)
   | NotP (para1) ->
     sprintf "it is not the case that (%s)"
       (render_para env para1)
   | AndP (para1, para2) -> 
-    sprintf "both (%s) and (%s)"
+    sprintf "both (%s and %s)"
       (render_para env para1)
       (render_para env para2)
   | OrP (para1, para2) -> 
-    sprintf "either (%s) or (%s)"
+    sprintf "either (%s or %s)"
       (render_para env para1)
       (render_para env para2)
   | ForallP (es, para1) -> 
-    sprintf "for all (%s), (%s)"
+    sprintf "for all %s, %s"
       (es
         |> List.map (render_expr env)
         |> String.concat ", ")
       (render_para env para1)
   | ExistsP (es, para1) -> 
-    sprintf "there exists (%s) such that (%s)"
+    sprintf "there exists %s such that %s"
       (es
         |> List.map (render_expr env)
         |> String.concat ", ")
       (render_para env para1)
   | ExpP (e1) -> 
-    sprintf "(%s) is true"
+    sprintf "%s is true"
       (render_expr env e1)
   | RelP (id, (ss, es)) ->
-    sprintf "relation %s holds (i.e. %s)"
+    sprintf "relation %s %s holds (i.e. %s)"
       id
+      (es 
+        |> List.map (render_expr env)
+        |> String.concat " ")
       (es
         |> List.map (render_expr env)
         |> Lib.List.interleave ss
@@ -661,6 +664,11 @@ let render_atom_title env name params =
 let render_funcname_title env fname params =
   render_expr env (Al.Ast.CallE (fname, params) $ no_region)
 
+let render_stmt env name para =
+  name ^ "\n" ^
+  String.make (String.length name) '.' ^ "\n" ^
+  String.capitalize_ascii (render_para env para)
+
 let render_pred env name params instrs =
   let title = render_atom_title env name params in
   title ^ "\n" ^
@@ -681,8 +689,8 @@ let render_func env fname params instrs =
   render_al_instrs env fname 0 instrs
 
 let render_def env = function
-  | Stmt (id, para) ->
-    "\n" ^ id ^ "\n" ^ render_para env para ^ "\n\n"
+  | Stmt (name, _, para) ->
+    "\n" ^ render_stmt env name para ^ "\n\n"
   | Pred (name, params, instrs) ->
     "\n" ^ render_pred env name params instrs ^ "\n\n"
   | Algo algo -> (match algo with

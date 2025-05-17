@@ -42,7 +42,7 @@ let get_proof_hint id =
   if not (Hint.bound !(env.proof_def) id) then None else
   let hints = Hint.find "definition" !(env.proof_def) id in
   let hexps = List.hd hints in
-  Some (List.hd hexps)
+  Some (Lib.String.unquote (List.hd hexps))
   
 (* MEMO: Returns the newly aliased type name for type alias
          and the number of parameters used in the syntax definition *)
@@ -709,8 +709,8 @@ let transform_defthm (style : text) (d : def) =
     let DefD (bs, _, _, _) = clause.it in
     let _as, ret = transform_clause None clause in
     (match style with
-    | "\"theorem\"" -> TheoremD (transform_thm_id id, List.map transform_bind bs, ret)
-    | "\"lemma\"" -> LemmaD (transform_thm_id id, List.map transform_bind bs, ret)
+    | "theorem" -> TheoremD (transform_thm_id id, List.map transform_bind bs, ret)
+    | "lemma" -> LemmaD (transform_thm_id id, List.map transform_bind bs, ret)
     | _ -> error d.at "unsupported theorem style")
   | _ -> assert false
 

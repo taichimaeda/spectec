@@ -32,7 +32,7 @@ type para =
 
 (* TODO: perhaps rename to avoid name clash *)
 type def =
-| Stmt of Al.Ast.id * para
+| Stmt of string * Al.Ast.id * para
 | Pred of Al.Ast.atom * Al.Ast.expr list * instr list
 | Algo of Al.Ast.algorithm
 

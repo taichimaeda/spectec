@@ -27,5 +27,6 @@ module String :
 sig
   val implode : char list -> string
   val explode : string -> char list
+  val unquote : string -> string
   val replace : string -> string -> string -> string
 end

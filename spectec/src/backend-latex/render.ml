@@ -1501,14 +1501,13 @@ let rec render_script env = function
         render_script env ds'
       )
     | DefD (id, _, e, _) ->
-      let style =
-        match Map.find_opt id.it !(env.proof_def) with
+      let style = match Map.find_opt id.it !(env.proof_def) with
         | Some ({it = TextE s; _}::_) -> Some s
         | _ -> None in 
       (match style with
-      | Some "\"theorem\"" -> 
+      | Some "theorem" -> 
         render_script env ((ThmD (id, e, []) $ d.at) :: ds)
-      | Some "\"lemma\"" ->
+      | Some "lemma" ->
         render_script env ((LemD (id, e, []) $ d.at) :: ds)
       | None -> 
         let funcdefs, ds' = split_funcdefs id.it [d] ds in

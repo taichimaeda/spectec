@@ -3,6 +3,7 @@ open Print
 open Il
 open Al.Al_util
 open Il2al.Translate
+open Util
 open Util.Source
 open Util.Error
 
@@ -90,7 +91,19 @@ let get_proof_hint (env : Hint.env) id =
   if not (Hint.bound !(env.proof_def) id) then None else
   let hints = Hint.find "definition" !(env.proof_def) id in
   let hexps = List.hd hints in
-  Some (List.hd hexps)
+  Some (Lib.String.unquote (List.hd hexps))
+
+let get_desc_hint (env : Hint.env) id = 
+  if Hint.bound !(env.desc_thm) id then
+    let hints = Hint.find "theorem" !(env.desc_thm) id in
+    let hexps = List.hd hints in
+    Some (Lib.String.unquote (List.hd hexps))
+  else if Hint.bound !(env.desc_def) id then
+    let hints = Hint.find "definition" !(env.desc_def) id in
+    let hexps = List.hd hints in
+    Some (Lib.String.unquote (List.hd hexps))
+  else 
+    None
 
 let get_para_hint (env : Hint.env) id = 
   if not (Hint.bound !(env.para_def) id) then None else
@@ -184,11 +197,15 @@ let vrule_group_to_prose ((_name, vrules): vrule_group) =
 let theorem_to_prose env d =
   match d.it with
   | Ast.ThmD (id, bs, e) | Ast.LemD (id, bs, e) ->
+    let hint = get_desc_hint env id in
+    let name = match hint with
+      | Some desc -> desc
+      | None -> id.it in
     let e' = match e.it with 
       | Ast.ForallE (bs', as_, e) -> {e with it = Ast.ForallE (bs @ bs', as_, e)}
       | Ast.ExistsE (bs', as_, e) -> {e with it = Ast.ExistsE (bs @ bs', as_, e)}
       | _ -> e in
-    Stmt (id.it, formula_to_para env e')
+    Stmt (name, id.it, formula_to_para env e')
   | _ -> assert false
 
 let rec extract_vrules def =
@@ -197,24 +214,29 @@ let rec extract_vrules def =
   | Ast.RelD (id, _, _, rules) when id.it = "Instr_ok" -> rules
   | _ -> []
 
+(* TODO: (lemmagen) Handles theorems defined via proof hints *)
+let extract_def_theorems style d = 
+  match d.it with 
+  | Ast.DecD (id, params, _, clauses) ->
+    if params <> [] then 
+      error d.at "theorem takes no arguments";
+    if List.length clauses <> 1 then
+      error d.at "theorem takes exactly one clause";
+    let clause = List.hd clauses in
+    let DefD (bs, _, e, _) = clause.it in
+    (match style with
+    | "theorem" -> [Ast.ThmD (id, bs, e) $ d.at]
+    | "lemma" -> [Ast.LemD (id, bs, e) $ d.at]
+    | _ -> error d.at "unsupported theorem style")
+  | _ -> assert false
+
 let extract_theorems env d = 
   match d.it with
   | Ast.ThmD _ | Ast.LemD _ -> [d]
-  | Ast.DecD (id, params, _, clauses) -> 
+  | Ast.DecD (id, _, _, _) -> 
     let hint = get_proof_hint env id in
     (match hint with 
-    | Some ("\"theorem\"" | "\"lemma\"" as s) ->
-      if params <> [] then 
-        error d.at "theorem takes no arguments";
-      if List.length clauses <> 1 then
-        error d.at "theorem takes exactly one clause";
-      let clause = List.hd clauses in
-      let DefD (bs, _, e, _) = clause.it in
-      (match s with
-      | "\"theorem\"" -> [Ast.ThmD (id, bs, e) $ d.at]
-      | "\"lemma\"" -> [Ast.LemD (id, bs, e) $ d.at]
-      | _ -> assert false)
-    | Some _ -> error d.at "unsupported theorem style"
+    | Some style -> extract_def_theorems style d
     | None -> [])
   | _ -> []
 
