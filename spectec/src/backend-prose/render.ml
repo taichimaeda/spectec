@@ -502,11 +502,12 @@ let rec render_para env para =
       (render_para env para)
   | IfP (paras, para) ->
     let paras', para' = Lib.List.split_last paras in
-    sprintf "if %s and %s, then %s"
+    sprintf "if %s%s, then %s"
       (paras'
         |> List.map (render_para env)
         |> String.concat ", ")
-      (render_para env para')
+      ((if paras' = [] then "" else " and ") ^ 
+       render_para env para')
       (render_para env para)
   | IffP (para1, para2) -> 
     sprintf "%s if and only if %s"

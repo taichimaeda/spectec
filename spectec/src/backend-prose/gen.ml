@@ -142,7 +142,7 @@ let rec formula_to_para env e : para =
     let para1 = formula_to_para env e1 in
     let para2 = formula_to_para env e2 in
     (match para2 with
-    | OrP paras -> AndP (para1::paras)
+    | OrP paras -> OrP (para1::paras)
     | _ -> OrP ([para1; para2]))
   | Ast.BinE (Ast.ImplOp, e1, e2) ->
     let para1 = formula_to_para env e1 in
