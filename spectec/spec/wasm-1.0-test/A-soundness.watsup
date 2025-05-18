@@ -264,23 +264,22 @@ def $terminal__form(admininstr*) : bool
 def $terminal__form(admininstr*) = 
   $const__list(admininstr*) \/ admininstr* = TRAP
 
-(; TODO: With the latest version of SpecTec which supports TypE
-         these variable declarations could be replaced by lab* : resulttype* etc. ;)
-var lab : valtype
-var ret : valtype
+;; TODO: These declarations will be redundant with the latest version
+var lab : resulttype
+var ret : resulttype
 
-theorem t_progress =  hint(desc "Progress")
+theorem t_progress hint(desc "Progress") =
   forall (s, f, admininstr*, t?)
   @(Config_ok: |- s; f; admininstr* : t?) =>
   $terminal__form(admininstr*) \/
   exists (s', f', admininstr'*)
   @(Step: s; f; admininstr* ~> s'; f'; admininstr'*)
 
-lemma t_progress_e =  hint(desc "Admin Fragment Progress")
+lemma t_progress_e hint(desc "Admin Fragment Progress") =
   forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab*, RETURN ret?)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
@@ -290,11 +289,11 @@ lemma t_progress_e =  hint(desc "Admin Fragment Progress")
   exists (s', f', admininstr'*)
   @(Step: s; f; val* admininstr* ~> s'; f'; admininstr'*)
 
-lemma t_progress_be =  hint(desc "Basic Fragment Progress")
+lemma t_progress_be hint(desc "Basic Fragment Progress") =
   forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab*, RETURN ret?)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
@@ -319,7 +318,7 @@ def $t__progress__e' : bool
 def $t__progress__e' = forall (s, C, C', f, val*, admininstr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Admin_instrs_ok: s; C |- admininstr* : ft) => 
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab*, RETURN ret?)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
@@ -335,7 +334,7 @@ def $t__progress__be' : bool
 def $t__progress__be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valtype_2*, lab*, ret?)
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
-  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab, RETURN ret)) =>
+  C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab*, RETURN ret?)) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
@@ -344,3 +343,62 @@ def $t__progress__be' = forall (s, C, C', f, val*, instr*, ft, valtype_1*, valty
   $const__list(instr*) \/
   exists (s', f', admininstr*)
   @(Step: s; f; val* instr* ~> s'; f'; admininstr*)
+
+lemma t_pure_preservation hint(desc "Pure Preservation") =
+  forall (s, mm, admininstr*, admininstr'*, C, C', valtype*, lab*, ret?, ft)
+  @(Module_instance_ok: s |- mm : C) =>
+  C' = $($(C, LOCALS valtype*, RETURN ret?, LABELS lab*)) =>
+  @(Admin_instrs_ok: s; C' |- admininstr* : ft) =>
+  @(Step_pure: admininstr* ~> admininstr'*) =>
+  @(Admin_instrs_ok: s; C' |- admininstr'* : ft)
+
+lemma t_read_preservation hint(desc "Read Preservation") =
+  forall (s, f, admininstr*, admininstr'*, C, C', valtype*, valtype_1*, valtype_2*, lab*, ret?)
+  @(Step_read: s; f; admininstr* ~> admininstr'*) =>
+  @(Store_ok: |- s : OK) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  (forall (i) @(Val_ok: |- f.LOCALS[i] : valtype*[i])) =>
+  C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
+  @(Admin_instrs_ok: s; C' |- admininstr* : (valtype_1* -> valtype_2*)) =>
+  @(Admin_instrs_ok: s; C' |- admininstr'* : (valtype_1* -> valtype_2*))
+
+lemma t_preservation_type hint(desc "Fragment Preservation") = 
+  forall (s, f, admininstr*, s', f', admininstr'*, C, C', valtype*, valtype_1*, valtype_2*, lab*, ret?)
+  @(Step: s; f; admininstr* ~> s'; f'; admininstr'*) =>
+  @(Store_ok: |- s : OK) =>
+  @(Store_ok: |- s' : OK) =>
+	@(Store_extension: |- s : s') =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  @(Module_instance_ok: s' |- f.MODULE : C) =>
+  (forall (i) @(Val_ok: |- f.LOCALS[i] : valtype*[i])) =>
+  C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
+  @(Admin_instrs_ok: s; C' |- admininstr* : (valtype_1* -> valtype_2*)) =>
+  @(Admin_instrs_ok: s'; C' |- admininstr'* : (valtype_1* -> valtype_2*))
+
+;; TODO: Rewrite with config and config'
+theorem t_preservation hint(desc "Preservation") = 
+  forall (s, f, admininstr*, s', f', admininstr'*, rt)
+	@(Step: s; f; admininstr* ~> s'; f'; admininstr'*) =>
+	@(Config_ok: |- s; f; admininstr* : rt) =>
+  @(Config_ok: |- s'; f'; admininstr'* : rt)
+
+;; TODO: Uncomment the following templates
+(;
+template {{ relations.Step_pure.name }}
+lemma Step_pure__preserves = 
+  forall (s, C, ft)
+  @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.before }} : ft) =>
+  @(Step_pure: {{ relations.Step_pure.before }} ~> {{ relations.Step_pure.after }}) =>
+  {{ relations.Step_pure.premises }} =>
+  @(Admin_instrs_ok: s; C |- eps : ft)
+
+template {{ relations.Step_read.name }}
+lemma Step_read__preserves = 
+  forall (s, f, C, z, ft, ts*, lab*, ret?)  
+  @(Admin_instrs_ok: s; (C, LOCALS (ts C.LOCALS), RETURN ret?, LABEL lab*) |- {{ relations.Step_read.before }} : ft) =>
+  @(Module_instance_ok: s |- f.MODULE : C) =>
+  z = s; f =>
+  {{ relations.Step_read.premises }} =>
+  (forall (i) @(Val_ok: |- f.LOCALS[i] : ts*[i])) =>
+  @(Admin_instrs_ok: S; (C, LOCAL (ts* C.LOCALS), RETURN ret?, LABEL lab*) |- {{ relations.Step_read.after }} : ft)
+;)
