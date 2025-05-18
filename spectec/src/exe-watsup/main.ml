@@ -167,6 +167,10 @@ let () =
     Arg.parse argspec add_arg usage;
     log "Parsing...";
     let el = List.concat_map Frontend.Parse.parse_file !srcs in
+
+    (* TODO: (lemmagen) Remove this line *)
+    (* let () = failwith "success" in *)
+
     if !print_el then
       Printf.printf "%s\n%!" (El.Print.string_of_script el);
     log "Elaboration...";

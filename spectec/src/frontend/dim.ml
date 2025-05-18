@@ -171,6 +171,8 @@ and check_exp env ctx e =
   | HoleE _
   | FuseE _
   | UnparenE _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_path env ctx p =
   match p.it with
@@ -286,6 +288,8 @@ let check_def d : env =
     check_exp env [] e;
     check_env env
   | SepD | HintD _ -> Env.empty
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let check_exp e : env =
   let env = ref Env.empty in 

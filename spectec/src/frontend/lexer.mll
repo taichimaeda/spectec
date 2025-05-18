@@ -79,6 +79,7 @@ let typid = loid
 let expid = loid
 let defid = id
 let thmid = id
+let tmplid = id
 let metaid = id
 
 let symbol =
@@ -133,6 +134,8 @@ and token = parse
   | "]" { RBRACK }
   | "{" { LBRACE }
   | "}" { RBRACE }
+  | "{{" { LLBRACE }
+  | "}}" { RRBRACE }
   | ":" { COLON }
   | ";" { SEMICOLON }
   | "," { COMMA }
@@ -227,6 +230,7 @@ and token = parse
   | "def" { DEF }
   | "theorem" { THEOREM }
   | "lemma" { LEMMA }
+  | "template" { TEMPLATE }
 
   | "forall (" { FORALL_SPACE_LPAREN }
   | "exists (" { EXISTS_SPACE_LPAREN }

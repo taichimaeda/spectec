@@ -123,7 +123,7 @@ and free_exp e =
   | SubE (e1, t1, t2) -> free_exp e1 + free_typ t1 + free_typ t2
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, _, e) -> free_thmid id + free_exp e
-  | ForallE (bs, as_, e) | ExistsE (bs, as_, e) -> free_binds bs + free_args as_ + free_exp e
+  | ForallE (bs, as_, e) | ExistsE (bs, as_, e) -> free_exp e - free_binds bs - free_args as_
 
 and free_expfield (_, e) = free_exp e
 

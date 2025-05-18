@@ -148,6 +148,8 @@ and free_exp e =
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, e1) -> free_relid id + free_exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> free_exp e1 - free_args as_
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and free_expfield (_, e) = free_exp e
 
@@ -186,6 +188,8 @@ and det_exp e =
   | RuleE (_, e1) -> det_exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> det_exp e1 - det_args as_
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and det_expfield (_, e) = det_exp e
 
@@ -349,6 +353,8 @@ let free_def d =
     (* TODO: (lemmagen) No free_thmid because theorems have no declarations *)
     free_thmid id + free_exp e
   | HintD _ -> empty
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let det_def d =
   match d.it with
@@ -358,3 +364,5 @@ let det_def d =
   | DefD (_id, as_, e, prems) -> det_args as_ + idx_exp e + det_prems prems
   (* TODO: (lemmagen) Is this correct? *)
   | ThmD (_id, e, _hints) | LemD (_id, e, _hints) -> idx_exp e
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"

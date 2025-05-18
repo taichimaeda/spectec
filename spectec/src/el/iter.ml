@@ -148,6 +148,8 @@ and exp e =
   | BrackE (at1, e1, at2) -> atom at1; exp e1; atom at2
   | RuleE (id, e1) -> thmid id; exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> args as_; exp e1
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and expfield (at, e) = atom at; exp e
 
@@ -241,6 +243,8 @@ let def d =
   | DefD (x, as_, e, prs) -> defid x; args as_; exp e; prems prs
   | ThmD (x, e, hs) | LemD (x, e, hs) -> thmid x; exp e; hints hs
   | HintD hd -> hintdef hd
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 end
 
 
@@ -300,6 +304,8 @@ and clone_exp e =
   | RuleE (id, e1) -> RuleE (id, clone_exp e1)
   | ForallE (args, e1) -> ForallE (List.map clone_arg args, clone_exp e1)
   | ExistsE (args, e1) -> ExistsE (List.map clone_arg args, clone_exp e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and clone_expfield (atom, e) = (clone_atom atom, clone_exp e)

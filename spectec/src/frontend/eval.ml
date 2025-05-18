@@ -290,6 +290,8 @@ and reduce_exp env e : exp =
     IterE (e1', iter) $ e.at  (* TODO *)
   | RuleE _ | ForallE _ | ExistsE _ 
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and reduce_expfield env (atom, e) : expfield = (atom, reduce_exp env e)
 

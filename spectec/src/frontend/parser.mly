@@ -64,7 +64,7 @@ type prec = Op | Seq | Post | Prim
 
 let prec_of_exp = function  (* as far as iteration is concerned *)
   | VarE _ | BoolE _ | NatE _ | TextE _ | EpsE | StrE _
-  | ParenE _ | TupE _ | BrackE _ | CallE _ | HoleE _ | RuleE _   -> Prim
+  | ParenE _ | TupE _ | BrackE _ | CallE _ | HoleE _ | TmplE _ | RuleE _ -> Prim
   | AtomE _ | IdxE _ | SliceE _ | UpdE _ | ExtE _ | DotE _ | IterE _ -> Post
   | SeqE _ -> Seq
   | UnE _ | BinE _ | CmpE _ | InfixE _ | LenE _ | SizeE _
@@ -113,7 +113,7 @@ let rec is_typcon t =
 
 %}
 
-%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
+%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE LLBRACE RRBRACE
 %token COLON SEMICOLON COMMA DOT DOTDOT DOTDOTDOT BAR BARBAR DASH BIGCOMP BIGAND BIGOR
 %token COMMA_NL NL_BAR NL_NL_NL
 %token EQ NE LT GT LE GE APPROX EQUIV ASSIGN SUB SUP EQDOT2
@@ -126,7 +126,7 @@ let rec is_typcon t =
 %token HOLE MULTIHOLE NOTHING FUSE FUSEFUSE
 %token<int> HOLEN
 %token BOOL NAT INT RAT REAL TEXT
-%token SYNTAX GRAMMAR RELATION RULE VAR DEF THEOREM LEMMA
+%token SYNTAX GRAMMAR RELATION RULE VAR DEF THEOREM LEMMA TEMPLATE
 %token IF OTHERWISE HINT_LPAREN
 %token FORALL_SPACE_LPAREN EXISTS_SPACE_LPAREN
 %token EPS INFINITY
@@ -223,6 +223,10 @@ defid : id { $1 $ $sloc } | IF { "if" $ $sloc }
 relid : id { $1 $ $sloc }
 gramid : id { $1 $ $sloc }
 thmid : id { $1 $ $sloc }
+tmplid : id { $1 $ $sloc }
+tmplids : 
+  | tmplid { [$1] }
+  | tmplids DOTID { $1 @ [$2 $ $loc($2)] }
 hintid : id { $1 }
 fieldid : atomid_ { Il.Atom.Atom $1 $$ $sloc } | atom_escape { $1 $$ $sloc }
 dotid : DOTID { Il.Atom.Atom $1 $$ $sloc }
@@ -537,7 +541,8 @@ exp_prim_ :
   | TICK LBRACE exp RBRACE
     { BrackE (Il.Atom.LBrace $$ $loc($2), $3, Il.Atom.RBrace $$ $loc($4)) }
   | DOLLAR LPAREN arith RPAREN { $3.it }
-  | FUSEFUSE exp_prim { UnparenE $2 }
+  | FUSEFUSE exp_prim { UnparenE $2 } 
+  | LLBRACE tmplids RRBRACE { TmplE $2 }
   | ATMARK LPAREN thmid COLON exp RPAREN { RuleE ($3, $5) }
 
 exp_post : exp_post_ { $1 $ $sloc }
@@ -803,10 +808,12 @@ def_ :
     { DefD ($3, [], $5, $6) }
   | DEF DOLLAR defid_lparen enter_scope comma_list(arg) RPAREN EQ exp prem_list exit_scope
     { DefD ($3, $5, $8, $9) }
-  | THEOREM thmid EQ hint* exp 
-    { ThmD ($2, $5, $4) }
-  | LEMMA thmid EQ hint* exp
-    { LemD ($2, $5, $4) }
+  | THEOREM thmid hint* EQ exp 
+    { ThmD ($2, $5, $3) }
+  | LEMMA thmid hint* EQ exp
+    { LemD ($2, $5, $3) }
+  | TEMPLATE LLBRACE tmplids RRBRACE def
+    { TmplD ($3, $5) }
   | NL_NL_NL
     { SepD }
   | SYNTAX varid_bind ruleid_list hint*

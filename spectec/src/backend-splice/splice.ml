@@ -105,6 +105,8 @@ let env_def env def =
     env.thm <- Map.add id.it {tdef = def; use = ref 0} env.thm
   | FamD _ | VarD _ | SepD | HintD _ ->
     ()
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 let valid_id = "valid"
 let exec_id = "exec"

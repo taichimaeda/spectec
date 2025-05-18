@@ -143,6 +143,8 @@ and subst_exp s e =
   | RuleE (id, e1) -> RuleE (id, subst_exp s e1)
   | ForallE (args, e1) -> ForallE (List.map (subst_arg s) args, subst_exp s e1)
   | ExistsE (args, e1) -> ExistsE (List.map (subst_arg s) args, subst_exp s e1)
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
   ) $ e.at
 
 and subst_expfield s (atom, e) = (atom, subst_exp s e)

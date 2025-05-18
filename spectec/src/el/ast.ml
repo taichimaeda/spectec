@@ -132,6 +132,7 @@ and exp' =
   | HoleE of [`Num of int | `Next | `Rest | `None]  (* `%N` or `%` or `%%` or `!%` *)
   | FuseE of exp * exp           (* exp `#` exp *)
   | UnparenE of exp              (* `##` exp *)
+  | TmplE of id list             (* `{{` tmplid (`.` tmplid)* `}}` *)
 
 and expfield = atom * exp        (* atom exp *)
 
@@ -193,8 +194,9 @@ and def' =
   | VarD of id * typ * hint list                   (* `var` varid `:` typ *)
   | DecD of id * param list * typ * hint list      (* `def` `$` defid params `:` typ hint* *)
   | DefD of id * arg list * exp * prem nl_list     (* `def` `$` defid args `=` exp (`--` prem)* *)
-  | ThmD of id * exp * hint list                   (* `theorem` thmid `:` exp hint* *)
-  | LemD of id * exp * hint list                   (* `lemma` thmid `:` exp hint* *)
+  | ThmD of id * exp * hint list                   (* `theorem` thmid hint* `=` exp *)
+  | LemD of id * exp * hint list                   (* `lemma` thmid hint* `=` exp *)
+  | TmplD of id list * def                         (* `template` `{{` tmplid (`.` tmplid)* `}}` def *)
   | SepD                                           (* separator *)
   | HintD of hintdef
 

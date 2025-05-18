@@ -177,6 +177,8 @@ and string_of_exp e =
   | HoleE `None -> "!%"
   | FuseE (e1, e2) -> string_of_exp e1 ^ "#" ^ string_of_exp e2
   | UnparenE e1 -> "##" ^ string_of_exp e1
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 and string_of_exps sep es =
   concat sep (List.map string_of_exp es)
@@ -296,6 +298,8 @@ let string_of_def d =
   | SepD ->
     "\n\n"
   | HintD _ -> ""
+  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
+  | _ -> failwith "unimplemented (lemmagen)"
 
 
 (* Scripts *)
