@@ -288,10 +288,10 @@ and reduce_exp env e : exp =
   | IterE (e1, iter) ->
     let e1' = reduce_exp env e1 in
     IterE (e1', iter) $ e.at  (* TODO *)
-  | RuleE _ | ForallE _ | ExistsE _ 
+  (* TODO: (lemmagen) Is this correct? *)
+  | TmplE s -> TmplE s $ e.at
+  | RuleE _ | ForallE _ | ExistsE _
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and reduce_expfield env (atom, e) : expfield = (atom, reduce_exp env e)
 
@@ -691,6 +691,7 @@ and sub_typ env t1 t2 =
   let t1 = reduce_typ env t1 in
   let t2 = reduce_typ env t2 in
   match t1.it, t2.it with
+  | BotT, _ -> true
   | NumT t1', NumT t2' -> t1' <= t2'
   | StrT tfs1, StrT tfs2 ->
     El.Convert.forall_nl_list (fun (atom, (t2, prems2), _) ->

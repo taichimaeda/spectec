@@ -246,6 +246,7 @@ let rec transform_type (typ : typ) =
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> transform_type t) typs)
     | IterT (typ, iter) -> T_app (transform_itertyp iter, [transform_type typ])
+    | BotT -> error typ.at "unexpected bottom type"
 
 (* Erases the dependent type for inductive families *)
 (* MEMO: This is the same as transform_type except that it erases the dependent indices
@@ -395,6 +396,8 @@ and transform_exp (exp : exp) =
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
     | RuleE _ | ForallE _ | ExistsE _ -> 
       error exp.at "unexpected formula"
+    | TmplE _ -> 
+      error exp.at "unexpected template expression"
 
 
 (* MEMO: This produces terms to be pattern matched against in match expressions
@@ -750,6 +753,8 @@ let rec transform_def (d : def) : coq_def =
       TheoremD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
     | LemD (id, bs, e1) -> 
       LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+    | TmplD _ ->
+      error d.at "unexpected template definition"
     | HintD _ -> UnsupportedD "") $ d.at
 
 let is_not_hintdef (d : def) : bool =

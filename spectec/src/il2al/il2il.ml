@@ -4,11 +4,14 @@ Functions that transform IL into IL.
 
 open Il.Ast
 open Il.Eq
+open Util
 open Util.Source
 
 type rgroup = (exp * exp * (prem list)) list
 
 (* Helpers *)
+
+let error at msg = Error.error at "il2il" msg
 
 let take_prefix n str =
   if String.length str < n then
@@ -103,6 +106,7 @@ let rec type_to_id ty = match ty.it with
 | TextT -> "s"
 | TupT tys -> List.map type_to_id (List.map snd tys) |> String.concat "_"
 | IterT (t, _) -> type_to_id t
+| BotT -> error ty.at "unexpected bottom type"
 
 let unified_prefix = "u"
 let _unified_idx = ref 0

@@ -55,6 +55,7 @@ and typ' =
   | SeqT of typ list             (* `eps` / typ typ *)
   | InfixT of typ * atom * typ   (* typ atom typ *)
   | BrackT of atom * typ * atom  (* ``` ([{ typ }]) *)
+  | BotT                         (* bottom type *)
 
 and typfield = atom * (typ * prem nl_list) * hint list (* atom typ prem* hint* *)
 and typcase = atom * (typ * prem nl_list) * hint list  (* atom typ* prem* hint* *)
@@ -107,6 +108,7 @@ and exp' =
   | UnE of unop * exp            (* unop exp *)
   | BinE of exp * binop * exp    (* exp binop exp *)
   | CmpE of exp * cmpop * exp    (* exp cmpop exp *)
+  (* TODO: (lemmagen) Move these to the bottom *)
   | RuleE of id * exp            (* relid : exp *)
   | ForallE of arg list * exp    (* forall `(` arg* `)` exp *)
   | ExistsE of arg list * exp    (* exists `(` arg* `)` exp *)
@@ -132,7 +134,7 @@ and exp' =
   | HoleE of [`Num of int | `Next | `Rest | `None]  (* `%N` or `%` or `%%` or `!%` *)
   | FuseE of exp * exp           (* exp `#` exp *)
   | UnparenE of exp              (* `##` exp *)
-  | TmplE of id list             (* `{{` tmplid (`.` tmplid)* `}}` *)
+  | TmplE of slot                (* `{{` slot `}}` *)
 
 and expfield = atom * exp        (* atom exp *)
 
@@ -143,6 +145,12 @@ and path' =
   | SliceP of path * exp * exp   (* path `[` exp `:` exp `]` *)
   | DotP of path * atom          (* path `.` atom *)
 
+and slot = slot' phrase
+and slot' = 
+  | TopS of id                   (* id *)
+  | DotS of slot * id            (* slot `.` id *)
+  | WildS of slot                (* slot `.` `*` *)
+  | VarS of slot                 (* `...` slot *)
 
 (* Grammars *)
 
@@ -196,7 +204,7 @@ and def' =
   | DefD of id * arg list * exp * prem nl_list     (* `def` `$` defid args `=` exp (`--` prem)* *)
   | ThmD of id * exp * hint list                   (* `theorem` thmid hint* `=` exp *)
   | LemD of id * exp * hint list                   (* `lemma` thmid hint* `=` exp *)
-  | TmplD of id list * def                         (* `template` `{{` tmplid (`.` tmplid)* `}}` def *)
+  | TmplD of def                                   (* `template` def *)
   | SepD                                           (* separator *)
   | HintD of hintdef
 

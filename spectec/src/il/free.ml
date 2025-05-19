@@ -6,10 +6,23 @@ open Ast
 
 module Set = Set.Make(String)
 
-type sets = {typid : Set.t; relid : Set.t; varid : Set.t; defid : Set.t; thmid : Set.t}
+type sets = 
+  { typid : Set.t; 
+    relid : Set.t; 
+    varid : Set.t; 
+    defid : Set.t; 
+    thmid : Set.t;
+    tmplid : Set.t;
+  }
 
 let empty =
-  {typid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty; thmid = Set.empty}
+  { typid = Set.empty; 
+    relid = Set.empty; 
+    varid = Set.empty;
+    defid = Set.empty; 
+    thmid = Set.empty;
+    tmplid = Set.empty;
+  }
 
 let union sets1 sets2 =
   { typid = Set.union sets1.typid sets2.typid;
@@ -17,6 +30,7 @@ let union sets1 sets2 =
     varid = Set.union sets1.varid sets2.varid;
     defid = Set.union sets1.defid sets2.defid;
     thmid = Set.union sets1.thmid sets2.defid;
+    tmplid = Set.union sets1.tmplid sets2.tmplid;
   }
 
 let diff sets1 sets2 =
@@ -25,6 +39,7 @@ let diff sets1 sets2 =
     varid = Set.diff sets1.varid sets2.varid;
     defid = Set.diff sets1.defid sets2.defid;
     thmid = Set.diff sets1.thmid sets2.defid;
+    tmplid = Set.diff sets1.tmplid sets2.tmplid;
   }
 
 let (+) = union
@@ -77,13 +92,13 @@ let rec free_iter iter =
 and free_typ t =
   match t.it with
   | VarT (id, as_) -> free_typid id + free_args as_
-  | BoolT | NumT _ | TextT -> empty
+  | BoolT | NumT _ | TextT | BotT -> empty
   | TupT ets -> free_typbinds ets
   | IterT (t1, iter) -> free_typ t1 + free_iter iter
 
 and bound_typ t =
   match t.it with
-  | VarT _ | BoolT | NumT _ | TextT -> empty
+  | VarT _ | BoolT | NumT _ | TextT | BotT -> empty
   | TupT ets -> bound_list bound_typbind ets
   | IterT (t1, _iter) -> bound_typ t1
   
@@ -124,6 +139,7 @@ and free_exp e =
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, _, e) -> free_thmid id + free_exp e
   | ForallE (bs, as_, e) | ExistsE (bs, as_, e) -> free_exp e - free_binds bs - free_args as_
+  | TmplE _ -> empty
 
 and free_expfield (_, e) = free_exp e
 
@@ -215,9 +231,10 @@ let rec free_def d =
     free_params ps + (free_typ t - bound_params ps)
       + free_list free_clause clauses
   | RecD ds -> free_list free_def ds
+  (* TODO: (lemmagen) Is this correct? *)
   | ThmD (_id, bs, e) | LemD (_id, bs, e) -> 
-    (* TODO: (lemmagen) Is this correct? *)
     free_binds bs + free_exp e
+  | TmplD d1 -> free_def d1
   | HintD hd -> free_hintdef hd
 
 let rec bound_def d =
@@ -228,4 +245,5 @@ let rec bound_def d =
   | RecD ds -> free_list bound_def ds
   (* TODO: (lemmagen) Is this correct? *)
   | ThmD (id, _, _) | LemD (id, _, _) -> free_thmid id
+  | TmplD d1 -> bound_def d1
   | HintD _ -> empty

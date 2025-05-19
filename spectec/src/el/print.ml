@@ -20,6 +20,7 @@ let string_of_ruleid id = if id.it = "" then "" else "/" ^ id.it
 let string_of_defid id = "$" ^ id.it
 let string_of_gramid id = id.it
 let string_of_thmid id = id.it
+let string_of_tmplid id = id.it
 
 
 (* Operators *)
@@ -100,6 +101,7 @@ and string_of_typ t =
     string_of_typ t1 ^ space string_of_atom atom ^ string_of_typ t2
   | BrackT (l, t1, r) ->
     "`" ^ string_of_atom l ^ string_of_typ t1 ^ string_of_atom r
+  | BotT -> "bottom"
 
 and string_of_typs sep ts =
   concat sep (List.map string_of_typ ts)
@@ -177,8 +179,7 @@ and string_of_exp e =
   | HoleE `None -> "!%"
   | FuseE (e1, e2) -> string_of_exp e1 ^ "#" ^ string_of_exp e2
   | UnparenE e1 -> "##" ^ string_of_exp e1
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE s -> string_of_slot s
 
 and string_of_exps sep es =
   concat sep (List.map string_of_exp es)
@@ -195,6 +196,12 @@ and string_of_path p =
   | DotP ({it = RootP; _}, atom) -> string_of_atom atom
   | DotP (p1, atom) -> string_of_path p1 ^ "." ^ string_of_atom atom
 
+and string_of_slot s = 
+  match s.it with
+  | TopS id -> id.it
+  | VarS s1 -> "..." ^ string_of_slot s1
+  | DotS (s1, id) -> string_of_slot s1 ^ "." ^ string_of_tmplid id
+  | WildS s1 -> string_of_slot s1 ^ ".*"
 
 (* Premises *)
 
@@ -266,7 +273,7 @@ let string_of_params = function
   | [] -> ""
   | ps -> "(" ^ concat ", " (List.map string_of_param ps) ^ ")"
 
-let string_of_def d =
+let rec string_of_def d =
   match d.it with
   | FamD (id, ps, _hints) ->
     "syntax " ^ string_of_typid id ^ string_of_params ps
@@ -298,8 +305,8 @@ let string_of_def d =
   | SepD ->
     "\n\n"
   | HintD _ -> ""
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplD d1 -> 
+    "template\n" ^ string_of_def d1
 
 
 (* Scripts *)

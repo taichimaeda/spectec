@@ -2,7 +2,14 @@ open Ast
 
 module Set : Set.S with type elt = string
 
-type sets = {typid : Set.t; relid : Set.t; varid : Set.t; defid : Set.t; thmid : Set.t}
+type sets = 
+  { typid : Set.t; 
+    relid : Set.t; 
+    varid : Set.t; 
+    defid : Set.t; 
+    thmid : Set.t;
+    tmplid : Set.t;
+  }
 
 val subset : sets -> sets -> bool
 val disjoint : sets -> sets -> bool

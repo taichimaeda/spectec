@@ -623,6 +623,7 @@ and elab_typ env t : Il.typ =
     )
   | StrT _ | CaseT _ | ConT _ | RangeT _ | AtomT _ | SeqT _ | InfixT _ | BrackT _ ->
     error t.at "this type is only allowed in type definitions"
+  | BotT -> Il.BotT $ t.at
 
 and elab_typ_definition env tid t : Il.deftyp =
   assert (valid_tid tid);
@@ -1008,7 +1009,7 @@ and infer_exp' env e : Il.exp' * typ =
     let t, _ = find "relation" env.rels id in
     let mixop, _, _ = elab_typ_notation env id t in
     let es', _s = elab_exp_notation' env id e1 t in
-    Il.RuleE (id, mixop, tup_exp' es' e.at), BoolT $ e1.at
+    Il.RuleE (id, mixop, tup_exp' es' e.at), BoolT $ e.at
   | ForallE (as_, e1) | ExistsE (as_, e1) ->
     let env' = local_env env in
     let dims = Dim.check_exp e in
@@ -1018,16 +1019,15 @@ and infer_exp' env e : Il.exp' * typ =
     (* TODO: (lemmagen) exp is only annotated once from top-level *)
     (* let e1' = Dim.annot_exp dims' e1' in *)
     let bs' = infer_arg_binds env env' dims dims' as_ in
-    let e' = (match e.it with
+    (match e.it with
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
-      | _ -> assert false) in
-    e', BoolT $ e1.at
+      | _ -> assert false), BoolT $ e.at
+  | TmplE s -> 
+    Il.TmplE (elab_slot env s), BotT $ e.at
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and infer_def_binds env env' dims dims' d : Il.bind list =
   let det = Free.det_def d in
@@ -1228,11 +1228,10 @@ and elab_exp' env e t : Il.exp' =
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
       | _ -> assert false)
+  | TmplE s -> Il.TmplE (elab_slot env s)
   | HoleE _ -> error e.at "misplaced hole"
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and elab_expfields env tid efs tfs t0 at : Il.expfield list =
   Debug.(log_in_at "el.elab_expfields" at
@@ -1482,6 +1481,12 @@ and elab_path' env p t : Il.path' * typ =
     let t', _prems = find_field tfs atom p1.at t1 in
     Il.DotP (p1', elab_atom atom (expand_id env t1)), t'
 
+and elab_slot env s : Il.slot = 
+  match s.it with
+  | TopS id -> Il.TopS id $ s.at
+  | DotS (s1, id) -> Il.DotS (elab_slot env s1, id) $ s.at
+  | WildS s1 -> Il.WildS (elab_slot env s1) $ s.at
+  | VarS s1 -> Il.VarS (elab_slot env s1) $ s.at
 
 and cast_empty phrase env t at t' : Il.exp =
   Debug.(log_at "el.cast_empty" at
@@ -1959,7 +1964,7 @@ let elab_hintdef _env hd : Il.def list =
     []
 
 
-let elab_def env d : Il.def list =
+let rec elab_def env d : Il.def list =
   Debug.(log_in "el.elab_def" line);
   Debug.(log_in_at "el.elab_def" d.at (fun _ -> el_def d));
   match d.it with
@@ -2072,12 +2077,13 @@ let elab_def env d : Il.def list =
       | LemD _ -> Il.LemD (id, bs', e') $ d.at
       | _ -> assert false) in
     [d'] @ elab_hintdef env (ThmH (id, hints) $ d.at)
+  | TmplD d1 ->
+    let ds = elab_def env d1 in
+    (Il.TmplD (List.hd ds) $ d.at) :: List.tl ds
   | SepD ->
     []
   | HintD hd ->
     elab_hintdef env hd
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let elab_gramdef env d =
   match d.it with
@@ -2148,10 +2154,28 @@ let populate_def env d' : Il.def =
   | Il.DecD (id, ps', t', []) ->
     let _, _, clauses' = find "definition" env.defs id in
     Il.DecD (id, ps', t', List.map snd clauses') $ d'.at
-  | Il.ThmD _ | Il.LemD _ | Il.HintD _ -> d'
+  | Il.ThmD _ | Il.LemD _ | Il.TmplD _ | Il.HintD _ -> d'
   | _ ->
     assert false
 
+let check_refs ds =
+  let frees = List.map (fun d ->
+    (Il.Free.free_def d, d)) ds in
+  let bounds = List.filter_map (fun d -> 
+    match d.it with 
+    | Il.ThmD _ | Il.LemD _ | Il.TmplD _ -> 
+      Some (Il.Free.bound_def d, d)
+    | _ -> None) ds in
+  List.iter (fun (f, df) -> 
+  List.iter (fun (b, db) -> 
+    if not (Il.Free.disjoint f b) then
+      match db.it with
+      | Il.ThmD _ | Il.LemD _ -> 
+        error df.at (" " ^ string_of_region db.at ^ "invalid reference to theorem")
+      | Il.TmplD _ -> 
+        error df.at (" " ^ string_of_region db.at ^ "invalid reference to template")
+      | _ -> assert false
+  ) bounds) frees
 
 (* Scripts *)
 
@@ -2168,12 +2192,12 @@ let check_recursion ds' =
   List.iter (fun d' ->
     match d'.it, (List.hd ds').it with
     | Il.HintD _, _ | _, Il.HintD _
-    (* TODO: (lemmagen) Theorems cannot refer to each other *)
-    | Il.ThmD _, _ | _, Il.ThmD _
-    | Il.LemD _, _ | _, Il.LemD _
     | Il.TypD _, Il.TypD _
     | Il.RelD _, Il.RelD _
-    | Il.DecD _, Il.DecD _ -> ()
+    | Il.DecD _, Il.DecD _ 
+    | Il.ThmD _, Il.ThmD _
+    | Il.LemD _, Il.LemD _
+    | Il.TmplD _ , Il.TmplD _ -> ()
     | _, _ ->
       error (List.hd ds').at (" " ^ string_of_region d'.at ^
         ": invalid recursion between definitions of different sort")
@@ -2220,6 +2244,7 @@ let elab ds : Il.script * env =
   List.iter (infer_gramdef env) ds;
   List.iter (elab_gramdef env) ds;
   check_dots env;
+  check_refs ds';
   let ds' = List.map (populate_def env) ds' in
   recursify_defs ds', env
 

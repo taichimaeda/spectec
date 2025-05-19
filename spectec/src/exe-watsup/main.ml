@@ -167,18 +167,18 @@ let () =
     Arg.parse argspec add_arg usage;
     log "Parsing...";
     let el = List.concat_map Frontend.Parse.parse_file !srcs in
-
-    (* TODO: (lemmagen) Remove this line *)
-    (* let () = failwith "success" in *)
-
     if !print_el then
       Printf.printf "%s\n%!" (El.Print.string_of_script el);
     log "Elaboration...";
-    let il, elab_env = Frontend.Elab.elab el in    
-
+    let il, elab_env = Frontend.Elab.elab el in
     if !print_elab_il || !print_all_il then print_il il;
     log "IL Validation...";
-    Il.Valid.valid il;
+    Il.Valid.valid_with_template il;
+
+    (* TODO: (lemmagen) Insert template expansion pass *)
+    (* TODO: (lemmagen) Remove this line *)
+    print_il il;
+    let () = failwith "success" in
 
     (match !target with
     | Prose | Splice _ | Interpreter _ ->
@@ -197,7 +197,7 @@ let () =
           let il = run_pass pass il in
           if !print_all_il then print_il il;
           log ("IL Validation after pass " ^ pass_flag pass ^ "...");
-          Il.Valid.valid il;
+          Il.Valid.valid_without_template il;
           il
         )
       ) il all_passes

@@ -121,6 +121,8 @@ and t_typ' env = function
   | (BoolT | NumT _ | TextT) as t -> t
   | TupT xts -> TupT (List.map (fun (id, t) -> (id, t_typ env t)) xts)
   | IterT (t, iter) -> IterT (t_typ env t, iter)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | BotT -> error no_region "unexpected bottom type"
 
 and t_deftyp env x = { x with it = t_deftyp' env x.it }
 
@@ -165,6 +167,8 @@ and t_exp' env = function
   | RuleE (id, mixop, e) -> RuleE (id, mixop, t_exp env e)
   | ForallE (bs, args, e) -> ForallE (t_binds env bs, args, t_exp env e)
   | ExistsE (bs, args, e) -> ExistsE (t_binds env bs, args, t_exp env e)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplE _ -> error no_region "unexpected template definition"
 
 and t_iter env = function
   | ListN (e, id_opt) -> ListN (t_exp env e, id_opt)
@@ -248,6 +252,8 @@ let rec t_def' env = function
     ThmD (id, t_binds env bs, t_exp env e)
   | LemD (id, bs, e) ->
     LemD (id, t_binds env bs, t_exp env e)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplD _ -> error no_region "unexpected template definition"
   | HintD _ as def -> def
 
 and t_def env (def : def) = { def with it = t_def' env def.it }

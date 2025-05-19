@@ -9,7 +9,13 @@ open Il.Ast
 include Il.Free
 
 let empty =
-  {typid = Set.empty; relid = Set.empty; varid = Set.empty; defid = Set.empty; thmid = Set.empty}
+  { typid = Set.empty; 
+    relid = Set.empty; 
+    varid = Set.empty; 
+    defid = Set.empty; 
+    thmid = Set.empty;
+    tmplid = Set.empty;
+  }
 let free_varid id = {empty with varid = Set.singleton id.it}
 
 let rec free_exp ignore_listN e =

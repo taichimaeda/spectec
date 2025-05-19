@@ -382,23 +382,23 @@ theorem t_preservation hint(desc "Preservation") =
 	@(Config_ok: |- s; f; admininstr* : rt) =>
   @(Config_ok: |- s'; f'; admininstr'* : rt)
 
-;; TODO: Uncomment the following templates
-(;
-template {{ relations.Step_pure.name }}
+template
 lemma Step_pure__preserves = 
   forall (s, C, ft)
-  @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.before }} : ft) =>
-  @(Step_pure: {{ relations.Step_pure.before }} ~> {{ relations.Step_pure.after }}) =>
-  {{ relations.Step_pure.premises }} =>
+  forall ({{ ...relations.Step_pure.*.freevars }})
+  @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.*.before }} : ft) =>
+  @(Step_pure: {{ relations.Step_pure.before }} ~> {{ relations.Step_pure.*.after }}) =>
+  {{ relations.Step_pure.*.premises }} =>
   @(Admin_instrs_ok: s; C |- eps : ft)
 
-template {{ relations.Step_read.name }}
+template
 lemma Step_read__preserves = 
-  forall (s, f, C, z, ft, ts*, lab*, ret?)  
-  @(Admin_instrs_ok: s; (C, LOCALS (ts C.LOCALS), RETURN ret?, LABEL lab*) |- {{ relations.Step_read.before }} : ft) =>
+  forall (s, f, C, C', z, ft, valtype*, lab*, ret?)  
+  forall ({{ ...relations.Step_read.*.freevars }})
+  C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
+  @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.*.before }} : ft) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   z = s; f =>
-  {{ relations.Step_read.premises }} =>
-  (forall (i) @(Val_ok: |- f.LOCALS[i] : ts*[i])) =>
-  @(Admin_instrs_ok: S; (C, LOCAL (ts* C.LOCALS), RETURN ret?, LABEL lab*) |- {{ relations.Step_read.after }} : ft)
-;)
+  {{ relations.Step_read.*.premises }} =>
+  (forall (i) @(Val_ok: |- f.LOCALS[i] : valtype*[i])) =>
+  @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.*.after }} : ft)

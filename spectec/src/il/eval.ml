@@ -338,6 +338,8 @@ and reduce_exp env e : exp =
       {e1' with note = e.note}
     | _ -> SubE (e1', t1', t2') $> e
     )
+  (* TODO: (lemmagen) Is this correct? *)
+  | TmplE s -> TmplE s $> e
   | RuleE _ | ForallE _ | ExistsE _ -> assert false
 
 and reduce_iter env = function
@@ -736,6 +738,7 @@ and sub_typ env t1 t2 =
   let t1' = reduce_typ env t1 in
   let t2' = reduce_typ env t2 in
   match t1'.it, t2'.it with
+  | BotT, _ -> true
   | NumT t1', NumT t2' -> t1' < t2'
   | TupT ets1, TupT ets2 -> sub_tup env Subst.empty ets1 ets2
   | VarT _, VarT _ ->

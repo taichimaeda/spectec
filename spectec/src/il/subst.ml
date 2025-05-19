@@ -66,7 +66,7 @@ and subst_typ s t =
     | None -> VarT (id, subst_args s as_)
     | Some t' -> assert (as_ = []); t'.it  (* We do not support higher-order substitutions yet *)
     )
-  | BoolT | NumT _ | TextT -> t.it
+  | BoolT | NumT _ | TextT | BotT -> t.it
   | TupT ets -> TupT (fst (subst_list_dep subst_typbind Free.bound_typbind s ets))
   | IterT (t1, iter) -> IterT (subst_typ s t1, subst_iter s iter)
   ) $ t.at
@@ -130,6 +130,7 @@ and subst_exp s e =
   | ExistsE (bs, as_, e1) -> 
     let bs', s' = subst_binds s bs in
     ExistsE (bs', subst_args s' as_, subst_exp s' e1)
+  | TmplE s -> TmplE s
   ) $$ e.at % subst_typ s e.note
 
 and subst_expfield s (atom, e) = (atom, subst_exp s e)

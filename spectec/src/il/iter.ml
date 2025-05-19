@@ -13,11 +13,13 @@ sig
   val visit_varid : id -> unit
   val visit_defid : id -> unit
   val visit_thmid : id -> unit
+  val visit_tmplid : id -> unit
 
   val visit_typ : typ -> unit
   val visit_deftyp : deftyp -> unit
   val visit_exp : exp -> unit
   val visit_path : path -> unit
+  val visit_slot : slot -> unit
   val visit_prem : prem -> unit
   val visit_def : def -> unit
 
@@ -35,11 +37,13 @@ struct
   let visit_defid _ = ()
   let visit_gramid _ = ()
   let visit_thmid _ = ()
+  let visit_tmplid _ = ()
 
   let visit_typ _ = ()
   let visit_deftyp _ = ()
   let visit_exp _ = ()
   let visit_path _ = ()
+  let visit_slot _ = ()
   let visit_prem _ = ()
   let visit_def _ = ()
 
@@ -70,6 +74,7 @@ let ruleid x = visit_ruleid x
 let varid x = visit_varid x
 let defid x = visit_defid x
 let thmid x = visit_thmid x
+let tmplid x = visit_tmplid x
 
 let unop _op = ()
 let binop _op = ()
@@ -96,7 +101,7 @@ and typ t =
   visit_typ t;
   match t.it with
   | VarT (x, as_) -> typid x; args as_
-  | BoolT | TextT -> ()
+  | BoolT | TextT | BotT -> ()
   | NumT nt -> numtyp nt
   | TupT ets -> list (pair exp typ) ets
   | IterT (t1, it) -> typ t1; iter it
@@ -139,6 +144,7 @@ and exp e =
   | SubE (e1, t1, t2) -> exp e1; typ t1; typ t2
   | RuleE (x, op, e1) -> relid x; mixop op; exp e1
   | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> binds bs; args as_; exp e1
+  | TmplE s -> slot s
 
 and expfield (at, e) = atom at; exp e
 
@@ -149,6 +155,14 @@ and path p =
   | IdxP (p1, e) -> path p1; exp e
   | SliceP (p1, e1, e2) -> path p1; exp e1; exp e2
   | DotP (p1, at) -> path p1; atom at
+
+and slot s = 
+  visit_slot s;
+  match s.it with
+  | TopS id -> tmplid id
+  | DotS (s1, id) -> tmplid id; slot s1
+  | WildS s1 -> slot s1
+  | VarS s1 -> slot s1
 
 and iterexp (it, xts) = iter it; list (pair varid typ) xts
 
@@ -217,5 +231,6 @@ let rec def d =
   | RecD ds -> list def ds
   | ThmD (x, bs, e) -> thmid x; binds bs; exp e
   | LemD (x, bs, e) -> thmid x; binds bs; exp e
+  | TmplD d1 -> def d1
   | HintD hd -> hintdef hd
 end

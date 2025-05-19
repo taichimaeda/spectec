@@ -38,6 +38,7 @@ and typ' =
   | TextT                        (* `text` *)
   | TupT of (exp * typ) list     (* typ * ... * typ *)
   | IterT of typ * iter          (* typ iter *)
+  | BotT                         (* bottom type *)
 
 and deftyp = deftyp' phrase
 and deftyp' =
@@ -110,6 +111,7 @@ and exp' =
   (* TODO: (lemmagen) Binds only args in quantifiers *)
   | ForallE of bind list * arg list * exp    (* forall `(` arg* `)` exp *)
   | ExistsE of bind list * arg list * exp    (* exists `(` arg* `)` exp *)
+  | TmplE of slot                (* `{{ slot`}}` *)
 
 and expfield = atom * exp        (* atom exp *)
 
@@ -119,6 +121,13 @@ and path' =
   | IdxP of path * exp           (* path `[` exp `]` *)
   | SliceP of path * exp * exp   (* path `[` exp `:` exp `]` *)
   | DotP of path * atom          (* path `.` atom *)
+
+and slot = slot' phrase
+and slot' = 
+  | TopS of id                   (* id *)
+  | DotS of slot * id            (* slot `.` id *)
+  | WildS of slot                (* slot `.` `*` *)
+  | VarS of slot                 (* `...` slot *)
 
 and iterexp = iter * (id * typ) list
 
@@ -148,6 +157,7 @@ and def' =
   | ThmD of id * bind list * exp                      (* theorem *)
   | LemD of id * bind list * exp                      (* lemma *)
   | RecD of def list                                  (* recursive *)
+  | TmplD of def                                      (* template *)
   | HintD of hintdef
 
 and inst = inst' phrase

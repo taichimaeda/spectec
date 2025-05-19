@@ -69,6 +69,7 @@ and string_of_typ t =
   | TextT -> "text"
   | TupT ets -> "(" ^ concat ", " (List.map string_of_typbind ets) ^ ")"
   | IterT (t1, iter) -> string_of_typ t1 ^ string_of_iter iter
+  | BotT -> "bottom"
 
 and string_of_typ_name t =
   match t.it with
@@ -152,9 +153,10 @@ and string_of_exp e =
   | RuleE (id, mixop, e1) -> 
     "@(" ^ id.it ^ ": " ^ string_of_mixop mixop ^ string_of_exp_args e1 ^ ")"
   | ForallE (bs, as_, e1) -> 
-    "forall " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ string_of_exp e1 ^ " "
+    "forall " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ " "
   | ExistsE (bs, as_, e1) -> 
-    "exists " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ string_of_exp e1 ^ " "
+    "exists " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ " "
+  | TmplE s -> "{{ " ^ string_of_slot s ^ " }}"
 
 
 and string_of_exp_args e =
@@ -181,6 +183,13 @@ and string_of_path p =
   | DotP (p1, atom) ->
     string_of_path p1 ^ "." ^ string_of_mixop [[atom]] ^ "_" ^ string_of_typ_name p1.note
 
+and string_of_slot s = 
+  match s.it with
+  | TopS id -> id.it
+  | VarS s1 -> "..." ^ string_of_slot s1
+  | DotS (s1, id) -> string_of_slot s1 ^ "." ^ id.it
+  | WildS s1 -> string_of_slot s1 ^ ".*"
+  
 and string_of_iterexp (iter, bs) =
   string_of_iter iter ^ "{" ^ String.concat ", "
     (List.map (fun (id, t) -> id.it ^ " : " ^ string_of_typ t) bs) ^ "}"
@@ -283,6 +292,8 @@ let rec string_of_def ?(suppress_pos = false) d =
     pre ^ "theorem " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
   | LemD (id, bs, e) ->
     pre ^ "lemma " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
+  | TmplD d1 -> 
+    "template\n" ^ string_of_def d1
   | HintD _ ->
     ""
 

@@ -103,6 +103,7 @@ let is_typcase t =
   | VarT _ | BoolT | NumT _ | TextT | TupT _ | SeqT _
   | ParenT _ | IterT _ -> false
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
+  | BotT -> assert false
 
 let rec is_typcon t =
   match t.it with
@@ -110,6 +111,7 @@ let rec is_typcon t =
   | VarT _ | BoolT | NumT _ | TextT | TupT _ -> false
   | ParenT t1 | IterT (t1, _) -> is_typcon t1
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
+  | BotT -> assert false
 
 %}
 
@@ -224,9 +226,6 @@ relid : id { $1 $ $sloc }
 gramid : id { $1 $ $sloc }
 thmid : id { $1 $ $sloc }
 tmplid : id { $1 $ $sloc }
-tmplids : 
-  | tmplid { [$1] }
-  | tmplids DOTID { $1 @ [$2 $ $loc($2)] }
 hintid : id { $1 }
 fieldid : atomid_ { Il.Atom.Atom $1 $$ $sloc } | atom_escape { $1 $$ $sloc }
 dotid : DOTID { Il.Atom.Atom $1 $$ $sloc }
@@ -542,7 +541,7 @@ exp_prim_ :
     { BrackE (Il.Atom.LBrace $$ $loc($2), $3, Il.Atom.RBrace $$ $loc($4)) }
   | DOLLAR LPAREN arith RPAREN { $3.it }
   | FUSEFUSE exp_prim { UnparenE $2 } 
-  | LLBRACE tmplids RRBRACE { TmplE $2 }
+  | LLBRACE slot RRBRACE { TmplE $2 }
   | ATMARK LPAREN thmid COLON exp RPAREN { RuleE ($3, $5) }
 
 exp_post : exp_post_ { $1 $ $sloc }
@@ -662,6 +661,18 @@ path_ :
   | path LBRACK arith RBRACK { IdxP ($1, $3) }
   | path LBRACK arith COLON arith RBRACK { SliceP ($1, $3, $5) }
   | path dotid { DotP ($1, $2) }
+
+
+slot_dots : slot_dots_ { $1 $ $sloc }
+slot_dots_ :
+  | tmplid { TopS $1 }
+  | slot_dots DOTID { DotS ($1, $2 $ $loc($2)) }
+  | slot_dots DOT STAR { WildS $1 }
+
+slot : slot_ { $1 $ $sloc }
+slot_ :
+  | slot_dots_ { $1 }
+  | DOTDOTDOT slot_dots { VarS $2 }
 
 
 (* Premises *)
@@ -812,8 +823,8 @@ def_ :
     { ThmD ($2, $5, $3) }
   | LEMMA thmid hint* EQ exp
     { LemD ($2, $5, $3) }
-  | TEMPLATE LLBRACE tmplids RRBRACE def
-    { TmplD ($3, $5) }
+  | TEMPLATE def
+    { TmplD $2 }
   | NL_NL_NL
     { SepD }
   | SYNTAX varid_bind ruleid_list hint*

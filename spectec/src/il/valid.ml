@@ -25,6 +25,7 @@ type env =
     mutable rels : rel_typ Env.t;
     mutable defs : def_typ Env.t;
     mutable thms : thm_typ Env.t;
+    template : bool;
   }
 
 let new_env () =
@@ -33,9 +34,15 @@ let new_env () =
     rels = Env.empty;
     defs = Env.empty;
     thms = Env.empty;
+    template = false;
   }
 
-let local_env env = {env with vars = env.vars; typs = env.typs}
+let local_env env = 
+  { env with 
+    vars = env.vars; 
+    typs = env.typs; 
+    template = env.template;
+  }
 
 (* TODO: avoid repeated copying of environment *)
 let to_eval_env env =
@@ -208,9 +215,7 @@ and valid_typ env t =
   | VarT (id, as_) ->
     let ps, _insts = find "syntax type" env.typs id in
     ignore (valid_args env as_ ps Subst.empty t.at)
-  | BoolT
-  | NumT _
-  | TextT ->
+  | BoolT | NumT _ | TextT ->
     ()
   | TupT ets ->
     let env' = local_env env in
@@ -219,6 +224,8 @@ and valid_typ env t =
     (match iter with
     | ListN (e, _) -> error e.at "definite iterator not allowed in type"
     | _ -> valid_iter env iter; valid_typ env t1)
+  | BotT ->
+    ()
 
 and valid_typbind env (e, t) =
   valid_typ env t;
@@ -324,9 +331,9 @@ and infer_exp env e : typ =
   | CaseE _ -> error e.at "cannot infer type of case constructor"
   | SubE _ -> error e.at "cannot infer type of subsumption"
   | RuleE _ | ForallE _ | ExistsE _ -> BoolT $ e.at
+  | TmplE _ -> BotT $ e.at
 
-
-and valid_exp ?(decidable = true) env e t =
+and valid_exp env e t =
   Debug.(log_at "il.valid_exp" e.at
     (fun _ -> fmt "%s : %s == %s" (il_exp e) (il_typ e.note) (il_typ t))
     (Fun.const "ok")
@@ -346,12 +353,12 @@ try
     equiv_typ env t' t e.at
   | UnE (op, e1) ->
     let t1, t' = infer_unop op in
-    valid_exp ~decidable env e1 (t1 $ e.at);
+    valid_exp env e1 (t1 $ e.at);
     equiv_typ env (t' $ e.at) t e.at
   | BinE (op, e1, e2) ->
     let t1, t2, t' = infer_binop op in
-    valid_exp ~decidable env e1 (t1 $ e.at);
-    valid_exp ~decidable env e2 (t2 $ e.at);
+    valid_exp env e1 (t1 $ e.at);
+    valid_exp env e2 (t2 $ e.at);
     equiv_typ env (t' $ e.at) t e.at
   | CmpE (op, e1, e2) ->
     let t' =
@@ -453,23 +460,40 @@ try
     valid_exp env e1 t1;
     equiv_typ env t2 t e.at;
     sub_typ env t1 t2 e.at
-  | RuleE _ | ForallE _ | ExistsE _ when decidable ->
-    assert (t.it = BoolT);
-    error e.at "unexpected rule or quantifier expression"
-  | RuleE (id, mixop, e1) -> 
-    valid_expmix env mixop e1 (find "relation" env.rels id) e.at;
-    equiv_typ env (BoolT $ e.at) t e.at
-  | ForallE (bs, _as_, e1) | ExistsE (bs, _as_, e1) -> 
-    List.iter (valid_bind env) bs;
-    (* TODO: (lemmagen) How should I implement this? *)
-    (* List.iter (infer_arg env) as_; *)
-    valid_exp ~decidable env e1 (BoolT $ e.at);
-    equiv_typ env (BoolT $ e.at) t e.at
+  | RuleE _ | ForallE _ | ExistsE _ ->
+    error e.at "unexpected formula"
+  | TmplE _ when not env.template ->
+    error e.at "unexpected template"
+  | TmplE s ->
+    valid_slot ~first:true env s;
+    sub_typ env (BotT $ e.at) t e.at
 with exn ->
   let bt = Printexc.get_raw_backtrace () in
   Printf.eprintf "[valid_exp] %s\n%!" (Debug.il_exp e);
   Printexc.raise_with_backtrace exn bt
 
+and valid_expform env e t = 
+  match e.it with
+  | UnE (op, e1) ->
+    let t1, t' = infer_unop op in
+    valid_expform env e1 (t1 $ e.at);
+    equiv_typ env (t' $ e.at) t e.at
+  | BinE (op, e1, e2) ->
+    let t1, t2, t' = infer_binop op in
+    valid_expform env e1 (t1 $ e.at);
+    valid_expform env e2 (t2 $ e.at);
+    equiv_typ env (t' $ e.at) t e.at
+  | RuleE (id, mixop, e1) -> 
+    valid_expmix env mixop e1 (find "relation" env.rels id) e.at;
+    equiv_typ env (BoolT $ e.at) t e.at
+  | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> 
+    List.iter (valid_bind env) bs;
+    List.iter (fun a -> match a.it with 
+      | ExpA e1 -> valid_exp env e1 (infer_exp env e1)
+      | TypA _ -> error e.at "invalid quantifier argument") as_;
+    valid_expform env e1 (BoolT $ e.at);
+    equiv_typ env (BoolT $ e.at) t e.at
+  | _ -> valid_exp env e t
 
 and valid_expmix env mixop e (mixop', t) at =
   if not (Eq.eq_mixop mixop mixop') then
@@ -516,6 +540,27 @@ and valid_path env p t : typ =
   in
   equiv_typ env p.note t' p.at;
   t'
+
+and valid_slot ?(first = false) env s =
+  match s.it with 
+  | TopS _ when first ->
+    error s.at "invalid template slot"
+  | VarS ({it = TopS _; _}) when first ->
+    error s.at "invalid template slot"
+  | VarS _ when not first -> 
+    error s.at "invalid template slot"
+  | VarS s1 -> valid_slot env s1
+  | DotS ({it = TopS id1; _}, id2) -> 
+    (match id1.it with
+    | "variables" -> ignore (find "variable" env.vars id2)
+    | "types" -> ignore (find "syntax type" env.typs id2)
+    | "relations" -> ignore (find "relation" env.rels id2)
+    | "grammars" -> ignore (find "grammar" env.defs id2)
+    | "theorems" -> ignore (find "theorem" env.thms id2)
+    | _ -> error s.at "invalid template slot 3")
+  | DotS (s1, _) -> valid_slot env s1
+  | WildS s1 -> valid_slot env s1
+  | _ -> error s.at "invalid template slot"
 
 and valid_iterexp env (iter, bs) : env =
   valid_iter env iter;
@@ -638,7 +683,7 @@ let valid_clause env ps t clause =
     List.iter (valid_bind env') bs;
     let s = valid_args env' as_ ps Subst.empty clause.at in
     (* TODO: (lemmagen) Definitions can contain formulas *)
-    valid_exp ~decidable:false env' e (Subst.subst_typ s t);
+    valid_expform env' e (Subst.subst_typ s t);
     List.iter (valid_prem env') prems
 
 let infer_def env d =
@@ -660,7 +705,7 @@ let infer_def env d =
 
 type bind = {bind : 'a. string -> 'a Env.t -> id -> 'a -> 'a Env.t}
 
-let rec valid_def {bind} env d =
+let rec valid_def ?(with_template = false) {bind} env d =
   Debug.(log_in "il.valid_def" line);
   Debug.(log_in_at "il.valid_def" d.at (fun _ -> il_def d));
   match d.it with
@@ -687,7 +732,10 @@ let rec valid_def {bind} env d =
       | HintD _, _ | _, HintD _
       | TypD _, TypD _
       | RelD _, RelD _
-      | DecD _, DecD _ -> ()
+      | DecD _, DecD _
+      | ThmD _, ThmD _
+      | LemD _, LemD _ 
+      | TmplD _, TmplD _ -> ()
       | _, _ ->
         error (List.hd ds).at (" " ^ string_of_region d.at ^
           ": invalid recursion between definitions of different sort")
@@ -695,14 +743,24 @@ let rec valid_def {bind} env d =
   | ThmD (id, bs, e) | LemD (id, bs, e) -> 
     let env' = local_env env in
     List.iter (valid_bind env') bs;
-    valid_exp ~decidable:false env' e (BoolT $ e.at);
+    (* TODO: (lemmagen) Theorems can contain formulas *)
+    valid_expform env' e (BoolT $ e.at);
     env.thms <- bind "theorem" env.thms id ()
+  | TmplD _ when not with_template -> 
+    error d.at "unexpected template definition"
+  | TmplD d1 ->
+    let env' = {env with template = true} in
+    valid_def ~with_template {bind} env' d1
   | HintD _ ->
     ()
 
 
 (* Scripts *)
 
-let valid ds =
+let valid_with_template ds = 
   let env = new_env () in
-  List.iter (valid_def {bind} env) ds
+  List.iter (valid_def ~with_template:true {bind} env) ds
+
+let valid_without_template ds =
+  let env = new_env () in
+  List.iter (valid_def ~with_template:false {bind} env) ds

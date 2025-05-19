@@ -158,6 +158,8 @@ and t_exp' n e : eqns * exp' =
     let eqns2, iterexp'' = t_iterexp n iterexp' in
     let iterexp''' = update_iterexp_vars (Il.Free.free_exp e') iterexp'' in
     eqns1' @ eqns2, IterE (e', iterexp''')
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplE _ -> error no_region "unexpected template expression"
 
 and t_field n ((a, e) : expfield) =
   unary t_exp n e (fun e' -> (a, e'))
@@ -216,6 +218,8 @@ let t_rule x = { x with it = t_rule' x.it }
 let rec t_def' = function
   | RecD defs -> RecD (List.map t_def defs)
   | RelD (id, mixop, typ, rules) -> RelD (id, mixop, typ, List.map t_rule rules)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplD _ -> error no_region "unexpected template definition"
   (* TODO: (lemmagen) No need to handle other defs? *)
   | def -> def
 

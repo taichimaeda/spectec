@@ -54,6 +54,7 @@ let rec varid_of_typ t =
   | NumT RealT -> "real"
   | TextT -> "text"
   | ParenT t1 -> (varid_of_typ t1).it
+  | BotT -> "bottom"
   | _ -> "_"
   ) $ t.at
 
@@ -90,6 +91,7 @@ let rec exp_of_typ t =
   | InfixT (t1, atom, t2) -> InfixE (exp_of_typ t1, atom, exp_of_typ t2)
   | BrackT (l, t1, r) -> BrackE (l, exp_of_typ t1, r)
   | CaseT _ | ConT _ | RangeT _ -> error t.at "malformed expression"
+  | BotT -> VarE (varid_of_typ t, [])
   ) $ t.at
 
 and expfield_of_typfield (atom, (t, _prems), _) =

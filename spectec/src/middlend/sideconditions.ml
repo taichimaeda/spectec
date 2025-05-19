@@ -111,6 +111,8 @@ let rec t_exp env e : prem list =
   -> t_exp env exp
   | ForallE (_, args, exp) | ExistsE (_, args, exp)
   -> t_args env args @ t_exp env exp
+  | TmplE _
+  -> error e.at "unexpected template expression"
 
 and t_iterexp env (iter, _) = t_iter env iter
 
@@ -181,7 +183,9 @@ let rec t_def' = function
   | RecD defs -> RecD (List.map t_def defs)
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, typ, t_rules rules)
-  (* TODO: (lemmagen) No need to handle other defs? *)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplD _ -> error no_region "unexpected template definition"
+  (* TODO: (lemmagen) Theorems cannot have premises *)
   | def -> def
 
 and t_def x = { x with it = t_def' x.it }

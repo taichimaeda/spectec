@@ -109,6 +109,7 @@ and free_typ t =
   | SeqT ts -> free_list free_typ ts
   | InfixT (t1, _, t2) -> free_typ t1 + free_typ t2
   | BrackT (_, t1, _) -> free_typ t1
+  | BotT -> empty
 
 and free_typfield (_, (t, prems), _) = free_typ t + free_prems prems
 and free_typcase (_, (t, prems), _) = free_typ t + free_prems prems
@@ -148,8 +149,7 @@ and free_exp e =
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, e1) -> free_relid id + free_exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> free_exp e1 - free_args as_
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE _ -> empty
 
 and free_expfield (_, e) = free_exp e
 
@@ -187,9 +187,8 @@ and det_exp e =
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (_, e1) -> det_exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> det_exp e1 - det_args as_
+  | TmplE _ -> empty
   | HoleE _ | FuseE _ | UnparenE _ -> assert false
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and det_expfield (_, e) = det_exp e
 
@@ -330,7 +329,7 @@ and det_args as_ = free_list det_arg as_
 and free_params ps = free_list_dep free_param bound_param ps
 and bound_params ps = bound_list bound_param ps
 
-let free_def d =
+let rec free_def d =
   match d.it with
   | FamD (_id, ps, _hints) ->
     free_list free_param ps
@@ -352,11 +351,10 @@ let free_def d =
     (* TODO: (lemmagen) Is this correct? *)
     (* TODO: (lemmagen) No free_thmid because theorems have no declarations *)
     free_thmid id + free_exp e
+  | TmplD d1 -> free_def d1
   | HintD _ -> empty
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
-let det_def d =
+let rec det_def d =
   match d.it with
   | FamD _ | GramD _ | VarD _ | SepD | RelD _ | DecD _ | HintD _ -> empty
   | TypD (_id1, _id2, as_, _t, _hints) -> det_args as_
@@ -364,5 +362,4 @@ let det_def d =
   | DefD (_id, as_, e, prems) -> det_args as_ + idx_exp e + det_prems prems
   (* TODO: (lemmagen) Is this correct? *)
   | ThmD (_id, e, _hints) | LemD (_id, e, _hints) -> idx_exp e
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplD d1 -> det_def d1

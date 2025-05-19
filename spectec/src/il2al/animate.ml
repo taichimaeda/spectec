@@ -13,6 +13,8 @@ open Free
 
 (* Helpers *)
 
+let error at msg = Error.error at "animation" msg
+
 let rec list_count' pred acc = function
 | [] -> acc
 | hd :: tl -> list_count' pred (acc + if pred hd then 1 else 0) tl
@@ -285,6 +287,7 @@ let rec animate_def d = match d.it with
     let new_clauses = List.map animate_clause clauses in
     DecD (id, t1, t2, new_clauses) $ d.at
   | RecD ds -> RecD (List.map animate_def ds) $ d.at
+  | TmplD _ -> error d.at "unexpected template definition"
   | TypD _ | ThmD _ | LemD _ | HintD _ -> d
 
 (* Main entry *)

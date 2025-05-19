@@ -121,6 +121,7 @@ and check_typ env ctx t =
   | InfixT (t1, _, t2) ->
     check_typ env ctx t1;
     check_typ env ctx t2
+  | BotT -> ()
 
 and check_exp env ctx e =
   match e.it with
@@ -168,11 +169,10 @@ and check_exp env ctx e =
   | ExistsE (args, e) ->
     List.iter (check_arg env ctx) args;
     check_exp env ctx e
+  | TmplE _ -> ()
   | HoleE _
   | FuseE _
   | UnparenE _ -> assert false
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 and check_path env ctx p =
   match p.it with
@@ -249,7 +249,7 @@ let check_param env ctx p =
     check_gramid env ctx id;
     check_typ env ctx t
 
-let check_def d : env =
+let rec check_def d : env =
   let env = ref Env.empty in
   match d.it with
   | FamD (_id, ps, _hints) ->
@@ -287,9 +287,9 @@ let check_def d : env =
   | LemD (_id, e, _hints) ->
     check_exp env [] e;
     check_env env
+  | TmplD d1 ->
+    check_def d1
   | SepD | HintD _ -> Env.empty
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 let check_exp e : env =
   let env = ref Env.empty in 
@@ -436,6 +436,7 @@ and annot_exp env e : Il.Ast.exp * occur =
       | ForallE _ -> ForallE (bs1, as1', e1')
       | ExistsE _ -> ExistsE (bs1, as1', e1')
       | _ -> assert false), List.fold_left union Env.empty (occur1::occurs)
+    | TmplE s -> TmplE s, Env.empty
   in {e with it}, occur
 
 and annot_expfield env (atom, e) : Il.Ast.expfield * occur =

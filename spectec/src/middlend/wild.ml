@@ -179,6 +179,9 @@ and t_exp' env e : bind list * exp' =
     let iterexp', binds1' = under_iterexp iterexp binds1 in
     let binds2, iterexp'' = t_iterexp env iterexp' in
     binds1' @ binds2, IterE (e', iterexp'')
+  
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplE _ -> error no_region "unexpected template expression"
 
 and t_field env ((a, e) : expfield) =
   unary t_exp env e (fun e' -> (a, e'))
@@ -241,7 +244,8 @@ let rec t_def' env = function
   | RecD defs -> RecD (t_defs env defs)
   | RelD (id, mixop, typ, rules) ->
     RelD (id, mixop, typ, t_rules env rules)
-  (* TODO: (lemmagen) No need to handle other defs? *)
+  (* TODO: (lemmagen) Replace no_region with correct pos *)
+  | TmplD _ -> error no_region "unexpected template definition"
   | def -> def
 
 and t_def env x = { x with it = t_def' env x.it }

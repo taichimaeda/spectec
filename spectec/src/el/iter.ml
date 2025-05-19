@@ -12,10 +12,12 @@ sig
   val visit_varid : id -> unit
   val visit_defid : id -> unit
   val visit_thmid : id -> unit
+  val visit_tmplid : id -> unit
 
   val visit_typ : typ -> unit
   val visit_exp : exp -> unit
   val visit_path : path -> unit
+  val visit_slot : slot -> unit
   val visit_prem : prem -> unit
   val visit_sym : sym -> unit
   val visit_def : def -> unit
@@ -33,10 +35,12 @@ struct
   let visit_varid _ = ()
   let visit_defid _ = ()
   let visit_thmid _ = ()
+  let visit_tmplid _ = ()
 
   let visit_typ _ = ()
   let visit_exp _ = ()
   let visit_path _ = ()
+  let visit_slot _ = ()
   let visit_prem _ = ()
   let visit_sym _ = ()
   let visit_def _ = ()
@@ -70,6 +74,7 @@ let ruleid x = visit_ruleid x
 let varid x = visit_varid x
 let defid x = visit_defid x
 let thmid x = visit_thmid x
+let tmplid x = visit_tmplid x
 
 let natop _op = ()
 let unop _op = ()
@@ -111,6 +116,7 @@ and typ t =
   | SeqT ts -> list typ ts
   | InfixT (t1, at, t2) -> typ t1; atom at; typ t2
   | BrackT (at1, t1, at2) -> atom at1; typ t1; atom at2
+  | BotT -> ()
 
 and typfield (at, (t, prs), hs) = atom at; typ t; prems prs; hints hs
 and typcase (at, (t, prs), hs) = atom at; typ t; prems prs; hints hs
@@ -148,8 +154,7 @@ and exp e =
   | BrackE (at1, e1, at2) -> atom at1; exp e1; atom at2
   | RuleE (id, e1) -> thmid id; exp e1
   | ForallE (as_, e1) | ExistsE (as_, e1) -> args as_; exp e1
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE s -> slot s
 
 and expfield (at, e) = atom at; exp e
 
@@ -160,6 +165,14 @@ and path p =
   | IdxP (p1, e) -> path p1; exp e
   | SliceP (p1, e1, e2) -> path p1; exp e1; exp e2
   | DotP (p1, at) -> path p1; atom at
+
+and slot s = 
+  visit_slot s;
+  match s.it with
+  | TopS id -> tmplid id
+  | DotS (s1, id) ->  slot s1; tmplid id
+  | WildS s1 -> slot s1
+  | VarS s1 -> slot s1
 
 
 (* Premises *)
@@ -229,7 +242,7 @@ let hintdef d =
   | DecH (x, hs) -> defid x; hints hs
   | ThmH (x, hs) | LemH (x, hs) -> thmid x; hints hs
 
-let def d =
+let rec def d =
   visit_def d;
   match d.it with
   | FamD (x, ps, hs) -> typid x; params ps; hints hs
@@ -242,9 +255,8 @@ let def d =
   | DecD (x, ps, t, hs) -> defid x; params ps; typ t; hints hs
   | DefD (x, as_, e, prs) -> defid x; args as_; exp e; prems prs
   | ThmD (x, e, hs) | LemD (x, e, hs) -> thmid x; exp e; hints hs
+  | TmplD d1 -> def d1;
   | HintD hd -> hintdef hd
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 end
 
 
@@ -269,6 +281,7 @@ and clone_typ t =
   | InfixT (t1, atom, t2) -> InfixT (clone_typ t1, clone_atom atom, clone_typ t2)
   | BrackT (atom1, t1, atom2) -> BrackT (clone_atom atom1, clone_typ t1, clone_atom atom2)
   | StrT _ | CaseT _ | ConT _ | RangeT _ -> assert false
+  | BotT as t' -> t'
   ) $ t.at
 
 and clone_typcase (atom, (t, prs), hints) =
@@ -304,8 +317,7 @@ and clone_exp e =
   | RuleE (id, e1) -> RuleE (id, clone_exp e1)
   | ForallE (args, e1) -> ForallE (List.map clone_arg args, clone_exp e1)
   | ExistsE (args, e1) -> ExistsE (List.map clone_arg args, clone_exp e1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE s -> TmplE (clone_slot s)
   ) $ e.at
 
 and clone_expfield (atom, e) = (clone_atom atom, clone_exp e)
@@ -317,6 +329,13 @@ and clone_path p =
   | SliceP (p1, e1, e2) -> SliceP (clone_path p1, clone_exp e1, clone_exp e2)
   | DotP (p1, atom) -> DotP (clone_path p1, clone_atom atom)
   ) $ p.at
+
+and clone_slot s = 
+  (match s.it with
+  | TopS id -> TopS id
+  | DotS (s1, id) -> DotS (clone_slot s1, id)
+  | WildS s1 -> WildS (clone_slot s1)
+  | VarS s1 -> VarS (clone_slot s1)) $ s.at
 
 and clone_arg a =
   (match !(a.it) with
