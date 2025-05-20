@@ -1,3 +1,3 @@
 open Il.Ast
 
-val transform : def -> def
+val transform : script -> script

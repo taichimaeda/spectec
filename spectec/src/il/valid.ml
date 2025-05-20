@@ -545,19 +545,11 @@ and valid_slot ?(first = false) env s =
   match s.it with 
   | TopS _ when first ->
     error s.at "invalid template slot"
-  | VarS ({it = TopS _; _}) when first ->
-    error s.at "invalid template slot"
   | VarS _ when not first -> 
     error s.at "invalid template slot"
+  | VarS ({it = TopS _; _}) when first ->
+    error s.at "invalid template slot"
   | VarS s1 -> valid_slot env s1
-  | DotS ({it = TopS id1; _}, id2) -> 
-    (match id1.it with
-    | "variables" -> ignore (find "variable" env.vars id2)
-    | "types" -> ignore (find "syntax type" env.typs id2)
-    | "relations" -> ignore (find "relation" env.rels id2)
-    | "grammars" -> ignore (find "grammar" env.defs id2)
-    | "theorems" -> ignore (find "theorem" env.thms id2)
-    | _ -> error s.at "invalid template slot 3")
   | DotS (s1, _) -> valid_slot env s1
   | WildS s1 -> valid_slot env s1
   | _ -> error s.at "invalid template slot"

@@ -11,10 +11,10 @@ let error at msg = Error.error at "template" msg
 
 (* TODO: (lemmagen) Templates can substitute exp only *)
 (* TODO: (lemmagen) ... on tuple exp expands entry in args *)
-type slotentry = exp * bind list
+type slotentry = bind list * exp
 
 type slottree = 
-  | LeafT of slotentry
+  | LeafT of slotentry option
   | NodeT of slottree Map.t
 
 type slottrie =
@@ -23,48 +23,198 @@ type slottrie =
 
 let rec string_of_slottree tree = 
   match tree with
-  | LeafT (e, bs) -> string_of_exp e ^ " " ^ string_of_binds bs
-  | NodeT cs -> 
-    Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottree v ^ " ") cs ""
+  | LeafT None -> "leaf()"
+  | LeafT Some (bs, e) -> "leaf(" ^ string_of_binds bs ^ string_of_exp e ^ ")"
+  | NodeT cs -> "node(" ^ 
+      Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottree v ^ " ") cs "" ^ ")"
 
 let rec string_of_slottrie trie =
   let aux s = 
-    Option.value ~default:"empty" (Option.map string_of_slot s) in
+    Option.value ~default:"" (Option.map string_of_slot s) in
 
   match trie with
-  | LeafI s -> "LeafI (" ^ aux s ^ ")"
-  | NodeI (s, cs) -> "NodeI (" ^ aux s ^ ")" ^
-    Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottrie v ^ " ") cs ""
+  | LeafI s -> "leaf(" ^ aux s ^ ")"
+  | NodeI (s, cs) -> "node(" ^ aux s ^
+      Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottrie v ^ " ") cs "" ^ ")"
 
-type env =
-  { typs : slottree Map.t ref;
-    defs : slottree Map.t ref;
-    rels : slottree Map.t ref;
-    grams : slottree Map.t ref;    
-    thms : slottree Map.t ref;
-  }
+type env = slottree
 
-let new_env () =
-  { typs = ref Map.empty;
-    defs = ref Map.empty;
-    rels = ref Map.empty;
-    grams = ref Map.empty;
-    thms = ref Map.empty;
-  }
+let id_vars = "variables"
+let id_typs = "types"
+let id_rels = "relations"
+let id_defs = "definitions"
+let id_thms = "theorems"
 
-let rec env_def d =
+let top_ids = [
+  id_vars;
+  id_typs;
+  id_rels;
+  id_defs;
+  id_thms;
+]
+
+let rec find env ids =
+  assert (List.mem (List.hd ids) top_ids);
+  match ids, env with
+  | [], LeafT (Some entry) -> entry
+  | [], LeafT None -> error no_region "empty slot"
+  | [], NodeT _ -> error no_region "not enough slot ids"
+  | _::_, LeafT _ -> error no_region "too many slot ids"
+  | id'::ids', NodeT cs ->
+    (match Map.find_opt id' cs with
+    | None -> error no_region "unexpected slot id"
+    | Some env' -> find env' ids')
+
+let rec bound env ids = 
+  assert (List.mem (List.hd ids) top_ids);
+  match ids, env with
+  | [], LeafT (Some _) -> true
+  | [], LeafT None -> false
+  | [], NodeT _ -> false
+  | _::_, LeafT _ -> false
+  | id'::ids', NodeT cs ->
+    (match Map.find_opt id' cs with
+      | None -> false
+      | Some env' -> bound env' ids')
+
+let rec bind env ids entry =
+  assert (List.mem (List.hd ids) top_ids);
+  match ids, env with
+  | [], LeafT _ -> LeafT (Some entry) (* override *)
+  | [], NodeT _ -> error no_region "not enough slot ids"
+  | _::_, LeafT (Some _) -> error no_region "occupied slot"
+  | id'::ids', LeafT None ->
+    let c = bind (LeafT None) ids' entry in
+    let cs = Map.add id' c Map.empty in
+    NodeT cs
+  | id'::ids', NodeT cs ->
+    let c = bind (LeafT None) ids' entry in
+    let cs' = Map.add id' c cs in
+    NodeT cs'
+
+let new_env () : env = LeafT None
+
+let entry_of_id id = 
+  [], (TextE id.it) $$ id.at % (TextT $ id.at)
+
+let entry_of_exp bs e = 
+  let mem = Il.Free.Set.mem in
+  let fs = Il.Free.free_exp e in
+  let bs' = List.filter (fun b ->
+    match b.it with 
+    | ExpB (id, _, _) -> mem id.it fs.varid
+    | TypB id -> mem id.it fs.typid) bs in
+  bs', e
+
+let entry_of_exps bs es =
+  let bss', es' = List.split (List.map (entry_of_exp bs) es) in
+  let bs' = List.flatten bss' in
+  let ts' = List.map (fun e -> e, e.note) es' in
+  let at = (List.hd es).at in
+  bs', TupE es' $$ at % (TupT ts' $ at)
+  
+let env_rule_prems env id1 id2 bs prems =
+  let es = List.map (fun p ->
+    (match p.it with
+    | RulePr (id, mixop, e) -> RuleE (id, mixop, e)
+    | IfPr e -> e.it
+    | LetPr (e1, e2, _) -> CmpE (EqOp, e1, e2)
+    (* TODO: (lemmagen) Not yet supported *)
+    | ElsePr -> BoolE true
+    (* TODO: (lemmagen) Not yet supported *)
+    | IterPr _ -> BoolE true)
+    $$ p.at % (BoolT $ p.at)) prems in
+  env := bind !env [id_rels; id1.it; "rules"; id2.it; "premises"] (entry_of_exps bs es)
+
+let env_rule_instr_ok env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [c; i; ft]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs i);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+  | RuleD _ -> error r.at "unexpected form of rule Instr_ok"
+
+let env_rule_instrs_ok env id1 r = 
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [c; is; ft]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs is);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+  | RuleD _ -> error r.at "unexpected form of rule Instrs_ok"
+
+let env_rule_admininstr_ok env id1 r = 
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [s; c; a; ft]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs a);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+  | RuleD _ -> error r.at "unexpected form of rule Admin_instr_ok"
+
+let env_rule_admininstrs_ok env id1 r = 
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [s; c; as_; ft]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs as_);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+  | RuleD _ -> error r.at "unexpected form of rule Admin_instrs_ok"
+
+let env_rule_step env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [c1; c2]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs c2)
+  | RuleD _ -> error r.at "unexpected form of rule Step"
+
+let env_rule_step_pure env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [as1; as2]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs as1);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
+  | RuleD _ -> error r.at "unexpected form of rule Step"
+
+let env_rule_step_read env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, {it = TupE [c1; as2]; _}, _) ->
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
+    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
+  | RuleD _ -> error r.at "unexpected form of rule Step"
+
+let env_rule env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, _, prems) ->
+    env_rule_prems env id1 id2 bs prems;
+  
+  match id1.it with
+  | "Instr_ok" -> env_rule_instr_ok env id1 r
+  | "Instrs_ok" -> env_rule_instr_ok env id1 r
+  | "Admin_instr_ok" -> env_rule_admininstr_ok env id1 r
+  | "Admin_instrs_ok" -> env_rule_admininstrs_ok env id1 r
+  | "Step" -> env_rule_step env id1 r
+  | "Step_pure" -> env_rule_step_pure env id1 r
+  | "Step_read" -> env_rule_step_read env id1 r
+  | _ -> ()
+
+let rec env_def env d =
   match d.it with
-  | TypD (_id, _ps, _insts) -> 
-    failwith "unimplemented (lemmagen)"
-  | RelD (_id, _mixop, _t, _rules) -> 
-    failwith "unimplemented (lemmagen)"
-  | DecD (_id, _ps, _t, _clauses) -> 
-    failwith "unimplemented (lemmagen)"
-  | RecD _ds -> 
-    failwith "unimplemented (lemmagen)"
-  | ThmD (_id, _bs, _e) | LemD (_id, _bs, _e) -> 
-    failwith "unimplemented (lemmagen)"
+  | RecD ds -> 
+    List.iter (env_def env) ds
+  | TypD (id, _, _) -> 
+    env := bind !env [id_typs; id.it; "name"] (entry_of_id id)
+  | RelD (id, _, _, rs) -> 
+    env := bind !env [id_rels; id.it; "name"] (entry_of_id id);
+    List.iter (env_rule env id) rs
+  | DecD (id, _, _, _) -> 
+    env := bind !env [id_defs; id.it; "name"] (entry_of_id id)
+  | ThmD (id, _bs, _e) | LemD (id, _bs, _e) -> 
+    env := bind !env [id_thms; id.it; "name"] (entry_of_id id)
   | TmplD _ | HintD _ -> ()
+
+let env ds : env =
+  let env = new_env () in
+  List.iter (env_def (ref env)) ds;
+  env
 
 let slots_list f xs = List.flatten (List.map f xs)
 
@@ -189,27 +339,22 @@ let rec slots_def d =
   | TmplD _ | HintD _ -> assert false
 
 (* TODO: (lemmagen) Is this correct? *)
-let rec insert_trie s ids trie =
+let rec insert_trie ids s trie =
   match ids with
-  | [] -> 
-    (match trie with
+  | [] -> (match trie with
     | LeafI _ -> LeafI (Some s)
-    | NodeI (_, trie) -> NodeI (Some s, trie))
-  | id::ids' -> 
-    (match trie with
+    | NodeI (_, cs) -> NodeI (Some s, cs))
+  | id::ids' -> (match trie with
     | LeafI s' -> 
-      let c = insert_trie s ids' (LeafI None) in
+      let c = insert_trie ids' s (LeafI None) in
       let cs = Map.add id c Map.empty in
       NodeI (s', cs)
-    | NodeI (s', trie') ->
-      let cs = match Map.find_opt id trie' with
-      | None -> 
-        let c = insert_trie s ids' (LeafI None) in
-        Map.add id c trie'
-      | Some c' -> 
-        let c = insert_trie s ids' c' in
-        Map.add id c trie' in
-      NodeI (s', cs))
+    | NodeI (s', cs) ->
+      let c = match Map.find_opt id cs with
+        | None -> insert_trie ids' s (LeafI None)
+        | Some trie' -> insert_trie ids' s trie' in
+      let cs' = Map.add id c cs in
+      NodeI (s', cs'))
 
 let make_trie ss = 
   let rec linearize' s acc =
@@ -222,24 +367,43 @@ let make_trie ss =
   let linearize s =
     List.rev (linearize' s []) in
 
-  let empty = LeafI None in
   List.fold_left (fun acc s -> 
     let ids = linearize s in
-    insert_trie s ids acc) empty ss
+    insert_trie ids s acc) (LeafI None) ss
 
 type subst = slot * slotentry
 type substs = subst list
 
 type comb = substs list
 
-let make_comb (_tree : slottree) (_trie : slottrie) : comb = 
+let make_comb (_env : env) (_trie : slottrie) : comb = 
   failwith "unimplemented (lemmagen)"
 
-let subst_def (_d : def) : def * bind list = 
+let subst_def (_substs : substs) (_d : def) : def * bind list = 
   failwith "unimplemented (lemmagen)"
 
-let transform (d : def) : def =
-  let d', _bs = subst_def d in
-  (* TODO: (lemmagen) Handle top-level binds *)
-  match d'.it with
-  | _ -> d'
+let transform ds =
+  let env = env ds in
+  ds
+  |> List.map (fun d ->
+    let slots = slots_def d in
+    let trie = make_trie slots in
+    let comb = make_comb env trie in
+    comb 
+    |> List.map (fun substs -> 
+      let d', _bs = subst_def substs d in
+      (* TODO: (lemmagen) Handle extra top-level binds *)
+      match d'.it with
+      | TypD (_id, _ps, _insts) -> 
+        failwith "unimplemented (lemmagen)"
+      | RelD (_id, _mixop, _t, _rules) -> 
+        failwith "unimplemented (lemmagen)"
+      | DecD (_id, _ps, _t, _clauses) -> 
+        failwith "unimplemented (lemmagen)"
+      | RecD _ds -> 
+        failwith "unimplemented (lemmagen)"
+      | ThmD (_id, _bs, _e) | LemD (_id, _bs, _e) -> 
+        failwith "unimplemented (lemmagen)"
+      | TmplD _ | HintD _ ->
+        assert false))
+  |> List.flatten
