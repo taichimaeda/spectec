@@ -13,13 +13,15 @@ let error at msg = Error.error at "template" msg
 (* TODO: (lemmagen) ... on tuple exp expands entry in args *)
 type slotentry = bind list * exp
 
+(* TODO: (lemmagen) slotentry cannot overlap in non-terminals *)
 type slottree = 
   | LeafT of slotentry option
   | NodeT of slottree Map.t
 
+(* TODO: (lemmagen) slot cannot overlap in non-terminals *)
 type slottrie =
   | LeafI of slot option
-  | NodeI of slot option * slottrie Map.t
+  | NodeI of slottrie Map.t
 
 let rec string_of_slottree tree = 
   match tree with
@@ -29,12 +31,9 @@ let rec string_of_slottree tree =
       Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottree v ^ " ") cs "" ^ ")"
 
 let rec string_of_slottrie trie =
-  let aux s = 
-    Option.value ~default:"" (Option.map string_of_slot s) in
-
   match trie with
-  | LeafI s -> "leaf(" ^ aux s ^ ")"
-  | NodeI (s, cs) -> "node(" ^ aux s ^
+  | LeafI s -> "leaf(" ^ Option.value ~default:"" (Option.map string_of_slot s) ^ ")"
+  | NodeI cs -> "node(" ^
       Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottrie v ^ " ") cs "" ^ ")"
 
 type env = slottree
@@ -349,18 +348,19 @@ let rec insert_trie ids s trie =
   match ids with
   | [] -> (match trie with
     | LeafI _ -> LeafI (Some s)
-    | NodeI (_, cs) -> NodeI (Some s, cs))
+    | NodeI _ -> error no_region "invalid slot ids")
   | id::ids' -> (match trie with
-    | LeafI s' -> 
+    | LeafI None -> 
       let c = insert_trie ids' s (LeafI None) in
       let cs = Map.add id c Map.empty in
-      NodeI (s', cs)
-    | NodeI (s', cs) ->
+      NodeI cs
+    | LeafI (Some _) -> error no_region "invalid slot ids"
+    | NodeI cs ->
       let c = match Map.find_opt id cs with
         | None -> insert_trie ids' s (LeafI None)
         | Some trie' -> insert_trie ids' s trie' in
       let cs' = Map.add id c cs in
-      NodeI (s', cs'))
+      NodeI cs')
 
 let make_trie ss = 
   let rec linearize' s acc =
@@ -382,8 +382,29 @@ type substs = subst list
 
 type comb = substs list
 
-let make_comb (_env : env) (_trie : slottrie) : comb = 
-  failwith "unimplemented (lemmagen)"
+let rec make_comb (env : env) (trie : slottrie) : comb = 
+  let product acc comb : comb = 
+    List.flatten 
+      (List.map (fun x -> 
+       List.map (fun y -> x @ y) acc) comb) in
+
+  match env, trie with 
+  | _, LeafI None -> error no_region "invalid trie"
+  | LeafT None, _ -> error no_region "invalid env"
+  | LeafT (Some e), LeafI (Some s) -> [[s, e]]
+  | LeafT _, NodeI _ -> error no_region "invalid env"
+  | NodeT _, LeafI _ -> error no_region "invalid trie"
+  | NodeT cs, NodeI ds ->
+    (* TODO: (lemmagen) Is this correct? *)
+    Map.fold (fun dk dv (acc : comb) -> (
+      if dk = "*" then
+        Map.fold (fun _ck cv (acc : comb) -> 
+          let comb = make_comb cv dv in
+          acc @ comb) cs []
+      else
+        let cv = Map.find dk cs in
+        let comb = make_comb cv dv in
+        product acc comb)) ds []
 
 let find_entry substs s : slotentry =
   let (_s', (bs, e)) = List.find (fun (s', _entry) -> s' = s) substs in
@@ -664,10 +685,10 @@ let rec subst_def (substs : substs) d : def * bind list =
     DecD (id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
   | ThmD (id, bs, e) ->
     let e', bs1 = subst_exp substs e in
-    ThmD (id, bs @ bs1, e') $ d.at, bs1
+    ThmD (id, bs @ bs1, e') $ d.at, []
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
-    LemD (id, bs @ bs1, e') $ d.at, bs1
+    LemD (id, bs @ bs1, e') $ d.at, []
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD hdef -> HintD hdef $ d.at, []
   (* TODO: (lemmagen) Templates cannot be recurisve *)
@@ -690,19 +711,6 @@ let transform ds =
     let comb = make_comb env trie in
     comb 
     |> List.map (fun substs -> 
-      let d', _bs = subst_def substs d in
-      (* TODO: (lemmagen) Handle extra top-level binds *)
-      match d'.it with
-      | TypD (_id, _ps, _insts) -> 
-        failwith "unimplemented (lemmagen)"
-      | RelD (_id, _mixop, _t, _rules) -> 
-        failwith "unimplemented (lemmagen)"
-      | DecD (_id, _ps, _t, _clauses) -> 
-        failwith "unimplemented (lemmagen)"
-      | RecD _ds -> 
-        failwith "unimplemented (lemmagen)"
-      | ThmD (_id, _bs, _e) | LemD (_id, _bs, _e) -> 
-        failwith "unimplemented (lemmagen)"
-      | TmplD _ | HintD _ ->
-        assert false))
+      let d', bs = subst_def substs d in
+      assert (bs = []); d'))
   |> List.flatten
