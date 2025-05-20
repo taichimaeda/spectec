@@ -98,8 +98,9 @@ let entry_of_id id =
   [], (TextE id.it) $$ id.at % (TextT $ id.at)
 
 let entry_of_exp bs e = 
-  let mem = Il.Free.Set.mem in
-  let fs = Il.Free.free_exp e in
+  let open Il.Free in
+  let open Il.Free.Set in
+  let fs = free_exp e in
   let bs' = List.filter (fun b ->
     match b.it with 
     | ExpB (id, _, _) -> mem id.it fs.varid
@@ -384,6 +385,10 @@ type comb = substs list
 let make_comb (_env : env) (_trie : slottrie) : comb = 
   failwith "unimplemented (lemmagen)"
 
+let find_entry substs s : slotentry =
+  let (_s', (bs, e)) = List.find (fun (s', _entry) -> s' = s) substs in
+  bs, e
+
 let subst_list f substs xs =
   let xs', bss = List.split (List.map (f substs) xs) in
   xs', List.flatten bss
@@ -398,7 +403,7 @@ let rec subst_iter substs it : iter * bind list =
 and subst_typ substs t : typ * bind list =
   match t.it with
   | VarT (id, as_) -> 
-    let as', bs1 = subst_list subst_arg substs as_ in
+    let as', bs1 = subst_args substs as_ in
     VarT (id, as') $ t.at, bs1
   | BoolT 
   | NumT _
@@ -511,7 +516,7 @@ and subst_exp substs e : exp * bind list =
     let e2', bs3 = subst_exp substs e2 in
     ExtE (e1', p1', e2') $$ e.at % e.note, bs1 @ bs2 @ bs3
   | CallE (id, as_) -> 
-    let as', bs1 = subst_list subst_arg substs as_ in
+    let as', bs1 = subst_args substs as_ in
     CallE (id, as') $$ e.at % e.note, bs1
   | IterE (e1, ie) -> 
     let e1', bs1 = subst_exp substs e1 in
@@ -525,19 +530,27 @@ and subst_exp substs e : exp * bind list =
   | RuleE (id, mixop, e1) -> 
     let e1', bs1 = subst_exp substs e1 in
     RuleE (id, mixop, e1') $$ e.at % e.note, bs1
-  | ForallE (bs, as_, e1) -> 
-    let as', bs1 = subst_list subst_arg substs as_ in
+  | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> 
+    let as', bs1 = subst_args substs as_ in
     let e1', bs2 = subst_exp substs e1 in
     (* TODO: (lemmagen) Handle binds properly *)
-    ForallE (bs, as', e1') $$ e.at % e.note, bs1 @ bs2
-  | ExistsE (bs, as_, e1) ->
-    let as', bs1 = subst_list subst_arg substs as_ in
-    let e1', bs2 = subst_exp substs e1 in
-    (* TODO: (lemmagen) Handle binds properly *)
-    ExistsE (bs, as', e1') $$ e.at % e.note, bs1 @ bs2
-  | TmplE _s ->
-    (* TODO: (lemmagen) Handle substitution properly *)
-    failwith "unimplemented (lemmagen)"
+    let open Il.Free in
+    let open Il.Free.Set in
+    let fs = free_list free_arg as' in
+    let bs1' = List.filter (fun b ->
+      match b.it with 
+      | ExpB (id, _, _) -> mem id.it fs.varid
+      | TypB id -> mem id.it fs.typid) bs1 in
+    let bs1'' = List.filter (fun b -> not (List.mem b bs1')) bs1 in
+    (match e.it with
+    | ForallE _ -> ForallE (bs @ bs1', as', e1')
+    | ExistsE _ -> ExistsE (bs @ bs1', as', e1')
+    | _ -> assert false) $$ e.at % e.note, bs1'' @ bs2
+  | TmplE {it = VarS _; _} ->
+    error e.at "unexpected variable template expression"
+  | TmplE s -> 
+    let bs, e = find_entry substs s in
+    e, bs
 
 and subst_expfield substs (atom, e) : expfield * bind list = 
   let e', bs1 = subst_exp substs e in
@@ -585,14 +598,25 @@ and subst_prem substs prem : prem * bind list =
     let iter', bs2 = subst_iterexp substs iter in
     IterPr (prem1', iter') $ prem.at, bs1 @ bs2
 
-and subst_arg substs a : arg * bind list =
-  match a.it with
-  | ExpA e -> 
-    let e', bs1 = subst_exp substs e in
-    ExpA e' $ a.at, bs1
-  | TypA t -> 
-    let t', bs1 = subst_typ substs t in
-    TypA t' $ t.at, bs1
+and subst_args substs as_ : arg list * bind list =
+  let subst_arg substs a : arg list * bind list = 
+    match a.it with
+    | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
+      let bs, e = find_entry substs s in
+      (match e.it with 
+      | ListE es | TupE es -> 
+        List.map (fun e' -> ExpA e' $ a.at) es, bs
+      | _ -> 
+        error a.at "variable template expression on non-tuple or non-list expression")
+    | ExpA e -> 
+      let e', bs1 = subst_exp substs e in
+      [ExpA e' $ a.at], bs1
+    | TypA t ->
+      let t', bs1 = subst_typ substs t in
+      [TypA t' $ a.at], bs1 in
+
+  let ass, bs = subst_list subst_arg substs as_ in
+  List.flatten ass, bs
 
 and subst_param substs p : param * bind list = 
   match p.it with
@@ -604,7 +628,7 @@ and subst_param substs p : param * bind list =
 let subst_inst substs inst : inst * bind list =
   match inst.it with
   | InstD (bs, as_, dt) -> 
-    let as', bs1 = subst_list subst_arg substs as_ in
+    let as', bs1 = subst_args substs as_ in
     let dt', bs2 = subst_deftyp substs dt in
     InstD (bs @ bs1 @ bs2, as', dt') $ inst.at, []
 
@@ -618,7 +642,7 @@ let subst_rule substs rule : rule * bind list =
 let subst_clause substs clause : clause * bind list =
   match clause.it with
   | DefD (bs, as_, e, prems) ->
-    let as', bs1 = subst_list subst_arg substs as_ in
+    let as', bs1 = subst_args substs as_ in
     let e', bs2 = subst_exp substs e in 
     let prems', bs3 = subst_list subst_prem substs prems in
     DefD (bs @ bs1 @ bs2 @ bs3, as', e', prems') $ clause.at, []
