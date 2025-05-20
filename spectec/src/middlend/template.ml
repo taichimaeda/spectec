@@ -39,6 +39,8 @@ let rec string_of_slottrie trie =
 
 type env = slottree
 
+let new_env () : env = LeafT None
+
 let id_vars = "variables"
 let id_typs = "types"
 let id_rels = "relations"
@@ -91,8 +93,6 @@ let rec bind env ids entry =
     let c = bind (LeafT None) ids' entry in
     let cs' = Map.add id' c cs in
     NodeT cs'
-
-let new_env () : env = LeafT None
 
 let entry_of_id id = 
   [], (TextE id.it) $$ id.at % (TextT $ id.at)
@@ -208,8 +208,11 @@ let rec env_def env d =
   | DecD (id, _, _, _) -> 
     env := bind !env [id_defs; id.it; "name"] (entry_of_id id)
   | ThmD (id, _bs, _e) | LemD (id, _bs, _e) -> 
+    (* TODO: (lemmage) Need to take binds in quantifiers too *)
     env := bind !env [id_thms; id.it; "name"] (entry_of_id id)
-  | TmplD _ | HintD _ -> ()
+  (* TODO: (lemmagen) Hints are currently ignored *)
+  | HintD _ -> ()
+  | TmplD _ -> assert false
 
 let env ds : env =
   let env = new_env () in
@@ -226,8 +229,8 @@ let rec slots_iter it =
 and slots_typ t =
   match t.it with
   | VarT (_, as_) -> slots_list slots_arg as_
-  | BoolT -> []
-  | NumT _ -> []
+  | BoolT
+  | NumT _
   | TextT -> []
   | TupT ets -> slots_list (fun (e, t) -> slots_exp e @ slots_typ t) ets
   | IterT (t1, it) -> slots_typ t1 @ slots_iter it
@@ -336,7 +339,9 @@ let rec slots_def d =
     slots_list slots_def ds
   | ThmD (_, _, e) | LemD (_, _, e) -> 
     slots_exp e
-  | TmplD _ | HintD _ -> assert false
+  (* TODO: (lemmagen) Hints are currently ignored *)
+  | HintD _ -> []
+  | TmplD _ -> assert false
 
 (* TODO: (lemmagen) Is this correct? *)
 let rec insert_trie ids s trie =
@@ -379,12 +384,282 @@ type comb = substs list
 let make_comb (_env : env) (_trie : slottrie) : comb = 
   failwith "unimplemented (lemmagen)"
 
-let subst_def (_substs : substs) (_d : def) : def * bind list = 
-  failwith "unimplemented (lemmagen)"
+let subst_list f substs xs =
+  let xs', bss = List.split (List.map (f substs) xs) in
+  xs', List.flatten bss
+
+let rec subst_iter substs it : iter * bind list =
+  match it with
+  | Opt | List | List1 -> it, []
+  | ListN (e, id) -> 
+    let e', bs1 = subst_exp substs e in
+    ListN (e', id), bs1
+  
+and subst_typ substs t : typ * bind list =
+  match t.it with
+  | VarT (id, as_) -> 
+    let as', bs1 = subst_list subst_arg substs as_ in
+    VarT (id, as') $ t.at, bs1
+  | BoolT 
+  | NumT _
+  | TextT -> t, []
+  | TupT ets -> 
+    let ets', bs3 = subst_list (fun _ (e, t) -> 
+      let e', bs1 = subst_exp substs e in 
+      let t', bs2 = subst_typ substs t in
+      (e', t'), bs1 @ bs2) substs ets in
+    TupT ets' $ t.at, bs3
+  | IterT (t1, it) ->
+    let t1', bs1 = subst_typ substs t1 in
+    let it', bs2 = subst_iter substs it in
+    IterT (t1', it') $ t.at, bs1 @ bs2
+  | BotT -> t, []
+
+and subst_deftyp substs dt: deftyp * bind list =
+  match dt.it with
+  | AliasT t -> 
+    let t', bs1 = subst_typ substs t in
+    AliasT t' $ dt.at, bs1
+  | StructT tfs ->
+    let tfs', bs1 = subst_list subst_typfield substs tfs in
+    StructT tfs' $ dt.at, bs1
+  | VariantT tcs ->
+    let tcs', bs1 = subst_list subst_typcase substs tcs in
+    VariantT tcs' $ dt.at, bs1
+
+and subst_typfield substs (atom, (bs, t, prems), hints) : typfield * bind list = 
+  let t', bs1 = subst_typ substs t in
+  let prems', bs2 = subst_list subst_prem substs prems in
+  (atom, (bs, t', prems'), hints), bs1 @ bs2
+
+and subst_typcase substs (mixop, (bs, t, prems), hints) : typcase * bind list =
+  let t', bs1 = subst_typ substs t in
+  let prems', bs2 = subst_list subst_prem substs prems in
+  (mixop, (bs, t', prems'), hints), bs1 @ bs2
+
+and subst_exp substs e : exp * bind list = 
+  match e.it with
+  | VarE _ -> e, []
+  | BoolE _ | NatE _ | TextE _ -> e, []
+  | UnE (op, e1) ->
+    let e1', bs1 = subst_exp substs e1 in
+    UnE (op, e1') $$ e.at % e.note, bs1
+  | BinE (op, e1, e2) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    BinE (op, e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | CmpE (op, e1, e2) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    CmpE (op, e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | TupE es -> 
+    let es', bs1 = subst_list subst_exp substs es in
+    TupE es' $$ e.at % e.note, bs1
+  | ProjE (e1, i) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    ProjE (e1', i) $$ e.at % e.note, bs1
+  | CaseE (mixop, e1) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    CaseE (mixop, e1') $$ e.at % e.note, bs1
+  | UncaseE (e1, mixop) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    UncaseE (e1', mixop) $$ e.at % e.note, bs1
+  | OptE None -> e, []
+  | OptE (Some e1) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    OptE (Some e1') $$ e.at % e.note, bs1
+  | TheE e1 -> 
+    let e1', bs1 = subst_exp substs e1 in
+    TheE e1' $$ e.at % e.note, bs1
+  | StrE efs -> 
+    let efs', bs1 = subst_list subst_expfield substs efs in
+    StrE efs' $$ e.at % e.note, bs1
+  | DotE (e1, atom) ->
+    let e1', bs1 = subst_exp substs e1 in
+    DotE (e1', atom) $$ e.at % e.note, bs1
+  | CompE (e1, e2) ->
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    CompE (e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | ListE es -> 
+    let es', bs1 = subst_list subst_exp substs es in
+    ListE es' $$ e.at % e.note, bs1
+  | LenE e1 ->
+    let e1', bs1 = subst_exp substs e1 in
+    LenE e1' $$ e.at % e.note, bs1
+  | CatE (e1, e2) ->
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    CatE (e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | IdxE (e1, e2) ->
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    IdxE (e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | SliceE (e1, e2, e3) ->
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    let e3', bs3 = subst_exp substs e3 in
+    SliceE (e1', e2', e3') $$ e.at % e.note, bs1 @ bs2 @ bs3
+  | UpdE (e1, p1, e2) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let p1', bs2 = subst_path substs p1 in
+    let e2', bs3 = subst_exp substs e2 in
+    UpdE (e1', p1', e2') $$ e.at % e.note, bs1 @ bs2 @ bs3
+  | ExtE (e1, p1, e2) ->
+    let e1', bs1 = subst_exp substs e1 in
+    let p1', bs2 = subst_path substs p1 in
+    let e2', bs3 = subst_exp substs e2 in
+    ExtE (e1', p1', e2') $$ e.at % e.note, bs1 @ bs2 @ bs3
+  | CallE (id, as_) -> 
+    let as', bs1 = subst_list subst_arg substs as_ in
+    CallE (id, as') $$ e.at % e.note, bs1
+  | IterE (e1, ie) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let ie', bs2 = subst_iterexp substs ie in
+    IterE (e1', ie') $$ e.at % e.note, bs1 @ bs2
+  | SubE (e1, t1, t2) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let t1', bs2 = subst_typ substs t1 in
+    let t2', bs3 = subst_typ substs t2 in
+    SubE (e1', t1', t2') $$ e.at % e.note, bs1 @ bs2 @ bs3
+  | RuleE (id, mixop, e1) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    RuleE (id, mixop, e1') $$ e.at % e.note, bs1
+  | ForallE (bs, as_, e1) -> 
+    let as', bs1 = subst_list subst_arg substs as_ in
+    let e1', bs2 = subst_exp substs e1 in
+    (* TODO: (lemmagen) Handle binds properly *)
+    ForallE (bs, as', e1') $$ e.at % e.note, bs1 @ bs2
+  | ExistsE (bs, as_, e1) ->
+    let as', bs1 = subst_list subst_arg substs as_ in
+    let e1', bs2 = subst_exp substs e1 in
+    (* TODO: (lemmagen) Handle binds properly *)
+    ExistsE (bs, as', e1') $$ e.at % e.note, bs1 @ bs2
+  | TmplE _s ->
+    (* TODO: (lemmagen) Handle substitution properly *)
+    failwith "unimplemented (lemmagen)"
+
+and subst_expfield substs (atom, e) : expfield * bind list = 
+  let e', bs1 = subst_exp substs e in
+  (atom, e'), bs1
+
+and subst_path substs p : path * bind list =
+  match p.it with
+  | RootP -> p, []
+  | IdxP (p1, e) -> 
+    let p1', bs1 = subst_path substs p1 in
+    let e', bs2 = subst_exp substs e in
+    IdxP (p1', e') $$ p.at % p.note, bs1 @ bs2
+  | SliceP (p1, e1, e2) -> 
+    let p1', bs1 = subst_path substs p1 in
+    let e1', bs2 = subst_exp substs e1 in
+    let e2', bs3 = subst_exp substs e2 in
+    SliceP (p1', e1', e2') $$ p.at % p.note, bs1 @ bs2 @ bs3
+  | DotP (p1, atom) -> 
+    let p1', bs1 = subst_path substs p1 in
+    DotP (p1', atom) $$ p.at % p.note, bs1
+
+and subst_iterexp substs (iter, bs) : iterexp * bind list =
+  let iter', bs1 = subst_iter substs iter in
+  let bs', bs2 = subst_list (fun _ (id, t) -> 
+    let t', bs1 = subst_typ substs t in
+    (id, t'), bs1) substs bs in
+  (iter', bs'), bs1 @ bs2
+
+and subst_prem substs prem : prem * bind list =
+  match prem.it with
+  | RulePr (id, mixop, e) -> 
+    let e', bs1 = subst_exp substs e in
+    RulePr (id, mixop, e') $ prem.at, bs1
+  | IfPr e ->
+    let e', bs1 = subst_exp substs e in
+    IfPr e' $ prem.at, bs1
+  | LetPr (e1, e2, ids) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let e2', bs2 = subst_exp substs e2 in
+    LetPr (e1', e2', ids) $ prem.at, bs1 @ bs2
+  | ElsePr -> 
+    ElsePr $ prem.at, []
+  | IterPr (prem1, iter) -> 
+    let prem1', bs1 = subst_prem substs prem1 in
+    let iter', bs2 = subst_iterexp substs iter in
+    IterPr (prem1', iter') $ prem.at, bs1 @ bs2
+
+and subst_arg substs a : arg * bind list =
+  match a.it with
+  | ExpA e -> 
+    let e', bs1 = subst_exp substs e in
+    ExpA e' $ a.at, bs1
+  | TypA t -> 
+    let t', bs1 = subst_typ substs t in
+    TypA t' $ t.at, bs1
+
+and subst_param substs p : param * bind list = 
+  match p.it with
+  | ExpP (id, t) -> 
+    let t', bs1 = subst_typ substs t in
+    ExpP (id, t') $ p.at, bs1
+  | TypP _ -> p, []
+
+let subst_inst substs inst : inst * bind list =
+  match inst.it with
+  | InstD (bs, as_, dt) -> 
+    let as', bs1 = subst_list subst_arg substs as_ in
+    let dt', bs2 = subst_deftyp substs dt in
+    InstD (bs @ bs1 @ bs2, as', dt') $ inst.at, []
+
+let subst_rule substs rule : rule * bind list =
+  match rule.it with
+  | RuleD (id, bs, mixop, e, prems) ->
+    let e', bs1 = subst_exp substs e in
+    let prems', bs2 = subst_list subst_prem substs prems in
+    RuleD (id, bs @ bs1 @ bs2, mixop, e', prems') $ rule.at, []
+
+let subst_clause substs clause : clause * bind list =
+  match clause.it with
+  | DefD (bs, as_, e, prems) ->
+    let as', bs1 = subst_list subst_arg substs as_ in
+    let e', bs2 = subst_exp substs e in 
+    let prems', bs3 = subst_list subst_prem substs prems in
+    DefD (bs @ bs1 @ bs2 @ bs3, as', e', prems') $ clause.at, []
+
+let rec subst_def (substs : substs) d : def * bind list = 
+  match d.it with
+  | TypD (id, ps, insts) -> 
+    let ps', bs1 = subst_list subst_param [] ps in
+    let insts', bs2 = subst_list subst_inst substs insts in
+    TypD (id, ps', insts') $ d.at, bs1 @ bs2
+  | RelD (id, mixop, t, rules) -> 
+    let t', bs1 = subst_typ [] t in
+    let rules', bs2 = subst_list subst_rule substs rules in
+    RelD (id, mixop, t', rules') $ d.at, bs1 @ bs2
+  | DecD (id, ps, t, clauses) ->
+    let ps', bs1 = subst_list subst_param [] ps in
+    let t', bs2 = subst_typ [] t in
+    let clauses', bs3 = subst_list subst_clause substs clauses in
+    DecD (id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
+  | ThmD (id, bs, e) ->
+    let e', bs1 = subst_exp substs e in
+    ThmD (id, bs @ bs1, e') $ d.at, bs1
+  | LemD (id, bs, e) -> 
+    let e', bs1 = subst_exp substs e in
+    LemD (id, bs @ bs1, e') $ d.at, bs1
+  (* TODO: (lemmagen) Hints are currently ignored *)
+  | HintD hdef -> HintD hdef $ d.at, []
+  (* TODO: (lemmagen) Templates cannot be recurisve *)
+  | RecD _ -> assert false
+  | TmplD _ -> assert false
+
+let partition ds = 
+  List.filter (fun d -> 
+    match d.it with TmplD _ -> false | _ -> true) ds,
+  List.filter_map (fun d ->
+    match d.it with TmplD d' -> Some d' | _ -> None) ds
 
 let transform ds =
-  let env = env ds in
-  ds
+  let ntds, tds = partition ds in
+  let env = env ntds in
+  tds
   |> List.map (fun d ->
     let slots = slots_def d in
     let trie = make_trie slots in

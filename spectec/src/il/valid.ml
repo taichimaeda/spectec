@@ -465,7 +465,7 @@ try
   | TmplE _ when not env.template ->
     error e.at "unexpected template"
   | TmplE s ->
-    valid_slot ~first:true env s;
+    valid_slot env s;
     sub_typ env (BotT $ e.at) t e.at
 with exn ->
   let bt = Printexc.get_raw_backtrace () in
@@ -541,18 +541,22 @@ and valid_path env p t : typ =
   equiv_typ env p.note t' p.at;
   t'
 
-and valid_slot ?(first = false) env s =
+and valid_slot env s =
   match s.it with 
-  | TopS _ when first ->
+  | TopS _ ->
     error s.at "invalid template slot"
-  | VarS _ when not first -> 
+  | VarS ({it = TopS _; _}) ->
     error s.at "invalid template slot"
-  | VarS ({it = TopS _; _}) when first ->
+  | VarS s1 | DotS (s1, _) | WildS s1 ->
+    valid_slot' env s1
+
+and valid_slot' env s = 
+  match s.it with
+  | VarS _ -> 
     error s.at "invalid template slot"
-  | VarS s1 -> valid_slot env s1
-  | DotS (s1, _) -> valid_slot env s1
-  | WildS s1 -> valid_slot env s1
-  | _ -> error s.at "invalid template slot"
+  | TopS _ -> ()
+  | DotS (s1, _) | WildS s1 -> 
+    valid_slot' env s1
 
 and valid_iterexp env (iter, bs) : env =
   valid_iter env iter;
@@ -697,7 +701,7 @@ let infer_def env d =
 
 type bind = {bind : 'a. string -> 'a Env.t -> id -> 'a -> 'a Env.t}
 
-let rec valid_def ?(with_template = false) {bind} env d =
+let rec valid_def {bind} env d =
   Debug.(log_in "il.valid_def" line);
   Debug.(log_in_at "il.valid_def" d.at (fun _ -> il_def d));
   match d.it with
@@ -738,21 +742,27 @@ let rec valid_def ?(with_template = false) {bind} env d =
     (* TODO: (lemmagen) Theorems can contain formulas *)
     valid_expform env' e (BoolT $ e.at);
     env.thms <- bind "theorem" env.thms id ()
-  | TmplD _ when not with_template -> 
+  | TmplD _ -> 
     error d.at "unexpected template definition"
-  | TmplD d1 ->
-    let env' = {env with template = true} in
-    valid_def ~with_template {bind} env' d1
   | HintD _ ->
     ()
 
 
 (* Scripts *)
 
+let partition ds = 
+  List.filter (fun d -> 
+    match d.it with TmplD _ -> false | _ -> true) ds,
+  List.filter_map (fun d ->
+    match d.it with TmplD d' -> Some d' | _ -> None) ds
+
 let valid_with_template ds = 
   let env = new_env () in
-  List.iter (valid_def ~with_template:true {bind} env) ds
+  let env' = {env with template = true} in
+  let ntds, tds = partition ds in
+  List.iter (valid_def {bind} env) ntds;
+  List.iter (valid_def {bind} env') tds
 
 let valid_without_template ds =
   let env = new_env () in
-  List.iter (valid_def ~with_template:false {bind} env) ds
+  List.iter (valid_def {bind} env) ds
