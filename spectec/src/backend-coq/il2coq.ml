@@ -9,7 +9,7 @@ open Either
 (* Util functions for transform *)
 module IdSet = Set.Make(String)
 let reserved_ids = ["N"; "in"; "In"; "()"; "tt"; "Import"; "Export"; "List"; "String"; "Type"; "list"; "nat"] |> IdSet.of_list
-let error at msg = Error.error at "Coq Generation" msg
+let error at msg = Error.error at "coq generation" msg
 let family_type_suffix = "entry"
 let coerce_prefix = "coec_"
 let var_prefix = "v_"
