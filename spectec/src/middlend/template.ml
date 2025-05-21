@@ -13,14 +13,12 @@ let error at msg = Error.error at "template" msg
 (* TODO: (lemmagen) ... on tuple exp expands entry in args *)
 type slotentry = bind list * exp
 
-(* TODO: (lemmagen) slotentry cannot overlap in non-terminals *)
 type slottree = 
-  | LeafT of slotentry option
+  | LeafT of slotentry option (* data at terminals only *)
   | NodeT of slottree Map.t
 
-(* TODO: (lemmagen) slot cannot overlap in non-terminals *)
 type slottrie =
-  | LeafI of slot option
+  | LeafI of slot option      (* data at terminals only *)
   | NodeI of slottrie Map.t
 
 let string_of_slotentry (bs, e) = 
@@ -101,20 +99,6 @@ let entry_of_id id =
 
 let entry_of_exp bs e = 
   binds_of_exp bs e, e
-
-let entry_of_exps bs es =
-  match es with
-  | [] -> 
-    (* TODO: (lemmagen) This is a hack *)
-    [], BoolE true $$ no_region % (BoolT $ no_region)
-  | _::_ ->
-    let bss', es' = List.split (List.map (entry_of_exp bs) es) in
-    let bs' = List.flatten bss' in
-    let ts' = List.map (fun e -> e, e.note) es' in
-    let at = match es with 
-      | [] -> no_region
-      | e::_ -> e.at in
-    bs', TupE es' $$ at % (TupT ts' $ at)
     
 let entry_of_freevars bs e =
   let rec fold_iters t its = 
@@ -144,7 +128,13 @@ let env_rule_prems env id1 id2 bs prems =
     (* TODO: (lemmagen) Not yet supported *)
     | IterPr _ -> BoolE true)
     $$ p.at % (BoolT $ p.at)) prems in
-  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (entry_of_exps bs es)
+
+  let ande = match es with 
+    | [] -> 
+      BoolE true $$ no_region % (BoolT $ no_region)
+    | e::es' -> List.fold_left (fun acc e -> 
+      BinE (AndOp, e, acc) $$ e.at % (BoolT $ e.at)) e es' in
+  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (entry_of_exp bs ande)
 
 let env_rule_instr_ok env id1 r =
   match r.it with
@@ -408,9 +398,11 @@ let make_trie ss =
     let ids = unfold_slot s' [] in
     insert_trie ids s' acc) (LeafI None) ss
 
-type subst = slot * slot * slotentry
+type subst = 
+    slot      (* old slot with wildcard *)
+  * slot      (* new slot without wildcard *)
+  * slotentry (* slot entry to be substituted *)
 type substs = subst list
-
 type comb = substs list
 
 let string_of_subst (s, s', e) =
@@ -475,6 +467,15 @@ let find_entry (substs : substs) s : slotentry =
   let (_, _, (bs, e)) = subst in
   bs, e
 
+let unique_binds bs : bind list = 
+  List.sort_uniq (fun b1 b2 -> 
+    match b1.it, b2.it with
+    (* TODO: (lemmagen) Take typ and iter into account *)
+    | ExpB (id1, _, _), ExpB (id2, _, _) -> String.compare id1.it id2.it
+    | TypB id1, TypB id2 -> String.compare id1.it id2.it
+    | ExpB _, TypB _ -> -1
+    | TypB _, ExpB _ -> +1) bs
+  
 let subst_list f substs xs =
   let xs', bss = List.split (List.map (f substs) xs) in
   xs', List.flatten bss
@@ -642,8 +643,8 @@ and subst_exp substs e : exp * bind list =
     let bs1' = binds_of_args bs1 as' in
     let bs1'' = List.filter (fun b -> not (List.mem b bs1')) bs1 in
     (match e.it with
-    | ForallE _ -> ForallE (bs @ bs1', as', e1')
-    | ExistsE _ -> ExistsE (bs @ bs1', as', e1')
+    | ForallE _ -> ForallE (unique_binds (bs @ bs1'), as', e1')
+    | ExistsE _ -> ExistsE (unique_binds (bs @ bs1'), as', e1')
     | _ -> assert false) $$ e.at % e.note, bs1'' @ bs2
   | TmplE {it = VarS _; _} ->
     error e.at "unexpected variable template expression"
@@ -729,14 +730,14 @@ let subst_inst substs inst : inst * bind list =
   | InstD (bs, as_, dt) -> 
     let as', bs1 = subst_args substs as_ in
     let dt', bs2 = subst_deftyp substs dt in
-    InstD (bs @ bs1 @ bs2, as', dt') $ inst.at, []
+    InstD (unique_binds (bs @ bs1 @ bs2), as', dt') $ inst.at, []
 
 let subst_rule substs rule : rule * bind list =
   match rule.it with
   | RuleD (id, bs, mixop, e, prems) ->
     let e', bs1 = subst_exp substs e in
     let prems', bs2 = subst_list subst_prem substs prems in
-    RuleD (id, bs @ bs1 @ bs2, mixop, e', prems') $ rule.at, []
+    RuleD (id, unique_binds (bs @ bs1 @ bs2), mixop, e', prems') $ rule.at, []
 
 let subst_clause substs clause : clause * bind list =
   match clause.it with
@@ -744,7 +745,7 @@ let subst_clause substs clause : clause * bind list =
     let as', bs1 = subst_args substs as_ in
     let e', bs2 = subst_exp substs e in 
     let prems', bs3 = subst_list subst_prem substs prems in
-    DefD (bs @ bs1 @ bs2 @ bs3, as', e', prems') $ clause.at, []
+    DefD (unique_binds (bs @ bs1 @ bs2) @ bs3, as', e', prems') $ clause.at, []
 
 let subst_def (substs : substs) d : def * bind list = 
   match d.it with
@@ -763,10 +764,10 @@ let subst_def (substs : substs) d : def * bind list =
     DecD (subst_id substs id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
   | ThmD (id, bs, e) ->
     let e', bs1 = subst_exp substs e in
-    ThmD (subst_id substs id, bs @ bs1, e') $ d.at, []
+    ThmD (subst_id substs id, unique_binds (bs @ bs1), e') $ d.at, []
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
-    LemD (subst_id substs id, bs @ bs1, e') $ d.at, []
+    LemD (subst_id substs id, unique_binds (bs @ bs1), e') $ d.at, []
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD hdef -> HintD hdef $ d.at, []
   (* TODO: (lemmagen) Templates cannot be recurisve *)
@@ -808,62 +809,96 @@ and simpl_typfield (atom, (bs, t, prems), hints) : typfield =
 and simpl_typcase (mixop, (bs, t, prems), hints) : typcase =
   (mixop, (bs, simpl_typ t, simpl_list simpl_prem prems), hints)
 
-and simpl_exp e : exp = 
+and simpl_exp e : exp =
+  (* hack by lazy eval *)
+  let rec fsub () = simpl_expsub fsub in
+  let rec fimpl () = simpl_expimpl fimpl in
+  let rec fall () = simpl_exp' fall in
+  e 
+  |> simpl_expsub fsub
+  |> simpl_expimpl fimpl
+  |> simpl_exp' fall
+
+and simpl_exp' f e : exp = 
+  let cont = f () in
   match e.it with
   | VarE _ -> e
   | BoolE _ | NatE _ | TextE _ -> e
   | UnE (op, e1) -> 
-    UnE (op, simpl_exp e1) $$ e.at % e.note
-  | BinE (op, e1, e2) -> 
-    BinE (op, simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+    UnE (op, cont e1) $$ e.at % e.note
+  | BinE (op, e1, e2) ->
+    BinE (op, cont e1, cont e2) $$ e.at % e.note
   | CmpE (op, e1, e2) -> 
-    CmpE (op, simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+    CmpE (op, cont e1, cont e2) $$ e.at % e.note
   | TupE es ->
-    TupE (simpl_list simpl_exp es) $$ e.at % e.note
+    TupE (simpl_list cont es) $$ e.at % e.note
   | ProjE (e1, i) -> 
-    ProjE (simpl_exp e1, i) $$ e.at % e.note
+    ProjE (cont e1, i) $$ e.at % e.note
   | CaseE (mixop, e1) -> 
-    CaseE (mixop, simpl_exp e1) $$ e.at % e.note
+    CaseE (mixop, cont e1) $$ e.at % e.note
   | UncaseE (e1, mixop) -> 
-    UncaseE (simpl_exp e1, mixop) $$ e.at % e.note
+    UncaseE (cont e1, mixop) $$ e.at % e.note
   | OptE None -> e
   | OptE (Some e1) -> 
-    OptE (Some (simpl_exp e1)) $$ e.at % e.note
+    OptE (Some (cont e1)) $$ e.at % e.note
   | TheE e1 -> 
-    TheE (simpl_exp e1) $$ e.at % e.note
+    TheE (cont e1) $$ e.at % e.note
   | StrE efs -> 
     StrE (simpl_list simpl_expfield efs) $$ e.at % e.note
   | DotE (e1, atom) ->
-    DotE (simpl_exp e1, atom) $$ e.at % e.note
+    DotE (cont e1, atom) $$ e.at % e.note
   | CompE (e1, e2) -> 
-    CompE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+    CompE (cont e1, cont e2) $$ e.at % e.note
   | ListE es -> 
-    ListE (simpl_list simpl_exp es) $$ e.at % e.note
+    ListE (simpl_list cont es) $$ e.at % e.note
   | LenE e1 ->
-    LenE (simpl_exp e1) $$ e.at % e.note
+    LenE (cont e1) $$ e.at % e.note
   | CatE (e1, e2) -> 
-    CatE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+    CatE (cont e1, cont e2) $$ e.at % e.note
   | IdxE (e1, e2) -> 
-    IdxE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+    IdxE (cont e1, cont e2) $$ e.at % e.note
   | SliceE (e1, e2, e3) ->
-    SliceE (simpl_exp e1, simpl_exp e2, simpl_exp e3) $$ e.at % e.note
+    SliceE (cont e1, cont e2, cont e3) $$ e.at % e.note
   | UpdE (e1, p1, e2) -> 
-    UpdE (simpl_exp e1, simpl_path p1, simpl_exp e2) $$ e.at % e.note
+    UpdE (cont e1, simpl_path p1, cont e2) $$ e.at % e.note
   | ExtE (e1, p1, e2) -> 
-    ExtE (simpl_exp e1, simpl_path p1, simpl_exp e2) $$ e.at % e.note
+    ExtE (cont e1, simpl_path p1, cont e2) $$ e.at % e.note
   | CallE (id, as_) -> 
     CallE (id, simpl_list simpl_arg as_) $$ e.at % e.note
   | IterE (e1, ie) -> 
-    IterE (simpl_exp e1, simpl_iterexp ie) $$ e.at % e.note
-  | SubE (e1, t1, t2) -> 
-    SubE (simpl_exp e1, simpl_typ t1, simpl_typ t2) $$ e.at % e.note
+    IterE (cont e1, simpl_iterexp ie) $$ e.at % e.note
+  | SubE (e1, t1, t2) ->
+    SubE (cont e1, simpl_typ t1, simpl_typ t2) $$ e.at % e.note
   | RuleE (id, mixop, e1) -> 
-    RuleE (id, mixop, simpl_exp e1) $$ e.at % e.note
+    RuleE (id, mixop, cont e1) $$ e.at % e.note
   | ForallE (bs, as_, e1) -> 
-    ForallE (bs, simpl_list simpl_arg as_, simpl_exp e1) $$ e.at % e.note
+    ForallE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
   | ExistsE (bs, as_, e1) -> 
-    ExistsE (bs, simpl_list simpl_arg as_, simpl_exp e1) $$ e.at % e.note
+    ExistsE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
   | TmplE _ -> assert false
+
+and simpl_expsub f e : exp = 
+  let cont = f () in
+  match e.it with
+  | SubE (e1, {it = BotT; _}, t2) ->
+    (* TODO: (lemmagen) These subsumptions were inserted as temporary solution
+                        to type templates expressions during elaboration *)
+    let e1' = cont e1 in
+    e1'.it $$ e1'.at % simpl_typ t2
+  | _ -> simpl_exp' f e
+
+and simpl_expimpl f e : exp =
+  let cont = f () in
+  match e.it with
+  | BinE (ImplOp, {it = BoolE true; _}, e2) -> 
+    (* TODO: (lemmagen) Simplifies redundant premises *)
+    cont e2
+  | BinE (ImplOp, {it = BinE (AndOp, e1, e1'); _}, e2) -> 
+    (* TODO: (lemmagen) Linearises conjunction of premises *)
+    (* TODO: (lemmagen) This assumes the rest of the conjunction is accumulated in e1' not e1 *)
+    let e2' = BinE (ImplOp, e1', e2) $$ e.at % e.note in
+    BinE (ImplOp, e1, cont e2') $$ e.at % e.note
+  | _ -> simpl_exp' f e
 
 and simpl_expfield (atom, e) : expfield = 
   (atom, simpl_exp e)
@@ -921,8 +956,6 @@ let simpl_clause clause : clause =
   | DefD (bs, as_, e, prems) ->
     DefD (bs, simpl_list simpl_arg as_, simpl_exp e, simpl_list simpl_prem prems) $ clause.at
 
-(* TODO: (lemmagen) Eliminates standalone true in implications *)
-(* TODO: (lemmagen) Linearises conjunction of premises in implications *)
 let rec simpl_def d = 
   match d.it with
   | TypD (id, ps, insts) -> 
