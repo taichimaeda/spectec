@@ -363,6 +363,28 @@ let rec slots_def d =
   | HintD _ -> []
   | TmplD _ -> assert false
 
+let unwrap_varslot s : slot = 
+  match s.it with
+  | VarS s1 -> s1
+  | _ -> s
+
+let rec fold_slot ids : slot = 
+  fold_slot' (List.rev ids)
+
+and fold_slot' ids : slot =
+  match ids with
+  | [id] -> TopS (id $ no_region) $ no_region
+  | "*"::ids' -> WildS (fold_slot' ids') $ no_region
+  | id::ids' -> DotS (fold_slot' ids', id $ no_region) $ no_region
+  | _ -> assert false
+
+and unfold_slot s acc : string list =
+  match s.it with
+  | TopS id -> id.it::acc
+  | DotS (s1, id) -> unfold_slot s1 (id.it::acc)
+  | WildS s1 -> unfold_slot s1 ("*"::acc)
+  | VarS _ -> assert false
+
 (* TODO: (lemmagen) Is this correct? *)
 let rec insert_trie ids s trie =
   match ids, trie with
@@ -381,30 +403,18 @@ let rec insert_trie ids s trie =
     NodeI cs'
 
 let make_trie ss =
-  let unwrap_var s = 
-    match s.it with
-    | VarS s1 -> s1
-    | _ -> s in
-
-  let rec flatten_slot s acc =
-    match s.it with
-    | TopS id -> id.it::acc
-    | DotS (s1, id) -> flatten_slot s1 (id.it::acc)
-    | WildS s1 -> flatten_slot s1 ("*"::acc)
-    | VarS _ -> assert false in
-
   List.fold_left (fun acc s -> 
-    let s' = unwrap_var s in
-    let ids = flatten_slot s' [] in
+    let s' = unwrap_varslot s in
+    let ids = unfold_slot s' [] in
     insert_trie ids s' acc) (LeafI None) ss
 
-type subst = slot * slotentry
+type subst = slot * slot * slotentry
 type substs = subst list
 
 type comb = substs list
 
-let string_of_subst (s, e) =
-  "(" ^ string_of_slot s ^ " -> " ^ string_of_slotentry e ^ ")"
+let string_of_subst (s, s', e) =
+  "(" ^ string_of_slot s ^ " -> " ^ string_of_slot s' ^ " : " ^ string_of_slotentry e ^ ")"
 
 let string_of_substs substs = 
   "{" ^ String.concat ",\n" (List.map string_of_subst substs) ^ "}"
@@ -413,12 +423,9 @@ let string_of_comb comb =
   String.concat "\n\n" (List.map string_of_substs comb)
 
 let rec make_comb tree trie = 
-  (* TODO: (lemmagen) Remove this line *)
-  (* let str1 = string_of_slottree tree in
-  let str2 = string_of_slottrie trie in
-  print_endline @@ "make_comb1: " ^ String.sub str1 0 (min (String.length str1) 100);
-  print_endline @@ "make_comb2: " ^ str2; *)
+  make_comb' tree trie []
 
+and make_comb' tree trie ids = 
   let sum acc comb : comb = 
     acc @ comb in
   let product acc comb : comb =
@@ -427,26 +434,34 @@ let rec make_comb tree trie =
     List.map (fun y -> x @ y) acc) comb
     |> List.flatten in
 
+  (* TODO: (lemmagen) Remove this line *)
+  (* let str1 = string_of_slottree tree in
+  let str2 = string_of_slottrie trie in
+  print_endline @@ "make_comb1: " ^ String.sub str1 0 (min (String.length str1) 100);
+  print_endline @@ "make_comb2: " ^ str2; *)
+
   (* TODO: (lemmagen) Is this correct? *)
   match tree, trie with 
-  | LeafT (Some e), LeafI (Some s) -> [[s, e]]
+  | LeafT (Some e), LeafI (Some s) -> 
+    let s' = fold_slot ids in
+    [[s, s', e]]
   | NodeT cs, NodeI ds ->
     Map.fold (fun dk dv (acc : comb) ->
       match dk with
       | "*" -> 
-        let comb = Map.fold (fun _ cv (acc' : comb) -> 
-          let comb' = make_comb cv dv in
+        let comb = Map.fold (fun ck cv (acc' : comb) -> 
+          let comb' = make_comb' cv dv (ids @ [ck]) in
           sum acc' comb') cs [] in
         product acc comb
       | _ ->
         let cv = Map.find dk cs in
-        let comb = make_comb cv dv in
+        let comb = make_comb' cv dv (ids @ [dk]) in
         product acc comb) ds []
   | LeafT _, NodeI _ -> error no_region "invalid env"
   | NodeT _, LeafI _ -> error no_region "invalid trie"
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
-let find_entry substs s : slotentry =
+let find_entry (substs : substs) s : slotentry =
   (* TODO: (lemmagen) Requires custom equality because of pos *)
   let rec eq_slot s1 s2 = 
     match s1.it, s2.it with
@@ -456,13 +471,33 @@ let find_entry substs s : slotentry =
     | VarS s1', VarS s2' -> eq_slot s1' s2'
     | _ -> false in
   
-  let subst = List.find (fun (s', _) -> eq_slot s s') substs in
-  let (_s', (bs, e)) = subst in
+  let subst = List.find (fun (s', _, _) -> eq_slot s s') substs in
+  let (_, _, (bs, e)) = subst in
   bs, e
 
 let subst_list f substs xs =
   let xs', bss = List.split (List.map (f substs) xs) in
   xs', List.flatten bss
+
+let subst_id substs id : id =
+  let rec wild_ids s1 s2 =
+    match s1.it, s2.it with
+    | TopS id1', TopS id2' -> 
+      assert (id1'.it = id2'.it);
+      []
+    | DotS (s1', id1'), DotS (s2', id2') -> 
+      assert (id1'.it = id2'.it);
+      wild_ids s1' s2'
+    | WildS s1', DotS (s2', id2') -> 
+      id2'.it :: wild_ids s1' s2'
+    | _, _ -> assert false in
+
+  let wids = substs
+    |> List.map (fun (s, s', _) -> wild_ids s s')
+    |> List.flatten in
+  let sids = List.sort_uniq String.compare wids in
+  let suffix = String.concat "" (List.map (fun id -> "_" ^ id) sids) in
+  {id with it = id.it ^ suffix}
 
 let rec subst_iter substs it : iter * bind list =
   match it with
@@ -470,7 +505,7 @@ let rec subst_iter substs it : iter * bind list =
   | ListN (e, id) -> 
     let e', bs1 = subst_exp substs e in
     ListN (e', id), bs1
-  
+
 and subst_typ substs t : typ * bind list =
   match t.it with
   | VarT (id, as_) -> 
@@ -662,24 +697,24 @@ and subst_prem substs prem : prem * bind list =
     let iter', bs2 = subst_iterexp substs iter in
     IterPr (prem1', iter') $ prem.at, bs1 @ bs2
 
-and subst_args substs as_ : arg list * bind list =
-  let aux substs a = 
-    match a.it with
-    | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
-      let bs, e = find_entry substs s in
-      (match e.it with 
-      | ListE es | TupE es -> 
-        List.map (fun e' -> ExpA e' $ a.at) es, bs
-      | _ -> 
-        error a.at "variable template expression on non-tuple or non-list expression")
-    | ExpA e -> 
-      let e', bs1 = subst_exp substs e in
-      [ExpA e' $ a.at], bs1
-    | TypA t ->
-      let t', bs1 = subst_typ substs t in
-      [TypA t' $ a.at], bs1 in
+and subst_arg substs a : arg list * bind list =
+  match a.it with
+  | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
+    let bs, e = find_entry substs s in
+    (match e.it with 
+    | ListE es | TupE es -> 
+      List.map (fun e' -> ExpA e' $ a.at) es, bs
+    | _ -> 
+      error a.at "variable template expression on non-tuple or non-list expression")
+  | ExpA e -> 
+    let e', bs1 = subst_exp substs e in
+    [ExpA e' $ a.at], bs1
+  | TypA t ->
+    let t', bs1 = subst_typ substs t in
+    [TypA t' $ a.at], bs1 
 
-  let ass, bs = subst_list aux substs as_ in
+and subst_args substs as_ : arg list * bind list =
+  let ass, bs = subst_list subst_arg substs as_ in
   List.flatten ass, bs
 
 and subst_param substs p : param * bind list = 
@@ -716,22 +751,22 @@ let subst_def (substs : substs) d : def * bind list =
   | TypD (id, ps, insts) -> 
     let ps', bs1 = subst_list subst_param [] ps in
     let insts', bs2 = subst_list subst_inst substs insts in
-    TypD (id, ps', insts') $ d.at, bs1 @ bs2
+    TypD (subst_id substs id, ps', insts') $ d.at, bs1 @ bs2
   | RelD (id, mixop, t, rules) -> 
     let t', bs1 = subst_typ [] t in
     let rules', bs2 = subst_list subst_rule substs rules in
-    RelD (id, mixop, t', rules') $ d.at, bs1 @ bs2
+    RelD (subst_id substs id, mixop, t', rules') $ d.at, bs1 @ bs2
   | DecD (id, ps, t, clauses) ->
     let ps', bs1 = subst_list subst_param [] ps in
     let t', bs2 = subst_typ [] t in
     let clauses', bs3 = subst_list subst_clause substs clauses in
-    DecD (id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
+    DecD (subst_id substs id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
   | ThmD (id, bs, e) ->
     let e', bs1 = subst_exp substs e in
-    ThmD (id, bs @ bs1, e') $ d.at, []
+    ThmD (subst_id substs id, bs @ bs1, e') $ d.at, []
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
-    LemD (id, bs @ bs1, e') $ d.at, []
+    LemD (subst_id substs id, bs @ bs1, e') $ d.at, []
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD hdef -> HintD hdef $ d.at, []
   (* TODO: (lemmagen) Templates cannot be recurisve *)
