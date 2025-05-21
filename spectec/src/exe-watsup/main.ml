@@ -175,9 +175,9 @@ let () =
     log "IL Validation...";
     Il.Valid.valid_with_template il;
 
-    (* TODO: (lemmagen) Insert template expansion pass *)
     (* TODO: (lemmagen) Remove this line *)
-    print_il il;
+    let il' = Middlend.Template.transform il in
+    print_il il';
     let () = failwith "success" in
 
     (match !target with

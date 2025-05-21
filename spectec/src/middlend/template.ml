@@ -27,70 +27,62 @@ let rec string_of_slottree tree =
   match tree with
   | LeafT None -> "leaf()"
   | LeafT Some (bs, e) -> "leaf(" ^ string_of_binds bs ^ string_of_exp e ^ ")"
-  | NodeT cs -> "node(" ^ 
-      Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottree v ^ " ") cs "" ^ ")"
+  | NodeT cs -> "node(" ^ String.concat ", " 
+      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ string_of_slottree v]) cs []) ^ ")"
 
 let rec string_of_slottrie trie =
   match trie with
   | LeafI s -> "leaf(" ^ Option.value ~default:"" (Option.map string_of_slot s) ^ ")"
-  | NodeI cs -> "node(" ^
-      Map.fold (fun k v acc -> acc ^ k ^ " -> " ^ string_of_slottrie v ^ " ") cs "" ^ ")"
+  | NodeI cs -> "node(" ^ String.concat ", " 
+      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ string_of_slottrie v]) cs []) ^ ")"
 
-type env = slottree
+type env =
+  { data : slottree ref; }
 
-let new_env () : env = LeafT None
+let new_env () : env = 
+  { data = ref (LeafT None); }
 
-let id_vars = "variables"
-let id_typs = "types"
-let id_rels = "relations"
-let id_defs = "definitions"
-let id_thms = "theorems"
-
-let top_ids = [
-  id_vars;
-  id_typs;
-  id_rels;
-  id_defs;
-  id_thms;
-]
-
-let rec find env ids =
-  assert (List.mem (List.hd ids) top_ids);
-  match ids, env with
+let rec find tree ids =
+  match ids, tree with
   | [], LeafT (Some entry) -> entry
   | [], LeafT None -> error no_region "empty slot"
   | [], NodeT _ -> error no_region "not enough slot ids"
   | _::_, LeafT _ -> error no_region "too many slot ids"
   | id'::ids', NodeT cs ->
-    (match Map.find_opt id' cs with
+    let k = if id' = "" then "_" else id' in
+    (match Map.find_opt k cs with
     | None -> error no_region "unexpected slot id"
     | Some env' -> find env' ids')
 
-let rec bound env ids = 
-  assert (List.mem (List.hd ids) top_ids);
-  match ids, env with
+let rec bound tree ids = 
+  match ids, tree with
   | [], LeafT (Some _) -> true
   | [], LeafT None -> false
   | [], NodeT _ -> false
   | _::_, LeafT _ -> false
   | id'::ids', NodeT cs ->
-    (match Map.find_opt id' cs with
+    let k = if id' = "" then "_" else id' in
+    (match Map.find_opt k cs with
       | None -> false
       | Some env' -> bound env' ids')
 
-let rec bind env ids entry =
-  assert (List.mem (List.hd ids) top_ids);
-  match ids, env with
-  | [], LeafT _ -> LeafT (Some entry) (* override *)
+let rec bind tree ids entry =
+  match ids, tree with
+  | [], LeafT _ -> LeafT (Some entry) (* overwrite *)
   | [], NodeT _ -> error no_region "not enough slot ids"
   | _::_, LeafT (Some _) -> error no_region "occupied slot"
   | id'::ids', LeafT None ->
+    let k = if id' = "" then "_" else id' in
     let c = bind (LeafT None) ids' entry in
-    let cs = Map.add id' c Map.empty in
+    let cs = Map.add k c Map.empty in
     NodeT cs
   | id'::ids', NodeT cs ->
-    let c = bind (LeafT None) ids' entry in
-    let cs' = Map.add id' c cs in
+    let k = if id' = "" then "_" else id' in
+    let c = 
+      match Map.find_opt k cs with
+      | Some tree' -> bind tree' ids' entry
+      | None -> bind (LeafT None) ids' entry in
+    let cs' = Map.add k c cs in
     NodeT cs'
 
 let entry_of_id id = 
@@ -107,12 +99,17 @@ let entry_of_exp bs e =
   bs', e
 
 let entry_of_exps bs es =
-  let bss', es' = List.split (List.map (entry_of_exp bs) es) in
-  let bs' = List.flatten bss' in
-  let ts' = List.map (fun e -> e, e.note) es' in
-  let at = (List.hd es).at in
-  bs', TupE es' $$ at % (TupT ts' $ at)
-  
+  match es with
+  | [] -> 
+    (* TODO: (lemmagen) This is a hack *)
+    [], BoolE true $$ no_region % (BoolT $ no_region)
+  | _::_ ->
+    let bss', es' = List.split (List.map (entry_of_exp bs) es) in
+    let bs' = List.flatten bss' in
+    let ts' = List.map (fun e -> e, e.note) es' in
+    let at = (List.hd es).at in
+    bs', TupE es' $$ at % (TupT ts' $ at)
+    
 let env_rule_prems env id1 id2 bs prems =
   let es = List.map (fun p ->
     (match p.it with
@@ -124,61 +121,62 @@ let env_rule_prems env id1 id2 bs prems =
     (* TODO: (lemmagen) Not yet supported *)
     | IterPr _ -> BoolE true)
     $$ p.at % (BoolT $ p.at)) prems in
-  env := bind !env [id_rels; id1.it; "rules"; id2.it; "premises"] (entry_of_exps bs es)
+  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (entry_of_exps bs es)
 
 let env_rule_instr_ok env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c; i; ft]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs i);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs i);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft);
+    print_endline @@ string_of_slottree !(env.data);
   | RuleD _ -> error r.at "unexpected form of rule Instr_ok"
 
 let env_rule_instrs_ok env id1 r = 
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c; is; ft]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs is);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs is);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
   | RuleD _ -> error r.at "unexpected form of rule Instrs_ok"
 
 let env_rule_admininstr_ok env id1 r = 
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [s; c; a; ft]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs a);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs a);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
   | RuleD _ -> error r.at "unexpected form of rule Admin_instr_ok"
 
 let env_rule_admininstrs_ok env id1 r = 
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [s; c; as_; ft]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs as_);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs as_);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
   | RuleD _ -> error r.at "unexpected form of rule Admin_instrs_ok"
 
 let env_rule_step env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c1; c2]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs c2)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs c2)
   | RuleD _ -> error r.at "unexpected form of rule Step"
 
 let env_rule_step_pure env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [as1; as2]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs as1);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs as1);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
   | RuleD _ -> error r.at "unexpected form of rule Step"
 
 let env_rule_step_read env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c1; as2]; _}, _) ->
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
-    env := bind !env [id_rels; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
   | RuleD _ -> error r.at "unexpected form of rule Step"
 
 let env_rule env id1 r =
@@ -201,22 +199,22 @@ let rec env_def env d =
   | RecD ds -> 
     List.iter (env_def env) ds
   | TypD (id, _, _) -> 
-    env := bind !env [id_typs; id.it; "name"] (entry_of_id id)
+    env.data := bind !(env.data) ["types"; id.it; "name"] (entry_of_id id)
   | RelD (id, _, _, rs) -> 
-    env := bind !env [id_rels; id.it; "name"] (entry_of_id id);
+    env.data := bind !(env.data) ["relations"; id.it; "name"] (entry_of_id id);
     List.iter (env_rule env id) rs
   | DecD (id, _, _, _) -> 
-    env := bind !env [id_defs; id.it; "name"] (entry_of_id id)
+    env.data := bind !(env.data) ["definitions"; id.it; "name"] (entry_of_id id)
   | ThmD (id, _bs, _e) | LemD (id, _bs, _e) -> 
     (* TODO: (lemmage) Need to take binds in quantifiers too *)
-    env := bind !env [id_thms; id.it; "name"] (entry_of_id id)
+    env.data := bind !(env.data) ["theorems"; id.it; "name"] (entry_of_id id)
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD _ -> ()
   | TmplD _ -> assert false
 
 let env ds : env =
   let env = new_env () in
-  List.iter (env_def (ref env)) ds;
+  List.iter (env_def env) ds;
   env
 
 let slots_list f xs = List.flatten (List.map f xs)
@@ -382,7 +380,7 @@ type substs = subst list
 
 type comb = substs list
 
-let rec make_comb env trie = 
+let rec make_comb tree trie = 
   let sum acc comb : comb = 
     acc @ comb in
   let product acc comb : comb = 
@@ -391,7 +389,7 @@ let rec make_comb env trie =
     |> List.flatten in
 
   (* TODO: (lemmagen) Is this correct? *)
-  match env, trie with 
+  match tree, trie with 
   | LeafT (Some e), LeafI (Some s) -> [[s, e]]
   | NodeT cs, NodeI ds ->
     Map.fold (fun dk dv (acc : comb) ->
@@ -699,6 +697,9 @@ let subst_def (substs : substs) d : def * bind list =
   | RecD _ -> assert false
   | TmplD _ -> assert false
 
+let simpl_def _d : def =
+  failwith "unimplemented (lemmagen)"
+
 let partition ds = 
   List.filter (fun d -> 
     match d.it with TmplD _ -> false | _ -> true) ds,
@@ -708,13 +709,19 @@ let partition ds =
 let transform ds =
   let ntds, tds = partition ds in
   let env = env ntds in
+
+  (* TODO: (lemmagen) Remove this line *)
+  print_endline @@ string_of_slottree !(env.data);
+  let () = failwith "success" in
+
   tds
   |> List.map (fun d ->
     let slots = slots_def d in
     let trie = make_trie slots in
-    let comb = make_comb env trie in
+    let comb = make_comb !(env.data) trie in
     comb 
     |> List.map (fun substs -> 
       let d', bs = subst_def substs d in
       assert (bs = []); d'))
   |> List.flatten
+  |> List.map simpl_def
