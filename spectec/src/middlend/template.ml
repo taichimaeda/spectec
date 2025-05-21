@@ -382,29 +382,31 @@ type substs = subst list
 
 type comb = substs list
 
-let rec make_comb (env : env) (trie : slottrie) : comb = 
+let rec make_comb env trie = 
+  let sum acc comb : comb = 
+    acc @ comb in
   let product acc comb : comb = 
-    List.flatten 
-      (List.map (fun x -> 
-       List.map (fun y -> x @ y) acc) comb) in
+    List.map (fun x -> 
+    List.map (fun y -> x @ y) acc) comb
+    |> List.flatten in
 
+   (* TODO: (lemmagen) Is this correct? *)
   match env, trie with 
-  | _, LeafI None -> error no_region "invalid trie"
-  | LeafT None, _ -> error no_region "invalid env"
   | LeafT (Some e), LeafI (Some s) -> [[s, e]]
-  | LeafT _, NodeI _ -> error no_region "invalid env"
-  | NodeT _, LeafI _ -> error no_region "invalid trie"
   | NodeT cs, NodeI ds ->
-    (* TODO: (lemmagen) Is this correct? *)
-    Map.fold (fun dk dv (acc : comb) -> (
-      if dk = "*" then
-        Map.fold (fun _ck cv (acc : comb) -> 
-          let comb = make_comb cv dv in
-          acc @ comb) cs []
-      else
+    Map.fold (fun dk dv (acc : comb) ->
+      match dk with
+      | "*" -> 
+        Map.fold (fun _ cv (acc : comb) -> 
+        let comb = make_comb cv dv in
+        sum acc comb) cs []
+      | _ ->
         let cv = Map.find dk cs in
         let comb = make_comb cv dv in
-        product acc comb)) ds []
+        product acc comb) ds []
+  | LeafT _, NodeI _ -> error no_region "invalid env"
+  | NodeT _, LeafI _ -> error no_region "invalid trie"
+  | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
 let find_entry substs s : slotentry =
   let (_s', (bs, e)) = List.find (fun (s', _entry) -> s' = s) substs in
