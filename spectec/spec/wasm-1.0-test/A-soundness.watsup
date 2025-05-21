@@ -387,7 +387,7 @@ lemma Step_pure__preserves =
   forall (s, C, ft)
   forall ({{ ...relations.Step_pure.rules.*.freevars }})
   @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.rules.*.before }} : ft) =>
-  @(Step_pure: {{ relations.Step_pure.*.before }} ~> {{ relations.Step_pure.rules.*.after }}) =>
+  @(Step_pure: {{ relations.Step_pure.rules.*.before }} ~> {{ relations.Step_pure.rules.*.after }}) =>
   {{ relations.Step_pure.rules.*.premises }} =>
   @(Admin_instrs_ok: s; C |- eps : ft)
 

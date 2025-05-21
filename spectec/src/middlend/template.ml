@@ -23,10 +23,15 @@ type slottrie =
   | LeafI of slot option
   | NodeI of slottrie Map.t
 
+let string_of_slotentry (bs, e) = 
+  [string_of_binds bs; string_of_exp e ]
+  |> List.filter (fun s -> s <> "")
+  |> String.concat " "
+
 let rec string_of_slottree tree = 
   match tree with
   | LeafT None -> "leaf()"
-  | LeafT Some (bs, e) -> "leaf(" ^ string_of_binds bs ^ string_of_exp e ^ ")"
+  | LeafT Some e -> "leaf(" ^ string_of_slotentry e ^ ")"
   | NodeT cs -> "node(" ^ String.concat ", " 
       (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ string_of_slottree v]) cs []) ^ ")"
 
@@ -44,7 +49,7 @@ let new_env () : env =
 
 let rec find tree ids =
   match ids, tree with
-  | [], LeafT (Some entry) -> entry
+  | [], LeafT (Some e) -> e
   | [], LeafT None -> error no_region "empty slot"
   | [], NodeT _ -> error no_region "not enough slot ids"
   | _::_, LeafT _ -> error no_region "too many slot ids"
@@ -54,49 +59,48 @@ let rec find tree ids =
     | None -> error no_region "unexpected slot id"
     | Some env' -> find env' ids')
 
-let rec bound tree ids = 
+let rec bind tree ids e =
   match ids, tree with
-  | [], LeafT (Some _) -> true
-  | [], LeafT None -> false
-  | [], NodeT _ -> false
-  | _::_, LeafT _ -> false
-  | id'::ids', NodeT cs ->
-    let k = if id' = "" then "_" else id' in
-    (match Map.find_opt k cs with
-      | None -> false
-      | Some env' -> bound env' ids')
-
-let rec bind tree ids entry =
-  match ids, tree with
-  | [], LeafT _ -> LeafT (Some entry) (* overwrite *)
+  | [], LeafT _ -> LeafT (Some e) (* overwrite *)
   | [], NodeT _ -> error no_region "not enough slot ids"
   | _::_, LeafT (Some _) -> error no_region "occupied slot"
   | id::ids', LeafT None ->
     let k = if id = "" then "_" else id in
-    let c = bind (LeafT None) ids' entry in
+    let c = bind (LeafT None) ids' e in
     let cs = Map.add k c Map.empty in
     NodeT cs
   | id::ids', NodeT cs ->
     let k = if id = "" then "_" else id in
     let c = 
       match Map.find_opt k cs with
-      | None -> bind (LeafT None) ids' entry
-      | Some tree' -> bind tree' ids' entry in
+      | None -> bind (LeafT None) ids' e
+      | Some tree' -> bind tree' ids' e in
     let cs' = Map.add k c cs in
     NodeT cs'
+
+let binds_of_exp bs e = 
+  let open Il.Free in
+  let open Il.Free.Set in
+  let fs = free_exp e in
+  List.filter (fun b ->
+    match b.it with 
+    | ExpB (id, _, _) -> mem id.it fs.varid
+    | TypB id -> mem id.it fs.typid) bs
+
+let binds_of_args bs as_ = 
+  let open Il.Free in
+  let open Il.Free.Set in
+  let fs = free_list free_arg as_ in
+  List.filter (fun b ->
+    match b.it with 
+    | ExpB (id, _, _) -> mem id.it fs.varid
+    | TypB id -> mem id.it fs.typid) bs
 
 let entry_of_id id = 
   [], (TextE id.it) $$ id.at % (TextT $ id.at)
 
 let entry_of_exp bs e = 
-  let open Il.Free in
-  let open Il.Free.Set in
-  let fs = free_exp e in
-  let bs' = List.filter (fun b ->
-    match b.it with 
-    | ExpB (id, _, _) -> mem id.it fs.varid
-    | TypB id -> mem id.it fs.typid) bs in
-  bs', e
+  binds_of_exp bs e, e
 
 let entry_of_exps bs es =
   match es with
@@ -107,9 +111,28 @@ let entry_of_exps bs es =
     let bss', es' = List.split (List.map (entry_of_exp bs) es) in
     let bs' = List.flatten bss' in
     let ts' = List.map (fun e -> e, e.note) es' in
-    let at = (List.hd es).at in
+    let at = match es with 
+      | [] -> no_region
+      | e::_ -> e.at in
     bs', TupE es' $$ at % (TupT ts' $ at)
     
+let entry_of_freevars bs e =
+  let rec fold_iters t its = 
+    match its with
+    | [] -> t
+    | it::its' -> IterT (fold_iters t its', it) $ t.at in
+    
+  let bs' = binds_of_exp bs e in
+  let es = List.filter_map (fun b -> match b.it with
+    | ExpB (id, t, iter) -> 
+      Some (VarE id $$ b.at % (fold_iters t iter))
+    | TypB _ -> None) bs' in
+  let ts = List.map (fun e -> e, e.note) es in
+  let at = match es with 
+    | [] -> no_region
+    | e::_ -> e.at in
+  bs', TupE es $$ at % (TupT ts $ at) 
+
 let env_rule_prems env id1 id2 bs prems =
   let es = List.map (fun p ->
     (match p.it with
@@ -180,7 +203,8 @@ let env_rule_step_read env id1 r =
 
 let env_rule env id1 r =
   match r.it with
-  | RuleD (id2, bs, _, _, prems) ->
+  | RuleD (id2, bs, _, e, prems) ->
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "freevars"] (entry_of_freevars bs e);
     env_rule_prems env id1 id2 bs prems;
   
   match id1.it with
@@ -199,7 +223,7 @@ let rec env_def env d =
     List.iter (env_def env) ds
   | TypD (id, _, _) -> 
     env.data := bind !(env.data) ["types"; id.it; "name"] (entry_of_id id)
-  | RelD (id, _, _, rs) -> 
+  | RelD (id, _, _, rs) ->
     env.data := bind !(env.data) ["relations"; id.it; "name"] (entry_of_id id);
     List.iter (env_rule env id) rs
   | DecD (id, _, _, _) ->
@@ -356,27 +380,49 @@ let rec insert_trie ids s trie =
     let cs' = Map.add id c cs in
     NodeI cs'
 
-let make_trie ss = 
-  let rec linearize s acc =
+let make_trie ss =
+  let unwrap_var s = 
+    match s.it with
+    | VarS s1 -> s1
+    | _ -> s in
+
+  let rec flatten_slot s acc =
     match s.it with
     | TopS id -> id.it::acc
-    | DotS (s1, id) -> linearize s1 (id.it::acc)
-    | WildS s1 -> linearize s1 ("*"::acc)
-    | VarS s1 -> linearize s1 acc in
+    | DotS (s1, id) -> flatten_slot s1 (id.it::acc)
+    | WildS s1 -> flatten_slot s1 ("*"::acc)
+    | VarS _ -> assert false in
 
   List.fold_left (fun acc s -> 
-    let ids = linearize s [] in
-    insert_trie ids s acc) (LeafI None) ss
+    let s' = unwrap_var s in
+    let ids = flatten_slot s' [] in
+    insert_trie ids s' acc) (LeafI None) ss
 
 type subst = slot * slotentry
 type substs = subst list
 
 type comb = substs list
 
+let string_of_subst (s, e) =
+  "(" ^ string_of_slot s ^ " -> " ^ string_of_slotentry e ^ ")"
+
+let string_of_substs substs = 
+  "{" ^ String.concat ",\n" (List.map string_of_subst substs) ^ "}"
+
+let string_of_comb comb = 
+  String.concat "\n\n" (List.map string_of_substs comb)
+
 let rec make_comb tree trie = 
+  (* TODO: (lemmagen) Remove this line *)
+  (* let str1 = string_of_slottree tree in
+  let str2 = string_of_slottrie trie in
+  print_endline @@ "make_comb1: " ^ String.sub str1 0 (min (String.length str1) 100);
+  print_endline @@ "make_comb2: " ^ str2; *)
+
   let sum acc comb : comb = 
     acc @ comb in
-  let product acc comb : comb = 
+  let product acc comb : comb =
+    if acc = [] then comb else
     List.map (fun x -> 
     List.map (fun y -> x @ y) acc) comb
     |> List.flatten in
@@ -401,7 +447,16 @@ let rec make_comb tree trie =
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
 let find_entry substs s : slotentry =
-  let subst = List.find (fun (s', _entry) -> s' = s) substs in
+  (* TODO: (lemmagen) Requires custom equality because of pos *)
+  let rec eq_slot s1 s2 = 
+    match s1.it, s2.it with
+    | TopS id1, TopS id2 -> id1.it = id2.it
+    | DotS (s1', id1), DotS (s2', id2) -> id1.it = id2.it && eq_slot s1' s2'
+    | WildS s1', WildS s2' -> eq_slot s1' s2'
+    | VarS s1', VarS s2' -> eq_slot s1' s2'
+    | _ -> false in
+  
+  let subst = List.find (fun (s', _) -> eq_slot s s') substs in
   let (_s', (bs, e)) = subst in
   bs, e
 
@@ -549,14 +604,7 @@ and subst_exp substs e : exp * bind list =
   | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> 
     let as', bs1 = subst_args substs as_ in
     let e1', bs2 = subst_exp substs e1 in
-    (* TODO: (lemmagen) Handle binds properly *)
-    let open Il.Free in
-    let open Il.Free.Set in
-    let fs = free_list free_arg as' in
-    let bs1' = List.filter (fun b ->
-      match b.it with 
-      | ExpB (id, _, _) -> mem id.it fs.varid
-      | TypB id -> mem id.it fs.typid) bs1 in
+    let bs1' = binds_of_args bs1 as' in
     let bs1'' = List.filter (fun b -> not (List.mem b bs1')) bs1 in
     (match e.it with
     | ForallE _ -> ForallE (bs @ bs1', as', e1')
@@ -615,7 +663,7 @@ and subst_prem substs prem : prem * bind list =
     IterPr (prem1', iter') $ prem.at, bs1 @ bs2
 
 and subst_args substs as_ : arg list * bind list =
-  let subst_arg substs a : arg list * bind list = 
+  let aux substs a = 
     match a.it with
     | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
       let bs, e = find_entry substs s in
@@ -631,7 +679,7 @@ and subst_args substs as_ : arg list * bind list =
       let t', bs1 = subst_typ substs t in
       [TypA t' $ a.at], bs1 in
 
-  let ass, bs = subst_list subst_arg substs as_ in
+  let ass, bs = subst_list aux substs as_ in
   List.flatten ass, bs
 
 and subst_param substs p : param * bind list = 
@@ -706,12 +754,19 @@ let transform ds =
   let env = env ntds in
 
   (* TODO: (lemmagen) Remove this line *)
-  (* print_endline @@ string_of_slottree !(env.data); *)
-  let slots = slots_def (List.hd tds) in
-  let trie = make_trie slots in
+  (* let td = List.hd tds in
+  let slots = slots_def td in
   print_endline @@ "slots: " ^ String.concat ", " (List.map string_of_slot slots);
+  let trie = make_trie slots in
   print_endline @@ "trie: " ^ string_of_slottrie trie;
-  let () = failwith "success" in
+  let comb = make_comb !(env.data) trie in
+  print_endline @@ "comb: " ^ string_of_comb comb;
+  let tds' = comb 
+    |> List.map (fun substs -> 
+      let d', bs = subst_def substs td in
+      assert (bs = []); d') in
+  print_endline @@ String.concat "\n" (List.map string_of_def tds');
+  let () = failwith "success" in *)
 
   tds
   |> List.map (fun d ->
