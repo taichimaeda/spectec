@@ -176,10 +176,10 @@ let () =
     Il.Valid.valid_with_template il;
 
     (* TODO: (lemmagen) Remove this line *)
-    let il' = Middlend.Template.transform il in
-    print_il il';
-    Il.Valid.valid_without_template il';
-    let () = failwith "success" in
+    let il = Middlend.Template.transform il in
+    Il.Valid.valid_without_template il;
+    (* print_il il; *)
+    (* let () = failwith "success" in *)
 
     (match !target with
     | Prose | Splice _ | Interpreter _ ->

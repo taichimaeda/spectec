@@ -396,7 +396,7 @@ lemma Step_read__preserves =
   forall (s, f, C, C', z, ft, valtype*, lab*, ret?)  
   forall ({{ ...relations.Step_read.rules.*.freevars }})
   C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
-  @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.before }} : ft) =>
+  @(Admin_instrs_ok: s; C' |- {{ ...relations.Step_read.rules.*.before }} : ft) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   z = s; f =>
   {{ relations.Step_read.rules.*.premises }} =>

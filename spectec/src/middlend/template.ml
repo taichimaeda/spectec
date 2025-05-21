@@ -142,77 +142,44 @@ let deps_binds all bs =
     match b.it with 
     | ExpB (id, _, _) -> Set.mem id.it fs.varid
     | TypB id -> Set.mem id.it fs.typid) all in
-  uniq_binds (bs' @ bs) (* bs' before bs *)
+  (* bs' must be before bs *)
+  uniq_binds (bs' @ bs)
 
-let binds_of_frees bs fs = 
+let binds_of_vars all fs = 
   let open Il.Free in
   let bs' = List.filter (fun b ->
     match b.it with 
     | ExpB (id, _, _) -> Set.mem id.it fs.varid
-    | TypB id -> Set.mem id.it fs.typid) bs in
-  fixpoint eq_binds (deps_binds bs) bs'
+    | TypB id -> Set.mem id.it fs.typid) all in
+  fixpoint eq_binds (deps_binds all) bs'
 
-let binds_of_exp bs e = 
+let binds_of_exp all e = 
   let open Il.Free in
   let fs = free_exp e in
-  binds_of_frees bs fs
+  binds_of_vars all fs
 
-let binds_of_args bs as_ = 
+let binds_of_exps all es = 
+  let open Il.Free in
+  let fs = free_list free_exp es in
+  binds_of_vars all fs
+
+let binds_of_args all as_ = 
   let open Il.Free in
   let fs = free_list free_arg as_ in
-  binds_of_frees bs fs
+  binds_of_vars all fs
+
+let binds_of_rule all e prems = 
+  let open Il.Free in
+  let fs1 = free_exp e in
+  let fs2 = free_list free_prem prems in
+  let fs = union fs1 fs2 in
+  binds_of_vars all fs
 
 let entry_of_id id = 
   [], (TextE id.it) $$ id.at % (TextT $ id.at)
 
-let entry_of_exp bs e = 
-  binds_of_exp bs e, e
-    
-let entry_of_freevars bs e =
-  let rec fold_iter id t its = 
-    fold_iter' id t (List.rev its)
-    
-  and fold_iter' id t its =
-    match its with
-    | [] -> 
-      VarE id $$ id.at % t, t
-    | it::its' ->
-      (* TODO: (lemmagen) Is this correct? *)
-      let ie = it, [(id, t)] in
-      let e1, t1 = fold_iter' id t its' in
-      let t1' = IterT (t1, it) $ t1.at in
-      let e1' = IterE (e1, ie) $$ e1.at % t1' in
-      e1', t1' in
-
-  let bs' = binds_of_exp bs e in
-  let es = List.filter_map (fun b -> match b.it with
-    | ExpB (id, t, iter) -> 
-      let e', _ = fold_iter id t iter in Some e'
-    | TypB _ -> None) bs' in
-  let ts = List.map (fun e -> e, e.note) es in
-  let at = match es with 
-    | [] -> no_region
-    | e::_ -> e.at in
-  bs', TupE es $$ at % (TupT ts $ at) 
-
-let env_rule_prems env id1 id2 bs prems =
-  let es = List.map (fun p ->
-    (match p.it with
-    | RulePr (id, mixop, e) -> RuleE (id, mixop, e)
-    | IfPr e -> e.it
-    | LetPr (e1, e2, _) -> CmpE (EqOp, e1, e2)
-    (* TODO: (lemmagen) Not yet supported *)
-    | ElsePr -> BoolE true
-    (* TODO: (lemmagen) Not yet supported *)
-    | IterPr _ -> BoolE true)
-    $$ p.at % (BoolT $ p.at)) prems in
-
-  let ande = match es with 
-    | [] -> 
-      BoolE true $$ no_region % (BoolT $ no_region)
-    | e::es' -> List.fold_left (fun acc e -> 
-      BinE (AndOp, e, acc) $$ e.at % (BoolT $ e.at)) e es' in
-  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (entry_of_exp bs ande)
+let entry_of_exp all e = 
+  binds_of_exp all e, e
 
 let env_rule_instr_ok env id1 r =
   match r.it with
@@ -265,11 +232,61 @@ let env_rule_step_read env id1 r =
     | _ -> error r.at "unexpected form of rule Step_read")
   | RuleD _ -> error r.at "unexpected form of rule Step_read"
 
+(* TODO: (lemmage) Handle binds in quantifiers when necessary in the future *)
+let env_rule_prems env id1 id2 bs prems =
+  let es = List.map (fun p ->
+    (match p.it with
+    | RulePr (id, mixop, e) -> RuleE (id, mixop, e)
+    | IfPr e -> e.it
+    | LetPr (e1, e2, _) -> CmpE (EqOp, e1, e2)
+    (* TODO: (lemmagen) Not yet supported *)
+    | ElsePr -> BoolE true
+    (* TODO: (lemmagen) Not yet supported *)
+    | IterPr _ -> BoolE true)
+    $$ p.at % (BoolT $ p.at)) prems in
+
+  let ande = match es with 
+    | [] -> 
+      BoolE true $$ no_region % (BoolT $ no_region)
+    | e::es' -> List.fold_left (fun acc e -> 
+      BinE (AndOp, e, acc) $$ e.at % (BoolT $ e.at)) e es' in
+  let bs' = binds_of_exp bs ande in
+  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', ande)
+
+(* TODO: (lemmage) Handle binds in quantifiers when necessary in the future *)
+let env_rule_freevars env id1 id2 bs e prems =
+  let rec fold_iter id t its = 
+    fold_iter' id t (List.rev its)
+    
+  and fold_iter' id t its =
+    match its with
+    | [] -> 
+      VarE id $$ id.at % t, t
+    | it::its' ->
+      (* TODO: (lemmagen) Is this correct? *)
+      let ie = it, [(id, t)] in
+      let e1, t1 = fold_iter' id t its' in
+      let t1' = IterT (t1, it) $ t1.at in
+      let e1' = IterE (e1, ie) $$ e1.at % t1' in
+      e1', t1' in
+
+  let bs' = binds_of_rule bs e prems in
+  let es = List.filter_map (fun b -> match b.it with
+    | ExpB (id, t, iter) -> 
+      let e', _ = fold_iter id t iter in Some e'
+    | TypB _ -> None) bs' in
+  let ts = List.map (fun e -> e, e.note) es in
+  let at = match es with 
+    | [] -> no_region
+    | e::_ -> e.at in
+  let e' = TupE es $$ at % (TupT ts $ at) in
+  env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "freevars"] (bs', e')
+
 let env_rule env id1 r =
   match r.it with
   | RuleD (id2, bs, _, e, prems) ->
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "freevars"] (entry_of_freevars bs e);
     env_rule_prems env id1 id2 bs prems;
+    env_rule_freevars env id1 id2 bs e prems;
   
   match id1.it with
   | "Instr_ok" -> env_rule_instr_ok env id1 r
@@ -290,13 +307,10 @@ let rec env_def env d =
     env.data := bind !(env.data) ["relations"; id.it; "name"] (entry_of_id id);
     List.iter (env_rule env id) rs
   | DecD (id, _, _, _) ->
-    (* TODO: (lemmagen) Handle definitions with proof hints as theorems  *)
     env.data := bind !(env.data) ["definitions"; id.it; "name"] (entry_of_id id)
-  | ThmD (id, _bs, _e) | LemD (id, _bs, _e) -> 
-    (* TODO: (lemmage) Need to take binds in quantifiers into account
-                       when collecting any subexpressions within theorems in the future *)
-    env.data := bind !(env.data) ["theorems"; id.it; "name"] (entry_of_id id)
-  (* TODO: (lemmagen) Hints are currently ignored *)
+  (* TODO: (lemmagen) Theorems are currently not collected *)
+  | ThmD _ | LemD _ -> ()
+  (* TODO: (lemmagen) Hints are currently not collected *)
   | HintD _ -> ()
   | TmplD _ -> assert false
 
@@ -831,7 +845,7 @@ let subst_def (substs : substs) d : def * bind list =
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
     LemD (subst_id substs id, uniq_binds (bs @ bs1), e') $ d.at, []
-  (* TODO: (lemmagen) Hints are currently ignored *)
+  (* TODO: (lemmagen) Hints are currently not substituted *)
   | HintD hdef -> HintD hdef $ d.at, []
   (* TODO: (lemmagen) Templates cannot be recurisve *)
   | RecD _ -> assert false
@@ -876,9 +890,11 @@ and simpl_exp e : exp =
   (* hack by lazy eval *)
   let rec fsub () = simpl_expsub fsub in
   let rec fimpl () = simpl_expimpl fimpl in
+  let rec fquant () = simpl_expquant fquant in
   e 
   |> simpl_expsub fsub
   |> simpl_expimpl fimpl
+  |> simpl_expquant fquant
 
 and simpl_exp' f e : exp = 
   let cont = f () in
@@ -961,6 +977,18 @@ and simpl_expimpl f e : exp =
     BinE (ImplOp, e1, cont e2') $$ e.at % e.note
   | _ -> simpl_exp' f e
 
+and simpl_expquant f e : exp = 
+  let cont = f () in
+  match e.it with
+  | ForallE (bs, as_, e1) ->
+    (* TODO: (lemmagen) Removes redundant quantifiers *)
+    if List.length as_ = 0 then e1 else
+    ForallE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
+  | ExistsE (bs, as_, e1) -> 
+    if List.length as_ = 0 then e1 else
+    ExistsE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
+  | _ -> simpl_exp' f e
+
 and simpl_expfield (atom, e) : expfield = 
   (atom, simpl_exp e)
 
@@ -1031,7 +1059,7 @@ let rec simpl_def d =
     ThmD (id, bs, simpl_exp e) $ d.at
   | LemD (id, bs, e) -> 
     LemD (id, bs, simpl_exp e) $ d.at
-  (* TODO: (lemmagen) Hints are currently ignored *)
+  (* TODO: (lemmagen) Hints are currently not simplified *)
   | HintD _ -> d
   | TmplD _ -> assert false
 

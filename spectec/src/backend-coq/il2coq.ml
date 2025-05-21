@@ -750,9 +750,9 @@ let rec transform_def (d : def) : coq_def =
       )
     | RecD defs -> MutualRecD (List.map transform_def defs)
     | ThmD (id, bs, e1) -> 
-      TheoremD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+      TheoremD (transform_id id, List.map transform_relation_bind bs, transform_formula_exp e1)
     | LemD (id, bs, e1) -> 
-      LemmaD (transform_id id, List.map transform_bind bs, transform_formula_exp e1)
+      LemmaD (transform_id id, List.map transform_relation_bind bs, transform_formula_exp e1)
     | TmplD _ ->
       error d.at "unexpected template definition"
     | HintD _ -> UnsupportedD "") $ d.at
