@@ -21,23 +21,23 @@ type slottrie =
   | LeafI of slot option      (* data at terminals only *)
   | NodeI of slottrie Map.t
 
-let string_of_slotentry (bs, e) = 
+let _string_of_slotentry (bs, e) = 
   [string_of_binds bs; string_of_exp e ]
   |> List.filter (fun s -> s <> "")
   |> String.concat " "
 
-let rec string_of_slottree tree = 
+let rec _string_of_slottree tree = 
   match tree with
   | LeafT None -> "leaf()"
-  | LeafT Some e -> "leaf(" ^ string_of_slotentry e ^ ")"
+  | LeafT Some e -> "leaf(" ^ _string_of_slotentry e ^ ")"
   | NodeT cs -> "node(" ^ String.concat ", " 
-      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ string_of_slottree v]) cs []) ^ ")"
+      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ _string_of_slottree v]) cs []) ^ ")"
 
-let rec string_of_slottrie trie =
+let rec _string_of_slottrie trie =
   match trie with
   | LeafI s -> "leaf(" ^ Option.value ~default:"" (Option.map string_of_slot s) ^ ")"
   | NodeI cs -> "node(" ^ String.concat ", " 
-      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ string_of_slottrie v]) cs []) ^ ")"
+      (Map.fold (fun k v acc -> acc @ [k ^ " -> " ^ _string_of_slottrie v]) cs []) ^ ")"
 
 type env =
   { data : slottree ref; }
@@ -45,7 +45,7 @@ type env =
 let new_env () : env = 
   { data = ref (LeafT None); }
 
-let rec find tree ids =
+let rec _find tree ids =
   match ids, tree with
   | [], LeafT (Some e) -> e
   | [], LeafT None -> error no_region "empty slot"
@@ -55,7 +55,7 @@ let rec find tree ids =
     let k = if id' = "" then "_" else id' in
     (match Map.find_opt k cs with
     | None -> error no_region "unexpected slot id"
-    | Some env' -> find env' ids')
+    | Some env' -> _find env' ids')
 
 let rec bind tree ids e =
   match ids, tree with
@@ -158,7 +158,7 @@ let binds_of_exp all e =
   let fs = free_exp e in
   binds_of_vars all fs
 
-let binds_of_exps all es = 
+let _binds_of_exps all es = 
   let open Il.Free in
   let fs = free_list free_exp es in
   binds_of_vars all fs
@@ -290,7 +290,7 @@ let env_rule env id1 r =
   
   match id1.it with
   | "Instr_ok" -> env_rule_instr_ok env id1 r
-  | "Instrs_ok" -> env_rule_instr_ok env id1 r
+  | "Instrs_ok" -> env_rule_instrs_ok env id1 r
   | "Admin_instr_ok" -> env_rule_admininstr_ok env id1 r
   | "Admin_instrs_ok" -> env_rule_admininstrs_ok env id1 r
   | "Step_pure" -> env_rule_step_pure env id1 r
@@ -492,14 +492,14 @@ type subst =
 type substs = subst list
 type comb = substs list
 
-let string_of_subst (s, s', e) =
-  "(" ^ string_of_slot s ^ " -> " ^ string_of_slot s' ^ " : " ^ string_of_slotentry e ^ ")"
+let _string_of_subst (s, s', e) =
+  "(" ^ string_of_slot s ^ " -> " ^ string_of_slot s' ^ " : " ^ _string_of_slotentry e ^ ")"
 
-let string_of_substs substs = 
-  "{" ^ String.concat ",\n" (List.map string_of_subst substs) ^ "}"
+let _string_of_substs substs = 
+  "{" ^ String.concat ",\n" (List.map _string_of_subst substs) ^ "}"
 
-let string_of_comb comb = 
-  String.concat "\n\n" (List.map string_of_substs comb)
+let _string_of_comb comb = 
+  String.concat "\n\n" (List.map _string_of_substs comb)
 
 let rec make_comb tree trie = 
   make_comb' tree trie []
