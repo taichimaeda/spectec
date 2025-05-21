@@ -11,6 +11,7 @@ type sets =
     tmplid : Set.t;
   }
 
+val empty : sets
 val subset : sets -> sets -> bool
 val disjoint : sets -> sets -> bool
 

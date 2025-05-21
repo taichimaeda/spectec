@@ -76,23 +76,86 @@ let rec bind tree ids e =
     let cs' = Map.add k c cs in
     NodeT cs'
 
+let rec fixpoint eq f x = 
+  fixpoint' 0 eq f x
+
+and fixpoint' c eq f x = 
+  if c > 10000 then 
+    error no_region "maximum recursion depth reached for fixpoint";
+  let y = f x in
+  if eq x y then y else fixpoint' (c + 1) eq f y
+
+(* TODO: (lemmagen) Requires custom equality because of pos *)
+let rec eq_slot s1 s2 = 
+  match s1.it, s2.it with
+  | TopS id1, TopS id2 -> id1.it = id2.it
+  | DotS (s1', id1), DotS (s2', id2) -> id1.it = id2.it && eq_slot s1' s2'
+  | WildS s1', WildS s2' -> eq_slot s1' s2'
+  | VarS s1', VarS s2' -> eq_slot s1' s2'
+  | _ -> false
+
+(* TODO: (lemmagen) Requires custom equality because of pos *)
+let eq_bind b1 b2 = 
+  match b1.it, b2.it with
+  | ExpB (id1, _, _), ExpB (id2, _, _) -> id1.it = id2.it
+  | TypB id1, TypB id2 -> id1.it = id2.it
+  | _, _ -> false
+
+(* TODO: (lemmagen) Requires custom equality because of pos *)
+let eq_binds bs1 bs2 = 
+  List.for_all2 (fun b1 b2 -> eq_bind b1 b2) bs1 bs2
+
+let cmp_binds b1 b2 = 
+  match b1.it, b2.it with
+  | ExpB (id1, _, _), ExpB (id2, _, _) -> String.compare id1.it id2.it
+  | TypB id1, TypB id2 -> String.compare id1.it id2.it
+  | ExpB _, TypB _ -> -1
+  | TypB _, ExpB _ -> 1
+
+let mem_binds b bs = 
+  List.exists (eq_bind b) bs
+
+let diff_binds bs1 bs2 =
+  List.filter (fun b1 -> not (mem_binds b1 bs2)) bs1
+
+let uniq_binds bs = 
+  List.fold_left (fun acc b ->
+    if mem_binds b acc then acc else b::acc) [] bs
+
+let deps_binds all bs =
+  let open Il.Free in
+  let fss = List.map (fun b -> 
+      match b.it with
+      | ExpB (_, t, iter) ->
+        let fs1 = free_typ t in
+        let fss2 = List.map free_iter iter in
+        let fs2 = List.fold_left union empty fss2 in
+        union fs1 fs2
+      | TypB _ -> empty) bs in
+  let fs = List.fold_left union empty fss in
+  let bs' = List.filter (fun b ->
+    match b.it with 
+    | ExpB (id, _, _) -> Set.mem id.it fs.varid
+    | TypB id -> Set.mem id.it fs.typid) all in
+  List.sort cmp_binds (uniq_binds (bs @ bs'))
+
+let binds_of_frees bs fs = 
+  let open Il.Free in
+  let bs' = List.filter (fun b ->
+    match b.it with 
+    | ExpB (id, _, _) -> Set.mem id.it fs.varid
+    | TypB id -> Set.mem id.it fs.typid) bs in
+  fixpoint eq_binds (deps_binds bs) bs'
+
 let binds_of_exp bs e = 
   let open Il.Free in
-  let open Il.Free.Set in
   let fs = free_exp e in
-  List.filter (fun b ->
-    match b.it with 
-    | ExpB (id, _, _) -> mem id.it fs.varid
-    | TypB id -> mem id.it fs.typid) bs
+  binds_of_frees bs fs
 
 let binds_of_args bs as_ = 
   let open Il.Free in
-  let open Il.Free.Set in
   let fs = free_list free_arg as_ in
-  List.filter (fun b ->
-    match b.it with 
-    | ExpB (id, _, _) -> mem id.it fs.varid
-    | TypB id -> mem id.it fs.typid) bs
+  binds_of_frees bs fs
 
 let entry_of_id id = 
   [], (TextE id.it) $$ id.at % (TextT $ id.at)
@@ -101,15 +164,18 @@ let entry_of_exp bs e =
   binds_of_exp bs e, e
     
 let entry_of_freevars bs e =
-  let rec fold_iters t its = 
+  let rec fold_iter t its = 
+    fold_iter' t (List.rev its)
+
+  and fold_iter' t its = 
     match its with
     | [] -> t
-    | it::its' -> IterT (fold_iters t its', it) $ t.at in
+    | it::its' -> IterT (fold_iter t its', it) $ t.at in
     
   let bs' = binds_of_exp bs e in
   let es = List.filter_map (fun b -> match b.it with
     | ExpB (id, t, iter) -> 
-      Some (VarE id $$ b.at % (fold_iters t iter))
+      Some (VarE id $$ b.at % (fold_iter t iter))
     | TypB _ -> None) bs' in
   let ts = List.map (fun e -> e, e.note) es in
   let at = match es with 
@@ -454,28 +520,10 @@ and make_comb' tree trie ids =
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
 let find_entry (substs : substs) s : slotentry =
-  (* TODO: (lemmagen) Requires custom equality because of pos *)
-  let rec eq_slot s1 s2 = 
-    match s1.it, s2.it with
-    | TopS id1, TopS id2 -> id1.it = id2.it
-    | DotS (s1', id1), DotS (s2', id2) -> id1.it = id2.it && eq_slot s1' s2'
-    | WildS s1', WildS s2' -> eq_slot s1' s2'
-    | VarS s1', VarS s2' -> eq_slot s1' s2'
-    | _ -> false in
-  
   let subst = List.find (fun (s', _, _) -> eq_slot s s') substs in
   let (_, _, (bs, e)) = subst in
   bs, e
 
-let unique_binds bs : bind list = 
-  List.sort_uniq (fun b1 b2 -> 
-    match b1.it, b2.it with
-    (* TODO: (lemmagen) Take typ and iter into account *)
-    | ExpB (id1, _, _), ExpB (id2, _, _) -> String.compare id1.it id2.it
-    | TypB id1, TypB id2 -> String.compare id1.it id2.it
-    | ExpB _, TypB _ -> -1
-    | TypB _, ExpB _ -> +1) bs
-  
 let subst_list f substs xs =
   let xs', bss = List.split (List.map (f substs) xs) in
   xs', List.flatten bss
@@ -641,11 +689,11 @@ and subst_exp substs e : exp * bind list =
     let as', bs1 = subst_args substs as_ in
     let e1', bs2 = subst_exp substs e1 in
     let bs1' = binds_of_args bs1 as' in
-    let bs1'' = List.filter (fun b -> not (List.mem b bs1')) bs1 in
+    let bs2' = diff_binds (bs1 @ bs2) bs1' in
     (match e.it with
-    | ForallE _ -> ForallE (unique_binds (bs @ bs1'), as', e1')
-    | ExistsE _ -> ExistsE (unique_binds (bs @ bs1'), as', e1')
-    | _ -> assert false) $$ e.at % e.note, bs1'' @ bs2
+    | ForallE _ -> ForallE (uniq_binds (bs @ bs1'), as', e1')
+    | ExistsE _ -> ExistsE (uniq_binds (bs @ bs1'), as', e1')
+    | _ -> assert false) $$ e.at % e.note, bs2'
   | TmplE {it = VarS _; _} ->
     error e.at "unexpected variable template expression"
   | TmplE s -> 
@@ -730,14 +778,14 @@ let subst_inst substs inst : inst * bind list =
   | InstD (bs, as_, dt) -> 
     let as', bs1 = subst_args substs as_ in
     let dt', bs2 = subst_deftyp substs dt in
-    InstD (unique_binds (bs @ bs1 @ bs2), as', dt') $ inst.at, []
+    InstD (uniq_binds (bs @ bs1 @ bs2), as', dt') $ inst.at, []
 
 let subst_rule substs rule : rule * bind list =
   match rule.it with
   | RuleD (id, bs, mixop, e, prems) ->
     let e', bs1 = subst_exp substs e in
     let prems', bs2 = subst_list subst_prem substs prems in
-    RuleD (id, unique_binds (bs @ bs1 @ bs2), mixop, e', prems') $ rule.at, []
+    RuleD (id, uniq_binds (bs @ bs1 @ bs2), mixop, e', prems') $ rule.at, []
 
 let subst_clause substs clause : clause * bind list =
   match clause.it with
@@ -745,7 +793,7 @@ let subst_clause substs clause : clause * bind list =
     let as', bs1 = subst_args substs as_ in
     let e', bs2 = subst_exp substs e in 
     let prems', bs3 = subst_list subst_prem substs prems in
-    DefD (unique_binds (bs @ bs1 @ bs2) @ bs3, as', e', prems') $ clause.at, []
+    DefD (uniq_binds (bs @ bs1 @ bs2) @ bs3, as', e', prems') $ clause.at, []
 
 let subst_def (substs : substs) d : def * bind list = 
   match d.it with
@@ -764,10 +812,10 @@ let subst_def (substs : substs) d : def * bind list =
     DecD (subst_id substs id, ps', t', clauses') $ d.at, bs1 @ bs2 @ bs3
   | ThmD (id, bs, e) ->
     let e', bs1 = subst_exp substs e in
-    ThmD (subst_id substs id, unique_binds (bs @ bs1), e') $ d.at, []
+    ThmD (subst_id substs id, uniq_binds (bs @ bs1), e') $ d.at, []
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
-    LemD (subst_id substs id, unique_binds (bs @ bs1), e') $ d.at, []
+    LemD (subst_id substs id, uniq_binds (bs @ bs1), e') $ d.at, []
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD hdef -> HintD hdef $ d.at, []
   (* TODO: (lemmagen) Templates cannot be recurisve *)
@@ -999,14 +1047,15 @@ let transform ds =
   print_endline @@ String.concat "\n" (List.map string_of_def tds');
   let () = failwith "success" in *)
 
-  tds
-  |> List.map (fun d ->
-    let slots = slots_def d in
-    let trie = make_trie slots in
-    let comb = make_comb !(env.data) trie in
-    comb 
-    |> List.map (fun substs -> 
-      let d', bs = subst_def substs d in
-      assert (bs = []); d'))
-  |> List.flatten
-  |> List.map simpl_def
+  let tds' = tds
+    |> List.map (fun d ->
+      let slots = slots_def d in
+      let trie = make_trie slots in
+      let comb = make_comb !(env.data) trie in
+      comb 
+      |> List.map (fun substs -> 
+        let d', bs = subst_def substs d in
+        assert (bs = []); d'))
+    |> List.flatten
+    |> List.map simpl_def in
+  ntds @ tds'
