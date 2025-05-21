@@ -757,10 +757,10 @@ let partition ds =
     match d.it with TmplD d' -> Some d' | _ -> None) ds
 
 let valid_with_template ds = 
-  let env = new_env () in
-  let env' = {env with template = true} in
   let ntds, tds = partition ds in
+  let env = new_env () in
   List.iter (valid_def {bind} env) ntds;
+  let env' = {env with template = true} in
   List.iter (valid_def {bind} env') tds
 
 let valid_without_template ds =

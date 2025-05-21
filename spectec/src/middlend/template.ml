@@ -390,16 +390,17 @@ let rec make_comb env trie =
     List.map (fun y -> x @ y) acc) comb
     |> List.flatten in
 
-   (* TODO: (lemmagen) Is this correct? *)
+  (* TODO: (lemmagen) Is this correct? *)
   match env, trie with 
   | LeafT (Some e), LeafI (Some s) -> [[s, e]]
   | NodeT cs, NodeI ds ->
     Map.fold (fun dk dv (acc : comb) ->
       match dk with
       | "*" -> 
-        Map.fold (fun _ cv (acc : comb) -> 
-        let comb = make_comb cv dv in
-        sum acc comb) cs []
+        let comb = Map.fold (fun _ cv (acc' : comb) -> 
+          let comb' = make_comb cv dv in
+          sum acc' comb') cs [] in
+        product acc comb
       | _ ->
         let cv = Map.find dk cs in
         let comb = make_comb cv dv in
@@ -409,7 +410,8 @@ let rec make_comb env trie =
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
 let find_entry substs s : slotentry =
-  let (_s', (bs, e)) = List.find (fun (s', _entry) -> s' = s) substs in
+  let subst = List.find (fun (s', _entry) -> s' = s) substs in
+  let (_s', (bs, e)) = subst in
   bs, e
 
 let subst_list f substs xs =
@@ -670,7 +672,7 @@ let subst_clause substs clause : clause * bind list =
     let prems', bs3 = subst_list subst_prem substs prems in
     DefD (bs @ bs1 @ bs2 @ bs3, as', e', prems') $ clause.at, []
 
-let rec subst_def (substs : substs) d : def * bind list = 
+let subst_def (substs : substs) d : def * bind list = 
   match d.it with
   | TypD (id, ps, insts) -> 
     let ps', bs1 = subst_list subst_param [] ps in
