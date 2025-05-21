@@ -738,10 +738,173 @@ let subst_def (substs : substs) d : def * bind list =
   | RecD _ -> assert false
   | TmplD _ -> assert false
 
+let simpl_list f xs = List.map f xs
+
+let rec simpl_iter it : iter =
+  match it with
+  | Opt | List | List1 -> it
+  | ListN (e, id) -> 
+    ListN (simpl_exp e, id)
+  
+and simpl_typ t : typ =
+  match t.it with
+  | VarT (id, as_) -> 
+    VarT (id, simpl_list simpl_arg as_) $ t.at
+  | BoolT
+  | NumT _
+  | TextT -> t
+  | TupT ets -> 
+    TupT (simpl_list (fun (e, t) -> simpl_exp e, simpl_typ t) ets) $ t.at
+  | IterT (t1, it) -> 
+    IterT (simpl_typ t1, simpl_iter it) $ t.at
+  | BotT -> t
+
+and simpl_deftyp dt : deftyp =
+  match dt.it with
+  | AliasT t -> 
+    AliasT (simpl_typ t) $ dt.at
+  | StructT tfs -> 
+    StructT (simpl_list simpl_typfield tfs) $ dt.at
+  | VariantT tcs ->
+    VariantT (simpl_list simpl_typcase tcs) $ dt.at
+
+and simpl_typfield (atom, (bs, t, prems), hints) : typfield = 
+  (atom, (bs, simpl_typ t, simpl_list simpl_prem prems), hints)
+and simpl_typcase (mixop, (bs, t, prems), hints) : typcase =
+  (mixop, (bs, simpl_typ t, simpl_list simpl_prem prems), hints)
+
+and simpl_exp e : exp = 
+  match e.it with
+  | VarE _ -> e
+  | BoolE _ | NatE _ | TextE _ -> e
+  | UnE (op, e1) -> 
+    UnE (op, simpl_exp e1) $$ e.at % e.note
+  | BinE (op, e1, e2) -> 
+    BinE (op, simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+  | CmpE (op, e1, e2) -> 
+    CmpE (op, simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+  | TupE es ->
+    TupE (simpl_list simpl_exp es) $$ e.at % e.note
+  | ProjE (e1, i) -> 
+    ProjE (simpl_exp e1, i) $$ e.at % e.note
+  | CaseE (mixop, e1) -> 
+    CaseE (mixop, simpl_exp e1) $$ e.at % e.note
+  | UncaseE (e1, mixop) -> 
+    UncaseE (simpl_exp e1, mixop) $$ e.at % e.note
+  | OptE None -> e
+  | OptE (Some e1) -> 
+    OptE (Some (simpl_exp e1)) $$ e.at % e.note
+  | TheE e1 -> 
+    TheE (simpl_exp e1) $$ e.at % e.note
+  | StrE efs -> 
+    StrE (simpl_list simpl_expfield efs) $$ e.at % e.note
+  | DotE (e1, atom) ->
+    DotE (simpl_exp e1, atom) $$ e.at % e.note
+  | CompE (e1, e2) -> 
+    CompE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+  | ListE es -> 
+    ListE (simpl_list simpl_exp es) $$ e.at % e.note
+  | LenE e1 ->
+    LenE (simpl_exp e1) $$ e.at % e.note
+  | CatE (e1, e2) -> 
+    CatE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+  | IdxE (e1, e2) -> 
+    IdxE (simpl_exp e1, simpl_exp e2) $$ e.at % e.note
+  | SliceE (e1, e2, e3) ->
+    SliceE (simpl_exp e1, simpl_exp e2, simpl_exp e3) $$ e.at % e.note
+  | UpdE (e1, p1, e2) -> 
+    UpdE (simpl_exp e1, simpl_path p1, simpl_exp e2) $$ e.at % e.note
+  | ExtE (e1, p1, e2) -> 
+    ExtE (simpl_exp e1, simpl_path p1, simpl_exp e2) $$ e.at % e.note
+  | CallE (id, as_) -> 
+    CallE (id, simpl_list simpl_arg as_) $$ e.at % e.note
+  | IterE (e1, ie) -> 
+    IterE (simpl_exp e1, simpl_iterexp ie) $$ e.at % e.note
+  | SubE (e1, t1, t2) -> 
+    SubE (simpl_exp e1, simpl_typ t1, simpl_typ t2) $$ e.at % e.note
+  | RuleE (id, mixop, e1) -> 
+    RuleE (id, mixop, simpl_exp e1) $$ e.at % e.note
+  | ForallE (bs, as_, e1) -> 
+    ForallE (bs, simpl_list simpl_arg as_, simpl_exp e1) $$ e.at % e.note
+  | ExistsE (bs, as_, e1) -> 
+    ExistsE (bs, simpl_list simpl_arg as_, simpl_exp e1) $$ e.at % e.note
+  | TmplE _ -> assert false
+
+and simpl_expfield (atom, e) : expfield = 
+  (atom, simpl_exp e)
+
+and simpl_path p : path =
+  match p.it with
+  | RootP -> p
+  | IdxP (p1, e) -> 
+    IdxP (simpl_path p1, simpl_exp e) $$ p.at % p.note
+  | SliceP (p1, e1, e2) ->
+    SliceP (simpl_path p1, simpl_exp e1, simpl_exp e2) $$ p.at % p.note
+  | DotP (p1, atom) -> 
+    DotP (simpl_path p1, atom) $$ p.at % p.note
+
+and simpl_iterexp (iter, bs) : iterexp =
+    (simpl_iter iter, simpl_list (fun (id, t) -> id, simpl_typ t) bs)
+
+and simpl_prem prem : prem =
+  match prem.it with
+  | RulePr (id, mixop, e) -> 
+    RulePr (id, mixop, simpl_exp e) $ prem.at
+  | IfPr e ->
+    IfPr (simpl_exp e) $ prem.at
+  | LetPr (e1, e2, ids) ->
+    LetPr (simpl_exp e1, simpl_exp e2, ids) $ prem.at
+  | ElsePr -> prem
+  | IterPr (prem1, iter) -> 
+    IterPr (simpl_prem prem1, simpl_iterexp iter) $ prem.at
+
+and simpl_arg a : arg =
+  match a.it with
+  | ExpA e -> 
+    ExpA (simpl_exp e) $ a.at
+  | TypA t ->
+    TypA (simpl_typ t) $ a.at
+
+and simpl_param p : param = 
+  match p.it with
+  | ExpP (id, t) ->
+    ExpP (id, simpl_typ t) $ p.at
+  | TypP _ -> p
+
+let simpl_inst inst : inst =
+  match inst.it with
+  | InstD (bs, as_, dt) -> 
+    InstD (bs, simpl_list simpl_arg as_, simpl_deftyp dt) $ inst.at
+
+let simpl_rule rule : rule =
+  match rule.it with
+  | RuleD (id, bs, mixop, e, prems) ->
+    RuleD (id, bs, mixop, simpl_exp e, simpl_list simpl_prem prems) $ rule.at
+
+let simpl_clause clause : clause =
+  match clause.it with
+  | DefD (bs, as_, e, prems) ->
+    DefD (bs, simpl_list simpl_arg as_, simpl_exp e, simpl_list simpl_prem prems) $ clause.at
+
 (* TODO: (lemmagen) Eliminates standalone true in implications *)
-(* TODO: (lemmagen) Linearises conjunction of premises in implications  *)
-let simpl_def _d : def =
-  failwith "unimplemented (lemmagen)"
+(* TODO: (lemmagen) Linearises conjunction of premises in implications *)
+let rec simpl_def d = 
+  match d.it with
+  | TypD (id, ps, insts) -> 
+    TypD (id, simpl_list simpl_param ps, simpl_list simpl_inst insts) $ d.at
+  | RelD (id, mixop, t, rules) -> 
+    RelD (id, mixop, simpl_typ t, simpl_list simpl_rule rules) $ d.at
+  | DecD (id, ps, t, clauses) ->
+    DecD (id, simpl_list simpl_param ps, simpl_typ t, simpl_list simpl_clause clauses) $ d.at
+  | RecD ds -> 
+    RecD (simpl_list simpl_def ds) $ d.at
+  | ThmD (id, bs, e) ->
+    ThmD (id, bs, simpl_exp e) $ d.at
+  | LemD (id, bs, e) -> 
+    LemD (id, bs, simpl_exp e) $ d.at
+  (* TODO: (lemmagen) Hints are currently ignored *)
+  | HintD _ -> d
+  | TmplD _ -> assert false
 
 let partition ds = 
   List.filter (fun d -> 
