@@ -386,8 +386,8 @@ template
 lemma Step_pure__preserves = 
   forall (s, C, ft)
   forall ({{ ...relations.Step_pure.rules.*.freevars }})
-  @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.rules.*.before }} : ft) =>
-  @(Step_pure: {{ relations.Step_pure.rules.*.before }} ~> {{ relations.Step_pure.rules.*.after }}) =>
+  @(Admin_instrs_ok: s; C |- {{ ...relations.Step_pure.rules.*.before }} : ft) =>
+  @(Step_pure: {{ ...relations.Step_pure.rules.*.before }} ~> {{ ...relations.Step_pure.rules.*.after }}) =>
   {{ relations.Step_pure.rules.*.premises }} =>
   @(Admin_instrs_ok: s; C |- eps : ft)
 
@@ -401,4 +401,4 @@ lemma Step_read__preserves =
   z = s; f =>
   {{ relations.Step_read.rules.*.premises }} =>
   (forall (i) @(Val_ok: |- f.LOCALS[i] : valtype*[i])) =>
-  @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.after }} : ft)
+  @(Admin_instrs_ok: s; C' |- {{ ...relations.Step_read.rules.*.after }} : ft)

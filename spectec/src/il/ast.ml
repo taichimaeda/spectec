@@ -111,7 +111,7 @@ and exp' =
   (* TODO: (lemmagen) Binds only args in quantifiers *)
   | ForallE of bind list * arg list * exp    (* forall `(` arg* `)` exp *)
   | ExistsE of bind list * arg list * exp    (* exists `(` arg* `)` exp *)
-  | TmplE of slot                (* `{{ slot`}}` *)
+  | TmplE of slot                (* `{{ slot `}}` *)
 
 and expfield = atom * exp        (* atom exp *)
 

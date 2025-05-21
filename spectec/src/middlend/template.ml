@@ -85,6 +85,13 @@ and fixpoint' c eq f x =
   let y = f x in
   if eq x y then y else fixpoint' (c + 1) eq f y
 
+let cmp_binds b1 b2 = 
+  match b1.it, b2.it with
+  | ExpB (id1, _, _), ExpB (id2, _, _) -> String.compare id1.it id2.it
+  | TypB id1, TypB id2 -> String.compare id1.it id2.it
+  | ExpB _, TypB _ -> -1
+  | TypB _, ExpB _ -> 1
+
 (* TODO: (lemmagen) Requires custom equality because of pos *)
 let rec eq_slot s1 s2 = 
   match s1.it, s2.it with
@@ -103,21 +110,19 @@ let eq_bind b1 b2 =
 
 (* TODO: (lemmagen) Requires custom equality because of pos *)
 let eq_binds bs1 bs2 = 
-  List.for_all2 (fun b1 b2 -> eq_bind b1 b2) bs1 bs2
-
-let cmp_binds b1 b2 = 
-  match b1.it, b2.it with
-  | ExpB (id1, _, _), ExpB (id2, _, _) -> String.compare id1.it id2.it
-  | TypB id1, TypB id2 -> String.compare id1.it id2.it
-  | ExpB _, TypB _ -> -1
-  | TypB _, ExpB _ -> 1
+  let bs1' = List.sort cmp_binds bs1 in
+  let bs2' = List.sort cmp_binds bs2 in
+  List.length bs1' = List.length bs2' &&
+  List.for_all2 (fun b1 b2 -> eq_bind b1 b2) bs1' bs2'
 
 let mem_binds b bs = 
   List.exists (eq_bind b) bs
 
+(* TODO: (lemmagen) Maintains the order of binds *)
 let diff_binds bs1 bs2 =
   List.filter (fun b1 -> not (mem_binds b1 bs2)) bs1
 
+(* TODO: (lemmagen) Maintains the order of binds *)
 let uniq_binds bs = 
   List.fold_left (fun acc b ->
     if mem_binds b acc then acc else b::acc) [] bs
@@ -137,7 +142,7 @@ let deps_binds all bs =
     match b.it with 
     | ExpB (id, _, _) -> Set.mem id.it fs.varid
     | TypB id -> Set.mem id.it fs.typid) all in
-  List.sort cmp_binds (uniq_binds (bs @ bs'))
+  uniq_binds (bs' @ bs) (* bs' before bs *)
 
 let binds_of_frees bs fs = 
   let open Il.Free in
@@ -164,18 +169,25 @@ let entry_of_exp bs e =
   binds_of_exp bs e, e
     
 let entry_of_freevars bs e =
-  let rec fold_iter t its = 
-    fold_iter' t (List.rev its)
-
-  and fold_iter' t its = 
-    match its with
-    | [] -> t
-    | it::its' -> IterT (fold_iter t its', it) $ t.at in
+  let rec fold_iter id t its = 
+    fold_iter' id t (List.rev its)
     
+  and fold_iter' id t its =
+    match its with
+    | [] -> 
+      VarE id $$ id.at % t, t
+    | it::its' ->
+      (* TODO: (lemmagen) Is this correct? *)
+      let ie = it, [(id, t)] in
+      let e1, t1 = fold_iter' id t its' in
+      let t1' = IterT (t1, it) $ t1.at in
+      let e1' = IterE (e1, ie) $$ e1.at % t1' in
+      e1', t1' in
+
   let bs' = binds_of_exp bs e in
   let es = List.filter_map (fun b -> match b.it with
     | ExpB (id, t, iter) -> 
-      Some (VarE id $$ b.at % (fold_iter t iter))
+      let e', _ = fold_iter id t iter in Some e'
     | TypB _ -> None) bs' in
   let ts = List.map (fun e -> e, e.note) es in
   let at = match es with 
@@ -215,7 +227,7 @@ let env_rule_instrs_ok env id1 r =
   | RuleD (id2, bs, _, {it = TupE [c; is; ft]; _}, _) ->
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs is);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft);
   | RuleD _ -> error r.at "unexpected form of rule Instrs_ok"
 
 let env_rule_admininstr_ok env id1 r = 
@@ -224,7 +236,7 @@ let env_rule_admininstr_ok env id1 r =
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs a);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft);
   | RuleD _ -> error r.at "unexpected form of rule Admin_instr_ok"
 
 let env_rule_admininstrs_ok env id1 r = 
@@ -233,29 +245,25 @@ let env_rule_admininstrs_ok env id1 r =
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "store"] (entry_of_exp bs s);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs as_);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft)
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft);
   | RuleD _ -> error r.at "unexpected form of rule Admin_instrs_ok"
-
-let env_rule_step env id1 r =
-  match r.it with
-  | RuleD (id2, bs, _, {it = TupE [c1; c2]; _}, _) ->
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs c2)
-  | RuleD _ -> error r.at "unexpected form of rule Step"
 
 let env_rule_step_pure env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [as1; as2]; _}, _) ->
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs as1);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
-  | RuleD _ -> error r.at "unexpected form of rule Step"
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2);
+  | RuleD _ -> error r.at "unexpected form of rule Step_pure"
 
 let env_rule_step_read env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c1; as2]; _}, _) ->
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs c1);
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2)
-  | RuleD _ -> error r.at "unexpected form of rule Step"
+    (match c1.it with
+    | CaseE (_, {it = TupE [_; as1]; _}) -> 
+      env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "before"] (entry_of_exp bs as1);
+      env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "after"] (entry_of_exp bs as2);
+    | _ -> error r.at "unexpected form of rule Step_read")
+  | RuleD _ -> error r.at "unexpected form of rule Step_read"
 
 let env_rule env id1 r =
   match r.it with
@@ -268,7 +276,6 @@ let env_rule env id1 r =
   | "Instrs_ok" -> env_rule_instr_ok env id1 r
   | "Admin_instr_ok" -> env_rule_admininstr_ok env id1 r
   | "Admin_instrs_ok" -> env_rule_admininstrs_ok env id1 r
-  | "Step" -> env_rule_step env id1 r
   | "Step_pure" -> env_rule_step_pure env id1 r
   | "Step_read" -> env_rule_step_read env id1 r
   | _ -> ()
@@ -641,6 +648,15 @@ and subst_exp substs e : exp * bind list =
     let e1', bs1 = subst_exp substs e1 in
     let e2', bs2 = subst_exp substs e2 in
     CompE (e1', e2') $$ e.at % e.note, bs1 @ bs2
+  | ListE [{it = TmplE ({it = VarS s; _}); _}] ->
+    let bs, e' = find_entry substs s in
+    (match e'.it with 
+    | ListE es' | TupE es' -> 
+      ListE es' $$ e.at % e.note, bs
+    (* TODO: (lemmagen) This is a hack *)
+    | CatE _ | IterE _ ->
+      e'.it $$ e.at % e.note, bs
+    | _ -> error e.at "unexpected variable template expression")
   | ListE es -> 
     let es', bs1 = subst_list subst_exp substs es in
     ListE es' $$ e.at % e.note, bs1
@@ -753,8 +769,7 @@ and subst_arg substs a : arg list * bind list =
     (match e.it with 
     | ListE es | TupE es -> 
       List.map (fun e' -> ExpA e' $ a.at) es, bs
-    | _ -> 
-      error a.at "variable template expression on non-tuple or non-list expression")
+    | _ -> error a.at "unexpected variable template expression")
   | ExpA e -> 
     let e', bs1 = subst_exp substs e in
     [ExpA e' $ a.at], bs1
@@ -861,11 +876,9 @@ and simpl_exp e : exp =
   (* hack by lazy eval *)
   let rec fsub () = simpl_expsub fsub in
   let rec fimpl () = simpl_expimpl fimpl in
-  let rec fall () = simpl_exp' fall in
   e 
   |> simpl_expsub fsub
   |> simpl_expimpl fimpl
-  |> simpl_exp' fall
 
 and simpl_exp' f e : exp = 
   let cont = f () in
