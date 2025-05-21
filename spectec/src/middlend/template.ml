@@ -71,17 +71,17 @@ let rec bind tree ids entry =
   | [], LeafT _ -> LeafT (Some entry) (* overwrite *)
   | [], NodeT _ -> error no_region "not enough slot ids"
   | _::_, LeafT (Some _) -> error no_region "occupied slot"
-  | id'::ids', LeafT None ->
-    let k = if id' = "" then "_" else id' in
+  | id::ids', LeafT None ->
+    let k = if id = "" then "_" else id in
     let c = bind (LeafT None) ids' entry in
     let cs = Map.add k c Map.empty in
     NodeT cs
-  | id'::ids', NodeT cs ->
-    let k = if id' = "" then "_" else id' in
+  | id::ids', NodeT cs ->
+    let k = if id = "" then "_" else id in
     let c = 
       match Map.find_opt k cs with
-      | Some tree' -> bind tree' ids' entry
-      | None -> bind (LeafT None) ids' entry in
+      | None -> bind (LeafT None) ids' entry
+      | Some tree' -> bind tree' ids' entry in
     let cs' = Map.add k c cs in
     NodeT cs'
 
@@ -129,7 +129,6 @@ let env_rule_instr_ok env id1 r =
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "context"] (entry_of_exp bs c);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "instrs"] (entry_of_exp bs i);
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "functype"] (entry_of_exp bs ft);
-    print_endline @@ string_of_slottree !(env.data);
   | RuleD _ -> error r.at "unexpected form of rule Instr_ok"
 
 let env_rule_instrs_ok env id1 r = 
@@ -203,10 +202,12 @@ let rec env_def env d =
   | RelD (id, _, _, rs) -> 
     env.data := bind !(env.data) ["relations"; id.it; "name"] (entry_of_id id);
     List.iter (env_rule env id) rs
-  | DecD (id, _, _, _) -> 
+  | DecD (id, _, _, _) ->
+    (* TODO: (lemmagen) Handle definitions with proof hints as theorems  *)
     env.data := bind !(env.data) ["definitions"; id.it; "name"] (entry_of_id id)
   | ThmD (id, _bs, _e) | LemD (id, _bs, _e) -> 
-    (* TODO: (lemmage) Need to take binds in quantifiers too *)
+    (* TODO: (lemmage) Need to take binds in quantifiers into account
+                       when collecting any subexpressions within theorems in the future *)
     env.data := bind !(env.data) ["theorems"; id.it; "name"] (entry_of_id id)
   (* TODO: (lemmagen) Hints are currently ignored *)
   | HintD _ -> ()
@@ -323,10 +324,7 @@ let slots_clause clause =
     slots_list slots_arg as_ @ slots_exp e @ slots_list slots_prem prems
 
 let rec slots_def d = 
-  let d' = match d.it with
-    | TmplD d1 -> d1
-    | _ -> error d.at "not a template definition" in
-  match d'.it with
+  match d.it with
   | TypD (_, ps, insts) -> 
     slots_list slots_param ps @ slots_list slots_inst insts
   | RelD (_, _, t, rules) -> 
@@ -343,36 +341,31 @@ let rec slots_def d =
 
 (* TODO: (lemmagen) Is this correct? *)
 let rec insert_trie ids s trie =
-  match ids with
-  | [] -> (match trie with
-    | LeafI _ -> LeafI (Some s)
-    | NodeI _ -> error no_region "invalid slot ids")
-  | id::ids' -> (match trie with
-    | LeafI None -> 
-      let c = insert_trie ids' s (LeafI None) in
-      let cs = Map.add id c Map.empty in
-      NodeI cs
-    | LeafI (Some _) -> error no_region "invalid slot ids"
-    | NodeI cs ->
-      let c = match Map.find_opt id cs with
-        | None -> insert_trie ids' s (LeafI None)
-        | Some trie' -> insert_trie ids' s trie' in
-      let cs' = Map.add id c cs in
-      NodeI cs')
+  match ids, trie with
+  | [], LeafI _ -> LeafI (Some s) (* overwrite *)
+  | [], NodeI _ -> error no_region "not enough slot ids"
+  | _::_, LeafI (Some _) -> error no_region "occupied slot"
+  | id::ids', LeafI None ->
+    let c = insert_trie ids' s (LeafI None) in
+    let cs = Map.add id c Map.empty in
+    NodeI cs
+  | id::ids', NodeI cs ->
+    let c = match Map.find_opt id cs with
+      | None -> insert_trie ids' s (LeafI None)
+      | Some trie' -> insert_trie ids' s trie' in
+    let cs' = Map.add id c cs in
+    NodeI cs'
 
 let make_trie ss = 
-  let rec linearize' s acc =
+  let rec linearize s acc =
     match s.it with
-    | TopS id -> [id.it]
-    | DotS (s1, id) -> linearize' s1 (id.it::acc)
-    | WildS s1 -> linearize' s1 ("*"::acc)
-    | VarS s1 -> linearize' s1 acc in
-
-  let linearize s =
-    List.rev (linearize' s []) in
+    | TopS id -> id.it::acc
+    | DotS (s1, id) -> linearize s1 (id.it::acc)
+    | WildS s1 -> linearize s1 ("*"::acc)
+    | VarS s1 -> linearize s1 acc in
 
   List.fold_left (fun acc s -> 
-    let ids = linearize s in
+    let ids = linearize s [] in
     insert_trie ids s acc) (LeafI None) ss
 
 type subst = slot * slotentry
@@ -697,6 +690,8 @@ let subst_def (substs : substs) d : def * bind list =
   | RecD _ -> assert false
   | TmplD _ -> assert false
 
+(* TODO: (lemmagen) Eliminates standalone true in implications *)
+(* TODO: (lemmagen) Linearises conjunction of premises in implications  *)
 let simpl_def _d : def =
   failwith "unimplemented (lemmagen)"
 
@@ -711,7 +706,11 @@ let transform ds =
   let env = env ntds in
 
   (* TODO: (lemmagen) Remove this line *)
-  print_endline @@ string_of_slottree !(env.data);
+  (* print_endline @@ string_of_slottree !(env.data); *)
+  let slots = slots_def (List.hd tds) in
+  let trie = make_trie slots in
+  print_endline @@ "slots: " ^ String.concat ", " (List.map string_of_slot slots);
+  print_endline @@ "trie: " ^ string_of_slottrie trie;
   let () = failwith "success" in
 
   tds
