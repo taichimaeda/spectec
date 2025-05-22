@@ -7,7 +7,12 @@ open Source
 module Set = Set.Make(String)
 module Map = Map.Make(String)
 
+(* Helpers *)
+
 let error at msg = Error.error at "template" msg
+
+
+(* Environment *)
 
 (* TODO: (lemmagen) Templates can substitute exp only *)
 (* TODO: (lemmagen) ... on tuple exp expands entry in args *)
@@ -319,6 +324,9 @@ let env ds : env =
   List.iter (env_def env) ds;
   env
 
+
+(* Collection *)
+
 let slots_list f xs = List.flatten (List.map f xs)
 
 let slots_pair f1 f2 (x, y) = f1 x @ f2 y
@@ -442,6 +450,9 @@ let rec slots_def d =
   | HintD _ -> []
   | TmplD _ -> assert false
 
+
+(* Combinations *)
+
 let unwrap_varslot s : slot = 
   match s.it with
   | VarS s1 -> s1
@@ -541,6 +552,9 @@ and make_comb' tree trie ids =
   | LeafT _, NodeI _ -> error no_region "invalid env"
   | NodeT _, LeafI _ -> error no_region "invalid trie"
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
+
+
+(* Repositioning *)
 
 let repos_list f at xs = 
   List.map (f at) xs
@@ -666,6 +680,9 @@ and repos_bind at b : bind =
     ExpB (repos_id at id, repos_typ at t, repos_list repos_iter at iter) $ at
   | TypB id ->
     TypB (repos_id at id) $ at
+
+
+(* Substitutions *)
 
 let find_entry (substs : substs) s : slotentry =
   let subst = List.find (fun (s', _, _) -> eq_slot s s') substs in
@@ -981,6 +998,9 @@ let subst_def (substs : substs) d : def * bind list =
   | RecD _ -> assert false
   | TmplD _ -> assert false
 
+
+(* Simplification *)
+
 let simpl_list f xs = List.map f xs
 
 let simpl_pair f1 f2 (x, y) = (f1 x, f2 y)
@@ -1194,6 +1214,9 @@ let rec simpl_def d =
   (* TODO: (lemmagen) Hints are currently not simplified *)
   | HintD _ -> d
   | TmplD _ -> assert false
+
+
+(* Transform *)
 
 let partition ds = 
   List.filter (fun d -> 
