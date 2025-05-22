@@ -268,7 +268,7 @@ let env_rule_freevars env id1 id2 bs e prems =
     | [] -> 
       VarE id $$ id.at % t, t
     | it::its' ->
-      (* TODO: (lemmagen) Is this correct? *)
+      (* emulates annot pass in frontend *)
       let ie = it, [(id, t)] in
       let e1, t1 = fold_iter' id t its' in
       let t1' = IterT (t1, it) $ t1.at in
@@ -808,16 +808,6 @@ and subst_exp substs e : exp * bind list =
     let e1', bs1 = subst_exp substs e1 in
     let e2', bs2 = subst_exp substs e2 in
     CompE (e1', e2') $$ e.at % e.note, bs1 @ bs2
-  | ListE [{it = TmplE ({it = VarS s; _}); _}] ->
-    let bs, e1 = find_entry substs s in
-    let e1' = repos_exp e.at e1 in
-    (match e1'.it with
-    | ListE es | TupE es -> 
-      ListE es $$ e.at % e.note, bs
-    (* TODO: (lemmagen) This is a hack *)
-    | CatE _ | IterE _ ->
-      e1'.it $$ e.at % e.note, bs
-    | _ -> error e.at "unexpected variable template expression")
   | ListE es ->
     let es', bs1 = subst_list subst_exp substs es in
     ListE es' $$ e.at % e.note, bs1

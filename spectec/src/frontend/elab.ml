@@ -1382,6 +1382,10 @@ and elab_exp_notation' env tid e t : Il.exp list * Subst.t =
   (* Elimination forms are considered splices *)
   | (IdxE _ | SliceE _ | UpdE _ | ExtE _ | DotE _ | CallE _), IterT _ ->
     [elab_exp env e t], Subst.empty
+  (* TODO: (lemmagen) Is this correct? *)
+  (* Templates are also considered splices *)
+  | TmplE _, IterT _ ->
+    [elab_exp env e t], Subst.empty
   (* All other expressions are considered splices *)
   (* TODO: can't they be splices, too? *)
   | _, IterT (t1, iter) ->

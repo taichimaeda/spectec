@@ -230,8 +230,11 @@ let theorem_to_prose env d =
       | Ast.LemD _ -> "lemma"
       | _ -> assert false in
     let e' = match e.it with 
-      | Ast.ForallE (bs', as_, e) -> {e with it = Ast.ForallE (bs @ bs', as_, e)}
-      | Ast.ExistsE (bs', as_, e) -> {e with it = Ast.ExistsE (bs @ bs', as_, e)}
+      (* only binds are used for rendering *)
+      | Ast.ForallE (bs', _, e) -> 
+        Ast.ForallE (bs @ bs', [], e) $$ e.at % e.note
+      | Ast.ExistsE _ -> 
+        Ast.ForallE (bs, [], e) $$ e.at % e.note
       | _ -> e in
     Stmt (name, style, id.it, formula_to_para env e')
   | _ -> assert false
