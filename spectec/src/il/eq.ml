@@ -107,6 +107,14 @@ and eq_path p1 p2 =
   | DotP (p11, atom1), DotP (p21, atom2) -> eq_path p11 p21 && eq_atom atom1 atom2
   | _, _ -> p1.it = p2.it
 
+and eq_slot s1 s2 = 
+  match s1.it, s2.it with
+  | TopS id1, TopS id2 -> id1.it = id2.it
+  | DotS (s1', id1), DotS (s2', id2) -> id1.it = id2.it && eq_slot s1' s2'
+  | WildS s1', WildS s2' -> eq_slot s1' s2'
+  | VarS s1', VarS s2' -> eq_slot s1' s2'
+  | _ -> s1.it = s2.it
+
 and eq_iterexp (iter1, bs1) (iter2, bs2) =
   eq_iter iter1 iter2 && eq_list (eq_pair eq_id eq_typ) bs1 bs2
 
@@ -129,4 +137,11 @@ and eq_arg a1 a2 =
   match a1.it, a2.it with
   | ExpA e1, ExpA e2 -> eq_exp e1 e2
   | TypA t1, TypA t2 -> eq_typ t1 t2
+  | _, _ -> false
+
+and eq_bind b1 b2 = 
+  match b1.it, b2.it with
+  | ExpB (id1, t1, iter1), ExpB (id2, t2, iter2) -> 
+    id1.it = id2.it && eq_typ t1 t2 && eq_list eq_iter iter1 iter2
+  | TypB id1, TypB id2 -> id1.it = id2.it
   | _, _ -> false

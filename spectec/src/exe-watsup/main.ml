@@ -178,7 +178,6 @@ let () =
     (* TODO: (lemmagen) Remove this line *)
     let il = Middlend.Template.transform il in
     Il.Valid.valid_without_template il;
-    (* let () = failwith "success" in *)
 
     (match !target with
     | Prose | Splice _ | Interpreter _ ->
