@@ -321,6 +321,8 @@ let env ds : env =
 
 let slots_list f xs = List.flatten (List.map f xs)
 
+let slots_pair f1 f2 (x, y) = f1 x @ f2 y
+
 let rec slots_iter it =
   match it with
   | Opt | List | List1 -> []
@@ -332,7 +334,7 @@ and slots_typ t =
   | BoolT
   | NumT _
   | TextT -> []
-  | TupT ets -> slots_list (fun (e, t) -> slots_exp e @ slots_typ t) ets
+  | TupT ets -> slots_list (slots_pair slots_exp slots_typ) ets
   | IterT (t1, it) -> slots_typ t1 @ slots_iter it
   | BotT -> []
 
@@ -389,7 +391,7 @@ and slots_path p =
   | DotP (p1, _) -> slots_path p1
 
 and slots_iterexp (iter, bs) =
-    slots_iter iter @ slots_list (fun (_, t) -> slots_typ t) bs
+  slots_iter iter @ slots_list (slots_pair (fun _ -> []) slots_typ) bs
 
 and slots_prem prem =
   match prem.it with
@@ -540,6 +542,131 @@ and make_comb' tree trie ids =
   | NodeT _, LeafI _ -> error no_region "invalid trie"
   | LeafT _, LeafI _ -> error no_region "invalid env or trie"
 
+let repos_list f at xs = 
+  List.map (f at) xs
+
+let repos_opt f at x = 
+  Option.map (f at) x
+
+let repos_pair f1 f2 at (x, y) = 
+  (f1 at x, f2 at y)
+
+let repos_id at id : id = 
+  id.it $ at
+
+let repos_atom at atom : atom = 
+  atom.it $$ at % atom.note
+
+let repos_mixop at mixop : mixop = 
+  repos_list (repos_list repos_atom) at mixop
+
+let rec repos_iter at it : iter =
+  match it with
+  | Opt | List | List1 -> it
+  | ListN (e, id) -> 
+    ListN (repos_exp at e, repos_opt repos_id at id)
+
+and repos_typ at t : typ =
+  match t.it with
+  | VarT (id, as_) -> 
+    VarT (repos_id at id, repos_list repos_arg at as_) $ at
+  | BoolT 
+  | NumT _
+  | TextT -> t.it $ at
+  | TupT ets -> 
+    TupT (repos_list (repos_pair repos_exp repos_typ) at ets) $ at
+  | IterT (t1, it) ->
+    IterT (repos_typ at t1, repos_iter at it) $ at
+  | BotT -> t.it $ at
+
+and repos_exp at e : exp = 
+  match e.it with
+  | VarE _ -> e.it $$ at % e.note
+  | BoolE _ | NatE _ | TextE _ -> e.it $$ at % e.note
+  | UnE (op, e1) ->
+    UnE (op, repos_exp at e1) $$ at % e.note
+  | BinE (op, e1, e2) -> 
+    BinE (op, repos_exp at e1, repos_exp at e2) $$ at % e.note
+  | CmpE (op, e1, e2) -> 
+    CmpE (op, repos_exp at e1, repos_exp at e2) $$ at % e.note
+  | TupE es -> 
+    TupE (repos_list repos_exp at es) $$ at % e.note
+  | ProjE (e1, i) -> 
+    ProjE (repos_exp at e1, i) $$ at % e.note
+  | CaseE (mixop, e1) -> 
+    CaseE (repos_mixop at mixop, repos_exp at e1) $$ at % e.note
+  | UncaseE (e1, mixop) -> 
+    UncaseE (repos_exp at e1, repos_mixop at mixop) $$ at % e.note
+  | OptE None -> e.it $$ at % e.note
+  | OptE (Some e1) -> 
+    OptE (Some (repos_exp at e1)) $$ at % e.note
+  | TheE e1 -> 
+    TheE (repos_exp at e1) $$ at % e.note
+  | StrE efs -> 
+    StrE (repos_list repos_expfield at efs) $$ at % e.note
+  | DotE (e1, atom) ->
+    DotE (repos_exp at e1, repos_atom at atom) $$ at % e.note
+  | CompE (e1, e2) ->
+    CompE (repos_exp at e1, repos_exp at e2) $$ at % e.note
+  | ListE es -> 
+    ListE (repos_list repos_exp at es) $$ at % e.note
+  | LenE e1 ->
+    LenE (repos_exp at e1) $$ at % e.note
+  | CatE (e1, e2) ->
+    CatE (repos_exp at e1, repos_exp at e2) $$ at % e.note
+  | IdxE (e1, e2) ->
+    IdxE (repos_exp at e1, repos_exp at e2) $$ at % e.note
+  | SliceE (e1, e2, e3) ->
+    SliceE (repos_exp at e1, repos_exp at e2, repos_exp at e3) $$ at % e.note
+  | UpdE (e1, p1, e2) ->
+    UpdE (repos_exp at e1, repos_path at p1, repos_exp at e2) $$ at % e.note
+  | ExtE (e1, p1, e2) ->
+    ExtE (repos_exp at e1, repos_path at p1, repos_exp at e2) $$ at % e.note
+  | CallE (id, as_) -> 
+    CallE (repos_id at id, repos_list repos_arg at as_) $$ at % e.note
+  | IterE (e1, ie) ->
+    IterE (repos_exp at e1, repos_iterexp at ie) $$ at % e.note
+  | SubE (e1, t1, t2) -> 
+    SubE (repos_exp at e1, repos_typ at t1, repos_typ at t2) $$ at % e.note
+  | RuleE (id, mixop, e1) -> 
+    RuleE (repos_id at id, repos_mixop at mixop, repos_exp at e1) $$ at % e.note
+  | ForallE (bs, as_, e1) ->
+    ForallE (repos_list repos_bind at bs, repos_list repos_arg at as_, repos_exp at e1) $$ at % e.note
+  | ExistsE (bs, as_, e1) -> 
+    ExistsE (repos_list repos_bind at bs, repos_list repos_arg at as_, repos_exp at e1) $$ at % e.note
+  | TmplE _ ->
+    error at "unexpected variable template expression"
+
+and repos_expfield at (atom, e) : expfield = 
+  (repos_atom at atom, repos_exp at e)
+
+and repos_path at p : path =
+  match p.it with
+  | RootP -> p.it $$ at % p.note
+  | IdxP (p1, e) -> 
+    IdxP (repos_path at p1, repos_exp at e) $$ at % p.note
+  | SliceP (p1, e1, e2) -> 
+    SliceP (repos_path at p1, repos_exp at e1, repos_exp at e2) $$ at % p.note
+  | DotP (p1, atom) -> 
+    DotP (repos_path at p1, repos_atom at atom) $$ at % p.note
+
+and repos_iterexp at (iter, bs) : iterexp =
+  (repos_iter at iter, repos_list (repos_pair repos_id repos_typ) at bs)
+
+and repos_arg at a : arg =
+  match a.it with
+  | ExpA e -> 
+    ExpA (repos_exp at e) $ at
+  | TypA t ->
+    TypA (repos_typ at t) $ at
+
+and repos_bind at b : bind = 
+  match b.it with
+  | ExpB (id, t, iter) ->
+    ExpB (repos_id at id, repos_typ at t, repos_list repos_iter at iter) $ at
+  | TypB id ->
+    TypB (repos_id at id) $ at
+
 let find_entry (substs : substs) s : slotentry =
   let subst = List.find (fun (s', _, _) -> eq_slot s s') substs in
   let (_, _, (bs, e)) = subst in
@@ -548,6 +675,11 @@ let find_entry (substs : substs) s : slotentry =
 let subst_list f substs xs =
   let xs', bss = List.split (List.map (f substs) xs) in
   xs', List.flatten bss
+
+let subst_pair f1 f2 substs (x, y) = 
+  let x', bs1 = f1 substs x in
+  let y', bs2 = f2 substs y in
+  (x', y'), bs1 @ bs2
 
 let subst_id substs id : id =
   let rec wild_ids s1 s2 =
@@ -585,10 +717,7 @@ and subst_typ substs t : typ * bind list =
   | NumT _
   | TextT -> t, []
   | TupT ets -> 
-    let ets', bs3 = subst_list (fun _ (e, t) -> 
-      let e', bs1 = subst_exp substs e in 
-      let t', bs2 = subst_typ substs t in
-      (e', t'), bs1 @ bs2) substs ets in
+    let ets', bs3 = subst_list (subst_pair subst_exp subst_typ) substs ets in
     TupT ets' $ t.at, bs3
   | IterT (t1, it) ->
     let t1', bs1 = subst_typ substs t1 in
@@ -663,15 +792,16 @@ and subst_exp substs e : exp * bind list =
     let e2', bs2 = subst_exp substs e2 in
     CompE (e1', e2') $$ e.at % e.note, bs1 @ bs2
   | ListE [{it = TmplE ({it = VarS s; _}); _}] ->
-    let bs, e' = find_entry substs s in
-    (match e'.it with 
-    | ListE es' | TupE es' -> 
-      ListE es' $$ e.at % e.note, bs
+    let bs, e1 = find_entry substs s in
+    let e1' = repos_exp e.at e1 in
+    (match e1'.it with
+    | ListE es | TupE es -> 
+      ListE es $$ e.at % e.note, bs
     (* TODO: (lemmagen) This is a hack *)
     | CatE _ | IterE _ ->
-      e'.it $$ e.at % e.note, bs
+      e1'.it $$ e.at % e.note, bs
     | _ -> error e.at "unexpected variable template expression")
-  | ListE es -> 
+  | ListE es ->
     let es', bs1 = subst_list subst_exp substs es in
     ListE es' $$ e.at % e.note, bs1
   | LenE e1 ->
@@ -727,8 +857,9 @@ and subst_exp substs e : exp * bind list =
   | TmplE {it = VarS _; _} ->
     error e.at "unexpected variable template expression"
   | TmplE s -> 
-    let bs, e = find_entry substs s in
-    e, bs
+    let bs, e1 = find_entry substs s in
+    let e1' = repos_exp e.at e1 in
+    e1', bs
 
 and subst_expfield substs (atom, e) : expfield * bind list = 
   let e', bs1 = subst_exp substs e in
@@ -752,9 +883,7 @@ and subst_path substs p : path * bind list =
 
 and subst_iterexp substs (iter, bs) : iterexp * bind list =
   let iter', bs1 = subst_iter substs iter in
-  let bs', bs2 = subst_list (fun _ (id, t) -> 
-    let t', bs1 = subst_typ substs t in
-    (id, t'), bs1) substs bs in
+  let bs', bs2 = subst_list (subst_pair (fun _ id -> id, []) subst_typ) substs bs in
   (iter', bs'), bs1 @ bs2
 
 and subst_prem substs prem : prem * bind list =
@@ -779,10 +908,11 @@ and subst_prem substs prem : prem * bind list =
 and subst_arg substs a : arg list * bind list =
   match a.it with
   | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
-    let bs, e = find_entry substs s in
-    (match e.it with 
+    let bs, e1 = find_entry substs s in
+    let e1' = repos_exp a.at e1 in
+    (match e1'.it with 
     | ListE es | TupE es -> 
-      List.map (fun e' -> ExpA e' $ a.at) es, bs
+      List.map (fun e -> ExpA e $ a.at) es, bs
     | _ -> error a.at "unexpected variable template expression")
   | ExpA e -> 
     let e', bs1 = subst_exp substs e in
@@ -853,6 +983,8 @@ let subst_def (substs : substs) d : def * bind list =
 
 let simpl_list f xs = List.map f xs
 
+let simpl_pair f1 f2 (x, y) = (f1 x, f2 y)
+
 let rec simpl_iter it : iter =
   match it with
   | Opt | List | List1 -> it
@@ -867,7 +999,7 @@ and simpl_typ t : typ =
   | NumT _
   | TextT -> t
   | TupT ets -> 
-    TupT (simpl_list (fun (e, t) -> simpl_exp e, simpl_typ t) ets) $ t.at
+    TupT (simpl_list (simpl_pair simpl_exp simpl_typ) ets) $ t.at
   | IterT (t1, it) -> 
     IterT (simpl_typ t1, simpl_iter it) $ t.at
   | BotT -> t
@@ -1003,7 +1135,7 @@ and simpl_path p : path =
     DotP (simpl_path p1, atom) $$ p.at % p.note
 
 and simpl_iterexp (iter, bs) : iterexp =
-    (simpl_iter iter, simpl_list (fun (id, t) -> id, simpl_typ t) bs)
+  (simpl_iter iter, simpl_list (simpl_pair (fun id -> id) simpl_typ) bs)
 
 and simpl_prem prem : prem =
   match prem.it with
