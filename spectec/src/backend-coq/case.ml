@@ -47,8 +47,6 @@ let _case_mixop (m : mixop) =
     | [{it = Atom a; _}]::tail when List.for_all ((=) []) tail -> a
     | _ -> ""
 
-(* MEMO: space is "Sub pass" or "Case"
-         space seems to be unused except for debugging purposes *)
 let find space env' id =
   match Env.find_opt id.it env' with
   | None -> error id.at ("undeclared " ^ space ^ " `" ^ id.it ^ "`")
@@ -67,7 +65,6 @@ let _print_env (env: env) =
     "Num Args: " ^ string_of_int num_args ^ "\n" ^
     "Struct Type: " ^ string_of_struct_type str_typ ^ "\n")) env.vars
 
-(* MEMO: Environment is only updated via this helper function *)
 let bind env' id t =
   if id = "_" then env' else
     Env.add id t env'
@@ -81,7 +78,6 @@ let case_deftyp (id : id) (args : arg list) (e : env) (dtyp : deftyp) =
   match dtyp.it with
   | AliasT typ -> 
     let (n_id, s_t) = case_typ typ in 
-    (* MEMO: This is a record update syntax *)
     (* MEMO: Collects number of arguments required to index this type family
              n_id is the right hand side of the equality which is assumed to be
              a single variable id  *)
@@ -111,11 +107,13 @@ let case_instance (e : env) (id : id) (params : param list) (i : inst) =
     )
 let rec case_def (e : env) (d : def) = 
   match d.it with
-    | (* MEMO: This type family contains a single instance *)
-      TypD (id, _params, [{it = InstD (_binds, args, deftyp); _}]) -> case_deftyp id args e deftyp
-    | (* MEMO: This type family contains multiple instances 
+    | TypD (id, _params, [{it = InstD (_binds, args, deftyp); _}]) -> 
+      (* MEMO: This type family contains a single instance *)
+      case_deftyp id args e deftyp
+    | TypD (id, params, insts) ->
+      (* MEMO: This type family contains multiple instances 
                indexed by arguments of the syntax definition *)
-      TypD (id, params, insts) -> List.iter (case_instance e id params) insts
+      List.iter (case_instance e id params) insts
     | (* MEMO: RecD group mutually recursive defs *)
       RecD defs -> List.iter (case_def e) defs
     | _ -> ()

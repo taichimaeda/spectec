@@ -190,6 +190,95 @@ let entry_of_id id =
 let entry_of_exp all e = 
   binds_of_exp all e, e
 
+let env_rule_prems env id1 r =
+  let find_prevs k assoc : bind list * exp list = 
+    let ents = List.filter_map (fun (k', ent) -> 
+      if eq_exp k k' then Some ent else None) assoc in
+    let bss, es = List.split ents in
+    List.flatten bss, es in
+
+  let add_prevs k ent assoc =
+    (k, ent)::assoc in
+
+  let neg_exp e = 
+    UnE (NotOp, e) $$ e.at % (BoolT $ e.at) in
+
+  let conj_exps es = 
+    match es with 
+    | [] -> BoolE true $$ no_region % (BoolT $ no_region)
+    | e::es' -> List.fold_left (fun acc e1 -> 
+      BinE (AndOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
+  
+  let disj_exps es = 
+    match es with 
+    | [] -> BoolE true $$ no_region % (BoolT $ no_region)
+    | e::es' -> List.fold_left (fun acc e1 -> 
+      BinE (OrOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
+
+  let rec exp_of_prem prevs prem =
+    (match prem.it with
+    | IfPr e -> e
+    | RulePr (id, mixop, e) -> 
+      RuleE (id, mixop, e) $$ prem.at % (BoolT $ prem.at)
+    | LetPr (e1, e2, _) -> 
+      CmpE (EqOp, e1, e2) $$ prem.at % (BoolT $ prem.at)
+    | IterPr (prem1, ie) -> 
+      FoldE (exp_of_prem prevs prem1, ie) $$ prem.at % (BoolT $ prem.at)
+    | ElsePr -> neg_exp (disj_exps prevs)) in
+      
+  let exp_of_prems prevs prems =
+    conj_exps (List.map (exp_of_prem prevs) prems) in
+
+  match id1.it, r.it with
+  | "Step_pure", RuleD (id2, bs1, _, {it = TupE [as1; _]; _}, prems) ->
+    let bs2, prevs = find_prevs as1 !(env.step_pure_prems) in
+    let boole = exp_of_prems prevs prems in
+    let bs' = binds_of_exp (bs1 @ bs2) boole in
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole);
+    env.step_pure_prems := add_prevs as1 (bs', boole) !(env.step_pure_prems)
+  | "Step_read", RuleD (id2, bs1, _, {it = TupE [c1; _]; _}, prems) ->
+    let bs2, prevs = find_prevs c1 !(env.step_read_prems) in
+    let boole = exp_of_prems prevs prems in
+    let bs' = binds_of_exp (bs1 @ bs2) boole in
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole);
+    env.step_read_prems := add_prevs c1 (bs', boole) !(env.step_read_prems)
+  | _, RuleD (id2, bs1, _, _, prems) ->
+    (* previous premises are not collected for all relations *)
+    let prevs = [] in
+    let boole = exp_of_prems prevs prems in
+    let bs' = binds_of_exp bs1 boole in
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole)
+
+let env_rule_freevars env id1 r =
+  match r.it with
+  | RuleD (id2, bs, _, e, prems) ->
+    let rec fold_iter id t its = 
+      fold_iter' id t (List.rev its)
+      
+    and fold_iter' id t its =
+      match its with
+      | [] -> 
+        VarE id $$ id.at % t, t
+      | it::its' ->
+        (* emulates annot pass in frontend *)
+        let ie = it, [(id, t)] in
+        let e1, t1 = fold_iter' id t its' in
+        let t1' = IterT (t1, it) $ t1.at in
+        let e1' = IterE (e1, ie) $$ e1.at % t1' in
+        e1', t1' in
+
+    let bs' = binds_of_rule bs e prems in
+    let es = List.filter_map (fun b -> match b.it with
+      | ExpB (id, t, iter) -> 
+        let e', _ = fold_iter id t iter in Some e'
+      | TypB _ -> None) bs' in
+    let ts = List.map (fun e -> e, e.note) es in
+    let at = match es with 
+      | [] -> no_region
+      | e::_ -> e.at in
+    let tupe = TupE es $$ at % (TupT ts $ at) in
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "freevars"] (bs', tupe)
+
 let env_rule_instr_ok env id1 r =
   match r.it with
   | RuleD (id2, bs, _, {it = TupE [c; i; ft]; _}, _) ->
@@ -241,99 +330,11 @@ let env_rule_step_read env id1 r =
     | _ -> error r.at "unexpected form of rule Step_read")
   | RuleD _ -> error r.at "unexpected form of rule Step_read"
 
-let env_rule_prems env id1 r =
-  let find_prevs k assoc : bind list * exp list = 
-    let ents = List.filter_map (fun (k', ent) -> 
-      if eq_exp k k' then Some ent else None) assoc in
-    let bss, es = List.split ents in
-    List.flatten bss, es in
-
-  let add_prevs k ent assoc =
-    (k, ent)::assoc in
-
-  let neg_exp e = 
-    UnE (NotOp, e) $$ e.at % (BoolT $ e.at) in
-
-  let conj_exps es = 
-    match es with 
-    | [] -> BoolE true $$ no_region % (BoolT $ no_region)
-    | e::es' -> List.fold_left (fun acc e1 -> 
-      BinE (AndOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
-  
-  let disj_exps es = 
-    match es with 
-    | [] -> BoolE true $$ no_region % (BoolT $ no_region)
-    | e::es' -> List.fold_left (fun acc e1 -> 
-      BinE (OrOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
-
-  let rec exp_of_prem prevs prem =
-    (match prem.it with
-    | IfPr e -> e
-    | RulePr (id, mixop, e) -> 
-      RuleE (id, mixop, e) $$ prem.at % (BoolT $ prem.at)
-    | LetPr (e1, e2, _) -> 
-      CmpE (EqOp, e1, e2) $$ prem.at % (BoolT $ prem.at)
-    | IterPr (prem1, ie) -> 
-      IterE (exp_of_prem prevs prem1, ie) $$ prem.at % (BoolT $ prem.at)
-    | ElsePr -> neg_exp (disj_exps prevs)) in
-      
-  let exp_of_prems prevs prems =
-    conj_exps (List.map (exp_of_prem prevs) prems) in
-
-  match id1.it, r.it with
-  | "Step_pure", RuleD (id2, bs1, _, {it = TupE [as1; _]; _}, prems) ->
-    let bs2, prevs = find_prevs as1 !(env.step_pure_prems) in
-    let boole = exp_of_prems prevs prems in
-    let bs' = binds_of_exp (bs1 @ bs2) boole in
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole);
-    env.step_pure_prems := add_prevs as1 (bs', boole) !(env.step_pure_prems)
-  | "Step_read", RuleD (id2, bs1, _, {it = TupE [c1; _]; _}, prems) ->
-    let bs2, prevs = find_prevs c1 !(env.step_read_prems) in
-    let boole = exp_of_prems prevs prems in
-    let bs' = binds_of_exp (bs1 @ bs2) boole in
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole);
-    env.step_read_prems := add_prevs c1 (bs', boole) !(env.step_read_prems)
-  | _, RuleD (id2, bs1, _, _, prems) ->
-    (* previous premises are not collected here *)
-    let prevs = [] in
-    let boole = exp_of_prems prevs prems in
-    let bs' = binds_of_exp bs1 boole in
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole)
-
-let env_rule_freevars env id1 r =
-  match r.it with
-  | RuleD (id2, bs, _, e, prems) ->
-    let rec fold_iter id t its = 
-      fold_iter' id t (List.rev its)
-      
-    and fold_iter' id t its =
-      match its with
-      | [] -> 
-        VarE id $$ id.at % t, t
-      | it::its' ->
-        (* emulates annot pass in frontend *)
-        let ie = it, [(id, t)] in
-        let e1, t1 = fold_iter' id t its' in
-        let t1' = IterT (t1, it) $ t1.at in
-        let e1' = IterE (e1, ie) $$ e1.at % t1' in
-        e1', t1' in
-
-    let bs' = binds_of_rule bs e prems in
-    let es = List.filter_map (fun b -> match b.it with
-      | ExpB (id, t, iter) -> 
-        let e', _ = fold_iter id t iter in Some e'
-      | TypB _ -> None) bs' in
-    let ts = List.map (fun e -> e, e.note) es in
-    let at = match es with 
-      | [] -> no_region
-      | e::_ -> e.at in
-    let tupe = TupE es $$ at % (TupT ts $ at) in
-    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "freevars"] (bs', tupe)
-
 let env_rule env id1 r =
   env_rule_prems env id1 r;
   env_rule_freevars env id1 r;
   
+  (* special slots for some relations *)
   match id1.it with
   | "Instr_ok" -> env_rule_instr_ok env id1 r
   | "Instrs_ok" -> env_rule_instrs_ok env id1 r
@@ -428,6 +429,7 @@ and slots_exp e =
   | RuleE (_, _, e1) -> slots_exp e1
   | ForallE (_, as_, e1) -> slots_list slots_arg as_ @ slots_exp e1
   | ExistsE (_, as_, e1) -> slots_list slots_arg as_ @ slots_exp e1
+  | FoldE (e1, ie) -> slots_exp e1 @ slots_iterexp ie
   | TmplE s -> [s]
 
 and slots_expfield (_, e) = slots_exp e
@@ -698,6 +700,8 @@ and repos_exp at e : exp =
     ForallE (repos_list repos_bind at bs, repos_list repos_arg at as_, repos_exp at e1) $$ at % e.note
   | ExistsE (bs, as_, e1) -> 
     ExistsE (repos_list repos_bind at bs, repos_list repos_arg at as_, repos_exp at e1) $$ at % e.note
+  | FoldE (e1, ie) -> 
+    FoldE (repos_exp at e1, repos_iterexp at ie) $$ at % e.note
   | TmplE _ ->
     error at "unexpected variable template expression"
 
@@ -911,6 +915,10 @@ and subst_exp substs e : exp * bind list =
     | ForallE _ -> ForallE (uniq_binds (bs @ bs1'), as', e1')
     | ExistsE _ -> ExistsE (uniq_binds (bs @ bs1'), as', e1')
     | _ -> assert false) $$ e.at % e.note, bs2'
+  | FoldE (e1, ie) -> 
+    let e1', bs1 = subst_exp substs e1 in
+    let ie', bs2 = subst_iterexp substs ie in
+    FoldE (e1', ie') $$ e.at % e.note, bs1 @ bs2
   | TmplE {it = VarS _; _} ->
     error e.at "unexpected variable template expression"
   | TmplE s -> 
@@ -1144,6 +1152,8 @@ and simpl_exp' f e : exp =
     ForallE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
   | ExistsE (bs, as_, e1) -> 
     ExistsE (bs, simpl_list simpl_arg as_, cont e1) $$ e.at % e.note
+  | FoldE (e1, ie) -> 
+    FoldE (cont e1, simpl_iterexp ie) $$ e.at % e.note
   | TmplE _ -> assert false
 
 and simpl_expsub f e : exp = 
@@ -1267,7 +1277,7 @@ let partition ds =
 let transform ds =
   let ntds, tds = partition ds in
   (* skip if no templates *)
-  if tds = [] then ntds else
+  if tds = [] then ds else
 
   let env = env ntds in
   let tds' = tds

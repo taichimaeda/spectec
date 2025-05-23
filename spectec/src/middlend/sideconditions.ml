@@ -111,6 +111,12 @@ let rec t_exp env e : prem list =
   -> t_exp env exp
   | ForallE (_, args, exp) | ExistsE (_, args, exp)
   -> t_args env args @ t_exp env exp
+  | FoldE (e1, iterexp)
+  ->
+    (* TODO: (lemmagen) Duplicate of IterE *)
+    t_iterexp env iterexp @
+    let env' = env_under_iter env iterexp in
+    List.map (fun pr -> IterPr (pr, iterexp) $ e.at) (t_exp env' e1)
   | TmplE _
   -> error e.at "unexpected template expression"
 

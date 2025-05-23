@@ -139,6 +139,7 @@ and free_exp e =
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, _, e) -> free_thmid id + free_exp e
   | ForallE (bs, as_, e) | ExistsE (bs, as_, e) -> free_exp e - free_binds bs - free_args as_
+  | FoldE (e1, iter) -> free_exp e1 + free_iterexp iter
   | TmplE _ -> empty
 
 and free_expfield (_, e) = free_exp e

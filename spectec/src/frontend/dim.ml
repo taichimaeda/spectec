@@ -437,6 +437,10 @@ and annot_exp env e : Il.Ast.exp * occur =
       | ForallE _ -> ForallE (bs1, as1', e1')
       | ExistsE _ -> ExistsE (bs1, as1', e1')
       | _ -> assert false), List.fold_left union Env.empty (occur1::occurs)
+    | FoldE (e1, iter) -> 
+      let e1', occur1 = annot_exp env e1 in
+      let iter', occur' = annot_iterexp env occur1 iter e.at in
+      FoldE (e1', iter'), occur'
     | TmplE s -> TmplE s, Env.empty
   in {e with it}, occur
 

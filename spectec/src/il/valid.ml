@@ -330,7 +330,7 @@ and infer_exp env e : typ =
   | CatE _ -> error e.at "cannot infer type of concatenation"
   | CaseE _ -> error e.at "cannot infer type of case constructor"
   | SubE _ -> error e.at "cannot infer type of subsumption"
-  | RuleE _ | ForallE _ | ExistsE _ -> BoolT $ e.at
+  | RuleE _ | ForallE _ | ExistsE _ | FoldE _ -> BoolT $ e.at
   | TmplE _ -> BotT $ e.at
 
 and valid_exp env e t =
@@ -462,6 +462,10 @@ try
     sub_typ env t1 t2 e.at
   | RuleE _ | ForallE _ | ExistsE _ ->
     error e.at "unexpected formula"
+  | FoldE (e1, iter) ->
+    let env' = valid_iterexp env iter in
+    valid_exp env' e1 t;
+    equiv_typ env t (BoolT $ e.at) e.at
   | TmplE _ when not env.template ->
     error e.at "unexpected template"
   | TmplE s ->
@@ -489,18 +493,15 @@ and valid_expform env e t =
   | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) ->
     let env' = local_env env in
     List.iter (valid_bind env') bs;
-    (* TODO: (lemmagen) Need to substitute ids bound by quantifiers in types *)
     List.iter (fun a -> match a.it with 
       | ExpA e1 -> valid_exp env' e1 (infer_exp env' e1)
-      | TypA _ -> error e.at "unsupported quantifier argument") as_;
+      | TypA t1 -> valid_typ env' t1) as_;
     valid_expform env' e1 (BoolT $ e.at);
     equiv_typ env' (BoolT $ e.at) t e.at
-  | IterE (e1, iter) when t.it = BoolT -> 
-    (* TODO: (lemmagen) Treats iterations as a conjunction
-                        when the type expects a scalar boolean value *)
+  | FoldE (e1, iter) ->
     let env' = valid_iterexp env iter in
-    valid_expform env' e1 (BoolT $ e.at);
-    equiv_typ env' (BoolT $ e.at) t e.at
+    valid_expform env' e1 t;
+    equiv_typ env t (BoolT $ e.at) e.at
   | _ -> valid_exp env e t
 
 and valid_expmix env mixop e (mixop', t) at =

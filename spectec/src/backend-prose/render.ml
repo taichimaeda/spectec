@@ -403,6 +403,11 @@ and render_expr' env expr =
     let msg = sprintf "expr cannot be rendered %s" se in
     error expr.at msg
 
+and render_exprs ?(sep = "") env exprs = 
+  exprs 
+  |> List.map (render_expr env)
+  |> String.concat sep
+
 and render_path env path =
   match path.it with
   | Al.Ast.IdxP e ->
@@ -476,6 +481,14 @@ let render_cmpop = function
   | Le -> "less than or equal to"
   | Ge -> "greater than or equal to"
 
+let render_item env (x, xs) = 
+  render_expr env x ^ " in " ^ render_expr env xs
+
+let render_items ?(sep = "") env items = 
+  items
+  |> List.map (render_item env)
+  |> String.concat sep
+
 let rec render_para env para = 
   match para with
   | CmpP (op, e1, e2) -> 
@@ -489,41 +502,38 @@ let rec render_para env para =
   | AndP (paras) -> 
     let paras', para = Lib.List.split_last paras in
     sprintf "%s and %s"
-      (paras'
-        |> List.map (render_para env)
-        |> String.concat ", ")
+      (render_paras ~sep:", " env paras')
       (render_para env para)
   | OrP (paras) -> 
     let paras', para = Lib.List.split_last paras in
     sprintf "%s or %s"
-      (paras'
-        |> List.map (render_para env)
-        |> String.concat ", ")
+      (render_paras ~sep:", " env paras')
       (render_para env para)
-  | IfP (paras, para) ->
-    let paras', para' = Lib.List.split_last paras in
+  | IfP (paras, para1) ->
+    let paras', para = Lib.List.split_last paras in
     sprintf "if %s%s, then %s"
-      (paras'
-        |> List.map (render_para env)
-        |> String.concat ", ")
+      (render_paras ~sep:", " env paras')
       ((if paras' = [] then "" else " and ") ^ 
-       render_para env para')
-      (render_para env para)
+       render_para env para)
+      (render_para env para1)
   | IffP (para1, para2) -> 
     sprintf "%s if and only if %s"
       (render_para env para1)
       (render_para env para2)
+  | ForeachP (items, para1) ->
+    let items', item = Lib.List.split_last items in
+    sprintf "for each %s%s, %s"
+      (render_items ~sep:", " env items')
+      ((if items' = [] then "" else " and ") ^ 
+       render_item env item)
+      (render_para env para1) 
   | ForallP (es, para1) -> 
     sprintf "for all %s, %s"
-      (es
-        |> List.map (render_expr env)
-        |> String.concat ", ")
+      (render_exprs ~sep:", " env es)
       (render_para env para1)
   | ExistsP (es, para1) -> 
     sprintf "there exists %s such that %s"
-      (es
-        |> List.map (render_expr env)
-        |> String.concat ", ")
+      (render_exprs ~sep:", " env es)
       (render_para env para1)
   | ExpP (e1) -> 
     sprintf "%s is true"
@@ -540,19 +550,20 @@ let rec render_para env para =
       (render_expr env e2)
   | RelP (id, es) ->
     sprintf "relation %s %s holds" id
-      (es 
-        |> List.map (render_expr env)
-        |> String.concat " ")
+      (render_exprs ~sep:" " env es)
   | PredP (id, es) -> 
     sprintf "predicate %s(%s) holds" id
-      (es
-        |> List.map (render_expr env)
-        |> String.concat ", ")
+      (render_exprs ~sep:", " env es)
   | CustomP (fmt, es) -> 
     print_endline @@ "debugging" ^ (replace_percent fmt (List.map (render_expr env) es));
     replace_percent fmt (List.map (render_expr env) es)
   | YetP s -> 
     sprintf "unsupported paragraph: %s" s
+
+and render_paras ?(sep = "") env paras = 
+  paras
+  |> List.map (render_para env)
+  |> String.concat sep
 
 (* Prefix for stack push/pop operations *)
 let render_stack_prefix expr =

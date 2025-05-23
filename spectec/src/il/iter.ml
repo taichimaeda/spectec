@@ -144,6 +144,7 @@ and exp e =
   | SubE (e1, t1, t2) -> exp e1; typ t1; typ t2
   | RuleE (x, op, e1) -> relid x; mixop op; exp e1
   | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> binds bs; args as_; exp e1
+  | FoldE (e1, it) -> exp e1; iterexp it
   | TmplE s -> slot s
 
 and expfield (at, e) = atom at; exp e

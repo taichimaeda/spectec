@@ -192,6 +192,16 @@ let rec formula_to_para env e : para =
     (match hint with
     | Some fmt -> CustomP (fmt, es)
     | None -> PredP (id.it, es))
+  | Ast.FoldE (e1, (iter, bs)) ->
+    (match iter with
+    | Ast.Opt -> 
+      let conds = List.map (fun (id, _) -> ExpP (isDefinedE (varE id.it))) bs in
+      IfP (conds, formula_to_para env e1)
+    | Ast.(List | List1 | ListN _) ->
+      let items = List.map (fun (id, _) -> 
+        let name = varE id.it in
+        (name, iterE (name, [id.it], Al.Ast.List))) bs in
+      ForeachP (items, formula_to_para env e1))
   | _ when e.note.it = Ast.BoolT ->
     ExpP (exp_to_expr e)
   | _ -> 
@@ -249,6 +259,7 @@ let rec extract_vrules def =
 let extract_def_theorems style d = 
   match d.it with 
   | Ast.DecD (id, params, _, clauses) ->
+    (* TODO: (lemmagen) Perform these checks in validation logic *)
     if params <> [] then 
       error d.at "theorem takes no arguments";
     if List.length clauses <> 1 then

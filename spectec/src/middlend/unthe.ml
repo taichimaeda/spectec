@@ -136,6 +136,13 @@ and t_exp' n e : eqns * exp' =
     binary t_args t_exp n (args, exp) (fun (args', exp') -> ForallE (binds, args', exp'))
   | ExistsE (binds, args, exp) ->
     binary t_args t_exp n (args, exp) (fun (args', exp') -> ExistsE (binds, args', exp'))
+  | FoldE (e, iterexp) ->
+    (* TODO: (lemmagen) Duplicate of IterE *)
+    let eqns1, e' = t_exp n e in
+    let iterexp', eqns1' = under_iterexp iterexp eqns1 in
+    let eqns2, iterexp'' = t_iterexp n iterexp' in
+    let iterexp''' = update_iterexp_vars (Il.Free.free_exp e') iterexp'' in
+    eqns1' @ eqns2, FoldE (e', iterexp''')
 
   | BinE (bo, exp1, exp2) -> t_ee n (exp1, exp2) (fun (e1', e2') -> BinE (bo, e1', e2'))
   | CmpE (co, exp1, exp2) -> t_ee n (exp1, exp2) (fun (e1', e2') -> CmpE (co, e1', e2'))

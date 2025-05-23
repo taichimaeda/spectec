@@ -83,7 +83,7 @@ let transform_id' (s : text) = match s with
 let transform_id (id : id) = transform_id' id.it
 
 let transform_var_id (id : id) = 
-  (* TODO: (lemmagen) Double underscores are used for escaping subscript in Latex *)
+  (* TODO: (lemmagen) Double underscore for escaping subscript in Latex *)
   let id' = Lib.String.replace "__" "_" id.it in
   var_prefix ^ transform_id' id'
 
@@ -125,8 +125,6 @@ let gen_arg_names (arg : arg) =
   match arg.it with
     | ExpA e -> let rec gen_argexp_name exp = 
       (match exp.it with
-        (* MEMO: exp.note denotes the type of the expressions exp in IL
-                 See elab_exp in elab.ml for more details *)
         (* MEMO: Generates list of type names of expressions by traversing
                  case expressions and tuples *)
         | VarE _ -> [gen_typ_name exp.note]
@@ -157,9 +155,10 @@ let infer_match_name (args : arg list) (type_name : text) =
   let rec infer_match_name_from_args ags = 
     match ags with
       | [] -> None
-      | (* MEMO: gen_arg_names a produces a list of type names
+      | a :: ags' -> 
+        (* MEMO: gen_arg_names a produces a list of type names
                  of all sub-expressions within the argument a *)
-        a :: ags' -> let name_list = gen_arg_names a in
+        let name_list = gen_arg_names a in
         (* MEMO: infer_function name_list finds the name of some sub-expression
                  which is registered in transform_inst as an instance of
                  type family named type_name *) 
@@ -185,9 +184,10 @@ let find_typ (args : arg list) (type_name : text) =
   let rec infer_match_name_from_args ags = 
     match ags with
       | [] -> None
-      | (* MEMO: gen_arg_names a produces a list of type names
+      | a :: ags' ->
+        (* MEMO: gen_arg_names a produces a list of type names
                  of all sub-expressions within the argument a *)
-        a :: ags' -> let name_list = gen_arg_names a in 
+        let name_list = gen_arg_names a in 
         (* MEMO: infer_function name_list finds the type of some sub-expression
                  whose name is registered in transform_inst as an instance of
                  type family named type_name *)
@@ -258,21 +258,20 @@ and erase_dependent_type (typ : typ) =
     | IterT (t, iter) -> T_app (transform_itertyp iter, [erase_dependent_type t])
     | TupT [] -> T_type_basic T_unit
     | TupT typs -> T_tuple (List.map (fun (_, t) -> erase_dependent_type t) typs)
-    | (* MEMO: This is the base case for this function
-               Skips dependent args in VarT if the type family is declared 
+    | VarT (id, _) ->
+      (* MEMO: Skips dependent args in VarT if the type family is declared 
                with the id otherwise defaults to transform_type *)
-      VarT (id, _) -> let inferred_opt = Hashtbl.mem family_helper (transform_id id) in      
+      let inferred_opt = Hashtbl.mem family_helper (transform_id id) in      
       if inferred_opt then T_ident [transform_id id] else transform_type typ
-    | _ -> transform_type typ
+      | _ -> transform_type typ
 
+(* MEMO: Returns true if the type expression contains variables 
+         that refer to a type family declaration or instance definition *)
 and check_family_dependent_type (typ : typ) = 
   match typ.it with
     | IterT (t, _iter) -> check_family_dependent_type t
     | TupT typs -> List.fold_left (fun acc (_, t) -> acc || check_family_dependent_type t) false typs
-    | (* MEMO: This is the base case for this function
-               Returns true if the type expression contains variables 
-               that refer to a type family declaration or instance definition *)
-      VarT (id, _) -> Hashtbl.mem family_helper (transform_id id)
+    | VarT (id, _) -> Hashtbl.mem family_helper (transform_id id)
     | _ -> false
 
 (* TODO: (lemmagen) Refactor this function *)
@@ -323,7 +322,7 @@ and transform_tuple_to_relation_args (t : typ) =
 and transform_exp (exp : exp) =
   match exp.it with 
     | VarE id -> 
-      (* MEMO: Need to case occurrences of variable identifiers
+      (* MEMO: Need to cast occurrences of variable identifiers
                if the type of the variable is an instance of type family
                because dependent indices in all typ expressions are erased in this implementation *)
       if (Hashtbl.mem family_helper (gen_typ_name exp.note)) 
@@ -341,7 +340,6 @@ and transform_exp (exp : exp) =
     | TupE exps -> T_match (List.map transform_exp exps) 
     | ProjE (e, n) -> T_app (T_exp_basic T_listlookup, [transform_exp e; T_exp_basic (T_nat (Z.of_int n))])
     | CaseE (mixop, e) ->
-      (* MEMO: exp.note denotes the type of the expression *)
       (* MEMO: num_args is required to supply enough arguments
                to the constructor of the inductive definition in Coq *)
       (* MEMO: actual_id is the name of the newly aliased type for type alias *)
@@ -367,15 +365,9 @@ and transform_exp (exp : exp) =
         let t_iter = if iter = Opt then I_option else I_list in
         let iter_str = if iter = Opt then "option" else "list" in
         (match iter, ids, exp.it with
-        | (* MEMO: If no variable in exp is being iterated 
-                   then the iteration must be a singleton list *)
-          (List | List1 | ListN _), [], _ -> T_list [exp1] 
-        | (* TODO: Is this case properly handled? *)
-          (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
-        | (* TODO: name and T_ident are being used inconsistently
-                   Ideally string manipulation logic like concatenation of identifiers with "__"
-                   should only appear in print.ml not in this module *)
-          (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) ->
+        | (List | List1 | ListN _), [], _ -> T_list [exp1] 
+        | (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
+        | (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) ->
           (* MEMO: e.g. list__val__admininstr v_val *)
           T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
         | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> 
@@ -391,6 +383,9 @@ and transform_exp (exp : exp) =
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
     | RuleE _ | ForallE _ | ExistsE _ -> 
       error exp.at "unexpected formula"
+    | FoldE (e1, (iter, bs)) ->
+      let t_iter = if iter = Opt then I_option else I_list in
+      T_listforall (t_iter, transform_exp e1, List.map (fun (i, _) -> transform_var_id i) bs)
     | TmplE _ -> 
       error exp.at "unexpected template expression"
 
@@ -409,12 +404,12 @@ and transform_match_exp (exp : exp) =
     | _ -> T_ident [transform_var_id id])
   | CatE (exp1, exp2) -> T_app_infix (T_exp_basic T_listmatch, transform_match_exp exp1, transform_match_exp exp2)
   | IterE (exp, _) -> transform_match_exp exp
-  | ListE exps -> (match exps with
-    | (* TODO: Should this be T_list [transform_match_exp e]? *)
-      [e] -> transform_match_exp e
-    | (* TODO: Does this handle inner occurrence of IterE etc in exp
-               properly for pattern matching? *)
-      _ -> transform_exp exp)
+  | ListE exps -> 
+    (* TODO: Does this handle inner occurrence of IterE etc in exp
+             properly for pattern matching? *)
+    (match exps with
+    | [e] -> transform_match_exp e
+    | _ -> transform_exp exp)
   | CaseE (m, e) -> 
     (* MEMO: infer_match_name returns the name of the child inductive type
              which corresponds to the matching instance of the type family named id_transformed *)
@@ -425,10 +420,11 @@ and transform_match_exp (exp : exp) =
       (* TODO: (lemmagen) Duplicate of transform_exp *)
       let actual_id, num_args = gen_case_name !caseenv_ref exp.note in 
       T_app (T_ident [transform_id actual_id; transform_mixop m], List.append (List.init num_args (fun _ -> T_ident ["_ "])) (transform_tuple_exp transform_match_exp e)))
-  | (* MEMO: Allows matching against the addition of natural numbers n1 + n2
+  | BinE (AddOp _, exp1, {it = NatE n ;_}) -> 
+    (* MEMO: Allows matching against the addition of natural numbers n1 + n2
              if n2 is a natural number literal
              Prepends successor constructor S of nat repeatedly n2 times *)
-    BinE (AddOp _, exp1, {it = NatE n ;_}) -> let rec get_succ n = (match n with
+    let rec get_succ n = (match n with
     | 0 -> transform_match_exp exp1
     | m -> T_app (T_exp_basic T_succ, [get_succ (m - 1)])
   ) in get_succ (Z.to_int n)
@@ -451,27 +447,22 @@ and transform_formula_exp (exp : exp) =
       T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
     | ExistsE (bs, _, e1) ->
       T_exists (List.map transform_relation_bind bs, transform_formula_exp e1)
-    | IterE (exp, (iter, id_types)) when exp.note.it = BoolT ->
-      (* TODO: (lemmagen) Treats iterations as a conjunction
-                          when the type expects a scalar boolean value *)
-      (* TODO: (lemmagen) Duplicate of transform_premise *)
+    | FoldE (e1, (iter, bs)) ->
       let t_iter = if iter = Opt then I_option else I_list in
-      T_listforall (t_iter, transform_formula_exp exp, List.map (fun (i, _typ) -> transform_var_id i) id_types)
+      T_listforall (t_iter, transform_formula_exp e1, List.map (fun (i, _) -> transform_var_id i) bs)
     | _ -> transform_exp exp
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
 (* This could be extended for other list expressions (and option), but for 1.0 this is fine *)
 and transform_return_exp (r_typ : typ option) (exp : exp) = 
-  if check_formula exp then 
-    transform_formula_exp exp
-  else 
-    match r_typ with
-    | None -> transform_exp exp
-    | Some typ -> (match exp.it with
-      | ListE exps -> T_list (List.map (fun e -> T_cast ((transform_exp e), erase_dependent_type (remove_iter_typ typ))) exps)
-      | OptE (Some e) -> T_app (T_exp_basic T_some, [T_cast (transform_exp e, erase_dependent_type (remove_iter_typ typ))])
-      | _ -> transform_exp exp
-    )
+  if check_formula exp then transform_formula_exp exp else 
+  match r_typ with
+  | None -> transform_exp exp
+  | Some typ -> (match exp.it with
+    | ListE exps -> T_list (List.map (fun e -> T_cast ((transform_exp e), erase_dependent_type (remove_iter_typ typ))) exps)
+    | OptE (Some e) -> T_app (T_exp_basic T_some, [T_cast (transform_exp e, erase_dependent_type (remove_iter_typ typ))])
+    | _ -> transform_exp exp
+  )
 
 and transform_unop (u : unop)= 
   match u with
@@ -531,13 +522,13 @@ and transform_arg (arg : arg) =
 and transform_match_arg (arg : arg) =
   match arg.it with
     | ExpA exp -> transform_match_exp exp
-    | (* MEMO: Cannot match against types in function definition in Coq *)
-      TypA _ -> T_ident ["_"]
+    | TypA _ -> T_ident ["_"]
 
 and transform_bind (bind : bind) =
   match bind.it with
-    | (* MEMO: This ignores iter list because it suffices for Wasm 1.0? *)
-      ExpB (id, typ, _) -> (transform_var_id id, erase_dependent_type typ)
+    | ExpB (id, typ, _) -> 
+      (* MEMO: This ignores iter list because it suffices for Wasm 1.0? *)
+      (transform_var_id id, erase_dependent_type typ)
     | TypB id -> (transform_id id, T_ident ["Type"])
 
 (* MEMO: This returns binders in Coq IL for each bind in IL *)
@@ -558,8 +549,7 @@ and transform_relation_bind (bind : bind) =
           | Some typ -> transform_type (transform_iter_bind (List.rev its) typ)
           | None -> erase_dependent_type (transform_iter_bind (List.rev its) t)
         ))
-    | (* MEMO: This is the case where typ is not a VarT *)
-      ExpB (id, typ, its) -> 
+    | ExpB (id, typ, its) -> 
       (transform_var_id id, erase_dependent_type (transform_iter_bind (List.rev its) typ))
     | TypB id -> (transform_var_id id, T_ident ["Type"])
 
@@ -606,8 +596,7 @@ and transform_path (paths : path list) (n : int) (name : string option) =
                Generates a list of record lookup function names for this path fragment *)
       let (dot_paths, rest) = list_split is_dot paths in
       let projection_list = List.map (fun p -> match p.it with 
-        | (* MEMO: p.note denotes the type of the struct type field *)
-          DotP (p, a) -> gen_typ_name p.note ^ "__" ^ transform_atom a
+        | DotP (p, a) -> gen_typ_name p.note ^ "__" ^ transform_atom a
         | _ -> "" (* Should not happen *)
       ) dot_paths in
       (* MEMO: var_prefix ^ string_of_int n is the parameter name of the continuation function
@@ -649,16 +638,19 @@ let rec transform_premise (p : prem) =
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
-    | (* MEMO: Type alias to terminal type is printed with Notation rather than Definition *)
-      AliasT typ -> if is_terminal_type typ
+    | AliasT typ -> 
+      (* MEMO: Type alias to terminal type is printed with Notation rather than Definition *)
+      if is_terminal_type typ
         then NotationD (transform_id id, transform_type typ) 
         else TypeAliasD (transform_id id, List.map transform_bind binds, erase_dependent_type typ)
-    | (* MEMO: Struct types are printed with Record *)
-      StructT typfields -> RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> 
+    | StructT typfields -> 
+      (* MEMO: Struct types are printed with Record *)
+      RecordD (transform_id id, List.map (fun (a, (_, t, _), _) -> 
       (transform_id id ^ "__" ^ transform_atom a, erase_dependent_type t, Option.map (get_struct_type !caseenv_ref) (get_typ_name t))
       ) typfields)
-    | (* MEMO: Variant types are printed with Inductive *)
-      VariantT typcases -> InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (_, t, _), _) ->
+    | VariantT typcases -> 
+      (* MEMO: Variant types are printed with Inductive *)
+      InductiveD (transform_id id, List.map transform_bind binds, List.map (fun (m, (_, t, _), _) ->
         (transform_id id ^ "__" ^ transform_mixop m, transform_typ_args t)) typcases)
 
 (* MEMO: This returns relation_type_entry in Coq IL for each rule in IL *)
@@ -688,8 +680,9 @@ let transform_inst (id : id) (i : inst) =
                  to indicate that this instance of the type family is defined *)
         Hashtbl.add family_helper name typ;
         TypeAliasT (erase_dependent_type typ)
-      | (* MEMO: Record types cannot take any parameters *)
-        StructT _ -> error i.at "Family of records should not exist" (* This should never occur *)
+      | StructT _ -> 
+        (* MEMO: Record types cannot take any variants *)
+        error i.at "Family of records should not exist" (* This should never occur *)
       | VariantT typcases -> 
         (* MEMO: Registers a dummy value for variant type
                  to indicate that this instance of the type family is defined *)
@@ -702,6 +695,7 @@ let transform_inst (id : id) (i : inst) =
 let transform_defthm (style : text) (d : def) = 
   match d.it with
   | DecD (id, params, _, clauses) -> 
+    (* TODO: (lemmagen) Perform these checks in validation logic *)
     if params <> [] then 
       error d.at "theorem takes no arguments";
     if List.length clauses <> 1 then
@@ -718,12 +712,14 @@ let transform_defthm (style : text) (d : def) =
 let rec transform_def (d : def) : coq_def =
   (match d.it with
     | TypD (id, _, [{it = InstD (binds, _, deftyp);_}]) -> transform_deftyp id binds deftyp 
-    | (* MEMO: Each instance in InductiveFamilyD 
+    | TypD (id, _, insts) -> 
+      (* MEMO: Each instance in InductiveFamilyD 
                results in a single inductive type definition with the exception of type aliases *)
-      TypD (id, _, insts) -> InductiveFamilyD (transform_id id, List.map (transform_inst id) insts)
-    | (* MEMO: Relations are defined in terms of notation type
+      InductiveFamilyD (transform_id id, List.map (transform_inst id) insts)
+    | RelD (id, _, typ, rules) -> 
+      (* MEMO: Relations are defined in terms of notation type
                typ is a tuple of types to be interspersed in the mixop which is ignored here *)
-      RelD (id, _, typ, rules) -> InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
+      InductiveRelationD (transform_id id, transform_tuple_to_relation_args typ, List.map (transform_rule id) rules)
     | DecD (id, params, typ, clauses) -> 
       let hint = find_proof_hint id in
       (match hint with
@@ -786,7 +782,6 @@ let rec get_sube_exp (exp : exp) =
     | ExtE (e1, _, e2) -> List.append (get_sube_exp e1) (get_sube_exp e2)
     | CallE (_, args) -> List.concat_map get_sube_arg args
     | IterE (e, _) -> get_sube_exp e
-    (* MEMO: This seems like the only base case in get_sube_* functions *)
     (* MEMO: Collects subsumption expressions in the IL *)
     | SubE _ as e -> [e $$ (exp.at, exp.note)]
     | _ -> []

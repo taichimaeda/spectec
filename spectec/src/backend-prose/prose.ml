@@ -22,6 +22,7 @@ type para =
 | OrP of para list
 | IfP of para list * para
 | IffP of para * para
+| ForeachP of (Al.Ast.expr * Al.Ast.expr) list * para
 | ForallP of Al.Ast.expr list * para
 | ExistsP of Al.Ast.expr list * para
 | ExpP of Al.Ast.expr

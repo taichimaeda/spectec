@@ -130,6 +130,9 @@ and subst_exp s e =
   | ExistsE (bs, as_, e1) -> 
     let bs', s' = subst_binds s bs in
     ExistsE (bs', subst_args s' as_, subst_exp s' e1)
+  | FoldE (e1, iterexp) -> 
+    FoldE (subst_exp s e1, subst_iterexp s iterexp)
+  (* no substitution for templates *)
   | TmplE s -> TmplE s
   ) $$ e.at % subst_typ s e.note
 

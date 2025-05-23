@@ -126,12 +126,13 @@ let not_apart lhs (_, _, lhs2) = not (apart lhs lhs2)
 (* MEMO: Matches against the list of relation_type_entry in Coq IL
          for each InductiveRelationD *)
 let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list = function
-  | (* MEMO: This is the base case of this function 
+  | [] -> 
+    (* MEMO: This is the base case of this function 
              There are no more rules or entries from this InductiveRelationD *)
-    [] -> [ InductiveRelationD (id, args, List.rev prev_rules) ]
-  | (* MEMO: r_id is each constructor name of the relation 
+    [ InductiveRelationD (id, args, List.rev prev_rules) ]
+  | ((r_id, binds), prems, terms) as r :: rules -> 
+    (* MEMO: r_id is each constructor name of the relation 
              terms is the arguments ot the relation in the conclusion of this constructor *)
-    ((r_id, binds), prems, terms) as r :: rules -> 
       if List.exists is_else prems
       then
         let lhs = match terms with
@@ -158,13 +159,14 @@ let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list =
         go id args typ1 (r :: prev_rules) rules
 
 let rec t_def (def : coq_def) : coq_def list = match def.it with
-  | (* MEMO: MutualRecD groups mutually recursive coq_defs *)
-    MutualRecD defs -> [ MutualRecD (List.concat_map t_def defs) $ def.at ]
+  | MutualRecD defs -> 
+    (* MEMO: MutualRecD groups mutually recursive coq_defs *)
+    [ MutualRecD (List.concat_map t_def defs) $ def.at ]
   | InductiveRelationD (id, args, r_entry) -> begin match args with
-    | (* MEMO: This only supports binary relation like Step_read *)
+    | [t1 ; _t2] ->
+      (* MEMO: This only supports binary relation like Step_read *)
       (* MEMO: This only passes t1 because the function go generates
                a unary relation on the LHS of the binary relation *)
-      [t1 ; _t2] ->
       List.map (fun d -> d $ def.at) (go id args t1 [] r_entry)
     | _ -> [def]
     end

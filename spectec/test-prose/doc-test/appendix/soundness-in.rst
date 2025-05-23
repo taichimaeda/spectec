@@ -79,3 +79,37 @@ $${theorem: t_pure_preservation}
 \
 
 $${theorem-prose: t_pure_preservation}
+
+.. _appendix-soundness-test-theorems:
+
+Test Theorems
+~~~~~~~~~~~~~~~
+
+Test Iterated Formula #1
+^^^^^^^^^^
+
+$${theorem: test_iterated_formula1}
+
+\
+
+$${theorem-prose: test_iterated_formula1}
+
+
+Test Iterated Formula #2
+^^^^^^^^^^
+
+$${theorem: test_iterated_formula2}
+
+\
+
+$${theorem-prose: test_iterated_formula2}
+
+
+Test Iterated Formula #3
+^^^^^^^^^^
+
+$${theorem: test_iterated_formula3}
+
+\
+
+$${theorem-prose: test_iterated_formula3}

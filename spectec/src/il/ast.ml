@@ -108,9 +108,10 @@ and exp' =
   | IterE of exp * iterexp       (* exp iter *)
   | SubE of exp * typ * typ      (* exp : typ1 <: typ2 *)
   | RuleE of id * mixop * exp    (* relid : exp *)
-  (* TODO: (lemmagen) Binds only args in quantifiers *)
-  | ForallE of bind list * arg list * exp    (* forall `(` arg* `)` exp *)
-  | ExistsE of bind list * arg list * exp    (* exists `(` arg* `)` exp *)
+  (* binds only args in quantifiers *)
+  | ForallE of bind list * arg list * exp    (* forall `{` bind* `}` `(` arg* `)` exp *)
+  | ExistsE of bind list * arg list * exp    (* exists `{` bind* `}` `(` arg* `)` exp *)
+  | FoldE of exp  * iterexp      (* exp iter *)
   | TmplE of slot                (* `{{` slot `}}` *)
 
 and expfield = atom * exp        (* atom exp *)

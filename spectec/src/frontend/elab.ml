@@ -1014,7 +1014,7 @@ and infer_exp' env e : Il.exp' * typ =
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = List.map (infer_arg env') as_ in
+    let as' = List.map (elab_argquant env') as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
     (* TODO: (lemmagen) exp is only annotated once from top-level *)
     (* let e1' = Dim.annot_exp dims' e1' in *)
@@ -1198,12 +1198,12 @@ and elab_exp' env e t : Il.exp' =
       (elab_exp_variant env (expand_id env t) e tcs t e.at).it
     else
       error_typ env e.at "expression" t
-  | IterE (e1, iter2) when t.it = BoolT  ->
-    (* TODO: (lemmagen) Treats iterations as a conjunction
-                        when the type expects a scalar boolean value *)
-    let e1' = elab_exp env e1 (BoolT $ e.at) in
-    let iter2' = elab_iterexp env iter2 in
-    Il.IterE (e1', iter2')
+  | IterE (e1, iter) when t.it = BoolT ->
+    (* TODO: (lemmagen) Folds iteration of boolean values by conjunction 
+                        if the expected type is a scalar boolean *)
+    let e1' = elab_exp env e1 t in
+    let iter' = elab_iterexp env iter in
+    Il.FoldE (e1', iter')
   | IterE (e1, iter2) ->
     (* An iteration expression must match the expected type directly,
      * significant parentheses have to be used otherwise *)
@@ -1227,7 +1227,7 @@ and elab_exp' env e t : Il.exp' =
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = List.map (infer_arg env') as_ in
+    let as' = List.map (elab_argquant env') as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
     let bs' = infer_arg_binds env env' dims dims' as_ in
     (match e.it with
@@ -1835,10 +1835,10 @@ and elab_args' in_lhs env as_ ps aos' s at : Il.arg list * Subst.subst =
     let ao', s' = elab_arg in_lhs env a p s in
     elab_args' in_lhs env as1 ps1 (ao'::aos') s' at
 
-(* TODO: (lemmagen) This implementation suffices for now *)
-and infer_arg env a : Il.arg = 
+and elab_argquant env a : Il.arg = 
   match !(a.it) with 
-  | ExpA e -> 
+  | ExpA e ->
+    (* TODO: (lemmagen) Handle type annotations *)
     let e', _t' = infer_exp env e in
     Il.ExpA e' $ a.at
   | TypA t ->

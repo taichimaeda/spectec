@@ -338,9 +338,19 @@ and reduce_exp env e : exp =
       {e1' with note = e.note}
     | _ -> SubE (e1', t1', t2') $> e
     )
-  (* TODO: (lemmagen) Is this correct? *)
-  | TmplE s -> TmplE s $> e
   | RuleE _ | ForallE _ | ExistsE _ -> assert false
+  | FoldE (e1, iter) -> 
+    (* TODO: (lemmagen) This is a hack *)
+    let e1' = reduce_exp env (IterE (e1, iter) $> e) in
+    (match e1'.it with
+    | ListE es -> 
+      BoolE (List.for_all (fun e -> 
+        match e.it with 
+        | BoolE b -> b 
+        | _ -> assert false) es)
+    | _ -> FoldE (e1', iter)
+    ) $> e
+  | TmplE s -> TmplE s $> e
 
 and reduce_iter env = function
   | ListN (e, ido) -> ListN (reduce_exp env e, ido)

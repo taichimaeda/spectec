@@ -108,6 +108,7 @@ and t_exp' env = function
   | RuleE (id, mixop, e) -> RuleE (id, mixop, t_exp env e)
   | ForallE (binds, args, e) -> ForallE (t_binds env binds, t_args env args, t_exp env e)
   | ExistsE (binds, args, e) -> ExistsE (t_binds env binds, t_args env args, t_exp env e)
+  | FoldE (e, iterexp) -> FoldE (t_exp env e, t_iterexp env iterexp)
   (* TODO: (lemmagen) Replace no_region with correct pos *)
   | TmplE _ -> error no_region "unexpected template expression"
 

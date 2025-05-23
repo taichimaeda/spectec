@@ -158,6 +158,12 @@ and t_exp' env e : bind list * exp' =
     binary t_args t_exp env (args, exp) (fun (args', exp') -> ForallE (binds, args', exp'))
   | ExistsE (binds, args, exp) ->
     binary t_args t_exp env (args, exp) (fun (args', exp') -> ExistsE (binds, args', exp'))
+  | FoldE (e, iterexp) ->
+    (* TODO: (lemmagen) Duplicate of IterE *)
+    let binds1, e' = t_exp env e in
+    let iterexp', binds1' = under_iterexp iterexp binds1 in
+    let binds2, iterexp'' = t_iterexp env iterexp' in
+    binds1' @ binds2, FoldE (e', iterexp'')
 
   | BinE (bo, exp1, exp2) -> t_ee env (exp1, exp2) (fun (e1', e2') -> BinE (bo, e1', e2'))
   | CmpE (co, exp1, exp2) -> t_ee env (exp1, exp2) (fun (e1', e2') -> CmpE (co, e1', e2'))
