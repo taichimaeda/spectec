@@ -156,7 +156,7 @@ and string_of_exp e =
     "forall (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
   | ExistsE (bs, as_, e1) -> 
     "exists (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
-  | FoldE (e1, iter) -> "&(" ^ string_of_exp e1 ^ string_of_iterexp iter ^ ")"
+  | FoldE (e1, iter) -> string_of_exp e1 ^ string_of_iterexp iter
   | TmplE s -> "{{ " ^ string_of_slot s ^ " }}"
 
 
@@ -271,32 +271,38 @@ let string_of_clause ?(suppress_pos = false) id clause =
       string_of_exp e ^
       concat "" (List.map (prefix "\n    -- " string_of_prem) prems)
 
-let rec string_of_def ?(suppress_pos = false) d =
-  let pre = "\n" ^ region_comment ~suppress_pos "" d.at in
+let rec string_of_def' ?(suppress_pos = false) d =
   match d.it with
   | TypD (id, _ps, [{it = InstD (bs, as_, dt); _}]) ->
-    pre ^ "syntax " ^ id.it ^ string_of_binds bs ^ string_of_args as_ ^ " = " ^
+    "syntax " ^ id.it ^ string_of_binds bs ^ string_of_args as_ ^ " = " ^
       string_of_deftyp `V dt ^ "\n"
   | TypD (id, ps, insts) ->
-    pre ^ "syntax " ^ id.it ^ string_of_params ps ^
+    "syntax " ^ id.it ^ string_of_params ps ^
      concat "\n" (List.map (string_of_inst ~suppress_pos id) insts) ^ "\n"
   | RelD (id, mixop, t, rules) ->
-    pre ^ "relation " ^ id.it ^ ": " ^
+    "relation " ^ id.it ^ ": " ^
     string_of_mixop mixop ^ string_of_typ_args t ^
       concat "\n" (List.map (string_of_rule ~suppress_pos) rules) ^ "\n"
   | DecD (id, ps, t, clauses) ->
-    pre ^ "def $" ^ id.it ^ string_of_params ps ^ " : " ^ string_of_typ t ^
+    "def $" ^ id.it ^ string_of_params ps ^ " : " ^ string_of_typ t ^
       concat "" (List.map (string_of_clause ~suppress_pos id) clauses) ^ "\n"
   | RecD ds ->
-    pre ^ "rec {\n" ^ concat "" (List.map string_of_def ds) ^ "}" ^ "\n"
+    "rec {\n" ^ concat "" (List.map string_of_def' ds) ^ "}" ^ "\n"
   | ThmD (id, bs, e) ->
-    pre ^ "theorem " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
+    "theorem " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
   | LemD (id, bs, e) ->
-    pre ^ "lemma " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
-  | TmplD d1 -> 
-    "template\n" ^ string_of_def d1
+    "lemma " ^ id.it ^ " : " ^ string_of_binds bs ^ string_of_exp e ^ "\n"
+  | TmplD _ -> assert false
   | HintD _ ->
     ""
+
+let string_of_def ?(suppress_pos = false) d =
+  let pre = "\n" ^ region_comment ~suppress_pos "" d.at in
+  match d.it with
+  | TmplD d1 -> 
+    pre ^ "template\n" ^ string_of_def' ~suppress_pos d1
+  | _ -> 
+    pre ^ string_of_def' d
 
 
 (* Scripts *)

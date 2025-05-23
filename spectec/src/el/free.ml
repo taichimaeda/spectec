@@ -228,6 +228,16 @@ and det_cond_exp e =
   | ParenE (e1, _) -> det_cond_exp e1
   | _ -> empty
 
+and det_form_exp e =
+  match e.it with
+  | ParenE (e1, _) | BrackE (_, e1, _) -> det_form_exp e1
+  | UnE (NotOp, e1) -> det_form_exp e1
+  | BinE (e1, (AndOp | OrOp | EquivOp | ImplOp), e2) -> det_form_exp e1 + det_form_exp e2
+  | CmpE (e1, EqOp, e2) -> det_form_exp e1 + det_form_exp e2
+  (* TODO: (lemmagen) Is this correct? *)
+  | RuleE (_, e1) -> det_exp e1
+  | ForallE (as_, e1) | ExistsE (as_, e1) -> det_form_exp e1 - det_args as_
+  | _ -> det_exp e
 
 (* Grammars *)
 
@@ -361,5 +371,5 @@ let rec det_def d =
   | RuleD (_id1, _id2, e, prems) -> det_exp e + det_prems prems
   | DefD (_id, as_, e, prems) -> det_args as_ + idx_exp e + det_prems prems
   (* TODO: (lemmagen) Is this correct? *)
-  | ThmD (_id, e, _hints) | LemD (_id, e, _hints) -> idx_exp e
+  | ThmD (_id, e, _hints) | LemD (_id, e, _hints) -> det_form_exp e
   | TmplD d1 -> det_def d1

@@ -174,7 +174,7 @@ let () =
     if !print_elab_il || !print_all_il then print_il il;
     log "IL Validation...";
     Il.Valid.valid_with_template il;
-
+    
     (* TODO: (lemmagen) Rewrite this line *)
     let il = Middlend.Template.transform il in
     Il.Valid.valid_without_template il;

@@ -584,8 +584,7 @@ and expand_exp env templ args i e =
     let e2' = expand_exp env templ args i e2 in
     FuseE (e1', e2')
   | UnparenE e1 -> UnparenE (expand_exp env templ args i e1)
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE s -> TmplE s
   ) $ e.at
 
 and expand_expfield env templ args i (atom, e) =

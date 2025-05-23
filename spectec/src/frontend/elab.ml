@@ -890,20 +890,20 @@ and infer_exp' env e : Il.exp' * typ =
   | TextE s ->
     Il.TextE s, TextT $ e.at
   | UnE (op, e1) ->
-    let e1', t1 = infer_exp env e1 in
+    let e1', t1 = infer_exp_operand env e1 in
     let op', t = infer_unop env op (typ_rep env t1) e.at in
     Il.UnE (op', cast_exp "operand" env e1' t1 t), t
   | BinE (e1, op, e2) ->
-    let e1', t1 = infer_exp env e1 in
-    let e2', t2 = infer_exp env e2 in
+    let e1', t1 = infer_exp_operand env e1 in
+    let e2', t2 = infer_exp_operand env e2 in
     let op', t = infer_binop env op (typ_rep env t1) (typ_rep env t2) e.at in
     Il.BinE (op',
       cast_exp "operand" env e1' t1 t,
       cast_exp "operand" env e2' t2 t
     ), t
   | CmpE (e1, op, ({it = CmpE (e21, _, _); _} as e2)) ->
-    let e1', _t1 = infer_exp env (CmpE (e1, op, e21) $ e.at) in
-    let e2', _t2 = infer_exp env e2 in
+    let e1', _t1 = infer_exp_operand env (CmpE (e1, op, e21) $ e.at) in
+    let e2', _t2 = infer_exp_operand env e2 in
     Il.BinE (Il.AndOp, e1', e2'), BoolT $ e.at
   | CmpE (e1, op, e2) ->
     (match infer_cmpop env op with
@@ -1014,11 +1014,11 @@ and infer_exp' env e : Il.exp' * typ =
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = List.map (elab_argquant env') as_ in
+    let as' = elab_quant_args env' as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
     (* TODO: (lemmagen) exp is only annotated once from top-level *)
     (* let e1' = Dim.annot_exp dims' e1' in *)
-    let bs' = infer_arg_binds env env' dims dims' as_ in
+    let bs' = infer_quant_binds env env' dims dims' as_ in
     (match e.it with
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
@@ -1029,7 +1029,18 @@ and infer_exp' env e : Il.exp' * typ =
   | FuseE _ -> error e.at "misplaced token concatenation"
   | UnparenE _ -> error e.at "misplaced unparenthesize"
 
-and infer_def_binds env env' dims dims' d : Il.bind list =
+and infer_exp_operand env e = 
+  (* TODO: (lemmagen) This is a hack *)
+  (* assumes operands must be a singular value *)
+  (* attempts to fold bool values via elab if inferred type is iter *)
+  let e', t = infer_exp env e in
+  if not (is_iter_typ env t) then e', t else
+  let t', _ = as_iter_typ "expression" env Check t e.at in
+  match t'.it with
+  | BoolT -> elab_exp env e t', t'
+  | _ -> e', t
+
+and infer_binds env env' dims dims' d : Il.bind list =
   let det = Free.det_def d in
   let free = Free.(diff (free_def d) (union det (bound_env env))) in
   if free <> Free.empty then
@@ -1040,7 +1051,13 @@ and infer_def_binds env env' dims dims' d : Il.bind list =
   Acc.def d;
   !acc_bs'
 
-and infer_arg_binds env env' dims dims' as_ : Il.bind list = 
+and infer_no_binds env d =
+  let dims = Dim.check_def d in
+  let dims' = Dim.Env.map (List.map (elab_iter env)) dims in
+  let bs' = infer_binds env env dims dims' d in
+  assert (bs' = [])
+
+and infer_quant_binds env env' dims dims' as_ : Il.bind list = 
   let det = Free.det_args as_ in
   let free = Free.(diff (free_args as_) (union det (bound_env env))) in
   if free <> Free.empty then 
@@ -1050,12 +1067,6 @@ and infer_arg_binds env env' dims dims' as_ : Il.bind list =
   let module Acc = Iter.Make(Arg) in
   Acc.args as_;
   !acc_bs'
-
-and infer_def_no_binds env d =
-  let dims = Dim.check_def d in
-  let dims' = Dim.Env.map (List.map (elab_iter env)) dims in
-  let bs' = infer_def_binds env env dims dims' d in
-  assert (bs' = [])
 
 
 and elab_exp env e t : Il.exp =
@@ -1199,8 +1210,9 @@ and elab_exp' env e t : Il.exp' =
     else
       error_typ env e.at "expression" t
   | IterE (e1, iter) when t.it = BoolT ->
-    (* TODO: (lemmagen) Folds iteration of boolean values by conjunction 
-                        if the expected type is a scalar boolean *)
+    (* TODO: (lemmagen) This is a hack *)
+    (* folds iteration of boolean values by conjunction  *)
+    (* only if the expected type is a singular boolean *)
     let e1' = elab_exp env e1 t in
     let iter' = elab_iterexp env iter in
     Il.FoldE (e1', iter')
@@ -1227,9 +1239,9 @@ and elab_exp' env e t : Il.exp' =
     let env' = local_env env in
     let dims = Dim.check_exp e in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let as' = List.map (elab_argquant env') as_ in
+    let as' = elab_quant_args env' as_ in
     let e1' = elab_exp env' e1 (BoolT $ e.at) in
-    let bs' = infer_arg_binds env env' dims dims' as_ in
+    let bs' = infer_quant_binds env env' dims dims' as_ in
     (match e.it with
       | ForallE _ -> Il.ForallE (bs', as', e1')
       | ExistsE _ -> Il.ExistsE (bs', as', e1')
@@ -1835,7 +1847,7 @@ and elab_args' in_lhs env as_ ps aos' s at : Il.arg list * Subst.subst =
     let ao', s' = elab_arg in_lhs env a p s in
     elab_args' in_lhs env as1 ps1 (ao'::aos') s' at
 
-and elab_argquant env a : Il.arg = 
+and elab_quant_arg env a : Il.arg = 
   match !(a.it) with 
   | ExpA e ->
     (* TODO: (lemmagen) Handle type annotations *)
@@ -1845,6 +1857,9 @@ and elab_argquant env a : Il.arg =
     let t' = elab_typ env t in
     Il.TypA t' $ a.at
   | _ -> error a.at "invalid argument"
+
+and elab_quant_args env as_ : Il.arg list = 
+  List.map (elab_quant_arg env) as_
 
 
 and subst_implicit env s t t' : Subst.subst =
@@ -1980,7 +1995,7 @@ let rec elab_def env d : Il.def list =
   match d.it with
   | FamD (id, ps, hints) ->
     let ps' = elab_params (local_env env) ps in
-    infer_def_no_binds env d;
+    infer_no_binds env d;
     env.typs <- rebind "syntax type" env.typs id (ps, Family []);
     [Il.TypD (id, ps', []) $ d.at]
       @ elab_hintdef env (TypH (id, "" $ id.at, hints) $ d.at)
@@ -1991,7 +2006,7 @@ let rec elab_def env d : Il.def list =
     let dt' = elab_typ_definition env' id1 t in
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
-    let bs' = infer_def_binds env env' dims dims' d in
+    let bs' = infer_binds env env' dims dims' d in
     let inst' = Il.InstD (bs', as', dt') $ d.at in
     let k1', closed =
       match k1, t.it with
@@ -2030,7 +2045,7 @@ let rec elab_def env d : Il.def list =
   | GramD _ -> []
   | RelD (id, t, hints) ->
     let mixop, ts', _ts = elab_typ_notation env id t in
-    infer_def_no_binds env d;
+    infer_no_binds env d;
     env.rels <- bind "relation" env.rels id (t, []);
     [Il.RelD (id, mixop, tup_typ' ts' t.at, []) $ d.at]
       @ elab_hintdef env (RelH (id, hints) $ d.at)
@@ -2043,20 +2058,20 @@ let rec elab_def env d : Il.def list =
     let es' = List.map (Dim.annot_exp dims') (fst (elab_exp_notation' env' id1 e t)) in
     let prems' = List.map (Dim.annot_prem dims')
       (concat_map_filter_nl_list (elab_prem env') prems) in
-    let bs' = infer_def_binds env env' dims dims' d in
+    let bs' = infer_binds env env' dims dims' d in
     let rule' = Il.RuleD (id2, bs', mixop, tup_exp' es' e.at, prems') $ d.at in
     env.rels <- rebind "relation" env.rels id1 (t, rules' @ [rule']);
     []
   | VarD (id, t, _hints) ->
     let _t' = elab_typ env t in
-    infer_def_no_binds env d;
+    infer_no_binds env d;
     env.gvars <- rebind "variable" env.gvars id t;
     []
   | DecD (id, ps, t, hints) ->
     let env' = local_env env in
     let ps' = elab_params env' ps in
     let t' = elab_typ env' t in
-    infer_def_no_binds env d;
+    infer_no_binds env d;
     env.defs <- bind "definition" env.defs id (ps, t, []);
     [Il.DecD (id, ps', t', []) $ d.at]
       @ elab_hintdef env (DecH (id, hints) $ d.at)
@@ -2070,7 +2085,7 @@ let rec elab_def env d : Il.def list =
     let e' = Dim.annot_exp dims' (elab_exp env' e (Subst.subst_typ s t)) in
     let prems' = List.map (Dim.annot_prem dims')
       (concat_map_filter_nl_list (elab_prem env') prems) in
-    let bs' = infer_def_binds env env' dims dims' d in
+    let bs' = infer_binds env env' dims dims' d in
     let clause' = Il.DefD (bs', as', e', prems') $ d.at in
     env.defs <- rebind "definition" env.defs id (ps, t, clauses' @ [(d, clause')]);
     []
@@ -2081,7 +2096,7 @@ let rec elab_def env d : Il.def list =
     let dims = Dim.check_def d in
     let dims' = Dim.Env.map (List.map (elab_iter env')) dims in
     let e' = Dim.annot_exp dims' (elab_exp env' e (BoolT $ e.at)) in
-    let bs' = infer_def_binds env env' dims dims' d in
+    let bs' = infer_binds env env' dims dims' d in
     let d' = (match d.it with
       | ThmD _ -> Il.ThmD (id, bs', e') $ d.at
       | LemD _ -> Il.LemD (id, bs', e') $ d.at
@@ -2104,7 +2119,7 @@ let elab_gramdef env d =
     let _ps' = elab_params env' ps in
     let _t' = elab_typ env' t in
     elab_gram env' gram t;
-    infer_def_no_binds env' d;
+    infer_no_binds env' d;
     let ps1, t1, gram1_opt = find "grammar" env.syms id1 in
     let gram' =
       match gram1_opt, gram.it with

@@ -738,6 +738,7 @@ and repos_bind at b : bind =
 
 (* Substitutions *)
 
+(* TODO: (lemmagen) Need to rename binds on conflict *)
 let find_entry (substs : substs) s : slotentry =
   let subst = List.find (fun (s', _, _) -> eq_slot s s') substs in
   let (_, _, (bs, e)) = subst in

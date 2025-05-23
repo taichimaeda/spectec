@@ -627,7 +627,8 @@ and transform_path_start (p : path) (start_name : exp) =
 let rec transform_premise (p : prem) =
   match p.it with
     | IfPr exp -> 
-      (* TODO: (lemmagen) This is a hack to prioritise prop operators *)
+      (* TODO: (lemmagen) This is a hack *)
+      (* using transform_formula_exp to prioritise prop operators *)
       P_if (transform_formula_exp exp)
     | ElsePr -> P_else
     | LetPr (exp1, exp2, _) -> P_if (T_app_infix (T_exp_basic T_eq, transform_exp exp1, transform_exp exp2))
