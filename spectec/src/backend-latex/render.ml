@@ -286,9 +286,7 @@ let env_def env d : (id * typ list) list =
   | HintD hd ->
     env_hintdef env hd;
     []
-  | RuleD _ | DefD _ | SepD -> []
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | RuleD _ | DefD _ | TmplD _ | SepD -> []
 
 let env_hints_inherit env map tid tid' =
   List.iter (fun atom ->
@@ -1096,8 +1094,7 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | UnparenE ({it = ParenE (e1, _); _} | e1) -> render_exp env e1
   | HoleE `None -> ""
   | HoleE _ -> error e.at "misplaced hole"
-  (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
+  | TmplE _ -> error e.at "unexpected template expression"
 
 and render_exps ?(sep = ",") ?(br = "\\\\[0.8ex]") env es =
   concat sep (List.filter ((<>) "") (List.map (render_exp ~br env) es))
@@ -1390,11 +1387,8 @@ let render_thmdeco env id =
 let render_thmdef env d = 
   match d.it with 
   | ThmD (id, e, _) | LemD (id, e, _) -> 
-    let deco = if env.deco_thm then "l" else "l@{}" in
-    "\\begin{array}{@{}" ^ deco ^ "l@{}}\n" ^ 
-      render_thmdeco env id ^
-      render_exp ~br:"\\\\[0.8ex]\n &" env e ^
-    "\\end{array}\n"
+    render_thmdeco env id ^
+    render_exp ~br:"\\\\[0.8ex]\n &" env e ^ "\n"
   | _ -> failwith "render_thmdef"
 
 let rec render_sep_defs ?(sep = " \\\\\n") ?(br = " \\\\[0.8ex]\n") f = function
@@ -1454,12 +1448,14 @@ let rec render_defs env = function
     | SepD ->
       " \\\\\n" ^
       render_defs env ds'
-    | ThmD _ | LemD _ ->
-      render_sep_defs ~sep:"\n\n" ~br:"\n\n" (render_thmdef env) ds
+    | ThmD _ | LemD _ -> 
+      let deco = if env.deco_thm then "l" else "l@{}" in
+      "\\begin{array}{@{}" ^ deco ^ "l@{}}\n" ^ 
+        render_sep_defs (render_thmdef env) ds ^
+      "\\end{array}"
+    | TmplD _ -> error d.at "unexpected template definition"
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       failwith "render_defs"
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-    | _ -> failwith "unimplemented (lemmagen)"
 
 let render_def env d = render_defs env [d]
 
@@ -1494,6 +1490,13 @@ let rec split_funcdefs id funcdefs = function
     match d.it with
     | DefD (id1, _, _, _) when id1.it = id -> split_funcdefs id (d::funcdefs) ds
     | _ -> List.rev funcdefs, d::ds
+
+let rec split_thmdefs thmdefs = function
+  | [] -> List.rev thmdefs, []
+  | d::ds ->
+    match d.it with
+    | ThmD _ | LemD _ -> split_thmdefs (d::thmdefs) ds
+    | _ -> List.rev thmdefs, d::ds
 
 let rec render_script env = function
   | [] -> ""
@@ -1538,12 +1541,15 @@ let rec render_script env = function
       "\\vspace{1ex}\n\n" ^
       render_script env ds
     | ThmD _ | LemD _ ->
-      "$$\n" ^ render_def env d ^ "\n$$\n\n" ^
+      let thmdefs, ds' = split_thmdefs [d] ds in
+      (* TODO: (lemmagen) This leaves redundasnt line breaks *)
+      "$$\n" ^ render_defs env thmdefs ^ "\n$$\n\n" ^
+      render_script env ds'
+    | TmplD _ ->
+      (* TODO: (lemmagen) Skips templates because templates expansion works on IL *)
       render_script env ds
     | FamD _ | VarD _ | DecD _ | HintD _ ->
       render_script env ds
-    (* TODO: (lemmagen) Non-exhaustive pattern matching *)
-  | _ -> failwith "unimplemented (lemmagen)"
 
 (* Exports *)
 

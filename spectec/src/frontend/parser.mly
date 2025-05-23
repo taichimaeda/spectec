@@ -115,7 +115,7 @@ let rec is_typcon t =
 
 %}
 
-%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE LLBRACE RRBRACE
+%token LPAREN RPAREN LBRACK RBRACK LBRACE RBRACE
 %token COLON SEMICOLON COMMA DOT DOTDOT DOTDOTDOT BAR BARBAR DASH BIGCOMP BIGAND BIGOR
 %token COMMA_NL NL_BAR NL_NL_NL
 %token EQ NE LT GT LE GE APPROX EQUIV ASSIGN SUB SUP EQDOT2
@@ -541,7 +541,7 @@ exp_prim_ :
     { BrackE (Il.Atom.LBrace $$ $loc($2), $3, Il.Atom.RBrace $$ $loc($4)) }
   | DOLLAR LPAREN arith RPAREN { $3.it }
   | FUSEFUSE exp_prim { UnparenE $2 } 
-  | LLBRACE slot RRBRACE { TmplE $2 }
+  | LBRACE LBRACE slot RBRACE RBRACE { TmplE $3 }
   | ATMARK LPAREN thmid COLON exp RPAREN { RuleE ($3, $5) }
 
 exp_post : exp_post_ { $1 $ $sloc }

@@ -266,22 +266,19 @@ let env_rule_prems env id1 r =
     | e::es' -> List.fold_left (fun acc e1 -> 
       BinE (OrOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
 
-  let rec exp_of_prem prem =
+  let rec exp_of_prem prevs prem =
     (match prem.it with
-    | IfPr e -> e.it
+    | IfPr e -> e
     | RulePr (id, mixop, e) -> 
-      RuleE (id, mixop, e)
+      RuleE (id, mixop, e) $$ prem.at % (BoolT $ prem.at)
     | LetPr (e1, e2, _) -> 
-      CmpE (EqOp, e1, e2)
+      CmpE (EqOp, e1, e2) $$ prem.at % (BoolT $ prem.at)
     | IterPr (prem1, ie) -> 
-      IterE (exp_of_prem prem1, ie)
-    | ElsePr -> error prem.at "unexpected otherwise premise") 
-      $$ prem.at % (BoolT $ prem.at) in
+      IterE (exp_of_prem prevs prem1, ie) $$ prem.at % (BoolT $ prem.at)
+    | ElsePr -> neg_exp (disj_exps prevs)) in
       
   let exp_of_prems prevs prems =
-    match prems with
-    | [{it = ElsePr; _}] -> neg_exp (disj_exps prevs)
-    | _ -> conj_exps (List.map exp_of_prem prems) in
+    conj_exps (List.map (exp_of_prem prevs) prems) in
 
   match id1.it, r.it with
   | "Step_pure", RuleD (id2, bs1, _, {it = TupE [as1; _]; _}, prems) ->
@@ -1269,23 +1266,10 @@ let partition ds =
 
 let transform ds =
   let ntds, tds = partition ds in
+  (* skip if no templates *)
+  if tds = [] then ntds else
+
   let env = env ntds in
-
-  (* TODO: (lemmagen) Remove this line *)
-  (* let td = List.hd tds in
-  let slots = slots_def td in
-  print_endline @@ "slots: " ^ String.concat ", " (List.map string_of_slot slots);
-  let trie = make_trie slots in
-  print_endline @@ "trie: " ^ string_of_slottrie trie;
-  let comb = make_comb !(env.data) trie in
-  print_endline @@ "comb: " ^ string_of_comb comb;
-  let tds' = comb 
-    |> List.map (fun substs -> 
-      let d', bs = subst_def substs td in
-      assert (bs = []); d') in
-  print_endline @@ String.concat "\n" (List.map string_of_def tds');
-  let () = failwith "success" in *)
-
   let tds' = tds
     |> List.map (fun d ->
       let slots = slots_def d in
@@ -1296,8 +1280,5 @@ let transform ds =
         let d', bs = subst_def substs d in
         assert (bs = []); d'))
     |> List.flatten
-    |> List.map (fun d -> 
-      match d.it with
-      | ThmD _ | LemD _ -> simpl_def d
-      | _ -> d) in
+    |> List.map simpl_def in
   ntds @ tds'

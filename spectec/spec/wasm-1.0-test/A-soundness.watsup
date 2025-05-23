@@ -416,15 +416,15 @@ lemma Step_read__preserves =
   @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.after }} : ft)
 
 ;; TODO: Remove these theorems
-theorem test_iterated_formula1 = 
+theorem test_iterated_formula1 hint(desc "Test Theorem") = 
   forall (z*, admininstr*, z'*, admininstr'*)
 	(@(Step: z; admininstr* ~> z'; admininstr'*))*
 
-theorem test_iterated_formula2 = 
+theorem test_iterated_formula2 hint(desc "Test Theorem") = 
   forall (z*, admininstr*, rt)
 	(forall (rt) @(Config_ok: |- z; admininstr* : rt))*
 
-theorem test_iterated_formula3 = 
+theorem test_iterated_formula3 hint(desc "Test Theorem") = 
   forall (z*, admininstr*, z'*, admininstr'*)
 	(forall (rt) @(Config_ok: |- z; admininstr* : rt) => 
                @(Config_ok: |- z'; admininstr'* : rt))*

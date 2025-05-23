@@ -134,8 +134,6 @@ and token = parse
   | "]" { RBRACK }
   | "{" { LBRACE }
   | "}" { RBRACE }
-  | "{{" { LLBRACE }
-  | "}}" { RRBRACE }
   | ":" { COLON }
   | ";" { SEMICOLON }
   | "," { COMMA }
