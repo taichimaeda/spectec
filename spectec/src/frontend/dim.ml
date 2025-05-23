@@ -167,7 +167,8 @@ and check_exp env ctx e =
   | RuleE (_id, e) -> check_exp env ctx e
   | ForallE (args, e) 
   | ExistsE (args, e) ->
-    List.iter (check_arg env ctx) args;
+    (* TODO: (lemmagen) Variables bound by quantifiers do not inherit iter context *)
+    List.iter (check_arg env []) args;
     check_exp env ctx e
   | TmplE _ -> ()
   | HoleE _

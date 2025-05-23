@@ -31,7 +31,7 @@ let comment_desc_def (def: coq_def): string =
     | CoercionD _ -> "Type Coercion Definition"
     | UnsupportedD _ -> ""
 
-(* TODO: Type for string_of_term? *)
+(* TODO: (lemmagen) Typo for string_of_term? *)
 let rec string_of_terms (term : coq_term) =
   match term with
     | T_exp_basic (T_bool b) -> string_of_bool b
@@ -102,6 +102,13 @@ let rec string_of_terms (term : coq_term) =
     | T_forall (binds, term) -> "forall " ^ string_of_binders binds ^ ", " ^ string_of_terms term
     | T_exists (binds, term) -> "exists " ^ string_of_binders binds ^ ", " ^ string_of_terms term
     | T_rule (id, terms) -> parens (id ^ " " ^ String.concat " " (List.map string_of_terms terms))
+    | T_listforall (iterator, exp, ids) -> 
+      (* TODO: (lemmagen) Duplicate of string_of_premise *)
+      let option_conversion = if iterator = I_option then "option_to_list " else "" in
+      (match ids with
+      | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_terms exp) ^ " " ^ parens (option_conversion ^ v)
+      | [v; s] -> "List.Forall2 " ^ parens ("fun " ^ v ^ " " ^ s ^ " => " ^ string_of_terms exp) ^ " " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s)
+      | _ -> assert false (* Should not happen *))
     | T_unsupported str -> comment_parens ("Unsupported term: " ^ str)
 
 and string_of_ident_terms (term : coq_term) =
@@ -262,8 +269,7 @@ let rec string_of_premise (prem : coq_premise) =
       (match ids with
       | [v] -> "List.Forall " ^ parens ( "fun " ^ v ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v)
       | [v; s] -> "List.Forall2 " ^ parens ("fun " ^ v ^ " " ^ s ^ " => " ^ string_of_premise p) ^ " " ^ parens (option_conversion ^ v) ^ " " ^ parens (option_conversion ^ s)
-      | _ -> assert false (* Should not happen *)
-    )
+      | _ -> assert false (* Should not happen *))
     | P_unsupported str -> comment_parens ("Unsupported premise: " ^ str)
   
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 

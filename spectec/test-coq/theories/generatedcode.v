@@ -2924,6 +2924,18 @@ Proof. Admitted.
 Theorem t_preservation : forall (v_s : store) (v_f : frame) (v_admininstr : (list admininstr)) (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)) (v_rt : resulttype), ((Step (config__ (state__ v_s v_f) v_admininstr) (config__ (state__ v_s' v_f') v_admininstr')) -> ((Config_ok (config__ (state__ v_s v_f) v_admininstr) v_rt) -> (Config_ok (config__ (state__ v_s' v_f') v_admininstr') v_rt))).
 Proof. Admitted.
 
+(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:419.1-421.48 *)
+Theorem test_iterated_formula1 : forall (v_z : (list state)) (v_admininstr : (list admininstr)) (v_z' : (list state)) (v_admininstr' : (list admininstr)), List.Forall2 (fun v_z v_z' => (Step (config__ v_z v_admininstr) (config__ v_z' v_admininstr'))) (v_z) (v_z').
+Proof. Admitted.
+
+(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:423.1-425.53 *)
+Theorem test_iterated_formula2 : forall (v_z : (list state)) (v_admininstr : (list admininstr)) (v_rt : resulttype), List.Forall (fun v_z => forall (v_rt : resulttype), (Config_ok (config__ v_z v_admininstr) v_rt)) (v_z).
+Proof. Admitted.
+
+(* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:427.1-430.56 *)
+Theorem test_iterated_formula3 : forall (v_z : (list state)) (v_admininstr : (list admininstr)) (v_z' : (list state)) (v_admininstr' : (list admininstr)), List.Forall2 (fun v_z v_z' => forall (v_rt : resulttype), ((Config_ok (config__ v_z v_admininstr) v_rt) -> (Config_ok (config__ v_z' v_admininstr') v_rt))) (v_z) (v_z').
+Proof. Admitted.
+
 (* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:394.1-400.39 *)
 Lemma Step_pure__preserves_binop_trap : forall (v_ft : functype) (v_C : context) (v_s : store), forall (v_t : valtype) (v_binop : binop_) (v_c_2 : val_) (v_c_1 : val_), ((Admin_instrs_ok v_s v_C [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] v_ft) -> ((Step_pure [(admininstr__CONST v_t (v_c_1 : val_));(admininstr__CONST v_t (v_c_2 : val_));(admininstr__BINOP v_t (v_binop : binop_))] [(admininstr__TRAP )]) -> (((fun_binop v_t (v_binop : binop_) (v_c_1 : val_) (v_c_2 : val_)) = None) -> (Admin_instrs_ok v_s v_C [] v_ft)))).
 Proof. Admitted.

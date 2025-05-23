@@ -1198,6 +1198,12 @@ and elab_exp' env e t : Il.exp' =
       (elab_exp_variant env (expand_id env t) e tcs t e.at).it
     else
       error_typ env e.at "expression" t
+  | IterE (e1, iter2) when t.it = BoolT  ->
+    (* TODO: (lemmagen) Treats iterations as a conjunction
+                        when the type expects a scalar boolean value *)
+    let e1' = elab_exp env e1 (BoolT $ e.at) in
+    let iter2' = elab_iterexp env iter2 in
+    Il.IterE (e1', iter2')
   | IterE (e1, iter2) ->
     (* An iteration expression must match the expected type directly,
      * significant parentheses have to be used otherwise *)

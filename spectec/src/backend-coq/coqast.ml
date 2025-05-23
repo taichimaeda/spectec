@@ -91,6 +91,7 @@ and coq_term =
   | T_forall of (binders * coq_term)
   | T_exists of (binders * coq_term)
   | T_rule of (ident * coq_term list)
+  | T_listforall of (iterator * coq_term * ident list)
   | T_unsupported of string
 
 and coq_premise =

@@ -175,7 +175,7 @@ let () =
     log "IL Validation...";
     Il.Valid.valid_with_template il;
 
-    (* TODO: (lemmagen) Remove this line *)
+    (* TODO: (lemmagen) Rewrite this line *)
     let il = Middlend.Template.transform il in
     Il.Valid.valid_without_template il;
 

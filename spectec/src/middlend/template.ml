@@ -266,19 +266,22 @@ let env_rule_prems env id1 r =
     | e::es' -> List.fold_left (fun acc e1 -> 
       BinE (OrOp, e1, acc) $$ e1.at % (BoolT $ e.at)) e es' in
 
+  let rec exp_of_prem prem =
+    (match prem.it with
+    | IfPr e -> e.it
+    | RulePr (id, mixop, e) -> 
+      RuleE (id, mixop, e)
+    | LetPr (e1, e2, _) -> 
+      CmpE (EqOp, e1, e2)
+    | IterPr (prem1, ie) -> 
+      IterE (exp_of_prem prem1, ie)
+    | ElsePr -> error prem.at "unexpected otherwise premise") 
+      $$ prem.at % (BoolT $ prem.at) in
+      
   let exp_of_prems prevs prems =
     match prems with
     | [{it = ElsePr; _}] -> neg_exp (disj_exps prevs)
-    | ({it = ElsePr; _} as p)::_ -> error p.at "use of multiple otherwise premises"
-    | _ -> conj_exps (List.map (fun p ->
-        (match p.it with
-        | IfPr e -> e.it
-        | RulePr (id, mixop, e) -> RuleE (id, mixop, e)
-        | LetPr (e1, e2, _) -> CmpE (EqOp, e1, e2)
-        | ElsePr -> assert false
-        (* not yet supported *)
-        | IterPr _ -> BoolE true)
-        $$ p.at % (BoolT $ p.at)) prems) in
+    | _ -> conj_exps (List.map exp_of_prem prems) in
 
   match id1.it, r.it with
   | "Step_pure", RuleD (id2, bs1, _, {it = TupE [as1; _]; _}, prems) ->
@@ -293,7 +296,12 @@ let env_rule_prems env id1 r =
     let bs' = binds_of_exp (bs1 @ bs2) boole in
     env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole);
     env.step_read_prems := add_prevs c1 (bs', boole) !(env.step_read_prems)
-  | _, _ -> ()
+  | _, RuleD (id2, bs1, _, _, prems) ->
+    (* previous premises are not collected here *)
+    let prevs = [] in
+    let boole = exp_of_prems prevs prems in
+    let bs' = binds_of_exp bs1 boole in
+    env.data := bind !(env.data) ["relations"; id1.it; "rules"; id2.it; "premises"] (bs', boole)
 
 let env_rule_freevars env id1 r =
   match r.it with
@@ -482,7 +490,7 @@ let rec slots_def d =
     slots_list slots_def ds
   | ThmD (_, _, e) | LemD (_, _, e) -> 
     slots_exp e
-  (* TODO: (lemmagen) Hints are currently ignored *)
+  (* hints are currently ignored *)
   | HintD _ -> []
   | TmplD _ -> assert false
 
@@ -1027,9 +1035,9 @@ let subst_def (substs : substs) d : def * bind list =
   | LemD (id, bs, e) -> 
     let e', bs1 = subst_exp substs e in
     LemD (subst_id substs id, uniq_binds (bs @ bs1), e') $ d.at, []
-  (* TODO: (lemmagen) Hints are currently not substituted *)
+  (* hints are currently not substituted *)
   | HintD hdef -> HintD hdef $ d.at, []
-  (* TODO: (lemmagen) Templates cannot be recurisve *)
+  (* templates cannot be recurisve *)
   | RecD _ -> assert false
   | TmplD _ -> assert false
 
@@ -1246,7 +1254,7 @@ let rec simpl_def d =
     ThmD (id, bs, simpl_exp e) $ d.at
   | LemD (id, bs, e) -> 
     LemD (id, bs, simpl_exp e) $ d.at
-  (* TODO: (lemmagen) Hints are currently not simplified *)
+  (* hints are currently not simplified *)
   | HintD _ -> d
   | TmplD _ -> assert false
 
@@ -1288,5 +1296,8 @@ let transform ds =
         let d', bs = subst_def substs d in
         assert (bs = []); d'))
     |> List.flatten
-    |> List.map simpl_def in
+    |> List.map (fun d -> 
+      match d.it with
+      | ThmD _ | LemD _ -> simpl_def d
+      | _ -> d) in
   ntds @ tds'

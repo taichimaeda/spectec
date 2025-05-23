@@ -486,13 +486,21 @@ and valid_expform env e t =
   | RuleE (id, mixop, e1) -> 
     valid_expmix env mixop e1 (find "relation" env.rels id) e.at;
     equiv_typ env (BoolT $ e.at) t e.at
-  | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) -> 
-    List.iter (valid_bind env) bs;
+  | ForallE (bs, as_, e1) | ExistsE (bs, as_, e1) ->
+    let env' = local_env env in
+    List.iter (valid_bind env') bs;
+    (* TODO: (lemmagen) Need to substitute ids bound by quantifiers in types *)
     List.iter (fun a -> match a.it with 
-      | ExpA e1 -> valid_exp env e1 (infer_exp env e1)
-      | TypA _ -> error e.at "invalid quantifier argument") as_;
-    valid_expform env e1 (BoolT $ e.at);
-    equiv_typ env (BoolT $ e.at) t e.at
+      | ExpA e1 -> valid_exp env' e1 (infer_exp env' e1)
+      | TypA _ -> error e.at "unsupported quantifier argument") as_;
+    valid_expform env' e1 (BoolT $ e.at);
+    equiv_typ env' (BoolT $ e.at) t e.at
+  | IterE (e1, iter) when t.it = BoolT -> 
+    (* TODO: (lemmagen) Treats iterations as a conjunction
+                        when the type expects a scalar boolean value *)
+    let env' = valid_iterexp env iter in
+    valid_expform env' e1 (BoolT $ e.at);
+    equiv_typ env' (BoolT $ e.at) t e.at
   | _ -> valid_exp env e t
 
 and valid_expmix env mixop e (mixop', t) at =

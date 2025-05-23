@@ -320,7 +320,6 @@ and transform_tuple_to_relation_args (t : typ) =
     | _ -> [erase_dependent_type t]
 
 (* Expression functions *)
-(* TODO: Resolve inconsistent variable names in patterns *)
 and transform_exp (exp : exp) =
   match exp.it with 
     | VarE id -> 
@@ -363,9 +362,7 @@ and transform_exp (exp : exp) =
     | UpdE (exp1, path, exp2) -> T_update (transform_path_start path exp1, transform_exp exp1, transform_exp exp2)
     | ExtE (exp1, path, exp2) -> T_extend (transform_path_start path exp1, transform_exp exp1, transform_exp exp2)
     | CallE (id, args) -> T_app (T_ident [transform_fun_id id], List.map transform_arg args)
-    | (* MEMO: iter is the iteration symbol like */?
-               ids is the list of index variables and their type *)
-      IterE (exp, (iter, ids)) ->  
+    | IterE (exp, (iter, ids)) ->  
         let exp1 = transform_exp exp in
         let t_iter = if iter = Opt then I_option else I_list in
         let iter_str = if iter = Opt then "option" else "list" in
@@ -375,22 +372,20 @@ and transform_exp (exp : exp) =
           (List | List1 | ListN _), [], _ -> T_list [exp1] 
         | (* TODO: Is this case properly handled? *)
           (List | List1 | ListN _ | Opt), _, (VarE _ | IterE _) -> exp1 
-        | (* MEMO: The following cases assume IterE contains a single index variables *)
-          (* TODO: name and T_ident are being used inconsistently
+        | (* TODO: name and T_ident are being used inconsistently
                    Ideally string manipulation logic like concatenation of identifiers with "__"
                    should only appear in print.ml not in this module *)
           (List | List1 | ListN _ | Opt), [(v, _)], (SubE ({it = VarE _; _}, typ1, typ2)) ->
-            (* MEMO: This T_ident refers to the list or option coercion function *)
-            T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
+          (* MEMO: e.g. list__val__admininstr v_val *)
+          T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_ident [transform_var_id v]])
         | (List | List1 | ListN _ | Opt), [(v, _)], (SubE (e, typ1, typ2)) -> 
-            (* MEMO: This T_ident refers to the list or option coercion function *)
-            (* MEMO: Need to map first unlike the previous case
-                     because the expression e being subsumed is not a variable identifier *)
-            T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_map (t_iter, transform_var_id v, transform_exp e)])
+          (* MEMO: e.g. list__val__admininstr (List.map (fun v_val => e)) v_val *)
+          T_app (T_ident [iter_str; gen_typ_name typ1; gen_typ_name typ2], [T_map (t_iter, transform_var_id v, transform_exp e)])
         | Opt, [(_, _)], OptE (Some e) -> T_app (T_exp_basic T_some, [transform_exp e])
         | (List | List1 | ListN _ | Opt), [(v, _)], _ -> T_map (t_iter, transform_var_id v, exp1)
-        | (* MEMO: The rest of the cases assume IterE contains at most two index variables *)
-          (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> T_zipwith (t_iter, transform_var_id v, transform_var_id s, transform_exp exp)
+        | (List | List1 | ListN _ | Opt), [(v, _); (s, _)], _ -> 
+          (* MEMO: The rest of the cases assume IterE contains at most two index variables *)
+          T_zipwith (t_iter, transform_var_id v, transform_var_id s, transform_exp exp)
         | _ -> exp1
       ) 
     | SubE (e, _, typ2) -> T_cast (transform_exp e, transform_type typ2)
@@ -452,10 +447,16 @@ and transform_formula_exp (exp : exp) =
     | RuleE (id, _, e1) -> 
       T_rule (transform_id id, transform_tuple_exp transform_exp e1)
     | ForallE (bs, _, e1) -> 
-      (* TODO: (lemmagen) Change transform_relation_bind to a more generic name *)
+      (* TODO: (lemmagen) Rename transform_relation_bind to a generic name *)
       T_forall (List.map transform_relation_bind bs, transform_formula_exp e1)
     | ExistsE (bs, _, e1) ->
       T_exists (List.map transform_relation_bind bs, transform_formula_exp e1)
+    | IterE (exp, (iter, id_types)) when exp.note.it = BoolT ->
+      (* TODO: (lemmagen) Treats iterations as a conjunction
+                          when the type expects a scalar boolean value *)
+      (* TODO: (lemmagen) Duplicate of transform_premise *)
+      let t_iter = if iter = Opt then I_option else I_list in
+      T_listforall (t_iter, transform_formula_exp exp, List.map (fun (i, _typ) -> transform_var_id i) id_types)
     | _ -> transform_exp exp
 
 (* This is mainly a hack to make it coerce correctly with list types (only 1d lists) *)
@@ -636,18 +637,15 @@ and transform_path_start (p : path) (start_name : exp) =
 (* Premises *)
 let rec transform_premise (p : prem) =
   match p.it with
-    | (* MEMO: This boolean expression is printed as a Coq term literally
-               which gets coerced by is_true *)
-      IfPr exp -> P_if (transform_formula_exp exp)
-    | (* MEMO: P_else is handled by else removal pass later *)
-      ElsePr -> P_else
+    | IfPr exp -> 
+      (* TODO: (lemmagen) This is a hack to prioritise prop operators *)
+      P_if (transform_formula_exp exp)
+    | ElsePr -> P_else
     | LetPr (exp1, exp2, _) -> P_if (T_app_infix (T_exp_basic T_eq, transform_exp exp1, transform_exp exp2))
-    | (* MEMO: This corresponds to iteration of premises over variables
-               listed in id_types *)
-      IterPr (p, (iter, id_types)) -> let t_iter = if iter = Opt then I_option else I_list in
+    | IterPr (p, (iter, id_types)) ->
+      let t_iter = if iter = Opt then I_option else I_list in
       P_listforall (t_iter, transform_premise p, List.map (fun (i, _typ) -> transform_var_id i) id_types)
-    | (* MEMO: This corresponds to premises invoking another relation *)
-      RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp transform_exp exp)
+    | RulePr (id, _mixop, exp) -> P_rule (transform_id id, transform_tuple_exp transform_exp exp)
 
 let transform_deftyp (id : id) (binds : bind list) (deftyp : deftyp) =
   match deftyp.it with
@@ -900,7 +898,7 @@ let rec transform_sub_def (d : def) =
         | _ -> []) sub_expressions) [Left d]
     | RecD defs -> let flat_list = List.concat_map transform_sub_def defs in
       let (defs, coq_defs) = partition_eitherlist flat_list in
-      (* TODO: Why not just @ [Left d]? *)
+      (* TODO: (lemmagen) Why not just @ [Left d]? *)
       (List.map Either.right coq_defs) @ [Left (RecD defs $ d.at)]
     | _ -> [Left d]
 
@@ -914,7 +912,7 @@ let transform (il : script) : coq_script =
   let sub_transformed = transform_sub il in
   (* MEMO: Right stores additional Coq constructs produced by the subpass
            Left stores original IL constructs to be transformed by the main pass *)
-  (* TODO: Why not just append the additional Coq constructs from the subpass? *)
+  (* TODO: (lemmagen) Why not just append the additional Coq constructs from the subpass? *)
   List.filter_map (fun d -> 
     match d with 
       (* MEMO: Skip the main pass if it is a standalone hint definition *)

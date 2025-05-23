@@ -153,9 +153,9 @@ and string_of_exp e =
   | RuleE (id, mixop, e1) -> 
     "@(" ^ id.it ^ ": " ^ string_of_mixop mixop ^ string_of_exp_args e1 ^ ")"
   | ForallE (bs, as_, e1) -> 
-    "forall " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ " "
+    "forall (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
   | ExistsE (bs, as_, e1) -> 
-    "exists " ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ " "
+    "exists (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
   | TmplE s -> "{{ " ^ string_of_slot s ^ " }}"
 
 

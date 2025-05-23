@@ -414,3 +414,17 @@ lemma Step_read__preserves =
     i < |valtype*| =>
     @(Val_ok: |- f.LOCALS[i] : valtype*[i])) =>
   @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.after }} : ft)
+
+;; TODO: Remove these theorems
+theorem test_iterated_formula1 = 
+  forall (z*, admininstr*, z'*, admininstr'*)
+	(@(Step: z; admininstr* ~> z'; admininstr'*))*
+
+theorem test_iterated_formula2 = 
+  forall (z*, admininstr*, rt)
+	(forall (rt) @(Config_ok: |- z; admininstr* : rt))*
+
+theorem test_iterated_formula3 = 
+  forall (z*, admininstr*, z'*, admininstr'*)
+	(forall (rt) @(Config_ok: |- z; admininstr* : rt) => 
+               @(Config_ok: |- z'; admininstr'* : rt))*

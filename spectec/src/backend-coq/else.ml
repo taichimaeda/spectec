@@ -138,14 +138,14 @@ let rec go id args typ1 prev_rules : relation_type_entry list -> coq_def' list =
           | [lhs; _] -> lhs
           | _ -> error no_region "expected manifest pair"
         in
-        (* TODO: e.g. Step_read_before_Step_read__call_indirect_trap *)
+        (* MEMO: e.g. Step_read_before_Step_read__call_indirect_trap *)
         let aux_name = id ^ "_before_" ^ r_id in
         (* MEMO: If an else clause exists in the premises of this constructor, 
                  scan the previous constructors and collect those  *)
         let applicable_prev_rules = prev_rules
               |> List.map unarize
               |> List.filter (not_apart lhs)
-              (* TODO: Is neg_suffix appropriate here? *)
+              (* TODO: (lemmagen) Is neg_suffix appropriate here? *)
               |> List.map (fun ((id', binds'), prems', term') -> ((id' ^ neg_suffix, binds'), prems', [term']))
               |> List.rev in
         [ InductiveRelationD (aux_name, [typ1], List.rev applicable_prev_rules) ] @
