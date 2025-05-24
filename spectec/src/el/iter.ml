@@ -148,6 +148,7 @@ and exp e =
   | StrE efs -> nl_list expfield efs
   | CallE (x, as_) -> defid x; args as_
   | IterE (e1, it) -> exp e1; iter it
+  | FoldE (e1, it) -> exp e1; iter it
   | TypE (e1, t) -> exp e1; typ t
   | AtomE at -> atom at
   | InfixE (e1, at1, e2) -> exp e1; atom at1; exp e2
@@ -311,6 +312,7 @@ and clone_exp e =
   | BrackE (atom1, e1, atom2) -> BrackE (clone_atom atom1, clone_exp e1, clone_atom atom2)
   | CallE (id, args) -> CallE (id, List.map clone_arg args)
   | IterE (e1, iter) -> IterE (clone_exp e1, clone_iter iter)
+  | FoldE (e1, iter) -> FoldE (clone_exp e1, clone_iter iter)
   | TypE (e1, t) -> TypE (clone_exp e1, clone_typ t)
   | FuseE (e1, e2) -> FuseE (clone_exp e1, clone_exp e2)
   | UnparenE e1 -> UnparenE (clone_exp e1)

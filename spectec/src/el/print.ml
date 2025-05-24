@@ -172,6 +172,7 @@ and string_of_exp e =
     "`" ^ string_of_atom l ^ string_of_exp e1 ^ string_of_atom r
   | CallE (id, args) -> string_of_defid id ^ string_of_args args
   | IterE (e1, iter) -> string_of_exp e1 ^ string_of_iter iter
+  | FoldE (e1, iter) -> "@" ^ string_of_exp e1 ^ string_of_iter iter
   | TypE (e1, t) -> string_of_exp e1 ^ " : " ^ string_of_typ t
   | HoleE (`Num i) -> "%" ^ string_of_int i
   | HoleE `Next -> "%"

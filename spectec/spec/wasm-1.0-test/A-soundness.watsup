@@ -357,7 +357,7 @@ lemma t_read_preservation hint(desc "Read Preservation") =
   @(Store_ok: |- s : OK) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
   val* = f.LOCALS =>
-  (@(Val_ok: |- val : valtype))* =>
+  @(@(Val_ok: |- val : valtype))* =>
   C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
   @(Admin_instrs_ok: s; C' |- admininstr* : (valtype_1* -> valtype_2*)) =>
   @(Admin_instrs_ok: s; C' |- admininstr'* : (valtype_1* -> valtype_2*))
@@ -371,7 +371,7 @@ lemma t_preservation_type hint(desc "Fragment Preservation") =
   @(Module_instance_ok: s |- f.MODULE : C) =>
   @(Module_instance_ok: s' |- f.MODULE : C) =>
   val* = f.LOCALS =>
-  (@(Val_ok: |- val_1 : valtype))* =>
+  @(@(Val_ok: |- val_1 : valtype))* =>
   C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
   @(Admin_instrs_ok: s; C' |- admininstr* : (valtype_1* -> valtype_2*)) =>
   @(Admin_instrs_ok: s'; C' |- admininstr'* : (valtype_1* -> valtype_2*))
@@ -400,5 +400,5 @@ lemma Step_read__preserves =
   @(Module_instance_ok: s |- f.MODULE : C) =>
   {{ relations.Step_read.rules.*.premises }} =>
   val_1* = f.LOCALS =>
-  (@(Val_ok: |- val_1 : valtype_1))* =>
+  @(@(Val_ok: |- val_1 : valtype_1))* =>
   @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.after }} : ft)

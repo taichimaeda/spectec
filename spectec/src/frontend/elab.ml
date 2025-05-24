@@ -1002,6 +1002,10 @@ and infer_exp' env e : Il.exp' * typ =
     let e1', t1 = infer_exp env e1 in
     let iter' = elab_iterexp env iter in
     Il.IterE (e1', iter'), IterT (t1, match iter with ListN _ -> List | _ -> iter) $ e.at
+  | FoldE (e1, iter) ->
+    let e1', t1 = infer_exp env e1 in
+    let iter' = elab_iterexp env iter in
+    Il.FoldE (e1', iter'), t1
   | TypE (e1, t) ->
     let _t' = elab_typ env t in
     (elab_exp env e1 t).it, t
@@ -1209,6 +1213,10 @@ and elab_exp' env e t : Il.exp' =
       (elab_exp_variant env (expand_id env t) e tcs t e.at).it
     else
       error_typ env e.at "expression" t
+  | FoldE (e1, iter2) -> 
+    let e1' = elab_exp env e1 t in
+    let iter2' = elab_iterexp env iter2 in
+    Il.FoldE (e1', iter2')
   | IterE (e1, iter) when t.it = BoolT ->
     (* TODO: (lemmagen) This is a hack *)
     (* folds iteration of boolean values by conjunction  *)

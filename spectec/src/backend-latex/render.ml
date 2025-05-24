@@ -554,6 +554,10 @@ and expand_exp env templ args i e =
     let e1' = expand_exp env templ args i e1 in
     let iter' = expand_iter env templ args i iter in
     IterE (e1', iter')
+  | FoldE (e1, iter) ->
+    let e1' = expand_exp env templ args i e1 in
+    let iter' = expand_iter env templ args i iter in
+    FoldE (e1', iter')
   | TypE (e1, t) -> TypE (expand_exp env templ args i e1, t)
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, e1) -> 
@@ -1069,6 +1073,7 @@ Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e
   | CallE (id, args) ->
     render_apply render_defid render_exp env env.show_def env.macro_def id args
   | IterE (e1, iter) -> "{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
+  | FoldE (e1, iter) -> "@{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
   | TypE ({it = VarE ({it = "_"; _}, []); _}, t) ->
     (* HACK for rendering shorthand parameters that have been turned into args
      * with arg_of_param, for use in render_apply. *)

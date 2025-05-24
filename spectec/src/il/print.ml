@@ -156,7 +156,7 @@ and string_of_exp e =
     "forall (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
   | ExistsE (bs, as_, e1) -> 
     "exists (" ^ string_of_binds bs ^ " " ^ string_of_args as_ ^ " " ^ string_of_exp e1 ^ ")"
-  | FoldE (e1, iter) -> string_of_exp e1 ^ string_of_iterexp iter
+  | FoldE (e1, iter) -> "@" ^ string_of_exp e1 ^ string_of_iterexp iter
   | TmplE s -> "{{ " ^ string_of_slot s ^ " }}"
 
 

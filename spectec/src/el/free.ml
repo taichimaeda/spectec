@@ -145,6 +145,7 @@ and free_exp e =
   | StrE efs -> free_nl_list free_expfield efs
   | CallE (id, as_) -> free_defid id + free_list free_arg as_
   | IterE (e1, iter) -> free_exp e1 + free_iter iter
+  | FoldE (e1, iter) -> free_exp e1 + free_iter iter
   | TypE (e1, t) -> free_exp e1 + free_typ t
   (* TODO: (lemmagen) Is this correct? *)
   | RuleE (id, e1) -> free_relid id + free_exp e1
@@ -173,7 +174,7 @@ and det_exp e =
   | InfixE (e1, _, e2) -> det_exp e1 + det_exp e2
   | SeqE es | TupE es -> free_list det_exp es
   | StrE efs -> free_nl_list det_expfield efs
-  | IterE (e1, iter) -> det_exp e1 + det_iter iter
+  | IterE (e1, iter)| FoldE (e1, iter) -> det_exp e1 + det_iter iter
   (* As a special hack to work with bijective functions,
    * we treat last position of a call as a pattern, too. *)
   | CallE (_, []) -> empty

@@ -161,7 +161,7 @@ and check_exp env ctx e =
   | TupE es -> List.iter (check_exp env ctx) es
   | StrE efs -> iter_nl_list (fun (_, eI) -> check_exp env ctx eI) efs
   | CallE (_, args) -> List.iter (check_arg env ctx) args
-  | IterE (e1, iter) ->
+  | IterE (e1, iter) | FoldE (e1, iter) ->
     check_iter env ctx iter;
     check_exp env (strip_index iter::ctx) e1
   | RuleE (_id, e) -> check_exp env ctx e

@@ -1089,6 +1089,7 @@ and simpl_typcase (mixop, (bs, t, prems), hints) : typcase =
 
 and simpl_exp e : exp =
   (* hack by lazy eval *)
+  (* simplifications must be applied in this particular order *)
   let rec fsub () = simpl_expsub fsub in
   let rec fimpl () = simpl_expimpl fimpl in
   let rec fquant () = simpl_expquant fquant in

@@ -65,7 +65,7 @@ type prec = Op | Seq | Post | Prim
 let prec_of_exp = function  (* as far as iteration is concerned *)
   | VarE _ | BoolE _ | NatE _ | TextE _ | EpsE | StrE _
   | ParenE _ | TupE _ | BrackE _ | CallE _ | HoleE _ | TmplE _ | RuleE _ -> Prim
-  | AtomE _ | IdxE _ | SliceE _ | UpdE _ | ExtE _ | DotE _ | IterE _ -> Post
+  | AtomE _ | IdxE _ | SliceE _ | UpdE _ | ExtE _ | DotE _ | IterE _ | FoldE _ -> Post
   | SeqE _ -> Seq
   | UnE _ | BinE _ | CmpE _ | InfixE _ | LenE _ | SizeE _
   | CommaE _ | CompE _ | TypE _ | FuseE _ | UnparenE _ | ForallE _ | ExistsE _ -> Op
@@ -92,7 +92,7 @@ let is_post_exp e =
   | ParenE _ | TupE _ | BrackE _
   | IdxE _ | SliceE _ | ExtE _
   | StrE _ | DotE _
-  | IterE _ | CallE _
+  | IterE _ | FoldE _ | CallE _
   | HoleE _ -> true
   | _ -> false
 
@@ -552,6 +552,9 @@ exp_post_ :
   | exp_atom LBRACK path EQ exp RBRACK { UpdE ($1, $3, $5) }
   | exp_atom LBRACK path EQDOT2 exp RBRACK { ExtE ($1, $3, $5) }
   | exp_atom iter { IterE ($1, $2) }
+  // TODO: (lemmagen) Is this correct?
+  // explicit alternative to fold expressions
+  | ATMARK exp_atom iter { FoldE ($2, $3) }
   | exp_post dotid { DotE ($1, $2) }
 
 exp_atom : exp_atom_ { $1 $ $sloc }
@@ -577,6 +580,9 @@ exp_un_ :
   | BARBAR gramid BARBAR { SizeE $2 }
   | unop exp_un { UnE ($1, $2) }
   | infixop exp_un { InfixE (SeqE [] $ $loc($1), $1, $2) }
+  // TODO: (lemmagen) Is this correct?
+  // allows quantification under unary binary operators
+  // lowest precedence due to rightmost derivation
   | FORALL_SPACE_LPAREN comma_list(arg) RPAREN exp { ForallE ($2, $4)}
   | EXISTS_SPACE_LPAREN comma_list(arg) RPAREN exp { ExistsE ($2, $4)}
 

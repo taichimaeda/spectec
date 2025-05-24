@@ -130,6 +130,7 @@ and exp' =
   | BrackE of atom * exp * atom  (* ``` ([{ exp }]) *)
   | CallE of id * arg list       (* `$` defid (`(` arg,* `)`)? *)
   | IterE of exp * iter          (* exp iter *)
+  | FoldE of exp * iter          (* exp iter *)
   | TypE of exp * typ            (* exp `:` typ *)
   | HoleE of [`Num of int | `Next | `Rest | `None]  (* `%N` or `%` or `%%` or `!%` *)
   | FuseE of exp * exp           (* exp `#` exp *)
