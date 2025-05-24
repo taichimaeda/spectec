@@ -494,7 +494,9 @@ and valid_expform env e t =
     let env' = local_env env in
     List.iter (valid_bind env') bs;
     List.iter (fun a -> match a.it with 
-      | ExpA e1 -> valid_exp env' e1 (infer_exp env' e1)
+      | ExpA e1 -> 
+        let t1 = infer_exp env' e1 in
+        valid_iterid_exp env' e1 t1
       | TypA t1 -> valid_typ env' t1) as_;
     valid_expform env' e1 (BoolT $ e.at);
     equiv_typ env' (BoolT $ e.at) t e.at
@@ -522,6 +524,16 @@ and valid_tup_exp env s es ets =
     | exception Eval.Irred -> false
     )
   | _, _ -> true
+
+and valid_iterid_exp env e t = 
+  match e.it with
+  | VarE _ -> valid_exp env e t
+  | TmplE _ -> valid_exp env e t
+  | IterE (e1, iter) -> 
+    let env' = valid_iterexp env iter in
+    let t1 = as_iter_typ (fst iter) "iteration" env Check t e.at in
+    valid_iterid_exp env' e1 t1
+  | _ -> error e.at "expected iterations of a variable"
 
 and valid_expfield env (atom1, e) (atom2, (_binds, t, _prems), _) =
   if not (Eq.eq_atom atom1 atom2) then error e.at "unexpected record field";
