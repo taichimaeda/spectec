@@ -264,7 +264,6 @@ def $terminal__form(admininstr*) : bool
 def $terminal__form(admininstr*) = 
   $const__list(admininstr*) \/ admininstr* = TRAP
 
-;; TODO: These declarations will be redundant with the latest version
 var lab : resulttype
 var ret : resulttype
 
@@ -386,8 +385,7 @@ theorem t_preservation hint(desc "Preservation") =
 
 template
 lemma Step_pure__preserves = 
-  forall (s, C, ft)
-  forall ({{ ...relations.Step_pure.rules.*.freevars }})
+  forall (s, C, ft, {{ ...relations.Step_pure.rules.*.freevars }})
   @(Admin_instrs_ok: s; C |- {{ relations.Step_pure.rules.*.before }} : ft) =>
   @(Step_pure: {{ relations.Step_pure.rules.*.before }} ~> {{ relations.Step_pure.rules.*.after }}) =>
   {{ relations.Step_pure.rules.*.premises }} =>
@@ -396,8 +394,7 @@ lemma Step_pure__preserves =
 template
 lemma Step_read__preserves = 
   ;; TODO: Requires _1 suffixes to prevent conflicts
-  forall (s, f, C, C', ft, val_1*, valtype_1*, lab*, ret?)
-  forall ({{ ...relations.Step_read.rules.*.freevars }})
+  forall (s, f, C, C', ft, val_1*, valtype_1*, lab*, ret?, {{ ...relations.Step_read.rules.*.freevars }})
   C' = $($(C, LOCALS valtype_1* C.LOCALS, RETURN ret?, LABELS lab*)) =>
   @(Admin_instrs_ok: s; C' |- {{ relations.Step_read.rules.*.before }} : ft) =>
   @(Module_instance_ok: s |- f.MODULE : C) =>
