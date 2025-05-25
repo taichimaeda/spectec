@@ -924,8 +924,9 @@ and subst_exp substs e : exp * bind list =
     error e.at "unexpected variable template expression"
   | TmplE s -> 
     let bs, e1 = find_entry substs s in
+    let bs' = repos_list repos_bind e.at bs in
     let e1' = repos_exp e.at e1 in
-    e1', bs
+    e1', bs'
 
 and subst_expfield substs (atom, e) : expfield * bind list = 
   let e', bs1 = subst_exp substs e in
@@ -975,10 +976,11 @@ and subst_arg substs a : arg list * bind list =
   match a.it with
   | ExpA {it = TmplE ({it = VarS s; _}); _} -> 
     let bs, e1 = find_entry substs s in
+    let bs' = repos_list repos_bind a.at bs in
     let e1' = repos_exp a.at e1 in
     (match e1'.it with 
     | ListE es | TupE es -> 
-      List.map (fun e -> ExpA e $ a.at) es, bs
+      List.map (fun e -> ExpA e $ a.at) es, bs'
     | _ -> error a.at "unexpected variable template expression")
   | ExpA e -> 
     let e', bs1 = subst_exp substs e in
