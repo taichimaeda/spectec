@@ -555,7 +555,6 @@ let rec render_para env para =
     sprintf "predicate %s(%s) holds" id
       (render_exprs ~sep:", " env es)
   | CustomP (fmt, es) -> 
-    print_endline @@ "debugging" ^ (replace_percent fmt (List.map (render_expr env) es));
     replace_percent fmt (List.map (render_expr env) es)
   | YetP s -> 
     sprintf "unsupported paragraph: %s" s

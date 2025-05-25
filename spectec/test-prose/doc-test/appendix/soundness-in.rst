@@ -119,7 +119,9 @@ $${theorem-prose: Step_pure__preserves_return-frame}
 
 $${theorem-prose: Step_pure__preserves_return-label}
 
-$${theorem-prose: Step_pure__preserves_trap-vals}
+$${theorem-prose: Step_pure__preserves_trap-vals-0}
+
+$${theorem-prose: Step_pure__preserves_trap-vals-1}
 
 $${theorem-prose: Step_pure__preserves_trap-label}
 
@@ -143,9 +145,13 @@ $${theorem-prose: Step_pure__preserves_cvtop-trap}
 
 $${theorem-prose: Step_pure__preserves_local.tee}
 
-$${theorem-prose: Step_read__preserves_block}
+$${theorem-prose: Step_read__preserves_block-0}
 
-$${theorem-prose: Step_read__preserves_loop}
+$${theorem-prose: Step_read__preserves_block-1}
+
+$${theorem-prose: Step_read__preserves_loop-0}
+
+$${theorem-prose: Step_read__preserves_loop-1}
 
 $${theorem-prose: Step_read__preserves_call}
 

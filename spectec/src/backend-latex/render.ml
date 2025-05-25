@@ -969,48 +969,69 @@ and flatten_fuse_exp_rev e =
   | FuseE (e1, e2) -> e2 :: flatten_fuse_exp_rev e1
   | _ -> [e]
 
-and render_exp ?(br = "") env e =
+(* TODO: (lemmagen) Propagate linebreaks in recursive calls *)
+and render_exp ?(br = "") env e = 
+  let rec filter ss = 
+    match ss with
+    | `AllowBreak::ss' -> filter ss'
+    | `MustBreak::ss' -> filter ss'
+    | _ -> ss in
+
+  let rec concat n ss =
+    match ss with
+    | [] -> ""
+    | `Str s::ss' -> s ^ concat (n + String.length s) ss'
+    (* TODO: (lemmagen) This is a char count in Latex code not rendered text *)
+    | `AllowBreak::`Str s::ss' when n > env.config.line_break_width ->
+      br ^ s ^ concat 0 ss'
+    | `AllowBreak::ss' -> concat n ss'
+    | `MustBreak::ss' -> br ^ concat 0 ss' in
+
+  (render_exp' env e) |> filter |> concat 0
+
+and render_exp' env e =
   (*
   Printf.eprintf "[render_exp %s] %s\n%!"
     (string_of_region e.at) (El.Print.string_of_exp e);
   *)
   match e.it with
   | VarE (id, args) ->
-    render_apply render_varid render_exp env env.show_typ env.macro_typ id args
+    [`Str (render_apply render_varid render_exp env env.show_typ env.macro_typ id args)]
   | BoolE b ->
-    render_atom env (Atom.(Atom (string_of_bool b) $$ e.at % info "bool"))
-  | NatE (DecOp, n) -> Z.to_string n
+    [`Str (render_atom env (Atom.(Atom (string_of_bool b) $$ e.at % info "bool")))]
+  | NatE (DecOp, n) -> [`Str (Z.to_string n)]
   | NatE (HexOp, n) ->
     let fmt =
       if n < Z.of_int 0x100 then "%02X" else
       if n < Z.of_int 0x10000 then "%04X" else
       "%X"
-    in "\\mathtt{0x" ^ Z.format fmt n ^ "}"
+    in [`Str ("\\mathtt{0x" ^ Z.format fmt n ^ "}")]
   | NatE (CharOp, n) ->
     let fmt =
       if n < Z.of_int 0x100 then "%02X" else
       if n < Z.of_int 0x10000 then "%04X" else
       "%X"
-    in "\\mathrm{U{+}" ^ Z.format fmt n ^ "}"
+    in [`Str ("\\mathrm{U{+}" ^ Z.format fmt n ^ "}")]
   | NatE (AtomOp, n) ->
     let atom = {it = Atom.Atom (Z.to_string n); at = e.at; note = Atom.info "nat"} in
-    render_atom (without_macros true env) atom
-  | TextE t -> "``" ^ t ^ "''"
-  | UnE (op, e2) -> "{" ^ render_unop op ^ render_exp env e2 ^ "}"
+    [`Str (render_atom (without_macros true env) atom)]
+  | TextE t -> [`Str ("``" ^ t ^ "''")]
+  | UnE (op, e2) -> [`Str "{"] @ [`Str (render_unop op)] @ render_exp' env e2 @ [`Str "}"]
   | BinE (e1, ExpOp, ({it = ParenE (e2, _); _ } | e2)) ->
-    "{" ^ render_exp env e1 ^ "^{" ^ render_exp env e2 ^ "}}"
+    [`Str "{"] @ render_exp' env e1 @ [`Str "^{"] @ render_exp' env e2 @ [`Str "}}"]
   | BinE (({it = NatE (DecOp, _); _} as e1), MulOp,
       ({it = VarE _ | CallE (_, []) | ParenE _; _ } as e2)) ->
-    render_exp env e1 ^ " \\, " ^ render_exp env e2
+    render_exp' env e1 @ [`Str " \\, "] @ render_exp' env e2
   | BinE (e1, op, e2) ->
-    let br' = match op with 
-      | ImplOp | EquivOp -> br
-      | _ -> "" in
-    render_exp ~br env e1 ^ space render_binop op ^ br' ^ render_exp ~br env e2
+    let br = match op with 
+      | ImplOp | EquivOp -> [`MustBreak]
+      | AndOp | OrOp -> [`AllowBreak]
+      | _ -> [] in
+    render_exp' env e1 @ [`Str (space render_binop op)] @ br @ render_exp' env e2
   | CmpE (e1, op, e2) ->
-    render_exp env e1 ^ space render_cmpop op ^ render_exp env e2
-  | EpsE -> "\\epsilon"
-  | AtomE atom -> render_atom env atom
+    render_exp' env e1 @ [`Str (space render_cmpop op)] @ render_exp' env e2
+  | EpsE -> [`Str "\\epsilon"]
+  | AtomE atom -> [`Str (render_atom env atom)]
   | SeqE es ->
     (match List.find_opt (is_atom_exp_with_show env) es with
     | Some {it = AtomE atom; _} ->
@@ -1019,84 +1040,80 @@ and render_exp ?(br = "") env e =
 if atom.it = Atom.Atom "X" && String.contains e.at.left.file 'A' then
 Printf.eprintf "[render %s:X @ %s] try expansion\n%!" (Source.string_of_region e.at) atom.note.Atom.def;
 *)
-      render_expand render_exp env env.show_atom env.macro_atom
-        (typed_id atom) args (fun () -> render_exp_seq env es)
-    | _ -> render_exp_seq env es
-    )
-  | IdxE (e1, e2) -> render_exp env e1 ^ "{}[" ^ render_exp env e2 ^ "]"
+      [`Str (render_expand render_exp env env.show_atom env.macro_atom
+        (typed_id atom) args (fun () -> render_exp_seq env es))]
+    | _ -> [`Str (render_exp_seq env es)])
+  | IdxE (e1, e2) -> render_exp' env e1 @ [`Str "{}["] @ render_exp' env e2 @ [`Str "]"]
   | SliceE (e1, e2, e3) ->
-    render_exp env e1 ^
-      "{}[" ^ render_exp env e2 ^ " : " ^ render_exp env e3 ^ "]"
+    render_exp' env e1 @ [`Str "{}["] @ render_exp' env e2 @ [`Str " : "] @ render_exp' env e3 @ [`Str "]"]
   | UpdE (e1, p, e2) ->
-    render_exp env e1 ^
-      "{}[" ^ render_path env p ^ " = " ^ render_exp env e2 ^ "]"
+    render_exp' env e1 @ [`Str "{}["] @ [`Str (render_path env p)] @ [`Str " = "] @ render_exp' env e2 @ [`Str "]"]
   | ExtE (e1, p, e2) ->
-    render_exp env e1 ^
-      "{}[" ^ render_path env p ^ " = .." ^ render_exp env e2 ^ "]"
+    render_exp' env e1 @ [`Str "{}["] @ [`Str (render_path env p)] @ [`Str " = .."] @ render_exp' env e2 @ [`Str "]"]
   | StrE efs ->
-    "\\{ " ^
+    [`Str ("\\{ " ^
     "\\begin{array}[t]{@{}l@{}}\n" ^
     concat_map_nl ",\\; " "\\\\\n  " (render_expfield env) efs ^ " \\}" ^
-    "\\end{array}"
-  | DotE (e1, atom) -> render_exp env e1 ^ "{.}" ^ render_fieldname env atom
-  | CommaE (e1, e2) -> render_exp env e1 ^ ", " ^ render_exp env e2
-  | CompE (e1, e2) -> render_exp env e1 ^ " \\oplus " ^ render_exp env e2
-  | LenE e1 -> "{|" ^ render_exp env e1 ^ "|}"
-  | SizeE id -> "||" ^ render_gramid env id ^ "||"
+    "\\end{array}")]
+  | DotE (e1, atom) -> render_exp' env e1 @ [`Str "{.}"] @ [`Str (render_fieldname env atom)]
+  | CommaE (e1, e2) -> render_exp' env e1 @ [`Str ", "] @ render_exp' env e2
+  | CompE (e1, e2) -> render_exp' env e1 @ [`Str " \\oplus "] @ render_exp' env e2
+  | LenE e1 -> [`Str "{|"] @ render_exp' env e1 @ [`Str "|}"]
+  | SizeE id -> [`Str ("||" ^ render_gramid env id ^ "||")]
   | ParenE ({it = SeqE [{it = AtomE atom; _}; _]; _} as e1, _)
     when render_atom env atom = "" ->
-    render_exp env e1
-  | ParenE (e1, _) -> "(" ^ render_exp env e1 ^ ")"
-  | TupE es -> "(" ^ render_exps ~sep:",\\, " env es ^ ")"
+    render_exp' env e1
+  | ParenE (e1, _) -> [`Str "("] @ render_exp' env e1 @ [`Str ")"]
+  | TupE es -> [`Str ("(" ^ render_exps ~sep:",\\, " env es ^ ")")]
   | InfixE (e1, atom, e2) ->
     let id = typed_id atom in
     let e = AtomE atom $ atom.at in
     let args = List.map arg_of_exp (as_seq_exp e1 @ [e] @ as_seq_exp e2) in
-    render_expand render_exp env env.show_atom env.macro_atom id args
+    [`Str (render_expand render_exp env env.show_atom env.macro_atom id args
       (fun () ->
         (match e1.it with
         | SeqE [] -> "{" ^ space (render_atom env) atom ^ "}\\;"
         | _ -> render_exp env e1 ^ space (render_atom env) atom
         ) ^ render_exp env e2
-      )
+      ))]
   | BrackE (l, e1, r) ->
     let id = typed_id l in
     let el = AtomE l $ l.at in
     let er = AtomE r $ r.at in
     let args = List.map arg_of_exp ([el] @ as_seq_exp e1 @ [er]) in
-    render_expand render_exp env env.show_atom env.macro_atom id args
-      (fun () -> render_atom env l ^ space (render_exp env) e1 ^ render_atom env r)
+    [`Str (render_expand render_exp env env.show_atom env.macro_atom id args
+      (fun () -> render_atom env l ^ space (render_exp env) e1 ^ render_atom env r))]
   | CallE (id, [arg]) when id.it = "" -> (* expansion result only *)
-    render_arg env arg
+    [`Str (render_arg env arg)]
   | CallE (id, args) when id.it = "" ->  (* expansion result only *)
-    render_args env args
+    [`Str (render_args env args)]
   | CallE (id, args) ->
-    render_apply render_defid render_exp env env.show_def env.macro_def id args
-  | IterE (e1, iter) -> "{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
-  | FoldE (e1, iter) -> "@{" ^ render_exp env e1 ^ render_iter env iter ^ "}"
+    [`Str (render_apply render_defid render_exp env env.show_def env.macro_def id args)]
+  | IterE (e1, iter) -> [`Str "{"] @ render_exp' env e1 @ [`Str (render_iter env iter ^ "}")]
+  | FoldE (e1, iter) -> [`Str "@{"] @ render_exp' env e1 @ [`Str (render_iter env iter ^ "}")]
   | TypE ({it = VarE ({it = "_"; _}, []); _}, t) ->
     (* HACK for rendering shorthand parameters that have been turned into args
      * with arg_of_param, for use in render_apply. *)
-    render_typ env t
-  | TypE (e1, _) -> render_exp env e1
-  | RuleE (_id, e1) -> render_exp env e1
+    [`Str (render_typ env t)]
+  | TypE (e1, _) -> render_exp' env e1
+  | RuleE (_id, e1) -> render_exp' env e1
   | ForallE (args, e1) | ExistsE (args, e1) -> 
-    let command = match e.it with
-      | ForallE _ -> "\\forall"
-      | ExistsE _ -> "\\exists"
-      | _ -> assert false in
-    let prefix = command ^ " " ^ render_quants env args in
-    (* TODO: (lemmagen) Remove magic number *)
-    (* TODO: (lemmagen) This is word count in Latex not rendered math *)
-    let br' = if String.length prefix > 80 then br else "" in
-    br' ^ prefix ^ "." ^ br' ^ render_exp ~br env e1
+    let prefix =
+      (match e.it with
+      | ForallE _ -> "\\forall "
+      | ExistsE _ -> "\\exists "
+      | _ -> assert false) ^ render_quants env args in
+    (* TODO: (lemmagen) This is a char count in Latex code not rendered text *)
+    let br = if String.length prefix > env.config.line_break_width 
+      then [`MustBreak] else [] in
+    br @ [`Str prefix] @ [`Str "."] @ br @ render_exp' env e1
   | FuseE (e1, e2) ->
     (* TODO: HACK for printing t.LOADn_sx (replace with invisible parens) *)
     let e2' = as_paren_exp (fuse_exp e2 true) in
     let es = e2' :: flatten_fuse_exp_rev e1 in
-    String.concat "" (List.map (fun e -> "{" ^ render_exp env e ^ "}") (List.rev es))
-  | UnparenE ({it = ParenE (e1, _); _} | e1) -> render_exp env e1
-  | HoleE `None -> ""
+    List.flatten (List.map (fun e -> [`Str "{"] @ render_exp' env e @ [`Str "}"]) (List.rev es))
+  | UnparenE ({it = ParenE (e1, _); _} | e1) -> render_exp' env e1
+  | HoleE `None -> []
   | HoleE _ -> error e.at "misplaced hole"
   | TmplE _ -> error e.at "unexpected template expression"
 
