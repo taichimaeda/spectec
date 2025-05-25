@@ -171,6 +171,76 @@ let string_of_inferred_types (types : inferred_types) =
 let string_of_relation_args (args : relation_args) = 
   String.concat " -> " (List.map string_of_terms args)
 
+let string_of_append_proof (id : ident) (entries : record_entry list) = 
+  "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
+  "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
+    match s_typ with 
+      | Some Inductive -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
+      | _ -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
+    )
+  )) entries) ^ "|}.\n\n" ^ 
+  "Global Instance Append_" ^ id ^ " : Append " ^ id ^ " := { _append arg1 arg2 := _append_" ^ id ^ " arg1 arg2 }"
+
+let string_of_setter_proof (id : ident) (entries : record_entry list) = 
+  let constructor_name = "mk" ^ id in
+  "#[export] Instance eta__" ^ id ^ " : Settable _ := settable! " ^ constructor_name ^ " <" ^ 
+  String.concat ";" (List.map (fun (record_id, _, _) -> record_id) entries) ^ ">"
+
+let string_of_inhabitance_proof_record (id : ident) (entries : record_entry list) = 
+  "Global Instance Inhabited_" ^ id ^ " : Inhabited " ^ id ^ " := \n" ^
+    "{default_val := {|\n\t" ^
+    String.concat ";\n\t" (List.map (fun (record_id, _, _) -> record_id ^ " := default_val") entries) ^ "|} }"
+
+let string_of_inhabitance_proof_inductive_def (id : ident) (args : inductive_args) (entries : inductive_type_entry list) = 
+  (* e.g.
+    Global Instance Inhabited__functype : Inhabited (functype) :=
+      { default_val := functype__ default_val default_val }. *)
+  (* e.g. 
+    Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }. *)
+  let binders = string_of_binders args in 
+  let binder_ids = string_of_binders_ids args in
+  "Global Instance Inhabited__" ^ id ^ " " ^ binders ^ " : Inhabited " ^ parens (id ^ " " ^ binder_ids) ^
+  match entries with
+    | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
+            "\tAdmitted"
+    | (* MEMO: Uses the first constructor as default value *)
+      (case_id, binds) :: _ -> " := { default_val := " ^ case_id ^ " " ^ binder_ids ^ 
+      (* MEMO: Supply default value of arguments to case_id *)
+      " " ^ (String.concat " " (List.map (fun _ -> "default_val" ) binds)) ^ " }"
+
+let string_of_eqtype_proof (id : ident) (args : inductive_args) =
+  let binders = string_of_binders args in 
+  let binder_ids = string_of_binders_ids args in
+  (* Decidable equality proof *)
+  (* e.g.
+    Definition functype_eq_dec : forall (tf1 tf2 : functype),
+      {tf1 = tf2} + {tf1 <> tf2}.
+    Proof. decidable_equality. Defined.
+    Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
+    Definition eqfunctypeP : Equality.axiom functype_eqb :=
+      eq_dec_Equality_axiom functype functype_eq_dec.
+    Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
+    Canonical Structure functype_eqType :=
+      Eval hnf in EqType functype functype_eqMixin. *)
+  (match id with
+  | "instr" | "admininstr" -> 
+    "Fixpoint " ^ id ^ "_eq_dec " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") {struct v1} :\n" ^
+      "\t{v1 = v2} + {v1 <> v2}.\n" ^
+    "Proof. decide equality; repeat decidable_equality_step. Qed.\n\n"
+  | _ -> 
+    "Definition " ^ id ^ "_eq_dec : forall " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ "),\n" ^
+      "\t{v1 = v2} + {v1 <> v2}.\n" ^
+    "Proof. repeat decidable_equality_step. Qed.\n\n") ^ 
+
+  "Definition " ^ id ^ "_eqb " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") : bool :=\n" ^
+    id ^ "_eq_dec " ^ binder_ids ^ " v1 v2.\n" ^  
+  "Definition eq" ^ id ^ "P " ^ binders ^ " : Equality.axiom " ^ parens (id ^ "_eqb " ^ binder_ids) ^ " :=\n" ^
+    "eq_dec_Equality_axiom " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eq_dec " ^ binder_ids) ^ ".\n\n" ^
+  "Canonical Structure " ^ id ^ "_eqMixin " ^ binders ^ " := EqMixin " ^ parens ("eq" ^ id ^ "P " ^ binder_ids) ^ ".\n" ^
+  "Canonical Structure " ^ id ^ "_eqType " ^ binders ^ " :=\n" ^
+    "Eval hnf in EqType " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eqMixin " ^ binder_ids) ^  ".\n\n" ^
+  "Hint Resolve " ^ id ^ "_eq_dec : eq_dec_db"
+
 let string_of_record (id: ident) (entries : record_entry list) = 
   let constructor_name = "mk" ^ id in
 
@@ -180,26 +250,16 @@ let string_of_record (id: ident) (entries : record_entry list) =
     record_id ^ " : " ^ string_of_terms typ) entries) ^ "\n}.\n\n" ^
 
   (* Inhabitance proof for default values *)
-  "Global Instance Inhabited_" ^ id ^ " : Inhabited " ^ id ^ " := \n" ^
-  "{default_val := {|\n\t" ^
-      String.concat ";\n\t" (List.map (fun (record_id, _, _) -> 
-        record_id ^ " := default_val") entries) ^ "|} }.\n\n" ^
+  string_of_inhabitance_proof_record id entries ^ ".\n\n" ^
 
   string_of_list_type id [] ^ ".\n\n" ^
   string_of_option_type id [] ^ ".\n\n" ^
   (* Record Append proof (TODO might need information on type to improve this) *)
-  "Definition _append_" ^ id ^ " (arg1 arg2 : " ^ id ^ ") :=\n" ^ 
-  "{|\n\t" ^ String.concat "\t" ((List.map (fun (record_id, _, s_typ) -> (
-    match s_typ with 
-      | Some Inductive -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ "); (* FIXME: This type does not have a trivial way to append *)\n" 
-      | _ -> record_id ^ " := " ^ "arg1.(" ^ record_id ^ ") ++ arg2.(" ^ record_id ^ ");\n" 
-    )
-  )) entries) ^ "|}.\n\n" ^ 
-  "Global Instance Append_" ^ id ^ " : Append " ^ id ^ " := { _append arg1 arg2 := _append_" ^ id ^ " arg1 arg2 }.\n\n" ^
-
+  string_of_append_proof id entries ^ ".\n\n" ^
   (* Setter proof *)
-  "#[export] Instance eta__" ^ id ^ " : Settable _ := settable! " ^ constructor_name ^ " <" ^ 
-  String.concat ";" (List.map (fun (record_id, _, _) -> record_id) entries) ^ ">"  
+  string_of_setter_proof id entries ^ ".\n\n" ^
+  (* eqtype proof *)
+  string_of_eqtype_proof id []
 
 let string_of_inductive_def (id : ident) (args : inductive_args) (entries : inductive_type_entry list) = 
   "Inductive " ^ id ^ " " ^ string_of_binders args ^ " : Type :=\n\t" ^
@@ -210,44 +270,11 @@ let string_of_inductive_def (id : ident) (args : inductive_args) (entries : indu
   string_of_list_type id args ^ ".\n\n" ^
   string_of_option_type id args ^ ".\n\n" ^
   (* Inhabitance proof for default values *)
-  let binders = string_of_binders args in 
-  let binder_ids = string_of_binders_ids args in
-  "Global Instance Inhabited__" ^ id ^ " " ^ binders ^ " : Inhabited " ^ parens (id ^ " " ^ binder_ids) ^
-  match entries with
-    | [] -> "(* FIXME: no inhabitant found! *) .\n" ^
-            "\tAdmitted"
-    | (* MEMO: Uses the first constructor as default value *)
-      (case_id, binds) :: _ -> " := { default_val := " ^ case_id ^ " " ^ binder_ids ^ 
-      (* MEMO: Supply default value of arguments to case_id *)
-      " " ^ (String.concat " " (List.map (fun _ -> "default_val" ) binds)) ^ " }.\n\n" ^
-  (* TODO: e.g.
-    Global Instance Inhabited__functype : Inhabited (functype) :=
-      { default_val := functype__ default_val default_val }. *)
-  (* TODO: e.g. 
-    Global Instance Inh_list {T: Type} : Inhabited (list T) := { default_val := nil }. *)
-
-  (* Decidable equality proof *)
-  "Definition " ^ id ^ "_eq_dec : forall " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ "),\n" ^
-    "{v1 = v2} + {v1 <> v2}.\n" ^
-  "Proof. Admitted.\n\n" ^
-  (* "Proof. decidable_equality. Defined.\n\n" ^ *)
-  "Definition " ^ id ^ "_eqb " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") : bool :=\n" ^
-    id ^ "_eq_dec " ^ binder_ids ^ " v1 v2.\n" ^  
-  "Definition eq" ^ id ^ "P " ^ binders ^ " : Equality.axiom " ^ parens (id ^ "_eqb " ^ binder_ids) ^ " :=\n" ^
-    "eq_dec_Equality_axiom " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eq_dec " ^ binder_ids) ^ ".\n\n" ^
-  "Canonical Structure " ^ id ^ "_eqMixin " ^ binders ^ " := EqMixin " ^ parens ("eq" ^ id ^ "P " ^ binder_ids) ^ ".\n" ^
-  "Canonical Structure " ^ id ^ "_eqType " ^ binders ^ " :=\n" ^
-    "Eval hnf in EqType " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eqMixin " ^ binder_ids)
-  (* TODO: e.g.
-    Definition functype_eq_dec : forall (tf1 tf2 : functype),
-      {tf1 = tf2} + {tf1 <> tf2}.
-    Proof. decidable_equality. Defined.
-    Definition functype_eqb v1 v2 : bool := functype_eq_dec v1 v2.
-    Definition eqfunctypeP : Equality.axiom functype_eqb :=
-      eq_dec_Equality_axiom functype functype_eq_dec.
-    Canonical Structure functype_eqMixin := EqMixin eqfunctypeP.
-    Canonical Structure functype_eqType :=
-      Eval hnf in EqType functype functype_eqMixin. *)
+  string_of_inhabitance_proof_inductive_def id args entries ^
+  (* eqtype proof *)
+  (* TODO: (lemmagen) This is a hack *)
+  if id = "reserved__list" then "" else 
+    (".\n\n" ^ string_of_eqtype_proof id args)
 
 let string_of_definition (prefix : string) (id : ident) (binders : binders) (return_type : return_type) (clauses : clause_entry list) = 
   match clauses with
@@ -275,7 +302,8 @@ let rec string_of_premise (prem : coq_premise) =
 let string_of_typealias (id : ident) (binds : binders) (typ : coq_term) = 
   "Definition " ^ id ^ " " ^ string_of_binders binds ^ " := " ^ string_of_terms typ ^ ".\n\n" ^ 
   string_of_list_type id binds ^ ".\n\n" ^
-  string_of_option_type id binds
+  string_of_option_type id binds ^ ".\n\n" ^
+  string_of_eqtype_proof id []
 
 
 let string_of_inductive_relation (prefix : string) (id : ident) (args : relation_args) (relations : relation_type_entry list) = 
@@ -482,25 +510,17 @@ let exported_string =
   "Coercion option_to_list: option >-> list.\n\n" ^
   "Definition option_eq_dec (A : Type) (eq_dec : forall (x y : A), {x = y} + {x <> y}):\n" ^
   "  forall (x y : option A), {x = y} + {x <> y}.\n" ^
-  "Proof.\n" ^
-  "  move=> x y.\n" ^
-  "  case: x; case: y; try by [left | right].\n" ^
-  "  move => x' y'.\n" ^
-  "  case: (eq_dec x' y') => H.\n" ^
-  "  - left. by congr Some.\n" ^
-  "  - right. move => [Hcontra]. by apply: H.\n" ^
-  "Qed.\n\n" ^
+  "Proof. decide equality. Qed.\n\n" ^
+  "Create HintDb eq_dec_db.\n\n" ^
   "Ltac decidable_equality_step :=\n" ^
   "  first [\n" ^
   "      by apply: eq_comparable\n" ^
+  "    | apply: PeanoNat.Nat.eq_dec\n" ^
   "    | apply: List.list_eq_dec\n" ^
   "    | apply: option_eq_dec\n" ^
-  "    | apply: PeanoNat.Nat.eq_dec\n" ^
-  "    | by eauto\n" ^
+  "    | by eauto with eq_dec_db \n" ^
   "    | intros; apply: decP; by (exact _ || eauto)\n" ^
   "    | decide equality ].\n\n" ^
-  "Ltac decidable_equality :=\n" ^
-  "  repeat decidable_equality_step.\n\n" ^
   "Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),\n" ^
   "  let eqb v1 v2 := is_left (eq_dec v1 v2) in\n" ^
   "  Equality.axiom eqb.\n" ^
