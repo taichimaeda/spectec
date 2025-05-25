@@ -763,8 +763,10 @@ let rec valid_def {bind} env d =
     (* TODO: (lemmagen) Theorems can contain formulas *)
     valid_expform env' e (BoolT $ e.at);
     env.thms <- bind "theorem" env.thms id ()
-  | TmplD _ -> 
+  | TmplD _ when not env.template -> 
     error d.at "unexpected template definition"
+  | TmplD d' ->
+    valid_def {bind} env d'
   | HintD _ ->
     ()
 
@@ -772,15 +774,13 @@ let rec valid_def {bind} env d =
 (* Scripts *)
 
 let partition ds = 
-  List.filter (fun d -> 
-    match d.it with TmplD _ -> false | _ -> true) ds,
-  List.filter_map (fun d ->
-    match d.it with TmplD d' -> Some d' | _ -> None) ds
+  List.partition (fun d -> 
+    match d.it with TmplD _ -> false | _ -> true) ds
 
 let valid_with_template ds = 
-  let ntds, tds = partition ds in
+  let ds, tds = partition ds in
   let env = new_env () in
-  List.iter (valid_def {bind} env) ntds;
+  List.iter (valid_def {bind} env) ds;
   let env' = {env with template = true} in
   List.iter (valid_def {bind} env') tds
 

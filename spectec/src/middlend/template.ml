@@ -1271,18 +1271,20 @@ let rec simpl_def d =
 (* Transform *)
 
 let partition ds = 
-  List.filter (fun d -> 
-    match d.it with TmplD _ -> false | _ -> true) ds,
-  List.filter_map (fun d ->
-    match d.it with TmplD d' -> Some d' | _ -> None) ds
+  List.partition (fun d -> 
+    match d.it with TmplD _ -> false | _ -> true) ds
 
 let transform ds =
-  let ntds, tds = partition ds in
+  let ds, tds = partition ds in
   (* skip if no templates *)
   if tds = [] then ds else
 
-  let env = env ntds in
+  let env = env ds in
   let tds' = tds
+    |> List.map (fun d ->
+      match d.it with
+      | TmplD d' -> d'
+      | _ -> assert false)
     |> List.map (fun d ->
       let slots = slots_def d in
       let trie = make_trie slots in
@@ -1293,4 +1295,4 @@ let transform ds =
         assert (bs = []); d'))
     |> List.flatten
     |> List.map simpl_def in
-  ntds @ tds'
+  ds @ tds'

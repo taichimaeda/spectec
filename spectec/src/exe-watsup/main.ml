@@ -174,10 +174,6 @@ let () =
     if !print_elab_il || !print_all_il then print_il il;
     log "IL Validation...";
     Il.Valid.valid_with_template il;
-    
-    (* TODO: (lemmagen) Rewrite this line *)
-    let il = Middlend.Template.transform il in
-    Il.Valid.valid_without_template il;
 
     (match !target with
     | Prose | Splice _ | Interpreter _ ->
@@ -187,7 +183,8 @@ let () =
     | _ -> ()
     );
 
-    let il =
+    let ds, tds = Middlend.Template.partition il in
+    let ds =
       List.fold_left (fun il pass ->
         if not (PS.mem pass !selected_passes) then il else
         (
@@ -199,9 +196,15 @@ let () =
           Il.Valid.valid_without_template il;
           il
         )
-      ) il all_passes
+      ) ds all_passes
     in
     last_pass := "";
+
+    log "Running template pass...";
+    let il = Middlend.Template.transform (ds @ tds) in
+
+    log "IL Validation after template pass...";
+    Il.Valid.valid_without_template il;
 
     if !print_final_il && not !print_all_il then print_il il;
 
