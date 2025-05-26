@@ -226,11 +226,11 @@ let string_of_eqtype_proof (id : ident) (args : inductive_args) =
   | "instr" | "admininstr" -> 
     "Fixpoint " ^ id ^ "_eq_dec " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") {struct v1} :\n" ^
       "\t{v1 = v2} + {v1 <> v2}.\n" ^
-    "Proof. decide equality; repeat decidable_equality_step. Qed.\n\n"
+    "Proof. decide equality; repeat decidable_equality_step. Defined.\n\n"
   | _ -> 
     "Definition " ^ id ^ "_eq_dec : forall " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ "),\n" ^
       "\t{v1 = v2} + {v1 <> v2}.\n" ^
-    "Proof. repeat decidable_equality_step. Qed.\n\n") ^ 
+    "Proof. repeat decidable_equality_step. Defined.\n\n") ^ 
 
   "Definition " ^ id ^ "_eqb " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") : bool :=\n" ^
     id ^ "_eq_dec " ^ binder_ids ^ " v1 v2.\n" ^  

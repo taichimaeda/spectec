@@ -211,7 +211,7 @@ Global Instance Inhabited__byte  : Inhabited (byte ) := { default_val := byte__ 
 
 Definition byte_eq_dec : forall  (v1 v2 : byte ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition byte_eqb  (v1 v2 : byte ) : bool :=
 byte_eq_dec  v1 v2.
@@ -345,7 +345,7 @@ Global Instance Inhabited__char  : Inhabited (char ) := { default_val := char__ 
 
 Definition char_eq_dec : forall  (v1 v2 : char ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition char_eqb  (v1 v2 : char ) : bool :=
 char_eq_dec  v1 v2.
@@ -373,7 +373,7 @@ Global Instance Inhabited__name  : Inhabited (name ) := { default_val := name__ 
 
 Definition name_eq_dec : forall  (v1 v2 : name ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition name_eqb  (v1 v2 : name ) : bool :=
 name_eq_dec  v1 v2.
@@ -455,7 +455,7 @@ Global Instance Inhabited__fnn  : Inhabited (fnn ) := { default_val := fnn__F32 
 
 Definition fnn_eq_dec : forall  (v1 v2 : fnn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition fnn_eqb  (v1 v2 : fnn ) : bool :=
 fnn_eq_dec  v1 v2.
@@ -481,7 +481,7 @@ Global Instance Inhabited__inn  : Inhabited (inn ) := { default_val := inn__I32 
 
 Definition inn_eq_dec : forall  (v1 v2 : inn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition inn_eqb  (v1 v2 : inn ) : bool :=
 inn_eq_dec  v1 v2.
@@ -507,7 +507,7 @@ Global Instance Inhabited__valtype  : Inhabited (valtype ) := { default_val := v
 
 Definition valtype_eq_dec : forall  (v1 v2 : valtype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition valtype_eqb  (v1 v2 : valtype ) : bool :=
 valtype_eq_dec  v1 v2.
@@ -536,7 +536,7 @@ Definition option__resulttype  := (option (resulttype )).
 
 Definition resulttype_eq_dec : forall  (v1 v2 : resulttype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition resulttype_eqb  (v1 v2 : resulttype ) : bool :=
 resulttype_eq_dec  v1 v2.
@@ -561,7 +561,7 @@ Global Instance Inhabited__mut  : Inhabited (mut ) := { default_val := mut__MUT 
 
 Definition mut_eq_dec : forall  (v1 v2 : mut ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition mut_eqb  (v1 v2 : mut ) : bool :=
 mut_eq_dec  v1 v2.
@@ -586,7 +586,7 @@ Global Instance Inhabited__limits  : Inhabited (limits ) := { default_val := lim
 
 Definition limits_eq_dec : forall  (v1 v2 : limits ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition limits_eqb  (v1 v2 : limits ) : bool :=
 limits_eq_dec  v1 v2.
@@ -611,7 +611,7 @@ Global Instance Inhabited__globaltype  : Inhabited (globaltype ) := { default_va
 
 Definition globaltype_eq_dec : forall  (v1 v2 : globaltype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition globaltype_eqb  (v1 v2 : globaltype ) : bool :=
 globaltype_eq_dec  v1 v2.
@@ -636,7 +636,7 @@ Global Instance Inhabited__functype  : Inhabited (functype ) := { default_val :=
 
 Definition functype_eq_dec : forall  (v1 v2 : functype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition functype_eqb  (v1 v2 : functype ) : bool :=
 functype_eq_dec  v1 v2.
@@ -678,7 +678,7 @@ Global Instance Inhabited__externtype  : Inhabited (externtype ) := { default_va
 
 Definition externtype_eq_dec : forall  (v1 v2 : externtype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition externtype_eqb  (v1 v2 : externtype ) : bool :=
 externtype_eq_dec  v1 v2.
@@ -744,7 +744,7 @@ Global Instance Inhabited__sx  : Inhabited (sx ) := { default_val := sx__U   }.
 
 Definition sx_eq_dec : forall  (v1 v2 : sx ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition sx_eqb  (v1 v2 : sx ) : bool :=
 sx_eq_dec  v1 v2.
@@ -771,7 +771,7 @@ Global Instance Inhabited__unop___inn  : Inhabited (unop___inn ) := { default_va
 
 Definition unop___inn_eq_dec : forall  (v1 v2 : unop___inn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition unop___inn_eqb  (v1 v2 : unop___inn ) : bool :=
 unop___inn_eq_dec  v1 v2.
@@ -801,7 +801,7 @@ Global Instance Inhabited__unop___fnn  : Inhabited (unop___fnn ) := { default_va
 
 Definition unop___fnn_eq_dec : forall  (v1 v2 : unop___fnn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition unop___fnn_eqb  (v1 v2 : unop___fnn ) : bool :=
 unop___fnn_eq_dec  v1 v2.
@@ -826,7 +826,7 @@ Global Instance Inhabited__unop_  : Inhabited (unop_ ) := { default_val := unop_
 
 Definition unop__eq_dec : forall  (v1 v2 : unop_ ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition unop__eqb  (v1 v2 : unop_ ) : bool :=
 unop__eq_dec  v1 v2.
@@ -862,7 +862,7 @@ Global Instance Inhabited__binop___inn  : Inhabited (binop___inn ) := { default_
 
 Definition binop___inn_eq_dec : forall  (v1 v2 : binop___inn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition binop___inn_eqb  (v1 v2 : binop___inn ) : bool :=
 binop___inn_eq_dec  v1 v2.
@@ -892,7 +892,7 @@ Global Instance Inhabited__binop___fnn  : Inhabited (binop___fnn ) := { default_
 
 Definition binop___fnn_eq_dec : forall  (v1 v2 : binop___fnn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition binop___fnn_eqb  (v1 v2 : binop___fnn ) : bool :=
 binop___fnn_eq_dec  v1 v2.
@@ -917,7 +917,7 @@ Global Instance Inhabited__binop_  : Inhabited (binop_ ) := { default_val := bin
 
 Definition binop__eq_dec : forall  (v1 v2 : binop_ ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition binop__eqb  (v1 v2 : binop_ ) : bool :=
 binop__eq_dec  v1 v2.
@@ -942,7 +942,7 @@ Global Instance Inhabited__testop___inn  : Inhabited (testop___inn ) := { defaul
 
 Definition testop___inn_eq_dec : forall  (v1 v2 : testop___inn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition testop___inn_eqb  (v1 v2 : testop___inn ) : bool :=
 testop___inn_eq_dec  v1 v2.
@@ -967,7 +967,7 @@ Global Instance Inhabited__testop___fnn  : Inhabited (testop___fnn )(* FIXME: no
 
 Definition testop___fnn_eq_dec : forall  (v1 v2 : testop___fnn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition testop___fnn_eqb  (v1 v2 : testop___fnn ) : bool :=
 testop___fnn_eq_dec  v1 v2.
@@ -992,7 +992,7 @@ Global Instance Inhabited__testop_  : Inhabited (testop_ ) := { default_val := t
 
 Definition testop__eq_dec : forall  (v1 v2 : testop_ ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition testop__eqb  (v1 v2 : testop_ ) : bool :=
 testop__eq_dec  v1 v2.
@@ -1022,7 +1022,7 @@ Global Instance Inhabited__relop___inn  : Inhabited (relop___inn ) := { default_
 
 Definition relop___inn_eq_dec : forall  (v1 v2 : relop___inn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition relop___inn_eqb  (v1 v2 : relop___inn ) : bool :=
 relop___inn_eq_dec  v1 v2.
@@ -1051,7 +1051,7 @@ Global Instance Inhabited__relop___fnn  : Inhabited (relop___fnn ) := { default_
 
 Definition relop___fnn_eq_dec : forall  (v1 v2 : relop___fnn ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition relop___fnn_eqb  (v1 v2 : relop___fnn ) : bool :=
 relop___fnn_eq_dec  v1 v2.
@@ -1076,7 +1076,7 @@ Global Instance Inhabited__relop_  : Inhabited (relop_ ) := { default_val := rel
 
 Definition relop__eq_dec : forall  (v1 v2 : relop_ ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition relop__eqb  (v1 v2 : relop_ ) : bool :=
 relop__eq_dec  v1 v2.
@@ -1102,7 +1102,7 @@ Global Instance Inhabited__cvtop  : Inhabited (cvtop ) := { default_val := cvtop
 
 Definition cvtop_eq_dec : forall  (v1 v2 : cvtop ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition cvtop_eqb  (v1 v2 : cvtop ) : bool :=
 cvtop_eq_dec  v1 v2.
@@ -1142,7 +1142,7 @@ Global Instance Append_memop : Append memop := { _append arg1 arg2 := _append_me
 
 Definition memop_eq_dec : forall  (v1 v2 : memop ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition memop_eqb  (v1 v2 : memop ) : bool :=
 memop_eq_dec  v1 v2.
@@ -1164,7 +1164,7 @@ Definition option__blocktype  := (option (blocktype )).
 
 Definition blocktype_eq_dec : forall  (v1 v2 : blocktype ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition blocktype_eqb  (v1 v2 : blocktype ) : bool :=
 blocktype_eq_dec  v1 v2.
@@ -1189,7 +1189,7 @@ Global Instance Inhabited__packsize  : Inhabited (packsize ) := { default_val :=
 
 Definition packsize_eq_dec : forall  (v1 v2 : packsize ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition packsize_eqb  (v1 v2 : packsize ) : bool :=
 packsize_eq_dec  v1 v2.
@@ -1271,7 +1271,7 @@ Definition option__expr  := (option (expr )).
 
 Definition expr_eq_dec : forall  (v1 v2 : expr ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition expr_eqb  (v1 v2 : expr ) : bool :=
 expr_eq_dec  v1 v2.
@@ -1296,7 +1296,7 @@ Global Instance Inhabited__type  : Inhabited (type ) := { default_val := type__T
 
 Definition type_eq_dec : forall  (v1 v2 : type ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition type_eqb  (v1 v2 : type ) : bool :=
 type_eq_dec  v1 v2.
@@ -1321,7 +1321,7 @@ Global Instance Inhabited__local  : Inhabited (local ) := { default_val := local
 
 Definition local_eq_dec : forall  (v1 v2 : local ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition local_eqb  (v1 v2 : local ) : bool :=
 local_eq_dec  v1 v2.
@@ -1346,7 +1346,7 @@ Global Instance Inhabited__func  : Inhabited (func ) := { default_val := func__F
 
 Definition func_eq_dec : forall  (v1 v2 : func ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition func_eqb  (v1 v2 : func ) : bool :=
 func_eq_dec  v1 v2.
@@ -1371,7 +1371,7 @@ Global Instance Inhabited__global  : Inhabited (global ) := { default_val := glo
 
 Definition global_eq_dec : forall  (v1 v2 : global ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition global_eqb  (v1 v2 : global ) : bool :=
 global_eq_dec  v1 v2.
@@ -1396,7 +1396,7 @@ Global Instance Inhabited__table  : Inhabited (table ) := { default_val := table
 
 Definition table_eq_dec : forall  (v1 v2 : table ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition table_eqb  (v1 v2 : table ) : bool :=
 table_eq_dec  v1 v2.
@@ -1421,7 +1421,7 @@ Global Instance Inhabited__mem  : Inhabited (mem ) := { default_val := mem__MEMO
 
 Definition mem_eq_dec : forall  (v1 v2 : mem ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition mem_eqb  (v1 v2 : mem ) : bool :=
 mem_eq_dec  v1 v2.
@@ -1446,7 +1446,7 @@ Global Instance Inhabited__elem  : Inhabited (elem ) := { default_val := elem__E
 
 Definition elem_eq_dec : forall  (v1 v2 : elem ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition elem_eqb  (v1 v2 : elem ) : bool :=
 elem_eq_dec  v1 v2.
@@ -1471,7 +1471,7 @@ Global Instance Inhabited__data  : Inhabited (data ) := { default_val := data__D
 
 Definition data_eq_dec : forall  (v1 v2 : data ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition data_eqb  (v1 v2 : data ) : bool :=
 data_eq_dec  v1 v2.
@@ -1496,7 +1496,7 @@ Global Instance Inhabited__start  : Inhabited (start ) := { default_val := start
 
 Definition start_eq_dec : forall  (v1 v2 : start ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition start_eqb  (v1 v2 : start ) : bool :=
 start_eq_dec  v1 v2.
@@ -1524,7 +1524,7 @@ Global Instance Inhabited__externidx  : Inhabited (externidx ) := { default_val 
 
 Definition externidx_eq_dec : forall  (v1 v2 : externidx ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition externidx_eqb  (v1 v2 : externidx ) : bool :=
 externidx_eq_dec  v1 v2.
@@ -1549,7 +1549,7 @@ Global Instance Inhabited__export  : Inhabited (export ) := { default_val := exp
 
 Definition export_eq_dec : forall  (v1 v2 : export ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition export_eqb  (v1 v2 : export ) : bool :=
 export_eq_dec  v1 v2.
@@ -1574,7 +1574,7 @@ Global Instance Inhabited__import  : Inhabited (import ) := { default_val := imp
 
 Definition import_eq_dec : forall  (v1 v2 : import ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition import_eqb  (v1 v2 : import ) : bool :=
 import_eq_dec  v1 v2.
@@ -1599,7 +1599,7 @@ Global Instance Inhabited__module  : Inhabited (module ) := { default_val := mod
 
 Definition module_eq_dec : forall  (v1 v2 : module ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition module_eqb  (v1 v2 : module ) : bool :=
 module_eq_dec  v1 v2.
@@ -1949,7 +1949,7 @@ Global Instance Inhabited__val  : Inhabited (val ) := { default_val := val__CONS
 
 Definition val_eq_dec : forall  (v1 v2 : val ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition val_eqb  (v1 v2 : val ) : bool :=
 val_eq_dec  v1 v2.
@@ -1975,7 +1975,7 @@ Global Instance Inhabited__result  : Inhabited (result ) := { default_val := res
 
 Definition result_eq_dec : forall  (v1 v2 : result ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition result_eqb  (v1 v2 : result ) : bool :=
 result_eq_dec  v1 v2.
@@ -2003,7 +2003,7 @@ Global Instance Inhabited__externval  : Inhabited (externval ) := { default_val 
 
 Definition externval_eq_dec : forall  (v1 v2 : externval ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition externval_eqb  (v1 v2 : externval ) : bool :=
 externval_eq_dec  v1 v2.
@@ -2043,7 +2043,7 @@ Global Instance Append_exportinst : Append exportinst := { _append arg1 arg2 := 
 
 Definition exportinst_eq_dec : forall  (v1 v2 : exportinst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition exportinst_eqb  (v1 v2 : exportinst ) : bool :=
 exportinst_eq_dec  v1 v2.
@@ -2095,7 +2095,7 @@ Global Instance Append_moduleinst : Append moduleinst := { _append arg1 arg2 := 
 
 Definition moduleinst_eq_dec : forall  (v1 v2 : moduleinst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition moduleinst_eqb  (v1 v2 : moduleinst ) : bool :=
 moduleinst_eq_dec  v1 v2.
@@ -2138,7 +2138,7 @@ Global Instance Append_funcinst : Append funcinst := { _append arg1 arg2 := _app
 
 Definition funcinst_eq_dec : forall  (v1 v2 : funcinst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition funcinst_eqb  (v1 v2 : funcinst ) : bool :=
 funcinst_eq_dec  v1 v2.
@@ -2178,7 +2178,7 @@ Global Instance Append_globalinst : Append globalinst := { _append arg1 arg2 := 
 
 Definition globalinst_eq_dec : forall  (v1 v2 : globalinst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition globalinst_eqb  (v1 v2 : globalinst ) : bool :=
 globalinst_eq_dec  v1 v2.
@@ -2218,7 +2218,7 @@ Global Instance Append_tableinst : Append tableinst := { _append arg1 arg2 := _a
 
 Definition tableinst_eq_dec : forall  (v1 v2 : tableinst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition tableinst_eqb  (v1 v2 : tableinst ) : bool :=
 tableinst_eq_dec  v1 v2.
@@ -2258,7 +2258,7 @@ Global Instance Append_meminst : Append meminst := { _append arg1 arg2 := _appen
 
 Definition meminst_eq_dec : forall  (v1 v2 : meminst ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition meminst_eqb  (v1 v2 : meminst ) : bool :=
 meminst_eq_dec  v1 v2.
@@ -2304,7 +2304,7 @@ Global Instance Append_store : Append store := { _append arg1 arg2 := _append_st
 
 Definition store_eq_dec : forall  (v1 v2 : store ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition store_eqb  (v1 v2 : store ) : bool :=
 store_eq_dec  v1 v2.
@@ -2344,7 +2344,7 @@ Global Instance Append_frame : Append frame := { _append arg1 arg2 := _append_fr
 
 Definition frame_eq_dec : forall  (v1 v2 : frame ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition frame_eqb  (v1 v2 : frame ) : bool :=
 frame_eq_dec  v1 v2.
@@ -2369,7 +2369,7 @@ Global Instance Inhabited__state  : Inhabited (state ) := { default_val := state
 
 Definition state_eq_dec : forall  (v1 v2 : state ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition state_eqb  (v1 v2 : state ) : bool :=
 state_eq_dec  v1 v2.
@@ -2451,7 +2451,7 @@ Global Instance Inhabited__config  : Inhabited (config ) := { default_val := con
 
 Definition config_eq_dec : forall  (v1 v2 : config ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition config_eqb  (v1 v2 : config ) : bool :=
 config_eq_dec  v1 v2.
@@ -2479,7 +2479,7 @@ Global Instance Inhabited__E  : Inhabited (E ) := { default_val := E___HOLE_   }
 
 Definition E_eq_dec : forall  (v1 v2 : E ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition E_eqb  (v1 v2 : E ) : bool :=
 E_eq_dec  v1 v2.
@@ -2709,7 +2709,7 @@ Global Instance Append_context : Append context := { _append arg1 arg2 := _appen
 
 Definition context_eq_dec : forall  (v1 v2 : context ),
 	{v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Qed.
+Proof. repeat decidable_equality_step. Defined.
 
 Definition context_eqb  (v1 v2 : context ) : bool :=
 context_eq_dec  v1 v2.
