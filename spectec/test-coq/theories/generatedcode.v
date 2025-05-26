@@ -120,13 +120,12 @@ Ltac decidable_equality_step :=
     | intros; apply: decP; by (exact _ || eauto)
     | decide equality ].
 
-Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),
-  let eqb v1 v2 := is_left (eq_dec v1 v2) in
-  Equality.axiom eqb.
+Lemma eq_dec_Equality_axiom :
+  forall (T : Type) (eq_dec : forall (x y : T), decidable (x = y)),
+  let eqb v1 v2 := is_left (eq_dec v1 v2) in Equality.axiom eqb.
 Proof.
-  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).
-  - move=> E /=. by apply/ReflectT.
-  - move=> E /=. by apply/ReflectF.
+  move=> T eq_dec eqb x y. rewrite /eqb.
+  case: (eq_dec x y); by [apply: ReflectT | apply: ReflectF].
 Qed.
 
 Open Scope wasm_scope.

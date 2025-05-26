@@ -1937,7 +1937,7 @@ Proof.
         apply: Step__pure.
         by apply: Step_pure__br_succ.
     + case: (return_reduce_decidable es) => [Hretred | Hnotretred].
-        rewrite /return_reduce in Hretred.
+      * rewrite /return_reduce in Hretred.
         move: Hretred => [vcs' [es' Hes]].
         right. exists s, f, (list__val__admininstr vcs' ++ [:: admininstr__RETURN]).
         rewrite Hes.

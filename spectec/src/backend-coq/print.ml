@@ -521,13 +521,12 @@ let exported_string =
   "    | by eauto with eq_dec_db \n" ^
   "    | intros; apply: decP; by (exact _ || eauto)\n" ^
   "    | decide equality ].\n\n" ^
-  "Lemma eq_dec_Equality_axiom : forall t (eq_dec : forall x y : t, {x = y} + {x <> y}),\n" ^
-  "  let eqb v1 v2 := is_left (eq_dec v1 v2) in\n" ^
-  "  Equality.axiom eqb.\n" ^
+  "Lemma eq_dec_Equality_axiom :\n" ^
+  "  forall (T : Type) (eq_dec : forall (x y : T), decidable (x = y)),\n" ^
+  "  let eqb v1 v2 := is_left (eq_dec v1 v2) in Equality.axiom eqb.\n" ^
   "Proof.\n" ^
-  "  move=> t eq_dec eqb x y. rewrite /eqb. case: (eq_dec x y).\n" ^
-  "  - move=> E /=. by apply/ReflectT.\n" ^
-  "  - move=> E /=. by apply/ReflectF.\n" ^
+  "  move=> T eq_dec eqb x y. rewrite /eqb.\n" ^
+  "  case: (eq_dec x y); by [apply: ReflectT | apply: ReflectF].\n" ^
   "Qed.\n\n" ^
   "Open Scope wasm_scope.\n" ^
   "Import ListNotations.\n" ^

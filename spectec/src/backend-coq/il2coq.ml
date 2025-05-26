@@ -282,7 +282,7 @@ and check_formula (exp : exp) =
       let flag = ref false
       let visit_exp exp' = 
         match exp'.it with
-        | RuleE _ | ForallE _ | ExistsE _ -> flag := true
+        | FoldE _ | RuleE _ | ForallE _ | ExistsE _ -> flag := true
         | _ -> ()  
     end in
   let module Acc = Il.Iter.Make(Arg) in
