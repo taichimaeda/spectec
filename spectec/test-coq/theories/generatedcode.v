@@ -104,21 +104,10 @@ Definition option_to_list {T: Type} (arg : option T) : list T :=
 
 Coercion option_to_list: option >-> list.
 
-Definition option_eq_dec (A : Type) (eq_dec : forall (x y : A), {x = y} + {x <> y}):
-  forall (x y : option A), {x = y} + {x <> y}.
-Proof. decide equality. Qed.
-
 Create HintDb eq_dec_db.
 
 Ltac decidable_equality_step :=
-  first [
-      by apply: eq_comparable
-    | apply: PeanoNat.Nat.eq_dec
-    | apply: List.list_eq_dec
-    | apply: option_eq_dec
-    | by eauto with eq_dec_db 
-    | intros; apply: decP; by (exact _ || eauto)
-    | decide equality ].
+  do [ by eauto with eq_dec_db | decide equality ].
 
 Lemma eq_dec_Equality_axiom :
   forall (T : Type) (eq_dec : forall (x y : T), decidable (x = y)),
@@ -1249,7 +1238,7 @@ Global Instance Inhabited__instr  : Inhabited (instr ) := { default_val := instr
 
 Fixpoint instr_eq_dec  (v1 v2 : instr ) {struct v1} :
 	{v1 = v2} + {v1 <> v2}.
-Proof. decide equality; repeat decidable_equality_step. Qed.
+Proof. decide equality; repeat decidable_equality_step. Defined.
 
 Definition instr_eqb  (v1 v2 : instr ) : bool :=
 instr_eq_dec  v1 v2.
@@ -2426,7 +2415,7 @@ Global Instance Inhabited__admininstr  : Inhabited (admininstr ) := { default_va
 
 Fixpoint admininstr_eq_dec  (v1 v2 : admininstr ) {struct v1} :
 	{v1 = v2} + {v1 <> v2}.
-Proof. decide equality; repeat decidable_equality_step. Qed.
+Proof. decide equality; repeat decidable_equality_step. Defined.
 
 Definition admininstr_eqb  (v1 v2 : admininstr ) : bool :=
 admininstr_eq_dec  v1 v2.

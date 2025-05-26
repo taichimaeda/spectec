@@ -508,19 +508,9 @@ let exported_string =
   "\t\t| Some a => a :: nil\n" ^ 
 	"\tend.\n\n" ^
   "Coercion option_to_list: option >-> list.\n\n" ^
-  "Definition option_eq_dec (A : Type) (eq_dec : forall (x y : A), {x = y} + {x <> y}):\n" ^
-  "  forall (x y : option A), {x = y} + {x <> y}.\n" ^
-  "Proof. decide equality. Qed.\n\n" ^
   "Create HintDb eq_dec_db.\n\n" ^
   "Ltac decidable_equality_step :=\n" ^
-  "  first [\n" ^
-  "      by apply: eq_comparable\n" ^
-  "    | apply: PeanoNat.Nat.eq_dec\n" ^
-  "    | apply: List.list_eq_dec\n" ^
-  "    | apply: option_eq_dec\n" ^
-  "    | by eauto with eq_dec_db \n" ^
-  "    | intros; apply: decP; by (exact _ || eauto)\n" ^
-  "    | decide equality ].\n\n" ^
+  "  do [ by eauto with eq_dec_db | decide equality ].\n\n" ^
   "Lemma eq_dec_Equality_axiom :\n" ^
   "  forall (T : Type) (eq_dec : forall (x y : T), decidable (x = y)),\n" ^
   "  let eqb v1 v2 := is_left (eq_dec v1 v2) in Equality.axiom eqb.\n" ^
