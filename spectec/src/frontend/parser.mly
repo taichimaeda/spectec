@@ -542,7 +542,7 @@ exp_prim_ :
   | DOLLAR LPAREN arith RPAREN { $3.it }
   | FUSEFUSE exp_prim { UnparenE $2 } 
   | LBRACE LBRACE slot RBRACE RBRACE { TmplE $3 }
-  | ATMARK LPAREN thmid COLON exp RPAREN { RuleE ($3, $5) }
+  | ATMARK LPAREN relid COLON exp RPAREN { RuleE ($3, $5) }
 
 exp_post : exp_post_ { $1 $ $sloc }
 exp_post_ :

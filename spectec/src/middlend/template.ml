@@ -770,8 +770,8 @@ let subst_id substs id : id =
     |> List.map (fun (s, s', _) -> wild_ids s s')
     |> List.flatten in
   let sids = List.sort_uniq String.compare wids in
-  let suffix = String.concat "" (List.map (fun id -> "_" ^ id) sids) in
-  {id with it = id.it ^ suffix}
+  let suffix = String.concat "_" sids in
+  {id with it = id.it ^ "__" ^ suffix}
 
 let rec subst_iter substs it : iter * bind list =
   match it with

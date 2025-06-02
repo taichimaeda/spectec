@@ -225,20 +225,20 @@ let string_of_eqtype_proof (id : ident) (args : inductive_args) =
   (match id with
   | "instr" | "admininstr" -> 
     "Fixpoint " ^ id ^ "_eq_dec " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") {struct v1} :\n" ^
-      "\t{v1 = v2} + {v1 <> v2}.\n" ^
+    "  {v1 = v2} + {v1 <> v2}.\n" ^
     "Proof. decide equality; repeat decidable_equality_step. Defined.\n\n"
   | _ -> 
     "Definition " ^ id ^ "_eq_dec : forall " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ "),\n" ^
-      "\t{v1 = v2} + {v1 <> v2}.\n" ^
+    "  {v1 = v2} + {v1 <> v2}.\n" ^
     "Proof. repeat decidable_equality_step. Defined.\n\n") ^ 
 
   "Definition " ^ id ^ "_eqb " ^ binders ^ " (v1 v2 : " ^ id ^ " " ^ binder_ids ^ ") : bool :=\n" ^
-    id ^ "_eq_dec " ^ binder_ids ^ " v1 v2.\n" ^  
+  "  is_left" ^ parens (id ^ "_eq_dec " ^ binder_ids ^ " v1 v2") ^ ".\n" ^  
   "Definition eq" ^ id ^ "P " ^ binders ^ " : Equality.axiom " ^ parens (id ^ "_eqb " ^ binder_ids) ^ " :=\n" ^
-    "eq_dec_Equality_axiom " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eq_dec " ^ binder_ids) ^ ".\n\n" ^
+  "  eq_dec_Equality_axiom " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eq_dec " ^ binder_ids) ^ ".\n\n" ^
   "Canonical Structure " ^ id ^ "_eqMixin " ^ binders ^ " := EqMixin " ^ parens ("eq" ^ id ^ "P " ^ binder_ids) ^ ".\n" ^
   "Canonical Structure " ^ id ^ "_eqType " ^ binders ^ " :=\n" ^
-    "Eval hnf in EqType " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eqMixin " ^ binder_ids) ^  ".\n\n" ^
+  "  Eval hnf in EqType " ^ parens (id ^ " " ^ binder_ids) ^ " " ^ parens (id ^ "_eqMixin " ^ binder_ids) ^  ".\n\n" ^
   "Hint Resolve " ^ id ^ "_eq_dec : eq_dec_db"
 
 let string_of_record (id: ident) (entries : record_entry list) = 

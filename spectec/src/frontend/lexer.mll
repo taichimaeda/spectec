@@ -230,6 +230,7 @@ and token = parse
   | "lemma" { LEMMA }
   | "template" { TEMPLATE }
 
+  (* TODO: (lemmagen) Allow any whitespaces before lparen? *)
   | "forall (" { FORALL_SPACE_LPAREN }
   | "exists (" { EXISTS_SPACE_LPAREN }
 

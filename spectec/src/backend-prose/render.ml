@@ -702,7 +702,7 @@ let render_funcname_title env fname params =
   render_expr env (Al.Ast.CallE (fname, params) $ no_region)
 
 let render_stmt env name style para =
-  "**" ^ String.capitalize_ascii style ^ "(" ^ name ^ ")**." ^ "\n" ^
+  "**" ^ String.capitalize_ascii style ^ " (" ^ name ^ ")**." ^ "\n" ^
   String.capitalize_ascii (render_para env para)
 
 let render_pred env name params instrs =
