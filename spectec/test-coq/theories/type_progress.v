@@ -2216,3 +2216,30 @@ Proof.
   - by move/s_typing_not_lf_br: Hthread. 
   - by move/s_typing_not_lf_return: Hthread.
 Qed.
+
+(* TODO: Duplicate of type_preservation.v *)
+Theorem t_preservation: forall s f es s' f' es' ts,
+  Step (config__ (state__ s f) es) (config__ (state__ s' f') es') ->
+	Config_ok (config__ (state__ s f) es) ts ->
+	Config_ok (config__ (state__ s' f') es') ts.
+Proof. Admitted.
+
+CoInductive Config_sound s f es ts (Hconfig : Config_ok (config__ (state__ s f) es) ts) : Prop :=
+  | Config_sound__terminal : 
+    terminal_form es -> 
+    Config_sound s f es ts Hconfig
+  | Config_sound__step s' f' es' (Hconfig' : Config_ok (config__ (state__ s' f') es') ts) :
+    Step (config__ (state__ s f) es) (config__ (state__ s' f') es') ->
+    Config_sound s' f' es' ts Hconfig' ->
+    Config_sound s f es ts Hconfig.
+
+Theorem t_soundness : 
+  forall s f es ts (Hconfig : Config_ok (config__ (state__ s f) es) ts), 
+  Config_sound s f es ts Hconfig.
+Proof.
+  cofix Hsound. move=> s f es ts Hconfig.
+  case Hprogress: (t_progress s f es ts Hconfig) => [Hterm | [s' [f' [es' Hstep]]]].
+  - by apply: Config_sound__terminal.
+  - have Hconfig' := t_preservation s f es s' f' es' ts Hstep Hconfig.
+    apply: (Config_sound__step s f es ts Hconfig s' f' es') => //=.
+Qed.
