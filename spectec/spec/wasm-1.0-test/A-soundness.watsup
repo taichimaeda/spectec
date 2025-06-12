@@ -293,7 +293,7 @@ lemma t_progress_be hint(desc "Basic Fragment Progress") =
   @(Instrs_ok: C |- instr* : ft) =>
   ft = (valtype_1* -> valtype_2*) =>
   C = $($(C', LOCALS $types__of(f.LOCALS), LABELS lab*, RETURN ret?)) =>
-  @(Module_instance_ok: s |- f.MODULE : C) =>
+  @(Module_instance_ok: s |- f.MODULE : C') =>
   $types__of(val*) = valtype_1* =>
   @(Store_ok: |- s : OK) =>
   $not__lf__br(instr*) =>
@@ -371,7 +371,7 @@ lemma t_preservation_type hint(desc "Fragment Preservation") =
   @(Module_instance_ok: s |- f.MODULE : C) =>
   @(Module_instance_ok: s' |- f.MODULE : C) =>
   val* = f.LOCALS =>
-  @(@(Val_ok: |- val_1 : valtype))* =>
+  @(@(Val_ok: |- val : valtype))* =>
   C' = $($(C, LOCALS valtype* C.LOCALS, RETURN ret?, LABELS lab*)) =>
   @(Admin_instrs_ok: s; C' |- admininstr* : (valtype_1* -> valtype_2*)) =>
   @(Admin_instrs_ok: s'; C' |- admininstr'* : (valtype_1* -> valtype_2*))
