@@ -200,7 +200,7 @@ Global Instance Inhabited__byte  : Inhabited (byte ) := { default_val := byte__ 
 
 Definition byte_eq_dec : forall  (v1 v2 : byte ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition byte_eqb  (v1 v2 : byte ) : bool :=
   is_left(byte_eq_dec  v1 v2).
@@ -334,7 +334,7 @@ Global Instance Inhabited__char  : Inhabited (char ) := { default_val := char__ 
 
 Definition char_eq_dec : forall  (v1 v2 : char ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition char_eqb  (v1 v2 : char ) : bool :=
   is_left(char_eq_dec  v1 v2).
@@ -362,7 +362,7 @@ Global Instance Inhabited__name  : Inhabited (name ) := { default_val := name__ 
 
 Definition name_eq_dec : forall  (v1 v2 : name ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition name_eqb  (v1 v2 : name ) : bool :=
   is_left(name_eq_dec  v1 v2).
@@ -444,7 +444,7 @@ Global Instance Inhabited__fnn  : Inhabited (fnn ) := { default_val := fnn__F32 
 
 Definition fnn_eq_dec : forall  (v1 v2 : fnn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition fnn_eqb  (v1 v2 : fnn ) : bool :=
   is_left(fnn_eq_dec  v1 v2).
@@ -470,7 +470,7 @@ Global Instance Inhabited__inn  : Inhabited (inn ) := { default_val := inn__I32 
 
 Definition inn_eq_dec : forall  (v1 v2 : inn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition inn_eqb  (v1 v2 : inn ) : bool :=
   is_left(inn_eq_dec  v1 v2).
@@ -496,7 +496,7 @@ Global Instance Inhabited__valtype  : Inhabited (valtype ) := { default_val := v
 
 Definition valtype_eq_dec : forall  (v1 v2 : valtype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition valtype_eqb  (v1 v2 : valtype ) : bool :=
   is_left(valtype_eq_dec  v1 v2).
@@ -525,7 +525,7 @@ Definition option__resulttype  := (option (resulttype )).
 
 Definition resulttype_eq_dec : forall  (v1 v2 : resulttype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition resulttype_eqb  (v1 v2 : resulttype ) : bool :=
   is_left(resulttype_eq_dec  v1 v2).
@@ -550,7 +550,7 @@ Global Instance Inhabited__mut  : Inhabited (mut ) := { default_val := mut__MUT 
 
 Definition mut_eq_dec : forall  (v1 v2 : mut ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition mut_eqb  (v1 v2 : mut ) : bool :=
   is_left(mut_eq_dec  v1 v2).
@@ -575,7 +575,7 @@ Global Instance Inhabited__limits  : Inhabited (limits ) := { default_val := lim
 
 Definition limits_eq_dec : forall  (v1 v2 : limits ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition limits_eqb  (v1 v2 : limits ) : bool :=
   is_left(limits_eq_dec  v1 v2).
@@ -600,7 +600,7 @@ Global Instance Inhabited__globaltype  : Inhabited (globaltype ) := { default_va
 
 Definition globaltype_eq_dec : forall  (v1 v2 : globaltype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition globaltype_eqb  (v1 v2 : globaltype ) : bool :=
   is_left(globaltype_eq_dec  v1 v2).
@@ -625,7 +625,7 @@ Global Instance Inhabited__functype  : Inhabited (functype ) := { default_val :=
 
 Definition functype_eq_dec : forall  (v1 v2 : functype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition functype_eqb  (v1 v2 : functype ) : bool :=
   is_left(functype_eq_dec  v1 v2).
@@ -667,7 +667,7 @@ Global Instance Inhabited__externtype  : Inhabited (externtype ) := { default_va
 
 Definition externtype_eq_dec : forall  (v1 v2 : externtype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition externtype_eqb  (v1 v2 : externtype ) : bool :=
   is_left(externtype_eq_dec  v1 v2).
@@ -733,7 +733,7 @@ Global Instance Inhabited__sx  : Inhabited (sx ) := { default_val := sx__U   }.
 
 Definition sx_eq_dec : forall  (v1 v2 : sx ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition sx_eqb  (v1 v2 : sx ) : bool :=
   is_left(sx_eq_dec  v1 v2).
@@ -760,7 +760,7 @@ Global Instance Inhabited__unop___inn  : Inhabited (unop___inn ) := { default_va
 
 Definition unop___inn_eq_dec : forall  (v1 v2 : unop___inn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition unop___inn_eqb  (v1 v2 : unop___inn ) : bool :=
   is_left(unop___inn_eq_dec  v1 v2).
@@ -790,7 +790,7 @@ Global Instance Inhabited__unop___fnn  : Inhabited (unop___fnn ) := { default_va
 
 Definition unop___fnn_eq_dec : forall  (v1 v2 : unop___fnn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition unop___fnn_eqb  (v1 v2 : unop___fnn ) : bool :=
   is_left(unop___fnn_eq_dec  v1 v2).
@@ -815,7 +815,7 @@ Global Instance Inhabited__unop_  : Inhabited (unop_ ) := { default_val := unop_
 
 Definition unop__eq_dec : forall  (v1 v2 : unop_ ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition unop__eqb  (v1 v2 : unop_ ) : bool :=
   is_left(unop__eq_dec  v1 v2).
@@ -851,7 +851,7 @@ Global Instance Inhabited__binop___inn  : Inhabited (binop___inn ) := { default_
 
 Definition binop___inn_eq_dec : forall  (v1 v2 : binop___inn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition binop___inn_eqb  (v1 v2 : binop___inn ) : bool :=
   is_left(binop___inn_eq_dec  v1 v2).
@@ -881,7 +881,7 @@ Global Instance Inhabited__binop___fnn  : Inhabited (binop___fnn ) := { default_
 
 Definition binop___fnn_eq_dec : forall  (v1 v2 : binop___fnn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition binop___fnn_eqb  (v1 v2 : binop___fnn ) : bool :=
   is_left(binop___fnn_eq_dec  v1 v2).
@@ -906,7 +906,7 @@ Global Instance Inhabited__binop_  : Inhabited (binop_ ) := { default_val := bin
 
 Definition binop__eq_dec : forall  (v1 v2 : binop_ ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition binop__eqb  (v1 v2 : binop_ ) : bool :=
   is_left(binop__eq_dec  v1 v2).
@@ -931,7 +931,7 @@ Global Instance Inhabited__testop___inn  : Inhabited (testop___inn ) := { defaul
 
 Definition testop___inn_eq_dec : forall  (v1 v2 : testop___inn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition testop___inn_eqb  (v1 v2 : testop___inn ) : bool :=
   is_left(testop___inn_eq_dec  v1 v2).
@@ -956,7 +956,7 @@ Global Instance Inhabited__testop___fnn  : Inhabited (testop___fnn )(* FIXME: no
 
 Definition testop___fnn_eq_dec : forall  (v1 v2 : testop___fnn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition testop___fnn_eqb  (v1 v2 : testop___fnn ) : bool :=
   is_left(testop___fnn_eq_dec  v1 v2).
@@ -981,7 +981,7 @@ Global Instance Inhabited__testop_  : Inhabited (testop_ ) := { default_val := t
 
 Definition testop__eq_dec : forall  (v1 v2 : testop_ ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition testop__eqb  (v1 v2 : testop_ ) : bool :=
   is_left(testop__eq_dec  v1 v2).
@@ -1011,7 +1011,7 @@ Global Instance Inhabited__relop___inn  : Inhabited (relop___inn ) := { default_
 
 Definition relop___inn_eq_dec : forall  (v1 v2 : relop___inn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition relop___inn_eqb  (v1 v2 : relop___inn ) : bool :=
   is_left(relop___inn_eq_dec  v1 v2).
@@ -1040,7 +1040,7 @@ Global Instance Inhabited__relop___fnn  : Inhabited (relop___fnn ) := { default_
 
 Definition relop___fnn_eq_dec : forall  (v1 v2 : relop___fnn ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition relop___fnn_eqb  (v1 v2 : relop___fnn ) : bool :=
   is_left(relop___fnn_eq_dec  v1 v2).
@@ -1065,7 +1065,7 @@ Global Instance Inhabited__relop_  : Inhabited (relop_ ) := { default_val := rel
 
 Definition relop__eq_dec : forall  (v1 v2 : relop_ ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition relop__eqb  (v1 v2 : relop_ ) : bool :=
   is_left(relop__eq_dec  v1 v2).
@@ -1091,7 +1091,7 @@ Global Instance Inhabited__cvtop  : Inhabited (cvtop ) := { default_val := cvtop
 
 Definition cvtop_eq_dec : forall  (v1 v2 : cvtop ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition cvtop_eqb  (v1 v2 : cvtop ) : bool :=
   is_left(cvtop_eq_dec  v1 v2).
@@ -1131,7 +1131,7 @@ Global Instance Append_memop : Append memop := { _append arg1 arg2 := _append_me
 
 Definition memop_eq_dec : forall  (v1 v2 : memop ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition memop_eqb  (v1 v2 : memop ) : bool :=
   is_left(memop_eq_dec  v1 v2).
@@ -1153,7 +1153,7 @@ Definition option__blocktype  := (option (blocktype )).
 
 Definition blocktype_eq_dec : forall  (v1 v2 : blocktype ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition blocktype_eqb  (v1 v2 : blocktype ) : bool :=
   is_left(blocktype_eq_dec  v1 v2).
@@ -1178,7 +1178,7 @@ Global Instance Inhabited__packsize  : Inhabited (packsize ) := { default_val :=
 
 Definition packsize_eq_dec : forall  (v1 v2 : packsize ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition packsize_eqb  (v1 v2 : packsize ) : bool :=
   is_left(packsize_eq_dec  v1 v2).
@@ -1238,7 +1238,7 @@ Global Instance Inhabited__instr  : Inhabited (instr ) := { default_val := instr
 
 Fixpoint instr_eq_dec  (v1 v2 : instr ) {struct v1} :
   {v1 = v2} + {v1 <> v2}.
-Proof. decide equality; repeat decidable_equality_step. Defined.
+Proof. decide equality; do ? decidable_equality_step. Defined.
 
 Definition instr_eqb  (v1 v2 : instr ) : bool :=
   is_left(instr_eq_dec  v1 v2).
@@ -1260,7 +1260,7 @@ Definition option__expr  := (option (expr )).
 
 Definition expr_eq_dec : forall  (v1 v2 : expr ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition expr_eqb  (v1 v2 : expr ) : bool :=
   is_left(expr_eq_dec  v1 v2).
@@ -1285,7 +1285,7 @@ Global Instance Inhabited__type  : Inhabited (type ) := { default_val := type__T
 
 Definition type_eq_dec : forall  (v1 v2 : type ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition type_eqb  (v1 v2 : type ) : bool :=
   is_left(type_eq_dec  v1 v2).
@@ -1310,7 +1310,7 @@ Global Instance Inhabited__local  : Inhabited (local ) := { default_val := local
 
 Definition local_eq_dec : forall  (v1 v2 : local ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition local_eqb  (v1 v2 : local ) : bool :=
   is_left(local_eq_dec  v1 v2).
@@ -1335,7 +1335,7 @@ Global Instance Inhabited__func  : Inhabited (func ) := { default_val := func__F
 
 Definition func_eq_dec : forall  (v1 v2 : func ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition func_eqb  (v1 v2 : func ) : bool :=
   is_left(func_eq_dec  v1 v2).
@@ -1360,7 +1360,7 @@ Global Instance Inhabited__global  : Inhabited (global ) := { default_val := glo
 
 Definition global_eq_dec : forall  (v1 v2 : global ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition global_eqb  (v1 v2 : global ) : bool :=
   is_left(global_eq_dec  v1 v2).
@@ -1385,7 +1385,7 @@ Global Instance Inhabited__table  : Inhabited (table ) := { default_val := table
 
 Definition table_eq_dec : forall  (v1 v2 : table ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition table_eqb  (v1 v2 : table ) : bool :=
   is_left(table_eq_dec  v1 v2).
@@ -1410,7 +1410,7 @@ Global Instance Inhabited__mem  : Inhabited (mem ) := { default_val := mem__MEMO
 
 Definition mem_eq_dec : forall  (v1 v2 : mem ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition mem_eqb  (v1 v2 : mem ) : bool :=
   is_left(mem_eq_dec  v1 v2).
@@ -1435,7 +1435,7 @@ Global Instance Inhabited__elem  : Inhabited (elem ) := { default_val := elem__E
 
 Definition elem_eq_dec : forall  (v1 v2 : elem ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition elem_eqb  (v1 v2 : elem ) : bool :=
   is_left(elem_eq_dec  v1 v2).
@@ -1460,7 +1460,7 @@ Global Instance Inhabited__data  : Inhabited (data ) := { default_val := data__D
 
 Definition data_eq_dec : forall  (v1 v2 : data ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition data_eqb  (v1 v2 : data ) : bool :=
   is_left(data_eq_dec  v1 v2).
@@ -1485,7 +1485,7 @@ Global Instance Inhabited__start  : Inhabited (start ) := { default_val := start
 
 Definition start_eq_dec : forall  (v1 v2 : start ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition start_eqb  (v1 v2 : start ) : bool :=
   is_left(start_eq_dec  v1 v2).
@@ -1513,7 +1513,7 @@ Global Instance Inhabited__externidx  : Inhabited (externidx ) := { default_val 
 
 Definition externidx_eq_dec : forall  (v1 v2 : externidx ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition externidx_eqb  (v1 v2 : externidx ) : bool :=
   is_left(externidx_eq_dec  v1 v2).
@@ -1538,7 +1538,7 @@ Global Instance Inhabited__export  : Inhabited (export ) := { default_val := exp
 
 Definition export_eq_dec : forall  (v1 v2 : export ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition export_eqb  (v1 v2 : export ) : bool :=
   is_left(export_eq_dec  v1 v2).
@@ -1563,7 +1563,7 @@ Global Instance Inhabited__import  : Inhabited (import ) := { default_val := imp
 
 Definition import_eq_dec : forall  (v1 v2 : import ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition import_eqb  (v1 v2 : import ) : bool :=
   is_left(import_eq_dec  v1 v2).
@@ -1588,7 +1588,7 @@ Global Instance Inhabited__module  : Inhabited (module ) := { default_val := mod
 
 Definition module_eq_dec : forall  (v1 v2 : module ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition module_eqb  (v1 v2 : module ) : bool :=
   is_left(module_eq_dec  v1 v2).
@@ -1938,7 +1938,7 @@ Global Instance Inhabited__val  : Inhabited (val ) := { default_val := val__CONS
 
 Definition val_eq_dec : forall  (v1 v2 : val ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition val_eqb  (v1 v2 : val ) : bool :=
   is_left(val_eq_dec  v1 v2).
@@ -1964,7 +1964,7 @@ Global Instance Inhabited__result  : Inhabited (result ) := { default_val := res
 
 Definition result_eq_dec : forall  (v1 v2 : result ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition result_eqb  (v1 v2 : result ) : bool :=
   is_left(result_eq_dec  v1 v2).
@@ -1992,7 +1992,7 @@ Global Instance Inhabited__externval  : Inhabited (externval ) := { default_val 
 
 Definition externval_eq_dec : forall  (v1 v2 : externval ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition externval_eqb  (v1 v2 : externval ) : bool :=
   is_left(externval_eq_dec  v1 v2).
@@ -2032,7 +2032,7 @@ Global Instance Append_exportinst : Append exportinst := { _append arg1 arg2 := 
 
 Definition exportinst_eq_dec : forall  (v1 v2 : exportinst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition exportinst_eqb  (v1 v2 : exportinst ) : bool :=
   is_left(exportinst_eq_dec  v1 v2).
@@ -2084,7 +2084,7 @@ Global Instance Append_moduleinst : Append moduleinst := { _append arg1 arg2 := 
 
 Definition moduleinst_eq_dec : forall  (v1 v2 : moduleinst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition moduleinst_eqb  (v1 v2 : moduleinst ) : bool :=
   is_left(moduleinst_eq_dec  v1 v2).
@@ -2127,7 +2127,7 @@ Global Instance Append_funcinst : Append funcinst := { _append arg1 arg2 := _app
 
 Definition funcinst_eq_dec : forall  (v1 v2 : funcinst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition funcinst_eqb  (v1 v2 : funcinst ) : bool :=
   is_left(funcinst_eq_dec  v1 v2).
@@ -2167,7 +2167,7 @@ Global Instance Append_globalinst : Append globalinst := { _append arg1 arg2 := 
 
 Definition globalinst_eq_dec : forall  (v1 v2 : globalinst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition globalinst_eqb  (v1 v2 : globalinst ) : bool :=
   is_left(globalinst_eq_dec  v1 v2).
@@ -2207,7 +2207,7 @@ Global Instance Append_tableinst : Append tableinst := { _append arg1 arg2 := _a
 
 Definition tableinst_eq_dec : forall  (v1 v2 : tableinst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition tableinst_eqb  (v1 v2 : tableinst ) : bool :=
   is_left(tableinst_eq_dec  v1 v2).
@@ -2247,7 +2247,7 @@ Global Instance Append_meminst : Append meminst := { _append arg1 arg2 := _appen
 
 Definition meminst_eq_dec : forall  (v1 v2 : meminst ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition meminst_eqb  (v1 v2 : meminst ) : bool :=
   is_left(meminst_eq_dec  v1 v2).
@@ -2293,7 +2293,7 @@ Global Instance Append_store : Append store := { _append arg1 arg2 := _append_st
 
 Definition store_eq_dec : forall  (v1 v2 : store ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition store_eqb  (v1 v2 : store ) : bool :=
   is_left(store_eq_dec  v1 v2).
@@ -2333,7 +2333,7 @@ Global Instance Append_frame : Append frame := { _append arg1 arg2 := _append_fr
 
 Definition frame_eq_dec : forall  (v1 v2 : frame ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition frame_eqb  (v1 v2 : frame ) : bool :=
   is_left(frame_eq_dec  v1 v2).
@@ -2358,7 +2358,7 @@ Global Instance Inhabited__state  : Inhabited (state ) := { default_val := state
 
 Definition state_eq_dec : forall  (v1 v2 : state ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition state_eqb  (v1 v2 : state ) : bool :=
   is_left(state_eq_dec  v1 v2).
@@ -2415,7 +2415,7 @@ Global Instance Inhabited__admininstr  : Inhabited (admininstr ) := { default_va
 
 Fixpoint admininstr_eq_dec  (v1 v2 : admininstr ) {struct v1} :
   {v1 = v2} + {v1 <> v2}.
-Proof. decide equality; repeat decidable_equality_step. Defined.
+Proof. decide equality; do ? decidable_equality_step. Defined.
 
 Definition admininstr_eqb  (v1 v2 : admininstr ) : bool :=
   is_left(admininstr_eq_dec  v1 v2).
@@ -2440,7 +2440,7 @@ Global Instance Inhabited__config  : Inhabited (config ) := { default_val := con
 
 Definition config_eq_dec : forall  (v1 v2 : config ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition config_eqb  (v1 v2 : config ) : bool :=
   is_left(config_eq_dec  v1 v2).
@@ -2468,7 +2468,7 @@ Global Instance Inhabited__E  : Inhabited (E ) := { default_val := E___HOLE_   }
 
 Definition E_eq_dec : forall  (v1 v2 : E ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition E_eqb  (v1 v2 : E ) : bool :=
   is_left(E_eq_dec  v1 v2).
@@ -2698,7 +2698,7 @@ Global Instance Append_context : Append context := { _append arg1 arg2 := _appen
 
 Definition context_eq_dec : forall  (v1 v2 : context ),
   {v1 = v2} + {v1 <> v2}.
-Proof. repeat decidable_equality_step. Defined.
+Proof. do ? decidable_equality_step. Defined.
 
 Definition context_eqb  (v1 v2 : context ) : bool :=
   is_left(context_eq_dec  v1 v2).
@@ -3162,7 +3162,7 @@ Lemma t_progress_e : forall (v_s : store) (v_C : context) (v_C' : context) (v_f 
 Proof. Admitted.
 
 (* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:291.1-303.52 *)
-Lemma t_progress_be : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_instr : (list instr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : (list resulttype)) (v_ret : (option resulttype)), ((Instrs_ok v_C v_instr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := v_ret |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := v_lab; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br (list__instr__admininstr v_instr)) -> ((fun_not_lf_return (list__instr__admininstr v_instr)) -> ((fun_const_list (list__instr__admininstr v_instr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr))) (config__ (state__ v_s' v_f') v_admininstr))))))))))).
+Lemma t_progress_be : forall (v_s : store) (v_C : context) (v_C' : context) (v_f : frame) (v_val : (list val)) (v_instr : (list instr)) (v_ft : functype) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : (list resulttype)) (v_ret : (option resulttype)), ((Instrs_ok v_C v_instr v_ft) -> ((v_ft = (functype__ v_valtype_1 v_valtype_2)) -> ((v_C = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := v_ret |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := v_lab; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (fun_types_of (frame__LOCALS v_f)); context__LABELS := []; context__RETURN := None |} ++ v_C')))) -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C') -> (((fun_types_of v_val) = v_valtype_1) -> ((Store_ok v_s) -> ((fun_not_lf_br (list__instr__admininstr v_instr)) -> ((fun_not_lf_return (list__instr__admininstr v_instr)) -> ((fun_const_list (list__instr__admininstr v_instr)) \/ exists (v_s' : store) (v_f' : frame) (v_admininstr : (list admininstr)), (Step (config__ (state__ v_s v_f) (@app _ (list__val__admininstr v_val) (list__instr__admininstr v_instr))) (config__ (state__ v_s' v_f') v_admininstr))))))))))).
 Proof. Admitted.
 
 (* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:305.1-307.24 *)
@@ -3186,7 +3186,7 @@ Lemma t_read_preservation : forall (v_s : store) (v_f : frame) (v_admininstr : (
 Proof. Admitted.
 
 (* Lemma Definition at: spec/wasm-1.0-test/A-soundness.watsup:365.1-377.74 *)
-Lemma t_preservation_type : forall (v_val_1 : (list val)), forall (v_s : store) (v_f : frame) (v_admininstr : (list admininstr)) (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)) (v_C : context) (v_C' : context) (v_val : (list val)) (v_valtype : (list valtype)) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : (list resulttype)) (v_ret : (option resulttype)), ((Step (config__ (state__ v_s v_f) v_admininstr) (config__ (state__ v_s' v_f') v_admininstr')) -> ((Store_ok v_s) -> ((Store_ok v_s') -> ((Store_extension v_s v_s') -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> ((Module_instance_ok v_s' (frame__MODULE v_f) v_C) -> ((v_val = (frame__LOCALS v_f)) -> (List.Forall2 (fun v_val_1 v_valtype => (Val_ok v_val_1 v_valtype)) (v_val_1) (v_valtype) -> ((v_C' = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := v_lab; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := v_ret |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (@app _ v_valtype (context__LOCALS v_C)); context__LABELS := []; context__RETURN := None |} ++ v_C)))) -> ((Admin_instrs_ok v_s v_C' v_admininstr (functype__ v_valtype_1 v_valtype_2)) -> (Admin_instrs_ok v_s' v_C' v_admininstr' (functype__ v_valtype_1 v_valtype_2)))))))))))).
+Lemma t_preservation_type : forall (v_s : store) (v_f : frame) (v_admininstr : (list admininstr)) (v_s' : store) (v_f' : frame) (v_admininstr' : (list admininstr)) (v_C : context) (v_C' : context) (v_val : (list val)) (v_valtype : (list valtype)) (v_valtype_1 : (list valtype)) (v_valtype_2 : (list valtype)) (v_lab : (list resulttype)) (v_ret : (option resulttype)), ((Step (config__ (state__ v_s v_f) v_admininstr) (config__ (state__ v_s' v_f') v_admininstr')) -> ((Store_ok v_s) -> ((Store_ok v_s') -> ((Store_extension v_s v_s') -> ((Module_instance_ok v_s (frame__MODULE v_f) v_C) -> ((Module_instance_ok v_s' (frame__MODULE v_f) v_C) -> ((v_val = (frame__LOCALS v_f)) -> (List.Forall2 (fun v_val v_valtype => (Val_ok v_val v_valtype)) (v_val) (v_valtype) -> ((v_C' = ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := v_lab; context__RETURN := None |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := []; context__LABELS := []; context__RETURN := v_ret |} ++ ({| context__TYPES := []; context__FUNCS := []; context__GLOBALS := []; context__TABLES := []; context__MEMS := []; context__LOCALS := (@app _ v_valtype (context__LOCALS v_C)); context__LABELS := []; context__RETURN := None |} ++ v_C)))) -> ((Admin_instrs_ok v_s v_C' v_admininstr (functype__ v_valtype_1 v_valtype_2)) -> (Admin_instrs_ok v_s' v_C' v_admininstr' (functype__ v_valtype_1 v_valtype_2)))))))))))).
 Proof. Admitted.
 
 (* Theorem Definition at: spec/wasm-1.0-test/A-soundness.watsup:380.1-384.45 *)

@@ -2241,5 +2241,5 @@ Proof.
   case Hprogress: (t_progress s f es ts Hconfig) => [Hterm | [s' [f' [es' Hstep]]]].
   - by apply: Config_sound__terminal.
   - have Hconfig' := t_preservation s f es s' f' es' ts Hstep Hconfig.
-    by apply: (Config_sound__step s f es ts Hconfig s' f' es') => //=.
+    by apply: (Config_sound__step s f es ts Hconfig s' f' es').
 Qed.
