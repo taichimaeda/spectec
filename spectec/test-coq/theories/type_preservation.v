@@ -287,6 +287,33 @@ Admitted.
 	- unfold lookup_total. by rewrite addn1.
 Qed. *)
 
+(* TODO: Example of migrating proofs using auto-translated statements *)
+(* Lemma Step_pure__preserves__br_if_true : 
+  forall (v_l : labelidx) (v_c : iN) (v_ft : functype) (v_C : context) (v_s : store), 
+  ((Admin_instrs_ok v_s v_C [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] v_ft) -> 
+  ((Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] [(admininstr__BR v_l)]) -> 
+  (((v_c : val_) <> 0) -> 
+  (Admin_instrs_ok v_s v_C [(admininstr__BR v_l)] v_ft)))).
+Proof.
+  move => l c ft C s Hadmin Hstep Hval.
+  destruct ft as [ts1 ts2].
+	apply_composition_typing_and_single Hadmin.
+	apply_composition_typing_single H4_comp.
+  apply Br_if_typing in H4_comp1; destruct H4_comp1 as [ts [ts' [H1 [H2 [H3 H4]]]]].
+  apply AI_const_typing in H4_comp0.
+  subst.
+  repeat rewrite -> app_assoc in H1_comp1; apply split_append_last in H1_comp1; destruct H1_comp1.
+  rewrite H.
+  repeat rewrite -> app_assoc.
+  apply Admin_instrs_ok__frame.
+  remember (lookup_total (context__LABELS C) l) as ts'.
+  apply (Admin_instrs_ok__seq s C [] (admininstr__BR l) ts' ts' ts').
+  apply admin_weakening_empty_both. apply Admin_instrs_ok__empty.
+  apply (Admin_instr_ok__instr _ _ (instr__BR l) (functype__ ts' ts')).
+  apply (Instr_ok__br C l [] ts' ts') => //=. 
+  by move/leP: H3.
+Qed. *)
+
 Lemma Step_pure__br_if_true_preserves : forall v_S v_C (v_c : iN) (v_l : labelidx) v_func_type,
 	Admin_instrs_ok v_S v_C [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] v_func_type ->
 	Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] [(admininstr__BR v_l)] ->
