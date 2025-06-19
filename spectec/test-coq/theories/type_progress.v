@@ -818,6 +818,7 @@ Qed.
 
 Lemma Admin_instrs_ok_all : forall s C es ts1 ts2,
   Admin_instrs_ok s C es (functype__ ts1 ts2) -> 
+  (* TODO: Rewrite with all *)
   forall e, e \in es -> exists ts1' ts2', Admin_instr_ok s C e (functype__ ts1' ts2').
 Proof.
   (* TODO: Make use of `+` elsewhere *)

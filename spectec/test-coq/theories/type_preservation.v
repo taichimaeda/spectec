@@ -287,7 +287,7 @@ Admitted.
 	- unfold lookup_total. by rewrite addn1.
 Qed. *)
 
-(* TODO: Example of migrating proofs using auto-translated statements *)
+(* TODO: Example of migrating proofs using auto-translated statements (Coq) *)
 (* Lemma Step_pure__preserves__br_if_true : 
   forall (v_l : labelidx) (v_c : iN) (v_ft : functype) (v_C : context) (v_s : store), 
   ((Admin_instrs_ok v_s v_C [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] v_ft) -> 
@@ -312,6 +312,67 @@ Proof.
   apply (Admin_instr_ok__instr _ _ (instr__BR l) (functype__ ts' ts')).
   apply (Instr_ok__br C l [] ts' ts') => //=. 
   by move/leP: H3.
+Qed. *)
+
+(* TODO: Example of migrating proofs using auto-translated statements (SSReflect) *)
+(* Lemma cat_app : 
+  forall {A : Type} (s1 s2 : seq A),
+  app s1 s2 = cat s1 s2.
+Proof. by []. Qed.
+
+Lemma cat_inv : 
+  forall {A : Type} (s1 : seq A) (s2 : seq A) (x1 : A) (x2 : A),
+	s1 ++ [:: x1] = s2 ++ [::x2] ->
+	s1 = s2 /\ x1 = x2.
+Proof. by apply: app_inj_tail. Qed.
+
+Lemma Admin_instrs_ok_admin_instr_ok : forall s C e ts1 ts2,
+  Admin_instrs_ok s C [:: e] (functype__ ts1 ts2) ->
+  exists ts ts1' ts2', 
+    ts1 = ts ++ ts1' /\
+    ts2 = ts ++ ts2' /\
+    Admin_instr_ok s C e (functype__ ts1' ts2').
+Proof.
+  move=> s C e ts1 ts2 Hadmin.
+  rewrite -[[:: _]]cat0s -cat_app in Hadmin.
+  move/admin_composition_typing_single: Hadmin => [ts [ts1' [ts2' [ts3 [Hts1 [Hts2 [Hempty Hadmin]]]]]]].
+  exists ts, ts1', ts2'; do ? split.
+  - by rewrite -cat_app.
+  - by rewrite -cat_app.
+  - move/admin_empty: Hempty => Hts3. 
+    by rewrite -{}Hts3 in Hadmin.
+Qed.
+
+Lemma Step_pure__preserves__br_if_true : 
+  forall (v_l : labelidx) (v_c : iN) (v_ft : functype) (v_C : context) (v_s : store), 
+  ((Admin_instrs_ok v_s v_C [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] v_ft) -> 
+  ((Step_pure [(admininstr__CONST (valtype__INN (inn__I32 )) (v_c : val_));(admininstr__BR_IF v_l)] [(admininstr__BR v_l)]) -> 
+  (((v_c : val_) <> 0) -> 
+  (Admin_instrs_ok v_s v_C [(admininstr__BR v_l)] v_ft)))).
+Proof.
+  move=> l c ft C s Hadmin Hstep Hval.
+  case: ft Hadmin => [ts1 ts2] Hadmin.
+  rewrite -cat1s in Hadmin.
+  move/admin_composition_typing: Hadmin => [ts [ts1' [ts2' [ts3 [Hts1 [Hts2 [Hconst Hbrif]]]]]]].
+  rewrite {}Hts1 {}Hts2.
+  move/Admin_instrs_ok_admin_instr_ok: Hconst => [ts' [ts1'' [ts3' [Hts1' [Hts3 Hconst]]]]].
+  rewrite {}Hts1' {}Hts3 in Hbrif *.
+  move/Admin_instrs_ok_admin_instr_ok: Hbrif => [ts'' [ts3'' [ts2'' [Hts' [Hts2' Hbrif]]]]].
+  rewrite {}Hts2'.
+  move/Br_if_typing: Hbrif => [ts''' [tslab [Hts2'' [Hts3'' [Hlen Hlookup]]]]].
+  rewrite {}Hts2'' in Hts3'' *. rewrite {}Hts3'' in Hts'.
+  move/AI_const_typing: Hconst => Hts3'.
+  rewrite {}Hts3' cat_app in Hts'.
+  have {Hts'} -> : ts' ++ ts1'' = ts'' ++ ts''' ++ tslab.
+  { rewrite [ts' ++ _]catA [ts'' ++ _]catA in Hts'.
+    by move: (cat_inv _ _ _ _ Hts') => [H _]. }
+  do 3 apply: Admin_instrs_ok__frame.
+  apply: (Admin_instrs_ok__seq _ _ [::] (admininstr__BR l) tslab tslab tslab).
+  - apply: admin_weakening_empty_both.
+    by apply: Admin_instrs_ok__empty.
+  - apply: (Admin_instr_ok__instr _ _ (instr__BR l) (functype__ tslab tslab)).
+    apply: (Instr_ok__br C l [] tslab tslab) => //=.
+    by move/leP: Hlen.
 Qed. *)
 
 Lemma Step_pure__br_if_true_preserves : forall v_S v_C (v_c : iN) (v_l : labelidx) v_func_type,
