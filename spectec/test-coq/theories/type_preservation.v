@@ -360,6 +360,7 @@ Proof.
   move/Admin_instrs_ok_admin_instr_ok: Hbrif => [ts'' [ts3'' [ts2'' [Hts' [Hts2' Hbrif]]]]].
   rewrite {}Hts2'.
   move/Br_if_typing: Hbrif => [ts''' [tslab [Hts2'' [Hts3'' [Hlen Hlookup]]]]].
+  move/leP: Hlen => Hlen.
   rewrite {}Hts2'' in Hts3'' *. rewrite {}Hts3'' in Hts'.
   move/AI_const_typing: Hconst => Hts3'.
   rewrite {}Hts3' cat_app in Hts'.
@@ -371,8 +372,7 @@ Proof.
   - apply: admin_weakening_empty_both.
     by apply: Admin_instrs_ok__empty.
   - apply: (Admin_instr_ok__instr _ _ (instr__BR l) (functype__ tslab tslab)).
-    apply: (Instr_ok__br C l [] tslab tslab) => //=.
-    by move/leP: Hlen.
+    by apply: (Instr_ok__br C l [] tslab tslab) => //=.
 Qed. *)
 
 Lemma Step_pure__br_if_true_preserves : forall v_S v_C (v_c : iN) (v_l : labelidx) v_func_type,
